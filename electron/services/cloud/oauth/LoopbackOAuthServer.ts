@@ -211,6 +211,8 @@ export async function startLoopbackOAuthServer(args?: {
     let resolved = false;
     let resolvePromise: ((value: LoopbackOAuthCallback) => void) | null = null;
     let rejectPromise: ((error: unknown) => void) | null = null;
+    let expectedStateValue: null | string = null;
+    let pendingCallback: LoopbackOAuthCallback | null = null;
 
     const callbackPromise = new Promise<LoopbackOAuthCallback>(
         (resolve, reject) => {
@@ -243,12 +245,12 @@ export async function startLoopbackOAuthServer(args?: {
 
             if (parsed.error) {
                 writeHtml(response, {
-                    body: `Authorization failed: ${parsed.error}`,
+                    body: "Authorization failed. Please return to the app to retry.",
                     statusCode: 400,
                     title: "Authorization failed",
                 });
 
-                if (!resolved) {
+                if (!resolved && expectedStateValue !== null) {
                     resolved = true;
                     rejectPromise?.(new Error(parsed.error));
                 }
@@ -261,6 +263,36 @@ export async function startLoopbackOAuthServer(args?: {
                     body: "Missing required callback parameters.",
                     statusCode: 400,
                     title: "Authorization failed",
+                });
+                return;
+            }
+
+            if (
+                expectedStateValue !== null &&
+                parsed.state !== expectedStateValue
+            ) {
+                writeHtml(response, {
+                    body: "OAuth state mismatch. Please retry the authorization flow.",
+                    statusCode: 400,
+                    title: "Authorization failed",
+                });
+                return;
+            }
+
+            if (expectedStateValue === null) {
+                // The server can receive the callback before the app begins
+                // awaiting it (race between opening the system browser and
+                // awaiting waitForCallback()). Buffer the first callback and
+                // avoid displaying a misleading "Connected" success page.
+                pendingCallback ??= {
+                    code: parsed.code,
+                    state: parsed.state,
+                };
+
+                writeHtml(response, {
+                    body: "Authorization received. Please return to the app to finish connecting.",
+                    statusCode: 200,
+                    title: "Authorization received",
                 });
                 return;
             }
@@ -327,6 +359,19 @@ export async function startLoopbackOAuthServer(args?: {
             expectedState,
             timeoutMs,
         }): Promise<LoopbackOAuthCallback> => {
+            expectedStateValue = expectedState;
+
+            if (
+                pendingCallback?.state === expectedStateValue &&
+                !resolved
+            ) {
+                resolved = true;
+                resolvePromise?.(pendingCallback);
+                pendingCallback = null;
+            } else if (pendingCallback) {
+                pendingCallback = null;
+            }
+
             const timeoutHandle = setTimeout(() => {
                 if (!resolved) {
                     resolved = true;
@@ -337,13 +382,14 @@ export async function startLoopbackOAuthServer(args?: {
             try {
                 const callback = await callbackPromise;
 
-                if (callback.state !== expectedState) {
+                if (callback.state !== expectedStateValue) {
                     throw new Error("OAuth state mismatch");
                 }
 
                 return callback;
             } finally {
                 clearTimeout(timeoutHandle);
+                expectedStateValue = null;
             }
         },
     };

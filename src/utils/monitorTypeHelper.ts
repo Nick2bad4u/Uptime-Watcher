@@ -78,6 +78,12 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
         [] as MonitorTypeConfig[]
     );
 
+    const latestStore = useMonitorTypesStore.getState();
+
+    if (!latestStore.isLoaded) {
+        return types;
+    }
+
     AppCaches.monitorTypes.set(cacheKey, types);
     return types;
 }

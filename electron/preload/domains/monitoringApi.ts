@@ -18,10 +18,13 @@ import {
     type MonitoringDomainBridge,
 } from "@shared/types/preload";
 import { validateStatusUpdate } from "@shared/validation/guards";
+import {
+    validateMonitoringStartSummary,
+    validateMonitoringStopSummary,
+} from "@shared/validation/monitoringSummarySchemas";
 
 import {
     createSafeParseAdapter,
-    createTypedInvoker,
     createValidatedInvoker,
     safeParseBooleanResult,
     type SafeParseLike,
@@ -128,7 +131,14 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to the lifecycle summary emitted by the
      *   backend.
      */
-    startMonitoring: createTypedInvoker(MONITORING_CHANNELS.startMonitoring),
+    startMonitoring: createValidatedInvoker(
+        MONITORING_CHANNELS.startMonitoring,
+        validateMonitoringStartSummary,
+        {
+            domain: "monitoringApi",
+            guardName: "validateMonitoringStartSummary",
+        }
+    ),
 
     /**
      * Starts monitoring for a specific monitor within a site
@@ -169,7 +179,14 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to the lifecycle summary emitted by the
      *   backend.
      */
-    stopMonitoring: createTypedInvoker(MONITORING_CHANNELS.stopMonitoring),
+    stopMonitoring: createValidatedInvoker(
+        MONITORING_CHANNELS.stopMonitoring,
+        validateMonitoringStopSummary,
+        {
+            domain: "monitoringApi",
+            guardName: "validateMonitoringStopSummary",
+        }
+    ),
 
     /**
      * Stops monitoring for a specific monitor within a site

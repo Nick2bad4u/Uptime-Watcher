@@ -42,6 +42,15 @@ const HISTORY_MANIPULATION_QUERIES = {
         "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
 } as const;
 
+const normalizePruneLimit = (limit: number): null | number => {
+    if (!Number.isFinite(limit)) {
+        return null;
+    }
+
+    const normalized = Math.floor(limit);
+    return normalized > 0 ? normalized : null;
+};
+
 /**
  * Add a new history entry for a monitor.
  *
@@ -239,7 +248,8 @@ export function pruneHistoryForMonitor(
     monitorId: string,
     limit: number
 ): void {
-    if (limit <= 0) {
+    const normalizedLimit = normalizePruneLimit(limit);
+    if (!normalizedLimit) {
         return;
     }
 
@@ -247,7 +257,7 @@ export function pruneHistoryForMonitor(
         const excessProbe = queryForIds(
             db,
             HISTORY_MANIPULATION_QUERIES.SELECT_EXCESS_ENTRIES,
-            [monitorId, limit]
+            [monitorId, normalizedLimit]
         );
 
         if (excessProbe.length === 0) {
@@ -256,7 +266,7 @@ export function pruneHistoryForMonitor(
 
         db.run(HISTORY_MANIPULATION_QUERIES.DELETE_EXCESS_ENTRIES, [
             monitorId,
-            limit,
+            normalizedLimit,
         ]);
 
         if (isDev()) {

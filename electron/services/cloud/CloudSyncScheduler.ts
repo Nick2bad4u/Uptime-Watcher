@@ -26,6 +26,8 @@ const JITTER_PERCENTAGE = 0.1;
 export class CloudSyncScheduler {
     private readonly cloudService: CloudService;
 
+    private isEnabled = false;
+
     private isRunning = false;
 
     private backoffAttempt = 0;
@@ -33,6 +35,10 @@ export class CloudSyncScheduler {
     private timer: NodeJS.Timeout | undefined;
 
     private async runOnce(): Promise<void> {
+        if (!this.isEnabled) {
+            return;
+        }
+
         if (this.isRunning) {
             this.scheduleNextRun(this.applyJitter(DEFAULT_SYNC_INTERVAL_MS));
             return;
@@ -78,11 +84,18 @@ export class CloudSyncScheduler {
 
     /** Starts the scheduler loop. */
     public initialize(): void {
+        if (this.isEnabled) {
+            return;
+        }
+
+        this.isEnabled = true;
+        this.backoffAttempt = 0;
         this.scheduleNextRun(0);
     }
 
     /** Stops any scheduled work. */
     public stop(): void {
+        this.isEnabled = false;
         if (this.timer) {
             clearTimeout(this.timer);
             this.timer = undefined;
@@ -90,6 +103,10 @@ export class CloudSyncScheduler {
     }
 
     private scheduleNextRun(delayMs: number): void {
+        if (!this.isEnabled) {
+            return;
+        }
+
         if (this.timer) {
             clearTimeout(this.timer);
         }

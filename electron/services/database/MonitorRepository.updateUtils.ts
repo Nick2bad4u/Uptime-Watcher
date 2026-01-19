@@ -106,7 +106,6 @@ export function buildUpdateFieldsAndValues(args: {
     for (const [key, value] of Object.entries(args.row)) {
         const shouldProcess =
             value !== undefined &&
-            value !== null &&
             !shouldSkipMonitoringFields(key, args.monitor);
 
         if (shouldProcess) {

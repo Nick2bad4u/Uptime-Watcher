@@ -396,7 +396,7 @@ async function handleFrontendOperation<T>(
             "set error state",
             error
         );
-        throw error;
+        throw normalizedError;
     } finally {
         // Always clear loading state
         safeStoreOperation(() => {

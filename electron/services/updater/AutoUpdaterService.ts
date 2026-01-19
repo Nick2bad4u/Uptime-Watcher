@@ -4,6 +4,7 @@
  */
 
 import { UPDATE_STATUS, type UpdateStatus } from "@shared/types/events";
+import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { autoUpdater } from "electron-updater";
 
@@ -33,6 +34,8 @@ export interface UpdateStatusData {
  * 4. Install updates when ready
  */
 export class AutoUpdaterService {
+    private isInitialized = false;
+
     /**
      * Optional callback function for update status changes.
      *
@@ -178,6 +181,13 @@ export class AutoUpdaterService {
      * @returns Void
      */
     public initialize(): void {
+        if (this.isInitialized) {
+            logger.debug(
+                "[AutoUpdaterService] Auto-updater already initialized"
+            );
+            return;
+        }
+
         logger.info("[AutoUpdaterService] Initializing auto-updater");
 
         autoUpdater.on("checking-for-update", this.handleCheckingForUpdate);
@@ -186,6 +196,8 @@ export class AutoUpdaterService {
         autoUpdater.on("download-progress", this.handleDownloadProgress);
         autoUpdater.on("update-downloaded", this.handleUpdateDownloaded);
         autoUpdater.on("error", this.handleError);
+
+        this.isInitialized = true;
     }
 
     /**
@@ -223,6 +235,8 @@ export class AutoUpdaterService {
             this.handleUpdateDownloaded
         );
         autoUpdater.removeListener("error", this.handleError);
+
+        this.isInitialized = false;
     }
 
     /**
@@ -337,8 +351,17 @@ export class AutoUpdaterService {
      * @internal
      */
     private notifyStatusChange(statusData: UpdateStatusData): void {
-        if (this.onStatusChange) {
+        if (!this.onStatusChange) {
+            return;
+        }
+
+        try {
             this.onStatusChange(statusData);
+        } catch (error) {
+            logger.error(
+                "[AutoUpdaterService] Status callback threw",
+                ensureError(error)
+            );
         }
     }
 }

@@ -12,7 +12,10 @@ import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { logger as backendLogger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "./constants";
-import { resolveMonitorOperationTimeoutMs } from "./shared/timeoutUtils";
+import {
+    resolveMonitorBaseTimeoutMs,
+    resolveMonitorOperationTimeoutMs,
+} from "./shared/timeoutUtils";
 
 const JITTER_PERCENTAGE = 0.1;
 
@@ -294,17 +297,33 @@ export class MonitorScheduler {
             siteIdentifier,
         });
 
+        const abortController = new AbortController();
+        const timeoutMs = resolveMonitorBaseTimeoutMs();
+        const timeoutHandle = setTimeout(() => {
+            abortController.abort("Manual check timed out");
+        }, timeoutMs);
+
+        timeoutHandle.unref();
+
         try {
             await this.onCheckCallback(
                 siteIdentifier,
                 monitorId,
-                new AbortController().signal
+                abortController.signal
             );
         } catch (error) {
-            this.logger.error(
+            const normalizedError = ensureError(error);
+            const logMethod = abortController.signal.aborted
+                ? this.logger.warn
+                : this.logger.error;
+
+            logMethod.call(
+                this.logger,
                 `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
-                error
+                normalizedError
             );
+        } finally {
+            clearTimeout(timeoutHandle);
         }
     }
 

@@ -263,6 +263,13 @@ export class IpcService {
             suppressErrors: true,
         });
 
+        this.knownSiteIdentifiers = new Set();
+        this.stateSyncStatus = {
+            lastSyncAt: null,
+            siteCount: 0,
+            source: STATE_SYNC_SOURCE.CACHE,
+            synchronized: false,
+        } satisfies StateSyncStatusSummary;
         this.stateSyncListenerRegistered = false;
     }
 
@@ -361,6 +368,7 @@ export class IpcService {
             const { siteCount, sites, truncated } = event;
 
             if (truncated === true) {
+                this.knownSiteIdentifiers = new Set();
                 this.stateSyncStatus = {
                     lastSyncAt: timestamp,
                     siteCount,
