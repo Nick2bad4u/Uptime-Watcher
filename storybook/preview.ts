@@ -208,6 +208,7 @@ const withApplicationProviders: Decorator = (storyFn, context) => {
  */
 const mswInitializeOptions: Parameters<typeof initialize>[0] = {
     onUnhandledRequest: "bypass",
+    quiet: true,
 };
 
 // `@storybook/addon-vitest` imports this file in the Vitest (Node) process to

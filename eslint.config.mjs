@@ -617,10 +617,9 @@ export default /** @type {EslintConfig} */ [
             "yml/plain-scalar": "off",
             "yml/quotes": "error",
             "yml/require-string-key": "error",
-            // Disabled: eslint-plugin-yml currently crashes during auto-fix on
-            // Windows/Node 25 (TypeError: diff is not a function), which breaks
-            // `lint:fix` entirely. Re-enable once upstream is fixed.
-            "yml/sort-keys": "off",
+            // Re-enabled: eslint-plugin-yml v2.0.1 fixes the diff-sequences
+            // import crash (TypeError: diff is not a function).
+            "yml/sort-keys": "error",
             "yml/sort-sequence-values": "off",
             "yml/spaced-comment": "warn",
             "yml/vue-custom-block/no-parsing-error": "warn",

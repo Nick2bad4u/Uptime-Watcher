@@ -110,6 +110,10 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
     await ensureStorybookCoverageDirectory();
 
     const baseViteConfig = createStorybookBaseViteConfig();
+    const electronLogRendererStubPath = path.resolve(
+        process.cwd(),
+        "storybook/shims/electronLogRenderer.stub.ts"
+    );
 
     return {
         ...baseViteConfig,
@@ -119,6 +123,13 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
             reactOptions: reactPluginOptions,
         }),
         publicDir: "public",
+        resolve: {
+            ...baseViteConfig.resolve,
+            alias: {
+                ...baseViteConfig.resolve?.alias,
+                "electron-log/renderer": electronLogRendererStubPath,
+            },
+        },
         test: {
             browser: {
                 enabled: true,

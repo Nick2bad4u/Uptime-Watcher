@@ -107,8 +107,9 @@ export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
 // monitor/site unions can become noisy (e.g. optionalizing required fields).
 // The runtime schema is the source of truth; we cast the type for ergonomic,
 // stable typing across IPC boundaries.
- 
+
 export const typedStatusUpdateSchema: z.ZodType<StatusUpdate> =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Intentional: enforce stable StatusUpdate output typing across strict TS/Zod inference edge cases.
     statusUpdateSchema as unknown as z.ZodType<StatusUpdate>;
 
 /**
