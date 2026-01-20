@@ -430,7 +430,7 @@ export function isHttpFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         })
     );
 }
@@ -452,7 +452,7 @@ export function isHttpHeaderFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.headerName === "string" &&
         data.headerName.trim() !== "" &&
@@ -478,7 +478,7 @@ export function isHttpJsonFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.jsonPath === "string" &&
         data.jsonPath.trim() !== "" &&
@@ -504,7 +504,7 @@ export function isHttpKeywordFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.bodyKeyword === "string" &&
         data.bodyKeyword.trim() !== ""
@@ -528,7 +528,7 @@ export function isHttpStatusFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.expectedStatusCode === "number" &&
         Number.isInteger(data.expectedStatusCode) &&
@@ -554,7 +554,7 @@ export function isHttpLatencyFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.maxResponseTime === "number" &&
         Number.isFinite(data.maxResponseTime) &&
@@ -582,9 +582,9 @@ export function isDnsFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             })) &&
         typeof data.recordType === "string" &&
         data.recordType.trim() !== ""
@@ -611,9 +611,9 @@ export function isPingFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             }))
     );
 }
@@ -638,9 +638,9 @@ export function isPortFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             })) &&
         typeof data.port === "number" &&
         isValidPort(data.port)
@@ -667,9 +667,9 @@ export function isSslFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             })) &&
         typeof data.port === "number" &&
         isValidPort(data.port) &&
@@ -697,7 +697,7 @@ export function isCdnEdgeConsistencyFormData(
         typeof data.baselineUrl === "string" &&
         isValidUrl(data.baselineUrl.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.edgeLocations === "string" &&
         data.edgeLocations.trim() !== ""
@@ -721,12 +721,12 @@ export function isReplicationFormData(
         typeof data.primaryStatusUrl === "string" &&
         isValidUrl(data.primaryStatusUrl.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.replicaStatusUrl === "string" &&
         isValidUrl(data.replicaStatusUrl.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         isNonEmptyString(data.replicationTimestampField) &&
         typeof data.maxReplicationLagSeconds === "number" &&
@@ -752,7 +752,7 @@ export function isServerHeartbeatFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         isNonEmptyString(data.heartbeatStatusField) &&
         isNonEmptyString(data.heartbeatTimestampField) &&
@@ -781,7 +781,7 @@ export function isWebsocketKeepaliveFormData(
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
             protocols: ["ws", "wss"],
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.maxPongDelayMs === "number" &&
         Number.isFinite(data.maxPongDelayMs)

@@ -125,9 +125,10 @@ if (isDev()) {
 
     void (async (): Promise<void> => {
         try {
-
             // eslint-disable-next-line n/no-unpublished-import -- `electron-debug` is a dev-time helper; production builds may not include it and this import is safely caught.
-            const module: unknown = await import(/* webpackChunkName: "electronDebug" */ "electron-debug");
+            const module: unknown = await import(
+                /* webpackChunkName: "electronDebug" */ "electron-debug"
+            );
 
             if (!isElectronDebugModule(module)) {
                 logger.warn(

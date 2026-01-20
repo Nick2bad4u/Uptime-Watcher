@@ -19,12 +19,13 @@ describe("useSitesStore (module coverage)", () => {
                     throw new Error("Not implemented in this test");
                 }),
                 removeSite: vi.fn(async () => true),
-                updateSite: vi.fn(async (_identifier: string, updates: Partial<Site>) =>
-                    ({
-                        // Minimal shape for this test; callers in these tests do
-                        // not depend on fields beyond identifier.
-                        identifier: updates.identifier ?? "mock-site",
-                    }) as unknown as Site
+                updateSite: vi.fn(
+                    async (_identifier: string, updates: Partial<Site>) =>
+                        ({
+                            // Minimal shape for this test; callers in these tests do
+                            // not depend on fields beyond identifier.
+                            identifier: updates.identifier ?? "mock-site",
+                        }) as unknown as Site
                 ),
             },
         }));

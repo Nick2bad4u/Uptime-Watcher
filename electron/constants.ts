@@ -2,13 +2,9 @@ import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { DEFAULT_SITE_NAME as SHARED_DEFAULT_SITE_NAME } from "@shared/constants/sites";
 
 /**
+ * @example Const delay = RETRY_BACKOFF.INITIAL_DELAY; const nextDelay =
+ * Math.min( delay * RETRY_BACKOFF.MULTIPLIER, RETRY_BACKOFF.MAX_DELAY );
  *
- * @example
- * const delay = RETRY_BACKOFF.INITIAL_DELAY;
- * const nextDelay = Math.min(
- *     delay * RETRY_BACKOFF.MULTIPLIER,
- *     RETRY_BACKOFF.MAX_DELAY
- * );
  * @packageDocumentation
  */
 
