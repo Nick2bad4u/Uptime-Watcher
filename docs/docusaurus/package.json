@@ -89,7 +89,7 @@
         "@docusaurus/eslint-plugin": "^3.9.2",
         "@docusaurus/module-type-aliases": "^3.9.2",
         "@docusaurus/tsconfig": "^3.9.2",
-        "@types/react": "^19.2.8",
+        "@types/react": "^19.2.9",
         "@types/react-dom": "^19.2.3",
         "cross-env": "^10.1.0",
         "typedoc": "^0.28.16",
