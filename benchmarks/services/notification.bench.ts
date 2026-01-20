@@ -1,9 +1,9 @@
 /**
  * Notification Service Performance Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises synthetic notification queues, channel providers, and delivery
+ * synthetic notification queues, channel providers, and delivery
  * pipelines to assess performance characteristics.
  */
 

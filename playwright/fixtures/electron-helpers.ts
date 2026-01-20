@@ -1,9 +1,9 @@
 /**
  * Electron test helpers for Playwright tests.
  *
- * @packageDocumentation
+ * @packageDocumentation Provides
  *
- * Provides utilities for launching Electron with appropriate configurations for
+ * utilities for launching Electron with appropriate configurations for
  * different environments (local development vs CI).
  */
 
@@ -91,7 +91,10 @@ export async function launchElectronApp(
                     await Promise.all(
                         entries.map(async (entry) => {
                             const source = path.join(directory, entry.name);
-                            const relative = path.join(relativePrefix, entry.name);
+                            const relative = path.join(
+                                relativePrefix,
+                                entry.name
+                            );
 
                             if (entry.isDirectory()) {
                                 await copyRelevantFiles(source, relative);
@@ -106,7 +109,10 @@ export async function launchElectronApp(
                                 return;
                             }
 
-                            const destination = path.join(logsOutputDir, relative);
+                            const destination = path.join(
+                                logsOutputDir,
+                                relative
+                            );
                             await mkdir(path.dirname(destination), {
                                 recursive: true,
                             });
@@ -128,8 +134,12 @@ export async function launchElectronApp(
         },
         async () => {
             await Promise.allSettled([
-                new Promise<void>((resolve) => stdoutStream.end(() => resolve())),
-                new Promise<void>((resolve) => stderrStream.end(() => resolve())),
+                new Promise<void>((resolve) =>
+                    stdoutStream.end(() => resolve())
+                ),
+                new Promise<void>((resolve) =>
+                    stderrStream.end(() => resolve())
+                ),
             ]);
         },
         async () => {

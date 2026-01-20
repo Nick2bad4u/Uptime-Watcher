@@ -284,10 +284,7 @@ export const SiteOverviewTab = ({
         [ActionsIcon, iconColors.actions]
     );
 
-    const copyIcon = useMemo(
-        () => <CopyIcon className="size-4" />,
-        [CopyIcon]
-    );
+    const copyIcon = useMemo(() => <CopyIcon className="size-4" />, [CopyIcon]);
 
     const siteNameIcon = useMemo(
         () => <SiteIcon className="size-5" />,

@@ -69,8 +69,11 @@ async function deleteObjectsBestEffort(args: {
  * current device.
  *
  * @remarks
- * - This does **not** require perfect deletion of older objects because
- *   `manifest.resetAt` ensures older operation objects are ignored.
+ * -
+ *
+ * This does **not** require perfect deletion of older objects because
+ * `manifest.resetAt` ensures older operation objects are ignored.
+ *
  * - The remote encryption config (if present) is preserved.
  */
 export async function resetProviderCloudSyncState(args: {

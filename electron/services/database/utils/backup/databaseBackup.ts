@@ -73,7 +73,10 @@ export interface DatabaseRestoreSummary {
  * Mode used for SQLite file integrity checks.
  *
  * @remarks
- * - `quick_check` is faster and should be used for most validation.
+ * -
+ *
+ * `quick_check` is faster and should be used for most validation.
+ *
  * - `integrity_check` is more thorough but can be slower on large databases.
  */
 export type SqliteIntegrityCheckMode = "integrity_check" | "quick_check";

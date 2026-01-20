@@ -274,10 +274,7 @@ export const CloudSection = ({
     );
     const syncHeaderIcon = useMemo(
         () => (
-            <SyncIcon
-                aria-hidden
-                className="settings-accent--success size-5"
-            />
+            <SyncIcon aria-hidden className="settings-accent--success size-5" />
         ),
         [SyncIcon]
     );

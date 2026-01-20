@@ -438,7 +438,11 @@ export class HistoryRepository {
 
         await withDatabaseOperation(
             () => {
-                pruneHistoryForMonitor(this.getDb(), monitorId, normalizedLimit);
+                pruneHistoryForMonitor(
+                    this.getDb(),
+                    monitorId,
+                    normalizedLimit
+                );
                 return Promise.resolve();
             },
             "history-prune",

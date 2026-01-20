@@ -9,9 +9,9 @@ import * as z from "zod";
  */
 const dropboxFilesUploadResultSchema = z
     .object({
-    path_display: z.string().min(1),
-    server_modified: z.string().min(1),
-    size: z.number(),
+        path_display: z.string().min(1),
+        server_modified: z.string().min(1),
+        size: z.number(),
     })
     .loose();
 
@@ -56,15 +56,7 @@ const dropboxFileBinarySchema = z.custom<unknown>(
 );
 
 const dropboxFileBlobSchema = z.custom<unknown>(
-    (value) => {
-        const BlobConstructor = (globalThis as { Blob?: unknown }).Blob;
-        if (typeof BlobConstructor !== "function") {
-            return false;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Runtime instanceof check against a global constructor.
-        return value instanceof (BlobConstructor as new (...args: never[]) => object);
-    },
+    (value) => typeof Blob !== "undefined" && value instanceof Blob,
     {
         error: "Expected Dropbox fileBlob to be a Blob",
     }
@@ -118,10 +110,10 @@ export function parseDropboxFilesDownloadResult(
 
 const dropboxListFolderFileEntrySchema = z
     .object({
-    ".tag": z.literal("file"),
-    path_display: z.string().min(1),
-    server_modified: z.string().min(1),
-    size: z.number(),
+        ".tag": z.literal("file"),
+        path_display: z.string().min(1),
+        server_modified: z.string().min(1),
+        size: z.number(),
     })
     .loose();
 
@@ -157,7 +149,7 @@ export function tryParseDropboxListFolderFileEntry(
 
 const dropboxCurrentAccountSchema = z
     .object({
-    email: z.string().min(1),
+        email: z.string().min(1),
         name: z
             .object({
                 display_name: z.string().min(1),

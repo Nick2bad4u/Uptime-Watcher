@@ -593,11 +593,6 @@ describe("App Additional Coverage Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Import Operation", "type");
 
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: App.additional-coverage", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Import Operation", "type");
-
         render(<App />);
 
         // Verify main components are rendered using actual DOM structure
@@ -923,11 +918,6 @@ describe("App Additional Coverage Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Data Loading", "type");
 
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: App.additional-coverage", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Data Loading", "type");
-
         const applyUpdateStatusMock = vi.fn();
         const setUpdateErrorMock = vi.fn();
 
@@ -937,8 +927,6 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateError = "Test error";
 
         render(<App />);
-
-        const user = userEvent.setup();
 
         const user = userEvent.setup();
 
@@ -1413,6 +1401,7 @@ describe("App Additional Coverage Tests", () => {
         fireEvent.keyDown(dismissButton, { key: " ", code: "Space" });
 
         // The button should still be responsive to clicks
+        const user = userEvent.setup();
         await user.click(dismissButton);
         expect(mockUpdatesStoreState.applyUpdateStatus).toHaveBeenCalledWith(
             "idle"

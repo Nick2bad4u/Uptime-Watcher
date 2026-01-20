@@ -1,9 +1,9 @@
 /**
  * Dns Monitoring Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises DNS monitoring benchmark scenarios to measure service throughput and resilience.
+ * DNS monitoring benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";

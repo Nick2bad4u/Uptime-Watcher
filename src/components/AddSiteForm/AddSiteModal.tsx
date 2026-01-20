@@ -2,7 +2,10 @@
  * AddSiteModal component that wraps the AddSiteForm in a modal dialog.
  *
  * @remarks
- * - Provides a modal wrapper for the AddSiteForm component
+ * -
+ *
+ * Provides a modal wrapper for the AddSiteForm component
+ *
  * - Parent-controlled visibility via onClose prop
  * - Handles form success by closing the modal
  * - Uses consistent theming and modal patterns

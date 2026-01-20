@@ -1,9 +1,9 @@
 /**
  * File Management Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises file management benchmark scenarios to measure service throughput and resilience.
+ * file management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";

@@ -1,9 +1,9 @@
 /**
  * Performance benchmarks for React component lifecycle operations.
  *
- * @packageDocumentation
+ * @packageDocumentation Emulates
  *
- * Emulates mounting, updating, and unmounting flows to analyze lifecycle
+ * mounting, updating, and unmounting flows to analyze lifecycle
  * overhead and render scheduling behaviour.
  */
 

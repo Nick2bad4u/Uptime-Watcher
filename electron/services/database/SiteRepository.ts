@@ -163,7 +163,10 @@ export class SiteRepository {
      * Bulk inserts sites into the database.
      *
      * @remarks
-     * - Uses a transaction for atomicity.
+     * -
+     *
+     * Uses a transaction for atomicity.
+     *
      * - Applies default values for missing name or monitoring fields.
      * - Uses `INSERT OR IGNORE` to avoid duplicate identifiers.
      *
@@ -358,7 +361,10 @@ export class SiteRepository {
      * Creates or updates a site in the database.
      *
      * @remarks
-     * - Uses `INSERT OR REPLACE` for atomic upsert.
+     * -
+     *
+     * Uses `INSERT OR REPLACE` for atomic upsert.
+     *
      * - Normalizes site data before persistence.
      *
      * @example
@@ -502,7 +508,10 @@ export class SiteRepository {
      * Internal method to bulk insert sites within an existing transaction.
      *
      * @remarks
-     * - Must be called within an active transaction context.
+     * -
+     *
+     * Must be called within an active transaction context.
+     *
      * - Uses prepared statements for performance.
      * - Normalizes site data before insertion.
      *
@@ -530,7 +539,11 @@ export class SiteRepository {
                 const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
                 const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
-                stmt.run([site.identifier, name, monitoringValue]);
+                stmt.run([
+                    site.identifier,
+                    name,
+                    monitoringValue,
+                ]);
             }
 
             logger.debug(
@@ -545,7 +558,10 @@ export class SiteRepository {
      * Internal method to delete all sites within an existing transaction.
      *
      * @remarks
-     * - Must be called within an active transaction context.
+     * -
+     *
+     * Must be called within an active transaction context.
+     *
      * - Performs a hard delete of all site records.
      *
      * @param db - Database connection (must be within active transaction).
@@ -562,7 +578,10 @@ export class SiteRepository {
      * transaction.
      *
      * @remarks
-     * - Must be called within an active transaction context.
+     * -
+     *
+     * Must be called within an active transaction context.
+     *
      * - Logs deletion status.
      *
      * @param db - Database connection (must be within active transaction).
@@ -602,7 +621,10 @@ export class SiteRepository {
      * Creates or updates a site within an existing transaction context.
      *
      * @remarks
-     * - Must be called within an active transaction context.
+     * -
+     *
+     * Must be called within an active transaction context.
+     *
      * - Applies default values for missing fields.
      *
      * @param db - The database connection (must be within an active
@@ -622,7 +644,11 @@ export class SiteRepository {
         const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
         const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
 
-        db.run(SITE_QUERIES.UPSERT, [identifier, name, monitoringValue]);
+        db.run(SITE_QUERIES.UPSERT, [
+            identifier,
+            name,
+            monitoringValue,
+        ]);
         logger.debug(
             `[SiteRepository] Upserted site (internal): ${identifier}`
         );

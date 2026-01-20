@@ -374,16 +374,7 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await renderApp();
-
-            const user = userEvent.setup();
-
-            const user = userEvent.setup();
 
             expect(screen.getByTestId("header")).toBeInTheDocument();
             expect(screen.getByTestId("site-list")).toBeInTheDocument();
@@ -395,11 +386,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -422,11 +408,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             await renderApp();
@@ -436,11 +417,6 @@ describe("App Component - Comprehensive Coverage", () => {
         });
 
         it("should display correct site count", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -590,11 +566,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -914,11 +885,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             mockUseUIStore.mockReturnValue({
                 ...defaultUIStore,
                 showSettings: false,
@@ -954,6 +920,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
             const closeButton = screen.getByTestId("close-settings");
             await user.click(closeButton);
 
@@ -1000,11 +967,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1059,6 +1021,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
             const closeButton = screen.getByTestId("close-site-details");
             await user.click(closeButton);
 

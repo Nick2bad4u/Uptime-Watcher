@@ -1,9 +1,9 @@
 /**
  * API Service Performance Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Simulates
  *
- * Simulates routing, middleware execution, caching, authentication, and other
+ * routing, middleware execution, caching, authentication, and other
  * API service behaviours to stress-test orchestration layers.
  */
 

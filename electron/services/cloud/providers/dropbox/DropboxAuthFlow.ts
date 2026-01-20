@@ -38,9 +38,9 @@ const DROPBOX_SCOPES = [
 
 const dropboxTokenExchangeResponseSchema = z
     .object({
-    access_token: z.string().min(1),
-    expires_in: z.number().positive(),
-    refresh_token: z.string().min(1),
+        access_token: z.string().min(1),
+        expires_in: z.number().positive(),
+        refresh_token: z.string().min(1),
     })
     .loose();
 

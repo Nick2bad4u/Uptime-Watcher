@@ -469,56 +469,60 @@ const resourceConstraintScenarios = fc.record({
 // Database Operation Fuzzing Tests
 // =============================================================================
 
- 
-describe("Comprehensive Database Operations Fuzzing", () => {
-    let performanceMetrics: {
-        operation: string;
-        time: number;
-        data: any;
-    }[] = [];
+interface PerformanceMetric {
+    operation: string;
+    time: number;
+    data: unknown;
+}
 
+let performanceMetrics: PerformanceMetric[] = [];
+
+const registerPerformanceMetricHooks = (): void => {
     beforeEach(() => {
         performanceMetrics = [];
     });
 
     afterEach(() => {
-        // Log performance issues
         const slowOperations = performanceMetrics.filter((m) => m.time > 1000);
         if (slowOperations.length > 0) {
             console.warn("Slow database operations detected:", slowOperations);
         }
     });
+};
 
-    /**
-     * Helper to measure database operation performance
-     */
-    function measureDbOperation<T extends unknown[], R>(
-        func: (...args: T) => R | Promise<R>,
-        operationName: string,
-        ...args: T
-    ): R | Promise<R> {
-        const startTime = performance.now();
-        const result = func(...args);
+/**
+ * Helper to measure database operation performance.
+ */
+function measureDbOperation<T extends unknown[], R>(
+    func: (...args: T) => R | Promise<R>,
+    operationName: string,
+    ...args: T
+): R | Promise<R> {
+    const startTime = performance.now();
+    const result = func(...args);
 
-        if (result instanceof Promise) {
-            return result.finally(() => {
-                const endTime = performance.now();
-                performanceMetrics.push({
-                    operation: operationName,
-                    time: endTime - startTime,
-                    data: args,
-                });
+    if (result instanceof Promise) {
+        return result.finally(() => {
+            const endTime = performance.now();
+            performanceMetrics.push({
+                operation: operationName,
+                time: endTime - startTime,
+                data: args,
             });
-        }
-
-        const endTime = performance.now();
-        performanceMetrics.push({
-            operation: operationName,
-            time: endTime - startTime,
-            data: args,
         });
-        return result;
     }
+
+    const endTime = performance.now();
+    performanceMetrics.push({
+        operation: operationName,
+        time: endTime - startTime,
+        data: args,
+    });
+    return result;
+}
+
+describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
+    registerPerformanceMetricHooks();
 
     describe("Transaction Safety Testing", () => {
         fcTest.prop([transactionOperations])(
@@ -1938,6 +1942,10 @@ describe("Comprehensive Database Operations Fuzzing", () => {
             }
         );
     });
+});
+
+describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
+    registerPerformanceMetricHooks();
 
     describe("Complex Data Types and Query Optimization", () => {
         fcTest.prop([complexDataTypes])(

@@ -51,8 +51,7 @@ const isTestMode = (): boolean =>
     process.env["NODE_ENV"] === "test" ||
     process.argv.includes("--test");
 
-const isCoverageMode = (): boolean =>
-    process.env["VITE_COVERAGE"] === "true";
+const isCoverageMode = (): boolean => process.env["VITE_COVERAGE"] === "true";
 
 /* eslint-enable n/no-process-env -- turn back on */
 
@@ -92,9 +91,7 @@ const config: StorybookConfig = {
         name: "@storybook/react-vite",
         options: {},
     },
-    stories: [
-        "./stories/**/*.stories.tsx",
-    ],
+    stories: ["./stories/**/*.stories.tsx"],
     viteFinal: (existingConfig) => {
         const toArray = (
             plugins: PluginOption | PluginOption[] | undefined

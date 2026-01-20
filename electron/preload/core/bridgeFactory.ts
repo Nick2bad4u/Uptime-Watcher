@@ -285,8 +285,8 @@ const verifiedChannels = new Set<string>([DIAGNOSTICS_CHANNEL]);
 const pendingVerifications = new Map<string, Promise<void>>();
 
 /**
- * @internal
- * Resets verification caches to support deterministic testing.
+ * @internal Resets
+ * verification caches to support deterministic testing.
  */
 export function resetDiagnosticsVerificationStateForTesting(): void {
     verifiedChannels.clear();

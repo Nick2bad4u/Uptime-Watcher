@@ -198,9 +198,10 @@ export function parseCloudSyncOperation(
 /**
  * Compares two write keys using ADR-016's deterministic ordering.
  *
- * @returns
+ * @returns -
  *
- *   - Negative when `a` should be applied before `b`
+ *   Negative when `a` should be applied before `b`
+ *
  *   - Positive when `a` should be applied after `b`
  *   - Zero when considered equal
  */

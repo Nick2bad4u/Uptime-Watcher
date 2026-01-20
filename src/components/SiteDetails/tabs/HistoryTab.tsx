@@ -35,7 +35,15 @@ import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import {
+    memo,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -330,13 +338,29 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 ? historyLimit
                 : Math.min(10, Math.max(1, historyLength));
 
+        const selectedMonitorHistoryLengthRef = useRef<number>(
+            selectedMonitor.history.length
+        );
+
+        useLayoutEffect(
+            function syncSelectedMonitorHistoryLengthRef() {
+                selectedMonitorHistoryLengthRef.current =
+                    selectedMonitor.history.length;
+            },
+            [
+                selectedMonitor.history.length,
+                selectedMonitor.id,
+                selectedMonitor.type,
+            ]
+        );
+
         // Log when history tab is viewed - only when monitor actually changes
         useEffect(
             function logHistoryTabViewed() {
                 logger.user.action("History tab viewed", {
                     monitorId: selectedMonitor.id,
                     monitorType: selectedMonitor.type,
-                    totalRecords: selectedMonitor.history.length,
+                    totalRecords: selectedMonitorHistoryLengthRef.current,
                 });
             },
             [selectedMonitor.id, selectedMonitor.type]

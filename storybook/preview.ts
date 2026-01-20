@@ -221,7 +221,6 @@ if (typeof window !== "undefined") {
     initialize(mswInitializeOptions);
 }
 
-
 /**
  * Global Storybook preview configuration shared across all stories.
  */

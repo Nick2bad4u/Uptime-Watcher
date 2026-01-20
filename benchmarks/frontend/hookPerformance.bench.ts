@@ -1,9 +1,9 @@
 /**
  * Performance benchmarks for React hook operations.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises synthetic implementations of core and custom hooks to evaluate
+ * synthetic implementations of core and custom hooks to evaluate
  * render scheduling, memoization, and dependency tracking costs.
  */
 

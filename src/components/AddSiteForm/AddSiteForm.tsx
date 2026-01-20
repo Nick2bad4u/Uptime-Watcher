@@ -90,8 +90,11 @@ const HelperInfoIcon = AppIcons.ui.info;
  * sites.
  *
  * @remarks
- * - Provides a comprehensive form with validation and flexible configuration
- *   options.
+ * -
+ *
+ * Provides a comprehensive form with validation and flexible configuration
+ * options.
+ *
  * - Supports both HTTP and port monitoring types with customizable intervals.
  * - Uses domain-specific Zustand stores for state management.
  * - Loads monitor types dynamically from the backend.
@@ -390,11 +393,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             resetForm();
             setHasSubmitted(false);
             onSuccess?.();
-        }, [
-            onSuccess,
-            resetForm,
-            setHasSubmitted,
-        ]);
+        }, [onSuccess, resetForm, setHasSubmitted]);
 
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
@@ -627,11 +626,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     setFormError(undefined);
                 }
             },
-            [
-                formError,
-                setFormError,
-                setName,
-            ]
+            [formError, setFormError, setName]
         );
 
         const handleFormSubmit = useCallback(
@@ -649,12 +644,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 setFormError(undefined);
                 void onSubmit(e);
             },
-            [
-                addMode,
-                isNameMissing,
-                onSubmit,
-                setFormError,
-            ]
+            [addMode, isNameMissing, onSubmit, setFormError]
         );
         const onClearError = useCallback(() => {
             clearError();
@@ -675,11 +665,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
                 setAddMode(value);
             },
-            [
-                addMode,
-                setAddMode,
-                setHasSubmitted,
-            ]
+            [addMode, setAddMode, setHasSubmitted]
         );
 
         // Memoized options arrays to prevent unnecessary re-renders

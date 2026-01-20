@@ -263,6 +263,11 @@ export function useOverflowMarquee<
 
     useEffect(
         function manageOverflowObservation() {
+            // Explicitly depend on the serialized dependencies so the observer
+            // is re-attached when upstream callers change the dependency list.
+            // eslint-disable-next-line sonarjs/void-use -- Intentional no-op reference.
+            void dependencyFingerprint;
+
             const evaluateOverflow = (): void => {
                 const element = containerRef.current;
                 const next = measureOverflow(element);
@@ -286,9 +291,10 @@ export function useOverflowMarquee<
             const supportsResizeObserver =
                 typeof ResizeObserver !== "undefined";
 
-            const handleOverflowObserverUpdate: OverflowSubscriber = (): void => {
-                evaluateOverflow();
-            };
+            const handleOverflowObserverUpdate: OverflowSubscriber =
+                (): void => {
+                    evaluateOverflow();
+                };
 
             if (supportsResizeObserver && element) {
                 registerOverflowObserver(element, handleOverflowObserverUpdate);
@@ -303,10 +309,17 @@ export function useOverflowMarquee<
                     return;
                 }
 
-                unregisterOverflowObserver(element, handleOverflowObserverUpdate);
+                unregisterOverflowObserver(
+                    element,
+                    handleOverflowObserverUpdate
+                );
             };
         },
-        [containerRef, dependencyFingerprint, measureOverflow]
+        [
+            containerRef,
+            /* Effect dep */ dependencyFingerprint,
+            measureOverflow,
+        ]
     );
 
     return {

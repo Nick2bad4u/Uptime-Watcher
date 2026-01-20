@@ -287,7 +287,10 @@ function renderModalHeader(args: {
  * Shared, accessible modal dialog.
  *
  * @remarks
- * - Renders in a portal to `document.body`.
+ * -
+ *
+ * Renders in a portal to `document.body`.
+ *
  * - Traps focus within the top-most open modal.
  * - Restores focus to the previously focused element on close.
  * - Uses the shared escape-key modal handler with per-modal priority.

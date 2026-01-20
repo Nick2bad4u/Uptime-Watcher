@@ -4,8 +4,8 @@
  * @remarks
  * `@storybook/addon-vitest`'s Vite plugin currently relies on micromatch to
  * decide which modules to transform. On Windows, the plugin builds glob
- * patterns using backslashes, which micromatch does **not** match, resulting
- * in story modules never being transformed into runnable tests.
+ * patterns using backslashes, which micromatch does **not** match, resulting in
+ * story modules never being transformed into runnable tests.
  *
  * To keep Storybook story tests working on Windows, we apply Storybook's
  * `vitestTransform` ourselves for story files under `storybook/stories/**`.
@@ -59,7 +59,6 @@ const isVitestTransformResultLike = (
     const record = value as Record<string, unknown>;
     return typeof record["code"] === "string" && "map" in record;
 };
-
 
 const createStorybookStoriesTransformPlugin = (): Plugin => {
     const configDir = path.resolve(process.cwd(), ".storybook");

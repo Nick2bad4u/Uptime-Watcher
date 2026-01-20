@@ -5,9 +5,9 @@
  * Provides safe accessors and metadata helpers for Chart.js configuration
  * structures using the project's hybrid Chart.js type system.
  *
- * @public
+ * @public For
  *
- * For background on the hybrid Chart.js type strategy refer to the internal
+ * background on the hybrid Chart.js type strategy refer to the internal
  * hybrid type system guide documented alongside the architecture reference.
  */
 

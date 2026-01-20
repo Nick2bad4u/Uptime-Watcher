@@ -1,9 +1,9 @@
 /**
  * Configuration Management Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises configuration management benchmark scenarios to measure service throughput and resilience.
+ * configuration management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";

@@ -92,7 +92,10 @@ function shouldSkipMonitoringFields(
  * Builds the update fields and values for a monitor UPDATE query.
  *
  * @remarks
- * - Only primitive values that SQLite can handle are included.
+ * -
+ *
+ * Only primitive values that SQLite can handle are included.
+ *
  * - Monitoring fields may be skipped per domain logic.
  */
 export function buildUpdateFieldsAndValues(args: {

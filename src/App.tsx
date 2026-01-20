@@ -107,8 +107,8 @@ const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
  *
  * @public
  *
- * @beta
- * The component API may change as we refine the architecture.
+ * @beta The
+ * component API may change as we refine the architecture.
  *
  * @see {@link useTheme} for theme management
  * @see {@link useSitesStore} for site state management
@@ -668,10 +668,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         }
 
         return (
-            <output
-                aria-live="polite"
-                className="fixed inset-x-0 top-12 z-50"
-            >
+            <output aria-live="polite" className="fixed inset-x-0 top-12 z-50">
                 <ThemedBox
                     className={`update-alert update-alert--${updateStatus}`}
                     padding="md"

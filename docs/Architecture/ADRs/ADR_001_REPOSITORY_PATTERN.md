@@ -103,6 +103,7 @@ import type { DatabaseService } from "@electron/services/database/DatabaseServic
  *
  * @example
  *  ```typescript
+ *
  *  const repository = new ExampleRepository({ databaseService });
  *
  *  // Public async method - creates its own transaction
@@ -132,6 +133,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  const repository = new ExampleRepository({
   *   databaseService: serviceContainer.getDatabaseService(),
   *  });
@@ -155,6 +157,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  // Bulk insert records with automatic transaction handling
   *  await repository.bulkInsert([record1, record2, record3]);
   *  ```;
@@ -196,6 +199,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  // Use within an existing transaction
   *  await databaseService.executeTransaction((db) => {
   *   repository.bulkInsertInternal(db, records);
@@ -217,11 +221,7 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([
-     record.id,
-     record.name,
-     record.createdAt,
-    ]);
+    stmt.run([record.id, record.name, record.createdAt]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} records (internal)`
@@ -240,6 +240,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  const allRecords = await repository.findAll();
   *  ```;
   *
@@ -266,6 +267,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  // Delete all records with automatic transaction handling
   *  await repository.deleteAll();
   *  ```;
@@ -302,6 +304,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  // Use within an existing transaction
   *  await databaseService.executeTransaction((db) => {
   *   repository.deleteAllInternal(db);
@@ -334,6 +337,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  const db = repository.getDb();
   *  // Use for complex queries not covered by repository methods
   *  ```;

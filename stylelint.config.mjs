@@ -897,7 +897,7 @@ const config = defineConfig({
                  * Project namespace for BEM classes.
                  *
                  * @remarks
-                 * "uw" stands for UptimeWatcher, providing consistent class
+                 * Uw stands for UptimeWatcher, providing consistent class
                  * prefixing across the application.
                  */
                 namespace: "uw", // UptimeWatcher namespace

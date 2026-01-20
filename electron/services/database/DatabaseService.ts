@@ -87,8 +87,8 @@ const TRANSACTION_RETRY_MAX_DELAY_MS = 750;
  * const db = dbService.getDatabase();
  * ```
  *
- * @public
- * Core database service for SQLite connection and schema management.
+ * @public Core
+ * database service for SQLite connection and schema management.
  */
 export class DatabaseService {
     /** Singleton instance of the database service */

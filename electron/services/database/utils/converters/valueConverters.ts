@@ -21,7 +21,10 @@ export type DbValue = null | number | string;
  * Converts an unknown input to a SQLite-bindable {@link DbValue}.
  *
  * @remarks
- * - `string` and `number` pass through
+ * -
+ *
+ * `string` and `number` pass through
+ *
  * - `boolean` becomes `1`/`0`
  * - `null` becomes `null`
  * - `undefined` and all other types return `undefined` (caller decides whether to

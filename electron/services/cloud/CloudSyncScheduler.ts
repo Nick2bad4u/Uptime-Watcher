@@ -18,7 +18,10 @@ const JITTER_PERCENTAGE = 0.1;
  * Background scheduler for cloud sync (ADR-015).
  *
  * @remarks
- * - Runs only when the configured provider is connected and sync is enabled.
+ * -
+ *
+ * Runs only when the configured provider is connected and sync is enabled.
+ *
  * - Uses jittered fixed-base intervals and exponential backoff on failures.
  * - Uses `unref()` timers so the scheduler will not keep the process alive
  *   (important for tests and graceful shutdown).

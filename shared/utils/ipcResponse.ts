@@ -71,7 +71,10 @@ const normalizeFailureMessage = (response: IpcResponse): string => {
  * Extracts `data` from a successful {@link IpcResponse} envelope.
  *
  * @remarks
- * - Throws for invalid envelopes.
+ * -
+ *
+ * Throws for invalid envelopes.
+ *
  * - Throws for `success: false` envelopes.
  * - Does **not** require `data` to be present. A successful response may
  *   legitimately omit `data` (e.g. `T` includes `undefined`).

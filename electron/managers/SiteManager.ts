@@ -96,8 +96,8 @@ interface UpdateSitesCacheOptions {
  * transactions. Event emission keeps other system components informed of site
  * changes and enables reactive UI updates.
  *
- * @public
- * Manages site operations and maintains in-memory cache.
+ * @public Manages
+ * site operations and maintains in-memory cache.
  */
 export class SiteManager {
     /** Configuration manager for business rules and validation */
@@ -231,7 +231,10 @@ export class SiteManager {
      * Emits a `sites:state-synchronized` event using the modern sync contract.
      *
      * @remarks
-     * - `bulk-sync` emits a full snapshot (`sites`) and `siteCount`.
+     * -
+     *
+     * `bulk-sync` emits a full snapshot (`sites`) and `siteCount`.
+     *
      * - `update`/`delete` emit _delta-only_ payloads.
      * - A monotonic `revision` is incremented for every emitted sync event so
      *   renderers can detect gaps and trigger a full-sync recovery.

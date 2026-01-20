@@ -222,10 +222,7 @@ export const OverviewTab = ({
     const boltIcon = useMemo(() => <PerformanceIcon />, []);
     const accessTimeIcon = useMemo(() => <TimeIcon />, []);
     const quickActionIcon = useMemo(() => <RefreshIcon />, []);
-    const checkNowIcon = useMemo(
-        () => <CheckNowIcon className="size-4" />,
-        []
-    );
+    const checkNowIcon = useMemo(() => <CheckNowIcon className="size-4" />, []);
     const trashIcon = useMemo(() => <RemoveIcon />, []);
     const saveIcon = useMemo(() => <SaveIcon className="size-4" />, []);
     return (

@@ -267,7 +267,10 @@ export function getMonitorWithResult(
  * if necessary.
  *
  * @remarks
- * - Validates the monitor type against the registry.
+ * -
+ *
+ * Validates the monitor type against the registry.
+ *
  * - Uses the singleton pattern: returns the cached instance if available,
  *   otherwise creates a new one. - If a configuration is provided, updates the
  *   instance's configuration if forced or if the instance is new. - Throws if
@@ -314,11 +317,13 @@ export function getMonitor(
  * instances.
  *
  * @remarks
- * - Applies the provided configuration to all cached monitor service instances. -
- *   Only affects already-created instances; future instances require explicit
- *   config on creation. - Type-specific settings in the config object may be
- *   ignored by some monitor types if not applicable. - Errors during config
- *   update are logged and do not interrupt updates for other instances.
+ * -
+ *
+ * Applies the provided configuration to all cached monitor service instances. -
+ * Only affects already-created instances; future instances require explicit
+ * config on creation. - Type-specific settings in the config object may be
+ * ignored by some monitor types if not applicable. - Errors during config
+ * update are logged and do not interrupt updates for other instances.
  *
  * @example
  *

@@ -83,7 +83,6 @@ export function useMount(
     mountCallback: () => Promise<void> | void,
     unmountCallback?: () => void
 ): void {
-
     useEffect(
         function handleMountLifecycle() {
             let didCleanup = false;

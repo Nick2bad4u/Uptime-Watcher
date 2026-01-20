@@ -1,9 +1,9 @@
 /**
  * Performance benchmarks for React event handling operations.
  *
- * @packageDocumentation
+ * @packageDocumentation Simulates
  *
- * Simulates synthetic events, delegation, and propagation patterns to stress
+ * synthetic events, delegation, and propagation patterns to stress
  * the renderer's event system utilities.
  */
 

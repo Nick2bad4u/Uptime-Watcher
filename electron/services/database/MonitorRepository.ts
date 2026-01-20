@@ -149,8 +149,8 @@ const MONITOR_QUERIES = {
  * handling. All operations use the DatabaseService for transaction management
  * and maintain atomicity.
  *
- * @public
- * Repository for managing monitor data persistence.
+ * @public Repository
+ * for managing monitor data persistence.
  */
 export class MonitorRepository {
     /** @internal */

@@ -18,8 +18,10 @@ const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
 const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
 
-/** Fallback placeholder when a user-supplied URL cannot be safely represented in
-logs. */
+/**
+ * Fallback placeholder when a user-supplied URL cannot be safely represented in
+ * logs.
+ */
 const FALLBACK_SAFE_URL_FOR_LOGGING = "[redacted]";
 
 /**
@@ -69,7 +71,10 @@ function getRedactedPathname(pathname: string): string {
  * Removes sensitive URL parts so log lines don't leak credentials or tokens.
  *
  * @remarks
- * - Strips username/password.
+ * -
+ *
+ * Strips username/password.
+ *
  * - Strips query string and hash.
  * - Leaves scheme/host/path for diagnostics.
  */

@@ -30,7 +30,10 @@ export interface CloudEncryptionConfigNone extends CloudEncryptionConfigBase {
  * Passphrase-derived key encryption configuration.
  *
  * @remarks
- * - `saltBase64` is used with a KDF to derive a device-local key.
+ * -
+ *
+ * `saltBase64` is used with a KDF to derive a device-local key.
+ *
  * - `keyCheckBase64` is an encrypted sentinel blob that allows a device to
  *   validate a passphrase without revealing secrets.
  */

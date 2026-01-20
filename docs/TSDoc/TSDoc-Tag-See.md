@@ -28,8 +28,8 @@ current item.
  * @returns The parsed result
  *
  * @see {@link ParsedUrl} for the returned data structure
- * @see {@link https://tools.ietf.org/html/rfc1738|RFC 1738}
- * for syntax
+ * @see {@link https://tools.ietf.org/html/rfc1738|RFC 1738} for
+ * syntax
  * @see your developer SDK for code samples
  */
 function parseURL(url: string): ParsedUrl;

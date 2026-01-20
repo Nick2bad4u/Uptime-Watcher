@@ -10,8 +10,8 @@
  *
  * @since 2025-09-05
  *
- * @features
- * - Property-based testing for string validation functions
+ * @features -
+ * Property-based testing for string validation functions
  * - URL and domain validation with comprehensive edge cases
  * - Host and port validation with boundary testing
  * - I        fc.property([

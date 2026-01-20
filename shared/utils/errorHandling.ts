@@ -5,9 +5,9 @@
  * Provides a unified pattern for error logging, reporting, and state management
  * across frontend and backend code.
  *
- * @example
+ * @example Frontend
  *
- * Frontend usage:
+ * Usage:
  *
  * ```typescript
  * await withErrorHandling(() => doSomethingAsync(), store);
@@ -409,10 +409,13 @@ async function handleFrontendOperation<T>(
  * Handle async operations with frontend store or backend context integration.
  *
  * @remarks
- * - For frontend stores: Automatically manages loading state and error state in
- *   the provided store. Clears error state before operation, sets loading
- *   during execution, and handles error state on failure while preserving the
- *   original error.
+ * -
+ *
+ * For frontend stores: Automatically manages loading state and error state in
+ * the provided store. Clears error state before operation, sets loading during
+ * execution, and handles error state on failure while preserving the original
+ * error.
+ *
  * - For backend contexts: Logs operation failures using the provided logger with
  *   contextual information. Preserves original error for upstream handling
  *   while ensuring proper logging.

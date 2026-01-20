@@ -44,12 +44,7 @@ vi.mock("../../../utils/monitorValidation", () => ({
 // Mock the error handling utility
 vi.mock("../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
-        async (
-            fn,
-            operationName,
-            fallbackValue,
-            shouldThrow = false
-        ) => {
+        async (fn, operationName, fallbackValue, shouldThrow = false) => {
             try {
                 return await fn();
             } catch (error) {

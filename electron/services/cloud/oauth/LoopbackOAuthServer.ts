@@ -361,10 +361,7 @@ export async function startLoopbackOAuthServer(args?: {
         }): Promise<LoopbackOAuthCallback> => {
             expectedStateValue = expectedState;
 
-            if (
-                pendingCallback?.state === expectedStateValue &&
-                !resolved
-            ) {
+            if (pendingCallback?.state === expectedStateValue && !resolved) {
                 resolved = true;
                 resolvePromise?.(pendingCallback);
                 pendingCallback = null;

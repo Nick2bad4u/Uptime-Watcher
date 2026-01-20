@@ -39,9 +39,9 @@ export interface CleanupValidationContext {
 export interface CleanupResolutionHandlers {
     /**
      * Invoked when the validated cleanup handler throws during execution.
-    *
-    * @remarks
-    * Also invoked when a cleanup handler returns a Promise that rejects.
+     *
+     * @remarks
+     * Also invoked when a cleanup handler returns a Promise that rejects.
      */
     readonly handleCleanupError: (error: unknown) => void;
     /**

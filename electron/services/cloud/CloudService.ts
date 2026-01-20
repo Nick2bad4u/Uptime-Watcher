@@ -174,7 +174,10 @@ export class CloudService {
      * Enables or unlocks passphrase-based encryption.
      *
      * @remarks
-     * - Does **not** upload the passphrase anywhere.
+     * -
+     *
+     * Does **not** upload the passphrase anywhere.
+     *
      * - Stores the derived key in {@link SecretStore} so the user is not prompted
      *   every run.
      */
