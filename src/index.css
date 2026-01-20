@@ -1,11 +1,11 @@
 /* Tailwind CSS v4 CSS-first configuration */
-@import "tailwindcss";
+@import "../node_modules/tailwindcss/index.css";
 
 /* https://github.com/reslear/tailwind-scrollbar-hide */
-@import "tailwind-scrollbar-hide/v4";
+@import "../node_modules/tailwind-scrollbar-hide/src/styles.css";
 
 /* https://github.com/Wombosvideo/tw-animate-css */
-@import "tw-animate-css";
+@import "../node_modules/tw-animate-css/dist/tw-animate.css";
 
 /* Theme component fragments */
 @import "./theme/styles/components/foundation.css";

@@ -178,10 +178,10 @@ describe("validatorUtils", () => {
 
             // Allow localhost with require_tld: false
             expect(
-                isValidFQDN("localhost", { require_tld: false })
+                isValidFQDN("localhost", { "require_tld": false })
             ).toBeTruthy();
             expect(
-                isValidFQDN("local-server", { require_tld: false })
+                isValidFQDN("local-server", { "require_tld": false })
             ).toBeTruthy();
         });
     });
@@ -784,13 +784,13 @@ describe("validatorUtils", () => {
             // Allow protocol relative URLs
             expect(
                 isValidUrl("//example.com", {
-                    allow_protocol_relative_urls: true,
+                    "allow_protocol_relative_urls": true,
                 })
             ).toBeFalsy(); // Still false due to require_protocol: true
 
             // Require TLD
             expect(
-                isValidUrl("http://localhost", { require_tld: true })
+                isValidUrl("http://localhost", { "require_tld": true })
             ).toBeFalsy();
 
             // Custom protocols - FTP is invalid in our validation (HTTP/HTTPS only)

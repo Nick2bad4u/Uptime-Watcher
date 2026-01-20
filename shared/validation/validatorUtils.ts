@@ -290,11 +290,11 @@ export function isValidHost(value: unknown): value is string {
     // Check if it's a valid FQDN
     if (
         validator.isFQDN(value, {
-            allow_numeric_tld: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            allow_wildcard: false,
-            require_tld: true,
+            "allow_numeric_tld": false,
+            "allow_trailing_dot": false,
+            "allow_underscores": false,
+            "allow_wildcard": false,
+            "require_tld": true,
         })
     ) {
         return true;
@@ -353,16 +353,16 @@ const buildValidatorUrlOptions = (
     } = options;
 
     const urlOptions = {
-        allow_protocol_relative_urls: false,
-        allow_trailing_dot: false,
-        allow_underscores: false,
-        disallow_auth: disallowAuth ?? false,
+        "allow_protocol_relative_urls": false,
+        "allow_trailing_dot": false,
+        "allow_underscores": false,
+        "disallow_auth": disallowAuth ?? false,
         protocols: ["http", "https"],
-        require_host: true,
-        require_port: false,
-        require_protocol: true,
-        require_tld: false,
-        require_valid_protocol: true,
+        "require_host": true,
+        "require_port": false,
+        "require_protocol": true,
+        "require_tld": false,
+        "require_valid_protocol": true,
         ...restOptions,
     } satisfies ValidatorIsUrlOptions;
 

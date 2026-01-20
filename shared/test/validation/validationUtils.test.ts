@@ -126,7 +126,7 @@ describe("Shared Validation Utils", () => {
 
             // By default, localhost might not be valid FQDN
             expect(
-                isValidFQDN("localhost", { require_tld: false })
+                isValidFQDN("localhost", { "require_tld": false })
             ).toBeTruthy();
         });
     });

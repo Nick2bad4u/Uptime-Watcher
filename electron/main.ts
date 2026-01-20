@@ -125,10 +125,10 @@ if (isDev()) {
 
     void (async (): Promise<void> => {
         try {
-            // eslint-disable-next-line n/no-unpublished-import -- `electron-debug` is a dev-time helper; production builds may not include it and this import is safely caught.
-            const module: unknown = await import(
-                /* webpackChunkName: "electronDebug" */ "electron-debug"
-            );
+            // Electron-debug is a devDependency; this dev-only dynamic import is
+            // intentional.
+            // eslint-disable-next-line n/no-unpublished-import -- Dev-only dynamic import of a devDependency; keep webpackChunkName comment unmodified.
+            const module: unknown = await import(/* webpackChunkName: "electronDebug" */ "electron-debug");
 
             if (!isElectronDebugModule(module)) {
                 logger.warn(
@@ -166,12 +166,15 @@ const configureLogging = (): {
     consoleLevel: ElectronLogLevel;
     fileLevel: ElectronLogLevel;
 } => {
-    // Check for debug flag in command line arguments
+    // Check for log level flags in command line arguments
     const args = new Set(process.argv.slice(2));
+
     const debugFlag = args.has("--debug") || args.has("--log-debug");
     const productionFlag =
-        args.has("--log-production") || args.has("--log-prod");
-    const infoFlag = args.has("--log-info");
+        args.has("--production") ||
+        args.has("--log-production") ||
+        args.has("--log-prod");
+    const infoFlag = args.has("--info") || args.has("--log-info");
 
     // Determine log level based on flags and environment
     return ((): {

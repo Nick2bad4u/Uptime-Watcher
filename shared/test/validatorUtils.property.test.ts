@@ -174,9 +174,11 @@ describe("Validator Utils Property-Based Tests", () => {
         it("should respect FQDN options when provided", () => {
             // Test with require_tld: false to allow localhost
             expect(
-                isValidFQDN("localhost", { require_tld: false })
+                isValidFQDN("localhost", { "require_tld": false })
             ).toBeTruthy();
-            expect(isValidFQDN("localhost", { require_tld: true })).toBeFalsy();
+            expect(
+                isValidFQDN("localhost", { "require_tld": true })
+            ).toBeFalsy();
         });
     });
 

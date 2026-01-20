@@ -124,7 +124,7 @@ const httpUrlArbitrary = fc
         isValidUrl(url, {
             allowSingleQuotes: true,
             protocols: ["http", "https"],
-            require_tld: false,
+            "require_tld": false,
         })
     )
     .filter((url) => {

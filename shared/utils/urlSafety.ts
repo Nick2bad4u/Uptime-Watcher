@@ -133,14 +133,14 @@ function hasSpaceBeforeQueryOrHash(url: string): boolean {
 
 function isValidHttpUrlWithValidator(url: string): boolean {
     return validator.isURL(url, {
-        allow_protocol_relative_urls: false,
-        disallow_auth: true,
+        "allow_protocol_relative_urls": false,
+        "disallow_auth": true,
         protocols: ["http", "https"],
-        require_host: true,
-        require_protocol: true,
+        "require_host": true,
+        "require_protocol": true,
         // Allow localhost-style hosts. We intentionally do *not* block
         // private-network hosts for external opening.
-        require_tld: false,
+        "require_tld": false,
     });
 }
 
