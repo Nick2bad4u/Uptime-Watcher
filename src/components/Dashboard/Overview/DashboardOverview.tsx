@@ -47,9 +47,11 @@ interface OverviewCardDescriptor {
 export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties> =
     memo(function DashboardOverview({ metrics, siteCountLabel }) {
         const cards = useMemo<OverviewCardDescriptor[]>(() => {
-            const averageResponse = metrics.averageResponseTime
-                ? `${metrics.averageResponseTime} ms`
-                : "—";
+            const averageResponse =
+                typeof metrics.averageResponseTime === "number" &&
+                metrics.averageResponseTime > 0
+                    ? `${metrics.averageResponseTime} ms`
+                    : "—";
             const uptime = `${metrics.uptimePercentage}%`;
             const downMonitors = metrics.monitorStatusCounts.down;
             const degradedMonitors = metrics.monitorStatusCounts.degraded;
