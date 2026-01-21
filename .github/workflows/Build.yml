@@ -325,7 +325,7 @@ jobs:
                   $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.7z','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak','*.tar.xz','*.tar.gz','*.tar.bz2')
                   $files = @()
                   foreach ($pattern in $patterns) {
-                    $files += Get-ChildItem -Path dist -Recurse -Include $pattern -ErrorAction SilentlyContinue
+                    $files += Get-ChildItem -Path release -Recurse -Include $pattern -ErrorAction SilentlyContinue
                   }
                   foreach ($file in $files | Sort-Object FullName -Unique) {
                     $hash = Get-FileHash $file.FullName -Algorithm SHA512
@@ -339,7 +339,7 @@ jobs:
               if: runner.os == 'Linux'
               shell: bash
               run: |
-                  find dist -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find release -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
                     hash=$(sha512sum "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
@@ -350,24 +350,26 @@ jobs:
               if: runner.os == 'macOS'
               shell: bash
               run: |
-                  find dist -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find release -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
                     hash=$(shasum -a 512 "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
                   done
               continue-on-error: true
 
-            - name: Upload build dist files as artifact
+            - name: Upload packaged distributables as artifact
               id: upload_artifact
               uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
               with:
                   name: dist-${{ matrix.os }}-${{ matrix.arch }}
                   path: |
-                      dist/Uptime-Watcher-*
-                      dist/latest*.yml
-                      dist/squirrel*/*
-                      dist/nsis-web/*
+                      release/Uptime-Watcher-*
+                      release/*.yml
+                      release/*.blockmap
+                      release/squirrel*/**/*
+                      release/nsis-web/**/*
                   include-hidden-files: true
+                  if-no-files-found: error
 
             - name: Update Build Matrix Summary (per platform/arch)
               if: always()
@@ -405,6 +407,28 @@ jobs:
               uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
               with:
                   path: ./artifacts
+
+            - name: Verify build artifacts were downloaded
+              id: verify_artifacts
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  if [ ! -d "./artifacts" ]; then
+                    echo "::error::./artifacts directory was not created. The build job likely did not upload any artifacts."
+                    exit 1
+                  fi
+
+                  shopt -s nullglob
+                  artifact_dirs=(./artifacts/dist-*)
+                  shopt -u nullglob
+
+                  if [ "${#artifact_dirs[@]}" -eq 0 ]; then
+                    echo "::error::No ./artifacts/dist-* directories found. The build job likely uploaded nothing (or the artifact name changed)."
+                    echo "Contents of ./artifacts:";
+                    ls -la ./artifacts || true
+                    exit 1
+                  fi
 
             - name: Determine previous release tag
               id: previous_tag
@@ -461,6 +485,10 @@ jobs:
               if: runner.os == 'Linux'
               shell: bash
               run: |
+                  if [ ! -d "./artifacts" ]; then
+                    echo "ERROR: ./artifacts directory does not exist."
+                    exit 1
+                  fi
                   find artifacts -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
                     hash=$(sha512sum "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
@@ -487,22 +515,38 @@ jobs:
               run: |
                   echo "Renaming nsis-web and root latest.yml files for Windows builds in ./artifacts..."
                   # 32-bit (ia32)
-                  ia32_root="./artifacts/dist-windows-latest-ia32/latest.yml"
-                  ia32_nsis="./artifacts/dist-windows-latest-ia32/nsis-web/latest.yml"
-                  if [ -f "$ia32_root" ]; then
-                    mv "$ia32_root" "./artifacts/dist-windows-latest-ia32/latest-win32.yml"
-                    echo "Renamed $ia32_root -> ./artifacts/dist-windows-latest-ia32/latest-win32.yml"
-                  fi
-                  if [ -f "$ia32_nsis" ]; then
-                    mv "$ia32_nsis" "./artifacts/dist-windows-latest-ia32/nsis-web/latest-nsis-web-win32.yml"
-                    echo "Renamed $ia32_nsis -> ./artifacts/dist-windows-latest-ia32/nsis-web/latest-nsis-web-win32.yml"
-                  fi
+                  for ia32_root in \
+                    "./artifacts/dist-windows-latest-ia32/latest.yml" \
+                    "./artifacts/dist-windows-latest-ia32/release/latest.yml"; do
+                    if [ -f "$ia32_root" ]; then
+                      ia32_root_dir=$(dirname "$ia32_root")
+                      mv "$ia32_root" "$ia32_root_dir/latest-win32.yml"
+                      echo "Renamed $ia32_root -> $ia32_root_dir/latest-win32.yml"
+                      break
+                    fi
+                  done
+
+                  for ia32_nsis in \
+                    "./artifacts/dist-windows-latest-ia32/nsis-web/latest.yml" \
+                    "./artifacts/dist-windows-latest-ia32/release/nsis-web/latest.yml"; do
+                    if [ -f "$ia32_nsis" ]; then
+                      ia32_nsis_dir=$(dirname "$ia32_nsis")
+                      mv "$ia32_nsis" "$ia32_nsis_dir/latest-nsis-web-win32.yml"
+                      echo "Renamed $ia32_nsis -> $ia32_nsis_dir/latest-nsis-web-win32.yml"
+                      break
+                    fi
+                  done
                   # 64-bit (x64)
-                  x64_nsis="./artifacts/dist-windows-latest-x64/nsis-web/latest.yml"
-                  if [ -f "$x64_nsis" ]; then
-                    mv "$x64_nsis" "./artifacts/dist-windows-latest-x64/nsis-web/latest-nsis-web.yml"
-                    echo "Renamed $x64_nsis -> ./artifacts/dist-windows-latest-x64/nsis-web/latest-nsis-web.yml"
-                  fi
+                  for x64_nsis in \
+                    "./artifacts/dist-windows-latest-x64/nsis-web/latest.yml" \
+                    "./artifacts/dist-windows-latest-x64/release/nsis-web/latest.yml"; do
+                    if [ -f "$x64_nsis" ]; then
+                      x64_nsis_dir=$(dirname "$x64_nsis")
+                      mv "$x64_nsis" "$x64_nsis_dir/latest-nsis-web.yml"
+                      echo "Renamed $x64_nsis -> $x64_nsis_dir/latest-nsis-web.yml"
+                      break
+                    fi
+                  done
 
             - name: Organize distributables by platform and arch
               id: organize_distributables
@@ -575,14 +619,27 @@ jobs:
                     ls -la "$artifact_dir" || { echo "ERROR: Failed to list $artifact_dir"; exit 1; }
 
                     echo
-                    echo "Copying main files from $artifact_dir to $target_dir"
+                    echo "Resolving artifact source root (supports nested release/ or dist/ directories)"
+                    source_root="$artifact_dir"
+                    if [ -d "$artifact_dir/release" ]; then
+                      source_root="$artifact_dir/release"
+                    elif [ -d "$artifact_dir/dist" ]; then
+                      source_root="$artifact_dir/dist"
+                    fi
+
+                    echo "Source root resolved to: $source_root"
+                    echo "Listing source_root contents for debugging:"
+                    ls -la "$source_root" || { echo "ERROR: Failed to list $source_root"; exit 1; }
+
+                    echo
+                    echo "Moving main files from $source_root to $target_dir"
                     echo "Glob patterns:"
-                    echo "  - $artifact_dir/Uptime-Watcher-*"
-                    echo "  - $artifact_dir/*.yml"
+                    echo "  - $source_root/Uptime-Watcher-*"
+                    echo "  - $source_root/*.yml"
 
                     # Expand globs explicitly so we can see what exists
                     main_files=()
-                    for f in "$artifact_dir"/Uptime-Watcher-* "$artifact_dir"/*.yml; do
+                    for f in "$source_root"/Uptime-Watcher-* "$source_root"/*.yml; do
                       if [ -e "$f" ]; then
                         main_files+=("$f")
                       fi
@@ -624,7 +681,7 @@ jobs:
                     echo
                     echo "Copying subdirectories (nsis-web, squirrel-windows, squirrel-windows-ia32)"
                     for subdir in nsis-web squirrel-windows squirrel-windows-ia32; do
-                      src_subdir="$artifact_dir/$subdir"
+                      src_subdir="$source_root/$subdir"
                       if [ -d "$src_subdir" ]; then
                         echo "Moving directory: $src_subdir -> $target_dir/"
                         # Move the directory rather than copying to avoid doubling disk usage
