@@ -9,6 +9,7 @@ import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import type {
     InterfaceDensity,
@@ -36,28 +37,6 @@ const selectSites = (state: SitesStoreState): readonly Site[] => state.sites;
 
 type UiStoreState = ReturnType<typeof useUIStore.getState>;
 
-const selectSiteListLayout = (state: UiStoreState): SiteListLayoutMode =>
-    state.siteListLayout;
-
-const selectSetSiteListLayout = (
-    state: UiStoreState
-): UiStoreState["setSiteListLayout"] => state.setSiteListLayout;
-
-const selectSiteCardPresentation = (
-    state: UiStoreState
-): SiteCardPresentation => state.siteCardPresentation;
-
-const selectSetSiteCardPresentation = (
-    state: UiStoreState
-): UiStoreState["setSiteCardPresentation"] => state.setSiteCardPresentation;
-
-const selectSurfaceDensity = (state: UiStoreState): InterfaceDensity =>
-    state.surfaceDensity;
-
-const selectSetSurfaceDensity = (
-    state: UiStoreState
-): UiStoreState["setSurfaceDensity"] => state.setSurfaceDensity;
-
 /**
  * Main site list component that displays all monitored sites.
  *
@@ -82,12 +61,29 @@ const selectSetSurfaceDensity = (
  */
 export const SiteList = (): JSX.Element => {
     const sites = useSitesStore(selectSites);
-    const layout = useUIStore(selectSiteListLayout);
-    const setLayout = useUIStore(selectSetSiteListLayout);
-    const cardPresentation = useUIStore(selectSiteCardPresentation);
-    const setCardPresentation = useUIStore(selectSetSiteCardPresentation);
-    const surfaceDensity = useUIStore(selectSurfaceDensity);
-    const setSurfaceDensity = useUIStore(selectSetSurfaceDensity);
+
+    const {
+        cardPresentation,
+        layout,
+        setCardPresentation,
+        setLayout,
+        setSurfaceDensity,
+        surfaceDensity,
+    } = useUIStore(
+        useShallow(
+            useCallback(
+                (state: UiStoreState) => ({
+                    cardPresentation: state.siteCardPresentation,
+                    layout: state.siteListLayout,
+                    setCardPresentation: state.setSiteCardPresentation,
+                    setLayout: state.setSiteListLayout,
+                    setSurfaceDensity: state.setSurfaceDensity,
+                    surfaceDensity: state.surfaceDensity,
+                }),
+                []
+            )
+        )
+    );
     const { isDark } = useTheme();
 
     const handleLayoutChange = useCallback(

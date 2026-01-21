@@ -194,6 +194,16 @@ const sampleSite: Site = {
 
 import { SiteTableRow } from "../../components/Dashboard/SiteList/SiteTableRow";
 
+const renderSiteTableRow = (site: Site = sampleSite): void => {
+    render(
+        <table>
+            <tbody>
+                <SiteTableRow site={site} />
+            </tbody>
+        </table>
+    );
+};
+
 describe("SiteTableRow interaction coverage", () => {
     beforeEach(() => {
         statusBadgeMock.props.length = 0;
@@ -206,7 +216,7 @@ describe("SiteTableRow interaction coverage", () => {
         const useSiteResult = createUseSiteReturn();
         useSiteState.factory.mockReturnValue(useSiteResult);
 
-        render(<SiteTableRow site={sampleSite} />);
+        renderSiteTableRow();
 
         const row = screen.getByRole("row");
         fireEvent.click(row);
@@ -229,7 +239,7 @@ describe("SiteTableRow interaction coverage", () => {
         const useSiteResult = createUseSiteReturn();
         useSiteState.factory.mockReturnValue(useSiteResult);
 
-        render(<SiteTableRow site={sampleSite} />);
+        renderSiteTableRow();
 
         const row = screen.getByRole("row");
         fireEvent.keyDown(row, { key: "Enter" });
@@ -251,7 +261,7 @@ describe("SiteTableRow interaction coverage", () => {
         const useSiteResult = createUseSiteReturn({ responseTime: null });
         useSiteState.factory.mockReturnValue(useSiteResult);
 
-        render(<SiteTableRow site={sampleSite} />);
+        renderSiteTableRow();
 
         expect(screen.getByText("—")).toBeInTheDocument();
     });
@@ -260,7 +270,7 @@ describe("SiteTableRow interaction coverage", () => {
         const useSiteResult = createUseSiteReturn();
         useSiteState.factory.mockReturnValue(useSiteResult);
 
-        render(<SiteTableRow site={sampleSite} />);
+        renderSiteTableRow();
 
         expect(monitorSelectorMock.props[0]).toMatchObject({
             monitors: useSiteResult.latestSite.monitors,
@@ -276,7 +286,7 @@ describe("SiteTableRow interaction coverage", () => {
         const useSiteResult = createUseSiteReturn({ monitor: null });
         useSiteState.factory.mockReturnValue(useSiteResult);
 
-        render(<SiteTableRow site={sampleSite} />);
+        renderSiteTableRow();
 
         expect(actionButtonGroupMock.props[0]).toMatchObject({
             disabled: true,
@@ -326,7 +336,7 @@ describe("SiteTableRow interaction coverage", () => {
         });
         useSiteState.factory.mockReturnValue(useSiteResult);
 
-        render(<SiteTableRow site={sampleSite} />);
+        renderSiteTableRow();
 
         expect(screen.getByText("100%")).toBeInTheDocument();
         expect(screen.getByText("75 ms")).toBeInTheDocument();

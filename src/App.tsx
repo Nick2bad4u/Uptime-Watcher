@@ -20,6 +20,7 @@ import {
 } from "react";
 import { useShallow } from "zustand/react/shallow";
 
+import type { ErrorStore } from "./stores/error/types";
 import type { UIStore } from "./stores/ui/types";
 import type { UpdatesStore } from "./stores/updates/types";
 
@@ -115,7 +116,18 @@ const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
  */
 export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Error store
-    const { clearError, isLoading, lastError } = useErrorStore();
+    const { clearError, isLoading, lastError } = useErrorStore(
+        useShallow(
+            useCallback(
+                (state: ErrorStore) => ({
+                    clearError: state.clearError,
+                    isLoading: state.isLoading,
+                    lastError: state.lastError,
+                }),
+                []
+            )
+        )
+    );
 
     // Sites store
     // Settings store - store is initialized via the initialization effect below
