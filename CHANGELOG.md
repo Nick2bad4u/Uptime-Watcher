@@ -4,6 +4,777 @@
 
 All notable changes to this project will be documented in this file.
 
+## [20.9.0] - 2026-01-21
+
+
+[[74077c3](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74077c383991162a387fb202449504ae80f682bb)...
+[29a5290](https://github.com/Nick2bad4u/Uptime-Watcher/commit/29a5290c7779a0e1ac9cae294ad02cac6a175d30)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/74077c383991162a387fb202449504ae80f682bb...29a5290c7779a0e1ac9cae294ad02cac6a175d30))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update hono 4.11.4 [`(eecc609)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eecc60999e6257c3d37d669bde1117c07cb2fcef)
+
+
+- *(deps)* [dependency] Update h3 in /docs/docusaurus [`(e2ba768)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e2ba768d15e51cb231d2e47b8a058add6aef9956)
+
+
+- *(deps)* [dependency] Update undici in /docs/docusaurus [`(74077c3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74077c383991162a387fb202449504ae80f682bb)
+
+
+
+### 🧹 Chores
+
+- *(release)* V20.9.0 [skip ci] [`(29a5290)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/29a5290c7779a0e1ac9cae294ad02cac6a175d30)
+
+
+
+
+
+
+## [20.8.0] - 2026-01-21
+
+
+[[53fd855](https://github.com/Nick2bad4u/Uptime-Watcher/commit/53fd85573f3d187177b22ed8cb6b814cd0e491a0)...
+[31583dc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/31583dc165bc9e8d356d6b00ff77b6000fbae28c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/53fd85573f3d187177b22ed8cb6b814cd0e491a0...31583dc165bc9e8d356d6b00ff77b6000fbae28c))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 6 updates [`(53fd855)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/53fd85573f3d187177b22ed8cb6b814cd0e491a0)
+
+
+
+### 🧹 Chores
+
+- *(release)* V20.8.0 [skip ci] [`(31583dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/31583dc165bc9e8d356d6b00ff77b6000fbae28c)
+
+
+
+
+
+
+## [20.7.0] - 2026-01-21
+
+
+[[fb577c0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fb577c095557ba1bd46bd53e0549584aa7edcba5)...
+[a391f85](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a391f8570c11432c7b203bdc4d5ff2ad21e1762a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/fb577c095557ba1bd46bd53e0549584aa7edcba5...a391f8570c11432c7b203bdc4d5ff2ad21e1762a))
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improves OAuth loopback stability
+
+🛠️ [fix] Strengthens loopback OAuth handling to guard ephemeral ports and surface callback errors for clearer recovery.
+🚜 [refactor] Consolidates Dropbox OAuth flow on shared loopback helpers and state generation to reduce duplicated handling.
+⚡ [perf] Limits UI store subscriptions and avoids showing invalid or zero response times for steadier rendering.
+🛠️ [fix] Adds IPC correlation validation for preload diagnostics and streamlines debouncing to avoid stale timers.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fb577c0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fb577c095557ba1bd46bd53e0549584aa7edcba5)
+
+
+
+### 🧹 Chores
+
+- *(release)* V20.7.0 [skip ci] [`(a391f85)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a391f8570c11432c7b203bdc4d5ff2ad21e1762a)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update artifact paths and add verification for build outputs
+ - Change artifact upload paths from `dist` to `release` for better organization
+ - Add verification step to ensure artifacts are correctly downloaded
+ - Improve error handling for missing artifact directories
+🧪 [test] Refactor SiteTableRow tests for improved readability
+ - Introduce `renderSiteTableRow` helper function to streamline rendering logic
+ - Replace direct render calls with `renderSiteTableRow` for consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2f3e758)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2f3e758a8895fb56998174a16aef8c1c70c8fdbb)
+
+
+
+
+
+
+## [20.6.0] - 2026-01-20
+
+
+[[5fcfb58](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5fcfb58716a78bee65688bb9a76a752b2b71731e)...
+[5a564c5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a564c5e0176f10c16edfe71e965801fe5040efa)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5fcfb58716a78bee65688bb9a76a752b2b71731e...5a564c5e0176f10c16edfe71e965801fe5040efa))
+
+
+### ✨ Features
+
+- ✨ [feat] Update BeastMode agent configuration
+ - Add wildcard support for agents to enhance flexibility
+ - Reorganize tools list for improved clarity and functionality
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f8c9f03)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f8c9f0352a1c75932233652fa01f891999b8cda2)
+
+
+- ✨ [feat] Enhances sync security and data integrity
+
+🛠️ [fix] Prevents sensitive token leakage by stripping raw error objects from cloud synchronization logs
+ - Extracts only non-sensitive metadata such as error codes and operation types to avoid logging private Authorization headers or request bodies
+🛠️ [fix] Sanitizes JSON data transfers by stripping internal cloud settings and secrets during import and export operations
+ - Ensures that machine-specific state and encrypted OAuth credentials are not leaked or transferred between different device environments
+🛠️ [fix] Implements a reference-counted subscription mechanism for state synchronization events to resolve race conditions
+ - Guarantees reliable resource cleanup and prevents memory leaks when components unmount before sync initialization completes
+🛠️ [fix] Strengthens database restoration safety by enforcing SQLite header validation and integrity assertions
+ - Verifies the file structure before writing to the local filesystem and performs a `quick_check` before swapping the active database file
+🛠️ [fix] Adds a 5-second timeout to identity provider metadata requests to prevent indefinite network hangs during account label fetching
+✨ [feat] Enforces IPC payload budgets for JSON exports to maintain system stability when handling large site datasets
+🛠️ [fix] Updates monitor import logic to utilize a fail-fast approach that aborts the entire transaction on any site-specific failure
+⚡ [perf] Optimizes theme hook performance by utilizing shallow state selection to prevent redundant re-renders from unrelated setting changes
+🧪 [test] Expands the test suite to verify token leak prevention, idempotent subscriptions, and robust backup validation routines
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4016128)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4016128e787b19b9e08b5cf33e36bd0047ea41be)
+
+
+- ✨ [feat] Enhance database schema and indexing for performance improvements
+ - 🛠️ [fix] Add composite index on history table for monitor_id and timestamp to optimize queries
+ - 🛠️ [fix] Implement safe SQL identifier checks and escaping in dynamic schema generation
+ - ⚡ [perf] Improve history pruning logic by ensuring valid IDs are processed and invalid ones are filtered out
+ - 🚜 [refactor] Update monitor repository to streamline deletion of history and monitor entries
+ - 🧪 [test] Add comprehensive tests for database service initialization and transaction retries
+ - 🧪 [test] Introduce tests for history manipulation utilities to ensure correct behavior with invalid IDs
+
+✨ [feat] Introduce connectivity checks with abort signal support
+ - 🛠️ [fix] Modify native connectivity functions to accept AbortSignal for cancellation
+ - 🧪 [test] Create tests for ping retry utilities to validate retry logic and signal handling
+ - 🧪 [test] Ensure connectivity checks throw errors on degraded or down statuses
+
+🧹 [chore] Update package.json scripts for cleaner test reporting
+ - 🔧 [build] Remove unnecessary no-truncate flags from test scripts for improved readability
+
+🎨 [style] Adjust confirm dialog store to expose automation hooks conditionally
+ - ⚡ [perf] Optimize confirm dialog store initialization based on environment mode
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6ee6b8f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ee6b8fae810b2d0687e07ff7d47602056026353)
+
+
+- ✨ [feat] Enhance monitoring utilities with AbortSignal support
+ - 🔧 [build] Introduce AbortSignal parameter in performSinglePingCheck and performPingCheckWithRetry functions to allow cancellation of ping checks.
+ - 🔧 [build] Update checkHttpConnectivity and checkConnectivity functions to accept AbortSignal for better control over network requests.
+ - 🔧 [build] Implement raceWithAbort utility to handle operation cancellation effectively.
+ - 🛠️ [fix] Modify handlePingCheckError and handlePortCheckError to return standardized responses for aborted operations.
+ - 🧪 [test] Add comprehensive tests for AbortSignal handling in ping and port monitoring utilities, ensuring correct behavior on cancellation.
+ - 🧪 [test] Enhance existing tests to validate the integration of AbortSignal in various scenarios, including connectivity checks and error handling.
+ - 📝 [docs] Update documentation to reflect changes in function signatures and usage of AbortSignal.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3fa6dbc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3fa6dbc50851d0cafbfb643433bb00b7e4a34e5b)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Update tools list in BeastMode agent configuration
+
+ - Refactor tools array to ensure consistency and maintainability
+ - Ensure all necessary tools for agent functionality are included
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(48289d0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48289d0332c1bae7a4d016e89685fbfb4dc8d975)
+
+
+- 🛠️ [fix] Updates logging flags and CSS imports
+
+🛠️ [fix] Expands logging flag parsing with production and info aliases for clearer runtime control
+🛠️ [fix] Uses explicit package paths for CSS imports to stabilize build resolution
+🎨 [style] Normalizes dynamic import formatting and validator option key quoting to satisfy linting
+🔧 [build] Adjusts dependency graph scripts to avoid spinners and ignore CSS
+🧪 [test] Targets the specific recovered toast on dismissal to reduce flakiness
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(656a83e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/656a83e2eb8a6b31a22e513500a46d116b20886f)
+
+
+- 🛠️ [fix] Improves UI state tracking
+
+🛠️ [fix] Improves metric logging and observer refresh to avoid stale UI state
+📝 [docs] Updates documentation examples and remark formatting for consistency
+🎨 [style] Aligns minor formatting in runtime modules for readability
+🧪 [test] Adds coverage for stores and validation plus test cleanup
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(60cb588)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/60cb588b7ad0d0715517d7ab4ce0e00427fadb38)
+
+
+- 🛠️ [fix] Improves validation and scheduling
+
+🛠️ [fix] Adds runtime validation for monitoring lifecycle summaries to block malformed IPC payloads.
+🛠️ [fix] Guards sync and update schedulers against duplicate runs and captures callback failures.
+🛠️ [fix] Hardens OAuth loopback flow with state checks, buffered callbacks, and clearer retry messaging.
+🛠️ [fix] Normalizes numeric inputs for pruning, retries, and cooldowns to avoid invalid limits.
+🛠️ [fix] Adds manual check timeouts and abort-aware logging for monitor executions.
+🚜 [refactor] Allows null field updates, handles async cleanup rejections, and broadens bridge readiness checks.
+🛠️ [fix] Coalesces site resync requests and avoids caching types before load.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(51e2eb8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/51e2eb8eec31dfaecb7b02fee68148fe8742d470)
+
+
+- 🛠️ [fix] Enhance UI interaction and build tooling
+
+🛠️ [fix] Optimize notification toaster interaction
+ - 🖱️ Set pointer-events to none on the alert container to allow interaction with UI elements behind the notification area
+🎨 [style] Address linting in validation logic
+ - 🛡️ Add suppression for intentional unsafe type assertions to maintain stable IPC typing
+🔧 [build] Refactor Flatpak manifest and re-enable YAML linting
+ - 📦 Restructure flatpak-build.yml for better readability and add extension points for custom themes
+ - 🧹 Clean up build environment variables and module definitions
+ - ✅ Restore yml/sort-keys linting rule following upstream plugin fix for Node 25
+🧪 [test] Stabilize Storybook and Vitest environments
+ - 🪵 Introduce an electron-log/renderer stub to prevent noisy initialization warnings in non-Electron contexts
+ - 🔇 Silence MSW unhandled request logs to reduce console clutter
+ - ⚙️ Refine Node.js warning suppression logic to handle various argument signatures during tests
+ - 🗺️ Configure Vitest aliases to route log imports to the new mocks
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a13074c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a13074ca226a347e265675fda6eee31491d5a031)
+
+
+- 🛠️ [fix] Enhance IPC safety and testing stability
+
+🛠️ [fix] Harden the Electron IPC bridge with runtime function validation
+ - 🛡️ Prevents memory leaks and log spam by rejecting invalid event callbacks
+ - 📝 Adds diagnostic logging for rejected listener registrations in the preload context
+🛠️ [fix] Align site monitoring store with the validation schemas
+ - 🔄 Corrects field mapping from `error` to `details` during optimistic updates and snapshot applications
+🎨 [style] Restore user interaction for status alert toasters by enabling pointer events
+🧪 [test] Overhaul Vitest configuration for Storybook story testing
+ - 🪟 Introduces a custom Vite transform to fix Windows path globbing issues
+ - 🏎️ Optimizes performance by switching to Node/jsdom and increasing memory limits for test runs
+ - 🤫 Suppresses irrelevant experimental Node storage warnings to keep output clean
+🧪 [test] Improve E2E test stability and locator reliability
+ - 🚦 Adjusts Playwright worker counts to prevent flakiness when launching multiple Electron instances
+ - 🎯 Updates locators for modals, tabs, and alerts to use more robust selection strategies
+🧹 [chore] Disable crashing ESLint YAML sorting rules on Windows and Node 25
+📦 [deps] [dependency] Update project dependencies including Typedoc, ESLint plugins, and Prettier utilities
+🔧 [build] Standardize Webpack chunk names for cloud providers and update VS Code tasks
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c3e3001)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c3e3001d7f02b7f199a7c024ff9783dd48c10b01)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Streamlines validation and UI
+
+🚜 [refactor] 🧩 Tightens cloud and data parsing with explicit loose schemas, safer generic metadata, and binary/blob validation.
+🛠️ [fix] 🎯 Simplifies overflow/mount behavior, trims resync coalescing, and refines alert layout plus icon sizing for consistency.
+🔧 [build] 🧰 Updates lint and script config, bumps tooling deps, and captures Electron/Playwright logs while relaxing strict-void in non-app code.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fce0f49)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fce0f49b18f68bed6873bc4fffa061b0b4f2299c)
+
+
+- 🚜 [refactor] Fixes backups and moves shared utils
+
+🚜 [refactor] Centralizes core logic by migrating utilities to shared modules
+ - Relocates `cloudKeyNormalization`, `jsonByteBudget`, and `errorSerialization` to `@shared/utils`
+ - Moves identifier validation logic to `@shared/validation` for consistent cross-process enforcement
+🛠️ [fix] Enhances database backup reliability and SQLite sidecar management
+ - Updates `DataBackupService` to handle `-wal`, `-shm`, and `-journal` sidecar files during restoration
+ - Ensures sidecars are relocated alongside the database during rollbacks to prevent mismatched state corruption
+ - Introduces `fsSafeOps` for standardized `fsync` and atomic-like rename operations
+🛠️ [fix] Resolves React lifecycle and sync subscription issues
+ - Fixes `useMount` cleanup to properly support React StrictMode's extra setup/cleanup cycles
+ - Ensures `useSiteSync` singleton manager dispatches status updates to the latest registered callback reference
+ - Defers initialization state updates in the `App` component to comply with rendering constraints
+⚡ [perf] Optimizes UI responsiveness and rate limiting logic
+ - Throttles `Tooltip` repositioning via `requestAnimationFrame` to reduce layout thrashing during scroll and resize events
+ - Generalizes `HttpRateLimiter` to support environment-agnostic configuration and fail-open wait thresholds
+🎨 [style] Eliminates button rendering glitches using hardware acceleration
+ - Applies `translate3d` transforms to themed buttons to maintain composited layers and prevent rasterization artifacts
+🧪 [test] Updates test coverage and removes redundant type checks
+ - Aligns repository and cloud test suites with the new shared utility import paths
+ - Removes obsolete coverage tests for pure interface definitions and documents their shared usage
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8fc8c48)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8fc8c48239d2866c66656d3d12a1da3bce89bfec)
+
+
+- 🚜 [refactor] Refactors monitoring lifecycle and optimizes history pruning
+
+🚜 [refactor] Centralizes monitoring timeout logic and improves operation coordination
+ - ⏱️ Implements a new utility for resolving base request timeouts versus operation timeouts that include cleanup buffers
+ - 🛡️ Enhances `MonitorOperationCoordinator` with a single-flight policy to prevent starting new operations for a monitor if one is still outstanding
+ - 📉 Optimizes `EnhancedMonitorChecker` by introducing a throttled history pruning strategy that reduces redundant database count queries
+ - 🧼 Simplifies `DnsMonitor` and `nativeConnectivity` by removing manual abort wrappers in favor of native signal propagation and integrated promise racing
+ - 🔌 Refactors `withOperationalHooks` to ensure consistent cancellation behavior across retries, providing a unified "Operation was aborted" error state
+ - 🏷️ Standardizes the use of `z.ZodType` and `z.ZodError` across all validation schemas and service boundaries for improved consistency
+
+🧪 [test] Strengthens monitoring test suite and benchmark reliability
+ - 📈 Adds coverage for history count check throttling to ensure performance optimizations work as intended
+ - 🩺 Validates that manual checks correctly enforce monitor-specific timeouts using the new signal utilities
+ - 🔄 Updates `MonitorOperationRegistry` and repository mocks to support the new single-flight and operation tracking logic
+ - 🛠️ Adjusts `HistoryRepository` test data to use string-based identifiers consistently
+
+🔧 [build] Updates project configuration and build paths
+ - 📂 Relocates `tsBuildInfoFile` and `declarationDir` outputs to a centralized `.cache` directory structure across UI, documentation, and test projects
+ - 🏗️ Aligns TypeScript configurations for `electron/test` and `shared/test` to extend dedicated testing base configs
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9f60412)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9f604129c9ac0aeb9d62df2c9cfa319f9c7a3362)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Refactor code formatting for improved readability
+ - Adjusted multiline import statements for better alignment in `cloudProviderDeps.ts`, `resolveCloudProviderOrNull.ts`, and `main.ts`
+ - Reformatted comments in `zodIssueFormatting.ts` for consistent line breaks
+ - Enhanced readability of function parameters in `monitorFormData.ts`
+ - Improved indentation in `useSitesStore.coverage.test.ts` for clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e0581c5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e0581c5c578484cb72007ded34f64b4ab881b5e7)
+
+
+- 🎨 [style] Standardize codebase formatting and structure
+
+🎨 [style] Applies a comprehensive project-wide formatting overhaul to align with standardized linting rules
+ - 🚜 Refactors complex conditional statements and object assignments across core services into readable multi-line formats 🚜
+ - 🧹 Eliminates redundant manual validation logic by removing `identifierValidation.ts` in favor of shared schemas 🧹
+ - ✨ Standardizes JSDoc documentation across the event catalogue and public bridges for improved IDE intellisense ✨
+ - 🧩 Reorganizes function signatures in the IPC layer to ensure consistent parameter wrapping and clarity 🧩
+ - 📂 Cleans up directory-wide whitespace, trailing lines, and inconsistent indentation in the `electron/` backend 📂
+ - 🔧 Harmonizes the primary `eslint.config.mjs` by grouping plugins and rules for better maintainability 🔧
+ - ⚡ Refines the Electron main process imports to use consistent grouping and standardized path aliases ⚡
+ - 🚜 Improves the readability of complex monitoring and cloud sync logic through logical line breaking 🚜
+ - 📝 Corrects documentation spacing and markdown formatting in feature development and testing guides 📝
+ - 🧪 Synchronizes the testing suite with new structural standards, updating mocks and property-based tests 🧪
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e5c7176)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e5c71768f5f6e1d9e2e2cd77c09355b201045ebc)
+
+
+
+### 🧹 Chores
+
+- *(release)* V20.6.0 [skip ci] [`(5a564c5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a564c5e0176f10c16edfe71e965801fe5040efa)
+
+
+- 🧹 [chore] Update dev dependencies
+
+🧹 [chore] Updates type definitions and tooling packages to newer versions for compatibility and maintenance.
+🧹 [chore] Refreshes linting, formatting, and markdown tooling to align with latest ecosystem updates.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(87c1ad2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/87c1ad2b324d67ac1f895accbd6d70e5b6e14f52)
+
+
+- 🧹 [chore] Adds lint plugin typings
+
+🧹 [chore] Adds local declaration stubs to replace suppression comments
+ - Improves TypeScript awareness for lint tooling
+
+🧹 [chore] Expands project config includes to pick up declarations
+ - Keeps IDE type resolution aligned with new typings
+
+🎨 [style] Reorders lint rule blocks for consistent grouping
+ - Keeps rule sets organized without behavioral changes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(58a63a0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/58a63a0a7b67037be77ca11081b9099ebc13196b)
+
+
+- 🧹 [chore] Improves lint config and deps
+
+🧹 [chore] Strengthens lint checks for markup, schemas, components, and tests to catch issues earlier
+🧹 [chore] Refines configuration to reduce type noise and align parser behavior
+🧹 [chore] Updates developer tooling dependencies for compatibility
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(07aac15)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/07aac1578fa2f316753312799c2adeaad23a1a95)
+
+
+- 🧹 [chore] Update dependencies and gitignore
+
+🔧 [build] Upgrade documentation and linting dependencies
+ - 📖 [dependency] Update `typedoc-plugin-mdn-links` to `v5.1.0` in both root and Docusaurus workspaces to ensure accurate external documentation references
+ - 🛠️ Update `eslint-plugin-toml` to `v1.0.3` to incorporate recent linting rule improvements
+ - 🛠️ Update `eslint-plugin-yml` to `v2.0.1` for YAML file validation stability
+🧹 [chore] Update version control ignore rules
+ - 📸 Add `storybook/stories/__screenshots__/` to `.gitignore` to prevent tracking of auto-generated visual regression testing assets
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e57c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dd2e57c6f343aadf376507f90e41f894663c0a55)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update .gitignore for Docusaurus outputs
+ - 🗑️ Remove outdated Docusaurus generated output paths
+ - ➕ Add back Docusaurus (repo-specific) generated outputs paths
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(42be818)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/42be818fdcfcb3dd835ced47d970d2309d4f5de7)
+
+
+- 🔧 [build] Harden IPC bridge & optimize UI stores
+
+✨ [feat] Implement comprehensive runtime validation for IPC response payloads across the preload bridge to ensure cross-process data integrity
+ - 🛡️ Introduce `createSafeParseAdapter` and specialized result parsers in the bridge factory to verify data coming from the main process
+ - 🔗 Migrate Cloud, Data, Monitoring, Settings, and System APIs to use `createValidatedInvoker` for strictly-typed response verification
+ - 📝 Expand shared Zod schemas to cover cloud migrations, status summaries, and synchronization results
+
+🛠️ [fix] Strengthen IPC parameter validation to mitigate potential prototype pollution vulnerabilities
+ - 🚫 Implement `getForbiddenRecordKeyErrors` to block reserved keys like `__proto__` and `constructor` in record validation
+
+⚡ [perf] Optimize React frontend performance by minimizing component re-renders
+ - 🧪 Apply `useShallow` selectors in `App.tsx` and `useSiteDetails.ts` to ensure components only update when relevant store slices change
+
+🚜 [refactor] Improve robustness of store event subscription and cleanup logic
+ - 🔄 Implement reference counting for update status event listeners to prevent duplicate registrations and ensure proper disposal
+ - 🐛 Resolve a race condition in site synchronization where cleanup could occur prematurely during subscription setup
+
+✨ [feat] Refine shared TypeScript definitions for better null safety and validation coverage
+ - 🔍 Enhance `isValidationResult` guard with stricter checks for errors, metadata, and success flags
+ - 🏗️ Standardize `StatusUpdate` and `CloudStatusSummary` types with explicit undefined properties
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb423d3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb423d315d543acbc735508af36917534bd6fd58)
+
+
+- 🔧 [build] Update ESLint and related dependencies for improved linting capabilities
+ - 🛠️ [fix] Change import of `yaml-eslint-parser` to use namespace import for consistency
+ - 🔧 [build] Upgrade `@eslint-react/eslint-plugin` to version 2.7.1 for better React linting support
+ - 🔧 [build] Update `eslint-plugin-react-dom`, `eslint-plugin-react-hooks-extra`, and `eslint-plugin-react-naming-convention` to version 2.7.1 for enhanced functionality
+ - 🔧 [build] Upgrade `stylelint-define-config` to version 17.0.0 for compatibility with newer stylelint features
+ - 🔧 [build] Update `toml-eslint-parser` to version 1.0.3 for improved TOML support
+ - 🔧 [build] Upgrade `yaml-eslint-parser` to version 2.0.0 for better YAML parsing capabilities
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0394b73)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0394b734a8033e752a81b44c6ba8b28e804cee44)
+
+
+- 🔧 [build] Update tools list in BeastMode agent for enhanced functionality
+ - Added 'todo' tool to the existing list for improved task management
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9cb6da7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9cb6da778af00bb9a686a88359aaf2c0a90b96de)
+
+
+- 🔧 [build] Update dependencies in package.json and package-lock.json
+
+ - 🔧 Update "@eslint-react/eslint-plugin" from "^2.6.4" to "^2.7.0" for improved linting capabilities.
+ - 🔧 Upgrade "@stylistic/stylelint-plugin" from "^4.0.1" to "^5.0.0" to leverage new features and fixes.
+ - 🔧 [dependency] Update "@types/node" from "^25.0.8" to "^25.0.9" for better type definitions.
+ - 🔧 Upgrade "electron" from "^39.2.7" to "^40.0.0" to utilize the latest Electron features and improvements.
+ - 🔧 Update "eslint-plugin-react-dom" from "^2.6.4" to "^2.7.0" for enhanced React DOM linting.
+ - 🔧 Upgrade "eslint-plugin-react-hooks-extra" and "eslint-plugin-react-naming-convention" from "^2.6.4" to "^2.7.0" for better React hooks linting.
+ - 🔧 Update "eslint-plugin-react-web-api" from "^2.6.4" to "^2.7.0" for improved linting of web API usage in React.
+ - 🔧 [dependency] Update "eslint-plugin-zod" from "^3.0.1" to "^3.0.2" for the latest validation features.
+ - 🔧 Upgrade "node-abi" from "^4.24.0" to "^4.25.0" for better compatibility with Node.js versions.
+ - 🔧 Update "putout" from "^41.8.1" to "^41.9.0" for the latest code transformation capabilities.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3d77be8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3d77be87d7e972e378fe8d12d57bc2d857236a2b)
+
+
+- 🔧 [build] Update TypeScript configuration files for improved build info management
+ - 🛠️ Update `tsBuildInfoFile` paths in multiple TypeScript configuration files to ensure consistency
+ - 🛠️ Adjust `declarationDir` paths in `.storybook/tsconfig.json` and `docs/docusaurus/tsconfig.json` for better organization
+ - 🛠️ Modify `tsBuildInfoFile` paths in benchmark and testing configurations to align with new directory structure
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fcf6daa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fcf6daa5fecd39ef8597474eae75d78efe9a3b9e)
+
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade "@csstools/stylelint-formatter-github" from "^1.0.0" to "^2.0.0" for improved formatting options.
+ - 🔄 Upgrade "@html-eslint/eslint-plugin" and "@html-eslint/parser" from "^0.52.x" to "^0.53.0" for better HTML linting support.
+ - 🔄 Upgrade "@stylistic/stylelint-plugin" from "^4.0.0" to "^4.0.1" for minor improvements.
+ - 🔄 Upgrade "eslint-plugin-zod" from "^3.0.0" to "^3.0.1" for bug fixes.
+ - 🔄 Upgrade "stylelint" from "^16.26.1" to "^17.0.0" to leverage new features and fixes.
+ - 🔄 Upgrade "stylelint-config-recommended" from "^17.0.0" to "^18.0.0" for updated linting rules.
+ - 🔄 Upgrade "stylelint-config-standard" from "^39.0.1" to "^40.0.0" for enhanced standard rules.
+ - 🔄 Upgrade "stylelint-config-standard-scss" from "^16.0.0" to "^17.0.0" for improved SCSS linting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4eaa0d9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4eaa0d96938e1e88f5743737727b65dc66cc5285)
+
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade node-sqlite3-wasm from ^0.8.52 to ^0.8.53 for improved performance and stability.
+ - 🔄 Upgrade type-fest from ^5.4.0 to ^5.4.1 for minor improvements.
+ - 🔄 Upgrade @eslint-react/eslint-plugin from ^2.6.0 to ^2.6.4 to incorporate the latest linting rules.
+ - 🔄 Upgrade @snyk/protect from ^1.1301.2 to ^1.1302.0 for enhanced security features.
+ - 🔄 Upgrade eslint-plugin-better-tailwindcss from ^4.0.0 to ^4.0.1 for better Tailwind CSS support.
+ - 🔄 Upgrade eslint-plugin-prettier from ^5.5.4 to ^5.5.5 for compatibility with the latest Prettier version.
+ - 🔄 Upgrade eslint-plugin-react-dom from ^2.6.0 to ^2.6.4 to ensure compatibility with React updates.
+ - 🔄 Upgrade eslint-plugin-react-hooks-extra from ^2.6.0 to ^2.6.4 for additional hooks linting rules.
+ - 🔄 Upgrade eslint-plugin-react-naming-convention from ^2.6.0 to ^2.6.4 for improved naming conventions.
+ - 🔄 Upgrade eslint-plugin-react-web-api from ^2.6.0 to ^2.6.4 for better web API linting.
+ - 🔄 Upgrade eslint-plugin-zod from ^1.4.0 to ^3.0.0 for major improvements in Zod validation.
+ - 🔄 Upgrade eslint-plugin-zod-x from ^2.0.1 to ^2.1.0 for enhanced Zod integration.
+ - 🔄 Upgrade knip from ^5.80.2 to ^5.81.0 for better code analysis.
+ - 🔄 Upgrade postcss-logical from ^8.1.0 to ^9.0.0 for improved logical properties support.
+ - 🔄 Upgrade prettier from ^3.7.4 to ^3.8.0 for the latest formatting features.
+ - 🔄 Upgrade putout from ^41.7.3 to ^41.8.1 for better code transformation capabilities.
+ - 🔄 Upgrade toml-eslint-parser from ^1.0.1 to ^1.0.2 for improved TOML parsing.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8051906)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8051906499e393c60925676d9b49f66986ceeee4)
+
+
+
+
+
+
+## [20.5.0] - 2026-01-13
+
+
+[[2182f82](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2182f82356185ddf68f337cad5adf38da018289a)...
+[67e726a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/67e726acc952aaf55ed1a47b1760709c75e1fa41)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2182f82356185ddf68f337cad5adf38da018289a...67e726acc952aaf55ed1a47b1760709c75e1fa41))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance cloud backup and token management functionality
+ - 🔧 [feat] Implement best-effort cleanup for orphaned metadata in `uploadBackupWithMetadata`
+ - 🔧 [feat] Add `deleteObject` method to `BaseCloudStorageProvider` for improved object management
+ - 🔧 [feat] Introduce `handleChildProcessGone` and `handleBrowserWindowCreated` for better process monitoring in Electron
+ - 🔧 [feat] Deduplicate concurrent token refresh requests in `DropboxTokenManager` and `GoogleDriveTokenManager`
+ - 🔧 [feat] Add logging for orphaned metadata sidecars in `listBackupsFromMetadataObjects`
+ - 🔧 [feat] Implement `syncFileSafely` and `syncDirectorySafely` methods in `DataBackupService` to ensure data integrity during file operations
+ - 🔧 [feat] Enhance error handling in `getUserFacingErrorDetail` to redact sensitive information
+ - 🧪 [test] Add tests for `uploadBackupWithMetadata` to verify deletion of backups on metadata upload failure
+ - 🧪 [test] Create tests for `listBackupsFromMetadataObjects` to ensure orphaned metadata is skipped
+ - 🧪 [test] Add tests for deduplication of concurrent refreshes in `DropboxTokenManager` and `GoogleDriveTokenManager`
+ - 🧪 [test] Update tests for `DataBackupService` to cover new sync methods
+ - 🎨 [style] Refactor `useOverflowMarquee` hook for improved readability and performance
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9cf2e5b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9cf2e5bed6dab0495f6c6bc9dedbccd7c2626224)
+
+
+- ✨ [feat] Add sqlite backup IPC and update tooling
+
+✨ [feat] Introduces `save-sqlite-backup` IPC invocation channel for database persistence 🗄️
+ - 🛰️ Establishes the communication bridge for serialized database backup results
+📝 [docs] Synchronizes architectural documentation with the latest IPC registry 📄
+ - 📈 Updates the generated channel inventory to reflect the new backup capability
+🔧 [build] Enhances the linting infrastructure with automated IPC validation 🛠️
+ - 🧼 Integrates dedicated `lint:ipc` and `lint:ipc:fix` tasks into the global workflow
+ - 🏎️ Streamlines the `lint:ci` script by centralizing static guard execution logic
+🧹 [chore] Performs a wide-scale update of development tools and dependencies 📦
+ - ⬆️ [dependency] Updates versions for core tooling including `vite`, `knip`, and `putout`
+ - ⚙️ Upgrades several ESLint plugins for React, Stylistic, and JSDoc rulesets
+ - 🔒 Refreshes the package lockfile to maintain a secure and consistent dependency tree
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f7928ed)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f7928ed26291f91c1f8dbb74cb690e1c9b61f650)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Harden data integrity, backoff logic, and logging safety
+
+🛠️ [fix] Improve database restore reliability by introducing mandatory SQLite structural integrity checks before swapping files
+ - 🛡️ Implement renderer-side IPC budget enforcement for backup and import payloads to prevent memory exhaustion and "IPC failed" confusion
+ - 🔒 Wrap database event emissions in protective try-catch blocks to ensure that notification failures do not interrupt critical data operations
+🛠️ [fix] Enhance service resilience by increasing maximum exponential backoff delay to 60 minutes, mitigating provider rate-limiting and local contention
+ - ⏱️ Update scheduler logic to ensure backoff caps never reduce the user-configured base monitoring interval
+ - 💤 Call `unref()` on monitoring timers to prevent scheduled checks from blocking graceful application shutdown
+🛠️ [fix] Secure monitoring logs by redacting sensitive URL components including credentials, query parameters, and fragments
+ - 📁 Update Dropbox provider to gracefully ignore folder and deleted entries during recursive file listings
+✨ [feat] Upgrade Settings UI to utilize the shared `Modal` component, adding 지원 for decorative backgrounds and detailed subtitles
+ - 🎹 Implement ARIA-compliant keyboard navigation (arrow keys, Home, End) for Site Details tabs to improve accessibility
+ - 🔍 Expand cloud sync maintenance tools with a new diagnostic JSON export and a live preview of the generated diagnostic text
+🚜 [refactor] Simplify IPC bridge type definitions to reduce mapped-type complexity and improve IDE performance/tooling accuracy
+🎨 [style] Modernize Settings styling using nested CSS rules for better maintainability and encapsulation
+🧹 [chore] Migrate YAML linting to ESLint for improved performance and consistency across the configuration stack
+🧪 [test] Add comprehensive unit and regression tests for scheduler backoff, URL redaction, database integrity, and IPC payload budgeting
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a1b90c2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1b90c2b69d6099e4ed7372cdda280480c6cf8ad)
+
+
+- 🛠️ [fix] Refine store cleanup and bump dependencies
+
+🛠️ [fix] Optimize cleanup logic in the updates store
+ - 🗑️ Remove redundant service cleanup call within the subscription handler to prevent unnecessary executions when the store is already disposed
+
+🔧 [build] Upgrade project-wide devDependencies and tools
+ - ⬆️ Update ESLint plugins for React, Playwright, and Putout to their latest versions
+ - ⬆️ [dependency] Update `@jscpd` and `jscpd` packages to improve code duplication detection
+ - ⬆️ Update `putout` and `markdown-to-jsx` for better code transformation and rendering
+ - ⬆️ Modernize documentation tools by upgrading `typedoc` and its dependency links plugin
+
+🧪 [test] Expand strict unit test coverage for services and stores
+ - ✅ Add detailed tests for `openExternalUtils` to verify secure URL handling and error suffix generation
+ - ✅ Implement unit tests for `AppNotificationService` to ensure IPC initialization and payload wrapping
+ - ✅ Add coverage for `usePromptDialog` to verify successful store delegation
+ - ✅ Create robust tests for `useUpdatesStore` covering state mutations, subscription management, and error logging
+ - 🚫 Update Vitest configuration to exclude Electron test directories from production coverage reports
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6bf53b5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6bf53b5658bfff3bb18c75d71c0448549c0e3172)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group [`(cc335f9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc335f9e4794789d9b2cfeb32333e131671c69e6)
+
+
+- *(deps)* [dependency] Update dependency group [`(b84f81b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b84f81b60f02abccd430a95b75e4fdbdcb92432b)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Modularize core services and harden IPC
+
+🚜 [refactor] Decompose monolithic services into specialized modules
+ - ☁️ Relocate `CloudService` logic into dedicated operation modules for backups, encryption, provider management, and synchronization.
+ - 🛡️ Introduce an internal operation context to safely share dependencies across extracted cloud modules.
+ - 📡 Offload `UptimeOrchestrator` event-handler plumbing to a dedicated handler class to improve maintainability.
+ - 🏗️ Extract site state synchronization and revision bookkeeping from `SiteManager` into `SiteManagerStateSync`.
+ - 🔍 Separate dynamic SQL query building and identifier escaping from `MonitorRepository` into specialized update utilities.
+
+✨ [feat] Harden IPC security and preload bridge validation
+ - 🧱 Implement `createValidatedInvoker` in the bridge factory to verify main-process response payloads against Zod schemas.
+ - 🛡️ Introduce strict JSON byte-budget checks for monitor validation payloads to prevent memory exhaustion via IPC.
+ - 📊 Enhance IPC response metadata to include execution duration, parameter counts, and structured validation errors.
+ - 🧪 Expand property-based testing for monitor type APIs to ensure schema enforcement for all edge cases.
+
+🛠️ [fix] Enhance WindowService security and idempotency
+ - 🗔 Ensure `createMainWindow` is idempotent by reusing existing instances instead of spawning duplicates.
+ - 🚫 Strengthen security by explicitly denying and logging unauthorized permission requests and display media (screen capture) attempts.
+
+🧹 [chore] Modernize project configuration and dependencies
+ - 📦 Update core dependencies including `@types/node`, `eslint-plugin-react`, and `secretlint` packages.
+ - 🎨 Clean up redundant Prettier configurations and adjust HTML hinting rules to support flexible tag closing.
+ - 🔧 Refine Node.js configuration for improved test reporting and diagnostic output.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eb04abf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eb04abff5a857c0756d6a21108d686f5500827a3)
+
+
+- 🚜 [refactor] Decouple event orchestration and modularize core services
+
+🚜 [refactor] Decouple event orchestration logic from the main orchestrator
+ - 🧩 Introduces `OrchestratorEventForwardingCoordinator` to isolate the logic for bridging internal manager events to renderer-facing public events
+ - 🧹 Removes extensive event handling boilerplate from `UptimeOrchestrator` to improve maintainability and focus on high-level lifecycle delegation
+🚜 [refactor] Modularize event type definitions via domain-specific catalogues
+ - 📂 Decomposes the monolithic `UptimeEvents` interface into specialized modules covering `core`, `internalCacheDatabase`, `internalMonitoringSite`, and `public` events
+ - 🔌 Employs TypeScript module augmentation to provide a scalable and organized event map architecture
+🚜 [refactor] Streamline service dependencies and cloud orchestration
+ - 📦 Extracts `ServiceContainerEventForwarder` to manage inter-manager bus communication outside of the primary `ServiceContainer`
+ - ☁️ Refactors `CloudService` by extracting settings, migration, and backup metadata logic into dedicated internal helper modules
+ - 🏗️ Isolates `SiteManager` dependency and interface contracts into a standalone type-only module to reduce implementation file noise
+🎨 [style] Standardize compiler and build configurations
+ - 🔧 Updates testing `tsconfig` files with consistent path mapping, output directories, and build info locations
+ - 💅 Reformats JSON configuration files for improved readability and structural consistency
+🧪 [test] Update test suites for architectural alignment
+ - 🛠️ Adjusts `ServiceContainer` and `SiteManager` tests to integrate with the new coordinator and type structures
+ - 🧪 Align monitoring and scheduler tests with updated event emission signatures
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9436129)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9436129ac38c9ac8acc719740f9290d0c80e25f9)
+
+
+- 🚜 [refactor] Standardize imports and event documentation
+
+🚜 [refactor] Enforces namespace imports for Node.js built-in modules using `import * as` syntax across the entire codebase to improve consistency and ESM compatibility 📦
+ - Updates usage of `node:path`, `node:fs`, `node:crypto`, `node:http`, and `node:tls` in services, scripts, and configuration files 🛠️
+
+📝 [docs] Extensively updates Architectural Decision Records (ADRs) and pattern guides to align with refined event naming conventions 📑
+ - Renames plural event topics like `sites:added` to singular `site:added` to strictly follow the `domain:action` standard 🏷️
+ - Clarifies state synchronization mechanisms, documenting how internal main-process events are rebroadcast to renderers via the `state-sync-event` IPC channel 📡
+ - Refines integration guides for error handling, renderer integration, and lifecycle management to include updated technical contracts 📈
+
+🧹 [chore] Hardens the linting configuration by implementing strict `unicorn/import-style` rules within `eslint.config.mjs` 🧼
+ - Adds repository-specific ignore patterns to `.gitignore` and `.remarkignore` to manage Docusaurus build outputs and generated documentation 📁
+
+🛡️ [fix] Optimizes the preload bridge by simplifying event validation guards and stripping redundant metadata reason codes 🔒
+ - Updates `WindowService` security notes to detail Chromium sandbox constraints and dependencies within the preload layer 🛡️
+
+🧪 [test] Updates the testing suite, including Vitest configurations and mock bridges, to reflect renamed identifiers and corrected import paths 🧪
+ - Adjusts Playwright fixtures and E2E coverage utilities to maintain parity with the updated project structure 🎭
+
+🏗️ [build] Updates Vite and Vitest configuration files to use standardized import patterns for build-time resolution utilities 🏗️
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7bfbade)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bfbade524a70f4877226e03e5335295e8467ad6)
+
+
+- 🚜 [refactor] Streamline IPC protocol and state sync events
+
+🚜 [refactor] Decouple event subscriptions from the state sync bridge by moving broadcast listeners to a dedicated events domain
+🚜 [refactor] Simplify the IPC response contract by removing legacy validation wrappers and specialized response types
+🛡️ [logic] Enhance site synchronization reliability with a new sanitation pipeline that detects duplicate identifiers and overlapping deltas
+✨ [feat] Add a bulk deletion method to the site management service for clearing all records in a single operation
+✅ [validator] Replace manual string checks with shared Zod schemas for site and monitor identifier validation
+📝 [docs] Update architecture guidelines and ADRs to reflect hyphenated naming conventions for invoke channels and broadcast patterns for events
+📂 [refactor] Reorganize IPC validators into domain-specific modules for better maintainability and discovery
+🧪 [test] Align comprehensive test suites with the revised preload bridge interface and improved error logging diagnostics
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7e0f249)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e0f249377aea5ea4997ac6bfc0a92149bd7ce85)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update architecture docs and linting
+
+🚜 [refactor] Standardize internal Zod schema naming and validation
+ - 🔄 Reorganizes internal schema variables to follow a consistent `internalSchema` suffix naming convention across shared types
+ - 🔢 Simplifies numeric validation by utilizing direct integer constraints for timestamps, ports, and retry counts
+ - ⚖️ Refines Zod error handling by switching custom refine logic to use explicit error objects for enhanced validation feedback
+
+🎨 [style] Improve acronym casing in UI display labels
+ - 🔡 Enhances text formatting utilities to correctly preserve uppercase for common acronyms like HTTP, DNS, and API
+ - 🏷️ Updates monitor status badges and selectors to display technical terms with consistent casing
+
+🔧 [build] Expand ESLint configuration for future-proofing and consistency
+ - 🧪 Integrates `eslint-plugin-react-19-upgrade` to prepare the codebase for upcoming React version transitions
+ - 📦 Adds `eslint-plugin-zod-x` and `eslint-plugin-case-police` to enforce best practices and string casing standards
+ - ⚙️ Configures additional rules for workspace hardening, including strict gitignore parsing and namespace import preferences
+
+📝 [docs] Update Architecture Decision Records and API documentation
+ - 📅 Refreshes multiple ADRs with updated review dates and refined implementation statuses for cloud sync and security
+ - 🗺️ Clarifies the roadmap for WebDAV support and documents the shift toward `safeStorage` for secret management
+ - 📖 Rewrites monitor configuration API guides to align with the shared domain model and centralized Zod schemas
+
+🛠️ [fix] Refine OAuth loopback behavior and platform-specific paths
+ - 🌐 Adjusts loopback redirect logic to accommodate provider-specific path requirements while maintaining port stability
+ - 🍎 Corrects a casing typo in the macOS application bundle path within the backup service tests
+
+🧪 [test] Synchronize test suites with updated UI and schema logic
+ - ✅ Updates unit and fuzzing tests to match new casing expectations for monitor type display labels
+ - 🧪 Refines property-based tests to accurately validate camelCase and snake_case transformations with acronym support
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(588c07b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/588c07b04f9373f729bd12bd03e2a753ecd6e2c9)
+
+
+
+### 🧹 Chores
+
+- *(release)* V20.5.0 [skip ci] [`(67e726a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/67e726acc952aaf55ed1a47b1760709c75e1fa41)
+
+
+- Update changelogs for v20.4.0 [skip ci] [`(2182f82)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2182f82356185ddf68f337cad5adf38da018289a)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update ESLint configuration for improved code quality
+ - Optimize ESLint rules for better adherence to domain-driven design principles
+ - Enhance support for modern ES2024+ features
+ - Improve security and performance rules to reduce false positives
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(174388e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/174388e81e5738adb4ad124caba24924fc8bcee9)
+
+
+- 🔧 [build] Update dependencies in package.json and package-lock.json
+
+ - 🔧 Update "@eslint-react/eslint-plugin" from "^2.5.3" to "^2.5.4" for improved linting capabilities.
+ - 🔧 Upgrade "@types/node" from "^25.0.3" to "^25.0.6" to ensure compatibility with the latest Node.js features.
+ - 🔧 [dependency] Update "@types/react" from "^19.2.7" to "^19.2.8" for enhanced type definitions.
+ - 🔧 Change "canvas" version from "^3.2.0" to "^3.2.1" to include bug fixes and performance improvements.
+ - 🔧 Update "eslint-plugin-json-schema-validator" from "^5.5.0" to "^5.5.1" for better JSON schema validation.
+ - 🔧 Upgrade "eslint-plugin-react-dom" from "^2.5.3" to "^2.5.4" for improved React DOM linting.
+ - 🔧 [dependency] Update "eslint-plugin-react-hooks-extra" and "eslint-plugin-react-naming-convention" from "^2.5.3" to "^2.5.4" for enhanced React hooks linting.
+ - 🔧 Update "eslint-plugin-react-web-api" from "^2.5.3" to "^2.5.4" for better linting of React web APIs.
+ - 🔧 Change "eslint-plugin-toml" from "^0.13.0" to "^0.13.1" to include minor updates.
+ - 🔧 Upgrade "markdown-to-jsx" from "^9.5.1" to "^9.5.3" for improved Markdown rendering.
+ - 🔧 Update "toml-eslint-parser" from "^0.11.0" to "^1.0.0" for enhanced TOML parsing capabilities.
+ - 🔧 Update various dependencies in package-lock.json to reflect the changes made in package.json.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d41682d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d41682d25abbd3a7a2aa6b0c394676092e5b21c3)
+
+
+
+
+
+
 ## [20.4.0] - 2026-01-09
 
 
@@ -359,6 +1130,16 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ea20
 ### 🧹 Chores
 
 - *(release)* V20.4.0 [skip ci] [`(ca17620)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca176206fe1d67e7463ba8dc59bd3c320b255c48)
+
+
+- 🧹 [chore] Update package.json and vite.config.ts to remove googleapis dependency
+
+ - 🔧 Removed "googleapis" from the dependencies in package.json to streamline the project and reduce unnecessary bloat.
+ - 🔧 Updated the "clean" script in package.json to include "release" in the cleanup process, ensuring that all relevant build artifacts are removed.
+ - 🔧 Modified the "clean:cache:dist" script to also remove "release" artifacts, maintaining a clean state for builds.
+ - 🔧 Removed "googleapis" from the external dependencies in vite.config.ts to further optimize the build process and avoid inflating the main-process bundle.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8af71)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7c8af71e64ce67f7f34472fe396ec34003719221)
 
 
 - Update changelogs for v20.3.0 [skip ci] [`(035312d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/035312d755c30d89d4584d3f95d1deb08b68eb74)
