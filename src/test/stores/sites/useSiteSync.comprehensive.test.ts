@@ -14,7 +14,7 @@ import {
     type Mock,
 } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import type { Site } from "@shared/types";
+import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 import { createMockFunction } from "../../utils/mockFactories";
@@ -185,7 +185,7 @@ describe("useSiteSync", () => {
 
             const fullSyncResult = {
                 completedAt: Date.now(),
-                   revision: 1,
+                revision: 1,
                 siteCount: mockSites.length,
                 sites: mockSites,
                 source: "frontend" as const,
@@ -340,6 +340,79 @@ describe("useSiteSync", () => {
             );
         });
 
+        it("uses the most recent callback when subscribing again", async () => {
+            const statusUpdateHandlerModule =
+                await import("../../../stores/sites/utils/statusUpdateHandler");
+            const StatusUpdateManagerMock = vi.mocked(
+                statusUpdateHandlerModule.StatusUpdateManager
+            );
+
+            let capturedOnUpdate: ((update: StatusUpdate) => void) | undefined;
+
+            StatusUpdateManagerMock.mockReset();
+            StatusUpdateManagerMock.mockImplementation(
+                function StatusUpdateManagerCallbackMock(options: {
+                    onUpdate?: (update: StatusUpdate) => void;
+                }) {
+                    capturedOnUpdate = options.onUpdate;
+
+                    return {
+                        getExpectedListenerCount: vi.fn(() => 4),
+                        subscribe: vi.fn(async () => ({
+                            errors: [],
+                            expectedListeners: 4,
+                            listenersAttached: 4,
+                            listenerStates: buildListenerStates(4),
+                            success: true,
+                        })),
+                        unsubscribe: vi.fn(),
+                    } as unknown as StatusUpdateManager;
+                }
+            );
+
+            const callbackA = vi.fn();
+            await syncActions.subscribeToStatusUpdates(callbackA);
+
+            expect(typeof capturedOnUpdate).toBe("function");
+
+            const updateA: StatusUpdate = {
+                monitor: {
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "site-1-monitor",
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 0,
+                    status: "up",
+                    timeout: 5000,
+                    type: "http",
+                    url: "https://example.com/site-1",
+                },
+                monitorId: "site-1-monitor",
+                site: buildSite("site-1"),
+                siteIdentifier: "site-1",
+                status: "up",
+                timestamp: new Date().toISOString(),
+            };
+
+            capturedOnUpdate?.(updateA);
+            expect(callbackA).toHaveBeenCalledTimes(1);
+
+            const callbackB = vi.fn();
+            await syncActions.subscribeToStatusUpdates(callbackB);
+
+            // The manager instance is reused; the dispatcher must forward to
+            // the latest callback.
+            capturedOnUpdate?.({
+                ...updateA,
+                timestamp: new Date().toISOString(),
+            });
+
+            expect(callbackB).toHaveBeenCalledTimes(1);
+            expect(callbackA).toHaveBeenCalledTimes(1);
+            expect(StatusUpdateManagerMock).toHaveBeenCalledTimes(1);
+        });
+
         it("should handle StatusUpdateManager subscription errors", async ({
             task,
             annotate,
@@ -481,6 +554,66 @@ describe("useSiteSync", () => {
             expect(typeof result).toBe("function");
         });
 
+        it("should be idempotent and ref-counted", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteSyncActions", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Subscription", "type");
+
+            const cleanupSpy = vi.fn();
+            mockStateSyncService.onStateSyncEvent.mockResolvedValue(cleanupSpy);
+
+            const unsubscribe1 = syncActions.subscribeToSyncEvents();
+            const unsubscribe2 = syncActions.subscribeToSyncEvents();
+
+            expect(mockStateSyncService.onStateSyncEvent).toHaveBeenCalledTimes(
+                1
+            );
+
+            // Let the async subscription resolve.
+            await Promise.resolve();
+            await Promise.resolve();
+
+            unsubscribe1();
+            expect(cleanupSpy).not.toHaveBeenCalled();
+
+            unsubscribe2();
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cleanup even if unsubscribed before subscription resolves", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteSyncActions", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Subscription", "type");
+
+            const cleanupSpy = vi.fn();
+            let resolveCleanup: ((cleanup: () => void) => void) | undefined;
+
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                () =>
+                    new Promise<() => void>((resolve) => {
+                        resolveCleanup = resolve;
+                    })
+            );
+
+            const unsubscribe = syncActions.subscribeToSyncEvents();
+            unsubscribe();
+
+            // Subscription resolves later.
+            resolveCleanup?.(cleanupSpy);
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        });
+
         it("should handle bulk-sync events", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteSync", "component");
@@ -496,14 +629,14 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-                const bulkSyncEvent = {
-                    action: "bulk-sync",
-                    revision: 1,
-                    siteCount: mockSites.length,
-                    sites: mockSites,
-                    source: "database",
-                    timestamp: Date.now(),
-                };
+            const bulkSyncEvent = {
+                action: "bulk-sync",
+                revision: 1,
+                siteCount: mockSites.length,
+                sites: mockSites,
+                source: "database",
+                timestamp: Date.now(),
+            };
 
             mockDeps.getSites.mockReturnValueOnce([]);
             eventHandler(bulkSyncEvent);
@@ -534,18 +667,18 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-                const deleteEvent = {
-                    action: "delete" as const,
-                    siteIdentifier: "site-1",
-                    delta: {
-                        addedSites: [],
-                        removedSiteIdentifiers: ["site-1"],
-                        updatedSites: [],
-                    },
-                    revision: 2,
-                    source: "frontend" as const,
-                    timestamp: Date.now(),
-                };
+            const deleteEvent = {
+                action: "delete" as const,
+                siteIdentifier: "site-1",
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: ["site-1"],
+                    updatedSites: [],
+                },
+                revision: 2,
+                source: "frontend" as const,
+                timestamp: Date.now(),
+            };
 
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
@@ -655,23 +788,23 @@ describe("useSiteSync", () => {
 
             syncActions.subscribeToSyncEvents();
 
-                const updateEvent = {
-                    action: "update" as const,
-                    siteIdentifier: "site-1",
-                    delta: {
-                        addedSites: [],
-                        removedSiteIdentifiers: [],
-                        updatedSites: [
-                            {
-                                ...buildSite("site-1"),
-                                name: "Updated Site 1",
-                            },
-                        ],
-                    },
-                    revision: 4,
-                    source: "frontend" as const,
-                    timestamp: Date.now(),
-                };
+            const updateEvent = {
+                action: "update" as const,
+                siteIdentifier: "site-1",
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [],
+                    updatedSites: [
+                        {
+                            ...buildSite("site-1"),
+                            name: "Updated Site 1",
+                        },
+                    ],
+                },
+                revision: 4,
+                source: "frontend" as const,
+                timestamp: Date.now(),
+            };
 
             mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(updateEvent);

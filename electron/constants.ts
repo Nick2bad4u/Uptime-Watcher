@@ -2,11 +2,8 @@ import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { DEFAULT_SITE_NAME as SHARED_DEFAULT_SITE_NAME } from "@shared/constants/sites";
 
 /**
- * Backend constants for the Uptime Watcher application.
- *
- * @remarks
- * This module defines configuration values and operational defaults used
- * throughout the Electron main process and backend services.
+ * @example Const delay = RETRY_BACKOFF.INITIAL_DELAY; const nextDelay =
+ * Math.min( delay * RETRY_BACKOFF.MULTIPLIER, RETRY_BACKOFF.MAX_DELAY );
  *
  * @packageDocumentation
  */

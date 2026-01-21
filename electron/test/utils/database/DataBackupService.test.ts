@@ -757,6 +757,24 @@ describe(DataBackupService, () => {
                 })
             );
             expect(mockDatabaseService.close).toHaveBeenCalled();
+
+            // WAL/SHM sidecars must not be applied to the restored DB.
+            const expectedDbPath = path.join(
+                "/test/userdata",
+                "uptime-watcher.sqlite"
+            );
+            expect(mockFsPromises.rename).toHaveBeenCalledWith(
+                `${expectedDbPath}-wal`,
+                expect.stringMatching(
+                    /uptime-watcher\.sqlite\.rollback-\d+-wal$/u
+                )
+            );
+            expect(mockFsPromises.rename).toHaveBeenCalledWith(
+                `${expectedDbPath}-shm`,
+                expect.stringMatching(
+                    /uptime-watcher\.sqlite\.rollback-\d+-shm$/u
+                )
+            );
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "database:backup-restored",
@@ -778,9 +796,13 @@ describe(DataBackupService, () => {
                 Buffer.from("corrupt-but-has-header"),
             ]);
 
-            vi.mocked(assertSqliteDatabaseIntegrity).mockImplementationOnce(() => {
-                throw new Error("SQLite quick_check failed: database disk image is malformed");
-            });
+            vi.mocked(assertSqliteDatabaseIntegrity).mockImplementationOnce(
+                () => {
+                    throw new Error(
+                        "SQLite quick_check failed: database disk image is malformed"
+                    );
+                }
+            );
 
             await expect(
                 dataBackupService.restoreDatabaseBackup({
@@ -822,8 +844,12 @@ describe(DataBackupService, () => {
         });
 
         it("should copy provided backup and reinitialize database", async () => {
+            const buffer = Buffer.concat([
+                Buffer.from("SQLite format 3\0", "ascii"),
+                Buffer.from("previous"),
+            ]);
             const backup: DatabaseBackupResult = {
-                buffer: Buffer.from("previous"),
+                buffer,
                 fileName: "pre-restore.sqlite",
                 metadata: {
                     appVersion: "0.0.0-test",
@@ -832,7 +858,7 @@ describe(DataBackupService, () => {
                     originalPath: "/tmp/pre-restore.sqlite",
                     retentionHintDays: 30,
                     schemaVersion: 1,
-                    sizeBytes: 9,
+                    sizeBytes: buffer.length,
                 },
             };
 
@@ -849,11 +875,42 @@ describe(DataBackupService, () => {
             );
             expect(mockDatabaseService.close).toHaveBeenCalled();
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
+            expect(assertSqliteDatabaseIntegrity).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    mode: "quick_check",
+                })
+            );
             expect(mockFsPromises.copyFile).toHaveBeenCalled();
             expect(metadata).toEqual({
                 ...backup.metadata,
                 originalPath: backup.fileName,
             });
+        });
+
+        it("should reject non-SQLite buffers before writing temp files", async () => {
+            const buffer = Buffer.from("definitely-not-sqlite");
+            const backup: DatabaseBackupResult = {
+                buffer,
+                fileName: "pre-restore.sqlite",
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "checksum",
+                    createdAt: Date.now(),
+                    originalPath: "/tmp/pre-restore.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: buffer.length,
+                },
+            };
+
+            await expect(
+                dataBackupService.applyDatabaseBackupResult(backup)
+            ).rejects.toThrowError(/not a valid SQLite database file/u);
+
+            expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
+            expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).not.toHaveBeenCalled();
         });
 
         it("should attempt to reinitialize even when copy fails", async () => {

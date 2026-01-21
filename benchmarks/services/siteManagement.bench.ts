@@ -1,9 +1,9 @@
 /**
  * Site Management Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises site management benchmark scenarios to measure service throughput and resilience.
+ * site management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";

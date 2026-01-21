@@ -29,8 +29,11 @@ describe("cloudApi", () => {
                 configured: false,
                 connected: false,
                 backupsEnabled: false,
+                encryptionLocked: false,
+                encryptionMode: "none",
                 syncEnabled: false,
                 lastBackupAt: null,
+                lastSyncAt: null,
             },
         });
 
@@ -106,8 +109,11 @@ describe("cloudApi", () => {
                 configured: false,
                 connected: false,
                 backupsEnabled: false,
+                encryptionLocked: false,
+                encryptionMode: "none",
                 syncEnabled: true,
                 lastBackupAt: null,
+                lastSyncAt: null,
             },
         });
 
@@ -128,8 +134,11 @@ describe("cloudApi", () => {
                 configured: false,
                 connected: false,
                 backupsEnabled: false,
+                encryptionLocked: false,
+                encryptionMode: "none",
                 syncEnabled: false,
                 lastBackupAt: null,
+                lastSyncAt: null,
             },
         });
 
@@ -149,8 +158,11 @@ describe("cloudApi", () => {
                 configured: true,
                 connected: true,
                 backupsEnabled: true,
+                encryptionLocked: false,
+                encryptionMode: "none",
                 syncEnabled: false,
                 lastBackupAt: null,
+                lastSyncAt: null,
                 providerDetails: {
                     kind: "filesystem",
                     baseDirectory: "C:/Backups",

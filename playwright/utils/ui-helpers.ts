@@ -805,7 +805,8 @@ export async function openSiteDetailsSettingsTab(
     siteDetailsModal: Locator
 ): Promise<void> {
     const settingsButton = siteDetailsModal
-        .getByRole("button", { name: "Settings" })
+        .getByRole("tab", { name: "Settings" })
+        .or(siteDetailsModal.getByRole("button", { name: "Settings" }))
         .first();
 
     await settingsButton.scrollIntoViewIfNeeded();
@@ -1125,15 +1126,24 @@ export async function waitForConfirmDialogRequest(
             ? "danger"
             : "default";
 
-        const message =
-            getText(".confirm-dialog__body") ??
-            getText("[data-testid='confirm-dialog-message']") ??
-            "";
+        // ConfirmDialog uses the shared Modal shell for its title.
         const title =
+            getText(".modal-shell__title") ??
             getText(".confirm-dialog__title") ??
             getText("[data-testid='confirm-dialog-title']") ??
             "";
-        const details = getText(".confirm-dialog__details");
+
+        const message =
+            getText(".confirm-dialog__message") ??
+            getText(".confirm-dialog__body") ??
+            getText("[data-testid='confirm-dialog-message']") ??
+            "";
+
+        const details =
+            getText(".confirm-dialog__details") ??
+            // Details are currently rendered as a ThemedText with margin utility
+            // classes, so fall back to a direct query by role when present.
+            getText("[role='alertdialog'] .mt-3");
 
         return {
             cancelLabel,

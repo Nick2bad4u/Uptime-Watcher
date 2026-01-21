@@ -279,6 +279,23 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
             expect(window).toBeDefined();
         });
+
+        it("should be idempotent and reuse the existing main window", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
+            const window1 = windowService.createMainWindow();
+            const window2 = windowService.createMainWindow();
+
+            expect(window2).toBe(window1);
+            // BrowserWindow constructor should only be called once.
+            expect(BrowserWindow).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("getMainWindow", () => {
@@ -1087,7 +1104,9 @@ describe(WindowService, () => {
             expect(BrowserWindow).toHaveBeenCalledWith(
                 expect.objectContaining({
                     webPreferences: expect.objectContaining({
-                        preload: expect.stringMatching(/dist[\\/]preload\.js$/u),
+                        preload: expect.stringMatching(
+                            /dist[\\/]preload\.js$/u
+                        ),
                     }),
                 })
             );

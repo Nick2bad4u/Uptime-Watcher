@@ -10,7 +10,7 @@
         "baseUrl": ".",
         "checkJs": false,
         "declaration": true,
-        "declarationDir": ".cache/builds/docusaurus/site/types",
+        "declarationDir": "../../.cache/builds/docusaurus/site/types",
         "declarationMap": true,
         "disableSizeLimit": true,
         "downlevelIteration": true,
@@ -62,7 +62,7 @@
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "../../.cache/tsconfig.docusaurus.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.docusaurus.tsbuildinfo",
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true
     },

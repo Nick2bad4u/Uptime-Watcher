@@ -212,10 +212,21 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                const dismissButton = recoveredToastEntry.getByRole("button", {
-                    name: "Dismiss alert",
+                const recoveredAlertId =
+                    await recoveredToastEntry.getAttribute("data-alert-id");
+                expect(recoveredAlertId).toBeTruthy();
+
+                await recoveredToastEntry.click();
+
+                // Wait for the specific toast we clicked to be removed after
+                // dismissal. We cannot assert that *all* recovered toasts are
+                // gone, because multiple recovered alerts can be emitted in
+                // quick succession (flaky timing).
+                await expect(
+                    page.getByTestId(`status-alert-${recoveredAlertId}`)
+                ).toHaveCount(0, {
+                    timeout: WAIT_TIMEOUTS.LONG,
                 });
-                await dismissButton.click();
             }
         );
     }

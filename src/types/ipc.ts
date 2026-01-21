@@ -112,9 +112,7 @@ export type SerializedDatabaseRestoreResult =
  * @public
  */
 // eslint-disable-next-line etc/no-misused-generics -- Type parameter must be explicitly provided for type guard
-export function isIpcResponse<T>(
-    value: unknown
-): value is IpcResponse<T> {
+export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
     return isIpcResponseEnvelope(value);
 }
 

@@ -3,9 +3,7 @@
  * handlers should return responses following this structure.
  */
 
-import type {
-    IpcResponse as SharedIpcResponse,
-} from "@shared/types/ipc";
+import type { IpcResponse as SharedIpcResponse } from "@shared/types/ipc";
 
 /**
  * Canonical IPC response shape used by Electron IPC handlers.

@@ -41,13 +41,15 @@ import {
     extractIpcResponseData,
     validateVoidIpcResponse,
 } from "@shared/utils/ipcResponse";
+import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
 
-import { isJsonByteBudgetExceeded } from "../../utils/jsonByteBudget";
 import {
+    buildPayloadPreview,
     preloadDiagnosticsLogger,
     preloadLogger,
+    reportPreloadGuardFailure,
 } from "../utils/preloadLogger";
 
 /**
@@ -56,6 +58,171 @@ import {
  * @typeParam T - Payload type carried by a successful IPC response.
  */
 export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
+
+/**
+ * Minimal "safe parse" shape compatible with Zod's `safeParse` return type.
+ *
+ * @remarks
+ * Preload bridges often reuse shared Zod schemas/guards to validate IPC
+ * payloads. This type allows domain modules to pass either Zod safe parsers or
+ * custom validators into {@link createValidatedInvoker}.
+ */
+export type SafeParseLike<T> =
+    | {
+          readonly data: T;
+          readonly success: true;
+      }
+    | {
+          readonly error: unknown;
+          readonly success: false;
+      };
+
+/**
+ * Generic safe-parse result shape used by Zod and compatible validators.
+ *
+ * @remarks
+ * This is intentionally _not_ tied to Zod's concrete types to avoid coupling
+ * shared validation modules to preload infrastructure.
+ */
+export type SafeParseResultLike<T> =
+    | {
+          readonly data: T;
+          readonly success: true;
+      }
+    | {
+          readonly error: unknown;
+          readonly success: false;
+      };
+
+/**
+ * Options controlling how validation failures are logged and reported.
+ */
+export interface ResultValidationOptions {
+    /** Optional domain label to help group diagnostics in logs. */
+    readonly domain?: string;
+    /** Override for the validator name displayed in diagnostics. */
+    readonly guardName?: string;
+    /** Optional reason string forwarded to diagnostics. */
+    readonly reason?: string;
+}
+
+function isSafeParseFailure<T>(
+    value: SafeParseLike<T>
+): value is Extract<SafeParseLike<T>, { readonly success: false }> {
+    return !value.success;
+}
+
+function isSafeParseResultFailure<T>(
+    value: SafeParseResultLike<T>
+): value is Extract<SafeParseResultLike<T>, { readonly success: false }> {
+    return !value.success;
+}
+
+function describeCandidateType(candidate: unknown): string {
+    if (candidate === null) {
+        return "null";
+    }
+
+    if (Array.isArray(candidate)) {
+        return "array";
+    }
+
+    return typeof candidate;
+}
+
+/**
+ * Adapts a Zod-style `safeParse` function to the bridge's {@link SafeParseLike}
+ * interface.
+ */
+export function createSafeParseAdapter<T>(
+    safeParse: (candidate: unknown) => SafeParseResultLike<T>
+): (candidate: unknown) => SafeParseLike<T> {
+    return (candidate): SafeParseLike<T> => {
+        const parsed = safeParse(candidate);
+        if (!isSafeParseResultFailure(parsed)) {
+            return { data: parsed.data, success: true };
+        }
+
+        return { error: parsed.error, success: false };
+    };
+}
+
+/**
+ * Runtime validator for boolean IPC responses.
+ */
+export function safeParseBooleanResult(
+    candidate: unknown
+): SafeParseLike<boolean> {
+    if (typeof candidate === "boolean") {
+        return { data: candidate, success: true };
+    }
+
+    return {
+        error: new Error(
+            `Expected boolean response payload, received ${describeCandidateType(candidate)}`
+        ),
+        success: false,
+    };
+}
+
+/**
+ * Runtime validator for string IPC responses.
+ */
+export function safeParseStringResult(
+    candidate: unknown
+): SafeParseLike<string> {
+    if (typeof candidate === "string") {
+        return { data: candidate, success: true };
+    }
+
+    return {
+        error: new Error(
+            `Expected string response payload, received ${describeCandidateType(candidate)}`
+        ),
+        success: false,
+    };
+}
+
+/**
+ * Runtime validator for numeric IPC responses.
+ */
+export function safeParseNumberResult(
+    candidate: unknown
+): SafeParseLike<number> {
+    if (typeof candidate === "number" && Number.isFinite(candidate)) {
+        return { data: candidate, success: true };
+    }
+
+    return {
+        error: new Error(
+            `Expected finite number response payload, received ${describeCandidateType(candidate)}`
+        ),
+        success: false,
+    };
+}
+
+/**
+ * Runtime validator for non-negative integer IPC responses.
+ */
+export function safeParseNonNegativeIntResult(
+    candidate: unknown
+): SafeParseLike<number> {
+    if (
+        typeof candidate === "number" &&
+        Number.isFinite(candidate) &&
+        Number.isInteger(candidate) &&
+        candidate >= 0
+    ) {
+        return { data: candidate, success: true };
+    }
+
+    return {
+        error: new Error(
+            `Expected non-negative integer response payload, received ${describeCandidateType(candidate)}`
+        ),
+        success: false,
+    };
+}
 
 const DIAGNOSTICS_CHANNEL = DIAGNOSTICS_CHANNELS.verifyIpcHandler;
 
@@ -118,8 +285,8 @@ const verifiedChannels = new Set<string>([DIAGNOSTICS_CHANNEL]);
 const pendingVerifications = new Map<string, Promise<void>>();
 
 /**
- * @internal
- * Resets verification caches to support deterministic testing.
+ * @internal Resets
+ * verification caches to support deterministic testing.
  */
 export function resetDiagnosticsVerificationStateForTesting(): void {
     verifiedChannels.clear();
@@ -400,6 +567,94 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
 }
 
 /**
+ * Creates a typed IPC invoker that additionally validates the successful
+ * response payload.
+ *
+ * @remarks
+ * The main process is generally trusted, but this adds defense-in-depth against
+ * malformed payloads caused by:
+ *
+ * - Handler bugs/regressions,
+ * - Database corruption producing invalid domain objects,
+ * - Version skew during development hot reload.
+ *
+ * When validation fails, this helper:
+ *
+ * 1. Logs a structured warning in preload diagnostics,
+ * 2. Forwards a diagnostics report to the main process,
+ * 3. Throws an {@link IpcError} so the renderer can surface the failure.
+ */
+export function createValidatedInvoker<TChannel extends IpcInvokeChannel>(
+    channel: TChannel,
+    validateResult: (
+        candidate: unknown
+    ) => SafeParseLike<IpcInvokeChannelResult<TChannel>>,
+    options: ResultValidationOptions = {}
+): (
+    ...args: IpcInvokeChannelParams<TChannel>
+) => Promise<IpcInvokeChannelResult<TChannel>> {
+    const invoke = createTypedInvoker(channel);
+
+    return async (
+        ...args: IpcInvokeChannelParams<TChannel>
+    ): Promise<IpcInvokeChannelResult<TChannel>> => {
+        const result = await invoke(...args);
+        const parsed = validateResult(result);
+
+        if (!isSafeParseFailure(parsed)) {
+            return parsed.data;
+        }
+
+        const guardName =
+            options.guardName ??
+            (validateResult.name.length > 0
+                ? validateResult.name
+                : "anonymous");
+        const domain = options.domain ?? "preload";
+        const payloadPreview = buildPayloadPreview(result);
+        const normalizedError = ensureError(parsed.error);
+
+        preloadDiagnosticsLogger.warn(
+            "[IPC Bridge] Rejected malformed response payload",
+            {
+                channel,
+                domain,
+                guard: guardName,
+                payloadType: Array.isArray(result) ? "array" : typeof result,
+                ...(payloadPreview ? { payloadPreview } : {}),
+                reason: options.reason ?? "response-validation",
+            }
+        );
+
+        preloadDiagnosticsLogger.debug(
+            "[IPC Bridge] Response validation failure details",
+            normalizedError
+        );
+
+        void reportPreloadGuardFailure({
+            channel,
+            guard: guardName,
+            metadata: {
+                domain,
+                phase: "invoke-result-validation",
+            },
+            ...(payloadPreview ? { payloadPreview } : {}),
+            reason: options.reason ?? "response-validation",
+        });
+
+        throw new IpcError(
+            `IPC response payload failed validation for channel '${channel}'`,
+            channel,
+            normalizedError,
+            {
+                domain,
+                guard: guardName,
+            }
+        );
+    };
+}
+
+/**
  * Creates an event listener manager for IPC events
  *
  * @param channel - The event channel name
@@ -408,7 +663,7 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
  */
 export function createEventManager(channel: string): {
     on: (callback: EventCallback) => RemoveListener;
-    once: (callback: EventCallback) => void;
+    once: (callback: EventCallback) => RemoveListener;
     removeAll: () => void;
 } {
     const registeredHandlers = new Set<
@@ -439,11 +694,40 @@ export function createEventManager(channel: string): {
         ipcRenderer.removeListener(channel, handler);
     };
 
+    const shouldRegisterCallback = (
+        callback: unknown,
+        mode: "on" | "once"
+    ): callback is EventCallback => {
+        if (typeof callback === "function") {
+            return true;
+        }
+
+        // Defense-in-depth: the renderer can still call this API with invalid
+        // values at runtime. Rejecting here avoids permanently registering a
+        // listener that would spam diagnostics on every event.
+        preloadDiagnosticsLogger.warn(
+            "[IPC Bridge] Rejected non-function event callback",
+            {
+                callbackType: typeof callback,
+                channel,
+                mode,
+            }
+        );
+
+        return false;
+    };
+
     return {
         /**
          * Add an event listener
          */
         on: (callback: EventCallback): RemoveListener => {
+            if (!shouldRegisterCallback(callback, "on")) {
+                return (): void => {
+                    // No-op: listener was not registered.
+                };
+            }
+
             const handleEventCallback = (
                 _event: IpcRendererEvent,
                 ...args: unknown[]
@@ -460,7 +744,13 @@ export function createEventManager(channel: string): {
         /**
          * Add a one-time event listener
          */
-        once: (callback: EventCallback): void => {
+        once: (callback: EventCallback): RemoveListener => {
+            if (!shouldRegisterCallback(callback, "once")) {
+                return (): void => {
+                    // No-op: listener was not registered.
+                };
+            }
+
             const handleEventCallback = (
                 _event: IpcRendererEvent,
                 ...args: unknown[]
@@ -470,7 +760,11 @@ export function createEventManager(channel: string): {
             };
 
             registeredHandlers.add(handleEventCallback);
-            ipcRenderer.on(channel, handleEventCallback);
+            ipcRenderer.once(channel, handleEventCallback);
+
+            return (): void => {
+                removeRegisteredHandler(handleEventCallback);
+            };
         },
 
         /**

@@ -1,57 +1,65 @@
-# eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- breaks build
-# eslint-disable yml/sort-keys -- messes up build
 # Flatpak Application Manifest for Uptime Watcher
 # Modern configuration with enhanced security, sandboxing, and 2025 best practices
 # yaml-language-server: $schema=https://raw.githubusercontent.com/flatpak/flatpak-builder/refs/heads/main/data/flatpak-manifest.schema.json
 $schema: https://raw.githubusercontent.com/flatpak/flatpak-builder/refs/heads/main/data/flatpak-manifest.schema.json
+# Extension points for additional functionality
+add-extensions:
+    # Optional: Custom themes extension point
+    io.github.uptimewatcher.Theme:
+        directory: share/themes
+        no-autodownload: true
+
+        subdirectories: true
 # Application metadata
 app-id: io.github.uptimewatcher
-runtime: org.freedesktop.Platform
-runtime-version: "24.08"
-# Pin SDK to matching version
-sdk: org.freedesktop.Sdk//24.08
-
 # Electron BaseApp for optimized Electron applications
 base: org.electronjs.Electron2.BaseApp
 base-version: "24.08"
 
-# Node.js SDK extension for build-time dependencies
-sdk-extensions:
-    - org.freedesktop.Sdk.Extension.node24
-
-# Application entry point
-command: run-electron.sh
-
-# Locale handling
-separate-locales: false
-
 # Build configuration
 build-options:
+    # Node.js build environment
+    append-path: /usr/lib/sdk/node24/bin
+
     # Optimization flags
     cflags: -O2 -g -fPIC
     cxxflags: -O2 -g -fPIC
 
-    # Node.js build environment
-    append-path: /usr/lib/sdk/node24/bin
-
     # Environment variables for build
     env:
-        # Node.js configuration
-        NPM_CONFIG_LOGLEVEL: info
-        NPM_CONFIG_PROGRESS: "false"
-        NPM_CONFIG_AUDIT: "false"
-        NPM_CONFIG_FUND: "false"
-        NODE_ENV: production
-
         # Electron configuration
         ELECTRON_CACHE: /run/build/uptime-watcher/electron-cache
         ELECTRON_SKIP_BINARY_DOWNLOAD: "true"
-
+        NODE_ENV: production
+        NPM_CONFIG_AUDIT: "false"
+        NPM_CONFIG_FUND: "false"
+        # Node.js configuration
+        NPM_CONFIG_LOGLEVEL: info
+        NPM_CONFIG_PROGRESS: "false"
         # Cache directories
         XDG_CACHE_HOME: /run/build/uptime-watcher/flatpak-node/cache
         npm_config_cache: /run/build/uptime-watcher/flatpak-node/npm-cache
         npm_config_nodedir: /usr/lib/sdk/node24
         npm_config_offline: "true"
+
+# Cleanup patterns for optimized package size
+cleanup:
+    - /include
+    - /lib/pkgconfig
+    - /man
+    - /share/doc
+    - /share/gtk-doc
+    - /share/man
+    - /share/pkgconfig
+    - "*.la"
+    - "*.a"
+# Cleanup commands to optimize final package size
+cleanup-commands:
+    - mkdir -p ${FLATPAK_DEST}/lib/electron-cache
+    - mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/{16x16,24x24,64x64,128x128,256x256,512x512}/apps
+
+# Application entry point
+command: run-electron.sh
 
 # Sandbox permissions with security-first approach
 finish-args:
@@ -100,9 +108,7 @@ finish-args:
 # Application modules
 modules:
     # Node.js module (using SDK extension)
-    - name: nodejs
-      buildsystem: simple
-      build-commands:
+    - build-commands:
           - |
               set -e
               # Node.js SDK extension is made available by system-wide install in CI workflow.
@@ -110,17 +116,12 @@ modules:
               # guarantees presence. This keeps local ad-hoc builds more forgiving.
               echo "(info) Node.js from extension version: $(node --version 2>/dev/null || echo 'unavailable')"
               echo "(info) npm version: $(npm --version 2>/dev/null || echo 'unavailable')"
+      buildsystem: simple
+      name: nodejs
       sources: []
 
     # Main application module
-    - name: uptime-watcher
-      buildsystem: simple
-      build-options:
-          env:
-              # Additional build-time environment
-              ELECTRON_BUILDER_CACHE: /run/build/uptime-watcher/electron-builder-cache
-
-      build-commands:
+    - build-commands:
           - |
               set -e
 
@@ -210,31 +211,25 @@ modules:
               echo "Application size: $(du -sh /app | cut -f1)"
               echo "Electron binary: $(ls -la /app/bin/electron 2>/dev/null || echo 'Not found')"
 
+      build-options:
+          env:
+              # Additional build-time environment
+              ELECTRON_BUILDER_CACHE: /run/build/uptime-watcher/electron-builder-cache
+
+      buildsystem: simple
+      name: uptime-watcher
       sources:
-          - type: dir
-            path: .
+          - path: .
 
-# Cleanup commands to optimize final package size
-cleanup-commands:
-    - mkdir -p ${FLATPAK_DEST}/lib/electron-cache
-    - mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/{16x16,24x24,64x64,128x128,256x256,512x512}/apps
+            type: dir
+runtime: org.freedesktop.Platform
+runtime-version: "24.08"
+# Pin SDK to matching version
+sdk: org.freedesktop.Sdk//24.08
 
-# Extension points for additional functionality
-add-extensions:
-    # Optional: Custom themes extension point
-    io.github.uptimewatcher.Theme:
-        directory: share/themes
-        subdirectories: true
-        no-autodownload: true
+# Node.js SDK extension for build-time dependencies
+sdk-extensions:
+    - org.freedesktop.Sdk.Extension.node24
 
-# Cleanup patterns for optimized package size
-cleanup:
-    - /include
-    - /lib/pkgconfig
-    - /man
-    - /share/doc
-    - /share/gtk-doc
-    - /share/man
-    - /share/pkgconfig
-    - "*.la"
-    - "*.a"
+# Locale handling
+separate-locales: false

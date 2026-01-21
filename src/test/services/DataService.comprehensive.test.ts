@@ -141,9 +141,7 @@ function createMockDataApi() {
         downloadSqliteBackup: vi.fn(() =>
             Promise.resolve(createMockBackupResult())
         ),
-        saveSqliteBackup: vi.fn(() =>
-            Promise.resolve(createMockSaveResult())
-        ),
+        saveSqliteBackup: vi.fn(() => Promise.resolve(createMockSaveResult())),
         exportData: vi.fn(() =>
             Promise.resolve('{"sites":[],"monitors":[],"settings":{}}')
         ),

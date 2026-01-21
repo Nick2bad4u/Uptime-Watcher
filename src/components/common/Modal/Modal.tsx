@@ -248,7 +248,10 @@ function renderModalHeader(args: {
                 <div className="modal-shell__title-group">
                     <div className="modal-shell__title-row">
                         {headerIcon ? (
-                            <div className="modal-shell__accent-icon">
+                            <div
+                                className="modal-shell__accent-icon"
+                                data-testid="modal-accent-icon"
+                            >
                                 {headerIcon}
                             </div>
                         ) : null}
@@ -284,7 +287,10 @@ function renderModalHeader(args: {
  * Shared, accessible modal dialog.
  *
  * @remarks
- * - Renders in a portal to `document.body`.
+ * -
+ *
+ * Renders in a portal to `document.body`.
+ *
  * - Traps focus within the top-most open modal.
  * - Restores focus to the previously focused element on close.
  * - Uses the shared escape-key modal handler with per-modal priority.
@@ -321,7 +327,10 @@ export const Modal = ({
     const titleId = useId();
 
     const CloseIcon = AppIcons.ui.close;
-    const closeIconElement = useMemo(() => <CloseIcon size={18} />, [CloseIcon]);
+    const closeIconElement = useMemo(
+        () => <CloseIcon size={18} />,
+        [CloseIcon]
+    );
 
     const portalRoot = useMemo<HTMLElement | null>(() => {
         if (typeof document === "undefined") {

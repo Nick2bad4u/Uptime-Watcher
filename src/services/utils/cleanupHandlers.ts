@@ -39,6 +39,9 @@ export interface CleanupValidationContext {
 export interface CleanupResolutionHandlers {
     /**
      * Invoked when the validated cleanup handler throws during execution.
+     *
+     * @remarks
+     * Also invoked when a cleanup handler returns a Promise that rejects.
      */
     readonly handleCleanupError: (error: unknown) => void;
     /**
@@ -63,8 +66,14 @@ export interface CleanupResolutionHandlers {
  *
  * @returns `true` when the candidate is a zero-argument function.
  */
-const isCleanupFunction = (candidate: unknown): candidate is () => void =>
+const isCleanupFunction = (candidate: unknown): candidate is () => unknown =>
     typeof candidate === "function";
+
+const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
+    typeof candidate === "object" &&
+    candidate !== null &&
+    "then" in candidate &&
+    typeof (candidate as { then: unknown }).then === "function";
 
 /**
  * Normalizes a cleanup candidate into a callable cleanup function.
@@ -88,7 +97,7 @@ export const resolveCleanupHandler = (
     cleanupCandidate: unknown,
     handlers: CleanupResolutionHandlers
 ): (() => void) => {
-    const cleanup: () => void = isCleanupFunction(cleanupCandidate)
+    const cleanup: () => unknown = isCleanupFunction(cleanupCandidate)
         ? cleanupCandidate
         : handlers.handleInvalidCleanup({
               actualType: typeof cleanupCandidate,
@@ -105,7 +114,16 @@ export const resolveCleanupHandler = (
         didCleanup = true;
 
         try {
-            cleanup();
+            const cleanupResult = cleanup();
+
+            if (isPromiseLike(cleanupResult)) {
+                // Cleanup must remain synchronous. We still attach a rejection
+                // handler to prevent unhandled promise rejections.
+                // eslint-disable-next-line promise/prefer-await-to-then -- Cleanup cannot be awaited; attach best-effort rejection handler.
+                Promise.resolve(cleanupResult).catch((error: unknown) => {
+                    handlers.handleCleanupError(error);
+                });
+            }
         } catch (error) {
             handlers.handleCleanupError(error);
         }

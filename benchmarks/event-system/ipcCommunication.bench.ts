@@ -234,7 +234,7 @@ class MockIpcService {
     }
 
     handleGetHistory(filters: HistoryFilters): HistoryEntry[] {
-        const { limit = 1000 } = filters;
+        const { limit } = filters;
         return Array.from({ length: limit }, (_, i) => ({
             id: `history-${i}`,
             timestamp: Date.now() - i * 60_000,

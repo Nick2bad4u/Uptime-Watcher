@@ -194,7 +194,8 @@ export function readProcessEnv(key: string): string | undefined {
  *
  * @remarks
  * Matches the previous Electron-only semantics:
- * - missing/invalid: returns `defaultValue`
+ *
+ * - Missing/invalid: returns `defaultValue`
  * - "true"/"1"/"yes": returns true
  */
 export function readBooleanEnv(key: string, defaultValue = false): boolean {
@@ -220,7 +221,8 @@ export function readBooleanEnv(key: string, defaultValue = false): boolean {
  *
  * @remarks
  * Matches the previous Electron-only semantics:
- * - missing/invalid: returns `defaultValue`
+ *
+ * - Missing/invalid: returns `defaultValue`
  */
 export function readNumberEnv(key: string, defaultValue: number): number {
     const value = readProcessEnv(key);

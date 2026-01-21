@@ -1,9 +1,9 @@
 /**
  * Authentication and Authorization Service Performance Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Models
  *
- * Models login flows, token issuance, and permission checks to profile
+ * login flows, token issuance, and permission checks to profile
  * authentication service behaviour.
  */
 

@@ -8,24 +8,9 @@
     "embeddedLanguageFormatting": "auto",
     "endOfLine": "auto",
     "experimentalOperatorPosition": "end",
-    "experimentalTernaries": false,
-    "htmlWhitespaceSensitivity": "css",
-    "insertPragma": false,
-    "jsxSingleQuote": false,
     "multilineArraysWrapThreshold": 2,
     "objectWrap": "preserve",
     "overrides": [
-        {
-            "files": [
-                "*.md",
-                "*.mdx",
-                "docs/**/*.md",
-                "docs/**/*.mdx"
-            ],
-            "options": {
-                "endOfLine": "lf"
-            }
-        },
         {
             "files": [
                 "*.js",
@@ -238,7 +223,11 @@
             }
         },
         {
-            "files": "*.json",
+            "files": [
+                "*.json",
+                "**/.prettierrc",
+                "**/.htmlhintrc"
+            ],
             "options": {
                 "jsonRecursiveSort": false,
                 "jsonSortOrder": "{\"*\": \"numeric\"}",

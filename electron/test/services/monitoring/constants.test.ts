@@ -202,7 +202,6 @@ describe("Monitoring Service Constants", () => {
                 DEFAULT_RETRY_ATTEMPTS * DEFAULT_MONITOR_TIMEOUT_SECONDS;
             expect(maxRetryTime).toBeLessThanOrEqual(300); // Should complete within 5 minutes
         });
-
     });
 
     describe("Constant Types and Immutability", () => {
@@ -341,6 +340,5 @@ describe("Monitoring Service Constants", () => {
                 frequentCheckInterval
             );
         });
-
     });
 });

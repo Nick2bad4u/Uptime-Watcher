@@ -9,7 +9,7 @@ import {
     assertCloudObjectKey,
     normalizeCloudObjectKey,
     normalizeProviderObjectKey,
-} from "../../../services/cloud/cloudKeyNormalization";
+} from "@shared/utils/cloudKeyNormalization";
 
 describe("cloudKeyNormalization", () => {
     it("normalizes Windows separators and strips leading slashes by default", () => {

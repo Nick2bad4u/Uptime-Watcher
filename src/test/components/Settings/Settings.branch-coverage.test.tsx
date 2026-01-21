@@ -65,8 +65,10 @@ interface GlobalWithSitesStoreMock extends UnknownRecord {
     __useSitesStoreMock_settingsBranch__?: typeof useSitesStoreMock;
 }
 
-const globalWithSitesStoreMock = globalThis as unknown as GlobalWithSitesStoreMock;
-globalWithSitesStoreMock.__useSitesStoreMock_settingsBranch__ = useSitesStoreMock;
+const globalWithSitesStoreMock =
+    globalThis as unknown as GlobalWithSitesStoreMock;
+globalWithSitesStoreMock.__useSitesStoreMock_settingsBranch__ =
+    useSitesStoreMock;
 
 const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
@@ -79,11 +81,12 @@ const resetSitesStoreState = (): void => {
 };
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: <Result = typeof sitesStoreState>(
+    useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
     ): Result | typeof sitesStoreState => {
-        const hook = globalWithSitesStoreMock.__useSitesStoreMock_settingsBranch__;
+        const hook =
+            globalWithSitesStoreMock.__useSitesStoreMock_settingsBranch__;
         if (!hook) {
             throw new Error("useSitesStore mock was not initialized");
         }
@@ -146,7 +149,11 @@ describe("Settings - Branch Coverage Tests", () => {
     };
 
     const mockTheme = {
-        availableThemes: ["light", "dark", "system"],
+        availableThemes: [
+            "light",
+            "dark",
+            "system",
+        ],
         currentTheme: themes.light,
         getColor: vi.fn(() => "#000"),
         getStatusColor: vi.fn(),
@@ -480,10 +487,7 @@ describe("Settings - Branch Coverage Tests", () => {
             });
         });
 
-        it("should handle backup save errors", async ({
-            task,
-            annotate,
-        }) => {
+        it("should handle backup save errors", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");

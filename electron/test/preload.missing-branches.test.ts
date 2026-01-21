@@ -65,6 +65,38 @@ describe("preload.ts - Missing Branch Coverage", () => {
             if (channel === "update-history-limit") {
                 return Promise.resolve({ success: true, data: null });
             }
+            // Monitoring start/stop summary operations return structured
+            // summaries (not booleans).
+            if (channel === "start-monitoring") {
+                return Promise.resolve({
+                    data: {
+                        alreadyActive: false,
+                        attempted: 0,
+                        failed: 0,
+                        isMonitoring: true,
+                        partialFailures: false,
+                        siteCount: 0,
+                        skipped: 0,
+                        succeeded: 0,
+                    },
+                    success: true,
+                });
+            }
+            if (channel === "stop-monitoring") {
+                return Promise.resolve({
+                    data: {
+                        alreadyInactive: false,
+                        attempted: 0,
+                        failed: 0,
+                        isMonitoring: false,
+                        partialFailures: false,
+                        siteCount: 0,
+                        skipped: 0,
+                        succeeded: 0,
+                    },
+                    success: true,
+                });
+            }
             // For other operations, return generic success
             return Promise.resolve({ success: true, data: true });
         });
@@ -219,19 +251,25 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 return Promise.resolve({ success: true, data: null });
             });
 
-            // Test with invalid numeric parameters - bridge still mirrors backend data
+            // Test with invalid numeric parameters - bridge now validates response payloads
             await expect(
                 exposedAPI.settings.updateHistoryLimit(-1)
-            ).resolves.toBe(-1);
+            ).rejects.toThrowError(
+                /failed validation for channel 'update-history-limit'/i
+            );
             await expect(
                 exposedAPI.settings.updateHistoryLimit(0)
             ).resolves.toBe(0);
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Infinity)
-            ).resolves.toBe(Infinity);
+            ).rejects.toThrowError(
+                /failed validation for channel 'update-history-limit'/i
+            );
             await expect(
                 exposedAPI.settings.updateHistoryLimit(Number.NaN)
-            ).resolves.toSatisfy(Number.isNaN);
+            ).rejects.toThrowError(
+                /failed validation for channel 'update-history-limit'/i
+            );
         });
     });
     describe("Concurrent Operations", () => {
@@ -280,7 +318,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             mockIpcRenderer.invoke
                 .mockResolvedValueOnce({ success: true, data: [mockSite] }) // GetSites success
                 .mockRejectedValueOnce(new Error("Error 2")) // AddSite failure
-                .mockResolvedValueOnce({ success: true, data: true }) // GetMonitorTypes success
+                .mockResolvedValueOnce({ success: true, data: [] }) // GetMonitorTypes success
                 .mockRejectedValueOnce(new Error("Error 4")); // ExportData failure
 
             // Test mixed success/failure
@@ -292,7 +330,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
             await expect(
                 exposedAPI.monitorTypes.getMonitorTypes()
-            ).resolves.toBeTruthy(); // Returns extracted data, not raw response
+            ).resolves.toEqual([]); // Returns extracted data, not raw response
             await expect(exposedAPI.data.exportData()).rejects.toThrowError(
                 "Error 4"
             );

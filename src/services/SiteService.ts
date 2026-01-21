@@ -9,7 +9,7 @@
 
 import type { Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
-import type { ZodError } from "zod";
+import type * as z from "zod";
 
 import { ApplicationError } from "@shared/utils/errorHandling";
 import {
@@ -39,7 +39,7 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("SiteService", {
 
 const logInvalidSnapshotAndThrow = (
     logMessage: string,
-    error: ZodError<Site>,
+    error: z.ZodError<Site>,
     metadata: UnknownRecord,
     thrownMessage: string
 ): never => {
@@ -136,7 +136,9 @@ export const SiteService: SiteServiceContract = {
      *
      * @returns The number of sites removed.
      */
-    deleteAllSites: wrap("deleteAllSites", async (api) => api.sites.deleteAllSites()),
+    deleteAllSites: wrap("deleteAllSites", async (api) =>
+        api.sites.deleteAllSites()
+    ),
 
     /**
      * Retrieves all sites from the backend.

@@ -50,7 +50,7 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
-        "tsBuildInfoFile": "../../.cache/tsconfig.scripts.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.scripts.tsbuildinfo",
         "types": [
             "node"
         ],
@@ -71,6 +71,8 @@
         "../../scripts/**/*.mjs",
         "../../scripts/**/*.cjs",
         "../../scripts/**/*.js",
+        "../../scripts/**/*.mts",
+        "../../scripts/**/*.cts",
         "../../scripts/**/*.ts",
         "../../scripts/**/*.tsx",
         "../../scripts/**/*.jsx",

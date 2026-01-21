@@ -127,14 +127,16 @@ describe("MonitoringService edge cases", () => {
         };
         monitoringApi.startMonitoring.mockResolvedValueOnce(failureSummary);
 
-        await expect(MonitoringService.startMonitoring()).rejects.toMatchObject({
-            code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
-            details: expect.objectContaining({
-                summary: failureSummary,
-            }),
-            message:
-                "[MonitoringService] Failed to start monitoring across all sites: 1/4 monitors activated.",
-        });
+        await expect(MonitoringService.startMonitoring()).rejects.toMatchObject(
+            {
+                code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
+                details: expect.objectContaining({
+                    summary: failureSummary,
+                }),
+                message:
+                    "[MonitoringService] Failed to start monitoring across all sites: 1/4 monitors activated.",
+            }
+        );
 
         expect(loggerMock.error).toHaveBeenCalledWith(
             "[MonitoringService] Global monitoring start failed",

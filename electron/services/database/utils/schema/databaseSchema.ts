@@ -10,7 +10,6 @@ import {
     generateMonitorTableSchema,
 } from "./dynamicSchema";
 
-
 /**
  * Utilities for managing the SQLite database schema, including table and index
  * creation and validation setup.
@@ -37,6 +36,8 @@ const SCHEMA_QUERIES = {
     COMMIT: "COMMIT",
     CREATE_INDEX_HISTORY_MONITOR_ID:
         "CREATE INDEX IF NOT EXISTS idx_history_monitor_id ON history(monitor_id)",
+    CREATE_INDEX_HISTORY_MONITOR_TIMESTAMP:
+        "CREATE INDEX IF NOT EXISTS idx_history_monitor_timestamp ON history(monitor_id, timestamp DESC)",
     CREATE_INDEX_HISTORY_TIMESTAMP:
         "CREATE INDEX IF NOT EXISTS idx_history_timestamp ON history(timestamp)",
     CREATE_INDEX_MONITORS_SITE_IDENTIFIER:
@@ -105,8 +106,8 @@ function parseTableInfoRows(value: unknown): TableInfoRow[] {
         return [];
     }
 
-    return value.filter((row): row is TableInfoRow =>
-        typeof row === "object" && row !== null
+    return value.filter(
+        (row): row is TableInfoRow => typeof row === "object" && row !== null
     );
 }
 
@@ -125,7 +126,7 @@ function ensureMonitorDynamicColumns(database: Database): void {
 
     const existingColumns = new Set<string>();
     for (const row of rows) {
-        const columnName = (row).name;
+        const columnName = row.name;
         if (typeof columnName === "string" && columnName.length > 0) {
             existingColumns.add(columnName);
         }
@@ -137,7 +138,9 @@ function ensureMonitorDynamicColumns(database: Database): void {
             const column = escapeSqlIdentifier(def.columnName);
             const sqlType = def.sqlType === "INTEGER" ? "INTEGER" : "TEXT";
 
-            database.run(`ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`);
+            database.run(
+                `ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`
+            );
             existingColumns.add(def.columnName);
         }
     }
@@ -205,6 +208,11 @@ export function createDatabaseIndexes(db: Database): void {
 
         // Index on history monitor_id for faster history queries
         db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_ID);
+
+        // Composite index to accelerate the common pattern:
+        //   WHERE monitor_id = ? ORDER BY timestamp DESC
+        // This is heavily used by history pruning and latest-entry queries.
+        db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_MONITOR_TIMESTAMP);
 
         // Index on history timestamp for time-based queries
         db.run(SCHEMA_QUERIES.CREATE_INDEX_HISTORY_TIMESTAMP);

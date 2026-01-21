@@ -99,7 +99,7 @@ describe("StateSyncService", () => {
         const callback = vi.fn();
         const fullSyncPayload = {
             completedAt: Date.now(),
-                revision: 10,
+            revision: 10,
             siteCount: 1,
             sites: [
                 {
@@ -550,7 +550,7 @@ describe("StateSyncService", () => {
                 ],
                 source: "database" as const,
                 synchronized: true,
-                   revision: 30,
+                revision: 30,
             };
 
             mockElectronAPI.stateSync.requestFullSync.mockResolvedValueOnce(

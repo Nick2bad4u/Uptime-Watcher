@@ -93,14 +93,6 @@ describe("MonitorSelector - Complete Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             renderMonitorSelector();
 
             const select = screen.getByTestId("themed-select");
@@ -492,8 +484,10 @@ describe("MonitorSelector - Complete Coverage", () => {
             const onChange = vi.fn();
             renderMonitorSelector({ onChange });
 
+            const user = userEvent.setup();
+
             const select = screen.getByTestId("themed-select");
-            await userEvent.selectOptions(select, "monitor-2");
+            await user.selectOptions(select, "monitor-2");
 
             expect(onChange).toHaveBeenCalled();
         });
@@ -1109,7 +1103,8 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(select).toHaveFocus();
 
             // Should be able to change selection with keyboard
-            await userEvent.keyboard("{ArrowDown}");
+            const user = userEvent.setup();
+            await user.keyboard("{ArrowDown}");
             // The actual selection change depends on the select implementation
         });
 

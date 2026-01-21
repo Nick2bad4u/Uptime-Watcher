@@ -58,7 +58,7 @@ export interface RemoteEndpointPayload {
  * Result produced while resolving monitor-specific configuration.
  */
 export type RemoteMonitorConfigResult<TContext> =
-    | { context: TContext; kind: "success"; }
+    | { context: TContext; kind: "success" }
     | { kind: "error"; message: string };
 
 /**
@@ -107,7 +107,6 @@ export function createRemoteMonitorService<
     behavior: RemoteMonitorBehavior<TType, TContext>
 ): new (config?: MonitorServiceConfig) => IMonitorService {
     return class RemoteMonitorServiceAdapter extends MonitorServiceAdapterBase<TType> {
-
         public async check(
             monitor: Site["monitors"][0],
             signal?: AbortSignal
@@ -137,10 +136,10 @@ export function createRemoteMonitorService<
 
             try {
                 const executionArgs = {
-                        ...buildMonitorExecutionBaseArgsWithOptionalSignal({
+                    ...buildMonitorExecutionBaseArgsWithOptionalSignal({
                         context: configuration.context,
                         signal,
-                            timeout,
+                        timeout,
                     }),
                     fetchEndpoint: (
                         url: string,
@@ -169,6 +168,9 @@ export function createRemoteMonitorService<
                         failureLogLevel: behavior.failureLogLevel ?? "warn",
                         maxRetries: retryAttempts + 1,
                         operationName,
+                        ...(executionArgs.signal
+                            ? { signal: executionArgs.signal }
+                            : {}),
                     }
                 );
             } catch (error) {
@@ -189,7 +191,6 @@ export function createRemoteMonitorService<
             timeout: number,
             signal?: AbortSignal
         ): Promise<RemoteEndpointPayload> {
-
             const combinedSignal = createTimeoutSignal(timeout, signal);
 
             try {

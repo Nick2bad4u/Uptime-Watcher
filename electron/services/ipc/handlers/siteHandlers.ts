@@ -1,9 +1,7 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 
 import { SITES_CHANNELS } from "@shared/types/preload";
-import {
-    LOG_TEMPLATES,
-} from "@shared/utils/logTemplates";
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";

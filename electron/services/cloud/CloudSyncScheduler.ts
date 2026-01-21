@@ -4,6 +4,7 @@ import { randomInt } from "node:crypto";
 import type { CloudService } from "./CloudService";
 
 import { logger } from "../../utils/logger";
+import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
 
 const DEFAULT_SYNC_INTERVAL_MS = 10 * 60_000;
 
@@ -17,13 +18,18 @@ const JITTER_PERCENTAGE = 0.1;
  * Background scheduler for cloud sync (ADR-015).
  *
  * @remarks
- * - Runs only when the configured provider is connected and sync is enabled.
+ * -
+ *
+ * Runs only when the configured provider is connected and sync is enabled.
+ *
  * - Uses jittered fixed-base intervals and exponential backoff on failures.
  * - Uses `unref()` timers so the scheduler will not keep the process alive
  *   (important for tests and graceful shutdown).
  */
 export class CloudSyncScheduler {
     private readonly cloudService: CloudService;
+
+    private isEnabled = false;
 
     private isRunning = false;
 
@@ -32,6 +38,10 @@ export class CloudSyncScheduler {
     private timer: NodeJS.Timeout | undefined;
 
     private async runOnce(): Promise<void> {
+        if (!this.isEnabled) {
+            return;
+        }
+
         if (this.isRunning) {
             this.scheduleNextRun(this.applyJitter(DEFAULT_SYNC_INTERVAL_MS));
             return;
@@ -51,7 +61,24 @@ export class CloudSyncScheduler {
             success = true;
         } catch (error) {
             const resolved = ensureError(error);
-            logger.warn("[CloudSyncScheduler] Sync cycle failed", resolved);
+
+            const providerDetails = isCloudProviderOperationError(resolved)
+                ? {
+                      code: resolved.code,
+                      operation: resolved.operation,
+                      providerKind: resolved.providerKind,
+                      target: resolved.target,
+                  }
+                : undefined;
+
+            // Never log raw error objects here: provider SDKs/HTTP clients can
+            // attach sensitive request config (headers, body) containing
+            // Authorization tokens.
+            logger.warn("[CloudSyncScheduler] Sync cycle failed", {
+                message: resolved.message,
+                name: resolved.name,
+                ...(providerDetails ? { providerDetails } : {}),
+            });
         } finally {
             this.isRunning = false;
             this.scheduleNextRun(this.computeDelayMs(success));
@@ -60,11 +87,18 @@ export class CloudSyncScheduler {
 
     /** Starts the scheduler loop. */
     public initialize(): void {
+        if (this.isEnabled) {
+            return;
+        }
+
+        this.isEnabled = true;
+        this.backoffAttempt = 0;
         this.scheduleNextRun(0);
     }
 
     /** Stops any scheduled work. */
     public stop(): void {
+        this.isEnabled = false;
         if (this.timer) {
             clearTimeout(this.timer);
             this.timer = undefined;
@@ -72,6 +106,10 @@ export class CloudSyncScheduler {
     }
 
     private scheduleNextRun(delayMs: number): void {
+        if (!this.isEnabled) {
+            return;
+        }
+
         if (this.timer) {
             clearTimeout(this.timer);
         }

@@ -71,6 +71,32 @@ describe("Operational Hooks", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
+
+        it("should stop retrying when aborted", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Cancellation", "type");
+
+            const controller = new AbortController();
+
+            const mockOperation = vi.fn().mockImplementation(async () => {
+                controller.abort("cancelled");
+                throw new Error("First failure");
+            });
+
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    operationName: "abort-retry",
+                    maxRetries: 3,
+                    initialDelay: 50,
+                    emitEvents: false,
+                    signal: controller.signal,
+                })
+            ).rejects.toThrowError(/aborted/i);
+
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+        });
         it("should fail after max retries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");

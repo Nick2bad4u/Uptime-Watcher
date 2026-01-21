@@ -2,7 +2,15 @@
  * Comprehensive tests for useSettingsStore providing maximum coverage.
  */
 
-import { afterAll, describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+    afterAll,
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+} from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { test, fc } from "@fast-check/vitest";
 import type { ElectronAPI } from "../../../types";
@@ -114,8 +122,8 @@ const mockElectronAPI = {
         onHistoryLimitUpdated: vi.fn<
             ElectronAPI["events"]["onHistoryLimitUpdated"]
         >(() => vi.fn()),
-        onStateSyncEvent: vi.fn<ElectronAPI["events"]["onStateSyncEvent"]>(
-            () => vi.fn()
+        onStateSyncEvent: vi.fn<ElectronAPI["events"]["onStateSyncEvent"]>(() =>
+            vi.fn()
         ),
     },
     settings: {
@@ -129,9 +137,12 @@ const mockElectronAPI = {
     },
 };
 
-const { restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
-    ensureWindow: true,
-});
+const { restore: restoreElectronApi } = installElectronApiMock(
+    mockElectronAPI,
+    {
+        ensureWindow: true,
+    }
+);
 
 afterAll(() => {
     restoreElectronApi();

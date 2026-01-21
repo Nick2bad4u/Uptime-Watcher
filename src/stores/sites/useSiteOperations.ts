@@ -50,8 +50,15 @@ const updateMonitorNumericField = async (args: {
     telemetry: UnknownRecord;
     value: number | undefined;
 }): Promise<void> => {
-    const { deps, field, monitorId, operationName, siteIdentifier, telemetry, value } =
-        args;
+    const {
+        deps,
+        field,
+        monitorId,
+        operationName,
+        siteIdentifier,
+        telemetry,
+        value,
+    } = args;
 
     await withSiteOperation(
         operationName,
@@ -61,7 +68,12 @@ const updateMonitorNumericField = async (args: {
                 updates[field] = value;
             }
 
-            await updateMonitorAndSave(siteIdentifier, monitorId, updates, deps);
+            await updateMonitorAndSave(
+                siteIdentifier,
+                monitorId,
+                updates,
+                deps
+            );
         },
         deps,
         {
@@ -76,7 +88,9 @@ interface ResultWithBackupMetadata {
     readonly metadata: BackupMetadata;
 }
 
-const runSqliteBackupOperationReturning = async <T extends ResultWithBackupMetadata>(args: {
+const runSqliteBackupOperationReturning = async <
+    T extends ResultWithBackupMetadata,
+>(args: {
     clearMetadataOnFailure: boolean;
     deps: SiteOperationsDependencies;
     errorLogMessage: string;
@@ -170,7 +184,6 @@ const restoreSqliteBackupAction = (
                 deps,
                 errorLogMessage: "Failed to restore SQLite backup:",
                 operation: () =>
-
                     deps.services.data.restoreSqliteBackup(payload),
             }),
         deps,
@@ -192,10 +205,9 @@ const normalizeMonitorOrThrow = (
     } catch (error) {
         const safeError = ensureError(error);
         logger.error(contextMessage, safeError);
-        throw new Error(
-            `Monitor normalization failed: ${safeError.message}`,
-            { cause: error }
-        );
+        throw new Error(`Monitor normalization failed: ${safeError.message}`, {
+            cause: error,
+        });
     }
 };
 

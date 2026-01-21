@@ -753,7 +753,9 @@ export class ApplicationService {
             );
             try {
                 const sitesCount =
-                    payload.action === "bulk-sync" ? payload.sites.length : undefined;
+                    payload.action === "bulk-sync"
+                        ? payload.sites.length
+                        : undefined;
                 const delta =
                     payload.action === "bulk-sync" ? undefined : payload.delta;
 
@@ -768,12 +770,10 @@ export class ApplicationService {
                             : {}),
                         ...(delta
                             ? {
-                                  deltaAddedCount:
-                                      delta.addedSites.length,
+                                  deltaAddedCount: delta.addedSites.length,
                                   deltaRemovedCount:
                                       delta.removedSiteIdentifiers.length,
-                                  deltaUpdatedCount:
-                                      delta.updatedSites.length,
+                                  deltaUpdatedCount: delta.updatedSites.length,
                               }
                             : {}),
                         source: payload.source,

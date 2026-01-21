@@ -227,7 +227,7 @@ const behavior: RemoteMonitorBehavior<
                 timestampField,
                 url,
             },
-                kind: "success",
+            kind: "success",
         };
     },
     scope: "ServerHeartbeatMonitor",

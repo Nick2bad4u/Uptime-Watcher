@@ -291,11 +291,11 @@ export const AnalyticsTab = ({
     const expandIcon = useMemo(() => <ExpandIcon />, [ExpandIcon]);
     const collapseIcon = useMemo(() => <CollapseIcon />, [CollapseIcon]);
     const upCountIcon = useMemo(
-        () => <UpIcon aria-hidden className="h-4 w-4" />,
+        () => <UpIcon aria-hidden className="size-4" />,
         [UpIcon]
     );
     const downCountIcon = useMemo(
-        () => <DownIcon aria-hidden className="h-4 w-4" />,
+        () => <DownIcon aria-hidden className="size-4" />,
         [DownIcon]
     );
 
@@ -352,8 +352,8 @@ export const AnalyticsTab = ({
                     variant="secondary"
                 >
                     <ThemedText size="sm" variant="secondary">
-                        Run a check (or wait for scheduled checks) to populate uptime and
-                        response-time charts.
+                        Run a check (or wait for scheduled checks) to populate
+                        uptime and response-time charts.
                     </ThemedText>
                 </ThemedCard>
             ) : null}
@@ -367,7 +367,9 @@ export const AnalyticsTab = ({
                     <div className="flex gap-2">
                         {CHART_TIME_RANGES.map((range) => (
                             <ThemedButton
-                                aria-pressed={siteDetailsChartTimeRange === range}
+                                aria-pressed={
+                                    siteDetailsChartTimeRange === range
+                                }
                                 key={range}
                                 onClick={createTimeRangeHandler(range)}
                                 size="sm"

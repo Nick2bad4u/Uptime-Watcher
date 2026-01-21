@@ -20,6 +20,7 @@ import {
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { MonitorRepository } from "../database/MonitorRepository";
 import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
+import type { OperationTimeoutManager } from "./OperationTimeoutManager";
 
 import { monitorLogger as logger } from "../../utils/logger";
 
@@ -75,6 +76,27 @@ export class MonitorStatusUpdateService {
     private readonly sites: StandardizedCache<Site>;
 
     /**
+     * Timeout manager used to clear operation timers once operations complete.
+     */
+    private readonly timeoutManager: OperationTimeoutManager;
+
+    private async pruneOperationFromMonitor(
+        monitor: Monitor,
+        operationId: string
+    ): Promise<void> {
+        const current = monitor.activeOperations ?? [];
+        const updated = current.filter((op) => op !== operationId);
+
+        if (updated.length === current.length) {
+            return;
+        }
+
+        await this.monitorRepository.update(monitor.id, {
+            activeOperations: updated,
+        });
+    }
+
+    /**
      * Update monitor status only if the operation is still valid.
      *
      * @param result - Check result with operation correlation
@@ -85,13 +107,28 @@ export class MonitorStatusUpdateService {
     public async updateMonitorStatus(
         result: StatusUpdateMonitorCheckResult
     ): Promise<boolean> {
-        // Validate operation is still valid
-        if (!this.operationRegistry.validateOperation(result.operationId)) {
-            logger.debug(`Ignoring cancelled operation ${result.operationId}`);
-            return false;
-        }
-
         try {
+            // Validate operation is still valid. Even when invalid/cancelled,
+            // we still want to prune stale activeOperations entries and clear
+            // the timeout so we don't accumulate pending timers.
+            if (!this.operationRegistry.validateOperation(result.operationId)) {
+                logger.debug(
+                    `Ignoring cancelled operation ${result.operationId}`
+                );
+
+                const monitor = await this.monitorRepository.findByIdentifier(
+                    result.monitorId
+                );
+                if (monitor) {
+                    await this.pruneOperationFromMonitor(
+                        monitor,
+                        result.operationId
+                    );
+                }
+
+                return false;
+            }
+
             // Get current monitor state
             const monitor = await this.monitorRepository.findByIdentifier(
                 result.monitorId
@@ -105,7 +142,6 @@ export class MonitorStatusUpdateService {
                         }
                     )
                 );
-                this.operationRegistry.completeOperation(result.operationId);
                 return false;
             }
 
@@ -119,7 +155,10 @@ export class MonitorStatusUpdateService {
                         }
                     )
                 );
-                this.operationRegistry.completeOperation(result.operationId);
+                await this.pruneOperationFromMonitor(
+                    monitor,
+                    result.operationId
+                );
                 return false;
             }
 
@@ -141,7 +180,6 @@ export class MonitorStatusUpdateService {
             // Refresh the site cache to ensure UI shows updated monitor status
             await this.refreshSiteCacheForMonitor(result.monitorId);
 
-            this.operationRegistry.completeOperation(result.operationId);
             logger.debug(
                 `Updated monitor ${result.monitorId} status to ${result.status}`
             );
@@ -151,8 +189,9 @@ export class MonitorStatusUpdateService {
                 `Failed to update monitor status for ${result.monitorId}`,
                 error
             );
-            this.operationRegistry.completeOperation(result.operationId);
             return false;
+        } finally {
+            this.cleanupOperationResources(result.operationId);
         }
     }
 
@@ -211,6 +250,12 @@ export class MonitorStatusUpdateService {
         }
     }
 
+    private cleanupOperationResources(operationId: string): void {
+        // Clear timer first so the process doesn't retain a pending timeout.
+        this.timeoutManager.clearTimeout(operationId);
+        this.operationRegistry.completeOperation(operationId);
+    }
+
     /**
      * Creates a new MonitorStatusUpdateService.
      *
@@ -221,10 +266,12 @@ export class MonitorStatusUpdateService {
     public constructor(
         operationRegistry: MonitorOperationRegistry,
         monitorRepository: MonitorRepository,
-        sites: StandardizedCache<Site>
+        sites: StandardizedCache<Site>,
+        timeoutManager: OperationTimeoutManager
     ) {
         this.operationRegistry = operationRegistry;
         this.monitorRepository = monitorRepository;
         this.sites = sites;
+        this.timeoutManager = timeoutManager;
     }
 }

@@ -15,9 +15,7 @@ import type {
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
-import type {
-    SiteSyncDelta,
-} from "@shared/types/stateSync";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
 import type {
@@ -49,7 +47,8 @@ export type SiteMonitoringActions = BaseSiteMonitoring;
  * @public
  */
 export interface SitesActions
-    extends BaseSiteOperations,
+    extends
+        BaseSiteOperations,
         BaseSiteState,
         BaseSiteSubscriptions,
         BaseSiteSync,

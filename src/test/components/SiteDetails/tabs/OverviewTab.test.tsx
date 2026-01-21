@@ -188,7 +188,11 @@ type ThemedButtonMockProperties = PropsWithChildren<
 >;
 
 vi.mock("../../../../theme/components/ThemedButton", () => ({
-    ThemedButton: ({ children, className, ...props }: ThemedButtonMockProperties) => (
+    ThemedButton: ({
+        children,
+        className,
+        ...props
+    }: ThemedButtonMockProperties) => (
         <button
             className={withBaseClass("themed-button", className)}
             data-testid="themed-button"
@@ -890,9 +894,7 @@ describe(OverviewTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(
-                <OverviewTab {...baseProps} localTimeoutSeconds={30} />
-            );
+            render(<OverviewTab {...baseProps} localTimeoutSeconds={30} />);
 
             expect(document.querySelector(".themed-input")).toBeInTheDocument();
         });

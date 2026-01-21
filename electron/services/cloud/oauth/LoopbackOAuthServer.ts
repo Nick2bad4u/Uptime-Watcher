@@ -80,6 +80,20 @@ async function listenHttpServer(
     await once(server, "listening");
 }
 
+function resolvePortFromServer(server: Server): number {
+    const address = server.address();
+    if (!address || typeof address === "string") {
+        throw new Error("OAuth loopback server address unavailable");
+    }
+
+    const portCandidate = address.port;
+    if (typeof portCandidate !== "number" || !Number.isFinite(portCandidate)) {
+        throw new TypeError("OAuth loopback server port unavailable");
+    }
+
+    return portCandidate;
+}
+
 /**
  * Result returned from {@link LoopbackOAuthServer.waitForCallback}.
  */
@@ -148,6 +162,7 @@ function parseCallbackWithExpectedPath(
 ): {
     readonly code: null | string;
     readonly error: null | string;
+    readonly errorDescription: null | string;
     readonly pathOk: boolean;
     readonly state: null | string;
 } {
@@ -157,10 +172,12 @@ function parseCallbackWithExpectedPath(
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state");
     const error = url.searchParams.get("error");
+    const errorDescription = url.searchParams.get("error_description");
 
     return {
         code,
         error,
+        errorDescription,
         pathOk,
         state,
     };
@@ -193,7 +210,7 @@ export async function startLoopbackOAuthServer(args?: {
      */
     readonly redirectPath?: string;
 }): Promise<LoopbackOAuthServer> {
-    const port = args?.port ?? DEFAULT_OAUTH_LOOPBACK_PORT;
+    const requestedPort = args?.port ?? DEFAULT_OAUTH_LOOPBACK_PORT;
     const redirectHost = args?.redirectHost ?? "localhost";
     const redirectPathRaw = args?.redirectPath;
     const expectedPath = normalizeRedirectPath(
@@ -203,14 +220,32 @@ export async function startLoopbackOAuthServer(args?: {
 
     assertSafeRedirectHost(redirectHost);
 
+    if (requestedPort === 0 && redirectHost === "localhost") {
+        throw new Error(
+            "Loopback OAuth server does not support port=0 with redirectHost=localhost. " +
+                "Use redirectHost=127.0.0.1 (or [::1]) when requesting an ephemeral port."
+        );
+    }
+
     const requiresIpv6 = redirectHost === "[::1]";
 
-    const origin = `http://${redirectHost}:${port}`;
-    const redirectUri = omitPath ? origin : `${origin}${expectedPath}`;
+    // When requesting an ephemeral port (port=0), we deliberately bind to a
+    // single loopback interface.
+    //
+    // Binding multiple interfaces with an ephemeral port would require
+    // negotiating a shared port across IPv4/IPv6 listeners (and can fail
+    // depending on system configuration). Ephemeral ports are primarily used
+    // by tests to avoid collisions.
+    const listenHosts =
+        requestedPort === 0
+            ? ([requiresIpv6 ? "::1" : "127.0.0.1"] as const)
+            : LOOPBACK_HOSTS;
 
     let resolved = false;
     let resolvePromise: ((value: LoopbackOAuthCallback) => void) | null = null;
     let rejectPromise: ((error: unknown) => void) | null = null;
+    let expectedStateValue: null | string = null;
+    let pendingCallback: LoopbackOAuthCallback | null = null;
 
     const callbackPromise = new Promise<LoopbackOAuthCallback>(
         (resolve, reject) => {
@@ -219,7 +254,7 @@ export async function startLoopbackOAuthServer(args?: {
         }
     );
 
-    const servers = LOOPBACK_HOSTS.map((host) => {
+    const servers = listenHosts.map((host) => {
         const server = createServer((request, response) => {
             if (request.method && request.method !== "GET") {
                 writeHtml(response, {
@@ -241,18 +276,21 @@ export async function startLoopbackOAuthServer(args?: {
                 return;
             }
 
-            if (parsed.error) {
+            const callbackError = parsed.errorDescription ?? parsed.error;
+
+            if (callbackError) {
                 writeHtml(response, {
-                    body: `Authorization failed: ${parsed.error}`,
+                    body: "Authorization failed. Please return to the app to retry.",
                     statusCode: 400,
                     title: "Authorization failed",
                 });
 
-                if (!resolved) {
+                if (!resolved && expectedStateValue !== null) {
                     resolved = true;
-                    rejectPromise?.(new Error(parsed.error));
+                    rejectPromise?.(
+                        new Error(`OAuth callback error: ${callbackError}`)
+                    );
                 }
-
                 return;
             }
 
@@ -261,6 +299,49 @@ export async function startLoopbackOAuthServer(args?: {
                     body: "Missing required callback parameters.",
                     statusCode: 400,
                     title: "Authorization failed",
+                });
+
+                if (!resolved && expectedStateValue !== null) {
+                    resolved = true;
+                    rejectPromise?.(
+                        new Error("OAuth callback missing required parameters")
+                    );
+                }
+
+                return;
+            }
+
+            if (
+                expectedStateValue !== null &&
+                parsed.state !== expectedStateValue
+            ) {
+                writeHtml(response, {
+                    body: "OAuth state mismatch. Please retry the authorization flow.",
+                    statusCode: 400,
+                    title: "Authorization failed",
+                });
+
+                if (!resolved) {
+                    resolved = true;
+                    rejectPromise?.(new Error("OAuth state mismatch"));
+                }
+                return;
+            }
+
+            if (expectedStateValue === null) {
+                // The server can receive the callback before the app begins
+                // awaiting it (race between opening the system browser and
+                // awaiting waitForCallback()). Buffer the first callback and
+                // avoid displaying a misleading "Connected" success page.
+                pendingCallback ??= {
+                    code: parsed.code,
+                    state: parsed.state,
+                };
+
+                writeHtml(response, {
+                    body: "Authorization received. Please return to the app to finish connecting.",
+                    statusCode: 200,
+                    title: "Authorization received",
                 });
                 return;
             }
@@ -286,7 +367,7 @@ export async function startLoopbackOAuthServer(args?: {
     await Promise.all(
         servers.map(async ({ host, server }) => {
             try {
-                await listenHttpServer(server, { host, port });
+                await listenHttpServer(server, { host, port: requestedPort });
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
                 const code = isRecord(error) ? error["code"] : undefined;
@@ -310,6 +391,15 @@ export async function startLoopbackOAuthServer(args?: {
         })
     );
 
+    const [primaryServer] = servers;
+    if (!primaryServer) {
+        throw new Error("OAuth loopback server did not initialize any listeners");
+    }
+
+    const port = resolvePortFromServer(primaryServer.server);
+    const origin = `http://${redirectHost}:${port}`;
+    const redirectUri = omitPath ? origin : `${origin}${expectedPath}`;
+
     return {
         close: async (): Promise<void> => {
             await Promise.all(
@@ -327,6 +417,16 @@ export async function startLoopbackOAuthServer(args?: {
             expectedState,
             timeoutMs,
         }): Promise<LoopbackOAuthCallback> => {
+            expectedStateValue = expectedState;
+
+            if (pendingCallback?.state === expectedStateValue && !resolved) {
+                resolved = true;
+                resolvePromise?.(pendingCallback);
+                pendingCallback = null;
+            } else if (pendingCallback) {
+                pendingCallback = null;
+            }
+
             const timeoutHandle = setTimeout(() => {
                 if (!resolved) {
                     resolved = true;
@@ -337,13 +437,14 @@ export async function startLoopbackOAuthServer(args?: {
             try {
                 const callback = await callbackPromise;
 
-                if (callback.state !== expectedState) {
+                if (callback.state !== expectedStateValue) {
                     throw new Error("OAuth state mismatch");
                 }
 
                 return callback;
             } finally {
                 clearTimeout(timeoutHandle);
+                expectedStateValue = null;
             }
         },
     };

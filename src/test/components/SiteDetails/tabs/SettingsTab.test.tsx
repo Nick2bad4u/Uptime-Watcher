@@ -761,7 +761,9 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} localRetryAttempts={3} />);
 
-            expect(screen.getByText(/maximum check duration/i)).toBeInTheDocument();
+            expect(
+                screen.getByText(/maximum check duration/i)
+            ).toBeInTheDocument();
             expect(screen.getByText(/~\s*\d+s/)).toBeInTheDocument();
         });
 
@@ -1049,9 +1051,7 @@ describe(SettingsTab, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(
-                <SettingsTab {...baseProps} localTimeoutSeconds={30} />
-            );
+            render(<SettingsTab {...baseProps} localTimeoutSeconds={30} />);
 
             const timeoutInput = screen.getByDisplayValue("30");
             expect(timeoutInput).toBeInTheDocument();

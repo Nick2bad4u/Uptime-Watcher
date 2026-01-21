@@ -245,6 +245,7 @@ export function handleAxiosError(
  * non-Error objects, uses "Unknown error" as a fallback message. Logs all
  * errors for diagnostic purposes. Always returns a {@link MonitorCheckResult}
  * and never throws.
+ *
  * @example
  *
  * ```typescript

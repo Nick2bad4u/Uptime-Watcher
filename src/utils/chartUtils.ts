@@ -5,9 +5,9 @@
  * Provides safe accessors and metadata helpers for Chart.js configuration
  * structures using the project's hybrid Chart.js type system.
  *
- * @public
+ * @public For
  *
- * For background on the hybrid Chart.js type strategy refer to the internal
+ * background on the hybrid Chart.js type strategy refer to the internal
  * hybrid type system guide documented alongside the architecture reference.
  */
 
@@ -23,9 +23,7 @@ import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
  */
 export type ScaleConfigResult = Simplify<{
     /** The scale configuration object */
-    config:
-        | ChartScalesConfig[keyof ChartScalesConfig]
-        | UnknownRecord;
+    config: ChartScalesConfig[keyof ChartScalesConfig] | UnknownRecord;
     /** Whether the scale exists */
     exists: boolean;
 }>;
@@ -59,7 +57,6 @@ export function getScaleConfigSafe(
         // Validate that the scale is actually an object (handle runtime type safety)
         if (typeof scale === "object" && scale !== null) {
             return {
-
                 config: scale as ChartScalesConfig[keyof ChartScalesConfig],
                 exists: true,
             };

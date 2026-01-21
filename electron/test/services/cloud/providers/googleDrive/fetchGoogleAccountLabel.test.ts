@@ -18,6 +18,19 @@ describe(fetchGoogleAccountLabel, () => {
             "me@example.com"
         );
         expect(fetchMock).toHaveBeenCalled();
+
+        const call = fetchMock.mock.calls[0];
+        expect(call?.[0]).toBe(
+            "https://openidconnect.googleapis.com/v1/userinfo"
+        );
+        expect(call?.[1]).toEqual(
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    Authorization: "Bearer token",
+                }),
+                signal: expect.any(AbortSignal),
+            })
+        );
     });
 
     it("falls back to name when email missing", async () => {

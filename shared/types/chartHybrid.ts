@@ -24,9 +24,9 @@
  * - `UptimeChartOptions<TType>`: Hybrid type for complete Uptime Watcher chart
  *   config
  *
- * @packageDocumentation
+ * @packageDocumentation For
  *
- * For comprehensive documentation see the hybrid type system guide in the
+ * comprehensive documentation see the hybrid type system guide in the
  * architecture documentation set.
  */
 

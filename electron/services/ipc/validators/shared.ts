@@ -18,6 +18,7 @@ import {
     MAX_IPC_JSON_IMPORT_BYTES,
     MAX_IPC_SQLITE_RESTORE_BYTES,
 } from "@shared/constants/backup";
+import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -70,17 +71,44 @@ const isRequiredRecordError = (
 ): result is Extract<RequiredRecordResult, { readonly ok: false }> =>
     !result.ok;
 
+const FORBIDDEN_RECORD_KEYS = new Set<string>([
+    "__proto__",
+    "constructor",
+    "prototype",
+]);
+
+function getForbiddenRecordKeyErrors(
+    record: UnknownRecord,
+    paramName: string
+): string[] {
+    const errors: string[] = [];
+
+    for (const key of FORBIDDEN_RECORD_KEYS) {
+        if (Object.hasOwn(record, key)) {
+            errors.push(`${paramName} must not include reserved key '${key}'`);
+        }
+    }
+
+    return errors;
+}
+
 const requireRecordParam = (
     value: unknown,
     paramName: string
 ): RequiredRecordResult => {
-    const objectError = IpcValidators.requiredObject(value, paramName);
-    if (objectError) {
-        return { error: toValidationResult(objectError), ok: false };
+    if (!isRecord(value)) {
+        return {
+            error: toValidationResult(`${paramName} must be a valid object`),
+            ok: false,
+        };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as object above
-    return { ok: true, record: value as UnknownRecord };
+    const forbiddenKeyErrors = getForbiddenRecordKeyErrors(value, paramName);
+    if (forbiddenKeyErrors.length > 0) {
+        return { error: forbiddenKeyErrors, ok: false };
+    }
+
+    return { ok: true, record: value };
 };
 
 interface CreateParamValidatorOptions {
@@ -113,6 +141,9 @@ const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
 
 /** Maximum byte budget accepted for user-supplied restore filenames. */
 const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
+
+/** Maximum byte budget accepted for monitor validation payloads over IPC. */
+const MAX_MONITOR_VALIDATION_DATA_BYTES: number = 256 * 1024;
 
 // NOTE: filesystem path validation helpers are centralized in
 // @shared/validation/filesystemBaseDirectoryValidation.
@@ -199,9 +230,7 @@ function createSiteIdentifierAndMonitorIdValidator(
             }
 
             const parsed = monitorIdSchema.safeParse(value);
-            return parsed.success
-                ? null
-                : formatZodIssues(parsed.error.issues);
+            return parsed.success ? null : formatZodIssues(parsed.error.issues);
         },
     ]);
 }
@@ -401,16 +430,12 @@ const validatePreloadGuardReport: IpcParameterValidator = createParamValidator(
         (report): ParameterValueValidationResult => {
             const errors: string[] = [];
 
-            const objectError = IpcValidators.requiredObject(
-                report,
-                "guardReport"
-            );
-            if (objectError) {
-                return toValidationResult(objectError);
+            const recordResult = requireRecordParam(report, "guardReport");
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- guardReport validated as object
-            const record = report as UnknownRecord;
+            const { record } = recordResult;
 
             const channelError = IpcValidators.requiredString(
                 record["channel"],
@@ -455,12 +480,14 @@ const validatePreloadGuardReport: IpcParameterValidator = createParamValidator(
 
             const metadataValue = record["metadata"];
             if (metadataValue !== undefined) {
-                const metadataError = IpcValidators.requiredObject(
+                const metadataRecordResult = requireRecordParam(
                     metadataValue,
                     "metadata"
                 );
-                if (metadataError) {
-                    errors.push(metadataError);
+                if (isRequiredRecordError(metadataRecordResult)) {
+                    if (metadataRecordResult.error) {
+                        errors.push(...metadataRecordResult.error);
+                    }
                 } else {
                     try {
                         const serialized = JSON.stringify(metadataValue);
@@ -516,6 +543,14 @@ const validateNotificationPreferences: IpcParameterValidator =
                     );
                 }
 
+                const forbiddenKeyErrors = getForbiddenRecordKeyErrors(
+                    preferences,
+                    "preferences"
+                );
+                if (forbiddenKeyErrors.length > 0) {
+                    return forbiddenKeyErrors;
+                }
+
                 const validationResult =
                     validateNotificationPreferenceUpdate(preferences);
                 return validationResult.success
@@ -536,6 +571,16 @@ const validateNotifyAppEvent: IpcParameterValidator = createParamValidator(
             );
             if (objectError) {
                 return toValidationResult(objectError);
+            }
+
+            if (isRecord(request)) {
+                const forbiddenKeyErrors = getForbiddenRecordKeyErrors(
+                    request,
+                    "request"
+                );
+                if (forbiddenKeyErrors.length > 0) {
+                    return forbiddenKeyErrors;
+                }
             }
 
             const validationResult = validateAppNotificationRequest(request);
@@ -611,13 +656,12 @@ const validateRestorePayload: IpcParameterValidator = createParamValidator(1, [
     (payload): ParameterValueValidationResult => {
         const errors: string[] = [];
 
-        const objectError = IpcValidators.requiredObject(payload, "payload");
-        if (objectError) {
-            return toValidationResult(objectError);
+        const recordResult = requireRecordParam(payload, "payload");
+        if (isRequiredRecordError(recordResult)) {
+            return recordResult.error;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- payload validated as object above
-        const record = payload as UnknownRecord;
+        const { record } = recordResult;
         errors.push(...validateRestoreBufferCandidate(record["buffer"]));
 
         const fileNameValue = record["fileName"];
@@ -856,6 +900,52 @@ function createStringWithUnvalidatedSecondValidator(
 }
 
 /**
+ * Helper function to create validators for handlers expecting a string
+ * parameter and a record-like object payload with a strict byte budget.
+ *
+ * @remarks
+ * This is intended for renderer-supplied objects that should be treated as
+ * untrusted input even though they originate from the app UI.
+ */
+function createStringWithBudgetedObjectValidator(
+    stringParamName: string,
+    objectParamName: string,
+    maxBytes: number
+): IpcParameterValidator {
+    return createParamValidator(2, [
+        (value): ParameterValueValidationResult =>
+            toValidationResult(
+                IpcValidators.requiredString(value, stringParamName)
+            ),
+        (value): ParameterValueValidationResult => {
+            const recordResult = requireRecordParam(value, objectParamName);
+            if (isRequiredRecordError(recordResult)) {
+                return recordResult.error;
+            }
+
+            if (isJsonByteBudgetExceeded(recordResult.record, maxBytes)) {
+                return toValidationResult(
+                    `${objectParamName} must not exceed ${maxBytes} bytes`
+                );
+            }
+
+            return null;
+        },
+    ]);
+}
+
+function createMonitorValidationPayloadValidator(
+    monitorTypeParamName: string,
+    dataParamName: string
+): IpcParameterValidator {
+    return createStringWithBudgetedObjectValidator(
+        monitorTypeParamName,
+        dataParamName,
+        MAX_MONITOR_VALIDATION_DATA_BYTES
+    );
+}
+
+/**
  * Helper function to create validators for handlers expecting two string
  * parameters.
  *
@@ -883,6 +973,7 @@ function createTwoStringValidator(
 export {
     createBackupKeyValidator,
     createClipboardTextValidator,
+    createMonitorValidationPayloadValidator,
     createNoParamsValidator,
     createPreloadGuardReportValidator,
     createSingleExternalOpenUrlValidator,
@@ -891,6 +982,7 @@ export {
     createSiteIdentifierAndMonitorIdValidator,
     createSiteIdentifierValidator,
     createStringObjectValidator,
+    createStringWithBudgetedObjectValidator,
     createStringWithUnvalidatedSecondValidator,
     createTwoStringValidator,
     validateCloudBackupMigrationRequest,

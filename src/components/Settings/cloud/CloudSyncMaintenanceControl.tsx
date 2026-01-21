@@ -66,10 +66,13 @@ export const CloudSyncMaintenanceControl = ({
         });
     }, []);
 
-    const description = (
-        useMemo(() => (<span>
-            Advanced tools for diagnosing and resetting remote sync history.
-        </span>), [])
+    const description = useMemo(
+        () => (
+            <span>
+                Advanced tools for diagnosing and resetting remote sync history.
+            </span>
+        ),
+        []
     );
     const openIcon = useMemo(
         () => <OpenIcon aria-hidden size={buttonIconSize} />,
@@ -77,9 +80,7 @@ export const CloudSyncMaintenanceControl = ({
     );
     return (
         <>
-            <SyncMaintenanceCard
-                description={description}
-            >
+            <SyncMaintenanceCard description={description}>
                 <div className="flex flex-wrap gap-2">
                     <ThemedButton
                         data-testid="cloud-sync-maintenance-open"

@@ -246,6 +246,7 @@ Use comprehensive TSDoc comments following the project standards:
  *
  * @example
  *  ```typescript
+ *
  *  const result = await httpMonitor.check(monitor);
  *  logger.info(`Check result: ${result.status}`);
  *  ```
@@ -269,6 +270,7 @@ Use comprehensive TSDoc comments following the project standards:
 /**
  * @example
  *  ```typescript
+ *
  *  const result = await service.performOperation();
  *  logger.info(`Operation completed: ${result.status}`);
  *  ```
@@ -278,6 +280,7 @@ Use comprehensive TSDoc comments following the project standards:
 /**
  * @example
  *  ```typescript
+ *
  *  const result = await service.performOperation();
  *  console.log(`Operation completed: ${result.status}`);
  *  ```

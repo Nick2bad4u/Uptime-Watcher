@@ -106,6 +106,7 @@ export class SslMonitor implements IMonitorService {
                     initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                     maxRetries: totalAttempts,
                     operationName: `SSL check for ${host}:${port}`,
+                    ...(signal ? { signal } : {}),
                     ...(onRetryHandler ? { onRetry: onRetryHandler } : {}),
                 }
             );

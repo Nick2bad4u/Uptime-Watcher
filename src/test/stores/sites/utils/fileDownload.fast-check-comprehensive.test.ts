@@ -173,9 +173,9 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         expect(() => downloadFile(options)).not.toThrowError();
 
                         // Primary attempt + fallback attempt.
-                        expect(mockDocument.createElement).toHaveBeenCalledTimes(
-                            2
-                        );
+                        expect(
+                            mockDocument.createElement
+                        ).toHaveBeenCalledTimes(2);
                     }
                 ),
                 { numRuns: 5 } // Limit runs to avoid mock conflicts

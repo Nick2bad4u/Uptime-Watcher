@@ -365,8 +365,8 @@ async function addToExistingSite(
     logger.info("Monitor added to site successfully", {
         identifier: selectedExistingSite,
         monitorId: monitor.id,
-                monitorType: monitor.type,
-        });
+        monitorType: monitor.type,
+    });
 }
 
 /**

@@ -53,7 +53,11 @@ export function useResponseTimeColorFromThemeColors(colors: {
             success: colors.success,
             warning: colors.warning,
         }),
-        [colors.error, colors.success, colors.warning]
+        [
+            colors.error,
+            colors.success,
+            colors.warning,
+        ]
     );
 
     return useCallback(

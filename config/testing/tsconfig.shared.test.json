@@ -9,7 +9,7 @@
         "noEmit": false,
         "outDir": "../../.cache/builds/test/shared",
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/tsconfig.shared.test.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.shared.test.tsbuildinfo",
         "types": [
             "node",
             "vitest/globals"

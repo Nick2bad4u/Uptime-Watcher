@@ -1,0 +1,742 @@
+/**
+ * Monitor normalization helper.
+ *
+ * @remarks
+ * This module contains the implementation details for `normalizeMonitor`. It is
+ * separated from `monitorOperations.ts` to keep the public utility module
+ * smaller and easier to navigate.
+ *
+ * @internal
+ */
+
+import type { UnknownRecord } from "type-fest";
+
+import {
+    DEFAULT_MONITOR_CHECK_INTERVAL_MS,
+    MIN_MONITOR_CHECK_INTERVAL_MS,
+} from "@shared/constants/monitoring";
+import {
+    BASE_MONITOR_TYPES,
+    DEFAULT_MONITOR_STATUS,
+    isMonitorStatus,
+    type Monitor,
+    type MonitorType,
+} from "@shared/types";
+import { validateMonitorType as isValidMonitorType } from "@shared/utils/validation";
+import {
+    isNonEmptyString,
+    isValidPort,
+    safeInteger,
+} from "@shared/validation/validatorUtils";
+
+/**
+ * Baseline defaults applied to every monitor regardless of type.
+ */
+const BASE_MONITOR_DEFAULTS = {
+    activeOperations: [] as string[],
+    history: [] as Monitor["history"],
+    responseTime: -1,
+    status: DEFAULT_MONITOR_STATUS,
+} as const;
+
+function assertUnreachable(value: never): never {
+    throw new Error(`Unhandled monitor type: ${String(value)}`);
+}
+
+function ensureBooleanOrFallback(value: unknown, fallback: boolean): boolean {
+    return typeof value === "boolean" ? value : fallback;
+}
+
+function ensureTrimmedStringOrFallback(
+    value: unknown,
+    fallback: string
+): string {
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+
+        if (trimmed.length > 0) {
+            return trimmed;
+        }
+    }
+    return fallback;
+}
+
+const DEFAULT_MONITOR_TIMEOUT_MS = 30_000;
+const DEFAULT_MONITOR_RETRY_ATTEMPTS = 3;
+const DEFAULT_MONITOR_MONITORING = true;
+const DEFAULT_SSL_WARNING_DAYS = 30;
+
+const HTTP_DEFAULT_URL = "https://example.com";
+
+const HTTP_HEADER_DEFAULT_HEADER_NAME = "content-type";
+const HTTP_HEADER_DEFAULT_EXPECTED_VALUE = "application/json";
+
+const HTTP_JSON_DEFAULT_PATH = "status";
+const HTTP_JSON_DEFAULT_EXPECTED_VALUE = "ok";
+
+const HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS = 2000;
+
+const WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS = 1500;
+const WEBSOCKET_KEEPALIVE_DEFAULT_URL = "wss://example.com/socket";
+
+const SERVER_HEARTBEAT_DEFAULT_URL = "https://example.com/heartbeat";
+const SERVER_HEARTBEAT_DEFAULT_STATUS_FIELD = "status";
+const SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS = "ok";
+const SERVER_HEARTBEAT_DEFAULT_TIMESTAMP_FIELD = "timestamp";
+const SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS = 60;
+
+const REPLICATION_DEFAULT_PRIMARY_URL = "https://primary.example.com/status";
+const REPLICATION_DEFAULT_REPLICA_URL = "https://replica.example.com/status";
+const REPLICATION_DEFAULT_TIMESTAMP_FIELD = "lastAppliedTimestamp";
+const REPLICATION_DEFAULT_MAX_LAG_SECONDS = 10;
+
+const CDN_EDGE_DEFAULT_BASELINE_URL = "https://origin.example.com/health";
+const CDN_EDGE_DEFAULT_EDGE_LOCATIONS =
+    "https://edge-1.example.com,https://edge-2.example.com";
+
+interface MonitorTypeDefaults {
+    checkInterval: number;
+    monitoring: boolean;
+    retryAttempts: number;
+    timeout: number;
+}
+
+function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
+    switch (type) {
+        case "cdn-edge-consistency":
+        case "dns":
+        case "http":
+        case "http-header":
+        case "http-json":
+        case "http-keyword":
+        case "http-latency":
+        case "http-status":
+        case "ping":
+        case "port":
+        case "ssl": {
+            return {
+                checkInterval: DEFAULT_MONITOR_CHECK_INTERVAL_MS,
+                monitoring: DEFAULT_MONITOR_MONITORING,
+                retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
+                timeout: DEFAULT_MONITOR_TIMEOUT_MS,
+            };
+        }
+
+        case "replication": {
+            return {
+                checkInterval: 120_000,
+                monitoring: DEFAULT_MONITOR_MONITORING,
+                retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
+                timeout: DEFAULT_MONITOR_TIMEOUT_MS,
+            };
+        }
+
+        case "server-heartbeat":
+        case "websocket-keepalive": {
+            return {
+                checkInterval: 60_000,
+                monitoring: DEFAULT_MONITOR_MONITORING,
+                retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
+                timeout: DEFAULT_MONITOR_TIMEOUT_MS,
+            };
+        }
+
+        default: {
+            return assertUnreachable(type);
+        }
+    }
+}
+
+/**
+ * Coerces an unknown monitor type into a valid {@link MonitorType}.
+ *
+ * @remarks
+ * Delegates membership checks to the canonical shared helper
+ * {@link validateMonitorType} and falls back to the first built-in base type
+ * when invalid.
+ */
+function resolveMonitorTypeOrDefault(type: unknown): MonitorType {
+    if (isValidMonitorType(type)) {
+        return type;
+    }
+
+    return BASE_MONITOR_TYPES[0];
+}
+
+/**
+ * Gets the allowed fields for a specific monitor type.
+ */
+function getAllowedFieldsForMonitorType(type: MonitorType): Set<string> {
+    // Base fields that all monitors have
+    const baseFields = new Set([
+        "activeOperations",
+        "checkInterval",
+        "history",
+        "id",
+        "lastChecked",
+        "monitoring",
+        "responseTime",
+        "retryAttempts",
+        "status",
+        "timeout",
+        "type",
+    ]);
+
+    // Add type-specific fields based on monitor type registry
+    switch (type) {
+        case "cdn-edge-consistency": {
+            baseFields.add("baselineUrl");
+            baseFields.add("edgeLocations");
+            break;
+        }
+        case "dns": {
+            baseFields.add("expectedValue");
+            baseFields.add("host");
+            baseFields.add("recordType");
+            break;
+        }
+        case "http": {
+            baseFields.add("url");
+            break;
+        }
+        case "http-header": {
+            baseFields.add("expectedHeaderValue");
+            baseFields.add("headerName");
+            baseFields.add("url");
+            break;
+        }
+        case "http-json": {
+            baseFields.add("expectedJsonValue");
+            baseFields.add("jsonPath");
+            baseFields.add("url");
+            break;
+        }
+        case "http-keyword": {
+            baseFields.add("bodyKeyword");
+            baseFields.add("url");
+            break;
+        }
+        case "http-latency": {
+            baseFields.add("maxResponseTime");
+            baseFields.add("url");
+            break;
+        }
+        case "http-status": {
+            baseFields.add("expectedStatusCode");
+            baseFields.add("url");
+            break;
+        }
+        case "ping": {
+            baseFields.add("host");
+            break;
+        }
+        case "port": {
+            baseFields.add("host");
+            baseFields.add("port");
+            break;
+        }
+        case "replication": {
+            baseFields.add("primaryStatusUrl");
+            baseFields.add("replicaStatusUrl");
+            baseFields.add("replicationTimestampField");
+            baseFields.add("maxReplicationLagSeconds");
+            break;
+        }
+        case "server-heartbeat": {
+            baseFields.add("url");
+            baseFields.add("heartbeatStatusField");
+            baseFields.add("heartbeatTimestampField");
+            baseFields.add("heartbeatExpectedStatus");
+            baseFields.add("heartbeatMaxDriftSeconds");
+            break;
+        }
+        case "ssl": {
+            baseFields.add("certificateWarningDays");
+            baseFields.add("host");
+            baseFields.add("port");
+            break;
+        }
+        case "websocket-keepalive": {
+            baseFields.add("url");
+            baseFields.add("maxPongDelayMs");
+            break;
+        }
+        default: {
+            throw new Error(`Unsupported monitor type: ${String(type)}`);
+        }
+    }
+
+    return baseFields;
+}
+
+/**
+ * Filters monitor object to only include fields appropriate for its type.
+ */
+function filterMonitorFieldsByType(
+    monitor: Partial<Monitor>,
+    type: MonitorType
+): Partial<Monitor> {
+    const allowedFields = getAllowedFieldsForMonitorType(type);
+    const filtered: Partial<Monitor> = {};
+
+    // Only include fields that are allowed for this monitor type. We keep
+    // the external signature strongly typed while using a local record cast
+    // to perform dynamic key assignment.
+    for (const [key, value] of Object.entries(monitor)) {
+        if (allowedFields.has(key)) {
+            (filtered as UnknownRecord)[key] = value;
+        }
+    }
+
+    return filtered;
+}
+
+/**
+ * Validates monitor input data before processing.
+ */
+function validateMonitorInput(monitor: Partial<Monitor>): void {
+    if (Array.isArray(monitor)) {
+        throw new TypeError(
+            "Invalid monitor data: must be an object, not an array"
+        );
+    }
+}
+
+function applyHttpMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    const urlValue = filteredData.url;
+    monitor.url = ensureTrimmedStringOrFallback(urlValue, HTTP_DEFAULT_URL);
+}
+
+function applyHttpKeywordMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const keywordValue = filteredData.bodyKeyword;
+    if (typeof keywordValue === "string" && keywordValue.trim()) {
+        monitor.bodyKeyword = keywordValue.trim();
+    } else {
+        monitor.bodyKeyword = "status: ok";
+    }
+}
+
+function applyHttpStatusMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const statusValue = filteredData.expectedStatusCode;
+    if (typeof statusValue === "number" && Number.isFinite(statusValue)) {
+        const clamped = Math.trunc(statusValue);
+        monitor.expectedStatusCode = Math.min(599, Math.max(100, clamped));
+    } else {
+        monitor.expectedStatusCode = 200;
+    }
+}
+
+function applyPortMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    // Port monitors require host and port
+    const hostValue = filteredData.host;
+    const portValue = filteredData.port;
+
+    monitor.host = isNonEmptyString(hostValue) ? hostValue : "localhost";
+    monitor.port = isValidPort(portValue) ? Number(portValue) : 80;
+}
+
+function applySslMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    const {
+        certificateWarningDays: warningValue,
+        host: hostValue,
+        port: portValue,
+    } = filteredData as {
+        certificateWarningDays?: unknown;
+        host?: unknown;
+        port?: unknown;
+    };
+
+    monitor.host = isNonEmptyString(hostValue) ? hostValue : "example.com";
+    monitor.port = isValidPort(portValue) ? Number(portValue) : 443;
+
+    const numericWarning =
+        typeof warningValue === "number" && Number.isFinite(warningValue)
+            ? Math.trunc(warningValue)
+            : DEFAULT_SSL_WARNING_DAYS;
+    monitor.certificateWarningDays = Math.min(Math.max(numericWarning, 1), 365);
+}
+
+function applyPingMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    const { host: hostValue } = filteredData as { host?: unknown };
+    monitor.host = isNonEmptyString(hostValue) ? hostValue : "localhost";
+}
+
+function applyDnsMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    const {
+        expectedValue,
+        host: hostValue,
+        recordType: recordTypeValue,
+    } = filteredData as {
+        expectedValue?: unknown;
+        host?: unknown;
+        recordType?: unknown;
+    };
+
+    const recordType: string =
+        typeof recordTypeValue === "string" && recordTypeValue
+            ? recordTypeValue
+            : "A";
+
+    monitor.host = isNonEmptyString(hostValue) ? hostValue : "example.com";
+    monitor.recordType = recordType;
+
+    if (typeof expectedValue === "string" && expectedValue.trim()) {
+        monitor.expectedValue = expectedValue;
+    } else {
+        delete monitor.expectedValue;
+    }
+}
+
+function applyHttpHeaderMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const { expectedHeaderValue, headerName } = filteredData as {
+        expectedHeaderValue?: unknown;
+        headerName?: unknown;
+    };
+
+    monitor.expectedHeaderValue = ensureTrimmedStringOrFallback(
+        expectedHeaderValue,
+        HTTP_HEADER_DEFAULT_EXPECTED_VALUE
+    );
+    monitor.headerName = ensureTrimmedStringOrFallback(
+        headerName,
+        HTTP_HEADER_DEFAULT_HEADER_NAME
+    );
+}
+
+function applyHttpJsonMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const { expectedJsonValue, jsonPath } = filteredData as {
+        expectedJsonValue?: unknown;
+        jsonPath?: unknown;
+    };
+
+    monitor.expectedJsonValue = ensureTrimmedStringOrFallback(
+        expectedJsonValue,
+        HTTP_JSON_DEFAULT_EXPECTED_VALUE
+    );
+    monitor.jsonPath = ensureTrimmedStringOrFallback(
+        jsonPath,
+        HTTP_JSON_DEFAULT_PATH
+    );
+}
+
+function applyHttpLatencyMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
+
+    const { maxResponseTime } = filteredData as {
+        maxResponseTime?: unknown;
+    };
+
+    let numericLatency = HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS;
+    if (
+        typeof maxResponseTime === "number" &&
+        Number.isFinite(maxResponseTime)
+    ) {
+        numericLatency = Math.trunc(maxResponseTime);
+    } else if (typeof maxResponseTime === "string") {
+        const parsed = Number.parseFloat(maxResponseTime);
+        if (Number.isFinite(parsed)) {
+            numericLatency = Math.trunc(parsed);
+        }
+    }
+
+    monitor.maxResponseTime = Math.max(1, numericLatency);
+}
+
+function applyWebsocketKeepaliveMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    monitor.url = ensureTrimmedStringOrFallback(
+        filteredData.url,
+        WEBSOCKET_KEEPALIVE_DEFAULT_URL
+    );
+
+    const maxPongDelayValue = (
+        filteredData as {
+            maxPongDelayMs?: unknown;
+        }
+    ).maxPongDelayMs;
+    let maxPongDelay = WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS;
+    if (
+        typeof maxPongDelayValue === "number" &&
+        Number.isFinite(maxPongDelayValue)
+    ) {
+        maxPongDelay = Math.trunc(maxPongDelayValue);
+    } else if (typeof maxPongDelayValue === "string") {
+        const parsed = Number.parseInt(maxPongDelayValue, 10);
+        if (Number.isFinite(parsed)) {
+            maxPongDelay = parsed;
+        }
+    }
+
+    monitor.maxPongDelayMs = Math.min(Math.max(maxPongDelay, 10), 60_000);
+}
+
+function applyServerHeartbeatMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    monitor.url = ensureTrimmedStringOrFallback(
+        filteredData.url,
+        SERVER_HEARTBEAT_DEFAULT_URL
+    );
+    monitor.heartbeatStatusField = ensureTrimmedStringOrFallback(
+        filteredData.heartbeatStatusField,
+        SERVER_HEARTBEAT_DEFAULT_STATUS_FIELD
+    );
+    monitor.heartbeatTimestampField = ensureTrimmedStringOrFallback(
+        filteredData.heartbeatTimestampField,
+        SERVER_HEARTBEAT_DEFAULT_TIMESTAMP_FIELD
+    );
+    monitor.heartbeatExpectedStatus = ensureTrimmedStringOrFallback(
+        filteredData.heartbeatExpectedStatus,
+        SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS
+    );
+
+    const maxDriftValue = (
+        filteredData as {
+            heartbeatMaxDriftSeconds?: unknown;
+        }
+    ).heartbeatMaxDriftSeconds;
+    let maxDrift = SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS;
+    if (typeof maxDriftValue === "number" && Number.isFinite(maxDriftValue)) {
+        maxDrift = Math.trunc(maxDriftValue);
+    } else if (typeof maxDriftValue === "string") {
+        const parsed = Number.parseInt(maxDriftValue, 10);
+        if (Number.isFinite(parsed)) {
+            maxDrift = parsed;
+        }
+    }
+
+    monitor.heartbeatMaxDriftSeconds = Math.min(
+        Math.max(Math.trunc(maxDrift), 1),
+        3600
+    );
+}
+
+function applyReplicationMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    monitor.primaryStatusUrl = ensureTrimmedStringOrFallback(
+        filteredData.primaryStatusUrl,
+        REPLICATION_DEFAULT_PRIMARY_URL
+    );
+    monitor.replicaStatusUrl = ensureTrimmedStringOrFallback(
+        filteredData.replicaStatusUrl,
+        REPLICATION_DEFAULT_REPLICA_URL
+    );
+    monitor.replicationTimestampField = ensureTrimmedStringOrFallback(
+        filteredData.replicationTimestampField,
+        REPLICATION_DEFAULT_TIMESTAMP_FIELD
+    );
+
+    const maxLagValue = (
+        filteredData as {
+            maxReplicationLagSeconds?: unknown;
+        }
+    ).maxReplicationLagSeconds;
+    let maxLagSeconds = REPLICATION_DEFAULT_MAX_LAG_SECONDS;
+    if (typeof maxLagValue === "number" && Number.isFinite(maxLagValue)) {
+        maxLagSeconds = Math.trunc(maxLagValue);
+    } else if (typeof maxLagValue === "string") {
+        const parsed = Number.parseInt(maxLagValue, 10);
+        if (Number.isFinite(parsed)) {
+            maxLagSeconds = parsed;
+        }
+    }
+
+    monitor.maxReplicationLagSeconds = Math.min(
+        Math.max(maxLagSeconds, 0),
+        86_400
+    );
+}
+
+function applyCdnEdgeConsistencyMonitorDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    monitor.baselineUrl = ensureTrimmedStringOrFallback(
+        filteredData.baselineUrl,
+        CDN_EDGE_DEFAULT_BASELINE_URL
+    );
+    monitor.edgeLocations = ensureTrimmedStringOrFallback(
+        filteredData.edgeLocations,
+        CDN_EDGE_DEFAULT_EDGE_LOCATIONS
+    );
+}
+
+function applyTypeSpecificDefaults(
+    monitor: Monitor,
+    filteredData: Partial<Monitor>
+): void {
+    switch (monitor.type) {
+        case "cdn-edge-consistency": {
+            applyCdnEdgeConsistencyMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "dns": {
+            applyDnsMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http": {
+            applyHttpMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-header": {
+            applyHttpHeaderMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-json": {
+            applyHttpJsonMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-keyword": {
+            applyHttpKeywordMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-latency": {
+            applyHttpLatencyMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "http-status": {
+            applyHttpStatusMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "ping": {
+            applyPingMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "port": {
+            applyPortMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "replication": {
+            applyReplicationMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "server-heartbeat": {
+            applyServerHeartbeatMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "ssl": {
+            applySslMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        case "websocket-keepalive": {
+            applyWebsocketKeepaliveMonitorDefaults(monitor, filteredData);
+            break;
+        }
+        default: {
+            throw new Error(
+                `Unsupported monitor type: ${String(monitor.type)}`
+            );
+        }
+    }
+}
+
+/**
+ * Normalizes a partial monitor object into a complete Monitor instance.
+ */
+export function normalizeMonitorInternal(monitor: Partial<Monitor>): Monitor {
+    validateMonitorInput(monitor);
+    const finalizedType = resolveMonitorTypeOrDefault(monitor.type);
+
+    // Filter the monitor data to only include fields appropriate for this type
+    const filteredMonitor = filterMonitorFieldsByType(monitor, finalizedType);
+
+    // Generate a valid ID - handle empty strings as falsy
+    const rawId = filteredMonitor.id;
+    const validId = isNonEmptyString(rawId) ? rawId : crypto.randomUUID();
+
+    const monitorTypeDefaults = getMonitorTypeDefaults(finalizedType);
+
+    // Build base monitor object with guaranteed required fields
+    const baseMonitor: Monitor = {
+        activeOperations: Array.isArray(filteredMonitor.activeOperations)
+            ? filteredMonitor.activeOperations
+            : BASE_MONITOR_DEFAULTS.activeOperations,
+        checkInterval: safeInteger(
+            filteredMonitor.checkInterval,
+            monitorTypeDefaults.checkInterval,
+            MIN_MONITOR_CHECK_INTERVAL_MS
+        ),
+        history: Array.isArray(filteredMonitor.history)
+            ? filteredMonitor.history
+            : BASE_MONITOR_DEFAULTS.history,
+        id: validId,
+        monitoring: ensureBooleanOrFallback(
+            filteredMonitor.monitoring,
+            monitorTypeDefaults.monitoring
+        ),
+        responseTime:
+            typeof filteredMonitor.responseTime === "number"
+                ? filteredMonitor.responseTime
+                : BASE_MONITOR_DEFAULTS.responseTime,
+        retryAttempts: safeInteger(
+            filteredMonitor.retryAttempts,
+            monitorTypeDefaults.retryAttempts,
+            0,
+            10
+        ),
+        status:
+            filteredMonitor.status && isMonitorStatus(filteredMonitor.status)
+                ? filteredMonitor.status
+                : BASE_MONITOR_DEFAULTS.status,
+        timeout: safeInteger(
+            filteredMonitor.timeout,
+            monitorTypeDefaults.timeout,
+            1000,
+            300_000
+        ),
+        type: finalizedType,
+    };
+
+    // Apply type-specific defaults
+    applyTypeSpecificDefaults(baseMonitor, filteredMonitor);
+
+    // Add optional fields that were provided and valid
+    if (filteredMonitor.lastChecked instanceof Date) {
+        baseMonitor.lastChecked = filteredMonitor.lastChecked;
+    }
+
+    return baseMonitor;
+}

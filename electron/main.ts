@@ -9,11 +9,7 @@
  * @packageDocumentation
  */
 
-import type {
-    Event,
-    RenderProcessGoneDetails,
-    WebContents,
-} from "electron";
+import type { Event, RenderProcessGoneDetails, WebContents } from "electron";
 
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -129,8 +125,10 @@ if (isDev()) {
 
     void (async (): Promise<void> => {
         try {
-            // eslint-disable-next-line n/no-unpublished-import -- Dev-only dependency loaded only in development mode.
-            const module: unknown = await import(/* webpackChunkName: "electron-debug" */ "electron-debug");
+            // Electron-debug is a devDependency; this dev-only dynamic import is
+            // intentional.
+            // eslint-disable-next-line n/no-unpublished-import -- Dev-only dynamic import of a devDependency; keep webpackChunkName comment unmodified.
+            const module: unknown = await import(/* webpackChunkName: "electronDebug" */ "electron-debug");
 
             if (!isElectronDebugModule(module)) {
                 logger.warn(
@@ -168,12 +166,15 @@ const configureLogging = (): {
     consoleLevel: ElectronLogLevel;
     fileLevel: ElectronLogLevel;
 } => {
-    // Check for debug flag in command line arguments
+    // Check for log level flags in command line arguments
     const args = new Set(process.argv.slice(2));
+
     const debugFlag = args.has("--debug") || args.has("--log-debug");
     const productionFlag =
-        args.has("--log-production") || args.has("--log-prod");
-    const infoFlag = args.has("--log-info");
+        args.has("--production") ||
+        args.has("--log-production") ||
+        args.has("--log-prod");
+    const infoFlag = args.has("--info") || args.has("--log-info");
 
     // Determine log level based on flags and environment
     return ((): {
@@ -474,13 +475,11 @@ if (isDev()) {
 class Main {
     private static readonly FATAL_SHUTDOWN_TIMEOUT_MS = 5000;
 
-/** Application service instance for managing app lifecycle and features */
+    /** Application service instance for managing app lifecycle and features */
     private readonly applicationService: ApplicationService;
 
     /** Flag to ensure cleanup is only called once */
     private cleanedUp = false;
-
-
 
     private readonly handleUnhandledRejection = (reason: unknown): void => {
         const normalizedError = ensureError(reason);
@@ -555,7 +554,7 @@ class Main {
     /**
      * Named event handler for safe cleanup on process exit.
      */
-private readonly handleProcessExit = (): void => {
+    private readonly handleProcessExit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously without blocking process exit
@@ -576,10 +575,10 @@ private readonly handleProcessExit = (): void => {
         }
     };
 
-/**
+    /**
      * Named event handler for safe cleanup on app quit.
      */
-private readonly handleAppQuit = (): void => {
+    private readonly handleAppQuit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously during app quit
@@ -600,7 +599,7 @@ private readonly handleAppQuit = (): void => {
         }
     };
 
-private async performFatalShutdown(
+    private async performFatalShutdown(
         reason: "uncaughtException" | "unhandledRejection",
         error: Error
     ): Promise<void> {
@@ -639,12 +638,6 @@ private async performFatalShutdown(
 
         app.exit(1);
     }
-
-
-
-
-
-
 
     /**
      * Performs cleanup of application service.

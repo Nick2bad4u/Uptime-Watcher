@@ -23,6 +23,9 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                     operationId: "test-operation-id",
                     signal: new AbortController().signal,
                 }),
+                hasOutstandingOperation: vi.fn().mockReturnValue(false),
+                getOutstandingOperationIds: vi.fn().mockReturnValue([]),
+                cancelOperations: vi.fn(),
                 completeOperation: vi.fn(),
                 validateOperation: vi.fn().mockReturnValue(true),
             },
@@ -231,6 +234,63 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             expect(
                 mockConfig.historyRepository.pruneHistory
             ).toHaveBeenCalledWith("monitor-1", 50);
+        });
+
+        it("should throttle history count checks between prunes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: enhanced-monitor-checker-targeted",
+                "component"
+            );
+            await annotate("Category: Core", "category");
+            await annotate("Type: Performance", "type");
+
+            const monitor: Monitor = {
+                id: "monitor-1",
+                type: "http",
+                url: "https://example.com",
+                checkInterval: 300_000,
+                timeout: 30_000,
+                retryAttempts: 3,
+                monitoring: true,
+                status: "up",
+                responseTime: 150,
+                history: [],
+            };
+
+            const checkResult = {
+                responseTime: 100,
+                status: "up" as const,
+                timestamp: new Date(),
+            };
+
+            vi.spyOn(mockConfig, "getHistoryLimit").mockReturnValue(50);
+
+            const getHistoryCount = vi.fn().mockResolvedValue(55);
+            const addEntry = vi.fn().mockResolvedValue(undefined);
+
+            mockConfig.historyRepository.getHistoryCount = getHistoryCount;
+            mockConfig.historyRepository.addEntry = addEntry;
+
+            const localChecker = new EnhancedMonitorChecker(mockConfig);
+            const saveMethod = (localChecker as any).saveHistoryEntry.bind(
+                localChecker
+            );
+
+            await saveMethod(monitor, checkResult);
+            await saveMethod(monitor, checkResult);
+
+            expect(addEntry).toHaveBeenCalledTimes(2);
+            // The pruning strategy should not query counts for every write.
+            // It checks on the first write, then batches count checks using
+            // buffer size.
+            expect(getHistoryCount).toHaveBeenCalledTimes(1);
+            expect(
+                mockConfig.historyRepository.pruneHistory
+            ).not.toHaveBeenCalled();
         });
     });
 

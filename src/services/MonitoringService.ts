@@ -38,7 +38,7 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
-import type { ZodError } from "zod";
+import type * as z from "zod";
 
 import { ApplicationError } from "@shared/utils/errorHandling";
 import { validateStatusUpdate } from "@shared/validation/guards";
@@ -107,7 +107,7 @@ const resolveIdentifier = (candidate: unknown, fallback: string): string => {
  *   attached as the `cause`.
  */
 const logInvalidStatusUpdateAndThrow = (
-    error: ZodError,
+    error: z.ZodError,
     metadata: UnknownRecord
 ): never => {
     logger.error(

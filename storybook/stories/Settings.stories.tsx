@@ -165,7 +165,7 @@ export default meta;
 
 export const LightTheme: Story = {
     play: async ({ canvasElement, step }) => {
-        const canvas = within(canvasElement);
+        const canvas = within(canvasElement.ownerDocument.body);
 
         await step("Locate history limit control", async () => {
             const select = await canvas.findByLabelText(

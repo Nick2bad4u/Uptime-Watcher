@@ -526,6 +526,52 @@
             "type": "npm"
         },
         {
+            "detail": "Runs the Storybook story tests via Vitest (starts a Storybook server and executes portable stories).",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiGreen",
+                "id": "book"
+            },
+            "isBackground": false,
+            "label": "Test:Storybook",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test-storybook",
+                "panel": "shared",
+                "preserveTerminalName": false,
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": false
+            },
+            "problemMatcher": {
+                "applyTo": "allDocuments",
+                "owner": "vitest",
+                "pattern": [
+                    {
+                        "message": 1,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError|SyntaxError|AggregateError):\\s*(?:\\x1b\\[[0-9;]*m)*(.*)$"
+                    },
+                    {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
+                    }
+                ],
+                "severity": "error",
+                "source": "vitest"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "test:storybook",
+            "type": "npm"
+        },
+        {
             "detail": "Runs all linters: TypeScript type-checking, ESLint, Stylelint, Madge, and Knip.",
             "group": "test",
             "icon": {

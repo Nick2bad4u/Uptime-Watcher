@@ -401,7 +401,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                             async (monitorId: string) => {
                                 for (const site of sites) {
                                     const monitor = site.monitors.find(
-                                        (candidate) => candidate.id === monitorId
+                                        (candidate) =>
+                                            candidate.id === monitorId
                                     );
 
                                     if (monitor) {

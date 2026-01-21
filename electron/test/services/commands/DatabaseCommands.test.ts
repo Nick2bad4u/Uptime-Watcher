@@ -1143,9 +1143,9 @@ describe("DatabaseCommands", () => {
             expect(result.errors).toContain(
                 "Import data did not match the expected format."
             );
-            expect(result.errors.some((error) => error.includes("sites"))).toBeTruthy(
-
-            );
+            expect(
+                result.errors.some((error) => error.includes("sites"))
+            ).toBeTruthy();
         });
 
         it("should provide correct description", async ({ task, annotate }) => {

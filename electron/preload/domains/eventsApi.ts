@@ -95,10 +95,7 @@ const MONITORING_CONTROL_REASON_SET: ReadonlySet<string> = new Set(
 const UPDATE_STATUS_SET: ReadonlySet<string> = new Set(UPDATE_STATUS_VALUES);
 
 function isRendererEventChannel(value: unknown): value is RendererEventChannel {
-    return (
-        typeof value === "string" &&
-        RENDERER_EVENT_CHANNEL_SET.has(value)
-    );
+    return typeof value === "string" && RENDERER_EVENT_CHANNEL_SET.has(value);
 }
 
 type SiteAddedEventDataPayload = RendererEventPayload<
@@ -129,20 +126,17 @@ type StateSyncEventDataPayload = RendererEventPayload<
 const isCacheInvalidationReason = (
     value: unknown
 ): value is CacheInvalidationReason =>
-    typeof value === "string" &&
-    CACHE_INVALIDATION_REASON_SET.has(value);
+    typeof value === "string" && CACHE_INVALIDATION_REASON_SET.has(value);
 
 const isCacheInvalidationType = (
     value: unknown
 ): value is CacheInvalidationType =>
-    typeof value === "string" &&
-    CACHE_INVALIDATION_TYPE_SET.has(value);
+    typeof value === "string" && CACHE_INVALIDATION_TYPE_SET.has(value);
 
 const isMonitoringControlReason = (
     value: unknown
 ): value is MonitoringControlReason =>
-    typeof value === "string" &&
-    MONITORING_CONTROL_REASON_SET.has(value);
+    typeof value === "string" && MONITORING_CONTROL_REASON_SET.has(value);
 
 const isMonitorCheckType = (
     value: unknown
@@ -150,8 +144,7 @@ const isMonitorCheckType = (
     value === "manual" || value === "scheduled";
 
 const isUpdateStatus = (value: unknown): value is UpdateStatus =>
-    typeof value === "string" &&
-    UPDATE_STATUS_SET.has(value);
+    typeof value === "string" && UPDATE_STATUS_SET.has(value);
 
 const isUnknownRecord = (value: unknown): value is UnknownRecord =>
     isSharedRecord(value);

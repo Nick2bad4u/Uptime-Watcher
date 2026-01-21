@@ -48,16 +48,23 @@ type ThemedButtonMockProperties = PropsWithChildren<
     ButtonHTMLAttributes<HTMLButtonElement>
 >;
 
-type ThemedCardMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+type ThemedCardMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement>
+>;
 
 type ThemedSelectMockProperties = PropsWithChildren<
     SelectHTMLAttributes<HTMLSelectElement>
 >;
 
-type ThemedTextMockProperties = PropsWithChildren<HTMLAttributes<HTMLSpanElement>>;
+type ThemedTextMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLSpanElement>
+>;
 
 vi.mock("../../../../theme/components", () => ({
-    StatusIndicator: ({ children, ...props }: StatusIndicatorMockProperties) => (
+    StatusIndicator: ({
+        children,
+        ...props
+    }: StatusIndicatorMockProperties) => (
         <div data-testid="status-indicator" {...props}>
             {children}
         </div>
@@ -73,10 +80,7 @@ vi.mock("../../../../theme/components", () => ({
         </div>
     ),
     ThemedSelect: ({ children, ...props }: ThemedSelectMockProperties) => (
-        <select
-            data-testid="themed-select"
-            {...props}
-        >
+        <select data-testid="themed-select" {...props}>
             {children}
         </select>
     ),
@@ -88,7 +92,9 @@ vi.mock("../../../../theme/components", () => ({
 }));
 
 // Mock MonitorUiComponents
-type DetailLabelMockProperties = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
+type DetailLabelMockProperties = PropsWithChildren<
+    HTMLAttributes<HTMLDivElement>
+>;
 
 vi.mock("../../../../components/common/MonitorUiComponents", () => ({
     DetailLabel: ({ children, ...props }: DetailLabelMockProperties) => (
@@ -276,8 +282,10 @@ describe(HistoryTab, () => {
             const monitor = createMockMonitor(4);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
+            const user = userEvent.setup();
+
             const upButton = screen.getByRole("button", { name: /up/i });
-            await userEvent.click(upButton);
+            await user.click(upButton);
 
             // Should show only up status records (every even index)
             expect(
@@ -289,11 +297,13 @@ describe(HistoryTab, () => {
             const monitor = createMockMonitor(4);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
+            const user = userEvent.setup();
+
             // Get the filter button specifically (not any text containing "down")
             const downButton = screen.getByRole("button", {
                 name: /^down$/i,
             });
-            await userEvent.click(downButton);
+            await user.click(downButton);
 
             // Should show only down status records (every odd index)
             expect(
@@ -305,16 +315,18 @@ describe(HistoryTab, () => {
             const monitor = createMockMonitor(4);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
+            const user = userEvent.setup();
+
             // First filter to up
             const upButton = screen.getByRole("button", { name: /up/i });
-            await userEvent.click(upButton);
+            await user.click(upButton);
             expect(
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(2);
 
             // Then switch back to all
             const allButton = screen.getByRole("button", { name: /all/i });
-            await userEvent.click(allButton);
+            await user.click(allButton);
             expect(
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(4);
@@ -343,9 +355,11 @@ describe(HistoryTab, () => {
 
             mockUseSettingsStore.mockImplementation((selector?: unknown) =>
                 typeof selector === "function"
-                    ? (selector as (state: typeof settingsStoreState) => unknown)(
-                          settingsStoreState
-                      )
+                    ? (
+                          selector as (
+                              state: typeof settingsStoreState
+                          ) => unknown
+                      )(settingsStoreState)
                     : settingsStoreState
             );
 
@@ -382,9 +396,11 @@ describe(HistoryTab, () => {
 
             mockUseSettingsStore.mockImplementation((selector?: unknown) =>
                 typeof selector === "function"
-                    ? (selector as (state: typeof settingsStoreState) => unknown)(
-                          settingsStoreState
-                      )
+                    ? (
+                          selector as (
+                              state: typeof settingsStoreState
+                          ) => unknown
+                      )(settingsStoreState)
                     : settingsStoreState
             );
 
@@ -696,14 +712,16 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
+            const user = userEvent.setup();
+
             const upButton = screen.getByRole("button", { name: /up/i });
             const downButton = screen.getByRole("button", { name: /down/i });
             const allButton = screen.getByRole("button", { name: /all/i });
 
             // Test filter state changes
-            await userEvent.click(upButton);
-            await userEvent.click(downButton);
-            await userEvent.click(allButton);
+            await user.click(upButton);
+            await user.click(downButton);
+            await user.click(allButton);
 
             // All clicks should work without errors
             expect(upButton).toBeInTheDocument();
@@ -724,14 +742,16 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
+            const user = userEvent.setup();
+
             const upButton = screen.getByRole("button", { name: /^up$/i });
             const downButton = screen.getByRole("button", { name: /^down$/i });
 
             // Rapid clicks
-            await userEvent.click(upButton);
-            await userEvent.click(downButton);
-            await userEvent.click(upButton);
-            await userEvent.click(downButton);
+            await user.click(upButton);
+            await user.click(downButton);
+            await user.click(upButton);
+            await user.click(downButton);
 
             // Should handle rapid state changes gracefully
             expect(document.querySelectorAll(".themed-card")).toHaveLength(2);

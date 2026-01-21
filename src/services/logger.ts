@@ -122,7 +122,7 @@ function isTransportFor<K extends keyof LogTransports>(
 function getLogTransport<K extends keyof LogTransports>(
     transportName: K
 ): LogTransports[K] | undefined {
-    const {transports} = log;
+    const { transports } = log;
     if (!isRecord(transports)) {
         return undefined;
     }
@@ -173,19 +173,26 @@ const buildFinalArgs = (
     context: unknown
 ): readonly unknown[] =>
     context
-        ? [logArgs[0], context, ...logArgs.slice(1)]
+        ? [
+              logArgs[0],
+              context,
+              ...logArgs.slice(1),
+          ]
         : Array.from(logArgs);
 
 type LogMethodName = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
 
-const isInvoke = (value: unknown): value is (...arguments_: unknown[]) => void =>
-    typeof value === "function";
+const isInvoke = (
+    value: unknown
+): value is (...arguments_: unknown[]) => void => typeof value === "function";
 
 const noopInvoke = (): void => {
     // no-op
 };
 
-const getLogInvoke = (name: LogMethodName): ((...arguments_: unknown[]) => void) => {
+const getLogInvoke = (
+    name: LogMethodName
+): ((...arguments_: unknown[]) => void) => {
     const candidate = Reflect.get(log, name);
     if (isInvoke(candidate)) {
         return candidate;
@@ -199,12 +206,17 @@ const getLogInvoke = (name: LogMethodName): ((...arguments_: unknown[]) => void)
 type ExtractLogContextLevel = Parameters<typeof extractLogContext>[1];
 
 type StandardLogMethod = (message: string, ...args: unknown[]) => void;
-type ErrorLogMethod = (message: string, error?: unknown, ...args: unknown[]) => void;
+type ErrorLogMethod = (
+    message: string,
+    error?: unknown,
+    ...args: unknown[]
+) => void;
 
-const createStandardLogMethod = (
-    invoke: (...arguments_: unknown[]) => void,
-    extractLevel: ExtractLogContextLevel
-): StandardLogMethod =>
+const createStandardLogMethod =
+    (
+        invoke: (...arguments_: unknown[]) => void,
+        extractLevel: ExtractLogContextLevel
+    ): StandardLogMethod =>
     (message: string, ...args: unknown[]): void => {
         const { context, remaining } = extractLogContext(args, extractLevel);
         const logArgs = buildLogArguments(
@@ -216,9 +228,8 @@ const createStandardLogMethod = (
         safeInvoke(invoke, finalArgs);
     };
 
-const createErrorLogMethod = (
-    invoke: (...arguments_: unknown[]) => void
-): ErrorLogMethod =>
+const createErrorLogMethod =
+    (invoke: (...arguments_: unknown[]) => void): ErrorLogMethod =>
     (message: string, error?: unknown, ...args: unknown[]): void => {
         const { context, remaining } = extractLogContext(args, "error");
         const logArgs = buildErrorLogArguments(

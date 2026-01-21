@@ -114,30 +114,26 @@ vi.mock("../services/logger", () => {
 });
 
 vi.mock("../stores/error/useErrorStore", () => ({
-    useErrorStore: vi.fn(
-        (selector?: (state: unknown) => unknown) => {
-            const state = {
-                clearError: vi.fn(),
-                isLoading: false,
-                lastError: null,
-                setError: vi.fn(),
-            };
-            return typeof selector === "function" ? selector(state) : state;
-        }
-    ),
+    useErrorStore: vi.fn((selector?: (state: unknown) => unknown) => {
+        const state = {
+            clearError: vi.fn(),
+            isLoading: false,
+            lastError: null,
+            setError: vi.fn(),
+        };
+        return typeof selector === "function" ? selector(state) : state;
+    }),
 }));
 
 vi.mock("../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(
-        (selector?: (state: unknown) => unknown) => {
-            const state = {
-                addMonitorToSite: vi.fn(),
-                createSite: vi.fn(),
-                sites: [],
-            };
-            return typeof selector === "function" ? selector(state) : state;
-        }
-    ),
+    useSitesStore: vi.fn((selector?: (state: unknown) => unknown) => {
+        const state = {
+            addMonitorToSite: vi.fn(),
+            createSite: vi.fn(),
+            sites: [],
+        };
+        return typeof selector === "function" ? selector(state) : state;
+    }),
 }));
 
 vi.mock("../hooks/useMonitorTypes", () => ({
@@ -528,19 +524,17 @@ describe("100% Coverage Edge Cases", () => {
     describe("Error Display Edge Cases", () => {
         it("should show error alert when error exists", () => {
             const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
-            mockUseErrorStore.mockImplementation(
-                ((selector?: (state: unknown) => unknown) => {
-                    const state = {
-                        clearError: vi.fn(),
-                        isLoading: false,
-                        lastError: "Test error message",
-                        setError: vi.fn(),
-                    };
-                    return typeof selector === "function"
-                        ? selector(state)
-                        : state;
-                }) as never
-            );
+            mockUseErrorStore.mockImplementation(((
+                selector?: (state: unknown) => unknown
+            ) => {
+                const state = {
+                    clearError: vi.fn(),
+                    isLoading: false,
+                    lastError: "Test error message",
+                    setError: vi.fn(),
+                };
+                return typeof selector === "function" ? selector(state) : state;
+            }) as never);
 
             render(<AddSiteForm />);
             expect(screen.getByTestId("error-alert")).toBeInTheDocument();
@@ -550,19 +544,17 @@ describe("100% Coverage Edge Cases", () => {
         it("should handle error dismissal", () => {
             const clearError = vi.fn();
             const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
-            mockUseErrorStore.mockImplementation(
-                ((selector?: (state: unknown) => unknown) => {
-                    const state = {
-                        clearError,
-                        isLoading: false,
-                        lastError: "Test error",
-                        setError: vi.fn(),
-                    };
-                    return typeof selector === "function"
-                        ? selector(state)
-                        : state;
-                }) as never
-            );
+            mockUseErrorStore.mockImplementation(((
+                selector?: (state: unknown) => unknown
+            ) => {
+                const state = {
+                    clearError,
+                    isLoading: false,
+                    lastError: "Test error",
+                    setError: vi.fn(),
+                };
+                return typeof selector === "function" ? selector(state) : state;
+            }) as never);
 
             render(<AddSiteForm />);
             const dismissButton = screen.getByRole("button", {
@@ -576,20 +568,18 @@ describe("100% Coverage Edge Cases", () => {
     describe("Loading State Edge Cases", () => {
         it("should handle loading state", () => {
             const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
-            mockUseErrorStore.mockImplementation(
-                ((selector?: (state: unknown) => unknown) => {
-                    const state = {
-                        clearError: vi.fn(),
-                        isLoading: true,
-                        lastError: null,
-                        setError: vi.fn(),
-                    };
+            mockUseErrorStore.mockImplementation(((
+                selector?: (state: unknown) => unknown
+            ) => {
+                const state = {
+                    clearError: vi.fn(),
+                    isLoading: true,
+                    lastError: null,
+                    setError: vi.fn(),
+                };
 
-                    return typeof selector === "function"
-                        ? selector(state)
-                        : state;
-                }) as never
-            );
+                return typeof selector === "function" ? selector(state) : state;
+            }) as never);
 
             render(<AddSiteForm />);
             const button = screen.getByRole("button");
@@ -624,22 +614,20 @@ describe("100% Coverage Edge Cases", () => {
             );
 
             const mockUseSitesStore = vi.mocked(useSitesStore); // Updated: Removed require() and used direct import
-            mockUseSitesStore.mockImplementation(
-                ((selector?: (state: unknown) => unknown) => {
-                    const state = {
-                        addMonitorToSite: vi.fn(),
-                        createSite: vi.fn(),
-                        sites: [
-                            { identifier: "site1", name: "Site 1" },
-                            { identifier: "site2", name: "Site 2" },
-                        ],
-                    };
+            mockUseSitesStore.mockImplementation(((
+                selector?: (state: unknown) => unknown
+            ) => {
+                const state = {
+                    addMonitorToSite: vi.fn(),
+                    createSite: vi.fn(),
+                    sites: [
+                        { identifier: "site1", name: "Site 1" },
+                        { identifier: "site2", name: "Site 2" },
+                    ],
+                };
 
-                    return typeof selector === "function"
-                        ? selector(state)
-                        : state;
-                }) as never
-            );
+                return typeof selector === "function" ? selector(state) : state;
+            }) as never);
 
             render(<AddSiteForm />);
             expect(screen.getByTestId("selectedSite")).toBeInTheDocument();
@@ -778,20 +766,18 @@ describe("100% Coverage Edge Cases", () => {
 
         it("should prioritize form error over store error", () => {
             const mockUseErrorStore = vi.mocked(useErrorStore); // Updated: Removed require() and used direct import
-            mockUseErrorStore.mockImplementation(
-                ((selector?: (state: unknown) => unknown) => {
-                    const state = {
-                        clearError: vi.fn(),
-                        isLoading: false,
-                        lastError: "Store error",
-                        setError: vi.fn(),
-                    };
+            mockUseErrorStore.mockImplementation(((
+                selector?: (state: unknown) => unknown
+            ) => {
+                const state = {
+                    clearError: vi.fn(),
+                    isLoading: false,
+                    lastError: "Store error",
+                    setError: vi.fn(),
+                };
 
-                    return typeof selector === "function"
-                        ? selector(state)
-                        : state;
-                }) as never
-            );
+                return typeof selector === "function" ? selector(state) : state;
+            }) as never);
 
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             mockUseAddSiteForm.mockReturnValue(

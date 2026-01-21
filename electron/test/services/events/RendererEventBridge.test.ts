@@ -46,54 +46,17 @@ describe(RendererEventBridge, () => {
 
     const createPayload = (): BulkStateSyncEventData =>
         ({
-        action: "bulk-sync",
-        revision: 1,
-        siteCount: 1,
-        sites: [
-            {
-                identifier: "site-1",
-                monitoring: true,
-                monitors: [
-                    {
-                        checkInterval: 60_000,
-                        history: [],
-                        id: "monitor-1",
-                        monitoring: true,
-                        responseTime: 0,
-                        retryAttempts: 0,
-                        status: STATUS_KIND.UP,
-                        timeout: 5000,
-                        type: "http",
-                    },
-                ],
-                name: "Sample Site",
-            },
-        ],
-        source: "database",
-        timestamp: Date.now(),
-        }) satisfies BulkStateSyncEventData;
-
-    const createUpdatePayloadWithHistory = (
-        historyEntries: number
-    ): DeltaStateSyncEventData =>
-        ({
-        action: "update",
-        delta: {
-            addedSites: [],
-            removedSiteIdentifiers: [],
-            updatedSites: [
+            action: "bulk-sync",
+            revision: 1,
+            siteCount: 1,
+            sites: [
                 {
                     identifier: "site-1",
                     monitoring: true,
                     monitors: [
                         {
                             checkInterval: 60_000,
-                            history: Array.from({ length: historyEntries }, (_, index) => ({
-                                details: `entry-${index}`,
-                                responseTime: 0,
-                                status: STATUS_KIND.UP,
-                                timestamp: Date.now() + index,
-                            })),
+                            history: [],
                             id: "monitor-1",
                             monitoring: true,
                             responseTime: 0,
@@ -101,17 +64,57 @@ describe(RendererEventBridge, () => {
                             status: STATUS_KIND.UP,
                             timeout: 5000,
                             type: "http",
-                            url: "https://example.com",
                         },
                     ],
                     name: "Sample Site",
                 },
             ],
-        },
-        revision: 2,
-        siteIdentifier: "site-1",
-        source: "database",
-        timestamp: Date.now(),
+            source: "database",
+            timestamp: Date.now(),
+        }) satisfies BulkStateSyncEventData;
+
+    const createUpdatePayloadWithHistory = (
+        historyEntries: number
+    ): DeltaStateSyncEventData =>
+        ({
+            action: "update",
+            delta: {
+                addedSites: [],
+                removedSiteIdentifiers: [],
+                updatedSites: [
+                    {
+                        identifier: "site-1",
+                        monitoring: true,
+                        monitors: [
+                            {
+                                checkInterval: 60_000,
+                                history: Array.from(
+                                    { length: historyEntries },
+                                    (_, index) => ({
+                                        details: `entry-${index}`,
+                                        responseTime: 0,
+                                        status: STATUS_KIND.UP,
+                                        timestamp: Date.now() + index,
+                                    })
+                                ),
+                                id: "monitor-1",
+                                monitoring: true,
+                                responseTime: 0,
+                                retryAttempts: 0,
+                                status: STATUS_KIND.UP,
+                                timeout: 5000,
+                                type: "http",
+                                url: "https://example.com",
+                            },
+                        ],
+                        name: "Sample Site",
+                    },
+                ],
+            },
+            revision: 2,
+            siteIdentifier: "site-1",
+            source: "database",
+            timestamp: Date.now(),
         }) satisfies DeltaStateSyncEventData;
 
     let bridge: RendererEventBridge;

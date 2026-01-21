@@ -7,23 +7,28 @@ import * as z from "zod";
 /**
  * Minimal subset of the Google API error shape returned by Drive endpoints.
  */
-const googleApiErrorEnvelopeSchema = z.looseObject({
-    error: z
-        .looseObject({
-            code: z.number().optional(),
-            errors: z
-                .array(
-                    z.looseObject({
-                        message: z.string().optional(),
-                        reason: z.string().optional(),
-                    })
-                )
-                .optional(),
-            message: z.string().optional(),
-            status: z.string().optional(),
-        })
-        .optional(),
-});
+const googleApiErrorEnvelopeSchema = z
+    .object({
+        error: z
+            .object({
+                code: z.number().optional(),
+                errors: z
+                    .array(
+                        z
+                            .object({
+                                message: z.string().optional(),
+                                reason: z.string().optional(),
+                            })
+                            .loose()
+                    )
+                    .optional(),
+                message: z.string().optional(),
+                status: z.string().optional(),
+            })
+            .loose()
+            .optional(),
+    })
+    .loose();
 
 type GoogleApiErrorEnvelope = z.infer<typeof googleApiErrorEnvelopeSchema>;
 

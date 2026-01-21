@@ -2,7 +2,8 @@
     "$schema": "https://www.schemastore.org/tsconfig.json",
     "compilerOptions": {
         "composite": false,
-        "noEmit": true
+        "noEmit": true,
+        "tsBuildInfoFile": "../.cache/tsbuildinfo/tsconfig.dotstorybook.tsbuildinfo"
     },
     "exclude": [],
     "extends": "../tsconfig.json",

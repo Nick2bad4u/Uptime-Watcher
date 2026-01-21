@@ -19,7 +19,16 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "../../stores/sites/baseTypes";
-import type { SitesStore } from "../../stores/sites/types";
+import type { SitesStore as SitesStoreInternal } from "../../stores/sites/types";
+
+/**
+ * Public type alias for consumers of this test helper.
+ *
+ * @remarks
+ * We intentionally avoid direct re-exports to comply with
+ * canonical/no-re-export.
+ */
+export type SitesStore = SitesStoreInternal;
 
 /**
  * Creates a reusable subscription summary object for mocks.
@@ -165,5 +174,3 @@ export const updateSitesStoreMock = (
 ): void => {
     Object.assign(state, partial);
 };
-
-export { type SitesStore } from "../../stores/sites/types";

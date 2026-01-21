@@ -1,5 +1,11 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- This provider only operates on sandboxed paths under appRoot derived from validated keys. */
 
+import {
+    assertCloudObjectKey,
+    DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
+    normalizeCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "@shared/utils/cloudKeyNormalization";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
@@ -12,12 +18,6 @@ import type {
     CloudStorageProvider,
 } from "./CloudStorageProvider.types";
 
-import {
-    assertCloudObjectKey,
-    DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
-    normalizeCloudObjectKey,
-    normalizeProviderObjectKey,
-} from "../cloudKeyNormalization";
 import { BaseCloudStorageProvider } from "./BaseCloudStorageProvider";
 import { CloudProviderOperationError } from "./cloudProviderErrors";
 

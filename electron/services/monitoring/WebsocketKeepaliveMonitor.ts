@@ -80,6 +80,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     failureLogLevel: "warn",
                     maxRetries: retryAttempts + 1,
                     operationName: `WebSocket keepalive for ${urlCandidate}`,
+                    ...(signal ? { signal } : {}),
                 }
             );
         } catch (error) {

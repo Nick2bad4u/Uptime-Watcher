@@ -54,9 +54,7 @@ describe(DropboxCloudStorageProvider, () => {
         expect(
             vi
                 .mocked(mockLog.warn)
-                .mock
-                .calls
-                .some((call) =>
+                .mock.calls.some((call) =>
                     String(call[0]).includes(
                         "Skipped invalid Dropbox list-folder entries"
                     )
@@ -161,12 +159,16 @@ describe(DropboxCloudStorageProvider, () => {
             getAccessToken: vi.fn().mockResolvedValue("token"),
         };
 
-        const conflict = new DropboxResponseError(409, {}, {
-            ".tag": "path",
-            path: {
-                ".tag": "conflict",
-            },
-        });
+        const conflict = new DropboxResponseError(
+            409,
+            {},
+            {
+                ".tag": "path",
+                path: {
+                    ".tag": "conflict",
+                },
+            }
+        );
 
         const filesUpload = vi.fn().mockRejectedValue(conflict);
 

@@ -377,7 +377,9 @@ describe(SiteDetails, () => {
             throw new Error("Expected AnalyticsTab lineChartData.labels[0]");
         }
 
-        expect(firstLabel).toEqual(new Date(filteredHistory[0]?.timestamp ?? 0));
+        expect(firstLabel).toEqual(
+            new Date(filteredHistory[0]?.timestamp ?? 0)
+        );
     });
 
     it("renders the history tab when selected", () => {

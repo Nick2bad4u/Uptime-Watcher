@@ -99,16 +99,17 @@ const getGlobalWindow = (): unknown => {
     return globalObject.window;
 };
 
-const isNonNullObject = (
-    value: unknown
-): value is UnknownRecord =>
-    typeof value === "object" && value !== null;
+type ObjectLike = ((...args: readonly unknown[]) => unknown) | UnknownRecord;
+
+const isObjectLike = (value: unknown): value is ObjectLike =>
+    (typeof value === "object" || typeof value === "function") &&
+    value !== null;
 
 const isBridgeRootCandidate = (value: unknown): value is BridgeRoot =>
-    typeof value === "function" || isNonNullObject(value);
+    isObjectLike(value);
 
 const safeGetProperty = (target: unknown, key: PropertyKey): unknown => {
-    if (!isNonNullObject(target)) {
+    if (!isObjectLike(target)) {
         return undefined;
     }
 
@@ -121,7 +122,7 @@ const safeGetProperty = (target: unknown, key: PropertyKey): unknown => {
 
 const obtainBridgeRoot = (): BridgeRoot | undefined => {
     const candidateWindow = getGlobalWindow();
-    if (!isNonNullObject(candidateWindow)) {
+    if (!isObjectLike(candidateWindow)) {
         return undefined;
     }
 
@@ -159,7 +160,7 @@ const evaluateContracts = (
 
     for (const contract of contracts) {
         const domainValue = safeGetProperty(bridge, contract.domain);
-        const domainAvailable = isNonNullObject(domainValue);
+        const domainAvailable = isObjectLike(domainValue);
 
         if (!domainAvailable) {
             missingDomains.push(contract.domain);

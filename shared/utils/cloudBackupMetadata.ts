@@ -4,11 +4,6 @@
 
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
-import type {
-    DatabaseBackupMetadata,
-    DatabaseBackupResult,
-} from "../../database/utils/backup/databaseBackup";
-
 /**
  * Sanitize a backup file name to a stable original-path value.
  *
@@ -29,7 +24,7 @@ export function deriveCloudBackupOriginalPath(fileName: string): string {
 /** Serialize backup metadata for storage in cloud provider sidecar files. */
 export function serializeBackupMetadata(args: {
     readonly fileName: string;
-    readonly metadata: DatabaseBackupResult["metadata"];
+    readonly metadata: SerializedDatabaseBackupMetadata;
 }): SerializedDatabaseBackupMetadata {
     const { fileName, metadata } = args;
 
@@ -44,18 +39,5 @@ export function serializeBackupMetadata(args: {
     };
 }
 
-/** Convert serialized metadata back into the runtime
-{@link DatabaseBackupMetadata} shape. */
-export function toDatabaseBackupMetadata(
-    serialized: SerializedDatabaseBackupMetadata
-): DatabaseBackupMetadata {
-    return {
-        appVersion: serialized.appVersion,
-        checksum: serialized.checksum,
-        createdAt: serialized.createdAt,
-        originalPath: serialized.originalPath,
-        retentionHintDays: serialized.retentionHintDays,
-        schemaVersion: serialized.schemaVersion,
-        sizeBytes: serialized.sizeBytes,
-    } satisfies DatabaseBackupMetadata;
-}
+// No conversion helper is necessary: serialized backup metadata is already in
+// a runtime-safe shape for cross-process transport.

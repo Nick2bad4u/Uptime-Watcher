@@ -20,9 +20,15 @@
             "./.cache",
             "./node_modules/.cache"
         ],
-        "conditions": ["development", "node"],
+        "conditions": [
+            "development",
+            "node"
+        ],
         "diagnostic-dir": "./temp",
-        "disable-warning": ["DEP0190", "ExperimentalWarning"],
+        "disable-warning": [
+            "DEP0190",
+            "ExperimentalWarning"
+        ],
         "enable-source-maps": true,
         "experimental-detect-module": true,
         "experimental-require-module": true,
@@ -55,8 +61,14 @@
         "test-coverage-lines": 90,
         "test-force-exit": true,
         "test-isolation": "process",
-        "test-reporter": ["spec", "json"],
-        "test-reporter-destination": ["stdout", "./coverage/test-results.json"],
+        "test-reporter": [
+            "spec",
+            "json"
+        ],
+        "test-reporter-destination": [
+            "stdout",
+            "./coverage/test-results.json"
+        ],
         "test-timeout": 30000,
         "test-update-snapshots": true
     },

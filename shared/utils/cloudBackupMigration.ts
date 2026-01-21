@@ -1,7 +1,3 @@
-/**
- * Small migration-related helpers extracted from {@link CloudService}.
- */
-
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { CloudBackupMigrationRequest } from "@shared/types/cloudBackupMigration";
 

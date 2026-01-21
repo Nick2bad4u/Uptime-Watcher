@@ -10,6 +10,7 @@
 import { isSiteStatus, type SiteStatus } from "@shared/types";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
@@ -136,7 +137,17 @@ interface UseThemeReturn {
  * @see {@link useSettingsStore} for settings integration
  */
 export function useTheme(): UseThemeReturn {
-    const { settings, updateSettings } = useSettingsStore();
+    const { storedTheme, updateSettings } = useSettingsStore(
+        useShallow(
+            useCallback(
+                (state) => ({
+                    storedTheme: state.settings.theme,
+                    updateSettings: state.updateSettings,
+                }),
+                []
+            )
+        )
+    );
     const [systemTheme, setSystemTheme] = useState<SystemThemePreference>(
         // Initialize with actual system preference to avoid flashing
         () => themeManager.getSystemThemePreference()
@@ -145,12 +156,12 @@ export function useTheme(): UseThemeReturn {
     // Memoized getCurrentTheme to satisfy useEffect deps and avoid unnecessary
     // re-renders
     const getCurrentTheme = useCallback((): Theme => {
-        if (settings.theme === "system") {
+        if (storedTheme === "system") {
             // Use component's systemTheme state for consistency with useEffect dependency
             return themeManager.getTheme(systemTheme);
         }
-        return themeManager.getTheme(settings.theme);
-    }, [settings.theme, systemTheme]);
+        return themeManager.getTheme(storedTheme);
+    }, [storedTheme, systemTheme]);
 
     // Compute current theme
     const currentTheme = useMemo(() => getCurrentTheme(), [getCurrentTheme]);
@@ -310,7 +321,7 @@ export function useTheme(): UseThemeReturn {
         /** ThemeManager instance for advanced operations */
         themeManager,
         /** Current theme name */
-        themeName: settings.theme,
+        themeName: storedTheme,
         /** Version counter that increments when theme changes */
         themeVersion,
         /** Toggle between light and dark themes */

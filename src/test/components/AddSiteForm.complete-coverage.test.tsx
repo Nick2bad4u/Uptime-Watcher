@@ -31,11 +31,12 @@ interface GlobalWithSitesStoreMock extends UnknownRecord {
     __useSitesStoreMock__?: typeof useSitesStoreMock;
 }
 
-const globalWithSitesStoreMock = globalThis as unknown as GlobalWithSitesStoreMock;
+const globalWithSitesStoreMock =
+    globalThis as unknown as GlobalWithSitesStoreMock;
 globalWithSitesStoreMock.__useSitesStoreMock__ = useSitesStoreMock;
 
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: <Result = typeof sitesStoreState>(
+    useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
     ): Result | typeof sitesStoreState => {
@@ -142,26 +143,26 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
             lastError: null,
             loadMonitorTypes: vi.fn(),
             monitorTypes: [
-            {
-                description: "Monitor HTTP endpoints",
-                displayName: "HTTP Monitor",
-                fields: [
-                    {
-                        helpText: "Enter the full URL including http://",
-                        label: "Website URL",
-                        name: "url",
-                        placeholder: "https://status.example.com",
-                        required: true,
-                        type: "url",
+                {
+                    description: "Monitor HTTP endpoints",
+                    displayName: "HTTP Monitor",
+                    fields: [
+                        {
+                            helpText: "Enter the full URL including http://",
+                            label: "Website URL",
+                            name: "url",
+                            placeholder: "https://status.example.com",
+                            required: true,
+                            type: "url",
+                        },
+                    ],
+                    type: "http",
+                    uiConfig: {
+                        supportsAdvancedAnalytics: true,
+                        supportsResponseTime: true,
                     },
-                ],
-                type: "http",
-                uiConfig: {
-                    supportsAdvancedAnalytics: true,
-                    supportsResponseTime: true,
+                    version: "1.0.0",
                 },
-                version: "1.0.0",
-            },
             ],
         };
 

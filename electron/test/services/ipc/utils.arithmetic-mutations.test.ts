@@ -119,6 +119,7 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 metadata: {
                     duration: 300,
                     handler: "param-channel",
+                    paramCount: 2,
                 },
             });
 
@@ -155,6 +156,7 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 metadata: {
                     duration: 600,
                     handler: "param-channel",
+                    paramCount: 1,
                 },
             });
 
@@ -182,6 +184,7 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 error: "Parameter validation failed: Invalid parameter",
                 metadata: {
                     handler: "validate-channel",
+                    paramCount: 1,
                     validationErrors: ["Invalid parameter"],
                 },
             });

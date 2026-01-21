@@ -105,7 +105,7 @@
         "suppressImplicitAnyIndexErrors": false,
         "target": "ES2024",
         "traceResolution": false,
-        "tsBuildInfoFile": "./.cache/tsconfig.tsbuildinfo",
+        "tsBuildInfoFile": "./.cache/tsbuildinfo/tsconfig.app.tsbuildinfo",
         "types": [
             "@testing-library/jest-dom",
             "electron",

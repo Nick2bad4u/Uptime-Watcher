@@ -253,8 +253,7 @@ const bulkStateSyncEventDataSchema = baseEventDataSchema
         if (value.siteCount !== value.sites.length) {
             ctx.addIssue({
                 code: "custom",
-                message:
-                    "siteCount must equal the number of serialized sites",
+                message: "siteCount must equal the number of serialized sites",
                 path: ["siteCount"],
             });
         }
@@ -323,9 +322,9 @@ const deleteStateSyncEventDataSchema = baseEventDataSchema
  */
 export const stateSyncEventDataSchema: z.ZodType<StateSyncEventData> =
     z.discriminatedUnion("action", [
-    bulkStateSyncEventDataSchema,
-    updateStateSyncEventDataSchema,
-    deleteStateSyncEventDataSchema,
+        bulkStateSyncEventDataSchema,
+        updateStateSyncEventDataSchema,
+        deleteStateSyncEventDataSchema,
     ]);
 
 /**

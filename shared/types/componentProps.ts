@@ -67,7 +67,6 @@ export type DataAttributeProperties = Readonly<
     Partial<Record<`data-${string}`, boolean | number | string | undefined>>
 >;
 
-
 /**
  * Accessibility properties following ARIA standards.
  *
@@ -364,7 +363,10 @@ export interface StandardButtonProperties
     /** Click handler for button interactions */
     readonly onClick?: ClickHandler;
 
-    /** Key down handler for keyboard interactions (e.g., arrow-key tab navigation). */
+    /**
+     * Key down handler for keyboard interactions (e.g., arrow-key tab
+     * navigation).
+     */
     readonly onKeyDown?: KeyPressHandler<HTMLButtonElement>;
     /** Tooltip text for hover states */
     readonly title?: string;

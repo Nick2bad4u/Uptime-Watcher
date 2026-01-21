@@ -32,23 +32,10 @@
  * });
  *
  * // Get history for a monitor
- * const history = await historyRepo.getHistoryByMonitorId("monitor123", {
- *     limit: 100,
- *     offset: 0,
- * });
+ * const history = await historyRepo.findByMonitorId("monitor123");
  * ```
  *
- * @example History management:
- *
- * ```typescript
- * // Prune old history entries
- * await historyRepo.pruneHistoryForMonitor("monitor123", 1000);
- *
- * // Get latest status
- * const latest = await historyRepo.getLatestHistoryEntry("monitor123");
- * ```
- *
- * @packageDocumentation
+ * @public
  */
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
@@ -72,14 +59,7 @@ import {
 import { queryForIds } from "./utils/queries/typedQueries";
 
 /**
- * Defines the dependencies required by the {@link HistoryRepository} for
- * managing history data persistence.
- *
- * @remarks
- * Provides the required {@link DatabaseService} for all history operations. This
- * interface is used for dependency injection.
- *
- * @public
+ * Dependencies required to construct a {@link HistoryRepository}.
  */
 export interface HistoryRepositoryDependencies {
     /**
@@ -127,6 +107,15 @@ const HISTORY_QUERIES = {
         "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
     SELECT_MONITOR_IDS: "SELECT id FROM monitors",
 } as const;
+
+const normalizePruneLimit = (limit: number): null | number => {
+    if (!Number.isFinite(limit)) {
+        return null;
+    }
+
+    const normalized = Math.floor(limit);
+    return normalized > 0 ? normalized : null;
+};
 
 /**
  * Repository for managing history data persistence.
@@ -406,44 +395,14 @@ export class HistoryRepository {
      * @throws Error if the database operation fails.
      */
     public async pruneAllHistory(limit: number): Promise<void> {
-        if (limit <= 0) return;
+        if (limit <= 0) {
+            return;
+        }
 
         await withDatabaseOperation(
             () =>
-                // Use executeTransaction for atomic multi-monitor operation
                 this.databaseService.executeTransaction((db) => {
-                    const monitors = queryForIds(
-                        db,
-                        HISTORY_QUERIES.SELECT_MONITOR_IDS
-                    );
-                    for (const monitor of monitors) {
-                        // Type assertion is safe: SQL query "SELECT id FROM
-                        // history..." guarantees { id: number } structure
-
-                        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Database queries return known structures from controlled SQL */
-                        const excessEntries = db.all(
-                            HISTORY_QUERIES.SELECT_EXCESS_ENTRIES,
-                            [String(monitor.id), limit]
-                        ) as Array<{ id: number }>;
-                        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- re-enable unsafe type assertion warnings */
-                        if (excessEntries.length > 0) {
-                            // Convert numeric IDs to ensure type safety and
-                            // validate they are numbers
-                            const excessIds = excessEntries
-                                .map((e) => e.id)
-                                .filter((id) => Number.isFinite(id) && id > 0);
-
-                            if (excessIds.length > 0) {
-                                const placeholders = excessIds
-                                    .map(() => "?")
-                                    .join(",");
-                                db.run(
-                                    `${HISTORY_QUERIES.DELETE_BY_IDS} (${placeholders})`,
-                                    excessIds
-                                );
-                            }
-                        }
-                    }
+                    this.pruneAllHistoryInternal(db, limit);
                     return Promise.resolve();
                 }),
             "history-prune-all",
@@ -472,14 +431,23 @@ export class HistoryRepository {
      * @throws Error if the database operation fails.
      */
     public async pruneHistory(monitorId: string, limit: number): Promise<void> {
-        return withDatabaseOperation(
+        const normalizedLimit = normalizePruneLimit(limit);
+        if (!normalizedLimit) {
+            return;
+        }
+
+        await withDatabaseOperation(
             () => {
-                pruneHistoryForMonitor(this.getDb(), monitorId, limit);
+                pruneHistoryForMonitor(
+                    this.getDb(),
+                    monitorId,
+                    normalizedLimit
+                );
                 return Promise.resolve();
             },
             "history-prune",
             undefined,
-            { limit, monitorId }
+            { limit: normalizedLimit, monitorId }
         );
     }
 
@@ -628,7 +596,8 @@ export class HistoryRepository {
      *   greater than 0.
      */
     public pruneAllHistoryInternal(db: Database, limit: number): void {
-        if (limit <= 0) {
+        const normalizedLimit = normalizePruneLimit(limit);
+        if (!normalizedLimit) {
             return;
         }
 
@@ -637,16 +606,16 @@ export class HistoryRepository {
 
         // Prune history for each monitor
         for (const row of monitorRows) {
-            // Validate monitor ID is a positive number before using it
-            const monitorId = Number(row.id);
-            if (Number.isFinite(monitorId) && monitorId > 0) {
-                pruneHistoryForMonitor(db, String(monitorId), limit);
-            }
+            const monitorId =
+                typeof row.id === "string" ? row.id : String(row.id);
+
+            // `queryForIds` already enforces non-empty strings and finite numbers.
+            pruneHistoryForMonitor(db, monitorId, normalizedLimit);
         }
 
         if (isDev()) {
             logger.debug(
-                `[HistoryRepository] Pruned history for all monitors (limit: ${limit}) (internal)`
+                `[HistoryRepository] Pruned history for all monitors (limit: ${normalizedLimit}) (internal)`
             );
         }
     }
@@ -670,15 +639,16 @@ export class HistoryRepository {
         monitorId: string,
         limit: number
     ): void {
-        if (limit <= 0) {
+        const normalizedLimit = normalizePruneLimit(limit);
+        if (!normalizedLimit) {
             return;
         }
 
-        pruneHistoryForMonitor(db, monitorId, limit);
+        pruneHistoryForMonitor(db, monitorId, normalizedLimit);
 
         if (isDev()) {
             logger.debug(
-                `[HistoryRepository] Pruned history for monitor ${monitorId} (limit: ${limit}) (internal)`
+                `[HistoryRepository] Pruned history for monitor ${monitorId} (limit: ${normalizedLimit}) (internal)`
             );
         }
     }

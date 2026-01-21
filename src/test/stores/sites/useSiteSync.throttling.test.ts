@@ -132,12 +132,12 @@ describe("useSiteSync throttling and edge cases", () => {
 
     it("sanitizes duplicate sites and warns when backend isn't synchronized", async () => {
         const duplicateSites = [buildSite("dup"), buildSite("dup")];
-            stateSyncServiceMock.requestFullSync.mockResolvedValueOnce({
-                completedAt: Date.now(),
-                revision: 1,
+        stateSyncServiceMock.requestFullSync.mockResolvedValueOnce({
+            completedAt: Date.now(),
+            revision: 1,
             siteCount: duplicateSites.length,
             sites: duplicateSites,
-                source: "database",
+            source: "database",
             synchronized: false,
         });
 
@@ -148,20 +148,20 @@ describe("useSiteSync throttling and edge cases", () => {
             expect.objectContaining({ identifier: "dup" }),
         ]);
 
-            expect(loggerMock.error).toHaveBeenCalledWith(
-                "Duplicate site identifiers detected in full sync response",
-                expect.objectContaining({
-                    duplicates: expect.arrayContaining([
-                        expect.objectContaining({
-                            identifier: "dup",
-                            occurrences: 2,
-                        }),
-                    ]),
-                    originalSiteCount: 2,
-                    sanitizedSiteCount: 1,
-                    source: "database",
-                })
-            );
+        expect(loggerMock.error).toHaveBeenCalledWith(
+            "Duplicate site identifiers detected in full sync response",
+            expect.objectContaining({
+                duplicates: expect.arrayContaining([
+                    expect.objectContaining({
+                        identifier: "dup",
+                        occurrences: 2,
+                    }),
+                ]),
+                originalSiteCount: 2,
+                sanitizedSiteCount: 1,
+                source: "database",
+            })
+        );
         expect(loggerMock.warn).toHaveBeenCalledWith(
             "Backend full sync completed without synchronized flag",
             expect.objectContaining({
@@ -197,12 +197,12 @@ describe("useSiteSync throttling and edge cases", () => {
 
         emittedHandler?.({ action: "update", timestamp: Date.now() });
 
-            expect(loggerMock.error).toHaveBeenCalledWith(
-                "Failed to apply state sync event",
-                expect.any(Error),
-                expect.objectContaining({
-                    action: "update",
-                })
-            );
+        expect(loggerMock.error).toHaveBeenCalledWith(
+            "Failed to apply state sync event",
+            expect.any(Error),
+            expect.objectContaining({
+                action: "update",
+            })
+        );
     });
 });

@@ -124,7 +124,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, mockStore)
-            ).rejects.toBe("String error");
+            ).rejects.toMatchObject({
+                message: "String error",
+            });
 
             expect(mockStore.setError).toHaveBeenCalledWith("String error");
         });
@@ -346,7 +348,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, mockStore)
-            ).rejects.toBe(complexError);
+            ).rejects.toMatchObject({
+                message: "[object Object]",
+            });
 
             expect(mockStore.setError).toHaveBeenCalledWith("[object Object]");
         });
@@ -364,7 +368,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, mockStore)
-            ).rejects.toBe(null);
+            ).rejects.toMatchObject({
+                message: "null",
+            });
 
             expect(mockStore.setError).toHaveBeenCalledWith("null");
         });
@@ -382,7 +388,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, mockStore)
-            ).rejects.toBe(42);
+            ).rejects.toMatchObject({
+                message: "42",
+            });
 
             expect(mockStore.setError).toHaveBeenCalledWith("42");
         });

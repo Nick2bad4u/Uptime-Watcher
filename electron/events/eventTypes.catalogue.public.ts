@@ -181,8 +181,10 @@ declare module "./eventTypes" {
          * @param value - The value of the metric.
          */
         "performance:metric": {
-            /** The metric category ("database", "monitoring", "system", or
-"ui"). */
+            /**
+             * The metric category ("database", "monitoring", "system", or
+             * "ui").
+             */
             category: "database" | "monitoring" | "system" | "ui";
             /** The metric name. */
             metric: string;
@@ -312,8 +314,10 @@ declare module "./eventTypes" {
             error: Error;
             /** Optional recovery suggestion. */
             recovery?: string;
-            /** The severity of the error ("critical", "high", "low", or
-"medium"). */
+            /**
+             * The severity of the error ("critical", "high", "low", or
+             * "medium").
+             */
             severity: "critical" | "high" | "low" | "medium";
             /** Unix timestamp (ms) when the error occurred. */
             timestamp: number;

@@ -12,6 +12,59 @@ import {
     raceWithAbort,
 } from "../../utils/abortUtils.js";
 
+class SpyAbortSignal {
+    public aborted = false;
+
+    public readonly addCalls: {
+        readonly type: string;
+        readonly listener: EventListenerOrEventListenerObject;
+    }[] = [];
+
+    public readonly removeCalls: {
+        readonly type: string;
+        readonly listener: EventListenerOrEventListenerObject;
+    }[] = [];
+
+    private readonly abortListeners =
+        new Set<EventListenerOrEventListenerObject>();
+
+    public addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject
+    ): void {
+        this.addCalls.push({ type, listener });
+        if (type === "abort") {
+            this.abortListeners.add(listener);
+        }
+    }
+
+    public removeEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject
+    ): void {
+        this.removeCalls.push({ type, listener });
+        if (type === "abort") {
+            this.abortListeners.delete(listener);
+        }
+    }
+
+    public dispatchAbort(): void {
+        this.aborted = true;
+        for (const listener of this.abortListeners) {
+            if (typeof listener === "function") {
+                // RaceWithAbort registers a zero-arg handler.
+                (listener as () => void)();
+            } else {
+                listener.handleEvent(undefined as never);
+            }
+        }
+    }
+
+    public getAbortListenerCount(): number {
+        return this.abortListeners.size;
+    }
+}
+
 describe("AbortUtils Function Coverage Tests", () => {
     describe(isAbortError, () => {
         test("should return true for Error with AbortError name", () => {
@@ -160,6 +213,85 @@ describe("AbortUtils Function Coverage Tests", () => {
             await expect(
                 raceWithAbort(operation, controller.signal)
             ).rejects.toThrowError("operation failed");
+        });
+
+        test("should remove abort listener when operation resolves", async () => {
+            const signal = new SpyAbortSignal();
+            const result = await raceWithAbort(
+                Promise.resolve("ok"),
+                signal as unknown as AbortSignal
+            );
+
+            expect(result).toBe("ok");
+            expect(signal.getAbortListenerCount()).toBe(0);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+        });
+
+        test("should remove abort listener when operation rejects", async () => {
+            const signal = new SpyAbortSignal();
+
+            await expect(
+                raceWithAbort(
+                    Promise.reject(new Error("boom")),
+                    signal as unknown as AbortSignal
+                )
+            ).rejects.toThrowError("boom");
+
+            expect(signal.getAbortListenerCount()).toBe(0);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+        });
+
+        test("should remove abort listener when aborted", async () => {
+            const signal = new SpyAbortSignal();
+            const pending = new Promise<string>(() => {
+                // Intentionally never resolves
+            });
+
+            const promise = raceWithAbort(
+                pending,
+                signal as unknown as AbortSignal
+            );
+
+            signal.dispatchAbort();
+
+            await expect(promise).rejects.toThrowError("Operation was aborted");
+            expect(signal.getAbortListenerCount()).toBe(0);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(1);
+        });
+
+        test("should not attach abort listener when already aborted", async () => {
+            const signal = new SpyAbortSignal();
+            signal.aborted = true;
+
+            await expect(
+                raceWithAbort(
+                    Promise.resolve("ok"),
+                    signal as unknown as AbortSignal
+                )
+            ).rejects.toThrowError("Operation was aborted");
+
+            expect(signal.getAbortListenerCount()).toBe(0);
+            expect(
+                signal.addCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(0);
+            expect(
+                signal.removeCalls.filter((call) => call.type === "abort")
+            ).toHaveLength(0);
         });
     });
 });

@@ -19,7 +19,10 @@ const noop = (): void => {};
  * Returns whether the current environment prefers dark mode.
  *
  * @remarks
- * - SSR-safe (returns `false` when `window` is unavailable)
+ * -
+ *
+ * SSR-safe (returns `false` when `window` is unavailable)
+ *
  * - Defensive against `matchMedia` throwing
  */
 export function getPrefersDarkMode(): boolean {
@@ -30,7 +33,10 @@ export function getPrefersDarkMode(): boolean {
  * Subscribes to dark-mode preference changes.
  *
  * @remarks
- * - SSR-safe (returns a no-op cleanup function)
+ * -
+ *
+ * SSR-safe (returns a no-op cleanup function)
+ *
  * - Defensive against `matchMedia` throwing
  *
  * @param onChange - Called with the new dark-mode preference.

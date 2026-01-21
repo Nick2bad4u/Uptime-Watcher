@@ -35,7 +35,10 @@ function isValidHttpStatus(httpStatus: number): boolean {
  * code.
  *
  * @remarks
- * - 1xx–4xx: "up" (site is responding)
+ * -
+ *
+ * 1xx–4xx: "up" (site is responding)
+ *
  * - 5xx degraded errors: "degraded" (server responding but with issues)
  *
  *   - 501 Not Implemented

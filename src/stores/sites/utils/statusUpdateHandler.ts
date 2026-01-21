@@ -324,16 +324,16 @@ export class StatusUpdateManager {
 
         const listenerDescriptors: StatusUpdateListenerDescriptor[] =
             createStatusUpdateListenerDescriptors({
-            handleMonitoringStarted: (event) => {
-                this.handleMonitoringLifecycleEvent("started", event);
-            },
-            handleMonitoringStopped: (event) => {
-                this.handleMonitoringLifecycleEvent("stopped", event);
-            },
-            processStatusUpdateCandidate: (candidate, source) => {
-                void this.processStatusUpdateCandidate(candidate, source);
-            },
-        });
+                handleMonitoringStarted: (event) => {
+                    this.handleMonitoringLifecycleEvent("started", event);
+                },
+                handleMonitoringStopped: (event) => {
+                    this.handleMonitoringLifecycleEvent("stopped", event);
+                },
+                processStatusUpdateCandidate: (candidate, source) => {
+                    void this.processStatusUpdateCandidate(candidate, source);
+                },
+            });
 
         let listenerStates: ListenerAttachmentState[] =
             createInitialListenerStates(listenerDescriptors);
@@ -387,7 +387,7 @@ export class StatusUpdateManager {
         } satisfies StatusUpdateSubscriptionResult;
     }
 
-/**
+    /**
      * Process an unknown candidate payload that may represent an enriched
      * monitor status change.
      *

@@ -180,7 +180,9 @@ const mockElectronAPI = {
                 sizeBytes: 8,
             },
         }),
-        saveSqliteBackup: vi.fn().mockResolvedValue({ canceled: true } as const),
+        saveSqliteBackup: vi
+            .fn()
+            .mockResolvedValue({ canceled: true } as const),
         exportData: vi.fn().mockResolvedValue("{}"),
         importData: vi.fn().mockResolvedValue(true),
         restoreSqliteBackup: vi.fn().mockResolvedValue({

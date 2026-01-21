@@ -32,38 +32,30 @@ export const debounce = <TArguments extends unknown[]>(
     function_: (...arguments_: TArguments) => void,
     wait: number
 ): ((...arguments_: TArguments) => void) => {
-    const argumentsMap = new Map<string, TArguments>();
-    const timerMap = new Map<string, ReturnType<typeof setTimeout>>();
+    // `wait` is treated as milliseconds. Negative values are coerced to 0.
+    const delay = Math.max(0, wait);
+
+    let timerId: null | ReturnType<typeof setTimeout> = null;
+    let lastArguments: null | TArguments = null;
 
     return (...arguments_: TArguments): void => {
-        const key = JSON.stringify(arguments_);
-        argumentsMap.set(key, arguments_);
+        lastArguments = arguments_;
 
-        const existingTimer = timerMap.get(key);
-
-        if (existingTimer) {
-            clearTimeout(existingTimer);
+        if (timerId !== null) {
+            clearTimeout(timerId);
         }
 
-        const argumentsForKey = argumentsMap.get(key);
+        timerId = setTimeout(() => {
+            const argsToExecute = lastArguments;
+            timerId = null;
+            lastArguments = null;
 
-        if (!argumentsForKey) {
-            return;
-        }
-
-        const timerId = setTimeout(() => {
-            const argumentsToExecute = argumentsMap.get(key);
-
-            if (!argumentsToExecute) {
+            if (!argsToExecute) {
                 return;
             }
 
-            argumentsMap.delete(key);
-            timerMap.delete(key);
-            function_(...argumentsToExecute);
-        }, wait);
-
-        timerMap.set(key, timerId);
+            function_(...argsToExecute);
+        }, delay);
     };
 };
 

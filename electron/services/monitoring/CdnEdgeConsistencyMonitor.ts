@@ -98,6 +98,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                     failureLogLevel: "warn",
                     maxRetries: retryAttempts + 1,
                     operationName: `CDN edge consistency check for ${baselineUrl}`,
+                    ...(signal ? { signal } : {}),
                 }
             );
         } catch (error) {

@@ -131,7 +131,7 @@ export const MonitoringStatusDisplay: NamedExoticComponent<MonitoringStatusDispl
                                     >
                                         <div className="flex items-center gap-1">
                                             <div
-                                                className={`h-2 w-2 rounded-full ${
+                                                className={`size-2 rounded-full ${
                                                     monitor.monitoring
                                                         ? "themed-status-up"
                                                         : "themed-status-paused"

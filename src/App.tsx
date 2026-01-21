@@ -1,3 +1,4 @@
+import type { JSX } from "react/jsx-runtime";
 /**
  * Main App component for Uptime Watcher application.
  *
@@ -6,8 +7,6 @@
  * layout. Coordinates between different views and handles application-wide
  * state management.
  */
-
-import type { JSX } from "react/jsx-runtime";
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
 import {
@@ -19,6 +18,11 @@ import {
     useRef,
     useState,
 } from "react";
+import { useShallow } from "zustand/react/shallow";
+
+import type { ErrorStore } from "./stores/error/types";
+import type { UIStore } from "./stores/ui/types";
+import type { UpdatesStore } from "./stores/updates/types";
 
 import { UI_MESSAGES } from "./app/appUiMessages";
 import {
@@ -34,9 +38,7 @@ import {
     setupSidebarMediaQueryListener,
 } from "./app/sidebar/sidebarMediaQueryListener";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
-import {
-    synchronizeNotificationPreferences,
-} from "./components/Alerts/alertCoordinator";
+import { synchronizeNotificationPreferences } from "./components/Alerts/alertCoordinator";
 import { StatusAlertToaster } from "./components/Alerts/StatusAlertToaster";
 import { ConfirmDialog } from "./components/common/ConfirmDialog/ConfirmDialog";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
@@ -69,11 +71,13 @@ import { ThemedText } from "./theme/components/ThemedText";
 import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 import { AppIcons } from "./utils/icons";
-import {
-    tryGetMediaQueryList,
-} from "./utils/mediaQueries";
+import { tryGetMediaQueryList } from "./utils/mediaQueries";
 
-
+const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
+    ".app-sidebar",
+    ".app-topbar__sidebar-toggle",
+    ".sidebar-reveal-button",
+] as const;
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -104,15 +108,26 @@ import {
  *
  * @public
  *
- * @beta
- * The component API may change as we refine the architecture.
+ * @beta The
+ * component API may change as we refine the architecture.
  *
  * @see {@link useTheme} for theme management
  * @see {@link useSitesStore} for site state management
  */
 export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Error store
-    const { clearError, isLoading, lastError } = useErrorStore();
+    const { clearError, isLoading, lastError } = useErrorStore(
+        useShallow(
+            useCallback(
+                (state: ErrorStore) => ({
+                    clearError: state.clearError,
+                    isLoading: state.isLoading,
+                    lastError: state.lastError,
+                }),
+                []
+            )
+        )
+    );
 
     // Sites store
     // Settings store - store is initialized via the initialization effect below
@@ -138,7 +153,26 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         showSiteDetails,
         sidebarCollapsedPreference,
         siteListLayout,
-    } = useUIStore();
+    } = useUIStore(
+        useShallow(
+            useCallback(
+                (state: UIStore) => ({
+                    setShowAddSiteModal: state.setShowAddSiteModal,
+                    setShowSettings: state.setShowSettings,
+                    setShowSiteDetails: state.setShowSiteDetails,
+                    setSidebarCollapsedPreference:
+                        state.setSidebarCollapsedPreference,
+                    showAddSiteModal: state.showAddSiteModal,
+                    showSettings: state.showSettings,
+                    showSiteDetails: state.showSiteDetails,
+                    sidebarCollapsedPreference:
+                        state.sidebarCollapsedPreference,
+                    siteListLayout: state.siteListLayout,
+                }),
+                []
+            )
+        )
+    );
 
     const { cancel: closeConfirmDialog, isOpen: isConfirmDialogOpen } =
         useConfirmDialogVisibility();
@@ -154,7 +188,22 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         subscribeToUpdateStatusEvents,
         updateError,
         updateStatus,
-    } = useUpdatesStore();
+    } = useUpdatesStore(
+        useShallow(
+            useCallback(
+                (state: UpdatesStore) => ({
+                    applyUpdate: state.applyUpdate,
+                    applyUpdateStatus: state.applyUpdateStatus,
+                    setUpdateError: state.setUpdateError,
+                    subscribeToUpdateStatusEvents:
+                        state.subscribeToUpdateStatusEvents,
+                    updateError: state.updateError,
+                    updateStatus: state.updateStatus,
+                }),
+                []
+            )
+        )
+    );
 
     const { isDark } = useTheme();
 
@@ -238,12 +287,14 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             // Only proceed if app is initialized
             if (isInitialized) {
                 if (!isLoading) {
-                    // Use timeout to defer state update to avoid direct call in
-                    // useEffect
+                    // Defer the state update to comply with the project
+                    // lint rule that forbids setState calls directly within an
+                    // effect.
                     const clearTimeoutId = setTimeout(
                         clearLoadingOverlay,
                         UI_DELAYS.STATE_UPDATE_DEFER
                     );
+
                     return (): void => {
                         clearTimeout(clearTimeoutId);
                     };
@@ -416,15 +467,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     return;
                 }
 
-                const interactiveSelectors: readonly string[] = [
-                    ".app-sidebar",
-                    ".app-topbar__sidebar-toggle",
-                    ".sidebar-reveal-button",
-                ];
-
-                const interactedWithinSidebar = interactiveSelectors.some(
-                    (selector) => target.closest(selector) !== null
-                );
+                const interactedWithinSidebar =
+                    SIDEBAR_DISMISS_INTERACTIVE_SELECTORS.some(
+                        (selector) => target.closest(selector) !== null
+                    );
 
                 if (interactedWithinSidebar) {
                     return;
@@ -598,7 +644,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             return (
                 <div
                     aria-live="assertive"
-                    className="fixed top-12 right-0 left-0 z-50"
+                    className="fixed inset-x-0 top-12 z-50"
                     role="alert"
                 >
                     <ThemedBox
@@ -634,10 +680,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         }
 
         return (
-            <output
-                aria-live="polite"
-                className="fixed top-12 right-0 left-0 z-50"
-            >
+            <output aria-live="polite" className="fixed inset-x-0 top-12 z-50">
                 <ThemedBox
                     className={`update-alert update-alert--${updateStatus}`}
                     padding="md"
@@ -732,7 +775,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                             ) : null}
 
                             {lastError ? (
-                                <div className="fixed top-0 right-0 left-0 z-50 p-4">
+                                <div className="fixed inset-x-0 top-0 z-50 p-4">
                                     <ErrorAlert
                                         message={lastError}
                                         onDismiss={clearError}

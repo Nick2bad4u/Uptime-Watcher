@@ -51,6 +51,8 @@ const isTestMode = (): boolean =>
     process.env["NODE_ENV"] === "test" ||
     process.argv.includes("--test");
 
+const isCoverageMode = (): boolean => process.env["VITE_COVERAGE"] === "true";
+
 /* eslint-enable n/no-process-env -- turn back on */
 
 /**
@@ -67,10 +69,14 @@ const config: StorybookConfig = {
         "@storybook/addon-links",
         "@storybook/addon-themes",
         "storybook-addon-jsx",
-        {
-            name: "@storybook/addon-coverage",
-            options: coverageOptions,
-        },
+        ...(isCoverageMode()
+            ? ([
+                  {
+                      name: "@storybook/addon-coverage",
+                      options: coverageOptions,
+                  },
+              ] as const)
+            : []),
         "@storybook/addon-designs",
         // Only load @storybook/addon-vitest during test runs, not in the browser UI
         // This prevents "store not ready" errors when clicking test buttons in the UI
@@ -85,7 +91,7 @@ const config: StorybookConfig = {
         name: "@storybook/react-vite",
         options: {},
     },
-    stories: ["./stories/**/*.stories.@(ts|tsx)"],
+    stories: ["./stories/**/*.stories.tsx"],
     viteFinal: (existingConfig) => {
         const toArray = (
             plugins: PluginOption | PluginOption[] | undefined

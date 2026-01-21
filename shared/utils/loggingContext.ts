@@ -269,6 +269,73 @@ const buildBaseLogContext = (
     timestamp: context?.timestamp ?? Date.now(),
 });
 
+function normalizeNonPlainObject(
+    candidate: object,
+    normalize: (value: unknown) => unknown
+):
+    | { readonly kind: "none" }
+    | { readonly kind: "normalized"; readonly value: unknown } {
+    if (candidate instanceof Date) {
+        return { kind: "normalized", value: candidate.toISOString() };
+    }
+
+    if (candidate instanceof URL) {
+        return {
+            kind: "normalized",
+            value: normalizeLogString(candidate.toString()),
+        };
+    }
+
+    if (candidate instanceof Error) {
+        const errorWithCause = candidate as Error & { cause?: unknown };
+        return {
+            kind: "normalized",
+            value: {
+                message: normalizeLogString(candidate.message),
+                name: normalizeLogString(candidate.name),
+                ...(candidate.stack
+                    ? { stack: normalizeLogString(candidate.stack) }
+                    : {}),
+                ...("cause" in errorWithCause
+                    ? { cause: normalize(errorWithCause.cause) }
+                    : {}),
+            } satisfies UnknownRecord,
+        };
+    }
+
+    if (candidate instanceof ArrayBuffer) {
+        return {
+            kind: "normalized",
+            value: {
+                byteLength: candidate.byteLength,
+                type: "ArrayBuffer",
+            } satisfies UnknownRecord,
+        };
+    }
+
+    if (candidate instanceof Map) {
+        return {
+            kind: "normalized",
+            value: {
+                size: candidate.size,
+                type: "Map",
+            } satisfies UnknownRecord,
+        };
+    }
+
+    if (candidate instanceof Set) {
+        return {
+            kind: "normalized",
+            value: {
+                size: candidate.size,
+                type: "Set",
+            } satisfies UnknownRecord,
+        };
+    }
+
+    return { kind: "none" };
+}
+
 export const normalizeLogValue = (value: unknown): unknown => {
     const seen = new WeakSet<object>();
 
@@ -283,6 +350,11 @@ export const normalizeLogValue = (value: unknown): unknown => {
             }
 
             seen.add(candidate);
+
+            const result = normalizeNonPlainObject(candidate, normalize);
+            if (result.kind === "normalized") {
+                return result.value;
+            }
         }
 
         if (Array.isArray(candidate)) {

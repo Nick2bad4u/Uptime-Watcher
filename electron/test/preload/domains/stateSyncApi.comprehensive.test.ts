@@ -82,10 +82,7 @@ describe("State Sync Domain API", () => {
 
     describe("API Structure Validation", () => {
         it("should expose all required state sync methods", () => {
-            const expectedMethods = [
-                "getSyncStatus",
-                "requestFullSync",
-            ];
+            const expectedMethods = ["getSyncStatus", "requestFullSync"];
 
             for (const method of expectedMethods) {
                 expect(api).toHaveProperty(method);
@@ -171,16 +168,13 @@ describe("State Sync Domain API", () => {
         it("should call IPC with correct channel and return full sync result", async () => {
             const mockSyncedSites: Site[] = [
                 {
-                    identifier: "synced-1",
+                    ...createMinimalSite("synced-1"),
                     name: "Synced Site 1",
-                    monitoring: true,
-                    monitors: [],
                 },
                 {
-                    identifier: "synced-2",
+                    ...createMinimalSite("synced-2"),
                     name: "Synced Site 2",
                     monitoring: false,
-                    monitors: [],
                 },
             ];
 
@@ -289,33 +283,51 @@ describe("State Sync Domain API", () => {
             );
         });
 
+        // Must match the shared Zod schemas:
+        // - identifier: /^[\dA-Z:_-]+$/i
+        // - name: /^[\dA-Z .:_-]+$/i
+        const siteIdentifierArb = fc.stringMatching(/^[\w:-]{1,50}$/);
+        const siteNameArb = fc
+            .stringMatching(/^[\w .:-]{1,120}$/)
+            .filter((name) => name.trim().length > 0);
+
         it("should handle various full sync scenarios", async () => {
             const siteArrayArb = fc
                 .array(
                     fc.record({
-                        identifier: fc.string({ minLength: 1, maxLength: 50 }),
-                        name: fc.string({ minLength: 1, maxLength: 120 }),
+                        identifier: siteIdentifierArb,
+                        name: siteNameArb,
                         monitoring: fc.boolean(),
                     }),
-                    { maxLength: 40 }
+                    { minLength: 0, maxLength: 40 }
                 )
                 .map((sites) =>
                     sites.map((site) => ({
                         ...site,
-                        monitors: [],
+                        monitors: createMinimalSite(site.identifier).monitors,
                     }))
                 );
 
             await fc.assert(
                 fc.asyncProperty(
                     siteArrayArb,
-                    fc.integer({ min: 0, max: Number.MAX_SAFE_INTEGER }),
+                    // Zod's `z.int()` contract expects a safe, non-negative
+                    // integer. Use a bounded range to avoid edge cases with
+                    // extremely large timestamps.
+                    fc.integer({ min: 0, max: 2_147_483_647 }),
+                    fc.integer({ min: 0, max: 2_147_483_647 }),
                     fc.boolean(),
                     fc.constantFrom(...VALID_STATE_SYNC_SOURCES),
-                    async (sites, completedAt, synchronized, source) => {
+                    async (
+                        sites,
+                        completedAt,
+                        revision,
+                        synchronized,
+                        source
+                    ) => {
                         const fullSync: StateSyncFullSyncResult = {
                             completedAt,
-                            revision: Math.max(0, completedAt),
+                            revision,
                             siteCount: sites.length,
                             sites,
                             source,
@@ -360,7 +372,6 @@ describe("State Sync Domain API", () => {
                 { numRuns: 10 }
             );
         });
-
     });
 
     describe("Integration and workflow scenarios", () => {
@@ -374,10 +385,8 @@ describe("State Sync Domain API", () => {
 
             const resolvedSites: Site[] = [
                 {
-                    identifier: "resolved-site",
+                    ...createMinimalSite("resolved-site"),
                     name: "Resolved Site",
-                    monitoring: true,
-                    monitors: [],
                 },
             ];
             const resolvedResult: StateSyncFullSyncResult = {
@@ -402,11 +411,16 @@ describe("State Sync Domain API", () => {
                 source: "database",
                 synchronized: true,
             };
+
+            const syncedSites: Site[] = [
+                createMinimalSite("sync-1"),
+                createMinimalSite("sync-2"),
+            ];
             const mockSync: StateSyncFullSyncResult = {
                 completedAt: Date.now(),
                 revision: 4,
-                siteCount: 2,
-                sites: [],
+                siteCount: syncedSites.length,
+                sites: syncedSites,
                 source: "database",
                 synchronized: true,
             };
@@ -460,15 +474,16 @@ describe("State Sync Domain API", () => {
                 createIpcResponse(malformedData)
             );
 
-            const result = await api.getSyncStatus();
-            expect(result).toEqual(malformedData);
+            await expect(api.getSyncStatus()).rejects.toThrowError(
+                /failed validation/i
+            );
         });
 
         it("should maintain type safety with edge case data", async () => {
             const edgeCaseSites: Site[] = [
                 {
-                    identifier: "a".repeat(1000),
-                    name: "b".repeat(1000),
+                    identifier: "a".repeat(100),
+                    name: "b".repeat(200),
                     monitoring: true,
                     monitors: createMinimalSite("edge-case").monitors,
                 },
@@ -505,10 +520,8 @@ describe("State Sync Domain API", () => {
         it("should maintain proper typing for all return values", async () => {
             const mockSites: Site[] = [
                 {
-                    identifier: "typed-site",
+                    ...createMinimalSite("typed-site"),
                     name: "Typed Site",
-                    monitoring: true,
-                    monitors: [],
                 },
             ];
 

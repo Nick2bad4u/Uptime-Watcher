@@ -16,7 +16,8 @@
  *    locations (tests and explicit helper/type-definition files).
  * 4. Event names passed to `.emitTyped()` / `.onTyped()` / `.offTyped()` /
  *    `.onceTyped()` in production code must be defined in the event catalogue
- *    (`electron/events/eventTypes.ts` and `electron/events/eventTypes.catalogue.*.ts`).
+ *    (`electron/events/eventTypes.ts` and
+ *    `electron/events/eventTypes.catalogue.*.ts`).
  */
 
 import { readFile, readdir } from "node:fs/promises";

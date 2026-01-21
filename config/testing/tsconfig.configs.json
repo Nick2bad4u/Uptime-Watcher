@@ -21,7 +21,7 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/tsconfig.configs.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.configs.tsbuildinfo"
     },
     "exclude": [
         "node_modules",

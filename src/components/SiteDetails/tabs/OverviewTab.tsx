@@ -24,9 +24,7 @@ import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";
-import {
-    useResponseTimeColorFromThemeColors,
-} from "../utils/responseTimeColors";
+import { useResponseTimeColorFromThemeColors } from "../utils/responseTimeColors";
 
 const MonitorIcon = AppIcons.metrics.monitor;
 const TimeIcon = AppIcons.metrics.time;
@@ -224,12 +222,9 @@ export const OverviewTab = ({
     const boltIcon = useMemo(() => <PerformanceIcon />, []);
     const accessTimeIcon = useMemo(() => <TimeIcon />, []);
     const quickActionIcon = useMemo(() => <RefreshIcon />, []);
-    const checkNowIcon = useMemo(
-        () => <CheckNowIcon className="h-4 w-4" />,
-        []
-    );
+    const checkNowIcon = useMemo(() => <CheckNowIcon className="size-4" />, []);
     const trashIcon = useMemo(() => <RemoveIcon />, []);
-    const saveIcon = useMemo(() => <SaveIcon className="h-4 w-4" />, []);
+    const saveIcon = useMemo(() => <SaveIcon className="size-4" />, []);
     return (
         <div className="space-y-6" data-testid="overview-tab">
             {/* Key Metrics Grid */}
@@ -342,7 +337,7 @@ export const OverviewTab = ({
                     {/* Interval Control */}
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                            <TimeIcon className="h-4 w-4 opacity-80" />
+                            <TimeIcon className="size-4 opacity-80" />
                             <ThemedText size="sm" variant="secondary">
                                 Interval
                             </ThemedText>
@@ -381,7 +376,7 @@ export const OverviewTab = ({
                     {/* Timeout Control */}
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                            <TimeIcon className="h-4 w-4 opacity-80" />
+                            <TimeIcon className="size-4 opacity-80" />
                             <ThemedText size="sm" variant="secondary">
                                 Timeout
                             </ThemedText>

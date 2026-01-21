@@ -593,11 +593,6 @@ describe("App Additional Coverage Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Import Operation", "type");
 
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: App.additional-coverage", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Import Operation", "type");
-
         render(<App />);
 
         // Verify main components are rendered using actual DOM structure
@@ -690,6 +685,8 @@ describe("App Additional Coverage Tests", () => {
         mockErrorStoreState.lastError = "Test error message";
         mockErrorStoreState.clearError = clearErrorMock;
 
+        const user = userEvent.setup();
+
         render(<App />);
 
         // Verify error alert is displayed using role="alert"
@@ -698,7 +695,7 @@ describe("App Additional Coverage Tests", () => {
 
         // Click close button
         const closeButton = screen.getByLabelText("Dismiss error");
-        await userEvent.click(closeButton);
+        await user.click(closeButton);
 
         expect(clearErrorMock).toHaveBeenCalled();
     });
@@ -847,6 +844,8 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
+        const user = userEvent.setup();
+
         // Check update downloaded message and ensure icon plus action are rendered
         const message = screen.getByText(
             "Update downloaded! Restart to apply."
@@ -861,7 +860,7 @@ describe("App Additional Coverage Tests", () => {
 
         // Test restart button click
         const restartButton = screen.getByText("Restart Now");
-        await userEvent.click(restartButton);
+        await user.click(restartButton);
         expect(applyUpdateMock).toHaveBeenCalled();
     });
 
@@ -919,11 +918,6 @@ describe("App Additional Coverage Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Data Loading", "type");
 
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: App.additional-coverage", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Data Loading", "type");
-
         const applyUpdateStatusMock = vi.fn();
         const setUpdateErrorMock = vi.fn();
 
@@ -934,9 +928,11 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
+        const user = userEvent.setup();
+
         // Click dismiss button
         const dismissButton = screen.getByText("Dismiss");
-        await userEvent.click(dismissButton);
+        await user.click(dismissButton);
 
         expect(applyUpdateStatusMock).toHaveBeenCalledWith("idle");
         expect(setUpdateErrorMock).toHaveBeenCalledWith(undefined);
@@ -1405,7 +1401,8 @@ describe("App Additional Coverage Tests", () => {
         fireEvent.keyDown(dismissButton, { key: " ", code: "Space" });
 
         // The button should still be responsive to clicks
-        await userEvent.click(dismissButton);
+        const user = userEvent.setup();
+        await user.click(dismissButton);
         expect(mockUpdatesStoreState.applyUpdateStatus).toHaveBeenCalledWith(
             "idle"
         );

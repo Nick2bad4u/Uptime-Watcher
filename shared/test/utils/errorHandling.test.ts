@@ -83,9 +83,18 @@ describe("Error Handling Utils", () => {
             const error = "String error";
             const operation = vi.fn().mockRejectedValue(error);
 
-            await expect(
-                withErrorHandling(operation, mockFrontendStore)
-            ).rejects.toBe("String error");
+            const promise = withErrorHandling(operation, mockFrontendStore);
+
+            await expect(promise).rejects.toMatchObject({
+                message: "String error",
+            });
+
+            await promise.catch((error_: unknown) => {
+                expect(error_).toBeInstanceOf(Error);
+                expect((error_ as Error & { cause?: unknown }).cause).toBe(
+                    "String error"
+                );
+            });
 
             expect(mockFrontendStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
@@ -108,9 +117,18 @@ describe("Error Handling Utils", () => {
             const error = { custom: "error" };
             const operation = vi.fn().mockRejectedValue(error);
 
-            await expect(
-                withErrorHandling(operation, mockFrontendStore)
-            ).rejects.toEqual({ custom: "error" });
+            const promise = withErrorHandling(operation, mockFrontendStore);
+
+            await expect(promise).rejects.toMatchObject({
+                message: "[object Object]",
+            });
+
+            await promise.catch((error_: unknown) => {
+                expect(error_).toBeInstanceOf(Error);
+                expect((error_ as Error & { cause?: unknown }).cause).toBe(
+                    error
+                );
+            });
 
             expect(mockFrontendStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);

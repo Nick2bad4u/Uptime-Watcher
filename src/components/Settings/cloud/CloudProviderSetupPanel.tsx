@@ -565,16 +565,16 @@ const OAuthProviderPanel = ({
     const InfoIcon = AppIcons.ui.info;
 
     const providerIconNode = useMemo(
-        () => <ProviderIcon aria-hidden className="h-4 w-4" />,
+        () => <ProviderIcon aria-hidden className="size-4" />,
         [ProviderIcon]
     );
     const connectedIconNode = useMemo(
-        () => <ConnectedIcon aria-hidden className="h-4 w-4" />,
+        () => <ConnectedIcon aria-hidden className="size-4" />,
         [ConnectedIcon]
     );
 
     const infoIconNode = useMemo(
-        () => <InfoIcon aria-hidden className="h-4 w-4" />,
+        () => <InfoIcon aria-hidden className="size-4" />,
         [InfoIcon]
     );
 
@@ -599,7 +599,11 @@ const OAuthProviderPanel = ({
                     </ThemedText>
 
                     <div className="settings-subcard__actions">
-                        <Tooltip content={description} maxWidth={520} position="top">
+                        <Tooltip
+                            content={description}
+                            maxWidth={520}
+                            position="top"
+                        >
                             {(trigger) => (
                                 <button
                                     aria-label="Authorization details"
@@ -701,8 +705,8 @@ function renderFilesystemProviderPanel(args: {
 
                 {args.connected ? (
                     <ThemedText as="p" size="xs" variant="tertiary">
-                        To use a different folder, clear configuration above
-                        and set it again.
+                        To use a different folder, clear configuration above and
+                        set it again.
                     </ThemedText>
                 ) : null}
             </div>
@@ -970,7 +974,7 @@ export const CloudProviderSetupPanel = ({
         () => (
             <ProviderIcon
                 aria-hidden
-                className="settings-accent--primary h-5 w-5"
+                className="settings-accent--primary size-5"
             />
         ),
         [ProviderIcon]
@@ -982,7 +986,12 @@ export const CloudProviderSetupPanel = ({
             <div className="settings-subcard__header">
                 <div className="settings-subcard__title">
                     {providerHeaderIcon}
-                    <ThemedText as="h4" size="sm" variant="secondary" weight="medium">
+                    <ThemedText
+                        as="h4"
+                        size="sm"
+                        variant="secondary"
+                        weight="medium"
+                    >
                         Provider
                     </ThemedText>
                 </div>

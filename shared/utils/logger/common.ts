@@ -49,7 +49,10 @@ function safeNormalizeLogString(value: string): string {
     return typeof sanitized === "string" ? sanitized : value;
 }
 
-function safeSerializeErrorInternal(error: Error, depth: number): SerializedError {
+function safeSerializeErrorInternal(
+    error: Error,
+    depth: number
+): SerializedError {
     const safeSerializeCause = (cause: unknown): unknown => {
         if (cause instanceof Error && depth < 3) {
             return safeNormalizeLogValue(
@@ -66,7 +69,9 @@ function safeSerializeErrorInternal(error: Error, depth: number): SerializedErro
         ...(error.stack ? { stack: safeNormalizeLogString(error.stack) } : {}),
         ...("cause" in error
             ? {
-                  cause: safeSerializeCause((error as { cause?: unknown }).cause),
+                  cause: safeSerializeCause(
+                      (error as { cause?: unknown }).cause
+                  ),
               }
             : {}),
     } satisfies SerializedError;

@@ -35,7 +35,7 @@
     "style-disabled": false,
     "tag-no-obsolete": true,
     "tag-pair": true,
-    "tag-self-close": true,
+    "tag-self-close": false,
     "tagname-lowercase": true,
     "tagname-specialchars": true,
     "tags-check": true,

@@ -242,11 +242,6 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
             mockUseUIStore.mockReturnValue({
                 showAddSiteModal: true,
                 setShowAddSiteModal: mockSetShowAddSiteModal,
@@ -303,6 +298,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             render(<AddSiteModal onClose={mockOnClose} />);
+
             const modalShell = document.querySelector(".modal-shell");
             expect(modalShell).not.toBeNull();
             expect(
@@ -447,7 +443,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             const closeButton = screen.getByRole("button", {
                 name: /close modal/i,
             });
-            await userEvent.click(closeButton);
+            const user = userEvent.setup();
+            await user.click(closeButton);
 
             await waitFor(() => {
                 expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -473,7 +470,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             // Get the backdrop by testing the event directly
             const backdrop = document.querySelector(".modal-overlay");
             expect(backdrop).not.toBeNull();
-            fireEvent.click(backdrop as Element);
+            const user = userEvent.setup();
+            await user.click(backdrop as Element);
 
             await waitFor(() => {
                 expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -519,8 +517,10 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
             render(<AddSiteModal onClose={mockOnClose} />);
 
+            const user = userEvent.setup();
+
             const successButton = screen.getByTestId("mock-success-button");
-            await userEvent.click(successButton);
+            await user.click(successButton);
 
             await waitFor(() => {
                 expect(mockOnClose).toHaveBeenCalledTimes(1);

@@ -19,7 +19,9 @@ import {
  * rules to fight normal property access.
  */
 export interface StatusUpdateSnapshotPayload {
-    readonly error?: string;
+    /** Optional diagnostic message describing the update (mirrors
+StatusUpdate.details). */
+    readonly details?: string;
     /** Optional snapshot of the monitor at update-time. */
     readonly monitor?: Monitor;
     readonly monitorId: string;
@@ -53,7 +55,7 @@ export const applyStatusUpdateSnapshot = (
     statusUpdate: StatusUpdateSnapshotPayload
 ): Site[] => {
     const {
-        error,
+        details,
         monitor,
         monitorId,
         previousStatus,
@@ -87,7 +89,7 @@ export const applyStatusUpdateSnapshot = (
     }
 
     const event: MonitorStatusChangedEvent = {
-        error,
+        ...(details === undefined ? {} : { details }),
         monitor,
         monitorId,
         previousStatus: resolvedPreviousStatus,

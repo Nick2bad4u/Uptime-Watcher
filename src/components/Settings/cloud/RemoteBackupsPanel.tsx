@@ -86,7 +86,7 @@ export const RemoteBackupsPanel = ({
     );
 
     const panelIcon = useMemo(
-        () => <CloudIcon aria-hidden className="h-5 w-5" />,
+        () => <CloudIcon aria-hidden className="size-5" />,
         [CloudIcon]
     );
 

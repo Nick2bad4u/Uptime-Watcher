@@ -21,7 +21,11 @@ export interface SiteCardStatusProperties {
     readonly status: MonitorStatus;
 }
 
-const STATUS_LABEL_ACRONYMS = new Set(["api", "dns", "http"]);
+const STATUS_LABEL_ACRONYMS = new Set([
+    "api",
+    "dns",
+    "http",
+]);
 
 const toTitleCase = (value: string): string => {
     if (!value) {

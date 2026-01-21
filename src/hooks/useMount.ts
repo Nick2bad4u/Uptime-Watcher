@@ -10,7 +10,7 @@
  *
  * Key features:
  *
- * - Prevents duplicate execution in React StrictMode
+ * - Compatible with React StrictMode's extra setup/cleanup cycle
  * - Supports both synchronous and asynchronous mount callbacks
  * - Provides automatic error handling with logging
  * - Ensures cleanup functions run exactly once on unmount
@@ -59,7 +59,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import { logger } from "../services/logger";
 
@@ -83,57 +83,32 @@ export function useMount(
     mountCallback: () => Promise<void> | void,
     unmountCallback?: () => void
 ): void {
-    const hasMountedRef = useRef(false);
-    const mountCallbackRef = useRef(mountCallback);
-    const unmountCallbackRef = useRef(unmountCallback);
-
     useEffect(
-        function syncMountCallbackRef() {
-            mountCallbackRef.current = mountCallback;
-        },
-        [mountCallback]
-    );
+        function handleMountLifecycle() {
+            let didCleanup = false;
 
-    useEffect(
-        function syncUnmountCallbackRef() {
-            unmountCallbackRef.current = unmountCallback;
-        },
-        [unmountCallback]
-    );
-
-    // eslint-disable-next-line canonical/prefer-use-mount -- This IS the useMount hook implementation; cannot use itself
-    useEffect(function handleMountLifecycle() {
-        // Prevent duplicate mount in StrictMode
-        if (hasMountedRef.current) {
-            // Return empty cleanup function for consistency
-            return (): void => {
-                // No-op cleanup for duplicate mount prevention
-            };
-        }
-
-        hasMountedRef.current = true;
-
-        // Execute mount callback with proper async/await handling
-        const executeMountCallback = async (): Promise<void> => {
-            try {
-                const result = mountCallbackRef.current();
-                // If mountCallback returns a Promise, await it
-                if (result instanceof Promise) {
-                    await result;
+            const executeMountCallback = async (): Promise<void> => {
+                try {
+                    await mountCallback();
+                } catch (error: unknown) {
+                    logger.error(
+                        "Error in useMount callback:",
+                        ensureError(error)
+                    );
                 }
-            } catch (error: unknown) {
-                logger.error("Error in useMount callback:", ensureError(error));
-            }
-        };
+            };
 
-        void executeMountCallback();
+            void executeMountCallback();
 
-        // Always return cleanup function for consistent return pattern
-        return (): void => {
-            // Only call unmount callback if it exists
-            if (unmountCallbackRef.current) {
-                unmountCallbackRef.current();
-            }
-        };
-    }, []);
+            return (): void => {
+                if (didCleanup) {
+                    return;
+                }
+
+                didCleanup = true;
+                unmountCallback?.();
+            };
+        },
+        [mountCallback, unmountCallback]
+    );
 }

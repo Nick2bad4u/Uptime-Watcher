@@ -161,7 +161,7 @@ function collectChannelsFromFile(
     );
 
     const stringConstants = new Map<string, string>();
-        const registrarIdentifiers = new Set<string>();
+    const registrarIdentifiers = new Set<string>();
 
     const registerStringConstants = (node: ts.Node): void => {
         if (ts.isVariableStatement(node)) {
@@ -187,25 +187,25 @@ function collectChannelsFromFile(
 
     registerStringConstants(sourceFile);
 
-        const collectRegistrarIdentifiers = (node: ts.Node): void => {
-            if (ts.isVariableDeclaration(node)) {
-                const { name, initializer } = node;
+    const collectRegistrarIdentifiers = (node: ts.Node): void => {
+        if (ts.isVariableDeclaration(node)) {
+            const { name, initializer } = node;
 
-                if (
-                    ts.isIdentifier(name) &&
-                    initializer &&
-                    ts.isCallExpression(initializer) &&
-                    ts.isIdentifier(initializer.expression) &&
-                    initializer.expression.text === "createStandardizedIpcRegistrar"
-                ) {
-                    registrarIdentifiers.add(name.text);
-                }
+            if (
+                ts.isIdentifier(name) &&
+                initializer &&
+                ts.isCallExpression(initializer) &&
+                ts.isIdentifier(initializer.expression) &&
+                initializer.expression.text === "createStandardizedIpcRegistrar"
+            ) {
+                registrarIdentifiers.add(name.text);
             }
+        }
 
-            ts.forEachChild(node, collectRegistrarIdentifiers);
-        };
+        ts.forEachChild(node, collectRegistrarIdentifiers);
+    };
 
-        collectRegistrarIdentifiers(sourceFile);
+    collectRegistrarIdentifiers(sourceFile);
 
     const resolveChannelName = (
         expression: ts.Expression
@@ -247,8 +247,8 @@ function collectChannelsFromFile(
 
             if (
                 ts.isIdentifier(callee) &&
-                    (callee.text === "registerStandardizedIpcHandler" ||
-                        registrarIdentifiers.has(callee.text))
+                (callee.text === "registerStandardizedIpcHandler" ||
+                    registrarIdentifiers.has(callee.text))
             ) {
                 const [channelArgument] = node.arguments;
                 if (channelArgument) {

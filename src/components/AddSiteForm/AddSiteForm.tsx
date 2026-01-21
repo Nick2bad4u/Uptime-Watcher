@@ -90,8 +90,11 @@ const HelperInfoIcon = AppIcons.ui.info;
  * sites.
  *
  * @remarks
- * - Provides a comprehensive form with validation and flexible configuration
- *   options.
+ * -
+ *
+ * Provides a comprehensive form with validation and flexible configuration
+ * options.
+ *
  * - Supports both HTTP and port monitoring types with customizable intervals.
  * - Uses domain-specific Zustand stores for state management.
  * - Loads monitor types dynamically from the backend.
@@ -231,7 +234,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             const match = CHECK_INTERVALS.find(
                 (interval) => interval.value === checkIntervalMs
             );
-            return match?.label ?? `${Math.round(checkIntervalMs / 60_000)} min`;
+            return (
+                match?.label ?? `${Math.round(checkIntervalMs / 60_000)} min`
+            );
         }, [checkIntervalMs]);
 
         const helperBullets = useMemo<HelperBullet[]>(() => {
@@ -388,11 +393,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             resetForm();
             setHasSubmitted(false);
             onSuccess?.();
-        }, [
-            onSuccess,
-            resetForm,
-            setHasSubmitted,
-        ]);
+        }, [onSuccess, resetForm, setHasSubmitted]);
 
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
@@ -625,11 +626,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     setFormError(undefined);
                 }
             },
-            [
-                formError,
-                setFormError,
-                setName,
-            ]
+            [formError, setFormError, setName]
         );
 
         const handleFormSubmit = useCallback(
@@ -647,12 +644,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 setFormError(undefined);
                 void onSubmit(e);
             },
-            [
-                addMode,
-                isNameMissing,
-                onSubmit,
-                setFormError,
-            ]
+            [addMode, isNameMissing, onSubmit, setFormError]
         );
         const onClearError = useCallback(() => {
             clearError();
@@ -673,11 +665,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
                 setAddMode(value);
             },
-            [
-                addMode,
-                setAddMode,
-                setHasSubmitted,
-            ]
+            [addMode, setAddMode, setHasSubmitted]
         );
 
         // Memoized options arrays to prevent unnecessary re-renders
@@ -890,7 +878,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                                     <div className="flex items-start gap-2">
                                         <HelperInfoIcon
                                             aria-hidden="true"
-                                            className="mt-0.5 h-4 w-4 shrink-0 opacity-70"
+                                            className="mt-0.5 size-4 shrink-0 opacity-70"
                                         />
                                         <ThemedText
                                             className="leading-snug"

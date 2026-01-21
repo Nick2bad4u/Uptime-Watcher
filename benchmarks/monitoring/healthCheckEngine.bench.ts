@@ -39,6 +39,9 @@ const mockHistoryRepository: HistoryRepository = {
 } as any;
 
 const mockMonitorRepository: MonitorRepository = {
+    clearActiveOperations: vi.fn().mockResolvedValue(undefined),
+    findByIdentifier: vi.fn().mockResolvedValue(null),
+    update: vi.fn().mockResolvedValue(true),
     updateStatus: vi.fn().mockResolvedValue(undefined),
     getMonitor: vi.fn().mockResolvedValue(null),
     updateMonitor: vi.fn().mockResolvedValue(undefined),
@@ -69,6 +72,7 @@ function createTestSite(siteIndex: number, monitorCount: number = 1): Site {
             checkInterval: 60_000,
             timeout: 5000,
             retryAttempts: 3,
+            activeOperations: [],
             monitoring: true,
             status: "up",
             responseTime: 0,
@@ -105,11 +109,15 @@ describe("Enhanced Monitor Checker Performance", () => {
         });
 
         operationRegistry = new MonitorOperationRegistry();
-        timeoutManager = new OperationTimeoutManager(operationRegistry);
+        timeoutManager = new OperationTimeoutManager(
+            operationRegistry,
+            mockMonitorRepository
+        );
         statusUpdateService = new MonitorStatusUpdateService(
             operationRegistry,
             mockMonitorRepository,
-            sitesCache
+            sitesCache,
+            timeoutManager
         );
 
         // Create EnhancedMonitorChecker with all dependencies
@@ -132,6 +140,35 @@ describe("Enhanced Monitor Checker Performance", () => {
             testSites.push(site);
             sitesCache.set(site.identifier, site);
         }
+
+        const monitorById = new Map<string, Site["monitors"][number]>();
+        for (const site of testSites) {
+            for (const monitor of site.monitors) {
+                monitorById.set(monitor.id, monitor);
+            }
+        }
+
+        vi.mocked(mockMonitorRepository.findByIdentifier).mockImplementation(
+            async (monitorId: string) => monitorById.get(monitorId) ?? null
+        );
+
+        vi.mocked(mockMonitorRepository.update).mockImplementation(
+            async (monitorId, updates) => {
+                const monitor = monitorById.get(monitorId);
+                if (monitor) {
+                    Object.assign(monitor, updates as Record<string, unknown>);
+                }
+            }
+        );
+
+        vi.mocked(
+            mockMonitorRepository.clearActiveOperations
+        ).mockImplementation(async (monitorId: string) => {
+            const monitor = monitorById.get(monitorId);
+            if (monitor) {
+                monitor.activeOperations = [];
+            }
+        });
     });
 
     bench(
@@ -146,12 +183,14 @@ describe("Enhanced Monitor Checker Performance", () => {
 
             const freshRegistry = new MonitorOperationRegistry();
             const freshTimeoutManager = new OperationTimeoutManager(
-                freshRegistry
+                freshRegistry,
+                mockMonitorRepository
             );
             const freshStatusService = new MonitorStatusUpdateService(
                 freshRegistry,
                 mockMonitorRepository,
-                freshCache
+                freshCache,
+                freshTimeoutManager
             );
 
             new EnhancedMonitorChecker({

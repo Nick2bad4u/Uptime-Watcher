@@ -8,6 +8,8 @@
     inset-block-end: var(--spacing-3xl, 2.5rem);
     inset-inline-end: var(--spacing-3xl, 2.5rem);
     max-inline-size: 90vi;
+    /* Allow clicks to pass through the toaster region except for the toast
+       buttons themselves (which set pointer-events: auto). */
     pointer-events: none;
 }
 

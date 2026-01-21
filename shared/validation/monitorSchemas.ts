@@ -19,696 +19,152 @@ import type {
 import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify, UnknownRecord } from "type-fest";
 
-import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
-import { monitorIdSchema } from "./monitorFieldSchemas";
 import {
-    monitorStatusEnumValues,
-    statusHistoryEnumValues,
-} from "./statusValidationPrimitives";
-import { isValidHost, isValidPort } from "./validatorUtils";
+    createCdnEdgeConsistencyMonitorSchema,
+    createReplicationMonitorSchema,
+    createServerHeartbeatMonitorSchema,
+    createWebsocketKeepaliveMonitorSchema,
+} from "./monitorSchemas.advanced";
+import {
+    createBaseMonitorSchema,
+    createDotPathSchemaFactory,
+    createEdgeLocationListSchema,
+    createHostValidationSchema,
+    createHttpHeaderNameSchema,
+    createHttpHeaderValueSchema,
+    createHttpUrlSchema,
+    createJsonPathSchema,
+    createWebsocketUrlSchema,
+} from "./monitorSchemas.common";
+import {
+    createHttpHeaderMonitorSchema,
+    createHttpJsonMonitorSchema,
+    createHttpKeywordMonitorSchema,
+    createHttpLatencyMonitorSchema,
+    createHttpMonitorSchema,
+    createHttpStatusMonitorSchema,
+} from "./monitorSchemas.http";
+import {
+    createDnsMonitorSchema,
+    createPingMonitorSchema,
+    createPortMonitorSchema,
+    createSslMonitorSchema,
+} from "./monitorSchemas.network";
 
-/**
- * Zod schema for status history entries.
- *
- * @remarks
- * Validates historical status records for monitors.
- */
-const statusHistorySchema = z
-    .object({
-        details: z.string().optional(),
-        responseTime: z.number(),
-        status: z.enum(statusHistoryEnumValues),
-        timestamp: z.number(),
-    })
-    .strict();
+const hostValidationSchema = createHostValidationSchema();
+const httpHeaderNameSchema = createHttpHeaderNameSchema();
+const httpHeaderValueSchema = createHttpHeaderValueSchema();
+const httpUrlSchema = createHttpUrlSchema();
+const jsonPathSchema = createJsonPathSchema();
+const websocketUrlSchema = createWebsocketUrlSchema();
+const edgeLocationListSchema = createEdgeLocationListSchema();
 
-/**
- * Validation constraints for monitor fields.
- *
- * @remarks
- * These values must match the UI constants in `@shared/constants`.
- */
-const VALIDATION_CONSTRAINTS = {
-    CHECK_INTERVAL: {
-        MAX: 2_592_000_000, // 30 days (maximum from CHECK_INTERVALS)
-        MIN: MIN_MONITOR_CHECK_INTERVAL_MS,
-    },
-    RETRY_ATTEMPTS: {
-        MAX: 10, // 10 retries maximum (from RETRY_CONSTRAINTS)
-        MIN: 0, // 0 retries minimum (from RETRY_CONSTRAINTS)
-    },
-    TIMEOUT: {
-        MAX: 300_000, // 300 seconds (from TIMEOUT_CONSTRAINTS_MS)
-        MIN: 1000, // 1 second (from TIMEOUT_CONSTRAINTS_MS)
-    },
-} as const;
+export const baseMonitorSchema: BaseMonitorSchemaType =
+    createBaseMonitorSchema();
 
-/**
- * Reusable host validation schema for monitors. Eliminates duplication between
- * port and ping monitor schemas.
- *
- * @remarks
- * Delegates to {@link isValidHost} so that hostnames, IPv4/IPv6 literals, and
- * `localhost` are all accepted consistently across monitor types.
- */
-const hostValidationSchema = z
-    .string()
-    .refine(isValidHost, "Must be a valid hostname, IP address, or localhost");
-
-/**
- * Zod schema for base monitor fields shared by all monitor types.
- *
- * @remarks
- * This schema is extended by type-specific monitor schemas.
- */
-export const baseMonitorSchema: BaseMonitorSchemaType = z
-    .object({
-        activeOperations: z.array(z.string()).optional(),
-        checkInterval: z
-            .number()
-            .min(
-                VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN,
-                `Check interval must be at least ${MIN_MONITOR_CHECK_INTERVAL_MS}ms`
-            )
-            .max(
-                VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX,
-                "Check interval cannot exceed 30 days"
-            ),
-        history: z.array(statusHistorySchema),
-        id: monitorIdSchema,
-        lastChecked: z.date().optional(),
-        monitoring: z.boolean(),
-        /**
-         * Response time in milliseconds.
-         *
-         * @remarks
-         * Uses -1 as a sentinel value to indicate "never checked" state.
-         * Positive values represent actual response times in milliseconds.
-         */
-        responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
-        retryAttempts: z
-            .number()
-            .min(
-                VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN,
-                "Retry attempts cannot be negative"
-            )
-            .max(
-                VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX,
-                "Retry attempts cannot exceed 10"
-            ),
-        status: z.enum(monitorStatusEnumValues),
-        timeout: z
-            .number()
-            .min(
-                VALIDATION_CONSTRAINTS.TIMEOUT.MIN,
-                "Timeout must be at least 1 second"
-            )
-            .max(
-                VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
-                "Timeout cannot exceed 300 seconds"
-            ),
-        type: z.enum([
-            "http",
-            "http-header",
-            "http-keyword",
-            "http-json",
-            "http-latency",
-            "http-status",
-            "port",
-            "ping",
-            "dns",
-            "ssl",
-            "cdn-edge-consistency",
-            "replication",
-            "server-heartbeat",
-            "websocket-keepalive",
-        ]),
-    })
-    .strict();
-
-/**
- * Reusable URL validation helper restricted to a specific set of protocols.
- *
- * @remarks
- * The primary syntax validation uses {@link isValidUrl} (validator.js backed) so
- * we avoid hand-rolled URL parsing heuristics.
- *
- * We still parse the URL using WHATWG {@link URL} to extract the hostname and
- * apply {@link isValidHost} so host semantics (FQDN with TLD, IP literals, or
- * `localhost`) remain consistent across monitor types.
- */
-function isUrlWithAllowedProtocols(
-    candidate: string,
-    protocols: readonly string[]
-): boolean {
-    if (typeof candidate !== "string" || candidate.trim().length === 0) {
-        return false;
+export const httpMonitorSchema: HttpMonitorSchemaType = createHttpMonitorSchema(
+    {
+        baseMonitorSchema,
+        httpUrlSchema,
     }
-
-    // Defense-in-depth: reject ASCII control characters (including newlines)
-    // to avoid ambiguous parsing/logging behavior.
-    if (hasAsciiControlCharacters(candidate)) {
-        return false;
-    }
-
-    const parsed = ((): null | URL => {
-        try {
-            return new URL(candidate);
-        } catch {
-            return null;
-        }
-    })();
-
-    if (!parsed) {
-        return false;
-    }
-
-    const scheme = parsed.protocol.replace(":", "").toLowerCase();
-    if (!protocols.includes(scheme)) {
-        return false;
-    }
-
-    return isValidHost(parsed.hostname);
-}
-
-/**
- * Creates a reusable URL schema restricted to a specific set of protocols.
- *
- * @remarks
- * Uses WHATWG {@link URL} parsing plus {@link isValidHost} to keep hostname
- * validation consistent across monitor types.
- */
-const createProtocolUrlSchema = (
-    protocols: readonly string[],
-    message: string
-): z.ZodString =>
-    z
-        .string()
-        .refine(
-            (value): boolean => isUrlWithAllowedProtocols(value, protocols),
-            message
-        );
-
-const httpUrlSchema = createProtocolUrlSchema(
-    ["http", "https"],
-    "Must be a valid HTTP or HTTPS URL"
-);
-/**
- * Reusable WebSocket URL validation schema for multiple monitor types.
- *
- * @remarks
- * Restricts URLs to `ws://` or `wss://` protocols.
- * @remarks
- * Uses WHATWG {@link URL} parsing plus {@link isValidHost} (same strategy as
- * {@link httpUrlSchema}) so host validation is consistent across monitor types.
- */
-const websocketUrlSchema = createProtocolUrlSchema(
-    ["ws", "wss"],
-    "Must be a valid WebSocket URL (ws:// or wss://)"
 );
 
-/**
- * RFC 7230 token characters permitted within HTTP header names.
- *
- * @remarks
- * {@link isValidHeaderName} relies on this set when evaluating user-provided
- * header keys for HTTP header monitors.
- */
-const ALLOWED_HEADER_SYMBOLS = new Set<string>([
-    "!",
-    "#",
-    "$",
-    "%",
-    "&",
-    "'",
-    "*",
-    "+",
-    "-",
-    ".",
-    "^",
-    "_",
-    "`",
-    "|",
-    "~",
-]);
-
-/**
- * Determines whether a header name complies with HTTP token syntax.
- *
- * @param value - Candidate header name to evaluate.
- *
- * @returns `true` when the name contains only valid token characters; otherwise
- *   `false`.
- */
-const isValidHeaderName = (value: string): boolean => {
-    if (value.length === 0 || value.length > 256) {
-        return false;
-    }
-
-    if (value.includes(":") || value.includes(" ")) {
-        return false;
-    }
-
-    return Array.from(value).every((char) => {
-        const codePoint = char.codePointAt(0);
-
-        if (codePoint === undefined) {
-            return false;
-        }
-
-        const isDigit = codePoint >= 48 && codePoint <= 57;
-        const isUppercase = codePoint >= 65 && codePoint <= 90;
-        const isLowercase = codePoint >= 97 && codePoint <= 122;
-
-        return (
-            isDigit ||
-            isUppercase ||
-            isLowercase ||
-            ALLOWED_HEADER_SYMBOLS.has(char)
-        );
-    });
-};
-
-/**
- * Shared schema enforcing {@link isValidHeaderName} constraints.
- *
- * @remarks
- * Used by monitors that inspect HTTP response headers.
- */
-const httpHeaderNameSchema = z
-    .string()
-    .min(1, "Header name is required")
-    .max(256, "Header name must be 256 characters or fewer")
-    .refine(isValidHeaderName, {
-        error:
-            "Header name must use valid HTTP token characters (letters, digits, and !#$%&'*+.^_`|~-)",
-    });
-
-/**
- * Shared schema constraining monitored header values.
- */
-const httpHeaderValueSchema = z
-    .string()
-    .min(1, "Expected header value is required")
-    .max(2048, "Expected header value must be 2048 characters or fewer")
-    .refine((value) => value.trim().length > 0, {
-        error: "Expected header value is required",
-    });
-
-/**
- * Validates whether a string represents a simple dot-notation JSON path.
- *
- * @param value - JSON path candidate supplied by the user.
- *
- * @returns `true` when the path is non-empty, contains no spaces, and does not
- *   use double dots; otherwise `false`.
- */
-type DotSeparatedPathValidationOptions = Readonly<{
-    /** When false, spaces are rejected anywhere in the path. */
-    allowSpaces: boolean;
-}>;
-
-/**
- * Validates whether a string represents a dot-separated path.
- *
- * @remarks
- * Used for monitor configurations that reference JSON object field paths.
- *
- * Rules:
- * - Must be non-empty after trimming
- * - Must not contain ".."
- * - Must not contain empty segments
- * - Optionally rejects spaces
- */
-const isValidDotSeparatedPath = (
-    value: string,
-    options: DotSeparatedPathValidationOptions
-): boolean => {
-    const trimmed = value.trim();
-
-    if (trimmed.length === 0 || trimmed.includes("..")) {
-        return false;
-    }
-
-    if (!options.allowSpaces && trimmed.includes(" ")) {
-        return false;
-    }
-
-    return trimmed.split(".").every((segment) => segment.length > 0);
-};
-
-const isValidJsonPath = (value: string): boolean =>
-    isValidDotSeparatedPath(value, { allowSpaces: false });
-
-/**
- * Shared schema validating JSON path configuration fields.
- */
-const jsonPathSchema = z
-    .string()
-    .min(1, "JSON path is required")
-    .max(512, "JSON path must be 512 characters or fewer")
-    .refine(isValidJsonPath, {
-        error:
-            "JSON path must use dot notation without spaces or empty segments",
-    });
-
-/**
- * Checks whether a dot-separated string is syntactically valid.
- *
- * @param value - Monitor configuration value expressed using dot notation.
- *
- * @returns `true` when the path is non-empty, has no empty segments, and does
- *   not contain double dots; otherwise `false`.
- */
-const isValidDotPath = (value: string): boolean =>
-    isValidDotSeparatedPath(value, { allowSpaces: false });
-
-/**
- * Creates a dot-notation schema with a contextualized validation message.
- *
- * @param fieldLabel - Friendly field label inserted into validation errors.
- *
- * @returns A {@link z.ZodString} enforcing dot-notation rules for the field.
- */
-const createDotPathSchema = (fieldLabel: string): z.ZodString =>
-    z
-        .string()
-        .min(1, `${fieldLabel} is required`)
-        .max(256, `${fieldLabel} must be 256 characters or fewer`)
-        .refine(isValidDotPath, {
-            error: `${fieldLabel} must use dot notation without spaces or empty segments`,
-        });
-
-/**
- * Schema verifying newline- or comma-separated lists of edge endpoint URLs.
- *
- * @remarks
- * Ensures each entry is a valid HTTP or HTTPS URL and that at least one value
- * is present after trimming.
- */
-const edgeLocationListSchema = z
-    .string()
-    .min(1, "At least one edge endpoint is required")
-    .refine((value) => {
-        const entries = value
-            .split(/[\n\r,]+/u)
-            .map((entry) => entry.trim())
-            .filter((entry) => entry.length > 0);
-
-        if (entries.length === 0) {
-            return false;
-        }
-
-        return entries.every((entry) =>
-            isUrlWithAllowedProtocols(entry, ["http", "https"])
-        );
-    }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines");
-
-/**
- * Zod schema for HTTP monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and adds the `url` field with robust
- * validation.
- */
-export const httpMonitorSchema: HttpMonitorSchemaType = baseMonitorSchema
-    .extend({
-        followRedirects: z.boolean().optional(),
-        type: z.literal("http"),
-        url: httpUrlSchema,
-    })
-    .strict();
-
-/**
- * Zod schema for HTTP header monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and validates header name/value pairs for
- * response inspection.
- */
 export const httpHeaderMonitorSchema: HttpHeaderMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            expectedHeaderValue: httpHeaderValueSchema,
-            followRedirects: z.boolean().optional(),
-            headerName: httpHeaderNameSchema,
-            type: z.literal("http-header"),
-            url: httpUrlSchema,
-        })
-        .strict();
+    createHttpHeaderMonitorSchema({
+        baseMonitorSchema,
+        httpHeaderNameSchema,
+        httpHeaderValueSchema,
+        httpUrlSchema,
+    });
 
-/**
- * Zod schema for HTTP keyword monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and adds `bodyKeyword` for response content
- * validation alongside the shared URL validation.
- */
 export const httpKeywordMonitorSchema: HttpKeywordMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            bodyKeyword: z
-                .string()
-                .min(1, "Keyword is required")
-                .max(1024, "Keyword must be 1024 characters or fewer")
-                .refine((keyword) => keyword.trim().length > 0, {
-                    error: "Keyword is required",
-                }),
-            followRedirects: z.boolean().optional(),
-            type: z.literal("http-keyword"),
-            url: httpUrlSchema,
-        })
-        .strict();
+    createHttpKeywordMonitorSchema({
+        baseMonitorSchema,
+        httpUrlSchema,
+    });
 
-/**
- * Zod schema for HTTP JSON monitor fields.
- *
- * @remarks
- * Validates dot-notation JSON paths and expected values for structured content
- * checks.
- */
 export const httpJsonMonitorSchema: HttpJsonMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            expectedJsonValue: z
-                .string()
-                .min(1, "Expected JSON value is required")
-                .max(
-                    2048,
-                    "Expected JSON value must be 2048 characters or fewer"
-                )
-                .refine((value) => value.trim().length > 0, {
-                    error: "Expected JSON value is required",
-                }),
-            followRedirects: z.boolean().optional(),
-            jsonPath: jsonPathSchema,
-            type: z.literal("http-json"),
-            url: httpUrlSchema,
-        })
-        .strict();
+    createHttpJsonMonitorSchema({
+        baseMonitorSchema,
+        httpUrlSchema,
+        jsonPathSchema,
+    });
 
-/**
- * Zod schema for HTTP status monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and adds `expectedStatusCode` for response
- * status validation alongside the shared URL validation.
- */
 export const httpStatusMonitorSchema: HttpStatusMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            expectedStatusCode: z
-                .int("Status code must be an integer")
-                .min(100, "Status code must be between 100 and 599")
-                .max(599, "Status code must be between 100 and 599"),
-            followRedirects: z.boolean().optional(),
-            type: z.literal("http-status"),
-            url: httpUrlSchema,
-        })
-        .strict();
+    createHttpStatusMonitorSchema({
+        baseMonitorSchema,
+        httpUrlSchema,
+    });
 
-/**
- * Zod schema for HTTP latency monitor fields.
- *
- * @remarks
- * Ensures latency thresholds are positive and within sensible limits.
- */
 export const httpLatencyMonitorSchema: HttpLatencyMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            followRedirects: z.boolean().optional(),
-            maxResponseTime: z
-                .number()
-                .min(1, "Maximum response time must be at least 1 millisecond")
-                .max(
-                    VALIDATION_CONSTRAINTS.TIMEOUT.MAX,
-                    "Maximum response time cannot exceed 300 seconds"
-                ),
-            type: z.literal("http-latency"),
-            url: httpUrlSchema,
-        })
-        .strict();
+    createHttpLatencyMonitorSchema({
+        baseMonitorSchema,
+        httpUrlSchema,
+    });
 
-/**
- * Zod schema for port monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and adds `host` and `port` fields with
- * strict validation.
- */
-export const portMonitorSchema: PortMonitorSchemaType = baseMonitorSchema
-    .extend({
-        host: hostValidationSchema,
-        port: z
-            .number()
-            .refine(isValidPort, "Must be a valid port number (1-65535)"),
-        type: z.literal("port"),
-    })
-    .strict();
+export const portMonitorSchema: PortMonitorSchemaType = createPortMonitorSchema(
+    {
+        baseMonitorSchema,
+        hostValidationSchema,
+    }
+);
 
-/**
- * Zod schema for ping monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and adds `host` field with strict
- * validation.
- */
-export const pingMonitorSchema: PingMonitorSchemaType = baseMonitorSchema
-    .extend({
-        host: hostValidationSchema,
-        type: z.literal("ping"),
-    })
-    .strict();
+export const pingMonitorSchema: PingMonitorSchemaType = createPingMonitorSchema(
+    {
+        baseMonitorSchema,
+        hostValidationSchema,
+    }
+);
 
-/**
- * Zod schema for DNS monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and adds DNS-specific fields for domain name
- * resolution monitoring with support for different record types.
- */
-export const dnsMonitorSchema: DnsMonitorSchemaType = baseMonitorSchema
-    .extend({
-        expectedValue: z.string().optional(),
-        host: hostValidationSchema,
-        recordType: z.enum([
-            "A",
-            "AAAA",
-            "ANY",
-            "CAA",
-            "CNAME",
-            "MX",
-            "NAPTR",
-            "NS",
-            "PTR",
-            "SOA",
-            "SRV",
-            "TLSA",
-            "TXT",
-        ]),
-        type: z.literal("dns"),
-    })
-    .strict();
+export const dnsMonitorSchema: DnsMonitorSchemaType = createDnsMonitorSchema({
+    baseMonitorSchema,
+    hostValidationSchema,
+});
 
-/**
- * Zod schema for SSL monitor fields.
- *
- * @remarks
- * Extends {@link baseMonitorSchema} and adds SSL-specific fields for certificate
- * monitoring.
- */
-export const sslMonitorSchema: SslMonitorSchemaType = baseMonitorSchema
-    .extend({
-        certificateWarningDays: z
-            .number()
-            .min(1, "Certificate warning threshold must be at least 1 day")
-            .max(365, "Certificate warning threshold cannot exceed 365 days"),
-        host: hostValidationSchema,
-        port: z
-            .number()
-            .refine(isValidPort, "Must be a valid port number (1-65535)"),
-        type: z.literal("ssl"),
-    })
-    .strict();
+export const sslMonitorSchema: SslMonitorSchemaType = createSslMonitorSchema({
+    baseMonitorSchema,
+    hostValidationSchema,
+});
 
-/**
- * Zod schema for CDN edge consistency monitor fields.
- */
 export const cdnEdgeConsistencyMonitorSchema: CdnEdgeConsistencyMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            baselineUrl: httpUrlSchema,
-            edgeLocations: edgeLocationListSchema,
-            type: z.literal("cdn-edge-consistency"),
-        })
-        .strict();
+    createCdnEdgeConsistencyMonitorSchema({
+        baseMonitorSchema,
+        createDotPathSchema: createDotPathSchemaFactory,
+        edgeLocationListSchema,
+        httpUrlSchema,
+        websocketUrlSchema,
+    });
 
-/**
- * Zod schema for replication monitor fields.
- */
 export const replicationMonitorSchema: ReplicationMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            maxReplicationLagSeconds: z
-                .number()
-                .min(0, "Replication lag threshold must be zero or greater"),
-            primaryStatusUrl: httpUrlSchema,
-            replicaStatusUrl: httpUrlSchema,
-            replicationTimestampField: createDotPathSchema(
-                "Replication timestamp field"
-            ),
-            type: z.literal("replication"),
-        })
-        .strict();
+    createReplicationMonitorSchema({
+        baseMonitorSchema,
+        createDotPathSchema: createDotPathSchemaFactory,
+        edgeLocationListSchema,
+        httpUrlSchema,
+        websocketUrlSchema,
+    });
 
-/**
- * Zod schema for server heartbeat monitor fields.
- */
 export const serverHeartbeatMonitorSchema: ServerHeartbeatMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            heartbeatExpectedStatus: z
-                .string()
-                .min(1, "Expected status is required")
-                .max(128, "Expected status must be 128 characters or fewer")
-                .refine((value) => value.trim().length > 0, {
-                    error: "Expected status is required",
-                }),
-            heartbeatMaxDriftSeconds: z
-                .number()
-                .min(0, "Heartbeat drift tolerance must be zero or greater")
-                .max(
-                    86_400,
-                    "Heartbeat drift tolerance cannot exceed 24 hours"
-                ),
-            heartbeatStatusField: createDotPathSchema("Heartbeat status field"),
-            heartbeatTimestampField: createDotPathSchema(
-                "Heartbeat timestamp field"
-            ),
-            type: z.literal("server-heartbeat"),
-            url: httpUrlSchema,
-        })
-        .strict();
+    createServerHeartbeatMonitorSchema({
+        baseMonitorSchema,
+        createDotPathSchema: createDotPathSchemaFactory,
+        edgeLocationListSchema,
+        httpUrlSchema,
+        websocketUrlSchema,
+    });
 
-/**
- * Zod schema for WebSocket keepalive monitor fields.
- */
 export const websocketKeepaliveMonitorSchema: WebsocketKeepaliveMonitorSchemaType =
-    baseMonitorSchema
-        .extend({
-            maxPongDelayMs: z
-                .number()
-                .min(10, "Maximum pong delay must be at least 10 milliseconds")
-                .max(60_000, "Maximum pong delay cannot exceed 60 seconds"),
-            type: z.literal("websocket-keepalive"),
-            url: websocketUrlSchema,
-        })
-        .strict();
+    createWebsocketKeepaliveMonitorSchema({
+        baseMonitorSchema,
+        createDotPathSchema: createDotPathSchemaFactory,
+        edgeLocationListSchema,
+        httpUrlSchema,
+        websocketUrlSchema,
+    });
 
 /**
  * Zod discriminated union schema for all monitor types.
@@ -864,6 +320,7 @@ export type DnsMonitor = z.infer<typeof dnsMonitorSchema>;
  * @see {@link monitorSchema}
  */
 export type Monitor = z.infer<typeof monitorSchema>;
+
 /** JSON-safe representation of a validated monitor. */
 export type MonitorJson = Jsonify<Monitor>;
 
@@ -895,11 +352,6 @@ export type SslMonitor = z.infer<typeof sslMonitorSchema>;
  * Uses the central schema registry for dynamic schema lookup. Returns
  * `undefined` when the provided discriminator is not part of
  * {@link monitorSchemas}.
- *
- * @param type - Monitor discriminator such as `http`, `port`, or `ssl`.
- *
- * @returns The schema registered for the monitor type, or `undefined` if
- *   unknown.
  */
 function getMonitorSchema(
     type: string
@@ -911,23 +363,6 @@ function getMonitorSchema(
     return monitorSchemas[type];
 }
 
-/**
- * Validates a specific field using the appropriate monitor schema.
- *
- * @remarks
- * Internal helper that constructs a transient object containing only the field
- * under test. Falls back to {@link baseMonitorSchema} for shared fields and
- * throws when the field does not exist for the selected monitor type.
- *
- * @param type - Monitor discriminator key from {@link monitorSchemas}.
- * @param fieldName - Name of the field to validate.
- * @param value - Value provided for the field.
- *
- * @returns An object containing the validated field.
- *
- * @throws Error If the field name is unknown for the monitor type.
- * @throws {@link z.ZodError} If validation fails for the supplied value.
- */
 /**
  * Error thrown when a monitor field name is not part of the schema for a given
  * monitor type.
@@ -995,28 +430,6 @@ function validateFieldWithSchema(
  * {@link ValidationResult} containing success state, validated data, and any
  * accumulated errors or warnings. Optional fields that are omitted are reported
  * as warnings instead of hard validation failures.
- *
- * @example
- *
- * ```typescript
- * import { logger } from "@app/services/logger";
- *
- * const result = validateMonitorData("http", {
- *     url: "https://example.com",
- *     timeout: 5000,
- * });
- * if (result.success) {
- *     logger.info("Monitor validation succeeded", result.data);
- * } else {
- *     logger.error("Monitor validation failed", result.errors);
- * }
- * ```
- *
- * @param type - Monitor discriminator key from {@link monitorSchemas}.
- * @param data - The monitor data to validate.
- *
- * @returns The validation result object summarizing success state, data,
- *   errors, and warnings.
  */
 export function validateMonitorData(
     type: string,
@@ -1119,14 +532,6 @@ export function getMonitorValidationErrors(candidate: unknown): string[] {
  * Useful for real-time validation during form input. Only validates the
  * specified field and mirrors the logic used by {@link validateMonitorData} for
  * warnings and metadata.
- *
- * @param type - Monitor discriminator key from {@link monitorSchemas}.
- * @param fieldName - Name of the field to validate.
- * @param value - Value provided for the field.
- *
- * @returns The validation result object for the field.
- *
- * @throws Error If the field name is unknown for the given monitor type.
  */
 export function validateMonitorField(
     type: string,

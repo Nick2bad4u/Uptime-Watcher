@@ -16,7 +16,11 @@ import {
     type SettingsDomainBridge,
 } from "@shared/types/preload";
 
-import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
+import {
+    createValidatedInvoker,
+    createVoidInvoker,
+    safeParseNonNegativeIntResult,
+} from "../core/bridgeFactory";
 
 /**
  * Interface defining the settings domain API operations.
@@ -57,7 +61,14 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @returns Promise resolving to the current history limit in days
      */
-    getHistoryLimit: createTypedInvoker(SETTINGS_CHANNELS.getHistoryLimit),
+    getHistoryLimit: createValidatedInvoker(
+        SETTINGS_CHANNELS.getHistoryLimit,
+        safeParseNonNegativeIntResult,
+        {
+            domain: "settingsApi",
+            guardName: "safeParseNonNegativeIntResult",
+        }
+    ),
 
     /**
      * Resets all persisted application settings to their defaults
@@ -73,8 +84,13 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @returns Promise resolving to the updated history limit value
      */
-    updateHistoryLimit: createTypedInvoker(
-        SETTINGS_CHANNELS.updateHistoryLimit
+    updateHistoryLimit: createValidatedInvoker(
+        SETTINGS_CHANNELS.updateHistoryLimit,
+        safeParseNonNegativeIntResult,
+        {
+            domain: "settingsApi",
+            guardName: "safeParseNonNegativeIntResult",
+        }
     ),
 } as const;
 

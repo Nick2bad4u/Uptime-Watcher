@@ -10,6 +10,10 @@ import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup"
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import * as z from "zod";
 
+const anyValueSchema = z.custom<unknown>(() => true, {
+    error: "Any value",
+});
+
 const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     (value): value is ArrayBuffer => value instanceof ArrayBuffer,
     "Expected transferable ArrayBuffer"
@@ -17,16 +21,16 @@ const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
 
 export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
     z
-    .object({
-        appVersion: z.string().min(1),
-        checksum: z.string().min(1),
-        createdAt: z.number(),
-        originalPath: z.string().min(1),
-        retentionHintDays: z.number(),
-        schemaVersion: z.number(),
-        sizeBytes: z.number(),
-    })
-    .strict();
+        .object({
+            appVersion: z.string().min(1),
+            checksum: z.string().min(1),
+            createdAt: z.number(),
+            originalPath: z.string().min(1),
+            retentionHintDays: z.number(),
+            schemaVersion: z.number(),
+            sizeBytes: z.number(),
+        })
+        .strict();
 
 export const serializedDatabaseBackupResultSchema: z.ZodType<{
     buffer: ArrayBuffer;
@@ -35,7 +39,8 @@ export const serializedDatabaseBackupResultSchema: z.ZodType<{
 }> = z
     .object({
         buffer: arrayBufferSchema.refine(
-            (buffer) => buffer.byteLength <= DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
+            (buffer) =>
+                buffer.byteLength <= DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
             {
                 message: `Backup buffer exceeds maximum IPC transfer size (${DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} bytes)`,
             }
@@ -106,9 +111,9 @@ export const validationResultSchema: z.ZodType<{
     warnings?: string[] | undefined;
 }> = z
     .object({
-        data: z.unknown().optional(),
+        data: anyValueSchema.optional(),
         errors: z.array(z.string()),
-        metadata: z.record(z.string(), z.unknown()).optional(),
+        metadata: z.record(z.string(), anyValueSchema).optional(),
         success: z.boolean(),
         warnings: z.array(z.string()).optional(),
     })

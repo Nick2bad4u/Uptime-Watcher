@@ -30,7 +30,6 @@ export interface FastCheckEnvOverrides {
  *
  * @param defaultNumRuns - Baseline run count used when the environment does not
  *   provide an override.
- *
  */
 export function resolveFastCheckEnvOverrides(
     defaultNumRuns: number

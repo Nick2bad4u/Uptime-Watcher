@@ -2,6 +2,8 @@
     "$schema": "https://www.schemastore.org/tsconfig.json",
     "compilerOptions": {
         "allowJs": true,
+        "composite": false,
+        "incremental": false,
         "isolatedDeclarations": false
     },
     "extends": "./tsconfig.json",

@@ -1,9 +1,9 @@
 /**
  * Global setup for Playwright Electron tests.
  *
- * @packageDocumentation
+ * @packageDocumentation This
  *
- * This module runs once before the Playwright test suite begins. It prepares
+ * module runs once before the Playwright test suite begins. It prepares
  * the Electron build output and configures environment flags required for
  * stable headless execution during automated UI runs.
  */

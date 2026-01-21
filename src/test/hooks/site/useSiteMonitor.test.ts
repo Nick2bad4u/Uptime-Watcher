@@ -22,10 +22,10 @@ const useSitesStoreMockRef = vi.hoisted(() => ({
 
 // Mock the dependencies
 vi.mock("../../../stores/sites/useSitesStore", async () => {
-    const { createSelectorHookMock } = await import(
-        "../../utils/createSelectorHookMock"
-    );
-    const { createSitesStoreMock } = await import("../../utils/createSitesStoreMock");
+    const { createSelectorHookMock } =
+        await import("../../utils/createSelectorHookMock");
+    const { createSitesStoreMock } =
+        await import("../../utils/createSitesStoreMock");
 
     useSitesStoreMockRef.current = createSelectorHookMock(
         createSitesStoreMock({ sites: [] })
@@ -288,7 +288,7 @@ describe("useSiteMonitor Hook", () => {
 
             useSitesStoreMockRef.current!.setState(
                 createSitesStoreMock({
-                        getSelectedMonitorId: vi.fn(() => undefined),
+                    getSelectedMonitorId: vi.fn(() => undefined),
                     setSelectedMonitorId: mockSetSelectedMonitorId,
                     sites: [mockSite],
                 })
@@ -335,7 +335,7 @@ describe("useSiteMonitor Hook", () => {
 
             useSitesStoreMockRef.current!.setState(
                 createSitesStoreMock({
-                        getSelectedMonitorId: vi.fn(() => undefined),
+                    getSelectedMonitorId: vi.fn(() => undefined),
                     sites: [mockSite],
                 })
             );

@@ -324,6 +324,7 @@ export interface ComponentProperties {
   *
   * @example
   *  ```tsx
+  *
   *  <Component onClick={() => console.log("Clicked!")} />;
   *  ```;
   */
@@ -352,14 +353,14 @@ export interface ComponentProperties {
  *   sizes, loading states, and full accessibility support.
  *
  * @example
- *  Basic usage:
- *
- *  ```tsx
+ *  Basic;
+ *  usage: ```tsx
  *  <Button onClick={handleClick}>Click me</Button>;
- *  ```
+ *  ```;
  *
  * @example
- *  With loading state:
+ *  With
+ *  loading state:
  *
  *  ```tsx
  *  <Button
@@ -386,11 +387,12 @@ export interface ComponentProperties {
 /**
  * [Component] - [brief description]
  *
- * @remarks
- *   [Detailed description of component purpose and features]
+ * @remarks {undefined}
+ *   Detailed description of component purpose and features
  *
  * @example
  *  ```tsx
+ *
  *  <ComponentName prop="value" />;
  *  ```;
  */

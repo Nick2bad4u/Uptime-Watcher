@@ -22,8 +22,8 @@
  * @param {string} testBody - The body of the test containing Playwright actions
  *   and assertions.
  *
- * @usage
- * Replace {{testName}}, {{testTitle}}, and {{testBody}} with appropriate values when generating a test file.
+ * @usage Replace
+ * {{testName}}, {{testTitle}}, and {{testBody}} with appropriate values when generating a test file.
  */
 const testTemplate = `/**
  * Generated UI test for {{testName}}

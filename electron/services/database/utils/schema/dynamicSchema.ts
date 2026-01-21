@@ -19,6 +19,39 @@ import { requireRecordLike } from "@shared/utils/typeHelpers";
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
 
+function assertSafeSqlIdentifier(identifier: string, context: string): void {
+    const isSafe = /^[A-Za-z_]\w*$/u.test(identifier);
+    if (!isSafe) {
+        throw new Error(
+            `[DynamicSchema] Unsafe SQL identifier rejected (${context}): '${identifier}'`
+        );
+    }
+}
+
+function escapeSqlIdentifier(identifier: string, context: string): string {
+    assertSafeSqlIdentifier(identifier, context);
+    return `"${identifier.replaceAll('"', '""')}"`;
+}
+
+const RESERVED_MONITOR_COLUMN_NAMES = new Set<string>([
+    "active_operations",
+    "check_interval",
+    "created_at",
+    "enabled",
+    // Static columns defined in generateMonitorTableSchema()
+    "id",
+    "last_checked",
+    "last_error",
+    "next_check",
+    "response_time",
+    "retry_attempts",
+    "site_identifier",
+    "status",
+    "timeout",
+    "type",
+    "updated_at",
+]);
+
 /**
  * Field mapping configuration for transforming monitor fields to database
  * columns.
@@ -480,14 +513,19 @@ function toSnakeCase(str: string): string {
 export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
     const configs = getAllMonitorTypeConfigs();
     const fields: DatabaseFieldDefinition[] = [];
-    const seenFields = new Set<string>();
+    const seenFields = new Set<string>(RESERVED_MONITOR_COLUMN_NAMES);
 
     for (const config of configs) {
         for (const field of config.fields) {
             // Convert field name to snake_case for database
             const columnName = toSnakeCase(field.name);
 
-            // Skip if we've already seen this field (avoid duplicates)
+            // Ensure this column name is safe to embed into SQL statements.
+            // (Identifiers cannot be parameter-bound.)
+            assertSafeSqlIdentifier(columnName, "monitor field");
+
+            // Skip if we've already seen this field (avoid duplicates and
+            // reserved columns).
             if (!seenFields.has(columnName)) {
                 seenFields.add(columnName);
 
@@ -604,10 +642,10 @@ export function generateMonitorTableSchema(): string {
     `;
 
     const dynamicFields = generateDatabaseFieldDefinitions()
-        .map(
-            (field) =>
-                `        ${field.columnName} ${field.sqlType}${field.nullable ? "" : " NOT NULL"}`
-        )
+        .map((field) => {
+            const escaped = escapeSqlIdentifier(field.columnName, "schema");
+            return `        ${escaped} ${field.sqlType}${field.nullable ? "" : " NOT NULL"}`;
+        })
         .join(",\n");
 
     return `CREATE TABLE IF NOT EXISTS monitors (
@@ -677,8 +715,13 @@ export function generateSqlParameters(): SqlParameters {
  *
  * @returns Database row object suitable for SQL operations.
  */
-export function mapMonitorToRow(monitor: Partial<MonitorRowSource>): MonitorRow {
-    const monitorRecord = requireRecordLike(monitor, "Expected monitor to be record-like");
+export function mapMonitorToRow(
+    monitor: Partial<MonitorRowSource>
+): MonitorRow {
+    const monitorRecord = requireRecordLike(
+        monitor,
+        "Expected monitor to be record-like"
+    );
     const row: MonitorRow = {};
 
     // Map standard fields first
@@ -744,7 +787,10 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
 
     if (monitorTypeConfig) {
         // Create a mutable version for dynamic field assignment
-        const mutableMonitor = requireRecordLike(monitor, "Expected monitor to be record-like");
+        const mutableMonitor = requireRecordLike(
+            monitor,
+            "Expected monitor to be record-like"
+        );
 
         // Only add fields that are specifically defined for this monitor type
         for (const field of monitorTypeConfig.fields) {

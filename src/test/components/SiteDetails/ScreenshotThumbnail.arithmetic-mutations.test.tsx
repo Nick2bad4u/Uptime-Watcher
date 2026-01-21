@@ -52,7 +52,9 @@ vi.mock("../../../theme/useTheme", () => ({
 
 // Mock useUIStore (following existing pattern)
 vi.mock("../../../stores/ui/useUiStore", () => ({
-    useUIStore: (selector?: (state: { openExternal: () => void }) => unknown) => {
+    useUIStore: (
+        selector?: (state: { openExternal: () => void }) => unknown
+    ) => {
         const state = {
             openExternal: vi.fn(),
         };
@@ -164,8 +166,10 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
 
+        const user = userEvent.setup();
+
         // Simulate hover to trigger overlay positioning calculation
-        await userEvent.hover(link);
+        await user.hover(link);
 
         // Wait for positioning calculations and portal creation
         await waitFor(
@@ -202,8 +206,10 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
 
+        const user = userEvent.setup();
+
         // Simulate hover to trigger overlay positioning calculation
-        await userEvent.hover(link);
+        await user.hover(link);
 
         // Wait for positioning calculations
         await waitFor(
@@ -236,8 +242,10 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
 
+        const user = userEvent.setup();
+
         // Simulate hover to trigger overlay positioning calculation
-        await userEvent.hover(link);
+        await user.hover(link);
 
         // Wait for positioning calculations
         await waitFor(
@@ -269,8 +277,10 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
 
+        const user = userEvent.setup();
+
         // Simulate hover
-        await userEvent.hover(link);
+        await user.hover(link);
 
         // Wait for calculations
         await waitFor(
@@ -302,8 +312,10 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
 
+        const user = userEvent.setup();
+
         // Simulate hover
-        await userEvent.hover(link);
+        await user.hover(link);
 
         // Wait for calculations
         await waitFor(

@@ -3,12 +3,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import {
-    fireEvent,
-    render,
-    screen,
-    within,
-} from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import "@testing-library/jest-dom";
 
@@ -152,7 +147,9 @@ describe(SyncMaintenancePanel, () => {
         }
         expect(within(syncHistoryMetric).getByText("4")).toBeInTheDocument();
 
-        const devicesMetric = screen.getByText("Devices").closest(".settings-metric");
+        const devicesMetric = screen
+            .getByText("Devices")
+            .closest(".settings-metric");
         expect(devicesMetric).not.toBeNull();
         if (!(devicesMetric instanceof HTMLElement)) {
             throw new TypeError("Expected devices metric to exist");
@@ -209,7 +206,9 @@ describe(SyncMaintenancePanel, () => {
         expect(screen.getByText("View device IDs")).toBeInTheDocument();
         expect(screen.getByText("device-a")).toBeInTheDocument();
 
-        expect(screen.getByText("Operation logs by device")).toBeInTheDocument();
+        expect(
+            screen.getByText("Operation logs by device")
+        ).toBeInTheDocument();
         expect(
             screen.getByText(/device-a — 2 op object\(s\)/)
         ).toBeInTheDocument();

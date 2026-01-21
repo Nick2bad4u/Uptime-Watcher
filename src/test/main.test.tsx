@@ -2,8 +2,9 @@
  * Tests for the React application entrypoint (main.tsx).
  *
  * These tests intentionally validate observable behavior:
- * - successful initialization renders via ReactDOM.createRoot
- * - missing root element is caught and logged (module-level try/catch)
+ *
+ * - Successful initialization renders via ReactDOM.createRoot
+ * - Missing root element is caught and logged (module-level try/catch)
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -50,7 +51,10 @@ describe("main.tsx - Application Entry Point", () => {
         vi.resetModules();
     });
 
-    it("initializes and renders when root exists", async ({ task, annotate }) => {
+    it("initializes and renders when root exists", async ({
+        task,
+        annotate,
+    }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: main", "component");
         annotate("Category: Core", "category");
@@ -67,7 +71,10 @@ describe("main.tsx - Application Entry Point", () => {
         expect(mockAppLogger.error).not.toHaveBeenCalled();
     });
 
-    it("logs an error when root element is missing", async ({ task, annotate }) => {
+    it("logs an error when root element is missing", async ({
+        task,
+        annotate,
+    }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: main", "component");
         annotate("Category: Core", "category");

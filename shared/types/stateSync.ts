@@ -13,7 +13,7 @@ import { siteSchema } from "@shared/validation/siteSchemas";
 import * as z from "zod";
 
 /**
- * Minimal site snapshot used for state-sync *bookkeeping*.
+ * Minimal site snapshot used for state-sync _bookkeeping_.
  *
  * @remarks
  * Some infrastructure layers (e.g. IPC status tracking) only need the site
@@ -30,12 +30,11 @@ export type SiteIdentifierSnapshot = Pick<Site, "identifier">;
 /**
  * Zod schema validating {@link SiteIdentifierSnapshot} payloads.
  */
-export const siteIdentifierSnapshotSchema: z.ZodType<SiteIdentifierSnapshot> =
-    z
-        .object({
-            identifier: z.string().min(1),
-        })
-        .strict();
+export const siteIdentifierSnapshotSchema: z.ZodType<SiteIdentifierSnapshot> = z
+    .object({
+        identifier: z.string().min(1),
+    })
+    .strict();
 
 const STATE_SYNC_SOURCE_VALUES = [
     "cache",
@@ -193,7 +192,7 @@ const stateSyncFullSyncResultInternalSchema: z.ZodType<{
  * Structured delta describing how the site collection changed during a sync.
  *
  * @remarks
- * This delta is intentionally lightweight: it contains only the *next* site
+ * This delta is intentionally lightweight: it contains only the _next_ site
  * snapshots for additions/updates and the identifiers for removals.
  *
  * Keeping deltas free of "previous" snapshots avoids duplicating large site

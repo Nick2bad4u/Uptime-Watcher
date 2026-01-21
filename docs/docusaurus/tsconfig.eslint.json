@@ -7,7 +7,7 @@
         "checkJs": false,
         "composite": true,
         "declaration": false,
-        "declarationDir": ".cache/builds/docusaurus/eslint/types",
+        "declarationDir": "../../.cache/builds/docusaurus/eslint/types",
         "declarationMap": false,
         "emitDeclarationOnly": false,
         "esModuleInterop": true,
@@ -35,7 +35,7 @@
         "sourceMap": false,
         "strict": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "../../.cache/typedoc-eslint.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.docusaurus.eslint.tsbuildinfo"
     },
     "exclude": [
         "node_modules/**",

@@ -151,7 +151,11 @@ export const ConfirmDialog: NamedExoticComponent = memo(
                         >
                             {calloutIcon}
                         </span>
-                        <ThemedText size="sm" variant="warning" weight="semibold">
+                        <ThemedText
+                            size="sm"
+                            variant="warning"
+                            weight="semibold"
+                        >
                             This can’t be undone.
                         </ThemedText>
                     </div>

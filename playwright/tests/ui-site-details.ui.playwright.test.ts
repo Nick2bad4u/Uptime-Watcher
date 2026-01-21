@@ -92,21 +92,21 @@ test.describe(
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
-                    .getByRole("button", { name: "Monitor Overview" })
+                    .getByRole("tab", { name: "Monitor Overview" })
                     .click();
                 await expect(
                     siteDetailsModal.getByTestId("overview-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
-                    .getByRole("button", { name: ANALYTICS_BUTTON_REGEX })
+                    .getByRole("tab", { name: ANALYTICS_BUTTON_REGEX })
                     .click();
                 await expect(
                     siteDetailsModal.getByTestId("analytics-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 const historyButton = siteDetailsModal
-                    .getByRole("button", {
+                    .getByRole("tab", {
                         name: "History",
                     })
                     .first();
@@ -262,8 +262,11 @@ test.describe(
                     "button",
                     { name: "Start Monitoring" }
                 );
+
                 await expect(startMonitoringButton).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                    // Stop monitoring triggers backend work + renderer store updates.
+                    // On slower CI / cold caches this can exceed the default 5s.
+                    timeout: WAIT_TIMEOUTS.LONG,
                 });
                 await startMonitoringButton.click();
 

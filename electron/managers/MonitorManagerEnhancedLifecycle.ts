@@ -568,16 +568,17 @@ const toggleMonitoringForSiteEnhancedFlow = async (params: {
             return false;
         }
 
-        if (kind === "start" && (
-                typeof monitor.checkInterval !== "number" ||
+        if (
+            kind === "start" &&
+            (typeof monitor.checkInterval !== "number" ||
                 Number.isNaN(monitor.checkInterval) ||
-                monitor.checkInterval <= 0
-            )) {
-                config.logger.warn(
-                    `Monitor ${identifier}:${monitorId} has no valid check interval set`
-                );
-                return false;
-            }
+                monitor.checkInterval <= 0)
+        ) {
+            config.logger.warn(
+                `Monitor ${identifier}:${monitorId} has no valid check interval set`
+            );
+            return false;
+        }
 
         try {
             return await toggleSingleMonitorEnhanced({

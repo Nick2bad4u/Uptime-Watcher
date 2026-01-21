@@ -198,7 +198,8 @@ export const DataService: DataServiceContract = {
                 try {
                     assertSqliteRestorePayloadWithinIpcBudget(payload);
 
-                    const response = await api.data.restoreSqliteBackup(payload);
+                    const response =
+                        await api.data.restoreSqliteBackup(payload);
 
                     return validateServicePayload<SerializedDatabaseRestoreResult>(
                         validateSerializedDatabaseRestoreResult,

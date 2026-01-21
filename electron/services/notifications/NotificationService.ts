@@ -125,7 +125,15 @@ export class NotificationService {
             this.mutedSites = new Set<string>(mutedIdentifiers);
         }
 
-        this.config = { ...this.config, ...newConfig };
+        const downAlertCooldownMs = this.normalizeDownAlertCooldownMs(
+            newConfig.downAlertCooldownMs
+        );
+
+        this.config = {
+            ...this.config,
+            ...newConfig,
+            downAlertCooldownMs,
+        };
     }
 
     public getConfig(): NotificationConfig {
@@ -136,9 +144,11 @@ export class NotificationService {
      * Applies shared suppression logic for monitor status notifications.
      *
      * @remarks
-     * Consolidates the duplicated code paths used by both down/up notifications:
-     * - site muting
-     * - per-monitor cooldown suppression
+     * Consolidates the duplicated code paths used by both down/up
+     * notifications:
+     *
+     * - Site muting
+     * - Per-monitor cooldown suppression
      */
     private shouldDispatchMonitorStatusNotification(args: {
         monitorId: string;
@@ -354,6 +364,26 @@ export class NotificationService {
         state.suppressionUntil = 0;
         this.monitorState.set(stateKey, state);
         return true;
+    }
+
+    private normalizeDownAlertCooldownMs(
+        candidate: NotificationConfig["downAlertCooldownMs"] | undefined
+    ): number {
+        if (candidate === undefined) {
+            return this.config.downAlertCooldownMs;
+        }
+
+        if (!Number.isFinite(candidate) || candidate < 0) {
+            logger.warn(
+                "[NotificationService] Invalid down alert cooldown value; keeping previous value",
+                {
+                    candidate,
+                }
+            );
+            return this.config.downAlertCooldownMs;
+        }
+
+        return Math.trunc(candidate);
     }
 
     private showNotification(

@@ -1,10 +1,11 @@
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { toSerializedError } from "@shared/utils/errorSerialization";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { isSqliteLockedError } from "@shared/utils/sqliteErrors";
-import { isRecord } from "@shared/utils/typeHelpers";
 import { app } from "electron";
 import sqlite3 from "node-sqlite3-wasm";
 import { createHash, randomUUID } from "node:crypto";
@@ -17,7 +18,11 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "./DatabaseService";
 
 import { DB_FILE_NAME } from "../../constants";
-import { toSerializedError } from "../../utils/errorSerialization";
+import {
+    renameIfExists,
+    syncDirectorySafely,
+    syncFileSafely,
+} from "../../utils/fsSafeOps";
 import { SiteLoadingError } from "./interfaces";
 import {
     assertSqliteDatabaseIntegrity,
@@ -113,14 +118,6 @@ function createSanitizedFileName(fileName: string): string {
     return `${shortenedBase}${ext}`;
 }
 
-function isErrnoWithCode(value: unknown): value is NodeJS.ErrnoException {
-    if (!isRecord(value)) {
-        return false;
-    }
-
-    return typeof value["code"] === "string";
-}
-
 /**
  * Dependencies required to orchestrate database backup workflows.
  */
@@ -153,8 +150,9 @@ export class DataBackupService {
      *
      * @remarks
      * These operations must not overlap. Concurrent execution can lead to:
-     * - closing the shared connection while another operation is using it,
-     * - partially replaced files being opened,
+     *
+     * - Closing the shared connection while another operation is using it,
+     * - Partially replaced files being opened,
      * - Windows rename/locking issues.
      */
     private async withExclusiveDatabaseFileOperation<T>(
@@ -187,9 +185,10 @@ export class DataBackupService {
      * @remarks
      * This avoids materializing the backup as a large in-memory Buffer.
      * Internally it:
-     * 1) creates a consistent snapshot via `VACUUM INTO` in a temp directory,
-     * 2) copies the snapshot into the destination directory under a temp name,
-     * 3) swaps the destination file atomically (rename with a backup fallback).
+     *
+     * 1. Creates a consistent snapshot via `VACUUM INTO` in a temp directory,
+     * 2. Copies the snapshot into the destination directory under a temp name,
+     * 3. Swaps the destination file atomically (rename with a backup fallback).
      */
     public async saveDatabaseBackupToPath(
         targetPath: string
@@ -216,9 +215,8 @@ export class DataBackupService {
 
                 let snapshotDir: null | string = null;
                 try {
-                    snapshotDir = await this.createTempDirectory(
-                        BACKUP_TEMP_PREFIX
-                    );
+                    snapshotDir =
+                        await this.createTempDirectory(BACKUP_TEMP_PREFIX);
                     const snapshotPath = this.createConsistentSnapshot({
                         dbPath,
                         snapshotDir,
@@ -340,9 +338,8 @@ export class DataBackupService {
                         app.getPath("userData"),
                         DB_FILE_NAME
                     );
-                    snapshotDir = await this.createTempDirectory(
-                        BACKUP_TEMP_PREFIX
-                    );
+                    snapshotDir =
+                        await this.createTempDirectory(BACKUP_TEMP_PREFIX);
                     const snapshotPath = this.createConsistentSnapshot({
                         dbPath,
                         snapshotDir,
@@ -352,7 +349,8 @@ export class DataBackupService {
                     const rawResult = await createDatabaseBackup({
                         dbPath: snapshotPath,
                     });
-                    const result = this.normalizeBackupResultMetadata(rawResult);
+                    const result =
+                        this.normalizeBackupResultMetadata(rawResult);
                     validateDatabaseBackupPayload(result);
                     this.logger.info(
                         "[DataBackupService] Created database backup",
@@ -425,7 +423,8 @@ export class DataBackupService {
                         );
                     }
 
-                    tempDir = await this.createTempDirectory(RESTORE_TEMP_PREFIX);
+                    tempDir =
+                        await this.createTempDirectory(RESTORE_TEMP_PREFIX);
                     const incomingFileName = payload.fileName?.trim();
                     const tempFileName =
                         incomingFileName && incomingFileName.length > 0
@@ -454,9 +453,8 @@ export class DataBackupService {
                         mode: "quick_check",
                     });
 
-                    preRestoreSnapshotDir = await this.createTempDirectory(
-                        BACKUP_TEMP_PREFIX
-                    );
+                    preRestoreSnapshotDir =
+                        await this.createTempDirectory(BACKUP_TEMP_PREFIX);
                     const preRestoreSnapshotPath =
                         this.createConsistentSnapshot({
                             dbPath,
@@ -565,23 +563,41 @@ export class DataBackupService {
                 const normalizedBackup =
                     this.normalizeBackupResultMetadata(backup);
                 validateDatabaseBackupPayload(normalizedBackup);
-                const tempDir = await this.createTempDirectory(
-                    ROLLBACK_TEMP_PREFIX
-                );
+
+                const buffer = Buffer.from(normalizedBackup.buffer);
+                if (
+                    buffer.length < SQLITE_HEADER.length ||
+                    !buffer
+                        .subarray(0, SQLITE_HEADER.length)
+                        .equals(SQLITE_HEADER)
+                ) {
+                    throw new Error(
+                        "Backup payload is not a valid SQLite database file"
+                    );
+                }
+
+                const tempDir =
+                    await this.createTempDirectory(ROLLBACK_TEMP_PREFIX);
                 const safeFileName = createSanitizedFileName(
                     normalizedBackup.fileName
                 );
-                const dbPath = path.join(
-                    app.getPath("userData"),
-                    DB_FILE_NAME
-                );
+                const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
 
                 try {
                     const tempFilePath = await this.writeFileWithinDirectory(
                         tempDir,
                         safeFileName,
-                        normalizedBackup.buffer
+                        buffer
                     );
+
+                    // Even for internally-produced backups, validate that the
+                    // replacement database file is structurally sound before
+                    // swapping it into place.
+                    assertSqliteDatabaseIntegrity({
+                        filePath: tempFilePath,
+                        mode: "quick_check",
+                    });
+
                     await this.replaceDatabaseFile(tempFilePath, dbPath);
                     return normalizedBackup.metadata;
                 } finally {
@@ -607,10 +623,17 @@ export class DataBackupService {
             targetDir,
             `${baseName}.rollback-${timestamp}`
         );
+        const rollbackWalPath = `${rollbackPath}-wal`;
+        const rollbackShmPath = `${rollbackPath}-shm`;
+        const rollbackJournalPath = `${rollbackPath}-journal`;
         const incomingPath = path.join(
             targetDir,
             `${baseName}.incoming-${timestamp}`
         );
+
+        const walPath = `${targetPath}-wal`;
+        const shmPath = `${targetPath}-shm`;
+        const journalPath = `${targetPath}-journal`;
 
         let hadExistingTarget = false;
         let copyError: Error | undefined = undefined;
@@ -620,16 +643,27 @@ export class DataBackupService {
             // `targetPath` is missing. This also ensures we never move the live
             // DB aside unless we have a fully-written replacement ready.
             await fs.copyFile(sourcePath, incomingPath);
-            await this.syncFileSafely(incomingPath);
+            await syncFileSafely(incomingPath);
 
             // Move the existing DB out of the way (so rename into place is safe).
             try {
+                // WAL/SHM sidecars must not follow the restored DB into place.
+                // We relocate them alongside the main DB so rollback restores
+                // the *exact* prior state and we avoid corrupting the restored
+                // DB with a mismatched WAL.
+                //
+                // These renames are best-effort. If files do not exist we
+                // treat it as a no-op.
+                await renameIfExists(walPath, rollbackWalPath);
+                await renameIfExists(shmPath, rollbackShmPath);
+                await renameIfExists(journalPath, rollbackJournalPath);
+
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath is derived from the trusted DB path with a controlled suffix.
                 await fs.rename(targetPath, rollbackPath);
                 hadExistingTarget = true;
-                await this.syncDirectorySafely(targetDir);
+                await syncDirectorySafely(targetDir);
             } catch (error) {
-                if (isErrnoWithCode(error) && error.code === "ENOENT") {
+                if (tryGetErrorCode(error) === "ENOENT") {
                     // No existing file.
                 } else {
                     throw ensureError(error);
@@ -638,7 +672,7 @@ export class DataBackupService {
 
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- incomingPath/targetPath are within app-controlled userData directory.
             await fs.rename(incomingPath, targetPath);
-            await this.syncDirectorySafely(targetDir);
+            await syncDirectorySafely(targetDir);
         } catch (error: unknown) {
             copyError = ensureError(error);
         }
@@ -652,6 +686,11 @@ export class DataBackupService {
                 await fs.rm(targetPath, { force: true });
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
                 await fs.rename(rollbackPath, targetPath);
+
+                // Restore sidecars if we relocated them.
+                await renameIfExists(rollbackWalPath, walPath);
+                await renameIfExists(rollbackShmPath, shmPath);
+                await renameIfExists(rollbackJournalPath, journalPath);
                 hadExistingTarget = false;
             } catch {
                 // Best effort. We still surface the original copy error below.
@@ -669,6 +708,10 @@ export class DataBackupService {
                     await fs.rm(targetPath, { force: true });
                     // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
                     await fs.rename(rollbackPath, targetPath);
+
+                    await renameIfExists(rollbackWalPath, walPath);
+                    await renameIfExists(rollbackShmPath, shmPath);
+                    await renameIfExists(rollbackJournalPath, journalPath);
                     this.databaseService.initialize();
                 } catch {
                     // If rollback fails, we still surface the init error below.
@@ -687,6 +730,11 @@ export class DataBackupService {
             await fs.rm(incomingPath, { force: true }).catch(() => {});
             if (!copyError) {
                 await fs.rm(rollbackPath, { force: true }).catch(() => {});
+                await fs.rm(rollbackWalPath, { force: true }).catch(() => {});
+                await fs.rm(rollbackShmPath, { force: true }).catch(() => {});
+                await fs
+                    .rm(rollbackJournalPath, { force: true })
+                    .catch(() => {});
             }
         }
 
@@ -695,54 +743,12 @@ export class DataBackupService {
         }
     }
 
-    /**
-     * Best-effort `fsync()` for a file path.
-     *
-     * @remarks
-     * This reduces the chance of ending up with a zero-length/partially-written
-     * replacement DB if the machine crashes or loses power around the rename.
-     */
-    private async syncFileSafely(filePath: string): Promise<void> {
-        try {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller ensures filePath is derived from app-controlled paths.
-            const handle = await fs.open(filePath, "r");
-            try {
-                await handle.sync();
-            } finally {
-                await handle.close();
-            }
-        } catch {
-            // Best-effort only.
-        }
-    }
-
-    /**
-     * Best-effort `fsync()` for a directory path.
-     *
-     * @remarks
-     * Helps persist rename operations on POSIX filesystems. On Windows,
-     * directory handles may not be syncable; we treat failures as non-fatal.
-     */
-    private async syncDirectorySafely(directoryPath: string): Promise<void> {
-        try {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller ensures directoryPath is derived from app-controlled paths.
-            const handle = await fs.open(directoryPath, "r");
-            try {
-                await handle.sync();
-            } finally {
-                await handle.close();
-            }
-        } catch {
-            // Best-effort only.
-        }
-    }
-
-private async createTempDirectory(prefix: string): Promise<string> {
+    private async createTempDirectory(prefix: string): Promise<string> {
         const osTempPath = os.tmpdir();
         return fs.mkdtemp(path.join(osTempPath, prefix));
     }
 
-private async removeDirectorySafe(
+    private async removeDirectorySafe(
         directoryPath: string,
         context: string
     ): Promise<void> {
@@ -780,13 +786,13 @@ private async removeDirectorySafe(
             // Path is validated by resolvePathWithinDirectory to prevent traversal.
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath is sanitized and confined to baseDirectory.
             await fs.writeFile(tmpPath, contents);
-            await this.syncFileSafely(tmpPath);
+            await syncFileSafely(tmpPath);
 
             try {
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath/rollbackPath are sanitized and confined to baseDirectory.
                 await fs.rename(targetPath, rollbackPath);
             } catch (error) {
-                if (isErrnoWithCode(error) && error.code === "ENOENT") {
+                if (tryGetErrorCode(error) === "ENOENT") {
                     // No existing file.
                 } else {
                     throw ensureError(error);
@@ -795,7 +801,7 @@ private async removeDirectorySafe(
 
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath/targetPath are sanitized and confined to baseDirectory.
             await fs.rename(tmpPath, targetPath);
-            await this.syncDirectorySafely(baseDirectory);
+            await syncDirectorySafely(baseDirectory);
         } catch (error) {
             // Best-effort cleanup.
             await fs.rm(tmpPath, { force: true }).catch(() => {});
@@ -803,7 +809,7 @@ private async removeDirectorySafe(
             // Best-effort rollback (no-op if rollback doesn't exist).
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are sanitized and confined to baseDirectory.
             await fs.rename(rollbackPath, targetPath).catch(() => {});
-            await this.syncDirectorySafely(baseDirectory);
+            await syncDirectorySafely(baseDirectory);
 
             throw ensureError(error);
         } finally {
@@ -825,7 +831,9 @@ private async removeDirectorySafe(
         });
         try {
             try {
-                tempDb.exec(`PRAGMA busy_timeout = ${SNAPSHOT_BUSY_TIMEOUT_MS}`);
+                tempDb.exec(
+                    `PRAGMA busy_timeout = ${SNAPSHOT_BUSY_TIMEOUT_MS}`
+                );
             } catch {
                 // Best-effort; snapshot still works without it.
             }
@@ -837,14 +845,6 @@ private async removeDirectorySafe(
             tempDb.close();
         }
     }
-
-
-
-
-
-
-
-
 
     private createConsistentSnapshot(args: {
         dbPath: string;

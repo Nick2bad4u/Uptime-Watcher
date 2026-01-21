@@ -6,7 +6,7 @@
         "baseUrl": "../",
         "checkJs": true,
         "declaration": true,
-        "declarationDir": ".cache/builds/test/playwright/types",
+        "declarationDir": "../.cache/builds/test/playwright/types",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "isolatedDeclarations": false,
@@ -31,7 +31,7 @@
         "skipLibCheck": true,
         "strict": true,
         "target": "ES2024",
-        "tsBuildInfoFile": "../.cache/tsconfig.playwright.tsbuildinfo",
+        "tsBuildInfoFile": "../.cache/tsbuildinfo/tsconfig.playwright.tsbuildinfo",
         "types": ["@playwright/test", "node"]
     },
     "exclude": [

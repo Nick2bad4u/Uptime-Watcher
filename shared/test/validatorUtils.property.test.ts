@@ -10,8 +10,8 @@
  *
  * @since 2025-09-05
  *
- * @features
- * - Property-based testing for string validation functions
+ * @features -
+ * Property-based testing for string validation functions
  * - URL and domain validation with comprehensive edge cases
  * - Host and port validation with boundary testing
  * - I        fc.property([
@@ -174,9 +174,11 @@ describe("Validator Utils Property-Based Tests", () => {
         it("should respect FQDN options when provided", () => {
             // Test with require_tld: false to allow localhost
             expect(
-                isValidFQDN("localhost", { require_tld: false })
+                isValidFQDN("localhost", { "require_tld": false })
             ).toBeTruthy();
-            expect(isValidFQDN("localhost", { require_tld: true })).toBeFalsy();
+            expect(
+                isValidFQDN("localhost", { "require_tld": true })
+            ).toBeFalsy();
         });
     });
 

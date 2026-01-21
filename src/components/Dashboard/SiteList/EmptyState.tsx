@@ -65,7 +65,7 @@ export const EmptyState = (): JSX.Element => {
                 <div className="flex items-center justify-center">
                     <MonitorIcon
                         aria-hidden="true"
-                        className="h-14 w-14 opacity-70"
+                        className="size-14 opacity-70"
                         data-testid="empty-state-monitor-icon"
                     />
                 </div>
@@ -81,7 +81,12 @@ export const EmptyState = (): JSX.Element => {
                         No sites are being monitored
                     </ThemedText>
 
-                    <ThemedText align="center" as="p" size="base" variant="secondary">
+                    <ThemedText
+                        align="center"
+                        as="p"
+                        size="base"
+                        variant="secondary"
+                    >
                         Add your first website to start monitoring its uptime.
                     </ThemedText>
                 </div>

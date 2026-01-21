@@ -15,7 +15,6 @@ import {
     useThemeValue,
 } from "../../theme/useTheme";
 
-
 describe("useTheme Hooks - Working Tests", () => {
     describe(useAvailabilityColors, () => {
         it("should return availability color functions", async ({

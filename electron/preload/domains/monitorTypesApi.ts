@@ -12,12 +12,66 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
+
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import {
     MONITOR_TYPES_CHANNELS,
     type MonitorTypesDomainBridge,
 } from "@shared/types/preload";
+import { isValidationResult } from "@shared/types/validation";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import {
+    createValidatedInvoker,
+    type SafeParseLike,
+    safeParseStringResult,
+} from "../core/bridgeFactory";
+
+function safeParseValidationResult(
+    candidate: unknown
+): SafeParseLike<ValidationResult> {
+    if (!isValidationResult(candidate)) {
+        return {
+            error: new Error(
+                `Expected ValidationResult response payload, received ${
+                    Array.isArray(candidate) ? "array" : typeof candidate
+                }`
+            ),
+            success: false,
+        };
+    }
+
+    return { data: candidate, success: true };
+}
+
+function safeParseMonitorTypeConfigs(
+    candidate: unknown
+): SafeParseLike<MonitorTypeConfig[]> {
+    if (!Array.isArray(candidate)) {
+        return {
+            error: new Error(
+                `Expected monitor type configuration array, received ${typeof candidate}`
+            ),
+            success: false,
+        };
+    }
+
+    const typedConfigs = candidate.filter(isMonitorTypeConfig);
+    if (typedConfigs.length !== candidate.length) {
+        return {
+            error: new Error(
+                "Monitor type configuration array contained invalid entries"
+            ),
+            success: false,
+        };
+    }
+
+    return {
+        data: typedConfigs,
+        success: true,
+    };
+}
 
 /**
  * Interface defining the monitor types domain API operations.
@@ -54,15 +108,25 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
     /**
      * Formats monitor detail information for display.
      */
-    formatMonitorDetail: createTypedInvoker(
-        MONITOR_TYPES_CHANNELS.formatMonitorDetail
+    formatMonitorDetail: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.formatMonitorDetail,
+        safeParseStringResult,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseStringResult",
+        }
     ),
 
     /**
      * Formats monitor title suffix for display.
      */
-    formatMonitorTitleSuffix: createTypedInvoker(
-        MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix
+    formatMonitorTitleSuffix: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
+        safeParseStringResult,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseStringResult",
+        }
     ),
 
     /**
@@ -70,13 +134,25 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
      *
      * @returns Promise resolving to monitor types registry
      */
-    getMonitorTypes: createTypedInvoker(MONITOR_TYPES_CHANNELS.getMonitorTypes),
+    getMonitorTypes: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.getMonitorTypes,
+        safeParseMonitorTypeConfigs,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseMonitorTypeConfigs",
+        }
+    ),
 
     /**
      * Validates monitor configuration data.
      */
-    validateMonitorData: createTypedInvoker(
-        MONITOR_TYPES_CHANNELS.validateMonitorData
+    validateMonitorData: createValidatedInvoker(
+        MONITOR_TYPES_CHANNELS.validateMonitorData,
+        safeParseValidationResult,
+        {
+            domain: "monitorTypesApi",
+            guardName: "safeParseValidationResult",
+        }
     ),
 } as const;
 

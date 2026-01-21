@@ -437,8 +437,24 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
             applyTooltipPosition();
 
+            let rafId: null | number = null;
+
+            const scheduleReposition = (): void => {
+                if (rafId !== null) {
+                    return;
+                }
+
+                // RequestAnimationFrame batches DOM reads/writes into a single
+                // frame, preventing scroll/resize from triggering multiple
+                // layout recalculations per frame.
+                rafId = window.requestAnimationFrame(() => {
+                    rafId = null;
+                    applyTooltipPosition();
+                });
+            };
+
             const handleReposition = (): void => {
-                applyTooltipPosition();
+                scheduleReposition();
             };
 
             const scrollListenerOptions = {
@@ -459,7 +475,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
             if (typeof ResizeObserver === "function") {
                 resizeObserver = new ResizeObserver(() => {
-                    applyTooltipPosition();
+                    scheduleReposition();
                 });
 
                 if (tooltipNode) {
@@ -472,6 +488,10 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
             }
 
             return (): void => {
+                if (rafId !== null) {
+                    window.cancelAnimationFrame(rafId);
+                }
+
                 window.removeEventListener("resize", handleReposition);
                 window.removeEventListener(
                     "scroll",

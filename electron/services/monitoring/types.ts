@@ -143,7 +143,10 @@ export interface MonitorCheckResult {
      * Status outcome of the check.
      *
      * @remarks
-     * - `"up"`: Monitor endpoint is healthy and responding normally
+     * -
+     *
+     * `"up"`: Monitor endpoint is healthy and responding normally
+     *
      * - `"degraded"`: Monitor endpoint shows partial functionality (e.g., DNS
      *   resolves but ports unreachable, HTTP responds with non-2xx status)
      * - `"down"`: Monitor endpoint is failing, unreachable, or returned an error
@@ -177,8 +180,7 @@ export type MonitorConfigurationInput = Simplify<
  *
  * @public
  */
-export interface MonitorServiceConfig
-    extends MonitorConfigurationInput {
+export interface MonitorServiceConfig extends MonitorConfigurationInput {
     /**
      * Request timeout in milliseconds.
      *

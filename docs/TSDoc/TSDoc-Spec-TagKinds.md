@@ -34,13 +34,15 @@ appearing prior to the first block tag is interpreted as the special
  *   This is a standalone block.
  *
  * @example
- *  Logging a warning
+ *  Logging
+ *  a warning
  *  ```ts
  *  logger.warn('Something happened');
  *  ```
  *
  * @example
- *  Logging an error
+ *  Logging
+ *  an error
  *  ```ts
  *  logger.error('Something happened');
  *  ```

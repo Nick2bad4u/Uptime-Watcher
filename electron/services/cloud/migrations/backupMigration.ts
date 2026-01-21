@@ -37,7 +37,10 @@ function isTargetEncrypted(
  * Migrates backups stored in a {@link CloudStorageProvider}.
  *
  * @remarks
- * - Operates on `CloudStorageProvider.listBackups()` entries.
+ * -
+ *
+ * Operates on `CloudStorageProvider.listBackups()` entries.
+ *
  * - Uploads migrated backups with `uploadBackup()` to ensure consistent metadata
  *   serialization.
  * - Deletes source objects only after a successful upload when

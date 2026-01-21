@@ -253,12 +253,12 @@ describe("useSite Hook", () => {
             mockUseSiteMonitor.mockReturnValueOnce(mockMonitorData);
             mockUseSiteStats.mockReturnValueOnce(mockStatsData);
             mockUseSiteActions.mockReturnValueOnce(mockActionsData);
-            mockUseErrorStore.mockImplementationOnce(
-                ((selector?: (state: unknown) => unknown) =>
-                    typeof selector === "function"
-                        ? selector(mockLoadingData)
-                        : mockLoadingData) as never
-            );
+            mockUseErrorStore.mockImplementationOnce(((
+                selector?: (state: unknown) => unknown
+            ) =>
+                typeof selector === "function"
+                    ? selector(mockLoadingData)
+                    : mockLoadingData) as never);
 
             const { result } = renderHook(() => useSite(mockSite));
 

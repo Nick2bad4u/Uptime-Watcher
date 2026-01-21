@@ -25,6 +25,7 @@ import {
  *
  * @remarks
  * This helper enforces the canonical backup storage layout:
+ *
  * - Backup object at `${backupsPrefix}${fileName}`
  * - Sidecar metadata at `${backupKey}.metadata.json`
  *

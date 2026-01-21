@@ -1,5 +1,3 @@
-import type { ZodType } from "zod";
-
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
@@ -48,10 +46,11 @@ export interface GoogleDriveListResponse {
     readonly nextPageToken: null | string;
 }
 
-const googleDriveCreateResponseSchema: ZodType<GoogleDriveCreateResponse> =
-    z.looseObject({
+const googleDriveCreateResponseSchema: z.ZodType<GoogleDriveCreateResponse> = z
+    .object({
         id: z.string().min(1),
-    });
+    })
+    .loose();
 
 /**
  * Parses and validates the `drive.files.create()` response data.
@@ -70,11 +69,12 @@ export function parseGoogleDriveCreateResponse(
     return { id: parsed.data.id };
 }
 
-const googleDriveFileMetadataSchema: ZodType<GoogleDriveFileMetadata> =
-    z.looseObject({
+const googleDriveFileMetadataSchema: z.ZodType<GoogleDriveFileMetadata> = z
+    .object({
         modifiedTime: z.string().optional(),
         size: z.union([z.string(), z.number()]).optional(),
-    });
+    })
+    .loose();
 
 /**
  * Parses and validates the `drive.files.get()` response data.
@@ -96,21 +96,25 @@ export function parseGoogleDriveFileMetadata(
     };
 }
 
-const googleDriveFileSchema: ZodType<GoogleDriveListedFile> = z.looseObject({
-    id: z.string().optional(),
-    mimeType: z.string().optional(),
-    modifiedTime: z.string().optional(),
-    name: z.string().optional(),
-    size: z.union([z.string(), z.number()]).optional(),
-});
+const googleDriveFileSchema: z.ZodType<GoogleDriveListedFile> = z
+    .object({
+        id: z.string().optional(),
+        mimeType: z.string().optional(),
+        modifiedTime: z.string().optional(),
+        name: z.string().optional(),
+        size: z.union([z.string(), z.number()]).optional(),
+    })
+    .loose();
 
-const googleDriveListResponseSchema: ZodType<{
+const googleDriveListResponseSchema: z.ZodType<{
     files?: GoogleDriveListedFile[] | undefined;
     nextPageToken?: null | string | undefined;
-}> = z.looseObject({
-    files: z.array(googleDriveFileSchema).optional(),
-    nextPageToken: z.union([z.string(), z.null()]).optional(),
-});
+}> = z
+    .object({
+        files: z.array(googleDriveFileSchema).optional(),
+        nextPageToken: z.union([z.string(), z.null()]).optional(),
+    })
+    .loose();
 
 /**
  * Parses and validates the `drive.files.list()` response data.

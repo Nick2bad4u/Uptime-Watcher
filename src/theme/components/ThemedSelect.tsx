@@ -73,7 +73,10 @@ import {
  * @public
  */
 export interface ThemedSelectProperties
-    extends AccessibilityProperties, CoreComponentProperties, DataAttributeProperties {
+    extends
+        AccessibilityProperties,
+        CoreComponentProperties,
+        DataAttributeProperties {
     /** Whether the select should expand to fill its container width */
     readonly fluid?: boolean;
     /** Unique identifier for the select element */

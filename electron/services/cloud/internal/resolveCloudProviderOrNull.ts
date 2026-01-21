@@ -48,8 +48,10 @@ export async function resolveCloudProviderOrNull(args: {
 
             const [{ DropboxTokenManager }, { DropboxCloudStorageProvider }] =
                 await Promise.all([
-                    import(/* webpackChunkName: "cloud-dropbox-tokens" */ "../providers/dropbox/DropboxTokenManager"),
-                    import(/* webpackChunkName: "cloud-dropbox-provider" */ "../providers/dropbox/DropboxCloudStorageProvider"),
+
+                    import(/* webpackChunkName: "cloudDropboxTokens" */ "../providers/dropbox/DropboxTokenManager"),
+
+                    import(/* webpackChunkName: "cloudDropboxProvider" */ "../providers/dropbox/DropboxCloudStorageProvider"),
                 ]);
 
             const tokenManager = new DropboxTokenManager({
@@ -87,11 +89,15 @@ export async function resolveCloudProviderOrNull(args: {
         case "google-drive": {
             const { clientId, clientSecret } = resolveGoogleDriveOAuthConfig();
 
-            const [{ GoogleDriveTokenManager }, { GoogleDriveCloudStorageProvider }] =
-                await Promise.all([
-                    import(/* webpackChunkName: "cloud-gdrive-tokens" */ "../providers/googleDrive/GoogleDriveTokenManager"),
-                    import(/* webpackChunkName: "cloud-gdrive-provider" */ "../providers/googleDrive/GoogleDriveCloudStorageProvider"),
-                ]);
+            const [
+                { GoogleDriveTokenManager },
+                { GoogleDriveCloudStorageProvider },
+            ] = await Promise.all([
+
+                import(/* webpackChunkName: "cloudGdriveTokens" */ "../providers/googleDrive/GoogleDriveTokenManager"),
+
+                import(/* webpackChunkName: "cloudGdriveProvider" */ "../providers/googleDrive/GoogleDriveCloudStorageProvider"),
+            ]);
 
             const tokenManager = new GoogleDriveTokenManager({
                 clientId,

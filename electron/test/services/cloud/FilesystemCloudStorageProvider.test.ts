@@ -132,7 +132,9 @@ describe("FilesystemCloudStorageProvider", () => {
         } catch (error: unknown) {
             expect(error).toBeInstanceOf(CloudProviderOperationError);
 
-            const typed = error as InstanceType<typeof CloudProviderOperationError>;
+            const typed = error as InstanceType<
+                typeof CloudProviderOperationError
+            >;
             expect(typed.code).toBe("ENOENT");
             expect(typed.operation).toBe("downloadObject");
             expect(typed.providerKind).toBe("filesystem");
@@ -159,7 +161,9 @@ describe("FilesystemCloudStorageProvider", () => {
         } catch (error: unknown) {
             expect(error).toBeInstanceOf(CloudProviderOperationError);
 
-            const typed = error as InstanceType<typeof CloudProviderOperationError>;
+            const typed = error as InstanceType<
+                typeof CloudProviderOperationError
+            >;
             expect(typed.code).toBe("EEXIST");
             expect(typed.operation).toBe("uploadObject");
             expect(typed.providerKind).toBe("filesystem");

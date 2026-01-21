@@ -1,9 +1,9 @@
 /**
  * Monitor Service Management Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises monitor service management benchmark scenarios to measure service throughput and resilience.
+ * monitor service management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";

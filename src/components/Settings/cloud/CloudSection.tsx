@@ -267,17 +267,14 @@ export const CloudSection = ({
         () => (
             <CloudIcon
                 aria-hidden
-                className="settings-accent--primary h-5 w-5"
+                className="settings-accent--primary size-5"
             />
         ),
         [CloudIcon]
     );
     const syncHeaderIcon = useMemo(
         () => (
-            <SyncIcon
-                aria-hidden
-                className="settings-accent--success h-5 w-5"
-            />
+            <SyncIcon aria-hidden className="settings-accent--success size-5" />
         ),
         [SyncIcon]
     );
@@ -285,7 +282,7 @@ export const CloudSection = ({
         () => (
             <LockIcon
                 aria-hidden
-                className="settings-accent--highlight h-5 w-5"
+                className="settings-accent--highlight size-5"
             />
         ),
         [LockIcon]
@@ -346,7 +343,13 @@ export const CloudSection = ({
                 ? UnlockIcon
                 : LockIcon;
         return <IconComponent aria-hidden size={buttonIconSize} />;
-    }, [buttonIconSize, encryptionLocked, encryptionMode, LockIcon, UnlockIcon]);
+    }, [
+        buttonIconSize,
+        encryptionLocked,
+        encryptionMode,
+        LockIcon,
+        UnlockIcon,
+    ]);
 
     const notConfiguredHint = renderCloudNotConfiguredHint({ configured });
 
@@ -381,7 +384,11 @@ export const CloudSection = ({
                 <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {connectionHeaderIcon}
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Connection & Status
                         </ThemedText>
                     </div>
@@ -406,7 +413,11 @@ export const CloudSection = ({
                 <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {syncHeaderIcon}
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Sync
                         </ThemedText>
                     </div>
@@ -436,7 +447,11 @@ export const CloudSection = ({
                 <div className="settings-subcard">
                     <div className="flex items-center gap-2">
                         {encryptionHeaderIcon}
-                        <ThemedText size="sm" variant="secondary" weight="medium">
+                        <ThemedText
+                            size="sm"
+                            variant="secondary"
+                            weight="medium"
+                        >
                             Encryption
                         </ThemedText>
                     </div>

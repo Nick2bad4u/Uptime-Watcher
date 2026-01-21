@@ -13,10 +13,6 @@
 # Docusaurus Build Directory
 /build/
 
-# Docusaurus (repo-specific) generated outputs
-docs/docusaurus/build/
-docs/docusaurus/docs/documents/
-
 ### Docusaurus.Node Stack ###
 # Logs
 logs
@@ -850,3 +846,8 @@ gha-creds-*.json
 assets/prettier-plugin-multiline-arrays/
 .jscpd/
 reports/
+storybook/stories/__screenshots__/
+
+# Docusaurus (repo-specific) generated outputs
+docs/docusaurus/build/
+docs/docusaurus/docs/documents/

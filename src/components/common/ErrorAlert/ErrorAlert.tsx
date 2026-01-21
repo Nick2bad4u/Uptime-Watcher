@@ -66,7 +66,7 @@ function getErrorIcon(variant: ErrorAlertVariant): JSX.Element {
     const InfoIcon = AppIcons.ui.info;
     const WarningIcon = AppIcons.status.warning;
 
-    const className = "h-5 w-5 shrink-0";
+    const className = "size-5 shrink-0";
 
     if (variant === "info") {
         return <InfoIcon className={className} data-testid="info-icon" />;
@@ -154,7 +154,7 @@ export const ErrorAlert = ({
                     title="Dismiss this error message"
                     type="button"
                 >
-                    <CloseIcon className="h-4 w-4" />
+                    <CloseIcon className="size-4" />
                 </button>
             ) : null}
         </div>

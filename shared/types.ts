@@ -404,19 +404,19 @@ export interface StatusHistory {
  */
 export interface StatusUpdate extends Readonly<UnknownRecord> {
     /** Optional diagnostic message describing the change. */
-    details?: string;
+    details?: string | undefined;
     readonly length?: never;
     /** Rich monitor context describing the updated entity. */
     monitor: Monitor;
     /** Identifier of the monitor generating the update. */
     monitorId: string;
     /** Previous status before the update, if known. */
-    previousStatus?: MonitorStatus;
+    previousStatus?: MonitorStatus | undefined;
     readonly [key: number]: unknown;
     readonly [key: string]: unknown;
     readonly [key: symbol]: unknown;
     /** Latest response time measurement, when recorded. */
-    responseTime?: number;
+    responseTime?: number | undefined;
     /** Full site entity associated with the monitor. */
     site: Site;
     /** Identifier of the site associated with the monitor. */

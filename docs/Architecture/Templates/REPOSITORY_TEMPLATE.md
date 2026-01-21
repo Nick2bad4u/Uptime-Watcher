@@ -92,6 +92,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  const repo = new ExampleRepository({ databaseService });
   *  ```;
   *
@@ -106,6 +107,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  await repo.create({
   *   id: "123",
   *   name: "Example",
@@ -134,18 +136,17 @@ export class ExampleRepository {
   * Creates a new entity within an existing transaction context.
   *
   * @remarks
-  *   - Must be called within an active transaction context.
+  *   -
+  *
+  *   Must be called within an active transaction context.
+  *
   *   - Applies data validation and normalization.
   *
   * @param db - The database connection (must be within an active transaction).
   * @param data - The entity data to create.
   */
  public createInternal(db: Database, data: ExampleRow): void {
-  db.run(EXAMPLE_QUERIES.INSERT, [
-   data.id,
-   data.name,
-   data.createdAt,
-  ]);
+  db.run(EXAMPLE_QUERIES.INSERT, [data.id, data.name, data.createdAt]);
   logger.debug(`[ExampleRepository] Created entity: ${data.id}`);
  }
 
@@ -154,6 +155,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  const examples = await repo.findAll();
   *  ```;
   *
@@ -173,6 +175,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  const example = await repo.findById("123");
   *  ```;
   *
@@ -198,6 +201,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  await repo.update("123", { name: "Updated Name" });
   *  ```;
   *
@@ -253,6 +257,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  await repo.deleteById("123");
   *  ```;
   *
@@ -293,6 +298,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  await repo.deleteAll();
   *  ```;
   *
@@ -313,7 +319,10 @@ export class ExampleRepository {
   * Deletes all entity records within an existing transaction context.
   *
   * @remarks
-  *   - Must be called within an active transaction context.
+  *   -
+  *
+  *   Must be called within an active transaction context.
+  *
   *   - This operation is destructive and irreversible.
   *
   * @param db - Database connection (must be within active transaction).
@@ -328,6 +337,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *  await repo.bulkInsert([record1, record2, record3]);
   *  ```;
   *
@@ -354,7 +364,10 @@ export class ExampleRepository {
   * Bulk inserts multiple entity records within an existing transaction context.
   *
   * @remarks
-  *   - Must be called within an active transaction context.
+  *   -
+  *
+  *   Must be called within an active transaction context.
+  *
   *   - Uses prepared statements for performance.
   *
   * @param db - The database connection (must be within an active transaction).
@@ -365,11 +378,7 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([
-     record.id,
-     record.name,
-     record.createdAt,
-    ]);
+    stmt.run([record.id, record.name, record.createdAt]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} entity records (internal)`

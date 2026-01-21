@@ -11,14 +11,42 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
+import type { StatusUpdate } from "@shared/types";
 
 import {
     MONITORING_CHANNELS,
     type MonitoringDomainBridge,
 } from "@shared/types/preload";
+import { validateStatusUpdate } from "@shared/validation/guards";
+import {
+    validateMonitoringStartSummary,
+    validateMonitoringStopSummary,
+} from "@shared/validation/monitoringSummarySchemas";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import {
+    createSafeParseAdapter,
+    createValidatedInvoker,
+    safeParseBooleanResult,
+    type SafeParseLike,
+} from "../core/bridgeFactory";
+
+const safeParseStatusUpdate = createSafeParseAdapter(validateStatusUpdate);
+
+function safeParseOptionalStatusUpdate(
+    candidate: unknown
+): SafeParseLike<StatusUpdate | undefined> {
+    if (candidate === undefined) {
+        return { data: undefined, success: true };
+    }
+
+    const parsed = safeParseStatusUpdate(candidate);
+
+    if (!("error" in parsed)) {
+        return { data: parsed.data, success: true };
+    }
+
+    return { error: parsed.error, success: false };
+}
 
 /**
  * Interface defining the monitoring domain API operations.
@@ -88,7 +116,14 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Performs an immediate check for a specific monitor
      */
-    checkSiteNow: createTypedInvoker(MONITORING_CHANNELS.checkSiteNow),
+    checkSiteNow: createValidatedInvoker(
+        MONITORING_CHANNELS.checkSiteNow,
+        safeParseOptionalStatusUpdate,
+        {
+            domain: "monitoringApi",
+            guardName: "safeParseOptionalStatusUpdate",
+        }
+    ),
 
     /**
      * Starts the global monitoring system
@@ -96,7 +131,14 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to the lifecycle summary emitted by the
      *   backend.
      */
-    startMonitoring: createTypedInvoker(MONITORING_CHANNELS.startMonitoring),
+    startMonitoring: createValidatedInvoker(
+        MONITORING_CHANNELS.startMonitoring,
+        validateMonitoringStartSummary,
+        {
+            domain: "monitoringApi",
+            guardName: "validateMonitoringStartSummary",
+        }
+    ),
 
     /**
      * Starts monitoring for a specific monitor within a site
@@ -106,8 +148,13 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoringForMonitor: createTypedInvoker(
-        MONITORING_CHANNELS.startMonitoringForMonitor
+    startMonitoringForMonitor: createValidatedInvoker(
+        MONITORING_CHANNELS.startMonitoringForMonitor,
+        safeParseBooleanResult,
+        {
+            domain: "monitoringApi",
+            guardName: "safeParseBooleanResult",
+        }
     ),
 
     /**
@@ -117,8 +164,13 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoringForSite: createTypedInvoker(
-        MONITORING_CHANNELS.startMonitoringForSite
+    startMonitoringForSite: createValidatedInvoker(
+        MONITORING_CHANNELS.startMonitoringForSite,
+        safeParseBooleanResult,
+        {
+            domain: "monitoringApi",
+            guardName: "safeParseBooleanResult",
+        }
     ),
 
     /**
@@ -127,7 +179,14 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to the lifecycle summary emitted by the
      *   backend.
      */
-    stopMonitoring: createTypedInvoker(MONITORING_CHANNELS.stopMonitoring),
+    stopMonitoring: createValidatedInvoker(
+        MONITORING_CHANNELS.stopMonitoring,
+        validateMonitoringStopSummary,
+        {
+            domain: "monitoringApi",
+            guardName: "validateMonitoringStopSummary",
+        }
+    ),
 
     /**
      * Stops monitoring for a specific monitor within a site
@@ -137,8 +196,13 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoringForMonitor: createTypedInvoker(
-        MONITORING_CHANNELS.stopMonitoringForMonitor
+    stopMonitoringForMonitor: createValidatedInvoker(
+        MONITORING_CHANNELS.stopMonitoringForMonitor,
+        safeParseBooleanResult,
+        {
+            domain: "monitoringApi",
+            guardName: "safeParseBooleanResult",
+        }
     ),
 
     /**
@@ -148,8 +212,13 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoringForSite: createTypedInvoker(
-        MONITORING_CHANNELS.stopMonitoringForSite
+    stopMonitoringForSite: createValidatedInvoker(
+        MONITORING_CHANNELS.stopMonitoringForSite,
+        safeParseBooleanResult,
+        {
+            domain: "monitoringApi",
+            guardName: "safeParseBooleanResult",
+        }
     ),
 } as const;
 
@@ -159,5 +228,3 @@ export const monitoringApi: MonitoringApiInterface = {
  * @public
  */
 export type MonitoringApi = MonitoringApiInterface;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

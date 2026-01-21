@@ -79,6 +79,40 @@ export class MonitorOperationRegistry {
     >();
 
     /**
+     * Returns whether the registry currently tracks any outstanding operation
+     * for the given monitor.
+     *
+     * @remarks
+     * This is used by correlated/scheduled checks to enforce a single-flight
+     * policy per monitor. The check intentionally treats aborted-but-not-yet-
+     * cleaned-up operations as outstanding so that we do not start additional
+     * work while the previous check is still unwinding.
+     */
+    public hasOutstandingOperation(monitorId: string): boolean {
+        for (const operation of this.activeOperations.values()) {
+            if (operation.monitorId === monitorId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the operation IDs currently associated with the provided monitor.
+     */
+    public getOutstandingOperationIds(monitorId: string): string[] {
+        const ids: string[] = [];
+        for (const [operationId, operation] of this.activeOperations) {
+            if (operation.monitorId === monitorId) {
+                ids.push(operationId);
+            }
+        }
+
+        return ids;
+    }
+
+    /**
      * Cancel all operations for a specific monitor.
      *
      * @param monitorId - ID of monitor to cancel operations for

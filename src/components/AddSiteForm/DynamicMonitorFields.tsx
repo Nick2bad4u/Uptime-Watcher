@@ -4,7 +4,10 @@
  * form fields.
  *
  * @remarks
- * - Loads monitor field definitions from the backend using the monitor type.
+ * -
+ *
+ * Loads monitor field definitions from the backend using the monitor type.
+ *
  * - Eliminates hard-coded form field rendering.
  * - Handles loading and error states for monitor type configuration.
  * - Each field is rendered dynamically based on its definition.
@@ -59,8 +62,11 @@ export interface DynamicMonitorFieldsProperties {
  * from backend.
  *
  * @remarks
- * - Fetches monitor type configuration using `getMonitorTypeConfig` from
- *   `monitorTypeHelper`.
+ * -
+ *
+ * Fetches monitor type configuration using `getMonitorTypeConfig` from
+ * `monitorTypeHelper`.
+ *
  * - Displays loading and error states as appropriate.
  * - For each field in the configuration, renders a {@link DynamicField}.
  * - If a field's onChange handler is missing, logs an error.
@@ -95,14 +101,23 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
         type MonitorTypesStoreState = ReturnType<
             typeof useMonitorTypesStore.getState
         >;
-        const selectIsLoaded = useCallback((state: MonitorTypesStoreState): boolean =>
-            state.isLoaded, []);
-        const selectLoadMonitorTypes = useCallback((
-            state: MonitorTypesStoreState
-        ): MonitorTypesStoreState["loadMonitorTypes"] => state.loadMonitorTypes, []);
-        const selectMonitorTypes = useCallback((
-            state: MonitorTypesStoreState
-        ): MonitorTypesStoreState["monitorTypes"] => state.monitorTypes, []);
+        const selectIsLoaded = useCallback(
+            (state: MonitorTypesStoreState): boolean => state.isLoaded,
+            []
+        );
+        const selectLoadMonitorTypes = useCallback(
+            (
+                state: MonitorTypesStoreState
+            ): MonitorTypesStoreState["loadMonitorTypes"] =>
+                state.loadMonitorTypes,
+            []
+        );
+        const selectMonitorTypes = useCallback(
+            (
+                state: MonitorTypesStoreState
+            ): MonitorTypesStoreState["monitorTypes"] => state.monitorTypes,
+            []
+        );
 
         const isLoaded = useMonitorTypesStore(selectIsLoaded);
         const loadMonitorTypes = useMonitorTypesStore(selectLoadMonitorTypes);
@@ -118,11 +133,7 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
                     void loadMonitorTypes();
                 }
             },
-            [
-                isLoaded,
-                loadMonitorTypes,
-                monitorTypesError,
-            ]
+            [isLoaded, loadMonitorTypes, monitorTypesError]
         );
 
         // Memoized default onChange handler to prevent new function creation on

@@ -29,7 +29,7 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/tsconfig.js.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.js.tsbuildinfo"
     },
     "exclude": [
         "../../electron/**/*.test.ts",

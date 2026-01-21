@@ -38,6 +38,8 @@
     ],
     "extends": "./tsconfig.json",
     "include": [
+        "**/*.d.ts",
+        "*.d.ts",
         "**/*.js",
         "**/*.mjs",
         "**/*.cjs",

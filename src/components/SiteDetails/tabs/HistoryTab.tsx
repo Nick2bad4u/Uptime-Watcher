@@ -35,7 +35,15 @@ import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+    memo,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -236,10 +244,13 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         selectedMonitor,
     }: HistoryTabProperties): JSX.Element {
         type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
-        const selectHistoryLimit = useCallback((
-            state: SettingsStoreState
-        ): SettingsStoreState["settings"]["historyLimit"] =>
-            state.settings.historyLimit, []);
+        const selectHistoryLimit = useCallback(
+            (
+                state: SettingsStoreState
+            ): SettingsStoreState["settings"]["historyLimit"] =>
+                state.settings.historyLimit,
+            []
+        );
 
         const historyLimitSetting = useSettingsStore(selectHistoryLimit);
         const historyDensity = useUIStore(selectSurfaceDensity);
@@ -255,13 +266,6 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             historyLimitSetting,
             historyLength
         );
-
-        // Track the last monitor ID and type we logged for to prevent duplicate
-        // logging
-        const lastLoggedMonitorRef = useRef<null | {
-            id: string;
-            type: string;
-        }>(null);
 
         // Icon colors configuration
         const getIconColors = (): {
@@ -334,34 +338,32 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 ? historyLimit
                 : Math.min(10, Math.max(1, historyLength));
 
-        // Log when history tab is viewed - only when monitor actually changes
-        useEffect(
-            function logHistoryTabViewed() {
-                const currentMonitor = {
-                    id: selectedMonitor.id,
-                    type: selectedMonitor.type,
-                };
-                const lastLogged = lastLoggedMonitorRef.current;
+        const selectedMonitorHistoryLengthRef = useRef<number>(
+            selectedMonitor.history.length
+        );
 
-                // Only log if monitor ID or type has changed (not just history
-                // length)
-                if (
-                    lastLogged?.id !== currentMonitor.id ||
-                    lastLogged.type !== currentMonitor.type
-                ) {
-                    logger.user.action("History tab viewed", {
-                        monitorId: selectedMonitor.id,
-                        monitorType: selectedMonitor.type,
-                        totalRecords: selectedMonitor.history.length,
-                    });
-                    lastLoggedMonitorRef.current = currentMonitor;
-                }
+        useLayoutEffect(
+            function syncSelectedMonitorHistoryLengthRef() {
+                selectedMonitorHistoryLengthRef.current =
+                    selectedMonitor.history.length;
             },
             [
                 selectedMonitor.history.length,
                 selectedMonitor.id,
                 selectedMonitor.type,
             ]
+        );
+
+        // Log when history tab is viewed - only when monitor actually changes
+        useEffect(
+            function logHistoryTabViewed() {
+                logger.user.action("History tab viewed", {
+                    monitorId: selectedMonitor.id,
+                    monitorType: selectedMonitor.type,
+                    totalRecords: selectedMonitorHistoryLengthRef.current,
+                });
+            },
+            [selectedMonitor.id, selectedMonitor.type]
         );
 
         const recordIndexByTimestamp = useMemo(() => {
@@ -381,7 +383,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                             record.status === historyFilter
                     )
                     .slice(0, safeHistoryLimit),
-            [historyFilter, safeHistoryLimit, selectedMonitor.history]
+            [
+                historyFilter,
+                safeHistoryLimit,
+                selectedMonitor.history,
+            ]
         );
 
         // Helper to render details with label using dynamic formatting
@@ -395,10 +401,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 statusCode === null ? null : getHttpStatusIcon(statusCode);
 
             const statusIconNode = StatusCodeIcon ? (
-                <StatusCodeIcon
-                    aria-hidden="true"
-                    className="h-4 w-4"
-                />
+                <StatusCodeIcon aria-hidden="true" className="size-4" />
             ) : null;
 
             return (
@@ -491,23 +494,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
             return {
                 comfortable: (
-                    <ComfortableDensityIcon
-                        aria-hidden
-                        className="h-4 w-4"
-                    />
+                    <ComfortableDensityIcon aria-hidden className="size-4" />
                 ),
-                compact: (
-                    <CompactDensityIcon
-                        aria-hidden
-                        className="h-4 w-4"
-                    />
-                ),
-                cozy: (
-                    <CozyDensityIcon
-                        aria-hidden
-                        className="h-4 w-4"
-                    />
-                ),
+                compact: <CompactDensityIcon aria-hidden className="size-4" />,
+                cozy: <CozyDensityIcon aria-hidden className="size-4" />,
             } satisfies Record<InterfaceDensity, ReactElement>;
         }, []);
 
@@ -529,7 +519,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                         </ThemedButton>
                     );
                 }),
-            [createDensityHandler, densityIconNodes, historyDensity]
+            [
+                createDensityHandler,
+                densityIconNodes,
+                historyDensity,
+            ]
         );
 
         const historyTabClassName = `space-y-6 history-tab history-tab--${historyDensity} density--${historyDensity}`;

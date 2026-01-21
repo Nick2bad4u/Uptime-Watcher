@@ -18,7 +18,10 @@ const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
 const SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH = 32;
 
-/** Fallback placeholder when a user-supplied URL cannot be safely represented in logs. */
+/**
+ * Fallback placeholder when a user-supplied URL cannot be safely represented in
+ * logs.
+ */
 const FALLBACK_SAFE_URL_FOR_LOGGING = "[redacted]";
 
 /**
@@ -68,7 +71,10 @@ function getRedactedPathname(pathname: string): string {
  * Removes sensitive URL parts so log lines don't leak credentials or tokens.
  *
  * @remarks
- * - Strips username/password.
+ * -
+ *
+ * Strips username/password.
+ *
  * - Strips query string and hash.
  * - Leaves scheme/host/path for diagnostics.
  */
@@ -127,14 +133,14 @@ function hasSpaceBeforeQueryOrHash(url: string): boolean {
 
 function isValidHttpUrlWithValidator(url: string): boolean {
     return validator.isURL(url, {
-        allow_protocol_relative_urls: false,
-        disallow_auth: true,
+        "allow_protocol_relative_urls": false,
+        "disallow_auth": true,
         protocols: ["http", "https"],
-        require_host: true,
-        require_protocol: true,
+        "require_host": true,
+        "require_protocol": true,
         // Allow localhost-style hosts. We intentionally do *not* block
         // private-network hosts for external opening.
-        require_tld: false,
+        "require_tld": false,
     });
 }
 
@@ -607,8 +613,8 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
  * Returns a sanitized HTTP(S) URL safe to send to third-party services.
  *
  * @remarks
- * This is stricter than {@link getSafeUrlForLogging} because the output must
- * be a *valid* URL that a third-party can request.
+ * This is stricter than {@link getSafeUrlForLogging} because the output must be
+ * a _valid_ URL that a third-party can request.
  *
  * - Allows only `http:` and `https:`.
  * - Rejects credentials.

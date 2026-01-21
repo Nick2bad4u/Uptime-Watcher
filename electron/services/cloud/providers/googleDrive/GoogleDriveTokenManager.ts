@@ -135,11 +135,16 @@ export class GoogleDriveTokenManager {
                         : oauthError.error;
                     const sanitized = normalizeLogValue(details);
                     const safeDetails =
-                        typeof sanitized === "string" ? sanitized : oauthError.error;
+                        typeof sanitized === "string"
+                            ? sanitized
+                            : oauthError.error;
 
-                    throw new Error(`Google OAuth refresh failed: ${safeDetails}`, {
-                        cause: error,
-                    });
+                    throw new Error(
+                        `Google OAuth refresh failed: ${safeDetails}`,
+                        {
+                            cause: error,
+                        }
+                    );
                 }
             }
 

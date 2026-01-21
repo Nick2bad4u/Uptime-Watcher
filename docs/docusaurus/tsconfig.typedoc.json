@@ -5,7 +5,7 @@
         "allowSyntheticDefaultImports": true,
         "checkJs": false,
         "declaration": true,
-        "declarationDir": ".cache/builds/docusaurus/typedoc/types",
+        "declarationDir": "../../.cache/builds/docusaurus/typedoc/types",
         "declarationMap": true,
         "emitDeclarationOnly": true,
         "esModuleInterop": true,
@@ -43,7 +43,7 @@
         "sourceMap": true,
         "strict": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "../../.cache/typedoc.tsbuildinfo",
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.docusaurus.typedoc.tsbuildinfo",
         "types": ["vite/client"]
     },
     "exclude": [

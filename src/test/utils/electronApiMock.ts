@@ -121,7 +121,10 @@ export const installElectronApiMock = (
         });
 
         const currentWindowRef = Reflect.get(globalThis, "window");
-        if (currentWindowRef !== undefined && typeof currentWindowRef === "object") {
+        if (
+            currentWindowRef !== undefined &&
+            typeof currentWindowRef === "object"
+        ) {
             Object.defineProperty(currentWindowRef as object, "electronAPI", {
                 configurable: true,
                 writable: true,
@@ -130,7 +133,6 @@ export const installElectronApiMock = (
         }
 
         if (createdWindow) {
-
             delete (globalThis as Record<string, unknown>)["window"];
         }
     };

@@ -23,7 +23,7 @@ export interface CloudProviderOperationErrorOptions extends ErrorOptions {
     /**
      * Optional Node-style error code to preserve errno semantics.
      *
-     * @example "ENOENT", "EEXIST"
+     * @example ENOENT , "EEXIST"
      */
     readonly code?: NodeJS.ErrnoException["code"] | undefined;
 

@@ -91,16 +91,48 @@ import { handlePingCheckError } from "./pingErrorHandling";
  */
 export async function performSinglePingCheck(
     host: string,
-    timeout: number
+    timeout: number,
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
+    if (signal?.aborted) {
+        throw new Error("Operation was aborted");
+    }
+
     try {
         // Determine check type based on host format
         const isHttpUrl = isValidUrl(host);
 
         // Use native connectivity check instead of ping package
-        return isHttpUrl
-            ? await checkHttpConnectivity(host, timeout)
+        if (isHttpUrl) {
+            const result = signal
+                ? await checkHttpConnectivity(host, timeout, signal)
+                : await checkHttpConnectivity(host, timeout);
+
+            // `withOperationalHooks` only retries when an operation throws.
+            // For ping connectivity checks, non-up statuses should be treated as
+            // failures to enable retry/backoff behavior.
+            if (result.status !== "up") {
+                throw new Error(
+                    result.error ??
+                        result.details ??
+                        "Connectivity check failed"
+                );
+            }
+
+            return result;
+        }
+
+        const result = signal
+            ? await checkConnectivity(host, { retries: 0, timeout }, signal)
             : await checkConnectivity(host, { retries: 0, timeout });
+
+        if (result.status !== "up") {
+            throw new Error(
+                result.error ?? result.details ?? "Connectivity check failed"
+            );
+        }
+
+        return result;
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
 
@@ -168,7 +200,8 @@ export async function performSinglePingCheck(
 export async function performPingCheckWithRetry(
     host: string,
     timeout: number,
-    maxRetries: number
+    maxRetries: number,
+    signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const normalizedRetries =
         typeof maxRetries === "number" && Number.isFinite(maxRetries)
@@ -191,11 +224,12 @@ export async function performPingCheckWithRetry(
 
     try {
         return await withOperationalHooks(
-            async () => performSinglePingCheck(host, timeout),
+            async () => performSinglePingCheck(host, timeout, signal),
             {
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                 maxRetries: totalAttempts,
                 operationName: "connectivity-check",
+                ...(signal ? { signal } : {}),
             }
         );
     } catch (error) {

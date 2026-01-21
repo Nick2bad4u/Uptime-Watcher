@@ -25,8 +25,10 @@ export const SiteSettingsHelpText = ({
     tone = "info",
 }: SiteSettingsHelpTextProps): ReactElement => {
     const Icon = icon ?? AppIcons.ui.info;
-    const toneClassName = tone === "warning" ? "site-settings-help--warning" : "";
-    const resolvedClassName = `site-settings-help ${toneClassName} ${className ?? ""}`.trim();
+    const toneClassName =
+        tone === "warning" ? "site-settings-help--warning" : "";
+    const resolvedClassName =
+        `site-settings-help ${toneClassName} ${className ?? ""}`.trim();
 
     return (
         <div className={resolvedClassName}>

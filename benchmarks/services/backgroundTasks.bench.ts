@@ -1,9 +1,9 @@
 /**
  * Background Task Service Performance Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Models
  *
- * Models queuing, scheduling, and retry workflows to measure background task
+ * queuing, scheduling, and retry workflows to measure background task
  * orchestration costs.
  */
 

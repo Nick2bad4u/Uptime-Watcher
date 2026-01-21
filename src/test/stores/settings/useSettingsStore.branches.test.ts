@@ -106,9 +106,12 @@ describe("useSettingsStore Branch Coverage Tests", () => {
         // Reset all mocks
         vi.clearAllMocks();
 
-        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
-            ensureWindow: true,
-        }));
+        ({ restore: restoreElectronApi } = installElectronApiMock(
+            mockElectronAPI,
+            {
+                ensureWindow: true,
+            }
+        ));
 
         mockWaitForElectronBridge.mockResolvedValue(undefined);
 

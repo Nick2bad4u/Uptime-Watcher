@@ -75,10 +75,10 @@ const useSitesStoreMockRef = vi.hoisted(() => ({
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", async () => {
-    const { createSelectorHookMock } = await import(
-        "../../utils/createSelectorHookMock"
-    );
-    const { createSitesStoreMock } = await import("../../utils/createSitesStoreMock");
+    const { createSelectorHookMock } =
+        await import("../../utils/createSelectorHookMock");
+    const { createSitesStoreMock } =
+        await import("../../utils/createSitesStoreMock");
 
     useSitesStoreMockRef.current = createSelectorHookMock(
         createSitesStoreMock({ sites: [] })

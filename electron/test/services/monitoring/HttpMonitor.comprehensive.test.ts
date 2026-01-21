@@ -59,7 +59,7 @@ vi.mock("../../../services/monitoring/utils/httpClient", () => ({
     createHttpClient: vi.fn(),
 }));
 
-vi.mock("../../../services/monitoring/utils/httpStatusUtils", () => ({
+vi.mock("@shared/utils/httpStatusUtils", () => ({
     determineMonitorStatus: vi.fn(),
 }));
 
@@ -509,7 +509,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { determineMonitorStatus } = vi.mocked(
-                await import("../../../services/monitoring/utils/httpStatusUtils")
+                await import("@shared/utils/httpStatusUtils")
             );
 
             const mockResponse: AxiosResponse = {
@@ -554,7 +554,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { determineMonitorStatus } = vi.mocked(
-                await import("../../../services/monitoring/utils/httpStatusUtils")
+                await import("@shared/utils/httpStatusUtils")
             );
 
             const mockResponse: AxiosResponse = {
@@ -586,7 +586,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const { determineMonitorStatus } = vi.mocked(
-                await import("../../../services/monitoring/utils/httpStatusUtils")
+                await import("@shared/utils/httpStatusUtils")
             );
 
             const mockResponse: AxiosResponse = {
@@ -628,7 +628,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
             const { determineMonitorStatus } = vi.mocked(
-                await import("../../../services/monitoring/utils/httpStatusUtils")
+                await import("@shared/utils/httpStatusUtils")
             );
             const { interpolateLogTemplate, LOG_TEMPLATES } = vi.mocked(
                 await import("@shared/utils/logTemplates")
@@ -680,7 +680,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const { isDev } = vi.mocked(await import("../../../electronUtils"));
             const { logger } = vi.mocked(await import("../../../utils/logger"));
             const { determineMonitorStatus } = vi.mocked(
-                await import("../../../services/monitoring/utils/httpStatusUtils")
+                await import("@shared/utils/httpStatusUtils")
             );
 
             isDev.mockReturnValue(false);
@@ -722,7 +722,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 await import("../../../utils/operationalHooks")
             );
             const { determineMonitorStatus } = vi.mocked(
-                await import("../../../services/monitoring/utils/httpStatusUtils")
+                await import("@shared/utils/httpStatusUtils")
             );
 
             validateMonitorUrl.mockReturnValue(null);

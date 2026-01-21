@@ -150,7 +150,8 @@ export class PingMonitor implements IMonitorService {
      * @see {@link performPingCheckWithRetry} - Core ping functionality
      */
     public async check(
-        monitor: Site["monitors"][0]
+        monitor: Site["monitors"][0],
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         if (monitor.type !== "ping") {
             throw new Error(
@@ -176,7 +177,7 @@ export class PingMonitor implements IMonitorService {
             timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
         });
 
-        return performPingCheckWithRetry(host, timeout, retryAttempts);
+        return performPingCheckWithRetry(host, timeout, retryAttempts, signal);
     }
 
     /**

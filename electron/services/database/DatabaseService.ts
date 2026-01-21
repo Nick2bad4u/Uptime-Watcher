@@ -7,6 +7,7 @@
  * database operations.
  */
 
+import { sleep } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isSqliteLockedError } from "@shared/utils/sqliteErrors";
@@ -43,6 +44,15 @@ const DATABASE_INITIALIZATION_MAX_ATTEMPTS = 3;
 /** Busy timeout (in milliseconds) applied to the SQLite connection. */
 const DATABASE_BUSY_TIMEOUT_MS = 5000;
 
+/** Maximum number of transaction attempts when SQLite reports BUSY/LOCKED. */
+const TRANSACTION_MAX_ATTEMPTS = 3;
+
+/** Base delay between transaction retry attempts (milliseconds). */
+const TRANSACTION_RETRY_INITIAL_DELAY_MS = 50;
+
+/** Maximum delay between transaction retries (milliseconds). */
+const TRANSACTION_RETRY_MAX_DELAY_MS = 750;
+
 /**
  * @remarks
  * Provides a singleton interface for low-level database operations:
@@ -77,8 +87,8 @@ const DATABASE_BUSY_TIMEOUT_MS = 5000;
  * const db = dbService.getDatabase();
  * ```
  *
- * @public
- * Core database service for SQLite connection and schema management.
+ * @public Core
+ * database service for SQLite connection and schema management.
  */
 export class DatabaseService {
     /** Singleton instance of the database service */
@@ -183,49 +193,73 @@ export class DatabaseService {
             }
         }
 
-        try {
-            db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
-            logger.debug("[DatabaseService] Started new transaction");
-
-            // Execute operation, then commit and return in one expression
-            // This ensures operation completes before commit, fixing the race condition
-            return await operation(db).then((result) => {
-                db.run(DATABASE_SERVICE_QUERIES.COMMIT);
-                logger.debug(
-                    "[DatabaseService] Successfully committed transaction"
-                );
-                return result;
-            });
-        } catch (error) {
-            const normalizedError = ensureError(error);
-            // Enhanced error logging to understand what's causing transaction failures
-            logger.error(
-                "[DatabaseService] Transaction operation failed",
-                normalizedError
-            );
-
-            // Only attempt rollback if a transaction is actually active
-            // This prevents "cannot rollback - no transaction is active" errors
+        const attemptTransaction = async (attempt: number): Promise<T> => {
             try {
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- node-sqlite3-wasm.Database.inTransaction is a valid runtime property
-                if (db.inTransaction) {
-                    db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
+                db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
+                logger.debug("[DatabaseService] Started new transaction");
+
+                // Execute operation, then commit and return in one expression
+                // This ensures operation completes before commit.
+                return await operation(db).then((result) => {
+                    db.run(DATABASE_SERVICE_QUERIES.COMMIT);
                     logger.debug(
-                        "[DatabaseService] Successfully rolled back transaction"
+                        "[DatabaseService] Successfully committed transaction"
+                    );
+                    return result;
+                });
+            } catch (error) {
+                const normalizedError = ensureError(error);
+                const canRetry =
+                    attempt < TRANSACTION_MAX_ATTEMPTS &&
+                    isSqliteLockedError(normalizedError);
+
+                if (canRetry) {
+                    logger.warn(
+                        `[DatabaseService] Transaction encountered SQLITE_BUSY/SQLITE_LOCKED; rolling back and retrying (attempt ${attempt}/${TRANSACTION_MAX_ATTEMPTS})`,
+                        normalizedError
                     );
                 } else {
-                    logger.debug(
-                        "[DatabaseService] No active transaction to rollback (transaction was already rolled back by SQLite)"
+                    // Enhanced error logging to understand what's causing transaction failures
+                    logger.error(
+                        "[DatabaseService] Transaction operation failed",
+                        normalizedError
                     );
                 }
-            } catch (rollbackError) {
-                logger.error(
-                    "[DatabaseService] Failed to rollback active transaction",
-                    ensureError(rollbackError)
+
+                // Only attempt rollback if a transaction is actually active.
+                // This prevents "cannot rollback - no transaction is active" errors.
+                try {
+                    if (db.inTransaction) {
+                        db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
+                        logger.debug(
+                            "[DatabaseService] Successfully rolled back transaction"
+                        );
+                    } else {
+                        logger.debug(
+                            "[DatabaseService] No active transaction to rollback (transaction was already rolled back by SQLite)"
+                        );
+                    }
+                } catch (rollbackError) {
+                    logger.error(
+                        "[DatabaseService] Failed to rollback active transaction",
+                        ensureError(rollbackError)
+                    );
+                }
+
+                if (!canRetry) {
+                    throw normalizedError;
+                }
+
+                const delay = Math.min(
+                    TRANSACTION_RETRY_INITIAL_DELAY_MS * 2 ** (attempt - 1),
+                    TRANSACTION_RETRY_MAX_DELAY_MS
                 );
+                await sleep(delay);
+                return attemptTransaction(attempt + 1);
             }
-            throw normalizedError;
-        }
+        };
+
+        return attemptTransaction(1);
     }
 
     /**
@@ -268,6 +302,7 @@ export class DatabaseService {
     public close(): void {
         if (this.db) {
             try {
+                this.applyShutdownPragmas(this.db);
                 // node-sqlite3-wasm completes all pending operations before
                 // closing
                 this.db.close();
@@ -283,6 +318,28 @@ export class DatabaseService {
             }
         }
         // Safe to call when already closed - no-op behavior
+    }
+
+    private applyShutdownPragmas(db: Database): void {
+        // These pragmas are best-effort cleanup actions.
+        // They should never prevent the app from shutting down.
+        try {
+            db.get("PRAGMA wal_checkpoint(TRUNCATE)");
+        } catch (error: unknown) {
+            logger.debug(
+                "[DatabaseService] WAL checkpoint(TRUNCATE) not available",
+                ensureError(error)
+            );
+        }
+
+        try {
+            db.get("PRAGMA optimize");
+        } catch (error: unknown) {
+            logger.debug(
+                "[DatabaseService] PRAGMA optimize not available",
+                ensureError(error)
+            );
+        }
     }
 
     /**

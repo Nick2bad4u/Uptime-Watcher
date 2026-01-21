@@ -116,7 +116,7 @@ export const FormField: NamedExoticComponent<FormFieldProperties> = memo(
                     >
                         <HelpIcon
                             aria-hidden="true"
-                            className="mt-0.5 h-4 w-4 shrink-0 opacity-70"
+                            className="mt-0.5 size-4 shrink-0 opacity-70"
                         />
                         <ThemedText
                             className="leading-snug"

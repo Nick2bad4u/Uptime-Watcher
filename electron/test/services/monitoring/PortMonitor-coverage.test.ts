@@ -379,7 +379,8 @@ describe("PortMonitor Coverage Tests", () => {
                 "example.com",
                 443,
                 5000,
-                3
+                3,
+                undefined
             );
             expect(result).toEqual(successResult);
         });
@@ -565,7 +566,8 @@ describe("PortMonitor Coverage Tests", () => {
                 "example.com",
                 443,
                 8000,
-                5
+                5,
+                undefined
             );
         });
 
@@ -618,7 +620,7 @@ describe("PortMonitor Coverage Tests", () => {
 
                 expect(
                     vi.mocked(performPortCheckWithRetry)
-                ).toHaveBeenCalledWith(host, 443, 5000, 3);
+                ).toHaveBeenCalledWith(host, 443, 5000, 3, undefined);
             }
         });
 
@@ -653,7 +655,7 @@ describe("PortMonitor Coverage Tests", () => {
 
                 expect(
                     vi.mocked(performPortCheckWithRetry)
-                ).toHaveBeenCalledWith("example.com", port, 5000, 3);
+                ).toHaveBeenCalledWith("example.com", port, 5000, 3, undefined);
             }
         });
 

@@ -73,7 +73,10 @@ export interface DatabaseRestoreSummary {
  * Mode used for SQLite file integrity checks.
  *
  * @remarks
- * - `quick_check` is faster and should be used for most validation.
+ * -
+ *
+ * `quick_check` is faster and should be used for most validation.
+ *
  * - `integrity_check` is more thorough but can be slower on large databases.
  */
 export type SqliteIntegrityCheckMode = "integrity_check" | "quick_check";
@@ -108,9 +111,7 @@ export function readDatabaseSchemaVersionFromFile(filePath: string): number {
         const result: unknown = database.prepare("PRAGMA user_version").get();
 
         if (result && typeof result === "object" && "user_version" in result) {
-            const version = (result as UnknownRecord)[
-                "user_version"
-            ];
+            const version = (result as UnknownRecord)["user_version"];
             if (typeof version === "number") {
                 return version;
             }
@@ -157,7 +158,8 @@ export function assertSqliteDatabaseIntegrity(args: {
     readonly mode?: SqliteIntegrityCheckMode;
 }): void {
     const mode = args.mode ?? "quick_check";
-    const pragma = mode === "integrity_check" ? "integrity_check" : "quick_check";
+    const pragma =
+        mode === "integrity_check" ? "integrity_check" : "quick_check";
     const statement = `PRAGMA ${pragma}`;
 
     const database = new sqlite3.Database(args.filePath, {

@@ -458,12 +458,9 @@ describe(HistoryRepository, () => {
             await annotate("Type: Configuration", "type");
 
             const limit = 100;
-            const mockMonitors = [{ id: 1 }, { id: 2 }];
-            const mockExcessEntries = [{ id: 10 }, { id: 11 }];
+            const mockMonitors = [{ id: "monitor-1" }, { id: "monitor-2" }];
 
-            vi.mocked(mockDatabase.all)
-                .mockReturnValueOnce(mockMonitors)
-                .mockReturnValue(mockExcessEntries);
+            vi.mocked(mockDatabase.all).mockReturnValue(mockMonitors);
 
             await historyRepository.pruneAllHistory(limit);
 
@@ -474,10 +471,13 @@ describe(HistoryRepository, () => {
                 "SELECT id FROM monitors",
                 undefined
             );
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "DELETE FROM history WHERE id IN (?,?)",
-                [10, 11]
-            );
+
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-1", limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-2", limit);
         });
         it("should not prune with zero limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -513,15 +513,13 @@ describe(HistoryRepository, () => {
             await annotate("Type: Business Logic", "type");
 
             const limit = 100;
-            const mockMonitors = [{ id: 1 }];
-
-            vi.mocked(mockDatabase.all)
-                .mockReturnValueOnce(mockMonitors)
-                .mockReturnValue([]);
+            vi.mocked(mockDatabase.all).mockReturnValue([]);
 
             await historyRepository.pruneAllHistory(limit);
 
-            expect(mockDatabase.run).not.toHaveBeenCalled();
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).not.toHaveBeenCalled();
         });
         it("should filter invalid IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -530,24 +528,27 @@ describe(HistoryRepository, () => {
             await annotate("Type: Business Logic", "type");
 
             const limit = 100;
-            const mockMonitors = [{ id: 1 }];
-            const mockExcessEntries = [
-                { id: 10 },
-                { id: "invalid" },
+
+            const mockMonitors = [
+                { id: "monitor-1" },
+                { id: "" },
                 { id: null },
-                { id: 12 },
+                { id: "monitor-2" },
             ];
 
-            vi.mocked(mockDatabase.all)
-                .mockReturnValueOnce(mockMonitors)
-                .mockReturnValue(mockExcessEntries);
+            vi.mocked(mockDatabase.all).mockReturnValue(mockMonitors);
 
             await historyRepository.pruneAllHistory(limit);
 
-            expect(mockDatabase.run).toHaveBeenCalledWith(
-                "DELETE FROM history WHERE id IN (?,?)",
-                [10, 12]
-            );
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-1", limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-2", limit);
+            expect(
+                historyManipulation.pruneHistoryForMonitor
+            ).toHaveBeenCalledTimes(2);
         });
     });
     describe("pruneAllHistoryInternal", () => {
@@ -561,7 +562,7 @@ describe(HistoryRepository, () => {
             await annotate("Type: Business Logic", "type");
 
             const limit = 100;
-            const mockMonitors = [{ id: 1 }, { id: 2 }];
+            const mockMonitors = [{ id: "monitor-1" }, { id: "monitor-2" }];
 
             vi.mocked(mockDatabase.all).mockReturnValue(mockMonitors);
 
@@ -573,10 +574,10 @@ describe(HistoryRepository, () => {
             );
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).toHaveBeenCalledWith(mockDatabase, "1", limit);
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-1", limit);
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).toHaveBeenCalledWith(mockDatabase, "2", limit);
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-2", limit);
             expect(logger.logger.debug).toHaveBeenCalledWith(
                 "[HistoryRepository] Pruned history for all monitors (limit: 100) (internal)"
             );
@@ -599,10 +600,10 @@ describe(HistoryRepository, () => {
 
             const limit = 100;
             const mockMonitors = [
-                { id: 1 },
-                { id: "invalid" },
+                { id: "monitor-1" },
+                { id: "" },
                 { id: null },
-                { id: 3 },
+                { id: "monitor-3" },
             ];
 
             vi.mocked(mockDatabase.all).mockReturnValue(mockMonitors);
@@ -611,10 +612,10 @@ describe(HistoryRepository, () => {
 
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).toHaveBeenCalledWith(mockDatabase, "1", limit);
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-1", limit);
             expect(
                 historyManipulation.pruneHistoryForMonitor
-            ).toHaveBeenCalledWith(mockDatabase, "3", limit);
+            ).toHaveBeenCalledWith(mockDatabase, "monitor-3", limit);
             expect(
                 historyManipulation.pruneHistoryForMonitor
             ).toHaveBeenCalledTimes(2);

@@ -11,7 +11,10 @@ import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type { UnknownRecord } from "type-fest";
 
+import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
+import { generateCorrelationId } from "@shared/utils/correlation";
+import { validateVoidIpcResponse } from "@shared/utils/ipcResponse";
 import {
     buildErrorLogArguments,
     buildLogArguments,
@@ -289,7 +292,17 @@ export const reportPreloadGuardFailure = async (
     };
 
     try {
-        await ipcRenderer.invoke(DIAGNOSTICS_CHANNEL, payload);
+        const correlationId = generateCorrelationId();
+        const response: unknown = await ipcRenderer.invoke(
+            DIAGNOSTICS_CHANNEL,
+            payload,
+            createIpcCorrelationEnvelope(correlationId)
+        );
+
+        // Best-effort: validate that the main process returned a proper void
+        // response envelope. Failures are logged but never allowed to crash
+        // preload.
+        validateVoidIpcResponse(response);
     } catch (error) {
         preloadDiagnosticsLogger.warn(
             "[Diagnostics] Failed forwarding preload guard failure",

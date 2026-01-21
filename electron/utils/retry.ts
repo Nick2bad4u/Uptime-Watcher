@@ -3,9 +3,9 @@
  * operations.
  *
  * @remarks
- * Provides configurable retry logic with a fixed delay between attempts for robust error
- * handling in backend operations. Useful for dealing with temporary network
- * issues, database locks, or other transient failures.
+ * Provides configurable retry logic with a fixed delay between attempts for
+ * robust error handling in backend operations. Useful for dealing with
+ * temporary network issues, database locks, or other transient failures.
  *
  * @example
  *
@@ -26,7 +26,10 @@
  * @packageDocumentation
  */
 
-import { sleep } from "@shared/utils/abortUtils";
+import {
+    isRetryNonErrorThrownError,
+    withRetry as withRetryBase,
+} from "@shared/utils/retry";
 
 import { dbLogger } from "./logger";
 
@@ -57,7 +60,7 @@ export async function withRetry<T>(
     } = {}
 ): Promise<T> {
     const operationName = options.operationName ?? "operation";
-    const {onError} = options;
+    const { onError } = options;
 
     // Treat negative delays as 0 to avoid scheduling oddities.
     const delayMs = Math.max(0, options.delayMs ?? 300);
@@ -72,44 +75,40 @@ export async function withRetry<T>(
         );
     }
 
-    const errors: unknown[] = [];
-
-    for (const attempt of Array.from({ length: maxRetries }, (_, i) => i)) {
-        try {
-            // eslint-disable-next-line no-await-in-loop -- retry operations require sequential awaits
-            return await operation();
-        } catch (error) {
-            errors.push(error);
-
-            if (onError) {
-                try {
-                    onError(error, attempt + 1);
-                } catch (callbackError) {
+    try {
+        return await withRetryBase(operation, {
+            delayMs,
+            maxRetries,
+            onError: (error, attempt) => {
+                if (onError) {
+                    try {
+                        onError(error, attempt);
+                    } catch (callbackError) {
+                        dbLogger.error(
+                            `${operationName} onError callback threw (attempt ${attempt}/${maxRetries})`,
+                            callbackError
+                        );
+                    }
+                } else {
                     dbLogger.error(
-                        `${operationName} onError callback threw (attempt ${attempt + 1}/${maxRetries})`,
-                        callbackError
+                        `${operationName} failed (attempt ${attempt}/${maxRetries})`,
+                        error
                     );
                 }
-            } else {
-                dbLogger.error(
-                    `${operationName} failed (attempt ${attempt + 1}/${maxRetries})`,
-                    error
-                );
-            }
+            },
+            operationName,
+        });
+    } catch (error) {
+        const thrownValue = isRetryNonErrorThrownError(error)
+            ? error.cause
+            : error;
 
-            if (attempt < maxRetries - 1) {
-                // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
-                await sleep(delayMs);
-            }
-        }
+        dbLogger.error(
+            `Persistent failure after ${maxRetries} retries for ${operationName}`,
+            thrownValue
+        );
+        throw thrownValue;
     }
-
-    const lastError = errors.at(-1);
-    dbLogger.error(
-        `Persistent failure after ${maxRetries} retries for ${operationName}`,
-        lastError
-    );
-    throw lastError;
 }
 
 /**

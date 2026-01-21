@@ -46,19 +46,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AppSettings } from "../../stores/types";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
-import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
-import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { logger } from "../../services/logger";
-import { useErrorStore } from "../../stores/error/useErrorStore";
-import { useSettingsStore } from "../../stores/settings/useSettingsStore";
-import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedSlider } from "../../theme/components/ThemedSlider";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { isThemeName, type ThemeName } from "../../theme/types";
-import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
@@ -73,24 +67,8 @@ import {
     MonitoringSection,
     NotificationSection,
 } from "./SettingsSections";
+import { useSettingsModel } from "./useSettingsModel";
 import "./Settings.css";
-
-type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
-
-const selectSaveSqliteBackup = (
-    state: SitesStoreState
-): SitesStoreState["saveSqliteBackup"] => state.saveSqliteBackup;
-const selectRestoreSqliteBackup = (
-    state: SitesStoreState
-): SitesStoreState["restoreSqliteBackup"] => state.restoreSqliteBackup;
-
-const selectFullResyncSites = (
-    state: SitesStoreState
-): SitesStoreState["fullResyncSites"] => state.fullResyncSites;
-
-const selectLastBackupMetadata = (
-    state: SitesStoreState
-): SitesStoreState["lastBackupMetadata"] => state.lastBackupMetadata;
 
 const formatBackupSize = (bytes: number): string => {
     if (!Number.isFinite(bytes) || bytes < 0) {
@@ -167,54 +145,25 @@ export interface SettingsProperties {
 export const Settings = ({
     onClose,
 }: Readonly<SettingsProperties>): ReactElement => {
-    type ErrorStoreState = ReturnType<typeof useErrorStore.getState>;
-    type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
-
-    const selectClearError = useCallback((
-        state: ErrorStoreState
-    ): ErrorStoreState["clearError"] => state.clearError, []);
-    const selectIsLoading = useCallback((state: ErrorStoreState): boolean =>
-        state.isLoading, []);
-    const selectLastError = useCallback((
-        state: ErrorStoreState
-    ): ErrorStoreState["lastError"] => state.lastError, []);
-    const selectSetError = useCallback((
-        state: ErrorStoreState
-    ): ErrorStoreState["setError"] => state.setError, []);
-
-    const clearError = useErrorStore(selectClearError);
-    const isLoading = useErrorStore(selectIsLoading);
-    const lastError = useErrorStore(selectLastError);
-    const setError = useErrorStore(selectSetError);
-
-    const selectPersistHistoryLimit = useCallback((
-        state: SettingsStoreState
-    ): SettingsStoreState["persistHistoryLimit"] => state.persistHistoryLimit, []);
-    const selectResetSettings = useCallback((
-        state: SettingsStoreState
-    ): SettingsStoreState["resetSettings"] => state.resetSettings, []);
-    const selectSettings = useCallback((
-        state: SettingsStoreState
-    ): SettingsStoreState["settings"] => state.settings, []);
-    const selectUpdateSettings = useCallback((
-        state: SettingsStoreState
-    ): SettingsStoreState["updateSettings"] => state.updateSettings, []);
-
-    const persistHistoryLimit = useSettingsStore(selectPersistHistoryLimit);
-    const resetSettings = useSettingsStore(selectResetSettings);
-    const settings = useSettingsStore(selectSettings);
-    const updateSettings = useSettingsStore(selectUpdateSettings);
-    const saveSqliteBackup = useSitesStore(selectSaveSqliteBackup);
-    const restoreSqliteBackup = useSitesStore(selectRestoreSqliteBackup);
-    const lastBackupMetadata = useSitesStore(selectLastBackupMetadata);
-
-    const fullResyncSites = useSitesStore(selectFullResyncSites);
-    const requestConfirmation = useConfirmDialog();
-
-    const { availableThemes, isDark, setTheme } = useTheme();
-
-    // Delayed loading state for button spinners (managed by custom hook)
-    const showButtonLoading = useDelayedButtonLoading(isLoading);
+    const {
+        availableThemes,
+        clearError,
+        fullResyncSites,
+        isDark,
+        isLoading,
+        lastBackupMetadata,
+        lastError,
+        persistHistoryLimit,
+        requestConfirmation,
+        resetSettings,
+        restoreSqliteBackup,
+        saveSqliteBackup,
+        setError,
+        setTheme,
+        settings,
+        showButtonLoading,
+        updateSettings,
+    } = useSettingsModel();
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
@@ -790,9 +739,7 @@ export const Settings = ({
                 "Failed to sync data from backend",
                 ensureError(error)
             );
-            setError(
-                `Failed to sync data: ${getUserFacingErrorDetail(error)}`
-            );
+            setError(`Failed to sync data: ${getUserFacingErrorDetail(error)}`);
         }
     }, [fullResyncSites, setError]);
 
@@ -813,10 +760,7 @@ export const Settings = ({
                 sizeBytes: result.metadata.sizeBytes,
             });
         } catch (error: unknown) {
-            logger.error(
-                "Failed to save SQLite backup",
-                ensureError(error)
-            );
+            logger.error("Failed to save SQLite backup", ensureError(error));
             setError(
                 `Failed to save SQLite backup: ${getUserFacingErrorDetail(error)}`
             );

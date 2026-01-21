@@ -12,14 +12,14 @@ import {
     readNumberEnv,
 } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import {
+    getJsonByteLengthUpTo,
+    isJsonByteBudgetExceeded,
+} from "@shared/utils/jsonByteBudget";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 import type { WindowService } from "../window/WindowService";
 
-import {
-    getJsonByteLengthUpTo,
-    isJsonByteBudgetExceeded,
-} from "../../utils/jsonByteBudget";
 import { logger } from "../../utils/logger";
 
 const DEFAULT_MAX_STATE_SYNC_EVENT_BYTES = 1e7;
@@ -132,10 +132,7 @@ const compactStateSyncPayload = (
     // For update/delete events, only the delta contains site snapshots.
     return {
         ...payload,
-        delta: truncateDeltaHistory(
-            payload.delta,
-            maxHistoryEntriesPerMonitor
-        ),
+        delta: truncateDeltaHistory(payload.delta, maxHistoryEntriesPerMonitor),
     };
 };
 
@@ -184,9 +181,7 @@ interface StateSyncPayloadDiagnostics {
     readonly topMonitorsByHistorySummary: readonly string[];
 }
 
-function shouldLogStateSyncPayloadDiagnostics(
-    estimatedBytes: number
-): boolean {
+function shouldLogStateSyncPayloadDiagnostics(estimatedBytes: number): boolean {
     if (getNodeEnv() === "production") {
         return false;
     }
@@ -213,12 +208,19 @@ function shouldLogStateSyncPayloadDiagnostics(
 }
 
 function toStringPreview(value: string): string {
-    const preview = value.slice(0, STATE_SYNC_PAYLOAD_DIAGNOSTICS_STRING_PREVIEW_CHARS);
+    const preview = value.slice(
+        0,
+        STATE_SYNC_PAYLOAD_DIAGNOSTICS_STRING_PREVIEW_CHARS
+    );
     // Collapse whitespace/newlines for easier console pasting.
     return preview.replaceAll(/\s+/gu, " ").trim();
 }
 
-function recordTopN<T>(items: T[], next: T, compare: (a: T, b: T) => number): void {
+function recordTopN<T>(
+    items: T[],
+    next: T,
+    compare: (a: T, b: T) => number
+): void {
     items.push(next);
     items.sort(compare);
     if (items.length > STATE_SYNC_PAYLOAD_DIAGNOSTICS_TOP_COUNT) {
@@ -276,7 +278,7 @@ function buildStateSyncPayloadDiagnostics(
 
             let maxDetailsBytes = 0;
             for (const [historyIndex, entry] of history.entries()) {
-                const {details} = entry;
+                const { details } = entry;
                 if (typeof details === "string" && details.length > 0) {
                     const detailsBytes = getUtfByteLength(details);
                     if (detailsBytes > maxDetailsBytes) {
@@ -387,9 +389,11 @@ function buildStateSyncPayloadDiagnostics(
     return {
         deltaBytes,
         deltaCounts,
-        deltaHistoryEntries: delta === undefined ? undefined : deltaHistoryEntries,
+        deltaHistoryEntries:
+            delta === undefined ? undefined : deltaHistoryEntries,
         deltaMonitors: delta === undefined ? undefined : deltaMonitors,
-        deltaSiteSnapshots: delta === undefined ? undefined : deltaSiteSnapshots,
+        deltaSiteSnapshots:
+            delta === undefined ? undefined : deltaSiteSnapshots,
         estimatedBytes,
         hasDelta: delta !== undefined,
         maxBytes,
@@ -499,10 +503,7 @@ export class RendererEventBridge {
         payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC>
     ): void {
         const maxBytes = getMaxStateSyncEventBytes();
-        const estimatedBytes = getJsonByteLengthUpTo(
-            payload,
-            maxBytes + 1
-        );
+        const estimatedBytes = getJsonByteLengthUpTo(payload, maxBytes + 1);
 
         const diagnosticsEnabled =
             shouldLogStateSyncPayloadDiagnostics(estimatedBytes);
@@ -588,7 +589,8 @@ export class RendererEventBridge {
             > = {
                 action: "bulk-sync",
                 revision: payload.revision,
-                siteCount: payload.action === "bulk-sync" ? payload.siteCount : 0,
+                siteCount:
+                    payload.action === "bulk-sync" ? payload.siteCount : 0,
                 siteIdentifier: payload.siteIdentifier,
                 sites: [],
                 source: payload.source,

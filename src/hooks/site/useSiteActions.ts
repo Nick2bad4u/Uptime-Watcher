@@ -163,13 +163,14 @@ export function useSiteActions(
         }
 
         runLoggedSiteOperation({
-            onSuccess: () =>
-                { logger.user.action("Started site monitoring", {
+            onSuccess: () => {
+                logger.user.action("Started site monitoring", {
                     monitorId: monitor.id,
                     monitorType: monitor.type,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                }); },
+                });
+            },
             operation: () =>
                 startSiteMonitorMonitoring(site.identifier, monitor.id),
             siteIdentifier: site.identifier,
@@ -196,13 +197,14 @@ export function useSiteActions(
         }
 
         runLoggedSiteOperation({
-            onSuccess: () =>
-                { logger.user.action("Stopped site monitoring", {
+            onSuccess: () => {
+                logger.user.action("Stopped site monitoring", {
                     monitorId: monitor.id,
                     monitorType: monitor.type,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                }); },
+                });
+            },
             operation: () =>
                 stopSiteMonitorMonitoring(site.identifier, monitor.id),
             siteIdentifier: site.identifier,
@@ -217,12 +219,13 @@ export function useSiteActions(
     // Start monitoring for all monitors in the site with proper logging
     const handleStartSiteMonitoring = useCallback((): void => {
         runLoggedSiteOperation({
-            onSuccess: () =>
-                { logger.user.action("Started site-wide monitoring", {
+            onSuccess: () => {
+                logger.user.action("Started site-wide monitoring", {
                     monitorsCount: site.monitors.length,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                }); },
+                });
+            },
             operation: () => startSiteMonitoring(site.identifier),
             siteIdentifier: site.identifier,
         });
@@ -236,12 +239,13 @@ export function useSiteActions(
     // Stop monitoring for all monitors in the site with proper logging
     const handleStopSiteMonitoring = useCallback((): void => {
         runLoggedSiteOperation({
-            onSuccess: () =>
-                { logger.user.action("Stopped site-wide monitoring", {
+            onSuccess: () => {
+                logger.user.action("Stopped site-wide monitoring", {
                     monitorsCount: site.monitors.length,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
-                }); },
+                });
+            },
             operation: () => stopSiteMonitoring(site.identifier),
             siteIdentifier: site.identifier,
         });

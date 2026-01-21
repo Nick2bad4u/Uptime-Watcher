@@ -208,9 +208,18 @@ const withApplicationProviders: Decorator = (storyFn, context) => {
  */
 const mswInitializeOptions: Parameters<typeof initialize>[0] = {
     onUnhandledRequest: "bypass",
+    quiet: true,
 };
 
-initialize(mswInitializeOptions);
+// `@storybook/addon-vitest` imports this file in the Vitest (Node) process to
+// build portable stories. MSW's Storybook addon will attempt to construct
+// Node-side interceptors (including WebSocket interceptors) when initialized
+// outside a browser, which can interfere with Vitest's browser provider.
+//
+// We only need MSW to initialize in the actual browser preview runtime.
+if (typeof window !== "undefined") {
+    initialize(mswInitializeOptions);
+}
 
 /**
  * Global Storybook preview configuration shared across all stories.

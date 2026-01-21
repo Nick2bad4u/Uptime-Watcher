@@ -83,15 +83,15 @@ const validUrlArbitrary = fc
     .filter((url) =>
         // Validate using the same options as the schema
         validator.isURL(url, {
-            allow_protocol_relative_urls: false,
-            allow_trailing_dot: false,
-            allow_underscores: false,
-            disallow_auth: false,
+            "allow_protocol_relative_urls": false,
+            "allow_trailing_dot": false,
+            "allow_underscores": false,
+            "disallow_auth": false,
             protocols: ["http", "https"],
-            require_host: true,
-            require_protocol: true,
-            require_tld: true,
-            validate_length: true,
+            "require_host": true,
+            "require_protocol": true,
+            "require_tld": true,
+            "validate_length": true,
         })
     );
 
@@ -116,11 +116,11 @@ const validHostArbitrary = fc
         // Check if it's a valid FQDN
         if (
             validator.isFQDN(host, {
-                allow_numeric_tld: false,
-                allow_trailing_dot: false,
-                allow_underscores: false,
-                allow_wildcard: false,
-                require_tld: true,
+                "allow_numeric_tld": false,
+                "allow_trailing_dot": false,
+                "allow_underscores": false,
+                "allow_wildcard": false,
+                "require_tld": true,
             })
         )
             return true;

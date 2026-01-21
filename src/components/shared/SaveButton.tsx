@@ -21,8 +21,8 @@ import { AppIcons, getIconSize } from "../../utils/icons";
  *
  * @remarks
  * This component forwards most button/DOM attributes to the underlying
- * {@link ThemedButton}. See {@link StandardButtonProperties} for the shared
- * prop surface.
+ * {@link ThemedButton}. See {@link StandardButtonProperties} for the shared prop
+ * surface.
  */
 export type SaveButtonProperties = ComponentProperties<
     StandardButtonProperties,

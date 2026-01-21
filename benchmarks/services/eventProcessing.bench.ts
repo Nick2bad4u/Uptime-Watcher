@@ -1,9 +1,9 @@
 /**
  * Event Processing Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises event processing benchmark scenarios to measure service throughput and resilience.
+ * event processing benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";

@@ -1,9 +1,9 @@
 /**
  * Global teardown for Playwright Electron tests.
  *
- * @packageDocumentation
+ * @packageDocumentation Invoked
  *
- * Invoked once after the Playwright suite wraps up to ensure Electron
+ * once after the Playwright suite wraps up to ensure Electron
  * processes spawned during the run are terminated cleanly.
  */
 

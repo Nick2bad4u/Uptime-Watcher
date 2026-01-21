@@ -24,9 +24,10 @@ import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { type ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import type { ChartTimeRange } from "../../constants";
-import type { SiteDetailsTab } from "../../stores/ui/types";
+import type { SiteDetailsTab, UIStore } from "../../stores/ui/types";
 
 import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import { logger } from "../../services/logger";
@@ -234,12 +235,18 @@ const runSiteDetailsOperation = async (
 export function useSiteDetails({
     site,
 }: UseSiteDetailsProperties): UseSiteDetailsResult {
-    const checkSiteNow = useSitesStore(useCallback((state) => state.checkSiteNow, []));
-    const deleteSite = useSitesStore(useCallback((state) => state.deleteSite, []));
+    const checkSiteNow = useSitesStore(
+        useCallback((state) => state.checkSiteNow, [])
+    );
+    const deleteSite = useSitesStore(
+        useCallback((state) => state.deleteSite, [])
+    );
     const getSelectedMonitorId = useSitesStore(
         useCallback((state) => state.getSelectedMonitorId, [])
     );
-    const modifySite = useSitesStore(useCallback((state) => state.modifySite, []));
+    const modifySite = useSitesStore(
+        useCallback((state) => state.modifySite, [])
+    );
     const removeMonitorFromSite = useSitesStore(
         useCallback((state) => state.removeMonitorFromSite, [])
     );
@@ -247,11 +254,15 @@ export function useSiteDetails({
         useCallback((state) => state.setSelectedMonitorId, [])
     );
     const sites = useSitesStore(useCallback((state) => state.sites, []));
-    const startSiteMonitoring = useSitesStore(useCallback((state) => state.startSiteMonitoring, []));
+    const startSiteMonitoring = useSitesStore(
+        useCallback((state) => state.startSiteMonitoring, [])
+    );
     const startSiteMonitorMonitoring = useSitesStore(
         useCallback((state) => state.startSiteMonitorMonitoring, [])
     );
-    const stopSiteMonitoring = useSitesStore(useCallback((state) => state.stopSiteMonitoring, []));
+    const stopSiteMonitoring = useSitesStore(
+        useCallback((state) => state.stopSiteMonitoring, [])
+    );
     const stopSiteMonitorMonitoring = useSitesStore(
         useCallback((state) => state.stopSiteMonitorMonitoring, [])
     );
@@ -275,7 +286,23 @@ export function useSiteDetails({
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
         syncActiveSiteDetailsTab,
-    } = useUIStore();
+    } = useUIStore(
+        useShallow(
+            useCallback(
+                (state: UIStore) => ({
+                    activeSiteDetailsTab: state.activeSiteDetailsTab,
+                    setActiveSiteDetailsTab: state.setActiveSiteDetailsTab,
+                    setShowAdvancedMetrics: state.setShowAdvancedMetrics,
+                    setSiteDetailsChartTimeRange:
+                        state.setSiteDetailsChartTimeRange,
+                    showAdvancedMetrics: state.showAdvancedMetrics,
+                    siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+                    syncActiveSiteDetailsTab: state.syncActiveSiteDetailsTab,
+                }),
+                []
+            )
+        )
+    );
 
     const requestConfirmation = useConfirmDialog();
 
@@ -334,9 +361,10 @@ export function useSiteDetails({
     >({});
 
     const effectiveMonitorId = selectedMonitorId;
-    const editStateForSelectedMonitor: MonitorEditState = (effectiveMonitorId
-        ? monitorEditStateById[effectiveMonitorId]
-        : undefined) ?? DEFAULT_MONITOR_EDIT_STATE;
+    const editStateForSelectedMonitor: MonitorEditState =
+        (effectiveMonitorId
+            ? monitorEditStateById[effectiveMonitorId]
+            : undefined) ?? DEFAULT_MONITOR_EDIT_STATE;
 
     const {
         intervalChanged,

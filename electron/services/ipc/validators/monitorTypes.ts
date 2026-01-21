@@ -5,9 +5,9 @@
 import type { IpcParameterValidator } from "../types";
 
 import {
+    createMonitorValidationPayloadValidator,
     createNoParamsValidator,
     createStringObjectValidator,
-    createStringWithUnvalidatedSecondValidator,
     createTwoStringValidator,
 } from "./shared";
 
@@ -29,6 +29,8 @@ export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface
             "monitor"
         ),
         getMonitorTypes: createNoParamsValidator(),
-        validateMonitorData:
-            createStringWithUnvalidatedSecondValidator("monitorType"),
+        validateMonitorData: createMonitorValidationPayloadValidator(
+            "monitorType",
+            "data"
+        ),
     } as const;

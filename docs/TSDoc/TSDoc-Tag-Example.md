@@ -27,14 +27,16 @@ For this code sample, the generated titles might be **"Example"** and **"Example
  * Adds two numbers together.
  *
  * @example
- *  Here's a simple example:
+ *  Here's
+ *  a simple example:
  *  ```
  *  // Prints "2":
  *  console.log(add(1,1));
  *  ```
  *
  * @example
- *  Here's an example with negative numbers:
+ *  Here's
+ *  an example with negative numbers:
  *  ```
  *  // Prints "0":
  *  console.log(add(1,-1));
@@ -53,7 +55,8 @@ For this code sample, the generated title might be **"Example: Parsing a basic J
  * Parses a JSON file.
  *
  * @example
- *  Parsing a basic JSON file
+ *  Parsing
+ *  a basic JSON file
  *
  *  # Contents of `file.json`
  *  ```json

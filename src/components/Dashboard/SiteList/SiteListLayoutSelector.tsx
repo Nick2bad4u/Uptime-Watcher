@@ -2,7 +2,6 @@
  * Segmented control allowing users to switch between site list layouts.
  */
 
-
 import {
     memo,
     type MouseEvent,
@@ -119,7 +118,9 @@ const getPresentationDataAttributes = (
     value: SiteCardPresentation
 ): Record<string, string> => ({ "data-presentation-mode": value });
 
-const getDensityDataAttributes = (value: InterfaceDensity): Record<string, string> => ({
+const getDensityDataAttributes = (
+    value: InterfaceDensity
+): Record<string, string> => ({
     "data-density-mode": value,
 });
 

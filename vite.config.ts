@@ -917,7 +917,8 @@ export default defineConfig(({ command, mode }) => {
             maxWorkers: Math.max(
                 1,
                 Number(
-                    process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
+                    process.env["MAX_THREADS"] ??
+                        (process.env["CI"] ? "1" : "8")
                 )
             ),
             name: {

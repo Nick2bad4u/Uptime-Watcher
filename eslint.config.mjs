@@ -21,7 +21,6 @@
 // @ts-expect-error -- No Types for this Package
 import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
-// @ts-expect-error -- No Types for this Package
 import pluginComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import eslintReact from "@eslint-react/eslint-plugin";
 import { fixupPluginRules } from "@eslint/compat";
@@ -82,17 +81,20 @@ import { importX } from "eslint-plugin-import-x";
 import importZod from "eslint-plugin-import-zod";
 // @ts-expect-error -- No Types for this Package
 import istanbul from "eslint-plugin-istanbul";
-// eslint-disable-next-line import-x/no-named-as-default -- required
-import jsdoc from "eslint-plugin-jsdoc";
+import eslintPluginJsdoc from "eslint-plugin-jsdoc";
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
 // Keep it opt-in via UW_ENABLE_JSON_SCHEMA_VALIDATION=1.
 const enableJsonSchemaValidation =
-    process.env[ "UW_ENABLE_JSON_SCHEMA_VALIDATION" ] === "1";
+    process.env["UW_ENABLE_JSON_SCHEMA_VALIDATION"] === "1";
 
-const eslintPluginJsonSchemaValidator = enableJsonSchemaValidation
-    ? ( await import( "eslint-plugin-json-schema-validator" ) ).default
-    : undefined;
+let eslintPluginJsonSchemaValidator = undefined;
+
+if (enableJsonSchemaValidation) {
+    eslintPluginJsonSchemaValidator = (
+        await import("eslint-plugin-json-schema-validator")
+    ).default;
+}
 
 const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
     ? { "json-schema-validator": eslintPluginJsonSchemaValidator }
@@ -151,7 +153,7 @@ import pluginPrettier from "eslint-plugin-prettier";
 import pluginPromise from "eslint-plugin-promise";
 import pluginReact from "eslint-plugin-react";
 // @ts-expect-error -- No Types for this Package
-import react19upgrade from "eslint-plugin-react-19-upgrade"
+import react19upgrade from "eslint-plugin-react-19-upgrade";
 import reactCompiler from "eslint-plugin-react-compiler";
 import eslintReactDom from "eslint-plugin-react-dom";
 // @ts-expect-error -- No Types for this Package
@@ -223,13 +225,12 @@ import pluginWriteGood from "eslint-plugin-write-good-comments";
 import xss from "eslint-plugin-xss";
 import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
-import eslintPluginZodX from 'eslint-plugin-zod-x';
 import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
 import { createRequire } from "node:module";
 import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
-import yamlEslintParser from "yaml-eslint-parser";
+import * as yamlEslintParser from "yaml-eslint-parser";
 
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract-interfaces.mjs";
@@ -274,33 +275,33 @@ import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract
 /** @typedef {import("eslint").Linter.BaseConfig} BaseEslintConfig */
 /** @typedef {import("eslint").Linter.LinterOptions} LinterOptions */
 
-const require = createRequire( import.meta.url );
+const require = createRequire(import.meta.url);
 const ROOT_DIR = import.meta.dirname;
 
-if ( !process.env[ "RECHECK_JAR" ] ) {
-    const resolvedRecheckJarPath = ( () => {
+if (!process.env["RECHECK_JAR"]) {
+    const resolvedRecheckJarPath = (() => {
         try {
-            return require.resolve( "recheck-jar/recheck.jar" );
+            return require.resolve("recheck-jar/recheck.jar");
         } catch {
             console.warn(
                 '[eslint.config] Unable to resolve "recheck-jar/recheck.jar". eslint-plugin-redos will rely on its internal resolution logic.'
             );
             return undefined;
         }
-    } )();
-    if ( resolvedRecheckJarPath ) {
-        process.env[ "RECHECK_JAR" ] = path.normalize( resolvedRecheckJarPath );
+    })();
+    if (resolvedRecheckJarPath) {
+        process.env["RECHECK_JAR"] = path.normalize(resolvedRecheckJarPath);
     }
 }
-export default /** @type {EslintConfig} */[
-    gitignore( {
+export default /** @type {EslintConfig} */ [
+    gitignore({
         name: "Global .gitignore Rules",
         root: true,
         strict: true,
-    } ), // MARK: Global Configs and Rules
+    }), // MARK: Global Configs and Rules
     sharedContractInterfaceGuard,
     {
-        files: [ "src/constants.ts" ],
+        files: ["src/constants.ts"],
         name: "Monitor Fallback Consistency",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
@@ -310,8 +311,8 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "electron/services/ipc/handlers/**/*.{ts,tsx}" ],
-        ignores: [ "electron/test/**/*" ],
+        files: ["electron/services/ipc/handlers/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
         name: "Electron IPC Handler Validation Guardrails",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
@@ -321,8 +322,8 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "electron/**/*.{ts,tsx}" ],
-        ignores: [ "electron/test/**/*" ],
+        files: ["electron/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
         name: "Electron Logger Enforcement",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
@@ -345,7 +346,7 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "**/*.{ts,tsx}" ],
+        files: ["**/*.{ts,tsx}"],
         name: "TSDoc Logger Examples",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
@@ -361,7 +362,7 @@ export default /** @type {EslintConfig} */[
             "src/**/*.{ts,tsx}",
             "storybook/**/*.{ts,tsx}",
         ],
-        ignores: [ "shared/**/*" ],
+        ignores: ["shared/**/*"],
         name: "Shared Alias Imports",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
@@ -371,7 +372,7 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "storybook/**/*.{ts,tsx,js,jsx,mts,mjs}" ],
+        files: ["storybook/**/*.{ts,tsx,js,jsx,mts,mjs}"],
         name: "Storybook Dev Helpers - storybook/**/*.{ts,tsx,js,jsx,mts,mjs}",
         rules: {
             "import-x/no-extraneous-dependencies": "off",
@@ -380,7 +381,7 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "shared/**/*.{ts,tsx,cts,mts}" ],
+        files: ["shared/**/*.{ts,tsx,cts,mts}"],
         name: "Shared Layer Isolation",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
@@ -390,8 +391,8 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}" ],
-        ignores: [ "src/test/**/*" ],
+        files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
+        ignores: ["src/test/**/*"],
         name: "Renderer Electron Isolation",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
@@ -443,19 +444,7 @@ export default /** @type {EslintConfig} */[
     nitpick.configs.recommended,
     pluginComments.recommended,
     arrayFunc.configs.all,
-    eslintPluginZodX.configs.recommended,
-    {
-        files: ["**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}"],
-        name: "Zod-X overrides",
-        rules: {
-            // This repo intentionally allows both `import * as z from "zod"`
-            // and fine-grained type-only imports (e.g. `import type { ZodType }`).
-            // Forcing a namespace import everywhere creates noisy churn without
-            // improving runtime safety.
-            "zod-x/prefer-namespace-import": "off",
-        },
-    },
-    ...storybook.configs[ "flat/recommended" ],
+    ...storybook.configs["flat/recommended"],
     ...pluginCasePolice.configs.recommended,
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Global Ignore Patterns
@@ -558,7 +547,7 @@ export default /** @type {EslintConfig} */[
                 node: true,
             },
             "import-x/resolver-next": [
-                createTypeScriptImportResolver( {
+                createTypeScriptImportResolver({
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
                     bun: true, // Resolve Bun modules (https://github.com/import-js/eslint-import-resolver-typescript#bun)
                     noWarnOnMultipleProjects: true, // Don't warn about multiple projects
@@ -577,7 +566,7 @@ export default /** @type {EslintConfig} */[
                         "tsconfig.json",
                         "tsconfig.shared.json",
                     ],
-                } ),
+                }),
             ],
             react: { version: "19" },
             "react-x": {
@@ -591,8 +580,9 @@ export default /** @type {EslintConfig} */[
     // MARK: YAML/YML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.{yaml,yml}" ],
+        files: ["**/*.{yaml,yml}"],
         ignores: [],
+        language: "yml/yaml",
         languageOptions: {
             parser: yamlEslintParser,
             // Options used with yaml-eslint-parser.
@@ -631,6 +621,8 @@ export default /** @type {EslintConfig} */[
             "yml/plain-scalar": "off",
             "yml/quotes": "error",
             "yml/require-string-key": "error",
+            // Re-enabled: eslint-plugin-yml v2.0.1 fixes the diff-sequences
+            // import crash (TypeError: diff is not a function).
             "yml/sort-keys": "error",
             "yml/sort-sequence-values": "off",
             "yml/spaced-comment": "warn",
@@ -641,8 +633,8 @@ export default /** @type {EslintConfig} */[
     // MARK: HTML files
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.{html,htm,xhtml}" ],
-        ignores: [ "report/**" ],
+        files: ["**/*.{html,htm,xhtml}"],
+        ignores: ["report/**"],
         languageOptions: {
             parser: htmlParser,
         },
@@ -653,8 +645,9 @@ export default /** @type {EslintConfig} */[
             xss: xss,
         },
         rules: {
-            // @ts-expect-error -- No Types for this Package
             ...html.configs.recommended.rules,
+            "html/class-spacing": "warn",
+            "html/css-no-empty-blocks": "warn",
             "html/id-naming-convention": "warn",
             "html/indent": "error",
             "html/lowercase": "warn",
@@ -687,6 +680,7 @@ export default /** @type {EslintConfig} */[
             "html/no-skip-heading-levels": "warn",
             "html/no-target-blank": "warn",
             "html/no-trailing-spaces": "warn",
+            "html/no-whitespace-only-children": "warn",
             "html/prefer-https": "warn",
             "html/require-attrs": "warn",
             "html/require-button-type": "warn",
@@ -709,7 +703,7 @@ export default /** @type {EslintConfig} */[
                         "CSS.escape()",
                         "Number()",
                     ],
-                    unsafe: [ ".html()" ],
+                    unsafe: [".html()"],
                 },
             ],
         },
@@ -718,8 +712,8 @@ export default /** @type {EslintConfig} */[
     // MARK: HTML in JS/TS files (HTML Literals)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}" ],
-        ignores: [ "report/**" ],
+        files: ["**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
+        ignores: ["report/**"],
         name: "HTML in JS/TS - **/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             html: html,
@@ -728,7 +722,6 @@ export default /** @type {EslintConfig} */[
         },
         rules: {
             // HTML Eslint Plugin Rules (html/*)
-            // @ts-expect-error -- No Types for this Package
             ...html.configs.recommended.rules,
             "html/indent": "error",
             "html/no-extra-spacing-attrs": [
@@ -745,7 +738,7 @@ export default /** @type {EslintConfig} */[
                         "CSS.escape()",
                         "Number()",
                     ],
-                    unsafe: [ ".html()" ],
+                    unsafe: [".html()"],
                 },
             ],
         },
@@ -782,7 +775,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Package.json Linting
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/package.json" ],
+        files: ["**/package.json"],
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
@@ -791,10 +784,10 @@ export default /** @type {EslintConfig} */[
         plugins: { json: json, "package-json": packageJson },
         rules: {
             ...json.configs.recommended.rules,
+            // Package.json Plugin Rules (package-json/*)
             "package-json/bin-name-casing": "warn",
             "package-json/exports-subpaths-style": "warn",
             "package-json/no-empty-fields": "warn",
-            // Package.json Plugin Rules (package-json/*)
             "package-json/no-redundant-files": "warn",
             "package-json/no-redundant-publishConfig": "warn",
             "package-json/order-properties": "warn",
@@ -809,11 +802,14 @@ export default /** @type {EslintConfig} */[
             "package-json/require-engines": "warn",
             "package-json/require-exports": "warn",
             "package-json/require-files": "off", // Not needed for Electron applications
+            "package-json/require-homepage": "warn",
             "package-json/require-keywords": "warn",
             "package-json/require-license": "warn",
             "package-json/require-name": "warn",
             "package-json/require-optionalDependencies": "off", // Not needed for Electron applications
             "package-json/require-peerDependencies": "off",
+            "package-json/require-repository": "error",
+            "package-json/require-scripts": "warn",
             "package-json/require-sideEffects": "warn",
             "package-json/require-type": "warn",
             "package-json/require-types": "off", // Not needed for Electron applications
@@ -843,6 +839,7 @@ export default /** @type {EslintConfig} */[
             "package-json/valid-local-dependency": "off",
             "package-json/valid-main": "warn",
             "package-json/valid-man": "warn",
+            "package-json/valid-module": "warn",
             "package-json/valid-name": "warn",
             "package-json/valid-optionalDependencies": "warn",
             "package-json/valid-os": "warn",
@@ -864,7 +861,7 @@ export default /** @type {EslintConfig} */[
     // ═══════════════════════════════════════════════════════════════════════════════
     // Main MDX Configuration - for MDX files with comprehensive remark linting
     {
-        files: [ "**/*.mdx" ],
+        files: ["**/*.mdx"],
         languageOptions: {
             ecmaVersion: "latest",
             globals: {
@@ -883,39 +880,12 @@ export default /** @type {EslintConfig} */[
             // React rules for MDX components
             "react/react-in-jsx-scope": "off",
         },
-        settings: {
-            processor: mdx.createRemarkProcessor( {
-                // Enable remark configuration file (.remarkrc.js) for comprehensive linting
-                ignoreRemarkConfig: false,
-                // Language mapper for code blocks
-                languageMapper: {
-                    // Map file extensions to languages for better code block processing
-                    cjs: "javascript",
-                    cts: "typescript",
-                    js: "javascript",
-                    json: "json",
-                    jsx: "javascript",
-                    md: "markdown",
-                    mdx: "mdx",
-                    mjs: "javascript",
-                    mts: "typescript",
-                    ts: "typescript",
-                    tsx: "typescript",
-                    yaml: "yaml",
-                    yml: "yaml",
-                },
-                // Enable code block linting within MDX
-                lintCodeBlocks: true,
-                // Path to remark config (optional, will auto-discover .remarkrc.js)
-                remarkConfigPath: ".remarkrc.mjs",
-            } ),
-        },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: MDX CodeBlocks
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.mdx" ],
+        files: ["**/*.mdx"],
         languageOptions: {
             ecmaVersion: "latest",
             globals: {
@@ -940,7 +910,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Markdown (md/*, markdown/*, markup/*, atom/*, rss/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.{md,markup,atom,rss,markdown}" ],
+        files: ["**/*.{md,markup,atom,rss,markdown}"],
         ignores: [
             "**/docs/packages/**",
             "**/docs/TSDoc/**",
@@ -978,21 +948,21 @@ export default /** @type {EslintConfig} */[
             "mdx/remark": "warn",
         },
         settings: {
-            processor: mdx.createRemarkProcessor( {
+            processor: mdx.createRemarkProcessor({
                 // Enable remark configuration file (.remarkrc.mjs) for comprehensive linting
                 ignoreRemarkConfig: false,
                 // Disable code block linting for regular markdown (use markdown plugin instead)
                 lintCodeBlocks: false,
                 // Path to remark config (optional, will auto-discover .remarkrc.mjs)
                 remarkConfigPath: ".remarkrc.mjs",
-            } ),
+            }),
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: CSS (css/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.css" ],
+        files: ["**/*.css"],
         ignores: [
             "docs/**",
             "**/test/**",
@@ -1028,20 +998,20 @@ export default /** @type {EslintConfig} */[
         ],
         ignores: [],
         name: "JSONC - **/*.JSONC",
-        plugins: {
-            eslintPluginJsonc: eslintPluginJsonc,
-            json: json,
-            ...jsonSchemaValidatorPlugins,
-            "no-secrets": noSecrets,
-        },
         // ═══════════════════════════════════════════════════════════════════════════════
         // Plugin Config for eslint-plugin-jsonc to enable Prettier formatting
         // ═══════════════════════════════════════════════════════════════════════════════
-        ...eslintPluginJsonc.configs[ "flat/prettier" ][ 0 ],
+        ...eslintPluginJsonc.configs["flat/prettier"][0],
         language: "json/jsonc",
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },
+        },
+        plugins: {
+            json: json,
+            jsonc: eslintPluginJsonc,
+            ...jsonSchemaValidatorPlugins,
+            "no-secrets": noSecrets,
         },
         rules: {
             ...json.configs.recommended.rules,
@@ -1139,7 +1109,7 @@ export default /** @type {EslintConfig} */[
     // MARK: JSON (json/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.json" ],
+        files: ["**/*.json"],
         language: "json/json",
         name: "JSON - **/*.JSON",
         plugins: {
@@ -1150,7 +1120,7 @@ export default /** @type {EslintConfig} */[
         rules: {
             ...json.configs.recommended.rules,
             ...jsonSchemaValidatorRules,
-            "json/sort-keys": [ "warn" ],
+            "json/sort-keys": ["warn"],
             "json/top-level-interop": "warn",
             "no-secrets/no-pattern-match": "off",
             "no-secrets/no-secrets": [
@@ -1165,7 +1135,7 @@ export default /** @type {EslintConfig} */[
     // MARK: JSON5 (json5/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.json5" ],
+        files: ["**/*.json5"],
         language: "json/json5",
         name: "JSON5 - **/*.JSON5",
         plugins: {
@@ -1189,8 +1159,8 @@ export default /** @type {EslintConfig} */[
     // MARK: TOML (toml/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.toml" ],
-        ignores: [ "lychee.toml" ],
+        files: ["**/*.toml"],
+        ignores: ["lychee.toml"],
         languageOptions: {
             parser: tomlEslintParser,
             parserOptions: { tomlVersion: "1.0.0" },
@@ -1227,7 +1197,7 @@ export default /** @type {EslintConfig} */[
     // MARK: TSX/JSX (tsx/*, jsx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.{tsx,jsx}" ],
+        files: ["**/*.{tsx,jsx}"],
         ignores: [],
         languageOptions: {
             globals: {
@@ -1247,7 +1217,7 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "tsconfig.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -1258,14 +1228,15 @@ export default /** @type {EslintConfig} */[
             "no-hardcoded-strings": pluginNoHardcoded,
             "react-19-upgrade": react19upgrade,
             tailwind: tailwind,
-            "undefined-css-classes": pluginUndefinedCss
+            "undefined-css-classes": pluginUndefinedCss,
         },
         rules: {
             // TypeScript rules
             ...css.configs.recommended.rules,
-            ...pluginUndefinedCss.configs[ "with-tailwind" ].rules,
+            ...pluginUndefinedCss.configs["with-tailwind"].rules,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...pluginBetterTailwindcss.configs[ "correctness" ].rules,
+            ...pluginBetterTailwindcss.configs["correctness"].rules,
+            "better-tailwindcss/enforce-canonical-classes": "warn",
             "better-tailwindcss/enforce-consistent-class-order": "warn",
             "better-tailwindcss/enforce-consistent-important-position": "warn",
             "better-tailwindcss/enforce-consistent-line-wrapping": "off",
@@ -1328,9 +1299,9 @@ export default /** @type {EslintConfig} */[
             },
             react: { version: "19" },
             tailwindcss: {
-                config: `${ ROOT_DIR }/src/index.css`,
+                config: `${ROOT_DIR}/src/index.css`,
                 // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
-                cssFiles: [ "./src/index.css" ],
+                cssFiles: ["./src/index.css"],
             },
         },
     },
@@ -1338,7 +1309,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Docusaurus (docusaurus/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "docs/docusaurus/**/*.{ts,tsx,mjs,cjs,js,jsx,mts,cts}" ],
+        files: ["docs/docusaurus/**/*.{ts,tsx,mjs,cjs,js,jsx,mts,cts}"],
         ignores: [
             "docs/docusaurus/docs/**",
             "docs/docusaurus/build/**",
@@ -1363,7 +1334,7 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "./docs/docusaurus/tsconfig.eslint.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -1391,10 +1362,10 @@ export default /** @type {EslintConfig} */[
             css: css,
             depend: depend,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules( pluginDeprecation ),
+            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            etc: fixupPluginRules( etc ),
+            etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
             "function-name": pluginFunctionNames,
@@ -1411,7 +1382,7 @@ export default /** @type {EslintConfig} */[
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            neverthrow: fixupPluginRules( pluginNeverThrow ),
+            neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
@@ -1432,17 +1403,17 @@ export default /** @type {EslintConfig} */[
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            "safe-jsx": fixupPluginRules( pluginSafeJSX ),
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
-            "ssr-friendly": fixupPluginRules( pluginSSR ),
+            "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
-            "total-functions": fixupPluginRules( pluginTotalFunctions ),
+            "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
             "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
@@ -1456,50 +1427,50 @@ export default /** @type {EslintConfig} */[
         rules: {
             // TypeScript backend rules
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
-            ...pluginRegexp.configs[ "flat/all" ].rules,
+            ...tseslint.configs["stylistic"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
-            ...pluginPromise.configs[ "flat/recommended" ].rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
-            ...reactHooks.configs[ "recommended-latest" ].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginPerfectionist.configs[ "recommended-natural" ].rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
             ...pluginSecurity.configs.recommended.rules,
-            ...nodePlugin.configs[ "flat/all" ].rules,
+            ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs[ "recommended-type-checked" ].rules,
-            ...pluginSortClassMembers.configs[ "flat/recommended" ].rules,
+            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
-            ...eslintPluginCommentLength.configs[ "flat/recommended" ].rules,
+            ...eslintPluginCommentLength.configs["flat/recommended"].rules,
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+            ...zod.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
@@ -1540,6 +1511,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-duplicate-key": "warn",
             "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
@@ -1550,6 +1522,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/no-unstable-context-value": "warn",
             "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -1688,7 +1661,7 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-empty-function": [
                 "error",
                 {
-                    allow: [ "arrowFunctions" ], // Allow empty arrow functions for React useEffect cleanup
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
                 },
             ],
             "@typescript-eslint/no-empty-object-type": "error",
@@ -1744,7 +1717,7 @@ export default /** @type {EslintConfig} */[
                                 "It provides no type safety when calling the function, which can be a common source of bugs.",
                                 "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
                                 "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
-                            ].join( "\n" ),
+                            ].join("\n"),
                         },
                     },
                 },
@@ -1827,7 +1800,7 @@ export default /** @type {EslintConfig} */[
                 "warn",
                 {
                     allowAny: true,
-                    allowedPromiseNames: [ "Promise" ],
+                    allowedPromiseNames: ["Promise"],
                     checkArrowFunctions: false,
                 },
             ],
@@ -1915,7 +1888,7 @@ export default /** @type {EslintConfig} */[
                             ],
                             from: "theme",
                         },
-                        { allow: [ "types" ], from: "types" },
+                        { allow: ["types"], from: "types" },
                         {
                             allow: [
                                 "types",
@@ -1973,7 +1946,7 @@ export default /** @type {EslintConfig} */[
                     aliases: [
                         {
                             alias: "@shared/",
-                            matchParent: path.resolve( import.meta.dirname ),
+                            matchParent: path.resolve(import.meta.dirname),
                             matchPath: "^shared/",
                             maxRelativeDepth: 0,
                         },
@@ -2458,7 +2431,7 @@ export default /** @type {EslintConfig} */[
             "react/jsx-filename-extension": [
                 "error",
                 {
-                    extensions: [ ".tsx" ],
+                    extensions: [".tsx"],
                 },
             ], // Enforce .tsx for JSX files
             "react/jsx-max-depth": "off",
@@ -2596,43 +2569,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
+            ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-immediate-mutation": "warn",
@@ -2675,13 +2656,15 @@ export default /** @type {EslintConfig} */[
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
             "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
         },
         settings: {
             "import-x/resolver": {
                 node: true,
-                project: [ "./docs/docusaurus/tsconfig.eslint.json" ],
+                project: ["./docs/docusaurus/tsconfig.eslint.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -2691,7 +2674,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "./docs/docusaurus/tsconfig.eslint.json" ],
+                    project: ["./docs/docusaurus/tsconfig.eslint.json"],
                 },
             },
         },
@@ -2700,7 +2683,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Docusaurus CSS (docs/docusaurus/**/*.css)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "docs/docusaurus/**/*.css" ],
+        files: ["docs/docusaurus/**/*.css"],
         ignores: [
             "docs/docusaurus/docs/**",
             "docs/docusaurus/build/**",
@@ -2785,7 +2768,7 @@ export default /** @type {EslintConfig} */[
                     "storybook/tsconfig.eslint.json",
                 ],
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -2815,10 +2798,10 @@ export default /** @type {EslintConfig} */[
             css: css,
             depend: depend,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules( pluginDeprecation ),
+            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            etc: fixupPluginRules( etc ),
+            etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
             "format-sql": pluginFormatSQL,
@@ -2836,7 +2819,7 @@ export default /** @type {EslintConfig} */[
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            neverthrow: fixupPluginRules( pluginNeverThrow ),
+            neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
@@ -2867,7 +2850,7 @@ export default /** @type {EslintConfig} */[
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            "safe-jsx": fixupPluginRules( pluginSafeJSX ),
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
@@ -2875,12 +2858,12 @@ export default /** @type {EslintConfig} */[
             "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
-            "ssr-friendly": fixupPluginRules( pluginSSR ),
+            "ssr-friendly": fixupPluginRules(pluginSSR),
             storybook: storybook,
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
             tailwind: tailwind,
-            "total-functions": fixupPluginRules( pluginTotalFunctions ),
+            "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
             "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
@@ -2889,51 +2872,50 @@ export default /** @type {EslintConfig} */[
             "validate-jsx-nesting": pluginValidateJSX,
             "write-good-comments": pluginWriteGood,
             xss: xss,
-            zod: zod
+            zod: zod,
         },
         rules: {
             // TypeScript rules
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
-            ...pluginRegexp.configs[ "flat/all" ].rules,
+            ...tseslint.configs["stylistic"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...reactRefresh.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            ...pluginPromise.configs[ "flat/recommended" ].rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
-            ...reactHooks.configs[ "recommended-latest" ].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginPerfectionist.configs[ "recommended-natural" ].rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
             ...pluginSecurity.configs.recommended.rules,
-            ...nodePlugin.configs[ "flat/all" ].rules,
+            ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs[ "recommended-type-checked" ].rules,
-            ...pluginSortClassMembers.configs[ "flat/recommended" ].rules,
+            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
-            ...eslintPluginCommentLength.configs[ "flat/recommended" ].rules,
+            ...eslintPluginCommentLength.configs["flat/recommended"].rules,
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
@@ -2943,8 +2925,8 @@ export default /** @type {EslintConfig} */[
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...pluginBetterTailwindcss.configs[ "correctness" ].rules,
-
+            ...pluginBetterTailwindcss.configs["correctness"].rules,
+            ...zod.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
@@ -2984,6 +2966,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-duplicate-key": "warn",
             "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
@@ -2994,6 +2977,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/no-unstable-context-value": "warn",
             "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -3141,7 +3125,7 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-empty-function": [
                 "error",
                 {
-                    allow: [ "arrowFunctions" ], // Allow empty arrow functions for React useEffect cleanup
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
                 },
             ],
             "@typescript-eslint/no-empty-object-type": "error",
@@ -3200,7 +3184,7 @@ export default /** @type {EslintConfig} */[
                                 "It provides no type safety when calling the function, which can be a common source of bugs.",
                                 "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
                                 "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
-                            ].join( "\n" ),
+                            ].join("\n"),
                         },
                     },
                 },
@@ -3282,7 +3266,7 @@ export default /** @type {EslintConfig} */[
                 "warn",
                 {
                     allowAny: true,
-                    allowedPromiseNames: [ "Promise" ],
+                    allowedPromiseNames: ["Promise"],
                     checkArrowFunctions: false,
                 },
             ],
@@ -3312,6 +3296,7 @@ export default /** @type {EslintConfig} */[
             "antfu/no-top-level-await": "error",
             "antfu/no-ts-export-equal": "error",
             "antfu/top-level-function": "off",
+            "better-tailwindcss/enforce-canonical-classes": "warn",
             "better-tailwindcss/enforce-consistent-class-order": "warn",
             "better-tailwindcss/enforce-consistent-important-position": "warn",
             "better-tailwindcss/enforce-consistent-line-wrapping": "off",
@@ -3328,7 +3313,7 @@ export default /** @type {EslintConfig} */[
                     detectComponentClasses: true,
                 },
             ],
-            "boundaries/element-types": [ "off" ],
+            "boundaries/element-types": ["off"],
             "canonical/filename-match-regex": "off", // Taken care of by unicorn rules
             "canonical/filename-no-index": "error",
             "canonical/import-specifier-newline": "off",
@@ -3344,7 +3329,7 @@ export default /** @type {EslintConfig} */[
                     aliases: [
                         {
                             alias: "@shared/",
-                            matchParent: path.resolve( import.meta.dirname ),
+                            matchParent: path.resolve(import.meta.dirname),
                             matchPath: "^shared/",
                             maxRelativeDepth: 0,
                         },
@@ -4019,7 +4004,7 @@ export default /** @type {EslintConfig} */[
             "react/jsx-filename-extension": [
                 "error",
                 {
-                    extensions: [ ".tsx" ],
+                    extensions: [".tsx"],
                 },
             ], // Enforce .tsx for JSX files
             "react/jsx-first-prop-new-line": "off",
@@ -4242,43 +4227,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
+            ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-immediate-mutation": "warn",
@@ -4321,8 +4314,10 @@ export default /** @type {EslintConfig} */[
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
             "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
         },
         settings: {
             "better-tailwindcss": {
@@ -4330,47 +4325,47 @@ export default /** @type {EslintConfig} */[
                 entryPoint: "./src/index.css",
             },
             "boundaries/elements": [
-                { capture: [ "app" ], pattern: "src/App.tsx", type: "app" },
-                { capture: [ "main" ], pattern: "src/main.tsx", type: "main" },
+                { capture: ["app"], pattern: "src/App.tsx", type: "app" },
+                { capture: ["main"], pattern: "src/main.tsx", type: "main" },
                 {
-                    capture: [ "styles" ],
+                    capture: ["styles"],
                     pattern: "src/index.css",
                     type: "styles",
                 },
                 {
-                    capture: [ "constants" ],
+                    capture: ["constants"],
                     pattern: "src/constants.ts",
                     type: "constants",
                 },
                 {
-                    capture: [ "component" ],
+                    capture: ["component"],
                     pattern: "src/components/**/*",
                     type: "components",
                 },
                 {
-                    capture: [ "store" ],
+                    capture: ["store"],
                     pattern: "src/stores/**/*",
                     type: "stores",
                 },
-                { capture: [ "hook" ], pattern: "src/hooks/**/*", type: "hooks" },
+                { capture: ["hook"], pattern: "src/hooks/**/*", type: "hooks" },
                 {
-                    capture: [ "service" ],
+                    capture: ["service"],
                     pattern: "src/services/**/*",
                     type: "services",
                 },
                 {
-                    capture: [ "theme" ],
+                    capture: ["theme"],
                     pattern: "src/theme/**/*",
                     type: "theme",
                 },
-                { capture: [ "util" ], pattern: "src/utils/**/*", type: "utils" },
-                { capture: [ "type" ], pattern: "src/types/**/*", type: "types" },
-                { capture: [ "type" ], pattern: "src/types.ts", type: "types" },
-                { capture: [ "test" ], pattern: "src/test/**/*", type: "test" },
+                { capture: ["util"], pattern: "src/utils/**/*", type: "utils" },
+                { capture: ["type"], pattern: "src/types/**/*", type: "types" },
+                { capture: ["type"], pattern: "src/types.ts", type: "types" },
+                { capture: ["test"], pattern: "src/test/**/*", type: "test" },
             ],
             "import-x/resolver": {
                 node: true,
-                project: [ "tsconfig.json" ],
+                project: ["tsconfig.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -4380,7 +4375,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "tsconfig.json" ],
+                    project: ["tsconfig.json"],
                 },
             },
             n: {
@@ -4392,9 +4387,9 @@ export default /** @type {EslintConfig} */[
             },
             react: { version: "19" },
             tailwindcss: {
-                config: `${ ROOT_DIR }/src/index.css`,
+                config: `${ROOT_DIR}/src/index.css`,
                 // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276#issuecomment-2481272848
-                cssFiles: [ "./src/index.css" ],
+                cssFiles: ["./src/index.css"],
             },
         },
     },
@@ -4402,7 +4397,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Electron Backend - (electron/**/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "electron/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}" ],
+        files: ["electron/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "electron/**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "electron/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -4431,7 +4426,7 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "tsconfig.electron.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -4459,10 +4454,10 @@ export default /** @type {EslintConfig} */[
             css: css,
             depend: depend,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules( pluginDeprecation ),
+            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            etc: fixupPluginRules( etc ),
+            etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
             "function-name": pluginFunctionNames,
@@ -4479,7 +4474,7 @@ export default /** @type {EslintConfig} */[
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            neverthrow: fixupPluginRules( pluginNeverThrow ),
+            neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
@@ -4501,17 +4496,17 @@ export default /** @type {EslintConfig} */[
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            "safe-jsx": fixupPluginRules( pluginSafeJSX ),
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
-            "ssr-friendly": fixupPluginRules( pluginSSR ),
+            "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
-            "total-functions": fixupPluginRules( pluginTotalFunctions ),
+            "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
             "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
@@ -4525,51 +4520,51 @@ export default /** @type {EslintConfig} */[
         rules: {
             // TypeScript Backend (Electron) Rules
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
-            ...pluginRegexp.configs[ "flat/all" ].rules,
+            ...tseslint.configs["stylistic"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
-            ...pluginPromise.configs[ "flat/recommended" ].rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
-            ...reactHooks.configs[ "recommended-latest" ].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginPerfectionist.configs[ "recommended-natural" ].rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
             ...pluginSecurity.configs.recommended.rules,
-            ...nodePlugin.configs[ "flat/all" ].rules,
+            ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs[ "recommended-type-checked" ].rules,
-            ...pluginSortClassMembers.configs[ "flat/recommended" ].rules,
+            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
-            ...eslintPluginCommentLength.configs[ "flat/recommended" ].rules,
+            ...eslintPluginCommentLength.configs["flat/recommended"].rules,
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
+            ...zod.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
@@ -4604,6 +4599,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-duplicate-key": "warn",
             "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
@@ -4614,6 +4610,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/no-unstable-context-value": "warn",
             "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -4761,7 +4758,7 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-empty-function": [
                 "error",
                 {
-                    allow: [ "arrowFunctions" ], // Allow empty arrow functions for React useEffect cleanup
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
                 },
             ],
             "@typescript-eslint/no-empty-object-type": "error",
@@ -4819,7 +4816,7 @@ export default /** @type {EslintConfig} */[
                                 "It provides no type safety when calling the function, which can be a common source of bugs.",
                                 "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
                                 "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
-                            ].join( "\n" ),
+                            ].join("\n"),
                         },
                     },
                 },
@@ -4901,7 +4898,7 @@ export default /** @type {EslintConfig} */[
                 "warn",
                 {
                     allowAny: true,
-                    allowedPromiseNames: [ "Promise" ],
+                    allowedPromiseNames: ["Promise"],
                     checkArrowFunctions: false,
                 },
             ],
@@ -4937,7 +4934,7 @@ export default /** @type {EslintConfig} */[
                     default: "disallow",
                     rules: [
                         {
-                            allow: [ "types" ],
+                            allow: ["types"],
                             from: "constants",
                         },
                         {
@@ -5051,7 +5048,7 @@ export default /** @type {EslintConfig} */[
                     aliases: [
                         {
                             alias: "@shared/",
-                            matchParent: path.resolve( import.meta.dirname ),
+                            matchParent: path.resolve(import.meta.dirname),
                             matchPath: "^shared/",
                             maxRelativeDepth: 0,
                         },
@@ -5658,43 +5655,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
+            ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-immediate-mutation": "warn",
@@ -5737,70 +5742,72 @@ export default /** @type {EslintConfig} */[
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
             "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
         },
         settings: {
             "boundaries/elements": [
                 {
-                    capture: [ "main" ],
+                    capture: ["main"],
                     pattern: "electron/main.ts",
                     type: "main",
                 },
                 {
-                    capture: [ "preload" ],
+                    capture: ["preload"],
                     pattern: "electron/preload.ts",
                     type: "preload",
                 },
                 {
-                    capture: [ "constants" ],
+                    capture: ["constants"],
                     pattern: "electron/constants.ts",
                     type: "constants",
                 },
                 {
-                    capture: [ "electronUtils" ],
+                    capture: ["electronUtils"],
                     pattern: "electron/electronUtils.ts",
                     type: "utils",
                 },
                 {
-                    capture: [ "orchestrator" ],
+                    capture: ["orchestrator"],
                     pattern: "electron/UptimeOrchestrator.ts",
                     type: "orchestrator",
                 },
                 {
-                    capture: [ "manager" ],
+                    capture: ["manager"],
                     pattern: "electron/managers/**/*",
                     type: "managers",
                 },
                 {
-                    capture: [ "service" ],
+                    capture: ["service"],
                     pattern: "electron/services/**/*",
                     type: "services",
                 },
                 {
-                    capture: [ "util" ],
+                    capture: ["util"],
                     pattern: "electron/utils/**/*",
                     type: "utils",
                 },
                 {
-                    capture: [ "event" ],
+                    capture: ["event"],
                     pattern: "electron/events/**/*",
                     type: "events",
                 },
                 {
-                    capture: [ "type" ],
+                    capture: ["type"],
                     pattern: "electron/types.ts",
                     type: "types",
                 },
                 {
-                    capture: [ "test" ],
+                    capture: ["test"],
                     pattern: "electron/test/**/*",
                     type: "test",
                 },
             ],
             "import-x/resolver": {
                 node: true,
-                project: [ "tsconfig.electron.json" ],
+                project: ["tsconfig.electron.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -5810,7 +5817,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "tsconfig.electron.json" ],
+                    project: ["tsconfig.electron.json"],
                 },
             },
             n: {
@@ -5827,7 +5834,7 @@ export default /** @type {EslintConfig} */[
     // MARK: TypeScript Shared - shared/**/*
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "shared/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}" ],
+        files: ["shared/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: [
             "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
             "shared/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
@@ -5853,7 +5860,7 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "tsconfig.shared.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -5882,10 +5889,10 @@ export default /** @type {EslintConfig} */[
             css: css,
             depend: depend,
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules( pluginDeprecation ),
+            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            etc: fixupPluginRules( etc ),
+            etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
             "format-sql": pluginFormatSQL,
@@ -5903,7 +5910,7 @@ export default /** @type {EslintConfig} */[
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            neverthrow: fixupPluginRules( pluginNeverThrow ),
+            neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
             "no-function-declare-after-return": pluginNFDAR,
@@ -5934,7 +5941,7 @@ export default /** @type {EslintConfig} */[
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            "safe-jsx": fixupPluginRules( pluginSafeJSX ),
+            "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
@@ -5942,11 +5949,11 @@ export default /** @type {EslintConfig} */[
             "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
-            "ssr-friendly": fixupPluginRules( pluginSSR ),
+            "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
             tailwind: tailwind,
-            "total-functions": fixupPluginRules( pluginTotalFunctions ),
+            "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
             "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
@@ -5955,51 +5962,50 @@ export default /** @type {EslintConfig} */[
             "validate-jsx-nesting": pluginValidateJSX,
             "write-good-comments": pluginWriteGood,
             xss: xss,
-            zod: zod
+            zod: zod,
         },
         rules: {
             // TypeScript rules
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
-            ...pluginRegexp.configs[ "flat/all" ].rules,
+            ...tseslint.configs["stylistic"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...reactRefresh.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            ...pluginPromise.configs[ "flat/recommended" ].rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
-            ...reactHooks.configs[ "recommended-latest" ].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginPerfectionist.configs[ "recommended-natural" ].rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
             ...pluginSecurity.configs.recommended.rules,
-            ...nodePlugin.configs[ "flat/all" ].rules,
+            ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs[ "recommended-type-checked" ].rules,
-            ...pluginSortClassMembers.configs[ "flat/recommended" ].rules,
+            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
-            ...eslintPluginCommentLength.configs[ "flat/recommended" ].rules,
+            ...eslintPluginCommentLength.configs["flat/recommended"].rules,
             ...pluginRegexLook.configs.recommended.rules,
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
@@ -6008,6 +6014,7 @@ export default /** @type {EslintConfig} */[
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
+            ...zod.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "warn",
@@ -6046,6 +6053,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/naming-convention/use-state": "warn",
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
+            "@eslint-react/no-duplicate-key": "warn",
             "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
@@ -6056,6 +6064,7 @@ export default /** @type {EslintConfig} */[
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unnecessary-use-ref": "warn",
             "@eslint-react/no-unstable-context-value": "warn",
             "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
@@ -6203,7 +6212,7 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-empty-function": [
                 "error",
                 {
-                    allow: [ "arrowFunctions" ], // Allow empty arrow functions for React useEffect cleanup
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
                 },
             ],
             "@typescript-eslint/no-empty-object-type": "error",
@@ -6262,7 +6271,7 @@ export default /** @type {EslintConfig} */[
                                 "It provides no type safety when calling the function, which can be a common source of bugs.",
                                 "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
                                 "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
-                            ].join( "\n" ),
+                            ].join("\n"),
                         },
                     },
                 },
@@ -6344,7 +6353,7 @@ export default /** @type {EslintConfig} */[
                 "warn",
                 {
                     allowAny: true,
-                    allowedPromiseNames: [ "Promise" ],
+                    allowedPromiseNames: ["Promise"],
                     checkArrowFunctions: false,
                 },
             ],
@@ -6380,11 +6389,11 @@ export default /** @type {EslintConfig} */[
                     default: "disallow",
                     rules: [
                         {
-                            allow: [ "types" ],
+                            allow: ["types"],
                             from: "constants",
                         },
                         {
-                            allow: [ "types" ],
+                            allow: ["types"],
                             from: "types",
                         },
                         {
@@ -6435,7 +6444,7 @@ export default /** @type {EslintConfig} */[
                     aliases: [
                         {
                             alias: "@shared/",
-                            matchParent: path.resolve( import.meta.dirname ),
+                            matchParent: path.resolve(import.meta.dirname),
                             matchPath: "^shared/",
                             maxRelativeDepth: 0,
                         },
@@ -7111,7 +7120,7 @@ export default /** @type {EslintConfig} */[
             "react/jsx-filename-extension": [
                 "error",
                 {
-                    extensions: [ ".tsx" ],
+                    extensions: [".tsx"],
                 },
             ], // Enforce .tsx for JSX files
             "react/jsx-first-prop-new-line": "off",
@@ -7334,43 +7343,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
+            ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-immediate-mutation": "warn",
@@ -7413,8 +7430,10 @@ export default /** @type {EslintConfig} */[
             "usememo-recommendations/detect-heavy-operations": "warn",
             "validate-jsx-nesting/no-invalid-jsx-nesting": "error",
             "xss/no-location-href-assign": "error",
-            "zod/prefer-enum": "error",
-            "zod/require-strict": "error",
+            "zod/consistent-import-source": "error",
+            "zod/consistent-object-schema-type": "error",
+            "zod/no-unknown-schema": "error",
+            "zod/schema-error-property-style": "error",
         },
         settings: {
             "better-tailwindcss": {
@@ -7423,48 +7442,48 @@ export default /** @type {EslintConfig} */[
             },
             "boundaries/elements": [
                 {
-                    capture: [ "constant" ],
+                    capture: ["constant"],
                     pattern: "shared/constants/**/*",
                     type: "constants",
                 },
                 {
                     allowChildren: false,
-                    capture: [ "constant" ],
+                    capture: ["constant"],
                     mode: "file",
                     pattern: "shared/constants.ts",
                     type: "constants",
                 },
                 {
-                    capture: [ "type" ],
+                    capture: ["type"],
                     pattern: "shared/types/**/*",
                     type: "types",
                 },
                 {
                     allowChildren: false,
-                    capture: [ "type" ],
+                    capture: ["type"],
                     mode: "file",
                     pattern: "shared/types.ts",
                     type: "types",
                 },
                 {
-                    capture: [ "util" ],
+                    capture: ["util"],
                     pattern: "shared/utils/**/*",
                     type: "utils",
                 },
                 {
-                    capture: [ "validation" ],
+                    capture: ["validation"],
                     pattern: "shared/validation/**/*",
                     type: "validation",
                 },
                 {
-                    capture: [ "test" ],
+                    capture: ["test"],
                     pattern: "shared/test/**/*",
                     type: "test",
                 },
             ],
             "import-x/resolver": {
                 node: true,
-                project: [ "tsconfig.shared.json" ],
+                project: ["tsconfig.shared.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -7474,7 +7493,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "tsconfig.shared.json" ],
+                    project: ["tsconfig.shared.json"],
                 },
             },
             n: {
@@ -7486,9 +7505,9 @@ export default /** @type {EslintConfig} */[
             },
             react: { version: "19" },
             tailwindcss: {
-                config: `${ ROOT_DIR }/src/index.css`,
+                config: `${ROOT_DIR}/src/index.css`,
                 // @see https://github.com/francoismassart/eslint-plugin-tailwindcss/issues/276
-                cssFiles: [ "./src/index.css" ],
+                cssFiles: ["./src/index.css"],
             },
         },
     },
@@ -7551,7 +7570,7 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "config/testing/tsconfig.test.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -7571,18 +7590,18 @@ export default /** @type {EslintConfig} */[
         },
         rules: {
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.recommended.rules,
-            ...pluginTestingLibrary.configs[ "flat/react" ].rules,
+            ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             // Relaxed function rules for tests (explicit for clarity)
@@ -7594,6 +7613,8 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             camelcase: "off",
             "capitalized-comments": [
                 "error",
@@ -7668,50 +7689,58 @@ export default /** @type {EslintConfig} */[
             "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
             "testing-library/prefer-screen-queries": "warn",
+            "testing-library/prefer-user-event-setup": "warn",
             "undefined-css-classes/no-undefined-css-classes": "off",
             "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
             "unicorn/filename-case": "off", // Allow test files to have any case
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
-
+            ],
             "unicorn/no-await-expression-member": "off", // Allow await in test expressions
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -7765,7 +7794,7 @@ export default /** @type {EslintConfig} */[
         settings: {
             "import-x/resolver": {
                 node: true,
-                project: [ "config/testing/tsconfig.test.json" ],
+                project: ["config/testing/tsconfig.test.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -7775,7 +7804,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "config/testing/tsconfig.test.json" ],
+                    project: ["config/testing/tsconfig.test.json"],
                 },
             },
             n: {
@@ -7824,7 +7853,7 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "config/testing/tsconfig.electron.test.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -7843,19 +7872,18 @@ export default /** @type {EslintConfig} */[
         rules: {
             // Test Files Backend Rules (Electron Tests)
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
-
-            ...pluginTestingLibrary.configs[ "flat/react" ].rules,
+            ...pluginTestingLibrary.configs["flat/react"].rules,
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -7865,6 +7893,8 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-use-before-define": "off", // Allow use before define in tests
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             camelcase: "off",
             "capitalized-comments": [
                 "error",
@@ -7941,48 +7971,57 @@ export default /** @type {EslintConfig} */[
             "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
             "testing-library/prefer-screen-queries": "warn",
+            "testing-library/prefer-user-event-setup": "warn",
             "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
             "unicorn/filename-case": "off", // Allow test files to have any case
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
+            ],
             "unicorn/no-await-expression-member": "off", // Allow await in test expressions
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -8036,7 +8075,7 @@ export default /** @type {EslintConfig} */[
         settings: {
             "import-x/resolver": {
                 node: true,
-                project: [ "config/testing/tsconfig.electron.test.json" ],
+                project: ["config/testing/tsconfig.electron.test.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -8046,7 +8085,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "config/testing/tsconfig.electron.test.json" ],
+                    project: ["config/testing/tsconfig.electron.test.json"],
                 },
             },
             n: {
@@ -8094,7 +8133,7 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "config/testing/tsconfig.shared.test.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -8114,18 +8153,18 @@ export default /** @type {EslintConfig} */[
         },
         rules: {
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.recommended.rules,
-            ...pluginTestingLibrary.configs[ "flat/react" ].rules,
+            ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
@@ -8134,6 +8173,8 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-restricted-types": "off", // Tests may need generic Function types
             "@typescript-eslint/no-unsafe-function-type": "off", // Tests may use generic handlers
             "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             camelcase: "off",
             "capitalized-comments": [
                 "error",
@@ -8189,50 +8230,58 @@ export default /** @type {EslintConfig} */[
             "testing-library/no-debugging-utils": "off",
             "testing-library/no-node-access": "off",
             "testing-library/prefer-screen-queries": "warn",
+            "testing-library/prefer-user-event-setup": "warn",
             "undefined-css-classes/no-undefined-css-classes": "off",
             "unicorn/consistent-function-scoping": "off", // Tests often use different scoping
             "unicorn/filename-case": "off", // Allow test files to have any case
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
-
+            ],
             "unicorn/no-await-expression-member": "off", // Allow await in test expressions
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -8284,7 +8333,7 @@ export default /** @type {EslintConfig} */[
         settings: {
             "import-x/resolver": {
                 node: true,
-                project: [ "config/testing/tsconfig.shared.test.json" ],
+                project: ["config/testing/tsconfig.shared.test.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -8294,7 +8343,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "config/testing/tsconfig.shared.test.json" ],
+                    project: ["config/testing/tsconfig.shared.test.json"],
                 },
             },
             n: {
@@ -8343,9 +8392,9 @@ export default /** @type {EslintConfig} */[
                 },
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
-                project: [ "config/benchmarks/tsconfig.bench.json" ],
+                project: ["config/benchmarks/tsconfig.bench.json"],
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -8363,15 +8412,15 @@ export default /** @type {EslintConfig} */[
         rules: {
             // Benchmark Files Rules
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
@@ -8385,7 +8434,9 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-restricted-types": "off",
             "@typescript-eslint/no-unsafe-function-type": "off",
             "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
             "@typescript-eslint/require-await": "off", // Benchmarks may have async patterns
+            "@typescript-eslint/strict-void-return": "warn",
             "@typescript-eslint/unified-signatures": "off",
             camelcase: "off",
             "capitalized-comments": [
@@ -8463,44 +8514,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
-
+            ],
             "unicorn/no-array-for-each": "off", // Benchmarks may use forEach for testing
             "unicorn/no-array-reduce": "off", // Benchmarks may test reduce performance
             "unicorn/no-await-expression-member": "off",
@@ -8565,7 +8623,7 @@ export default /** @type {EslintConfig} */[
             "**/*.config.**.*.{ts,tsx,mts,cts}",
             "config/testing/utils/**/*.ts",
         ],
-        ignores: [ "docs/docusaurus/docusaurus.config.ts" ],
+        ignores: ["docs/docusaurus/docusaurus.config.ts"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -8606,7 +8664,7 @@ export default /** @type {EslintConfig} */[
                     maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 24,
                 },
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
@@ -8647,29 +8705,28 @@ export default /** @type {EslintConfig} */[
             // TypeScript Config Files Rules
             // TypeScript backend rules
             ...js.configs.all.rules,
-            ...tseslint.configs[ "recommendedTypeChecked" ],
+            ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "recommended" ].rules,
-            ...tseslint.configs[ "strictTypeChecked" ],
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "strict" ].rules,
-            ...tseslint.configs[ "stylisticTypeChecked" ],
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-            ...tseslint.configs[ "stylistic" ].rules,
-            ...pluginRegexp.configs[ "flat/all" ].rules,
+            ...tseslint.configs["stylistic"].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            ...pluginPromise.configs[ "flat/recommended" ].rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginPerfectionist.configs[ "recommended-natural" ].rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
             ...pluginSecurity.configs.recommended.rules,
-            ...nodePlugin.configs[ "flat/all" ].rules,
+            ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...pluginComments.recommended.rules,
@@ -8682,7 +8739,7 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-empty-function": [
                 "error",
                 {
-                    allow: [ "arrowFunctions" ], // Allow empty arrow functions for React useEffect cleanup
+                    allow: ["arrowFunctions"], // Allow empty arrow functions for React useEffect cleanup
                 },
             ],
             "@typescript-eslint/no-empty-object-type": "error",
@@ -8716,7 +8773,7 @@ export default /** @type {EslintConfig} */[
                                 "It provides no type safety when calling the function, which can be a common source of bugs.",
                                 "If you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
                                 "Use '(...args: unknown[]) => unknown' for generic handlers or define specific function signatures.",
-                            ].join( "\n" ),
+                            ].join("\n"),
                         },
                     },
                 },
@@ -8754,7 +8811,7 @@ export default /** @type {EslintConfig} */[
                 "in-try-catch",
             ], // Proper await handling in try-catch
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
-            "boundaries/element-types": [ "off" ],
+            "boundaries/element-types": ["off"],
             // Architecture boundaries for Electron
             "boundaries/no-ignored": "off",
             camelcase: "off",
@@ -9079,43 +9136,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
+            ],
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
@@ -9150,7 +9215,7 @@ export default /** @type {EslintConfig} */[
         settings: {
             "import-x/resolver": {
                 node: true,
-                project: [ "config/testing/tsconfig.electron.test.json" ],
+                project: ["config/testing/tsconfig.electron.test.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -9160,7 +9225,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "config/testing/tsconfig.electron.test.json" ],
+                    project: ["config/testing/tsconfig.electron.test.json"],
                 },
             },
             n: {
@@ -9199,7 +9264,9 @@ export default /** @type {EslintConfig} */[
             parser: tseslintParser,
             parserOptions: {
                 ecmaVersion: "latest",
+                project: "config/testing/tsconfig.scripts.json",
                 sourceType: "module",
+                tsconfigRootDir: path.resolve(import.meta.dirname),
             },
         },
         name: "Scripts - scripts/**/*.{TS,TSX,CTS,MTS,MJS,JS,JSX,CJS}",
@@ -9229,7 +9296,9 @@ export default /** @type {EslintConfig} */[
             "@typescript-eslint/no-restricted-types": "off",
             "@typescript-eslint/no-unsafe-function-type": "off",
             "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
             "@typescript-eslint/require-await": "off", // Scripts may have async patterns
+            "@typescript-eslint/strict-void-return": "warn",
             camelcase: "off",
             "capitalized-comments": [
                 "error",
@@ -9306,44 +9375,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
-
+            ],
             "unicorn/no-array-for-each": "off", // Benchmarks may use forEach for testing
             "unicorn/no-array-reduce": "off", // Benchmarks may test reduce performance
             "unicorn/no-await-expression-member": "off",
@@ -9370,7 +9446,7 @@ export default /** @type {EslintConfig} */[
         settings: {
             "import-x/resolver": {
                 node: true,
-                project: [ "./config/scripts/tsconfig.scripts.json" ],
+                project: ["./config/scripts/tsconfig.scripts.json"],
                 // You will also need to install and configure the TypeScript resolver
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: true,
@@ -9380,7 +9456,7 @@ export default /** @type {EslintConfig} */[
                 // See also https://github.com/import-js/eslint-import-resolver-typescript#configuration
                 typescript: {
                     alwaysTryTypes: true, // Always try to resolve types under `<root>@types` directory even if it doesn't contain any source code, like `@types/unist`
-                    project: [ "./config/scripts/tsconfig.scripts.json" ],
+                    project: ["./config/scripts/tsconfig.scripts.json"],
                 },
             },
             n: {
@@ -9397,7 +9473,7 @@ export default /** @type {EslintConfig} */[
     // MARK: JS JsDoc
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/*.{js,cjs}" ],
+        files: ["**/*.{js,cjs}"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -9410,7 +9486,7 @@ export default /** @type {EslintConfig} */[
         },
         name: "JS JSDoc - **/*.{JS,CJS}",
         plugins: {
-            jsdoc: jsdoc,
+            jsdoc: eslintPluginJsdoc,
         },
         rules: {
             "jsdoc/check-access": "warn", // Recommended
@@ -9542,22 +9618,21 @@ export default /** @type {EslintConfig} */[
         },
         rules: {
             ...js.configs.all.rules,
-            ...pluginRegexp.configs[ "flat/all" ].rules,
+            ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            ...pluginPromise.configs[ "flat/recommended" ].rules,
+            ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             ...pluginReact.configs.all.rules,
-            ...reactHooks.configs[ "recommended-latest" ].rules,
+            ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
-            ...pluginPerfectionist.configs[ "recommended-natural" ].rules,
+            ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
             ...pluginSecurity.configs.recommended.rules,
-            ...nodePlugin.configs[ "flat/recommended" ].rules,
+            ...nodePlugin.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             camelcase: "off",
             "capitalized-comments": [
@@ -9654,43 +9729,51 @@ export default /** @type {EslintConfig} */[
             "unicorn/import-style": [
                 "error",
                 {
-                  styles: {
-                    "fs": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // crypto: disallow default imports, allow named + namespace
-                    // (named is most common; namespace is sometimes handy)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:crypto": { default: false, named: true, namespace: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // Filesystem: disallow default imports, but allow named + namespace
-                    // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
-                    // ─────────────────────────────────────────────────────────────
-                    "node:fs": { default: false, named: true, namespace: true },
-                    "node:fs/promises": { default: false, named: true, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // Node “path-like” modules: allow ONLY namespace imports
-                    // (prevents `import path from "node:path"` which relies on default interop)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:path": { default: false, namespace: true },
-                    "node:path/posix": { default: false, namespace: true },
-                    "node:path/win32": { default: false, namespace: true },
-
-                    // ─────────────────────────────────────────────────────────────
-                    // timers/promises: named is the common usage
-                    // ─────────────────────────────────────────────────────────────
-                    "node:timers/promises": { named: true },
-                    // ─────────────────────────────────────────────────────────────
-                    // util: keep unicorn’s intent (named only)
-                    // ─────────────────────────────────────────────────────────────
-                    "node:util": { named: true },
-
-                    "path": { default: false, namespace: true }, // Just in case any non-node: path remains
-
-                    "util": { named: true },
-                  },
+                    styles: {
+                        fs: { default: false, named: true, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // crypto: disallow default imports, allow named + namespace
+                        // (named is most common; namespace is sometimes handy)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:crypto": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Filesystem: disallow default imports, but allow named + namespace
+                        // (named is ergonomic; namespace is useful for vi.spyOn(fs, "..."))
+                        // ─────────────────────────────────────────────────────────────
+                        "node:fs": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        "node:fs/promises": {
+                            default: false,
+                            named: true,
+                            namespace: true,
+                        },
+                        // ─────────────────────────────────────────────────────────────
+                        // Node “path-like” modules: allow ONLY namespace imports
+                        // (prevents `import path from "node:path"` which relies on default interop)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:path": { default: false, namespace: true },
+                        "node:path/posix": { default: false, namespace: true },
+                        "node:path/win32": { default: false, namespace: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // timers/promises: named is the common usage
+                        // ─────────────────────────────────────────────────────────────
+                        "node:timers/promises": { named: true },
+                        // ─────────────────────────────────────────────────────────────
+                        // util: keep unicorn’s intent (named only)
+                        // ─────────────────────────────────────────────────────────────
+                        "node:util": { named: true },
+                        path: { default: false, namespace: true }, // Just in case any non-node: path remains
+                        util: { named: true },
+                    },
                 },
-              ],
+            ],
             "unicorn/no-await-expression-member": "off", // Allow await in config expressions
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -9733,7 +9816,7 @@ export default /** @type {EslintConfig} */[
             "**/playwright/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
         ],
         name: "Playwright E2E Tests - playwright/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
-        ...playwright.configs[ "flat/recommended" ],
+        ...playwright.configs["flat/recommended"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -9756,20 +9839,20 @@ export default /** @type {EslintConfig} */[
                 jsDocParsingMode: "all",
                 project: "playwright/tsconfig.json",
                 sourceType: "module",
-                tsconfigRootDir: path.resolve( import.meta.dirname ),
+                tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
             },
         },
         plugins: {
-            ...playwright.configs[ "flat/recommended" ].plugins,
+            ...playwright.configs["flat/recommended"].plugins,
             "@typescript-eslint": tseslint,
             playwright: playwright,
             "testing-library": pluginTestingLibrary,
             vitest: vitest,
         },
         rules: {
-            ...playwright.configs[ "flat/recommended" ].rules,
-            ...pluginTestingLibrary.configs[ "flat/dom" ].rules,
+            ...playwright.configs["flat/recommended"].rules,
+            ...pluginTestingLibrary.configs["flat/dom"].rules,
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             // TypeScript and testing-specific overrides for Playwright
             "@typescript-eslint/no-unused-vars": [
@@ -9889,7 +9972,7 @@ export default /** @type {EslintConfig} */[
             "testing-library/consistent-data-testid": [
                 "warn",
                 {
-                    testIdAttribute: [ "data-testid" ],
+                    testIdAttribute: ["data-testid"],
                     testIdPattern:
                         "^[a-z]+([A-Z][a-z]+)*(-[a-z]+([A-Z][a-z]+)*)*$", // Kebab-case or camelCase
                 },
@@ -9909,9 +9992,9 @@ export default /** @type {EslintConfig} */[
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Storybook
     // ═══════════════════════════════════════════════════════════════════════════════
-    ...storybook.configs[ "flat/recommended" ],
-    ...storybook.configs[ "flat/csf-strict" ],
-    ...storybook.configs[ "flat/addon-interactions" ],
+    ...storybook.configs["flat/recommended"],
+    ...storybook.configs["flat/csf-strict"],
+    ...storybook.configs["flat/addon-interactions"],
     {
         files: [
             ".storybook/**/*.{ts,tsx,mts,cts}",
@@ -9933,7 +10016,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Storybook Stories
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "storybook/**/*.stories.tsx" ],
+        files: ["storybook/**/*.stories.tsx"],
         name: "Storybook Stories - storybook/**/*.stories.tsx",
         rules: {
             "@arthurgeron/react-usememo/require-usememo": "off",
@@ -9961,7 +10044,9 @@ export default /** @type {EslintConfig} */[
                 "warn",
                 { args: "none", varsIgnorePattern: "^_ignored$" },
             ],
+            "@typescript-eslint/no-useless-default-assignment": "warn",
             "@typescript-eslint/require-await": "off",
+            "@typescript-eslint/strict-void-return": "warn",
             "canonical/filename-match-exported": "off",
             "capitalized-comments": "off",
             "clean-timer/assign-timer-id": "off",
@@ -10002,7 +10087,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Theme Components Override
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "src/theme/**/*.{ts,tsx,cts,mts}" ],
+        files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
         name: "Theme Components Override - src/theme/**/*.{TS,TSX,CTS,MTS}",
         plugins: {
             "react-perf": reactPerfPlugin,
@@ -10045,15 +10130,15 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "**/.vscode/**" ],
+        files: ["**/.vscode/**"],
         name: "VS Code Files - Disables",
         rules: {
             "jsonc/array-bracket-newline": "off",
         },
     },
     {
-        files: [ "electron/services/sync/**/*.{ts,tsx}" ],
-        ignores: [ "electron/services/sync/syncEngineUtils.ts" ],
+        files: ["electron/services/sync/**/*.{ts,tsx}"],
+        ignores: ["electron/services/sync/syncEngineUtils.ts"],
         name: "Cloud Sync Drift Guards",
         rules: {
             "uptime-watcher/no-local-identifiers": [
@@ -10061,13 +10146,13 @@ export default /** @type {EslintConfig} */[
                 {
                     banned: [
                         {
-                            kinds: [ "function" ],
+                            kinds: ["function"],
                             message:
                                 "Use isAsciiDigits from electron/services/sync/syncEngineUtils.ts (avoid duplicated validation policies).",
                             name: "isAsciiDigits",
                         },
                         {
-                            kinds: [ "function" ],
+                            kinds: ["function"],
                             message:
                                 "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts (avoid duplicated validation policies).",
                             name: "hasAsciiControlCharacters",
@@ -10078,7 +10163,7 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "electron/services/cloud/providers/**/*.{ts,tsx}" ],
+        files: ["electron/services/cloud/providers/**/*.{ts,tsx}"],
         name: "Cloud Providers Drift Guards",
         rules: {
             "uptime-watcher/no-call-identifiers": [
@@ -10098,13 +10183,13 @@ export default /** @type {EslintConfig} */[
                 {
                     banned: [
                         {
-                            kinds: [ "function" ],
+                            kinds: ["function"],
                             message:
                                 "Use tryParseJsonRecord from shared/utils/jsonSafety.ts instead of defining local JSON parsing helpers.",
                             name: "tryParseJsonRecord",
                         },
                         {
-                            kinds: [ "function" ],
+                            kinds: ["function"],
                             message:
                                 "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
                             name: "isPlainObject",
@@ -10115,7 +10200,7 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "shared/types/**/*.{ts,tsx}" ],
+        files: ["shared/types/**/*.{ts,tsx}"],
         name: "Shared Types Drift Guards",
         rules: {
             "uptime-watcher/no-local-identifiers": [
@@ -10123,7 +10208,7 @@ export default /** @type {EslintConfig} */[
                 {
                     banned: [
                         {
-                            kinds: [ "variable" ],
+                            kinds: ["variable"],
                             message:
                                 "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
                             name: "isPlainObject",
@@ -10134,7 +10219,7 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "electron/preload/**/*.{ts,tsx}" ],
+        files: ["electron/preload/**/*.{ts,tsx}"],
         name: "Preload Drift Guards",
         rules: {
             "uptime-watcher/no-local-identifiers": [
@@ -10142,7 +10227,7 @@ export default /** @type {EslintConfig} */[
                 {
                     banned: [
                         {
-                            kinds: [ "variable" ],
+                            kinds: ["variable"],
                             message:
                                 "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
                             name: "isPlainObject",
@@ -10153,8 +10238,8 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "electron/services/**/*.{ts,tsx}" ],
-        ignores: [ "electron/services/sync/syncEngineUtils.ts" ],
+        files: ["electron/services/**/*.{ts,tsx}"],
+        ignores: ["electron/services/sync/syncEngineUtils.ts"],
         name: "String Safety Drift Guards",
         rules: {
             "uptime-watcher/no-local-identifiers": [
@@ -10162,7 +10247,7 @@ export default /** @type {EslintConfig} */[
                 {
                     banned: [
                         {
-                            kinds: [ "function" ],
+                            kinds: ["function"],
                             message:
                                 "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts instead of defining local implementations.",
                             name: "hasAsciiControlCharacters",
@@ -10173,8 +10258,8 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "electron/services/**/*.{ts,tsx}" ],
-        ignores: [ "electron/services/shell/openExternalUtils.ts" ],
+        files: ["electron/services/**/*.{ts,tsx}"],
+        ignores: ["electron/services/shell/openExternalUtils.ts"],
         name: "Electron Error Formatting Drift Guards",
         rules: {
             "no-restricted-syntax": [
@@ -10190,7 +10275,7 @@ export default /** @type {EslintConfig} */[
         },
     },
     {
-        files: [ "**/*.{ts,tsx}" ],
+        files: ["**/*.{ts,tsx}"],
         name: "Regex Drift Guards",
         rules: {
             "uptime-watcher/no-regexp-v-flag": "error",
@@ -10200,7 +10285,7 @@ export default /** @type {EslintConfig} */[
     // MARK: Global Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [ "**/**" ],
+        files: ["**/**"],
         name: "Globals",
         rules: {
             "@eslint-react/debug/class-component": "off", // Debugging not needed
@@ -10286,7 +10371,6 @@ export default /** @type {EslintConfig} */[
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
             "unicorn/prefer-spread": "off", // Prefer Array.from
-
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules
@@ -10336,7 +10420,37 @@ export default /** @type {EslintConfig} */[
         },
         rules: {
             "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-useless-default-assignment": "warn",
+            "@typescript-eslint/strict-void-return": "warn",
             "canonical/no-re-export": "off",
+        },
+    },
+    {
+        files: [
+            "**/*.test.{ts,tsx}",
+            "**/*.spec.{ts,tsx}",
+            "src/test/**/*.{ts,tsx}",
+            "tests/**/*.{ts,tsx}",
+        ],
+        name: "Tests - relax strict void rules",
+        rules: {
+            // This rule is extremely noisy in tests (especially property-based
+            // tests) where callback return values are often incidental.
+            "@typescript-eslint/strict-void-return": "off",
+        },
+    },
+    {
+        files: [
+            "benchmarks/**/*.{ts,tsx}",
+            "electron/test/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}",
+        ],
+        name: "Benchmarks/Scripts - relax strict void rules",
+        rules: {
+            // Benchmarks frequently return measurement values from callbacks.
+            // Scripts commonly use void/Promise-returning callbacks where the
+            // return value is intentionally ignored.
+            "@typescript-eslint/strict-void-return": "off",
         },
     },
     eslintConfigPrettier,

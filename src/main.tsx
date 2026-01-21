@@ -22,7 +22,10 @@ import "./index.css";
  * Initializes and renders the Uptime Watcher React application.
  *
  * @remarks
- * - Locates the root DOM element by ID ("root").
+ * -
+ *
+ * Locates the root DOM element by ID ("root").
+ *
  * - Throws an error if the root element is missing.
  * - Creates a React root and renders the {@link App} component inside
  *   {@link StrictMode}.

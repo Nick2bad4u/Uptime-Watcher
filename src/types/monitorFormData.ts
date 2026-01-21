@@ -791,7 +791,7 @@ export function isWebsocketKeepaliveFormData(
 /**
  * Registry of type-specific validation functions.
  *
-    * When true, prefix each message with a rendered path (e.g. `foo.bar: ...`).
+ * When true, prefix each message with a rendered path (e.g. `foo.bar: ...`).
  * whenever a new monitor type is introduced.
  *
  * @internal

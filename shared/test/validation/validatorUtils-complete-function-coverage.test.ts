@@ -52,7 +52,7 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             // Test with options
             expect(
                 validatorUtilsModule.isValidFQDN("localhost", {
-                    require_tld: false,
+                    "require_tld": false,
                 })
             ).toBeTruthy();
 
@@ -213,7 +213,7 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             // Test with options
             expect(
                 validatorUtilsModule.isValidUrl("https://example.com", {
-                    require_tld: true,
+                    "require_tld": true,
                 })
             ).toBeTruthy();
 
@@ -259,12 +259,12 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             // Test isValidFQDN with various options
             expect(
                 validatorUtilsModule.isValidFQDN("example.com.", {
-                    allow_trailing_dot: true,
+                    "allow_trailing_dot": true,
                 })
             ).toBeTruthy();
             expect(
                 validatorUtilsModule.isValidFQDN("example.com.", {
-                    allow_trailing_dot: false,
+                    "allow_trailing_dot": false,
                 })
             ).toBeFalsy();
 

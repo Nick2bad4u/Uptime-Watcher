@@ -47,9 +47,12 @@ describe("MonitoringService - Site-level monitoring", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockWaitForElectronBridge.mockResolvedValue(undefined);
-        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI, {
-            ensureWindow: true,
-        }));
+        ({ restore: restoreElectronApi } = installElectronApiMock(
+            mockElectronAPI,
+            {
+                ensureWindow: true,
+            }
+        ));
     });
 
     afterEach(() => {

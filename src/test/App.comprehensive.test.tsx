@@ -374,11 +374,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await renderApp();
 
             expect(screen.getByTestId("header")).toBeInTheDocument();
@@ -391,11 +386,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -418,11 +408,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             await renderApp();
@@ -432,11 +417,6 @@ describe("App Component - Comprehensive Coverage", () => {
         });
 
         it("should display correct site count", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -591,11 +571,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
             const clearError = vi.fn();
             mockUseErrorStore.mockReturnValue({
                 ...defaultErrorStore,
@@ -605,8 +580,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
+
             const closeButton = screen.getByLabelText("Dismiss error");
-            await userEvent.click(closeButton);
+            await user.click(closeButton);
 
             expect(clearError).toHaveBeenCalledTimes(1);
         });
@@ -828,8 +805,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
+
             const restartButton = screen.getByText("Restart Now");
-            await userEvent.click(restartButton);
+            await user.click(restartButton);
 
             expect(applyUpdate).toHaveBeenCalledTimes(1);
         });
@@ -860,8 +839,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
+
             const dismissButton = screen.getByText("Dismiss");
-            await userEvent.click(dismissButton);
+            await user.click(dismissButton);
 
             expect(applyUpdateStatus).toHaveBeenCalledWith("idle");
             expect(setUpdateError).toHaveBeenCalledWith(undefined);
@@ -904,11 +885,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             mockUseUIStore.mockReturnValue({
                 ...defaultUIStore,
                 showSettings: false,
@@ -944,8 +920,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
             const closeButton = screen.getByTestId("close-settings");
-            await userEvent.click(closeButton);
+            await user.click(closeButton);
 
             expect(setShowSettings).toHaveBeenCalledWith(false);
         });
@@ -990,11 +967,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1049,8 +1021,9 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
+            const user = userEvent.setup();
             const closeButton = screen.getByTestId("close-site-details");
-            await userEvent.click(closeButton);
+            await user.click(closeButton);
 
             expect(setShowSiteDetails).toHaveBeenCalledWith(false);
         });
@@ -1265,9 +1238,11 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
-            expect(
-                mockBackendFocusSync.useBackendFocusSync
-            ).toHaveBeenCalledWith(false);
+            await waitFor(() => {
+                expect(
+                    mockBackendFocusSync.useBackendFocusSync
+                ).toHaveBeenCalledWith(false);
+            });
         });
     });
 
@@ -1321,8 +1296,11 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
-            // Wait a bit to ensure initialization completes
-            await new Promise((resolve) => setTimeout(resolve, 50));
+            // Flush pending microtasks so App initialization effects settle
+            // without leaking state updates outside of act(...).
+            await act(async () => {
+                await Promise.resolve();
+            });
 
             expect(mockLogger.logger.app.started).not.toHaveBeenCalled();
         });

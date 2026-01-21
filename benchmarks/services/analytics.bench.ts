@@ -1,9 +1,9 @@
 /**
  * Data Analytics Service Performance Benchmarks.
  *
- * @packageDocumentation
+ * @packageDocumentation Exercises
  *
- * Exercises synthetic metric ingestion, aggregation, and alerting pipelines to
+ * synthetic metric ingestion, aggregation, and alerting pipelines to
  * benchmark analytics workloads.
  */
 

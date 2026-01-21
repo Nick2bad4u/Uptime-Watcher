@@ -80,7 +80,7 @@ export const BackupMigrationPanel = ({
     const LockIcon = AppIcons.ui.lock;
     const TrashIcon = AppIcons.actions.remove;
 
-    const headerIcon = <LockIcon aria-hidden className="h-5 w-5" />;
+    const headerIcon = <LockIcon aria-hidden className="size-5" />;
     const encryptIcon = useMemo(
         () => <LockIcon aria-hidden size={buttonIconSize} />,
         [buttonIconSize, LockIcon]

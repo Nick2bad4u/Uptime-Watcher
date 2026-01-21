@@ -241,14 +241,16 @@ export const EnhancedMonitoringServiceFactory = {
 
         // Create timeout manager
         const timeoutManager = new OperationTimeoutManager(
-            operationRegistryInstance
+            operationRegistryInstance,
+            dependencies.monitorRepository
         );
 
         // Create status update service
         const statusUpdateService = new MonitorStatusUpdateService(
             operationRegistryInstance,
             dependencies.monitorRepository,
-            dependencies.sites
+            dependencies.sites,
+            timeoutManager
         );
 
         // Create enhanced monitor checker configuration

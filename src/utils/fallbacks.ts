@@ -424,7 +424,11 @@ const MONITOR_TYPE_LABELS = new Map<string, string>([
  * @remarks
  * This is intentionally small and focused on common, user-facing terms.
  */
-const MONITOR_TYPE_ACRONYMS = new Set(["api", "dns", "http"]);
+const MONITOR_TYPE_ACRONYMS = new Set([
+    "api",
+    "dns",
+    "http",
+]);
 
 function formatMonitorTypeSegment(segment: string): string {
     if (!segment) {
@@ -487,9 +491,7 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                     // eslint-disable-next-line no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp -- Environment compatibility
                     .replaceAll(/(?<=[a-z])(?=[A-Z])/gu, " ") // Add space before capitals
                     .split(" ")
-                    .map(
-                        (word) => formatMonitorTypeSegment(word)
-                    )
+                    .map((word) => formatMonitorTypeSegment(word))
                     .join(" ");
 
                 return `${titleCase} Monitor`;

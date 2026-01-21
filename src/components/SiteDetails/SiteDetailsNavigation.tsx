@@ -252,20 +252,24 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
             [analyticsTabKey]
         );
 
-        const tabActions = useMemo(() => new Map<string, () => void>([
-                ["history", handleHistoryClick],
-                ["monitor-overview", handleMonitorOverviewClick],
-                ["settings", handleSettingsClick],
-                ["site-overview", handleSiteOverviewClick],
-                [analyticsTabKey, handleMonitorAnalyticsClick],
-            ]), [
-            analyticsTabKey,
-            handleHistoryClick,
-            handleMonitorAnalyticsClick,
-            handleMonitorOverviewClick,
-            handleSettingsClick,
-            handleSiteOverviewClick,
-        ]);
+        const tabActions = useMemo(
+            () =>
+                new Map<string, () => void>([
+                    ["history", handleHistoryClick],
+                    ["monitor-overview", handleMonitorOverviewClick],
+                    ["settings", handleSettingsClick],
+                    ["site-overview", handleSiteOverviewClick],
+                    [analyticsTabKey, handleMonitorAnalyticsClick],
+                ]),
+            [
+                analyticsTabKey,
+                handleHistoryClick,
+                handleMonitorAnalyticsClick,
+                handleMonitorOverviewClick,
+                handleSettingsClick,
+                handleSiteOverviewClick,
+            ]
+        );
 
         const handleTabKeyDown = useCallback(
             (event: ReactKeyboardEvent<HTMLButtonElement>): void => {
@@ -305,7 +309,11 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                         ?.focus();
                 });
             },
-            [activeSiteDetailsTab, tabActions, tabKeys]
+            [
+                activeSiteDetailsTab,
+                tabActions,
+                tabKeys,
+            ]
         );
 
         return (
@@ -324,7 +332,9 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                     >
                         <ThemedButton
                             aria-controls="site-details-tabpanel"
-                            aria-selected={activeSiteDetailsTab === "site-overview"}
+                            aria-selected={
+                                activeSiteDetailsTab === "site-overview"
+                            }
                             className="flex items-center gap-2"
                             id={resolveSiteDetailsTabId("site-overview")}
                             onClick={handleSiteOverviewClick}
@@ -373,7 +383,9 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                         {/* Render analytics tab for selected monitor type only */}
                         <ThemedButton
                             aria-controls="site-details-tabpanel"
-                            aria-selected={activeSiteDetailsTab === analyticsTabKey}
+                            aria-selected={
+                                activeSiteDetailsTab === analyticsTabKey
+                            }
                             className="flex items-center gap-2"
                             id={resolveSiteDetailsTabId(analyticsTabKey)}
                             onClick={handleMonitorAnalyticsClick}

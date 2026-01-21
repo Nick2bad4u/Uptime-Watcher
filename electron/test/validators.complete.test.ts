@@ -1,7 +1,8 @@
 /**
  * Provides complete test coverage for all exported validator groups in the
- * per-domain validator modules using isolated testing with comprehensive dependency
- * mocking. Tests the actual validator behavior and parameter validation logic.
+ * per-domain validator modules using isolated testing with comprehensive
+ * dependency mocking. Tests the actual validator behavior and parameter
+ * validation logic.
  *
  * @module ValidatorsTest
  *
@@ -916,6 +917,29 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
+
+            it("should reject reserved prototype keys in restore payload", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Security", "type");
+
+                const payload = Object.create(null) as Record<string, unknown>;
+                payload["buffer"] = new ArrayBuffer(8);
+                Object.defineProperty(payload, "__proto__", {
+                    enumerable: true,
+                    value: { polluted: true },
+                });
+
+                const result = DataHandlerValidators.restoreSqliteBackup([
+                    payload,
+                ]);
+
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
         });
     });
 
@@ -1017,6 +1041,30 @@ describe("IPC Validators - Exported Validator Groups", () => {
                     CloudHandlerValidators.configureFilesystemProvider([
                         { baseDirectory: " C:/Backups" },
                     ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("rejects reserved prototype keys", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Security", "type");
+
+                const config = Object.create(null) as Record<string, unknown>;
+                config["baseDirectory"] = "C:/Backups";
+                Object.defineProperty(config, "__proto__", {
+                    enumerable: true,
+                    value: { polluted: true },
+                });
+
+                const result =
+                    CloudHandlerValidators.configureFilesystemProvider([
+                        config,
+                    ]);
+
                 expect(isValidationFailure(result)).toBeTruthy();
             });
         });
@@ -1427,7 +1475,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("should accept any type for second parameter", async ({
+            it("should reject non-object second parameter", async ({
                 task,
                 annotate,
             }) => {
@@ -1441,7 +1489,6 @@ describe("IPC Validators - Exported Validator Groups", () => {
                         "http",
                         null,
                     ]);
-
                 const result2 =
                     MonitorTypeHandlerValidators.validateMonitorData([
                         "ping",
@@ -1453,9 +1500,26 @@ describe("IPC Validators - Exported Validator Groups", () => {
                         "string",
                     ]);
 
-                expect(isValidationSuccess(result1)).toBeTruthy();
-                expect(isValidationSuccess(result2)).toBeTruthy();
-                expect(isValidationSuccess(result3)).toBeTruthy();
+                expect(isValidationFailure(result1)).toBeTruthy();
+                expect(isValidationFailure(result2)).toBeTruthy();
+                expect(isValidationFailure(result3)).toBeTruthy();
+            });
+
+            it("should reject oversized payloads", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Security", "type");
+
+                const largeString = "x".repeat(300 * 1024);
+                const result = MonitorTypeHandlerValidators.validateMonitorData(
+                    ["http", { blob: largeString }]
+                );
+
+                expect(isValidationFailure(result)).toBeTruthy();
             });
 
             it("should return error array for invalid parameter count", async ({

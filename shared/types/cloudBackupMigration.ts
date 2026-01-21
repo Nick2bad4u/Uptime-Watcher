@@ -70,3 +70,40 @@ export function parseCloudBackupMigrationRequest(
 ): CloudBackupMigrationRequest {
     return cloudBackupMigrationRequestInternalSchema.parse(candidate);
 }
+
+const cloudBackupMigrationFailureSchema: z.ZodType<CloudBackupMigrationFailure> =
+    z
+        .object({
+            key: z.string().min(1),
+            message: z.string().min(1),
+        })
+        .strict();
+
+const cloudBackupMigrationResultInternalSchema: z.ZodType<CloudBackupMigrationResult> =
+    z
+        .object({
+            completedAt: z.number(),
+            deleteSource: z.boolean(),
+            failures: z.array(cloudBackupMigrationFailureSchema),
+            migrated: z.int().nonnegative(),
+            processed: z.int().nonnegative(),
+            skipped: z.int().nonnegative(),
+            startedAt: z.number(),
+            target: cloudBackupMigrationTargetSchema,
+        })
+        .strict();
+
+/** Zod schema for {@link CloudBackupMigrationResult}. */
+export const cloudBackupMigrationResultSchema: z.ZodType<CloudBackupMigrationResult> =
+    cloudBackupMigrationResultInternalSchema;
+
+/**
+ * Safe parser for {@link CloudBackupMigrationResult}.
+ *
+ * @remarks
+ * Used by the preload bridge to validate IPC payloads without throwing.
+ */
+export const safeParseCloudBackupMigrationResult = (
+    candidate: unknown
+): ReturnType<typeof cloudBackupMigrationResultInternalSchema.safeParse> =>
+    cloudBackupMigrationResultInternalSchema.safeParse(candidate);

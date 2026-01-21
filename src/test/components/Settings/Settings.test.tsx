@@ -62,14 +62,16 @@ interface GlobalWithSettingsMocks extends UnknownRecord {
     __useSitesStoreMock_settings__?: typeof useSitesStoreMock;
 }
 
-const globalWithSettingsMocks = globalThis as unknown as GlobalWithSettingsMocks;
+const globalWithSettingsMocks =
+    globalThis as unknown as GlobalWithSettingsMocks;
 
 globalWithSettingsMocks.__useErrorStoreMock_settings__ = useErrorStoreMock;
-globalWithSettingsMocks.__useSettingsStoreMock_settings__ = useSettingsStoreMock;
+globalWithSettingsMocks.__useSettingsStoreMock_settings__ =
+    useSettingsStoreMock;
 
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
-    useErrorStore: <Result = typeof errorStoreState>(
+    useErrorStore: <Result = typeof errorStoreState,>(
         selector?: (state: typeof errorStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
     ): Result | typeof errorStoreState => {
@@ -83,7 +85,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 }));
 
 vi.mock("../../../stores/settings/useSettingsStore", () => ({
-    useSettingsStore: <Result = typeof settingsStoreState>(
+    useSettingsStore: <Result = typeof settingsStoreState,>(
         selector?: (state: typeof settingsStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
     ): Result | typeof settingsStoreState => {
@@ -130,7 +132,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 globalWithSettingsMocks.__useSitesStoreMock_settings__ = useSitesStoreMock;
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: <Result = typeof sitesStoreState>(
+    useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
     ): Result | typeof sitesStoreState => {

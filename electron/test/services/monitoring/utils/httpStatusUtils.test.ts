@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { determineMonitorStatus } from "../../../../services/monitoring/utils/httpStatusUtils";
+import { determineMonitorStatus } from "@shared/utils/httpStatusUtils";
 
 describe("HTTP Status Utils", () => {
     describe(determineMonitorStatus, () => {

@@ -41,10 +41,7 @@ const { ensureInitialized, wrap } = getIpcServiceHelpers("StateSyncService", {
     bridgeContracts: [
         {
             domain: "stateSync",
-            methods: [
-                "getSyncStatus",
-                "requestFullSync",
-            ],
+            methods: ["getSyncStatus", "requestFullSync"],
         },
         {
             domain: "events",
@@ -376,8 +373,7 @@ export const StateSyncService: StateSyncServiceContract = {
                             {
                                 revision: parsedEvent.data.revision,
                                 siteCount:
-                                    parsedEvent.data.action ===
-                                    "bulk-sync"
+                                    parsedEvent.data.action === "bulk-sync"
                                         ? parsedEvent.data.siteCount
                                         : undefined,
                                 source: parsedEvent.data.source,

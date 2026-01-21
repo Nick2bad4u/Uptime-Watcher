@@ -532,10 +532,7 @@ describe(SaveButton, () => {
             annotate("Type: Business Logic", "type");
 
             render(
-                <SaveButton
-                    {...defaultProps}
-                    data-testattribute="test-value"
-                />
+                <SaveButton {...defaultProps} data-testattribute="test-value" />
             );
 
             const button = screen.getByTestId("themed-button");

@@ -40,7 +40,7 @@ import {
  */
 function copyDynamicFields(
     monitor: Site["monitors"][0],
-        dynamicMonitor: UnknownRecord
+    dynamicMonitor: UnknownRecord
 ): void {
     const excludedFields = new Set([
         "checkInterval",
@@ -304,7 +304,10 @@ export function isValidMonitorRow(row: UnknownRecord): boolean {
  * system.
  *
  * @remarks
- * - Handles monitor type-specific fields via {@link mapRowToMonitor}.
+ * -
+ *
+ * Handles monitor type-specific fields via {@link mapRowToMonitor}.
+ *
  * - Adds security validation for activeOperations JSON.
  * - Performs safe type conversions with fallbacks.
  *
@@ -389,7 +392,10 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
  * system.
  *
  * @remarks
- * - Maps snake_case DB fields to camelCase.
+ * -
+ *
+ * Maps snake_case DB fields to camelCase.
+ *
  * - Handles monitor type-specific fields via {@link mapRowToMonitor}.
  * - Applies default values for missing/invalid fields.
  * - Does not load history (history is loaded separately).
@@ -401,7 +407,10 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
  * row is missing.
  *
  * @remarks
- * - Returns `undefined` if the input row is `undefined` or `null`.
+ * -
+ *
+ * Returns `undefined` if the input row is `undefined` or `null`.
+ *
  * - Otherwise, delegates to {@link rowToMonitor}.
  * - Used by repository methods where a missing monitor is not an error.
  *

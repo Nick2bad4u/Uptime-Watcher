@@ -1,7 +1,6 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
 
 import { defineConfig, devices } from "@playwright/test";
-import * as os from "node:os";
 
 const readEnv = (key: string): string | undefined => {
     if (typeof process === "undefined") {
@@ -24,7 +23,30 @@ const coerceEnvFlag = (value: string | undefined): boolean => {
 const isCI = coerceEnvFlag(readEnv("CI"));
 const headlessBrowserMode =
     isCI || coerceEnvFlag(readEnv("PLAYWRIGHT_HEADLESS"));
-const uiTestWorkerCount = isCI ? 2 : Math.min(Math.max(os.cpus().length, 2), 4);
+
+const parseWorkerCount = (value: string | undefined): number | undefined => {
+    if (!value) {
+        return undefined;
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+        return undefined;
+    }
+
+    return parsed;
+};
+
+// UI tests launch full Electron instances; running too many in parallel can be
+// flaky on developer machines (renderer exits / window closes). Default to a
+// single worker locally, allow override for power users.
+const uiTestWorkerCount =
+    parseWorkerCount(readEnv("PLAYWRIGHT_UI_WORKERS")) ?? (isCI ? 2 : 1);
+
+// Cap total worker processes across all projects. Electron E2E runs can be
+// flaky when too many app instances are launched concurrently.
+const totalWorkerCount =
+    parseWorkerCount(readEnv("PLAYWRIGHT_WORKERS")) ?? (isCI ? 2 : 1);
 const slowMoMsValue = readEnv("PLAYWRIGHT_SLOWMO");
 const slowMoMs = slowMoMsValue ? Number.parseInt(slowMoMsValue, 10) || 0 : 0;
 const chromiumDevice = devices["Desktop Chrome"];
@@ -149,7 +171,6 @@ const config: PlaywrightTestConfig = defineConfig({
     globalTeardown: "./playwright/fixtures/global-teardown.ts",
     outputDir: "playwright/test-results/",
     projects: mergedProjects,
-
     reporter: [
         ["list"],
         [
@@ -163,6 +184,7 @@ const config: PlaywrightTestConfig = defineConfig({
     retries: isCI ? 2 : 0,
 
     testDir: "./playwright/tests",
+
     testIgnore: [
         "**/*.vitest.test.ts",
         "**/*.vitest.test.js",
@@ -173,8 +195,8 @@ const config: PlaywrightTestConfig = defineConfig({
         "**/coverage/**",
         "**/dist*/**",
     ],
-    testMatch: ["**/*.playwright.test.ts"],
 
+    testMatch: ["**/*.playwright.test.ts"],
     timeout: 20 * 1000,
     tsconfig: "./playwright/tsconfig.json",
 
@@ -202,6 +224,7 @@ const config: PlaywrightTestConfig = defineConfig({
             : "off",
         viewport: { height: 720, width: 1280 },
     },
+    workers: totalWorkerCount,
 });
 
 export default config;

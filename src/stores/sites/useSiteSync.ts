@@ -51,8 +51,6 @@ import {
 /**
  * Site synchronization actions interface.
  *
- * @remarks
- * Defines all available site synchronization operations that can be performed.
  * These actions are designed to work within the Zustand store architecture and
  * provide consistent error handling and logging.
  *
@@ -156,8 +154,6 @@ export interface SiteSyncActions {
 }
 
 /**
- * Dependencies required for site synchronization operations.
- *
  * @remarks
  * These dependencies are injected into the sync actions to maintain separation
  * of concerns and enable easier testing. The dependencies provide access to the
@@ -184,14 +180,22 @@ export interface SiteSyncDependencies {
     ) => void;
 }
 
-// Create a shared status update manager instance - will be initialized when
-// first used
 // Singleton instance management for status updates, lazily initialized to
-// avoid unnecessary object creation
+// avoid unnecessary object creation.
+//
+// IMPORTANT: Callbacks can change between subscriptions (different components),
+// so the manager must not capture a stale callback reference.
 const statusUpdateManager: {
-    callback?: (update: StatusUpdate) => void;
-    instance?: StatusUpdateManager;
-} = {};
+    callback: ((update: StatusUpdate) => void) | undefined;
+    instance: StatusUpdateManager | undefined;
+} = {
+    callback: undefined,
+    instance: undefined,
+};
+
+function dispatchStatusUpdate(update: StatusUpdate): void {
+    statusUpdateManager.callback?.(update);
+}
 
 /**
  * Resets the module-level status update manager singleton.
@@ -206,8 +210,8 @@ const statusUpdateManager: {
  */
 export function resetStatusUpdateManagerForTesting(): void {
     statusUpdateManager.instance?.unsubscribe();
-    delete statusUpdateManager.instance;
-    delete statusUpdateManager.callback;
+    statusUpdateManager.instance = undefined;
+    statusUpdateManager.callback = undefined;
 }
 
 const FALLBACK_EXPECTED_LISTENERS = 4;
@@ -269,6 +273,16 @@ export const createSiteSyncActions = (
 ): SiteSyncActions => {
     // Synchronization state to prevent concurrent syncs
     let pendingSyncPromise: null | Promise<void> = null;
+
+    const syncEventSubscription: {
+        cleanup?: () => void;
+        pending?: Promise<void>;
+        refCount: number;
+        shouldCleanupOnReady: boolean;
+    } = {
+        refCount: 0,
+        shouldCleanupOnReady: false,
+    };
 
     /**
      * Normalizes backend site snapshots by removing duplicate identifiers while
@@ -388,7 +402,7 @@ export const createSiteSyncActions = (
 
             if (statusUpdateManager.instance) {
                 statusUpdateManager.instance.unsubscribe();
-                delete statusUpdateManager.instance;
+                statusUpdateManager.instance = undefined;
             }
 
             deps.setStatusSubscriptionSummary(undefined);
@@ -431,7 +445,7 @@ export const createSiteSyncActions = (
             statusUpdateManager.instance ??= new StatusUpdateManager({
                 fullResyncSites: actions.fullResyncSites,
                 getSites: deps.getSites,
-                onUpdate: effectiveCallback,
+                onUpdate: dispatchStatusUpdate,
                 setSites: deps.setSites,
             });
 
@@ -555,258 +569,295 @@ export const createSiteSyncActions = (
             return withErrorHandling(executeSubscription, errorHandler);
         },
         subscribeToSyncEvents: (): (() => void) => {
-            let cleanup: (() => void) | null = null;
-            let disposed = false;
+            syncEventSubscription.refCount += 1;
 
-            const logSyncEventReceived = (event: StateSyncEventData): void => {
-                const {
-                    action,
-                    revision,
-                    siteIdentifier,
-                    source,
-                    timestamp,
-                } = event;
+            // A previous cleanup request can set `shouldCleanupOnReady` while
+            // subscription setup is still pending. If a new subscriber attaches
+            // before setup completes, we must not auto-cleanup on completion.
+            syncEventSubscription.shouldCleanupOnReady = false;
+            let released = false;
 
-                let sitesCount: number | undefined = undefined;
-                if (action === "bulk-sync") {
-                    const { sites } = event;
-                    sitesCount = sites.length;
-                }
+            const shouldAttachSubscription =
+                syncEventSubscription.cleanup === undefined &&
+                syncEventSubscription.pending === undefined;
 
-                logStoreAction("SitesStore", "syncEventReceived", {
-                    action,
-                    message: `Received sync event: ${action}`,
-                    revision,
-                    siteIdentifier,
-                    source,
-                    timestamp,
-                    ...(typeof sitesCount === "number" ? { sitesCount } : {}),
-                });
-            };
+            if (shouldAttachSubscription) {
+                const logSyncEventReceived = (
+                    event: StateSyncEventData
+                ): void => {
+                    const {
+                        action,
+                        revision,
+                        siteIdentifier,
+                        source,
+                        timestamp,
+                    } = event;
 
-            const applySnapshotEvent = (event: BulkStateSyncEventData): void => {
-                const {
-                    action,
-                    revision,
-                    siteIdentifier,
-                    sites,
-                    source,
-                    timestamp,
-                } = event;
+                    let sitesCount: number | undefined = undefined;
+                    if (action === "bulk-sync") {
+                        const { sites } = event;
+                        sitesCount = sites.length;
+                    }
 
-                const snapshot = prepareSiteSyncSnapshot({
-                    previousSnapshot: deps.getSites(),
-                    sites,
-                });
+                    logStoreAction("SitesStore", "syncEventReceived", {
+                        action,
+                        message: `Received sync event: ${action}`,
+                        revision,
+                        siteIdentifier,
+                        source,
+                        timestamp,
+                        ...(typeof sitesCount === "number"
+                            ? { sitesCount }
+                            : {}),
+                    });
+                };
 
-                const { delta, duplicates, emissionSnapshot } = snapshot;
+                const applySnapshotEvent = (
+                    event: BulkStateSyncEventData
+                ): void => {
+                    const {
+                        action,
+                        revision,
+                        siteIdentifier,
+                        sites,
+                        source,
+                        timestamp,
+                    } = event;
 
-                if (duplicates.length > 0) {
-                    logger.error(
-                        "Duplicate site identifiers detected in state sync snapshot",
-                        {
-                            action,
-                            duplicates,
-                            originalSiteCount: sites.length,
-                            sanitizedSiteCount: emissionSnapshot.length,
-                            source,
-                        }
-                    );
-                }
+                    const snapshot = prepareSiteSyncSnapshot({
+                        previousSnapshot: deps.getSites(),
+                        sites,
+                    });
 
-                const hasChanges = hasSiteSyncChanges(delta);
+                    const { delta, duplicates, emissionSnapshot } = snapshot;
 
-                logStoreAction("SitesStore", "applySyncDelta", {
-                    action,
-                    addedCount: delta.addedSites.length,
-                    removedCount: delta.removedSiteIdentifiers.length,
-                    sanitizedSiteCount: emissionSnapshot.length,
-                    source,
-                    timestamp,
-                    updatedCount: delta.updatedSites.length,
-                });
+                    if (duplicates.length > 0) {
+                        logger.error(
+                            "Duplicate site identifiers detected in state sync snapshot",
+                            {
+                                action,
+                                duplicates,
+                                originalSiteCount: sites.length,
+                                sanitizedSiteCount: emissionSnapshot.length,
+                                source,
+                            }
+                        );
+                    }
 
-                if (!hasChanges) {
-                    logger.debug(
-                        "Sync snapshot did not change site state; skipping store update",
-                        {
-                            action,
-                            revision,
-                            siteIdentifier,
-                            source,
-                            timestamp,
-                        }
-                    );
+                    const hasChanges = hasSiteSyncChanges(delta);
+
+                    logStoreAction("SitesStore", "applySyncDelta", {
+                        action,
+                        addedCount: delta.addedSites.length,
+                        removedCount: delta.removedSiteIdentifiers.length,
+                        sanitizedSiteCount: emissionSnapshot.length,
+                        source,
+                        timestamp,
+                        updatedCount: delta.updatedSites.length,
+                    });
+
+                    if (!hasChanges) {
+                        logger.debug(
+                            "Sync snapshot did not change site state; skipping store update",
+                            {
+                                action,
+                                revision,
+                                siteIdentifier,
+                                source,
+                                timestamp,
+                            }
+                        );
+                        deps.onSiteDelta?.(delta);
+                        return;
+                    }
+
+                    deps.setSites(emissionSnapshot);
                     deps.onSiteDelta?.(delta);
-                    return;
-                }
+                };
 
-                deps.setSites(emissionSnapshot);
-                deps.onSiteDelta?.(delta);
-            };
+                const applyDeltaEvent = (
+                    event: DeltaStateSyncEventData
+                ): void => {
+                    const {
+                        action,
+                        delta,
+                        revision,
+                        siteIdentifier,
+                        source,
+                        timestamp,
+                    } = event;
 
-            const applyDeltaEvent = (event: DeltaStateSyncEventData): void => {
-                const {
-                    action,
-                    delta,
-                    revision,
-                    siteIdentifier,
-                    source,
-                    timestamp,
-                } = event;
-
-                const {
-                    delta: sanitizedDelta,
-                    diagnostics: {
-                        addedDuplicates,
-                        overlapIdentifiers,
-                        updatedDuplicates,
-                    },
-                } = buildSanitizedIncomingSiteSyncDelta(delta);
-
-                if (addedDuplicates.length > 0) {
-                    logger.error(
-                        "Duplicate site identifiers detected in incoming sync delta additions",
-                        {
-                            action,
-                            duplicates: addedDuplicates,
-                            source,
-                        }
-                    );
-                }
-
-                if (updatedDuplicates.length > 0) {
-                    logger.error(
-                        "Duplicate site identifiers detected in incoming sync delta updates",
-                        {
-                            action,
-                            duplicates: updatedDuplicates,
-                            source,
-                        }
-                    );
-                }
-
-                if (overlapIdentifiers.length > 0) {
-                    logger.error(
-                        "Incoming sync delta contains overlapping added/updated identifiers",
-                        {
-                            action,
+                    const {
+                        delta: sanitizedDelta,
+                        diagnostics: {
+                            addedDuplicates,
                             overlapIdentifiers,
-                            source,
-                        }
-                    );
-                }
+                            updatedDuplicates,
+                        },
+                    } = buildSanitizedIncomingSiteSyncDelta(delta);
 
-                const hasChanges = hasSiteSyncChanges(sanitizedDelta);
-                if (!hasChanges) {
-                    logger.debug(
-                        "Sync delta did not change site state; skipping store update",
-                        {
-                            action,
-                            revision,
-                            siteIdentifier,
-                            source,
-                            timestamp,
-                        }
+                    if (addedDuplicates.length > 0) {
+                        logger.error(
+                            "Duplicate site identifiers detected in incoming sync delta additions",
+                            {
+                                action,
+                                duplicates: addedDuplicates,
+                                source,
+                            }
+                        );
+                    }
+
+                    if (updatedDuplicates.length > 0) {
+                        logger.error(
+                            "Duplicate site identifiers detected in incoming sync delta updates",
+                            {
+                                action,
+                                duplicates: updatedDuplicates,
+                                source,
+                            }
+                        );
+                    }
+
+                    if (overlapIdentifiers.length > 0) {
+                        logger.error(
+                            "Incoming sync delta contains overlapping added/updated identifiers",
+                            {
+                                action,
+                                overlapIdentifiers,
+                                source,
+                            }
+                        );
+                    }
+
+                    const hasChanges = hasSiteSyncChanges(sanitizedDelta);
+                    if (!hasChanges) {
+                        logger.debug(
+                            "Sync delta did not change site state; skipping store update",
+                            {
+                                action,
+                                revision,
+                                siteIdentifier,
+                                source,
+                                timestamp,
+                            }
+                        );
+                        deps.onSiteDelta?.(sanitizedDelta);
+                        return;
+                    }
+
+                    const currentSites = deps.getSites();
+                    const removedIdentifiers = new Set(
+                        sanitizedDelta.removedSiteIdentifiers
                     );
+                    const { addedSites, removedSiteIdentifiers, updatedSites } =
+                        sanitizedDelta;
+
+                    const updatedByIdentifier = new Map(
+                        updatedSites.map(
+                            (site) => [site.identifier, site] as const
+                        )
+                    );
+
+                    const nextSites: Site[] = [];
+                    const seenIdentifiers = new Set<string>();
+
+                    for (const site of currentSites) {
+                        const { identifier } = site;
+                        const removed = removedIdentifiers.has(identifier);
+                        if (!removed) {
+                            const updatedSite =
+                                updatedByIdentifier.get(identifier);
+                            nextSites.push(updatedSite ?? site);
+                            seenIdentifiers.add(identifier);
+                        }
+                    }
+
+                    for (const site of addedSites) {
+                        const { identifier } = site;
+                        const shouldAdd =
+                            !removedIdentifiers.has(identifier) &&
+                            !seenIdentifiers.has(identifier);
+
+                        if (shouldAdd) {
+                            nextSites.push(site);
+                            seenIdentifiers.add(identifier);
+                        }
+                    }
+
+                    // Treat unknown updates as upserts.
+                    for (const site of updatedSites) {
+                        const { identifier } = site;
+                        const shouldAdd =
+                            !removedIdentifiers.has(identifier) &&
+                            !seenIdentifiers.has(identifier);
+
+                        if (shouldAdd) {
+                            nextSites.push(site);
+                            seenIdentifiers.add(identifier);
+                        }
+                    }
+
+                    const snapshot = deriveSiteSnapshot(nextSites);
+                    const { duplicates, sanitizedSites } = snapshot;
+                    if (duplicates.length > 0) {
+                        logger.error(
+                            "Duplicate site identifiers detected after applying sync delta",
+                            {
+                                action,
+                                duplicates,
+                                source,
+                            }
+                        );
+                    }
+
+                    logStoreAction("SitesStore", "applySyncDelta", {
+                        action,
+                        addedCount: addedSites.length,
+                        removedCount: removedSiteIdentifiers.length,
+                        sanitizedSiteCount: sanitizedSites.length,
+                        source,
+                        timestamp,
+                        updatedCount: updatedSites.length,
+                    });
+
+                    deps.setSites(sanitizedSites);
                     deps.onSiteDelta?.(sanitizedDelta);
-                    return;
-                }
+                };
 
-                const currentSites = deps.getSites();
-                const removedIdentifiers = new Set(
-                    sanitizedDelta.removedSiteIdentifiers
-                );
-                const {
-                    addedSites,
-                    removedSiteIdentifiers,
-                    updatedSites,
-                } = sanitizedDelta;
+                const handleEvent = (event: StateSyncEventData): void => {
+                    try {
+                        logSyncEventReceived(event);
 
-                const updatedByIdentifier = new Map(
-                    updatedSites.map((site) => [site.identifier, site])
-                );
-
-                const nextSites: Site[] = [];
-                const seenIdentifiers = new Set<string>();
-
-                for (const site of currentSites) {
-                    const { identifier } = site;
-                    const removed = removedIdentifiers.has(identifier);
-                    if (!removed) {
-                        const updatedSite = updatedByIdentifier.get(identifier);
-                        nextSites.push(updatedSite ?? site);
-                        seenIdentifiers.add(identifier);
-                    }
-                }
-
-                for (const site of addedSites) {
-                    const { identifier } = site;
-                    const shouldAdd =
-                        !removedIdentifiers.has(identifier) &&
-                        !seenIdentifiers.has(identifier);
-
-                    if (shouldAdd) {
-                        nextSites.push(site);
-                        seenIdentifiers.add(identifier);
-                    }
-                }
-
-                // Treat unknown updates as upserts.
-                for (const site of updatedSites) {
-                    const { identifier } = site;
-                    const shouldAdd =
-                        !removedIdentifiers.has(identifier) &&
-                        !seenIdentifiers.has(identifier);
-
-                    if (shouldAdd) {
-                        nextSites.push(site);
-                        seenIdentifiers.add(identifier);
-                    }
-                }
-
-                const snapshot = deriveSiteSnapshot(nextSites);
-                const { duplicates, sanitizedSites } = snapshot;
-                if (duplicates.length > 0) {
-                    logger.error(
-                        "Duplicate site identifiers detected after applying sync delta",
-                        {
-                            action,
-                            duplicates,
-                            source,
+                        if (event.truncated === true) {
+                            // Normally handled upstream by StateSyncService (full-sync recovery),
+                            // but keep this guard to avoid applying incomplete payloads.
+                            const { action, revision, siteIdentifier, source } =
+                                event;
+                            logger.warn(
+                                "Ignoring truncated state sync event in SitesStore",
+                                {
+                                    action,
+                                    revision,
+                                    siteIdentifier,
+                                    source,
+                                }
+                            );
+                            return;
                         }
-                    );
-                }
 
-                logStoreAction("SitesStore", "applySyncDelta", {
-                    action,
-                    addedCount: addedSites.length,
-                    removedCount: removedSiteIdentifiers.length,
-                    sanitizedSiteCount: sanitizedSites.length,
-                    source,
-                    timestamp,
-                    updatedCount: updatedSites.length,
-                });
+                        if (event.action === "bulk-sync") {
+                            applySnapshotEvent(event);
+                            return;
+                        }
 
-                deps.setSites(sanitizedSites);
-                deps.onSiteDelta?.(sanitizedDelta);
-            };
-
-            const handleEvent = (event: StateSyncEventData): void => {
-                try {
-                    logSyncEventReceived(event);
-
-                    if (event.truncated === true) {
-                        // Normally handled upstream by StateSyncService (full-sync recovery),
-                        // but keep this guard to avoid applying incomplete payloads.
-                        const {
-                            action,
-                            revision,
-                            siteIdentifier,
-                            source,
-                        } = event;
-                        logger.warn(
-                            "Ignoring truncated state sync event in SitesStore",
+                        applyDeltaEvent(event);
+                    } catch (error: unknown) {
+                        const normalizedError = ensureError(error);
+                        const { action, revision, siteIdentifier, source } =
+                            event;
+                        logger.error(
+                            "Failed to apply state sync event",
+                            normalizedError,
                             {
                                 action,
                                 revision,
@@ -814,73 +865,87 @@ export const createSiteSyncActions = (
                                 source,
                             }
                         );
-                        return;
                     }
+                };
 
-                    if (event.action === "bulk-sync") {
-                        applySnapshotEvent(event);
-                        return;
-                    }
+                syncEventSubscription.pending = (async (): Promise<void> => {
+                    try {
+                        const serviceCleanup =
+                            await StateSyncService.onStateSyncEvent(
+                                handleEvent
+                            );
 
-                    applyDeltaEvent(event);
-                } catch (error: unknown) {
-                    const normalizedError = ensureError(error);
-                    const { action, revision, siteIdentifier, source } = event;
-                    logger.error(
-                        "Failed to apply state sync event",
-                        normalizedError,
-                        {
-                            action,
-                            revision,
-                            siteIdentifier,
-                            source,
+                        if (syncEventSubscription.refCount === 0) {
+                            serviceCleanup();
+                            syncEventSubscription.shouldCleanupOnReady = false;
+                            return;
                         }
-                    );
-                }
-            };
 
-            void (async (): Promise<void> => {
-                try {
-                    const serviceCleanup =
-                        await StateSyncService.onStateSyncEvent(handleEvent);
+                        syncEventSubscription.cleanup = serviceCleanup;
+                        logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                            message: "Sync event subscription setup completed",
+                            status: "success",
+                            success: true,
+                        });
+                    } catch (error) {
+                        const normalizedError = ensureError(error);
+                        logger.error(
+                            "Failed to subscribe to sync events:",
+                            normalizedError
+                        );
+                        logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                            error: normalizedError.message,
+                            message: "Failed to subscribe to sync events",
+                            status: "failure",
+                            success: false,
+                        });
 
-                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- disposed may flip while awaiting subscription.
-                    if (disposed) {
-                        serviceCleanup();
-                        return;
+                        syncEventSubscription.refCount = 0;
+                        syncEventSubscription.shouldCleanupOnReady = false;
+                    } finally {
+                        delete syncEventSubscription.pending;
+
+                        if (
+                            syncEventSubscription.refCount === 0 &&
+                            syncEventSubscription.cleanup
+                        ) {
+                            syncEventSubscription.cleanup();
+                            delete syncEventSubscription.cleanup;
+                            syncEventSubscription.shouldCleanupOnReady = false;
+                        }
                     }
+                })();
 
-                    cleanup = serviceCleanup;
-                    logStoreAction("SitesStore", "subscribeToSyncEvents", {
-                        message: "Sync event subscription setup completed",
-                        status: "success",
-                        success: true,
-                    });
-                } catch (error) {
-                    const normalizedError = ensureError(error);
-                    logger.error(
-                        "Failed to subscribe to sync events:",
-                        normalizedError
-                    );
-                    logStoreAction("SitesStore", "subscribeToSyncEvents", {
-                        error: normalizedError.message,
-                        message: "Failed to subscribe to sync events",
-                        status: "failure",
-                        success: false,
-                    });
-                }
-            })();
-
-            logStoreAction("SitesStore", "subscribeToSyncEvents", {
-                message: "Sync event subscription setup initiated",
-                status: "pending",
-            });
+                logStoreAction("SitesStore", "subscribeToSyncEvents", {
+                    message: "Sync event subscription setup initiated",
+                    status: "pending",
+                });
+            }
 
             return (): void => {
-                disposed = true;
-                if (cleanup) {
-                    cleanup();
-                    cleanup = null;
+                if (released) {
+                    return;
+                }
+
+                released = true;
+                syncEventSubscription.refCount = Math.max(
+                    0,
+                    syncEventSubscription.refCount - 1
+                );
+
+                if (syncEventSubscription.refCount > 0) {
+                    return;
+                }
+
+                if (syncEventSubscription.cleanup) {
+                    syncEventSubscription.cleanup();
+                    delete syncEventSubscription.cleanup;
+                    syncEventSubscription.shouldCleanupOnReady = false;
+                    return;
+                }
+
+                if (syncEventSubscription.pending) {
+                    syncEventSubscription.shouldCleanupOnReady = true;
                 }
             };
         },
@@ -972,8 +1037,8 @@ export const createSiteSyncActions = (
         },
         unsubscribeFromStatusUpdates: () => {
             statusUpdateManager.instance?.unsubscribe();
-            delete statusUpdateManager.instance;
-            delete statusUpdateManager.callback;
+            statusUpdateManager.instance = undefined;
+            statusUpdateManager.callback = undefined;
             deps.setStatusSubscriptionSummary(undefined);
             const result: StatusUpdateUnsubscribeResult = {
                 message: "Successfully unsubscribed from status updates",

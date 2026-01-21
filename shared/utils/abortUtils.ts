@@ -507,21 +507,72 @@ export async function raceWithAbort<T>(
         throw new Error("Operation was aborted");
     }
 
-    // Create abort promise before racing to ensure listener is set up
-    const abortPromise = new Promise<never>((_resolve, reject) => {
+    return new Promise<T>((resolve, reject) => {
+        let settled = false;
+        let listenerAttached = false;
+
+        function rejectWith(reason: unknown): void {
+            const error =
+                reason instanceof Error ? reason : new Error(String(reason));
+            reject(error);
+        }
+
+        function handleAbort(): void {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            if (listenerAttached) {
+                listenerAttached = false;
+                signal.removeEventListener("abort", handleAbort);
+            }
+            rejectWith(new Error("Operation was aborted"));
+        }
+
+        function settleResolved(value: T): void {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            if (listenerAttached) {
+                listenerAttached = false;
+                signal.removeEventListener("abort", handleAbort);
+            }
+            resolve(value);
+        }
+
+        function settleRejected(reason: unknown): void {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            if (listenerAttached) {
+                listenerAttached = false;
+                signal.removeEventListener("abort", handleAbort);
+            }
+            rejectWith(reason);
+        }
+
         if (signal.aborted) {
-            reject(new Error("Operation was aborted"));
+            handleAbort();
             return;
         }
 
-        signal.addEventListener(
-            "abort",
-            () => {
-                reject(new Error("Operation was aborted"));
-            },
-            { once: true }
-        );
-    });
+        signal.addEventListener("abort", handleAbort);
+        listenerAttached = true;
 
-    return Promise.race([operation, abortPromise]);
+        const resolveOperation = async (): Promise<void> => {
+            try {
+                const value = await operation;
+                settleResolved(value);
+            } catch (error: unknown) {
+                settleRejected(error);
+            }
+        };
+
+        void resolveOperation();
+    });
 }

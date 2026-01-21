@@ -60,7 +60,9 @@ const mockOpenExternal = vi.fn();
 
 // Mock useUIStore hook
 vi.mock("../stores/ui/useUiStore", () => ({
-    useUIStore: (selector?: (state: { openExternal: typeof mockOpenExternal }) => unknown) => {
+    useUIStore: (
+        selector?: (state: { openExternal: typeof mockOpenExternal }) => unknown
+    ) => {
         const state = {
             openExternal: mockOpenExternal,
         };
@@ -147,7 +149,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         vi.clearAllMocks();
         mockOpenExternal.mockClear();
 
-        ({ restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI));
+        ({ restore: restoreElectronApi } =
+            installElectronApiMock(mockElectronAPI));
         // Clear any existing timeouts
         vi.useFakeTimers();
 
