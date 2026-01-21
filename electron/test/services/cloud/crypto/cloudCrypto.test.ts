@@ -63,4 +63,25 @@ describe("cloudCrypto", () => {
             })
         ).toBeFalsy();
     });
+
+    it("key-check rejects malformed base64", async () => {
+        const salt = generateEncryptionSalt();
+        const key = await derivePassphraseKey({ passphrase: "secret", salt });
+
+        const keyCheckBase64 = createKeyCheckBase64(key);
+
+        expect(
+            verifyKeyCheckBase64({
+                key,
+                keyCheckBase64: `${keyCheckBase64}\n`,
+            })
+        ).toBeFalsy();
+
+        expect(
+            verifyKeyCheckBase64({
+                key,
+                keyCheckBase64: keyCheckBase64.replaceAll("A", "@"),
+            })
+        ).toBeFalsy();
+    });
 });

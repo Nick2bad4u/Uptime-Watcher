@@ -200,7 +200,12 @@ export function settingsToRecord(
     for (const setting of settings) {
         // Use type-specific validation instead of awkward casting
         if (isValidSettingObject(setting)) {
-            result[setting.key] = setting.value;
+            Object.defineProperty(result, setting.key, {
+                configurable: true,
+                enumerable: true,
+                value: setting.value,
+                writable: true,
+            });
         }
     }
 

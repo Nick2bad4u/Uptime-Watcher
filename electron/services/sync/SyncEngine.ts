@@ -1,4 +1,5 @@
 import type { Monitor, Site } from "@shared/types";
+import type { CloudProviderKind } from "@shared/types/cloud";
 import type {
     CloudSyncMonitorConfig,
     CloudSyncSettingsConfig,
@@ -15,6 +16,7 @@ import {
     type CloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
+import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
@@ -102,6 +104,8 @@ const SETTINGS_KEY_DEVICE_ID = "cloud.sync.deviceId" as const;
 const SETTINGS_KEY_NEXT_OP_ID = "cloud.sync.nextOpId" as const;
 const SETTINGS_KEY_BASELINE = "cloud.sync.baseline.v1" as const;
 
+const noop = (): void => {};
+
 /**
  * Sync engine implementing ADR-016 (operation log + snapshots).
  */
@@ -110,7 +114,35 @@ export class SyncEngine {
 
     private readonly settings: SyncEngineSettingsAdapter;
 
+    /**
+     * Serializes sync runs across provider kinds.
+     *
+     * @remarks
+     * This is intentionally a queue (not a single-flight): if provider kind
+     * changes, we still want the new request to run after the prior one.
+     */
+    private syncQueue: Promise<void> = Promise.resolve();
+
+    /**
+     * Single-flight wrappers per provider kind.
+     *
+     * @remarks
+     * Coalesces concurrent calls for the same provider kind **including** when
+     * they are queued behind another provider's sync run.
+     */
+    private readonly syncNowByProviderKind = new Map<
+        CloudProviderKind,
+        (provider: CloudStorageProvider) => Promise<SyncEngineResult>
+    >();
+
     public async syncNow(
+        provider: CloudStorageProvider
+    ): Promise<SyncEngineResult> {
+        const runner = this.getOrCreateSyncNowRunner(provider.kind);
+        return runner(provider);
+    }
+
+    private async syncNowInternal(
         provider: CloudStorageProvider
     ): Promise<SyncEngineResult> {
         const transport = ProviderCloudSyncTransport.create(provider);
@@ -345,7 +377,7 @@ export class SyncEngine {
         };
     }
 
-    private async applyMergedState(
+private async applyMergedState(
         state: CloudSyncState,
         existingSettings: Record<string, string>
     ): Promise<CloudSyncBaseline> {
@@ -446,7 +478,7 @@ export class SyncEngine {
         };
     }
 
-    private async applySettings(
+private async applySettings(
         existing: Record<string, string>,
         desired: CloudSyncSettingsConfig
     ): Promise<void> {
@@ -472,7 +504,7 @@ export class SyncEngine {
         /* eslint-enable no-await-in-loop -- Settings reconciliation complete */
     }
 
-    private async loadSnapshotState(
+private async loadSnapshotState(
         transport: ProviderCloudSyncTransport,
         manifest: CloudSyncManifest
     ): Promise<
@@ -508,7 +540,7 @@ export class SyncEngine {
         }
     }
 
-    private async getOrCreateDeviceId(): Promise<string> {
+private async getOrCreateDeviceId(): Promise<string> {
         const existing = await this.settings.get(SETTINGS_KEY_DEVICE_ID);
         if (existing && isValidPersistedDeviceId(existing)) {
             return existing;
@@ -532,13 +564,13 @@ export class SyncEngine {
         return deviceId;
     }
 
-    private async getNextOpId(): Promise<number> {
+private async getNextOpId(): Promise<number> {
         const raw = await this.settings.get(SETTINGS_KEY_NEXT_OP_ID);
         const value = raw ? Number(raw) : 0;
         return Number.isFinite(value) && value >= 0 ? value : 0;
     }
 
-    private async getBaseline(): Promise<CloudSyncBaseline> {
+private async getBaseline(): Promise<CloudSyncBaseline> {
         const raw = await this.settings.get(SETTINGS_KEY_BASELINE);
         if (!raw) {
             return createEmptyBaseline();
@@ -558,12 +590,71 @@ export class SyncEngine {
         return parsed.baseline;
     }
 
-    private async setBaseline(baseline: CloudSyncBaseline): Promise<void> {
+private async setBaseline(baseline: CloudSyncBaseline): Promise<void> {
         await this.settings.set(
             SETTINGS_KEY_BASELINE,
             stringifyBaseline(baseline)
         );
     }
+
+private async enqueueSyncRun<Result>(
+        fn: () => Promise<Result>
+    ): Promise<Result> {
+        const previous = this.syncQueue;
+        let release: () => void = noop;
+        const next = new Promise<void>((resolve) => {
+            release = resolve;
+        });
+
+        this.syncQueue = next;
+
+        return (async (): Promise<Result> => {
+            try {
+                await previous;
+            } catch {
+                // Ignore failures from previous runs; callers observe their own.
+            }
+
+            try {
+                return await fn();
+            } finally {
+                release();
+            }
+        })();
+    }
+
+    private getOrCreateSyncNowRunner(
+        providerKind: CloudProviderKind
+    ): (provider: CloudStorageProvider) => Promise<SyncEngineResult> {
+        const existing = this.syncNowByProviderKind.get(providerKind);
+        if (existing) {
+            return existing;
+        }
+
+        const runner = createSingleFlight(
+            async (provider: CloudStorageProvider): Promise<SyncEngineResult> =>
+                this.enqueueSyncRun(async () => this.syncNowInternal(provider))
+        );
+
+        this.syncNowByProviderKind.set(providerKind, runner);
+        return runner;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Removes invalid sites/monitors from a merged sync state before we compact

@@ -263,6 +263,25 @@ export class FilesystemCloudStorageProvider
                             return null;
                         }
 
+                        // Ensure the derived key is already canonical.
+                        //
+                        // @remarks
+                        // Filesystem filenames can contain leading/trailing
+                        // whitespace and other oddities that we intentionally
+                        // do not normalize into a *different* cloud key. If a
+                        // key would change under normalization, ignore it.
+                        try {
+                            const normalizedKey =
+                                FilesystemCloudStorageProvider.normalizeObjectKey(
+                                    key
+                                );
+                            if (normalizedKey !== key) {
+                                return null;
+                            }
+                        } catch {
+                            return null;
+                        }
+
                         try {
                             return await toCloudObjectEntry(key, absolute);
                         } catch {

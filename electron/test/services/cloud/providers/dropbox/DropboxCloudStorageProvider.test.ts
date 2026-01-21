@@ -79,6 +79,12 @@ describe(DropboxCloudStorageProvider, () => {
                     },
                     {
                         ".tag": "file",
+                        path_display: "/uptime-watcher/syncX/b.ndjson",
+                        server_modified: "2025-01-01T00:00:00Z",
+                        size: 11,
+                    },
+                    {
+                        ".tag": "file",
                         path_display: "/uptime-watcher/backups/b.sqlite",
                         server_modified: "2025-01-01T00:00:00Z",
                         size: 20,
@@ -102,7 +108,7 @@ describe(DropboxCloudStorageProvider, () => {
             tokenManager: tokenManager as never,
         });
 
-        const entries = await provider.listObjects("sync/");
+        const entries = await provider.listObjects("sync");
         expect(entries).toHaveLength(1);
         expect(entries[0]?.key).toBe("sync/a.ndjson");
         expect(entries[0]?.sizeBytes).toBe(10);

@@ -6,11 +6,11 @@
  * concurrency) used by {@link SyncEngine}.
  */
 
-import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters as sharedHasAsciiControlCharacters } from "@shared/utils/stringSafety";
-
-/** Maximum byte budget accepted for persisted sync device IDs. */
-export const MAX_PERSISTED_DEVICE_ID_BYTES = 256;
+import {
+    getPersistedDeviceIdValidationError as sharedGetPersistedDeviceIdValidationError,
+    isValidPersistedDeviceId as sharedIsValidPersistedDeviceId,
+} from "@shared/validation/persistedDeviceIdValidation";
 
 /**
  * Returns true when the string contains only ASCII digits.
@@ -65,39 +65,9 @@ export function hasAsciiControlCharacters(value: string): boolean {
 export function getPersistedDeviceIdValidationError(
     candidate: string
 ): null | string {
-    const trimmed = candidate.trim();
-    if (trimmed.length === 0) {
-        return "deviceId must be a non-empty string";
-    }
-
-    if (trimmed !== candidate) {
-        return "deviceId must not contain leading or trailing whitespace";
-    }
-
-    if (Buffer.byteLength(candidate, "utf8") > MAX_PERSISTED_DEVICE_ID_BYTES) {
-        return `deviceId must not exceed ${MAX_PERSISTED_DEVICE_ID_BYTES} bytes`;
-    }
-
-    if (hasAsciiControlCharacters(candidate)) {
-        return "deviceId must not contain control characters";
-    }
-
-    // Device IDs must be a single key segment.
-    if (normalizePathSeparatorsToPosix(candidate).includes("/")) {
-        return "deviceId must not contain path separators";
-    }
-
-    // Device IDs are used in provider object keys; reject colon tokens to avoid
-    // ambiguity across providers and to match other key policies.
-    if (candidate.includes(":")) {
-        return "deviceId must not contain ':'";
-    }
-
-    if (candidate === "." || candidate === "..") {
-        return "deviceId must not be a traversal segment";
-    }
-
-    return null;
+    const impl: (candidate: string) => null | string =
+        sharedGetPersistedDeviceIdValidationError;
+    return impl(candidate);
 }
 
 /**
@@ -109,7 +79,8 @@ export function getPersistedDeviceIdValidationError(
  * control characters.
  */
 export function isValidPersistedDeviceId(candidate: string): boolean {
-    return getPersistedDeviceIdValidationError(candidate) === null;
+    const impl: (candidate: string) => boolean = sharedIsValidPersistedDeviceId;
+    return impl(candidate);
 }
 
 function assertNoUndefined<T>(

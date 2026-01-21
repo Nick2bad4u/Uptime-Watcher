@@ -90,8 +90,46 @@ export function encodeBase64(buffer: Buffer): string {
     return buffer.toString("base64");
 }
 
-function decodeBase64(value: string): Buffer {
-    return Buffer.from(value, "base64");
+function assertCanonicalBase64(args: { label: string; value: string }): void {
+    const { label, value } = args;
+
+    if (typeof value !== "string") {
+        throw new TypeError(`Invalid ${label}: must be a string`);
+    }
+
+    // Node's base64 decoder is permissive (ignores whitespace/invalid chars).
+    // We require canonical base64 because these values are persisted and used
+    // for key derivation; permissive parsing would make corruption harder to
+    // detect and could lead to irrecoverable encryption state.
+    if (/\s/u.test(value)) {
+        throw new Error(`Invalid ${label}: base64 must not contain whitespace`);
+    }
+
+    if (value.length === 0) {
+        throw new Error(`Invalid ${label}: base64 must not be empty`);
+    }
+
+    if (value.length % 4 !== 0) {
+        throw new Error(
+            `Invalid ${label}: base64 length must be a multiple of 4 characters`
+        );
+    }
+
+    // Standard base64 (not URL-safe).
+    if (!/^[A-Za-z0-9+/]+={0,2}$/u.test(value)) {
+        throw new Error(`Invalid ${label}: base64 contains invalid characters`);
+    }
+}
+
+/**
+ * Decodes a base64 value after validating it is canonical.
+ */
+export function decodeCanonicalBase64(args: {
+    label: string;
+    value: string;
+}): Buffer {
+    assertCanonicalBase64(args);
+    return Buffer.from(args.value, "base64");
 }
 
 /**
@@ -102,7 +140,10 @@ export function decodeStrictBase64(args: {
     label: string;
     value: string;
 }): Buffer {
-    const buffer = decodeBase64(args.value);
+    const buffer = decodeCanonicalBase64({
+        label: args.label,
+        value: args.value,
+    });
 
     if (buffer.byteLength !== args.expectedBytes) {
         throw new Error(

@@ -276,6 +276,55 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
             expect(result).toBe('{"exported": true}');
         });
+        it("should not throw when settings contains '__proto__' key", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Export", "category");
+
+            const { safeJsonStringifyWithFallback } = await import(
+                "@shared/utils/jsonSafety"
+            );
+            const safeJsonStringifyWithFallbackMock = vi.mocked(
+                safeJsonStringifyWithFallback
+            );
+
+            // Simulate a corrupted database or hostile import that inserted a
+            // dangerous key into the settings table.
+            mockRepositories.settings.getAll.mockResolvedValue({
+                ["__proto__"]: "evil",
+                "ui.theme": "dark",
+                "cloud.dropbox.tokens": "secret",
+            });
+
+            mockRepositories.site.exportAllRows.mockResolvedValue([]);
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                "{\"exported\":true}"
+            );
+
+            const output = await service.exportAllData();
+
+            expect(output).toBe("{\"exported\":true}");
+
+            const calls = safeJsonStringifyWithFallbackMock.mock.calls;
+            expect(calls).toHaveLength(1);
+
+            const [payload] = calls[0] ?? [];
+            expect(payload).toBeTruthy();
+            expect(payload).toEqual(
+                expect.objectContaining({
+                    settings: expect.objectContaining({
+                        "ui.theme": "dark",
+                    }),
+                })
+            );
+
+            expect(
+                (payload as { settings: Record<string, string> }).settings
+            ).not.toHaveProperty("cloud.dropbox.tokens");
+        });
 
         it("should handle export errors and emit database error event", async ({
             task,

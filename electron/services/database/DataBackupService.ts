@@ -562,8 +562,6 @@ export class DataBackupService {
             async () => {
                 const normalizedBackup =
                     this.normalizeBackupResultMetadata(backup);
-                validateDatabaseBackupPayload(normalizedBackup);
-
                 const buffer = Buffer.from(normalizedBackup.buffer);
                 if (
                     buffer.length < SQLITE_HEADER.length ||
@@ -590,6 +588,25 @@ export class DataBackupService {
                         buffer
                     );
 
+                    // The incoming metadata may be untrusted (e.g. downloaded
+                    // from cloud storage). Always compute the schema version
+                    // from the actual SQLite file so a forged schemaVersion
+                    // cannot bypass compatibility checks.
+                    const schemaVersion = readDatabaseSchemaVersionFromFile(
+                        tempFilePath
+                    );
+
+                    const effectiveBackup: DatabaseBackupResult = {
+                        ...normalizedBackup,
+                        metadata: {
+                            ...normalizedBackup.metadata,
+                            schemaVersion,
+                            sizeBytes: buffer.length,
+                        },
+                    };
+
+                    validateDatabaseBackupPayload(effectiveBackup);
+
                     // Even for internally-produced backups, validate that the
                     // replacement database file is structurally sound before
                     // swapping it into place.
@@ -599,7 +616,7 @@ export class DataBackupService {
                     });
 
                     await this.replaceDatabaseFile(tempFilePath, dbPath);
-                    return normalizedBackup.metadata;
+                    return effectiveBackup.metadata;
                 } finally {
                     await this.removeDirectorySafe(
                         tempDir,

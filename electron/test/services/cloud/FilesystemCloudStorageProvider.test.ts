@@ -123,6 +123,35 @@ describe("FilesystemCloudStorageProvider", () => {
         expect(entries.map((entry) => entry.key)).toEqual(["sync/file.txt"]);
     });
 
+    it("ignores filesystem entries that are not canonical cloud keys", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+        // Create a file whose name would be changed by normalization.
+        // On most filesystems this is valid, but it should not be treated as a
+        // different canonical key.
+        await provider.uploadObject({
+            buffer: Buffer.from("a"),
+            key: "sync/canonical.txt",
+            overwrite: true,
+        });
+
+        const nodeFs = await import("node:fs");
+        const nodePath = await import("node:path");
+        const appRoot = nodePath.resolve(baseDirectory, "uptime-watcher");
+        await nodeFs.promises.mkdir(nodePath.join(appRoot, "sync"), {
+            recursive: true,
+        });
+        await nodeFs.promises.writeFile(
+            nodePath.join(appRoot, "sync", "noncanonical.txt "),
+            Buffer.from("b")
+        );
+
+        const entries = await provider.listObjects("sync");
+        expect(entries.map((entry) => entry.key)).toEqual([
+            "sync/canonical.txt",
+        ]);
+    });
+
     it("throws a typed ENOENT error when downloading a missing object", async () => {
         const provider = new FilesystemCloudStorageProvider({ baseDirectory });
 

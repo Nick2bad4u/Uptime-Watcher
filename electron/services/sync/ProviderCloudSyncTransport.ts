@@ -48,6 +48,9 @@ const DEFAULT_MAX_MANIFEST_BYTES = 256 * 1024; // 256 KiB
 /** Maximum byte budget accepted for provider object keys handled by sync. */
 const MAX_SYNC_KEY_BYTES = 2048;
 
+/** Minimum hex chars used for snapshot nonce suffix. */
+const SNAPSHOT_NONCE_HEX_CHARS = 32;
+
 function getMaxOpsObjectBytes(): number {
     return readNumberEnv(
         "UW_CLOUD_SYNC_MAX_OPS_OBJECT_BYTES",
@@ -126,8 +129,13 @@ function encodeUtf8(value: string): Buffer {
     return Buffer.from(value, "utf8");
 }
 
-function decodeUtf8(buffer: Buffer): string {
-    return buffer.toString("utf8");
+const utfEightDecoder = new TextDecoder("utf-8", { fatal: true });
+
+function decodeUtfEightStrict(buffer: Buffer): string {
+    // Node's Buffer#toString('utf8') is permissive and will replace invalid
+    // byte sequences. For sync artifacts, permissive decoding can mask remote
+    // corruption and lead to hard-to-diagnose state issues.
+    return utfEightDecoder.decode(buffer);
 }
 
 function toNdjson(operations: readonly CloudSyncOperation[]): string {
@@ -255,7 +263,9 @@ function assertSnapshotKey(key: string): void {
     assertSafeProviderKey(key);
 
     const segments = key.split("/");
-    // Expected: sync/snapshots/<schemaVersion>/<createdAt>.json
+    // Expected:
+    // - legacy: sync/snapshots/<schemaVersion>/<createdAt>.json
+    // - v2:     sync/snapshots/<schemaVersion>/<createdAt>-<nonceHex>.json
     if (segments.length !== 4) {
         throw new Error(`Invalid snapshot key: ${key}`);
     }
@@ -280,8 +290,36 @@ function assertSnapshotKey(key: string): void {
     }
 
     const stem = fileName.slice(0, -".json".length);
-    if (!isAsciiDigits(stem)) {
+
+    const [createdAtRaw, nonceRaw, ...rest] = stem.split("-");
+    if (!createdAtRaw || rest.length > 0) {
         throw new Error(`Invalid snapshot key: ${key}`);
+    }
+
+    if (!isAsciiDigits(createdAtRaw)) {
+        throw new Error(`Invalid snapshot key: ${key}`);
+    }
+
+    if (nonceRaw !== undefined) {
+        const normalized = nonceRaw.toLowerCase();
+        if (normalized.length !== SNAPSHOT_NONCE_HEX_CHARS) {
+            throw new Error(`Invalid snapshot key: ${key}`);
+        }
+
+        // Keep this strict: the suffix is an internal nonce used for
+        // collision avoidance and should be ASCII hex.
+        for (const char of normalized) {
+            const codePoint = char.codePointAt(0);
+            if (codePoint === undefined) {
+                throw new Error(`Invalid snapshot key: ${key}`);
+            }
+
+            const isDigit = codePoint >= 48 && codePoint <= 57;
+            const isHexLower = codePoint >= 97 && codePoint <= 102;
+            if (!isDigit && !isHexLower) {
+                throw new Error(`Invalid snapshot key: ${key}`);
+            }
+        }
     }
 }
 
@@ -372,8 +410,18 @@ function createEmptyManifest(): CloudSyncManifest {
     };
 }
 
+function createSnapshotNonceHex(): string {
+    if (typeof globalThis.crypto.randomUUID !== "function") {
+        throw new TypeError("crypto.randomUUID is unavailable");
+    }
+
+    // RandomUUID is RFC4122 (hex + dashes). Remove dashes to get 32 hex chars.
+    return globalThis.crypto.randomUUID().replaceAll("-", "");
+}
+
 function createSnapshotKey(createdAt: number): string {
-    return `${getSnapshotsPrefix()}/${createdAt}.json`;
+    const nonceHex = createSnapshotNonceHex();
+    return `${getSnapshotsPrefix()}/${createdAt}-${nonceHex}.json`;
 }
 
 function createOpsKey(
@@ -489,7 +537,22 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
     public async listOperationObjects(): Promise<CloudObjectEntry[]> {
         const objects = await this.provider.listObjects(`${OPS_PREFIX}/`);
-        return objects.filter((entry) => isValidOpsObjectKey(entry.key));
+        const filtered = objects.filter((entry) => isValidOpsObjectKey(entry.key));
+
+        // Providers may return keys in arbitrary order or even duplicate keys.
+        // Deduplicate by key and sort deterministically.
+        const byKey = new Map<string, CloudObjectEntry>();
+        for (const entry of filtered) {
+            // Keep the newest metadata if duplicates exist.
+            const existing = byKey.get(entry.key);
+            if (!existing || entry.lastModifiedAt > existing.lastModifiedAt) {
+                byKey.set(entry.key, entry);
+            }
+        }
+
+        return Array.from(byKey.values()).toSorted((a, b) =>
+            a.key.localeCompare(b.key)
+        );
     }
 
     public async readManifest(): Promise<CloudSyncManifest | null> {
@@ -504,8 +567,30 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
                 });
             }
 
-            const raw = decodeUtf8(buffer);
-            return parseCloudSyncManifest(JSON.parse(raw));
+            const rawOrNull = ((): null | string => {
+                try {
+                    return decodeUtfEightStrict(buffer);
+                } catch (error) {
+                    // Treat invalid UTF-8 as a corrupt manifest. We
+                    // intentionally recover by treating the manifest as
+                    // missing.
+                    const resolved = ensureError(error);
+                    logger.warn(
+                        "[ProviderCloudSyncTransport] Remote manifest contains invalid UTF-8; treating as missing",
+                        {
+                            message: resolved.message,
+                            name: resolved.name,
+                        }
+                    );
+                    return null;
+                }
+            })();
+
+            if (rawOrNull === null) {
+                return null;
+            }
+
+            return parseCloudSyncManifest(JSON.parse(rawOrNull));
         } catch (error) {
             if (isProviderNotFoundError(error)) {
                 return null;
@@ -554,7 +639,22 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             );
         }
 
-        const raw = decodeUtf8(buffer);
+        const raw = ((): string => {
+            try {
+                return decodeUtfEightStrict(buffer);
+            } catch (error: unknown) {
+                const resolved = ensureError(error);
+                throw new CloudSyncCorruptRemoteObjectError(
+                    `Cloud sync operation object '${key}' contains invalid UTF-8: ${resolved.message}`,
+                    {
+                        cause: error,
+                        key,
+                        kind: "operations",
+                    }
+                );
+            }
+        })();
+
         const operations = parseNdjsonOperations({
             key,
             maxLineChars: getMaxOpsLineChars(),
@@ -611,14 +711,35 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             const buffer = await this.provider.downloadObject(key);
             const maxBytes = getMaxSnapshotBytes();
             if (buffer.byteLength > maxBytes) {
-                throw new Error(
-                    `Cloud sync snapshot '${key}' exceeds size limit (${maxBytes} bytes)`
-                );
+                throw new CloudSyncSizeLimitError({
+                    actualBytes: buffer.byteLength,
+                    maxBytes,
+                    objectKind: "snapshot",
+                });
             }
 
-            const raw = decodeUtf8(buffer);
+            const raw = ((): string => {
+                try {
+                    return decodeUtfEightStrict(buffer);
+                } catch (error: unknown) {
+                    const resolved = ensureError(error);
+                    throw new CloudSyncCorruptRemoteObjectError(
+                        `Cloud sync snapshot '${key}' contains invalid UTF-8: ${resolved.message}`,
+                        {
+                            cause: error,
+                            key,
+                            kind: "snapshot",
+                        }
+                    );
+                }
+            })();
+
             return parseCloudSyncSnapshot(JSON.parse(raw));
         } catch (error) {
+            if (ensureError(error) instanceof CloudSyncCorruptRemoteObjectError) {
+                throw error;
+            }
+
             if (
                 isCloudSyncJsonValidationError(error) ||
                 isCloudSyncSizeLimitError(error)
@@ -656,7 +777,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         return this.provider.uploadObject({
             buffer: encodeUtf8(json),
             key: createSnapshotKey(snapshot.createdAt),
-            overwrite: true,
+            overwrite: false,
         });
     }
 

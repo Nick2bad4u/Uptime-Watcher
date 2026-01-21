@@ -175,7 +175,12 @@ export async function configureFilesystemProvider(
             canonical
         );
 
+        // Switching to the filesystem provider means OAuth-based providers are
+        // no longer configured. Clear any stored OAuth secrets so we don't
+        // retain unused credentials on disk.
         await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
+        await ctx.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
+        await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
 
         logger.info("[CloudService] Configured filesystem provider", {
             baseDirectory: canonical,
@@ -192,6 +197,13 @@ export async function connectDropbox(
     ctx: CloudServiceOperationContext
 ): Promise<CloudStatusSummary> {
     return ctx.runCloudOperation("connectDropbox", async () => {
+        const previousProvider = (await ctx.settings.get(SETTINGS_KEY_PROVIDER)) ?? "";
+        const previousFilesystemBaseDirectory =
+            (await ctx.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ?? "";
+        const previousStoredTokens = await ctx.secretStore.getSecret(
+            SETTINGS_KEY_DROPBOX_TOKENS
+        );
+
         const {
             DropboxAuthFlow,
             DropboxCloudStorageProvider,
@@ -208,8 +220,6 @@ export async function connectDropbox(
         });
 
         await tokenManager.storeTokens(tokens);
-        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "dropbox");
-        await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
 
         // Verify the connection immediately so the UI doesn't end up in a
         // confusing "configured but down" state.
@@ -219,10 +229,26 @@ export async function connectDropbox(
             });
             await provider.getAccountLabel();
         } catch (error) {
-            // Roll back any partial config so the user can retry cleanly.
-            await ctx.settings.set(SETTINGS_KEY_PROVIDER, "");
-            await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
-            await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
+            // Roll back any partial state so the user can retry cleanly.
+            //
+            // @remarks
+            // This must restore the previous provider settings rather than
+            // blindly clearing them. Otherwise a failed attempt to connect a
+            // new provider would disconnect the previously configured one.
+            if (previousStoredTokens) {
+                await ctx.secretStore.setSecret(
+                    SETTINGS_KEY_DROPBOX_TOKENS,
+                    previousStoredTokens
+                );
+            } else {
+                await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
+            }
+
+            await ctx.settings.set(SETTINGS_KEY_PROVIDER, previousProvider);
+            await ctx.settings.set(
+                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+                previousFilesystemBaseDirectory
+            );
 
             const resolved = ensureError(error);
             throw new Error(
@@ -230,6 +256,17 @@ export async function connectDropbox(
                 { cause: error }
             );
         }
+
+        // Commit the provider switch only after the OAuth flow + verification
+        // has succeeded.
+        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "dropbox");
+        await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
+
+        // Clear Google Drive secrets after a successful provider switch.
+        await ctx.secretStore
+            .deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS)
+            .catch(() => {});
+        await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
 
         logger.info("[CloudService] Connected Dropbox provider");
         return ctx.buildStatusSummary();
@@ -257,18 +294,22 @@ export async function connectGoogleDrive(
             hasClientSecret: Boolean(clientSecret),
         });
 
+        const authFlow = new GoogleDriveAuthFlow({
+            clientId,
+            ...(clientSecret ? { clientSecret } : {}),
+        });
+        const auth = await authFlow.run();
+
+        // Fetch the label before persisting anything so a failure doesn't
+        // partially overwrite existing cloud configuration.
+        const accountLabel = await fetchGoogleAccountLabel(auth.accessToken);
+
         const tokenManager = new GoogleDriveTokenManager({
             clientId,
             ...(clientSecret ? { clientSecret } : {}),
             secretStore: ctx.secretStore,
             storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
         });
-
-        const authFlow = new GoogleDriveAuthFlow({
-            clientId,
-            ...(clientSecret ? { clientSecret } : {}),
-        });
-        const auth = await authFlow.run();
 
         await tokenManager.setTokens({
             accessToken: auth.accessToken,
@@ -278,18 +319,18 @@ export async function connectGoogleDrive(
             tokenType: auth.tokenType,
         });
 
-        const accountLabel = await fetchGoogleAccountLabel(auth.accessToken);
-        if (accountLabel) {
-            await ctx.settings.set(
-                SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
-                accountLabel
-            );
-        }
+        await ctx.settings.set(
+            SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+            accountLabel ?? ""
+        );
 
         await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
-        await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-
         await ctx.settings.set(SETTINGS_KEY_PROVIDER, "google-drive");
+
+        // Clear Dropbox secrets after a successful provider switch.
+        await ctx.secretStore
+            .deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+            .catch(() => {});
 
         logger.info("[CloudService] Connected Google Drive provider");
         return ctx.buildStatusSummary();

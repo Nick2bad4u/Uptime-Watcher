@@ -315,6 +315,74 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
         ).rejects.toThrowError(/opid range is inconsistent/i);
     });
+
+    it("rejects operation objects containing invalid UTF-8", async () => {
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from([0xff, 0xfe, 0xfd]),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
+        ).rejects.toThrowError(/invalid utf-8/i);
+    });
+});
+
+describe("ProviderCloudSyncTransport.readManifest decoding", () => {
+    it("treats invalid UTF-8 manifest content as missing", async () => {
+        const provider = createProvider({
+            downloadObject: async (key) => {
+                if (key === "manifest.json") {
+                    return Buffer.from([0xff, 0xfe, 0xfd]);
+                }
+                return Buffer.from("", "utf8");
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        await expect(transport.readManifest()).resolves.toBeNull();
+    });
+});
+
+describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
+    it("rejects snapshots containing invalid UTF-8", async () => {
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from([0xff, 0xfe, 0xfd]),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readSnapshot(
+                `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
+            )
+        ).rejects.toThrowError(/invalid utf-8/i);
+    });
+
+    it("rejects oversized snapshots", async () => {
+        const envKey = "UW_CLOUD_SYNC_MAX_SNAPSHOT_BYTES" as const;
+        const original = process.env[envKey];
+
+        process.env[envKey] = "1";
+
+        try {
+            const provider = createProvider({
+                downloadObject: async () => Buffer.from("{}", "utf8"),
+            });
+
+            const transport = ProviderCloudSyncTransport.create(provider);
+
+            await expect(
+                transport.readSnapshot(
+                    `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
+                )
+            ).rejects.toThrowError(/exceeds size limit/i);
+        } finally {
+            // eslint-disable-next-line require-atomic-updates -- test-only env restore
+            process.env[envKey] = original;
+        }
+    });
 });
 
 describe("ProviderCloudSyncTransport.appendOperations key metadata", () => {
@@ -395,6 +463,29 @@ describe("ProviderCloudSyncTransport snapshot key validation", () => {
         await expect(
             transport.readSnapshot(
                 `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
+            )
+        ).resolves.toBeTruthy();
+    });
+
+    it("accepts snapshot keys with a nonce suffix", async () => {
+        const provider = createProvider({
+            downloadObject: async () =>
+                Buffer.from(
+                    JSON.stringify({
+                        createdAt: 1,
+                        snapshotVersion: 1,
+                        state: { monitor: {}, settings: {}, site: {} },
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readSnapshot(
+                `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1-0123456789abcdef0123456789abcdef.json`
             )
         ).resolves.toBeTruthy();
     });

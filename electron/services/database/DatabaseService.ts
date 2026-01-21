@@ -198,7 +198,7 @@ export class DatabaseService {
                 db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
                 logger.debug("[DatabaseService] Started new transaction");
 
-                // Execute operation, then commit and return in one expression
+                // Execute operation, then commit and return in one expression.
                 // This ensures operation completes before commit.
                 return await operation(db).then((result) => {
                     db.run(DATABASE_SERVICE_QUERIES.COMMIT);

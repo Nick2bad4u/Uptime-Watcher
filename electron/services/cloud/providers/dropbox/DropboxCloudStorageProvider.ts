@@ -57,6 +57,15 @@ function normalizeKey(key: string): string {
     return normalizeProviderObjectKey(key);
 }
 
+function ensureTrailingSlash(prefix: string): string {
+    const normalized = normalizeKey(prefix);
+    if (!normalized) {
+        return "";
+    }
+
+    return normalized.endsWith("/") ? normalized : `${normalized}/`;
+}
+
 function toDropboxObjectPath(key: string): string {
     const normalized = normalizeKey(key);
     assertCloudObjectKey(normalized);
@@ -268,7 +277,7 @@ export class DropboxCloudStorageProvider
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {
         const client = await this.createClient();
-        const normalizedPrefix = normalizeKey(prefix);
+        const normalizedPrefix = ensureTrailingSlash(prefix);
 
         const rootPath = toDropboxPath("");
 
@@ -389,6 +398,7 @@ export class DropboxCloudStorageProvider
             hasMore = nextHasMore;
         }
 
+        objects.sort((a, b) => a.key.localeCompare(b.key));
         return objects;
     }
 

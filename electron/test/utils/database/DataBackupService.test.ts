@@ -105,6 +105,7 @@ import { app } from "electron";
 import {
     assertSqliteDatabaseIntegrity,
     createDatabaseBackup,
+    readDatabaseSchemaVersionFromFile,
     validateDatabaseBackupPayload,
 } from "../../../services/database/utils/backup/databaseBackup";
 import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
@@ -844,6 +845,8 @@ describe(DataBackupService, () => {
         });
 
         it("should copy provided backup and reinitialize database", async () => {
+            vi.mocked(readDatabaseSchemaVersionFromFile).mockReturnValueOnce(7);
+
             const buffer = Buffer.concat([
                 Buffer.from("SQLite format 3\0", "ascii"),
                 Buffer.from("previous"),
@@ -870,6 +873,8 @@ describe(DataBackupService, () => {
                     fileName: backup.fileName,
                     metadata: expect.objectContaining({
                         originalPath: backup.fileName,
+                        schemaVersion: 7,
+                        sizeBytes: buffer.length,
                     }),
                 })
             );
@@ -884,6 +889,8 @@ describe(DataBackupService, () => {
             expect(metadata).toEqual({
                 ...backup.metadata,
                 originalPath: backup.fileName,
+                schemaVersion: 7,
+                sizeBytes: buffer.length,
             });
         });
 

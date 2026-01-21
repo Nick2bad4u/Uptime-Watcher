@@ -110,7 +110,12 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
         const result: Record<string, Jsonifiable> = {};
         for (const [key, nested] of Object.entries(value)) {
             if (nested !== undefined) {
-                result[key] = toJsonifiable(nested);
+                Object.defineProperty(result, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: toJsonifiable(nested),
+                    writable: true,
+                });
             }
         }
         return result;
@@ -415,7 +420,12 @@ export class DataImportExportService {
             if (key.startsWith(DataImportExportService.CLOUD_SETTINGS_PREFIX)) {
                 strippedKeys.push(key);
             } else {
-                result[key] = value;
+                Object.defineProperty(result, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value,
+                    writable: true,
+                });
             }
         }
 

@@ -44,7 +44,9 @@ describe("CloudService", () => {
             .update(backupBuffer)
             .digest("hex");
 
-        const settings = new Map<string, string>();
+        const settings = new Map<string, string>([
+            ["cloud.googleDrive.accountLabel", "someone@example.com"],
+        ]);
         const syncEngine = {
             syncNow: vi.fn().mockResolvedValue({
                 appliedRemoteOperations: 0,
@@ -82,6 +84,11 @@ describe("CloudService", () => {
             }),
         } as unknown as UptimeOrchestrator;
 
+        const secretStore = new InMemorySecretStore();
+        // Seed secrets to ensure switching to filesystem provider clears them.
+        await secretStore.setSecret("cloud.dropbox.tokens", "dropbox-token");
+        await secretStore.setSecret("cloud.googleDrive.tokens", "google-token");
+
         const cloudService = new CloudService({
             orchestrator,
             settings: {
@@ -91,13 +98,17 @@ describe("CloudService", () => {
                 },
             },
             syncEngine,
-            secretStore: new InMemorySecretStore(),
+            secretStore,
         });
 
         const status = await cloudService.configureFilesystemProvider({
             baseDirectory,
         });
         expect(status.provider).toBe("filesystem");
+
+        await expect(secretStore.getSecret("cloud.dropbox.tokens")).resolves.toBeUndefined();
+        await expect(secretStore.getSecret("cloud.googleDrive.tokens")).resolves.toBeUndefined();
+        expect(settings.get("cloud.googleDrive.accountLabel")).toBe("");
 
         const syncStatus = await cloudService.enableSync({ enabled: true });
         expect(syncStatus.syncEnabled).toBeTruthy();

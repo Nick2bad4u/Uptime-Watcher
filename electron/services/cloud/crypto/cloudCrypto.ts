@@ -6,6 +6,8 @@ import {
     timingSafeEqual,
 } from "node:crypto";
 
+import { decodeCanonicalBase64 } from "../internal/cloudServicePrimitives";
+
 const MAGIC = Buffer.from("UWENC001", "ascii");
 const VERSION = 1;
 
@@ -180,7 +182,10 @@ export function verifyKeyCheckBase64(args: {
     keyCheckBase64: string;
 }): boolean {
     try {
-        const decoded = Buffer.from(args.keyCheckBase64, "base64");
+        const decoded = decodeCanonicalBase64({
+            label: "key check",
+            value: args.keyCheckBase64,
+        });
         const plaintext = decryptBuffer({
             ciphertext: decoded,
             key: args.key,
