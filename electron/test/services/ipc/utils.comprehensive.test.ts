@@ -740,7 +740,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             const result = toClonedArrayBuffer(view);
             expect(result).toBe(buffer);
-            expect(Array.from(new Uint8Array(result))).toEqual([
+            expect([...new Uint8Array(result)]).toEqual([
                 1,
                 2,
                 3,
@@ -779,7 +779,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
             expect(result).not.toBe(buffer);
             expect(result.byteLength).toBe(4);
-            expect(Array.from(new Uint8Array(result))).toEqual([
+            expect([...new Uint8Array(result)]).toEqual([
                 3,
                 4,
                 5,

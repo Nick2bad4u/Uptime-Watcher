@@ -614,8 +614,10 @@ describe("main.ts - Electron Main Process", () => {
             // IMPORTANT: ApplicationService is instantiated with `new`.
             // `mockReturnValue` uses a non-constructable arrow implementation.
             // We use a constructable function implementation instead.
-            (ApplicationService as any).mockReturnValue(
-                null as any
+            (ApplicationService as any).mockImplementation(
+                function ApplicationServiceNullMock() {
+                    return null as any;
+                }
             );
 
             const processOnSpy = vi.spyOn(process, "on");
@@ -632,8 +634,10 @@ describe("main.ts - Electron Main Process", () => {
             }).not.toThrowError();
 
             // Restore default implementation for subsequent tests
-            (ApplicationService as any).mockReturnValue(
-                mockApplicationService as unknown as ApplicationServiceType
+            (ApplicationService as any).mockImplementation(
+                function ApplicationServiceDefaultMock() {
+                    return mockApplicationService as unknown as ApplicationServiceType;
+                }
             );
         });
     });

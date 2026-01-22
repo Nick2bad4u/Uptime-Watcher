@@ -103,6 +103,7 @@ const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
 const jsonSchemaValidatorRules = enableJsonSchemaValidation
     ? { "json-schema-validator/no-invalid": "error" }
     : {};
+import stylistic from "@stylistic/eslint-plugin";
 import pluginCasePolice from "eslint-plugin-case-police";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsxA11y from "eslint-plugin-jsx-a11y";
@@ -227,7 +228,6 @@ import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
 import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
-import stylistic from "@stylistic/eslint-plugin";
 import { createRequire } from "node:module";
 import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
@@ -299,22 +299,22 @@ export default /** @type {EslintConfig} */ [
         root: true,
         strict: true,
     }), // MARK: Global Configs and Rules
-    stylistic.configs.customize({
-        // the following options are the default values
-        indent: 4,
-        quotes: 'double',
-        semi: true,
-        jsx: true,
-        arrowParens: true,
-        blockSpacing: true,
-        braceStyle: "stroustrup",
-        commaDangle: "always-multiline",
-        experimental: true,
-        pluginName: "@stylistic",
-        quoteProps: "as-needed",
-        severity: "warn",
-        // ...
-      }),
+    // stylistic.configs.customize({
+    //     arrowParens: true,
+    //     blockSpacing: true,
+    //     braceStyle: "stroustrup",
+    //     commaDangle: "always-multiline",
+    //     experimental: true,
+    //     // The following options are the default values
+    //     indent: 4,
+    //     jsx: true,
+    //     pluginName: "@stylistic",
+    //     quoteProps: "as-needed",
+    //     quotes: 'double',
+    //     semi: true,
+    //     severity: "warn",
+    //     // ...
+    //   }),
     {
         // NOTE: In ESLint flat config, ignore-only entries are safest when
         // placed near the start of the config array.
@@ -526,6 +526,16 @@ export default /** @type {EslintConfig} */ [
     nitpick.configs.recommended,
     pluginComments.recommended,
     arrayFunc.configs.all,
+    {
+        name: "Array conversion: prefer spread",
+        rules: {
+            // Conflicts with `unicorn/prefer-spread` and can cause circular
+            // autofix loops. We prefer spread (`[...iterable]`) for iterables
+            // and only reach for Array.from when we specifically need its
+            // mapping function or array-like support.
+            "array-func/prefer-array-from": "off",
+        },
+    },
     ...storybook.configs["flat/recommended"],
     ...pluginCasePolice.configs.recommended,
     ...jsdocPlugin.configs["examples-and-default-expressions"],
@@ -1373,6 +1383,7 @@ export default /** @type {EslintConfig} */ [
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@rushstack/security": rushStackSecurity,
+            "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             "array-func": arrayFunc,
             boundaries: pluginBoundaries,
@@ -1446,7 +1457,6 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
-            '@stylistic': stylistic,
         },
         rules: {
             // TypeScript backend rules
@@ -1625,6 +1635,58 @@ export default /** @type {EslintConfig} */ [
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@rushstack/security/no-unsafe-regexp": "warn",
+            "@stylistic/jsx-props-no-multi-spaces": "warn",
+            "@stylistic/jsx-sort-props": "off",
+            // Code spacing and formatting rules
+            "@stylistic/lines-around-comment": [
+                "off",
+                {
+                    afterBlockComment: false,
+                    afterLineComment: false,
+                    allowArrayEnd: true,
+                    allowArrayStart: true,
+                    allowBlockEnd: true,
+                    allowBlockStart: true,
+                    allowClassEnd: true,
+                    allowClassStart: true,
+                    allowObjectEnd: true,
+                    allowObjectStart: true,
+                    applyDefaultIgnorePatterns: true,
+                    beforeBlockComment: true,
+                    beforeLineComment: false,
+                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
+                },
+            ],
+            "@stylistic/lines-between-class-members": [
+                "warn",
+                "always",
+                {
+                    exceptAfterSingleLine: false,
+                },
+            ],
+            "@stylistic/padding-line-between-statements": [
+                "warn",
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "function",
+                },
+                {
+                    blankLine: "always",
+                    next: "function",
+                    prev: "*",
+                },
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "class",
+                },
+                {
+                    blankLine: "always",
+                    next: "class",
+                    prev: "*",
+                },
+            ],
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -2112,7 +2174,10 @@ export default /** @type {EslintConfig} */ [
             "id-length": "off",
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
-            "import-x/dynamic-import-chunkname": "warn",
+            // This rule is primarily designed for Webpack chunk naming.
+            // Uptime-Watcher uses Vite/Electron bundling, so the rule is
+            // misleading noise.
+            "import-x/dynamic-import-chunkname": "off",
             "import-x/export": "warn",
             "import-x/exports-last": "off",
             "import-x/extensions": "warn",
@@ -2165,33 +2230,6 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/lang": "off",
             "jsx-a11y/no-aria-hidden-on-focusable": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
-            // Code spacing and formatting rules
-            "@stylistic/lines-around-comment": [
-                "off",
-                {
-                    afterBlockComment: false,
-                    afterLineComment: false,
-                    allowArrayEnd: true,
-                    allowArrayStart: true,
-                    allowBlockEnd: true,
-                    allowBlockStart: true,
-                    allowClassEnd: true,
-                    allowClassStart: true,
-                    allowObjectEnd: true,
-                    allowObjectStart: true,
-                    applyDefaultIgnorePatterns: true,
-                    beforeBlockComment: true,
-                    beforeLineComment: false,
-                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
-                },
-            ],
-            "@stylistic/lines-between-class-members": [
-                "warn",
-                "always",
-                {
-                    exceptAfterSingleLine: false,
-                },
-            ],
             "loadable-imports/sort": "error",
             // Math
             "math/abs": "warn",
@@ -2246,6 +2284,7 @@ export default /** @type {EslintConfig} */ [
                     allowModules: [
                         "electron",
                         "node",
+                        "electron-debug",
                         "electron-devtools-installer",
                         "eslint-plugin-storybook",
                         "index.css",
@@ -2329,29 +2368,6 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "@stylistic/padding-line-between-statements": [
-                "warn",
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "function",
-                },
-                {
-                    blankLine: "always",
-                    next: "function",
-                    prev: "*",
-                },
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "class",
-                },
-                {
-                    blankLine: "always",
-                    next: "class",
-                    prev: "*",
-                },
-            ],
             "perfectionist/sort-classes": "off",
             "perfectionist/sort-imports": "off", // Will handle this manually to avoid conflicts
             "perfectionist/sort-jsx-props": "off", // Allow flexible JSX prop ordering
@@ -2458,7 +2474,8 @@ export default /** @type {EslintConfig} */ [
             ], // Enforce .tsx for JSX files
             "react/jsx-max-depth": "off",
             "react/jsx-no-literals": "off",
-            "react/jsx-props-no-multi-spaces": "warn",
+            // Migrated to ESLint Stylistic (react version is deprecated).
+            "react/jsx-props-no-multi-spaces": "off",
             "react/jsx-props-no-spread-multi": "warn",
             "react/jsx-props-no-spreading": "off",
             "react/jsx-sort-props": "off", // Allow flexible prop ordering in Docusaurus
@@ -2806,6 +2823,7 @@ export default /** @type {EslintConfig} */ [
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@rushstack/security": rushStackSecurity,
+            "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             antfu: antfu,
             "array-func": arrayFunc,
@@ -2895,7 +2913,6 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
-            "@stylistic": stylistic,
         },
         rules: {
             // TypeScript rules
@@ -3088,6 +3105,75 @@ export default /** @type {EslintConfig} */ [
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@rushstack/security/no-unsafe-regexp": "warn",
+            "@stylistic/jsx-child-element-spacing": "warn",
+            "@stylistic/jsx-closing-bracket-location": "warn",
+            "@stylistic/jsx-closing-tag-location": "warn",
+            "@stylistic/jsx-curly-brace-presence": "warn",
+            "@stylistic/jsx-curly-newline": "off",
+            "@stylistic/jsx-curly-spacing": "off",
+            "@stylistic/jsx-equals-spacing": "off",
+            "@stylistic/jsx-first-prop-new-line": "off",
+            "@stylistic/jsx-indent": "off",
+            "@stylistic/jsx-indent-props": "off",
+            "@stylistic/jsx-max-props-per-line": "off",
+            "@stylistic/jsx-newline": "off",
+            "@stylistic/jsx-one-expression-per-line": "off",
+            "@stylistic/jsx-pascal-case": "warn",
+            "@stylistic/jsx-props-no-multi-spaces": "warn",
+            "@stylistic/jsx-self-closing-comp": "warn",
+            "@stylistic/jsx-sort-props": "off",
+            "@stylistic/jsx-tag-spacing": "warn",
+            "@stylistic/jsx-wrap-multilines": "warn",
+            // Code spacing and formatting rules
+            "@stylistic/lines-around-comment": [
+                "off",
+                {
+                    afterBlockComment: false,
+                    afterLineComment: false,
+                    allowArrayEnd: true,
+                    allowArrayStart: true,
+                    allowBlockEnd: true,
+                    allowBlockStart: true,
+                    allowClassEnd: true,
+                    allowClassStart: true,
+                    allowObjectEnd: true,
+                    allowObjectStart: true,
+                    applyDefaultIgnorePatterns: true,
+                    beforeBlockComment: true,
+                    beforeLineComment: false,
+                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
+                },
+            ],
+            "@stylistic/lines-between-class-members": [
+                "warn",
+                "always",
+                {
+                    exceptAfterSingleLine: false,
+                },
+            ],
+            "@stylistic/padding-line-between-statements": [
+                "warn",
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "function",
+                },
+                {
+                    blankLine: "always",
+                    next: "function",
+                    prev: "*",
+                },
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "class",
+                },
+                {
+                    blankLine: "always",
+                    next: "class",
+                    prev: "*",
+                },
+            ],
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -3494,7 +3580,8 @@ export default /** @type {EslintConfig} */ [
             // CSS
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
-            "import-x/dynamic-import-chunkname": "warn",
+            // Webpack-only guidance; disabled for Vite/Electron.
+            "import-x/dynamic-import-chunkname": "off",
             "import-x/export": "warn",
             "import-x/exports-last": "off",
             "import-x/extensions": "warn",
@@ -3560,33 +3647,6 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/no-aria-hidden-on-focusable": "warn",
             "jsx-a11y/no-autofocus": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
-            // Code spacing and formatting rules
-            "@stylistic/lines-around-comment": [
-                "off",
-                {
-                    afterBlockComment: false,
-                    afterLineComment: false,
-                    allowArrayEnd: true,
-                    allowArrayStart: true,
-                    allowBlockEnd: true,
-                    allowBlockStart: true,
-                    allowClassEnd: true,
-                    allowClassStart: true,
-                    allowObjectEnd: true,
-                    allowObjectStart: true,
-                    applyDefaultIgnorePatterns: true,
-                    beforeBlockComment: true,
-                    beforeLineComment: false,
-                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
-                },
-            ],
-            "@stylistic/lines-between-class-members": [
-                "warn",
-                "always",
-                {
-                    exceptAfterSingleLine: false,
-                },
-            ],
             "loadable-imports/sort": "error",
             // Math
             "math/abs": "warn",
@@ -3647,6 +3707,7 @@ export default /** @type {EslintConfig} */ [
                     allowModules: [
                         "electron",
                         "node",
+                        "electron-debug",
                         "electron-devtools-installer",
                         "index.css",
                         "styles.css",
@@ -3727,29 +3788,6 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "@stylistic/padding-line-between-statements": [
-                "warn",
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "function",
-                },
-                {
-                    blankLine: "always",
-                    next: "function",
-                    prev: "*",
-                },
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "class",
-                },
-                {
-                    blankLine: "always",
-                    next: "class",
-                    prev: "*",
-                },
-            ],
             "paths/alias": [
                 "warn",
                 {
@@ -4013,14 +4051,18 @@ export default /** @type {EslintConfig} */ [
             "react/hook-use-state": "warn",
             "react/iframe-missing-sandbox": "warn",
             // React 19 optimized rules
+            // NOTE: ESLint Stylistic maintains the framework-agnostic JSX
+            // formatting rules that used to live in eslint-plugin-react.
+            // We keep the react/* versions explicitly disabled to ensure we are
+            // not depending on unmaintained stylistic rules.
             "react/jsx-boolean-value": [
                 "warn",
                 "never",
             ],
-            "react/jsx-child-element-spacing": "warn",
-            "react/jsx-closing-bracket-location": "warn",
-            "react/jsx-closing-tag-location": "warn",
-            "react/jsx-curly-brace-presence": "warn",
+            "react/jsx-child-element-spacing": "off",
+            "react/jsx-closing-bracket-location": "off",
+            "react/jsx-closing-tag-location": "off",
+            "react/jsx-curly-brace-presence": "off",
             "react/jsx-curly-newline": "off",
             "react/jsx-curly-spacing": "off",
             "react/jsx-equals-spacing": "off",
@@ -4052,14 +4094,15 @@ export default /** @type {EslintConfig} */ [
             "react/jsx-no-script-url": "warn",
             "react/jsx-no-useless-fragment": "warn",
             "react/jsx-one-expression-per-line": "off",
-            "react/jsx-pascal-case": "warn",
-            "react/jsx-props-no-multi-spaces": "warn",
+            "react/jsx-pascal-case": "off",
+            "react/jsx-props-no-multi-spaces": "off",
             "react/jsx-props-no-spread-multi": "warn",
             "react/jsx-props-no-spreading": "off",
-            "react/jsx-sort-props": "warn",
-            "react/jsx-tag-spacing": "warn",
-            "react/jsx-uses-react": "warn",
-            "react/jsx-wrap-multilines": "warn",
+            "react/jsx-sort-props": "off",
+            "react/jsx-tag-spacing": "off",
+            // React 17 legacy JSX transform rules are not needed for React 19.
+            "react/jsx-uses-react": "off",
+            "react/jsx-wrap-multilines": "off",
             "react/no-access-state-in-setstate": "warn",
             "react/no-adjacent-inline-elements": "warn",
             "react/no-array-index-key": "warn",
@@ -4088,7 +4131,7 @@ export default /** @type {EslintConfig} */ [
             "react/react-in-jsx-scope": "off",
             "react/require-default-props": "off",
             "react/require-optimization": "warn",
-            "react/self-closing-comp": "warn",
+            "react/self-closing-comp": "off",
             "react/sort-comp": "warn",
             "react/sort-default-props": "warn",
             "react/sort-prop-types": "warn",
@@ -4464,6 +4507,7 @@ export default /** @type {EslintConfig} */ [
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@rushstack/security": rushStackSecurity,
+            "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             antfu: antfu,
             "array-func": arrayFunc,
@@ -4539,7 +4583,6 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
-            "@stylistic": stylistic,
         },
         rules: {
             // TypeScript Backend (Electron) Rules
@@ -4722,6 +4765,56 @@ export default /** @type {EslintConfig} */ [
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@rushstack/security/no-unsafe-regexp": "warn",
+            // Code spacing and formatting rules
+            "@stylistic/lines-around-comment": [
+                "off",
+                {
+                    afterBlockComment: false,
+                    afterLineComment: false,
+                    allowArrayEnd: true,
+                    allowArrayStart: true,
+                    allowBlockEnd: true,
+                    allowBlockStart: true,
+                    allowClassEnd: true,
+                    allowClassStart: true,
+                    allowObjectEnd: true,
+                    allowObjectStart: true,
+                    applyDefaultIgnorePatterns: true,
+                    beforeBlockComment: true,
+                    beforeLineComment: false,
+                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
+                },
+            ],
+            "@stylistic/lines-between-class-members": [
+                "warn",
+                "always",
+                {
+                    exceptAfterSingleLine: false,
+                },
+            ],
+            "@stylistic/padding-line-between-statements": [
+                "warn",
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "function",
+                },
+                {
+                    blankLine: "always",
+                    next: "function",
+                    prev: "*",
+                },
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "class",
+                },
+                {
+                    blankLine: "always",
+                    next: "class",
+                    prev: "*",
+                },
+            ],
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -5213,7 +5306,8 @@ export default /** @type {EslintConfig} */ [
             "id-length": "off",
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
-            "import-x/dynamic-import-chunkname": "warn",
+            // Webpack-only guidance; disabled for Vite/Electron.
+            "import-x/dynamic-import-chunkname": "off",
             "import-x/export": "warn",
             "import-x/exports-last": "off",
             "import-x/extensions": "warn",
@@ -5266,33 +5360,6 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/lang": "off",
             "jsx-a11y/no-aria-hidden-on-focusable": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
-            // Code spacing and formatting rules
-            "@stylistic/lines-around-comment": [
-                "off",
-                {
-                    afterBlockComment: false,
-                    afterLineComment: false,
-                    allowArrayEnd: true,
-                    allowArrayStart: true,
-                    allowBlockEnd: true,
-                    allowBlockStart: true,
-                    allowClassEnd: true,
-                    allowClassStart: true,
-                    allowObjectEnd: true,
-                    allowObjectStart: true,
-                    applyDefaultIgnorePatterns: true,
-                    beforeBlockComment: true,
-                    beforeLineComment: false,
-                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
-                },
-            ],
-            "@stylistic/lines-between-class-members": [
-                "warn",
-                "always",
-                {
-                    exceptAfterSingleLine: false,
-                },
-            ],
             "loadable-imports/sort": "error",
             // Math
             "math/abs": "warn",
@@ -5354,6 +5421,7 @@ export default /** @type {EslintConfig} */ [
                     allowModules: [
                         "electron",
                         "node",
+                        "electron-debug",
                         "electron-devtools-installer",
                         "index.css",
                         "styles.css",
@@ -5434,29 +5502,6 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "@stylistic/padding-line-between-statements": [
-                "warn",
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "function",
-                },
-                {
-                    blankLine: "always",
-                    next: "function",
-                    prev: "*",
-                },
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "class",
-                },
-                {
-                    blankLine: "always",
-                    next: "class",
-                    prev: "*",
-                },
-            ],
             "paths/alias": [
                 "warn",
                 {
@@ -5898,6 +5943,7 @@ export default /** @type {EslintConfig} */ [
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
             "@rushstack/security": rushStackSecurity,
+            "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             antfu: antfu,
             "array-func": arrayFunc,
@@ -5985,7 +6031,6 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
-            "@stylistic": stylistic,
         },
         rules: {
             // TypeScript rules
@@ -6175,6 +6220,75 @@ export default /** @type {EslintConfig} */ [
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@rushstack/security/no-unsafe-regexp": "warn",
+            "@stylistic/jsx-child-element-spacing": "warn",
+            "@stylistic/jsx-closing-bracket-location": "warn",
+            "@stylistic/jsx-closing-tag-location": "warn",
+            "@stylistic/jsx-curly-brace-presence": "warn",
+            "@stylistic/jsx-curly-newline": "off",
+            "@stylistic/jsx-curly-spacing": "off",
+            "@stylistic/jsx-equals-spacing": "off",
+            "@stylistic/jsx-first-prop-new-line": "off",
+            "@stylistic/jsx-indent": "off",
+            "@stylistic/jsx-indent-props": "off",
+            "@stylistic/jsx-max-props-per-line": "off",
+            "@stylistic/jsx-newline": "off",
+            "@stylistic/jsx-one-expression-per-line": "off",
+            "@stylistic/jsx-pascal-case": "warn",
+            "@stylistic/jsx-props-no-multi-spaces": "warn",
+            "@stylistic/jsx-self-closing-comp": "warn",
+            "@stylistic/jsx-sort-props": "off",
+            "@stylistic/jsx-tag-spacing": "warn",
+            "@stylistic/jsx-wrap-multilines": "warn",
+            // Code spacing and formatting rules
+            "@stylistic/lines-around-comment": [
+                "off",
+                {
+                    afterBlockComment: false,
+                    afterLineComment: false,
+                    allowArrayEnd: true,
+                    allowArrayStart: true,
+                    allowBlockEnd: true,
+                    allowBlockStart: true,
+                    allowClassEnd: true,
+                    allowClassStart: true,
+                    allowObjectEnd: true,
+                    allowObjectStart: true,
+                    applyDefaultIgnorePatterns: true,
+                    beforeBlockComment: true,
+                    beforeLineComment: false,
+                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
+                },
+            ],
+            "@stylistic/lines-between-class-members": [
+                "warn",
+                "always",
+                {
+                    exceptAfterSingleLine: false,
+                },
+            ],
+            "@stylistic/padding-line-between-statements": [
+                "warn",
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "function",
+                },
+                {
+                    blankLine: "always",
+                    next: "function",
+                    prev: "*",
+                },
+                {
+                    blankLine: "always",
+                    next: "*",
+                    prev: "class",
+                },
+                {
+                    blankLine: "always",
+                    next: "class",
+                    prev: "*",
+                },
+            ],
             "@typescript-eslint/adjacent-overload-signatures": "warn",
             "@typescript-eslint/array-type": [
                 "error",
@@ -6609,7 +6723,8 @@ export default /** @type {EslintConfig} */ [
             // CSS
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
-            "import-x/dynamic-import-chunkname": "warn",
+            // Webpack-only guidance; disabled for Vite/Electron.
+            "import-x/dynamic-import-chunkname": "off",
             "import-x/export": "warn",
             "import-x/exports-last": "off",
             "import-x/extensions": "warn",
@@ -6675,33 +6790,6 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/no-aria-hidden-on-focusable": "warn",
             "jsx-a11y/no-autofocus": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
-            // Code spacing and formatting rules
-            "@stylistic/lines-around-comment": [
-                "off",
-                {
-                    afterBlockComment: false,
-                    afterLineComment: false,
-                    allowArrayEnd: true,
-                    allowArrayStart: true,
-                    allowBlockEnd: true,
-                    allowBlockStart: true,
-                    allowClassEnd: true,
-                    allowClassStart: true,
-                    allowObjectEnd: true,
-                    allowObjectStart: true,
-                    applyDefaultIgnorePatterns: true,
-                    beforeBlockComment: true,
-                    beforeLineComment: false,
-                    ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
-                },
-            ],
-            "@stylistic/lines-between-class-members": [
-                "warn",
-                "always",
-                {
-                    exceptAfterSingleLine: false,
-                },
-            ],
             "loadable-imports/sort": "error",
             // Math
             "math/abs": "warn",
@@ -6843,29 +6931,6 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "@stylistic/padding-line-between-statements": [
-                "warn",
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "function",
-                },
-                {
-                    blankLine: "always",
-                    next: "function",
-                    prev: "*",
-                },
-                {
-                    blankLine: "always",
-                    next: "*",
-                    prev: "class",
-                },
-                {
-                    blankLine: "always",
-                    next: "class",
-                    prev: "*",
-                },
-            ],
             "paths/alias": [
                 "warn",
                 {
@@ -7129,14 +7194,18 @@ export default /** @type {EslintConfig} */ [
             "react/hook-use-state": "warn",
             "react/iframe-missing-sandbox": "warn",
             // React 19 optimized rules
+            // NOTE: ESLint Stylistic maintains the framework-agnostic JSX
+            // formatting rules that used to live in eslint-plugin-react.
+            // We keep the react/* versions explicitly disabled to ensure we are
+            // not depending on unmaintained stylistic rules.
             "react/jsx-boolean-value": [
                 "warn",
                 "never",
             ],
-            "react/jsx-child-element-spacing": "warn",
-            "react/jsx-closing-bracket-location": "warn",
-            "react/jsx-closing-tag-location": "warn",
-            "react/jsx-curly-brace-presence": "warn",
+            "react/jsx-child-element-spacing": "off",
+            "react/jsx-closing-bracket-location": "off",
+            "react/jsx-closing-tag-location": "off",
+            "react/jsx-curly-brace-presence": "off",
             "react/jsx-curly-newline": "off",
             "react/jsx-curly-spacing": "off",
             "react/jsx-equals-spacing": "off",
@@ -7168,14 +7237,15 @@ export default /** @type {EslintConfig} */ [
             "react/jsx-no-script-url": "warn",
             "react/jsx-no-useless-fragment": "warn",
             "react/jsx-one-expression-per-line": "off",
-            "react/jsx-pascal-case": "warn",
-            "react/jsx-props-no-multi-spaces": "warn",
+            "react/jsx-pascal-case": "off",
+            "react/jsx-props-no-multi-spaces": "off",
             "react/jsx-props-no-spread-multi": "warn",
             "react/jsx-props-no-spreading": "off",
-            "react/jsx-sort-props": "warn",
-            "react/jsx-tag-spacing": "warn",
-            "react/jsx-uses-react": "warn",
-            "react/jsx-wrap-multilines": "warn",
+            "react/jsx-sort-props": "off",
+            "react/jsx-tag-spacing": "off",
+            // React 17 legacy JSX transform rules are not needed for React 19.
+            "react/jsx-uses-react": "off",
+            "react/jsx-wrap-multilines": "off",
             "react/no-access-state-in-setstate": "warn",
             "react/no-adjacent-inline-elements": "warn",
             "react/no-array-index-key": "warn",
@@ -7204,7 +7274,7 @@ export default /** @type {EslintConfig} */ [
             "react/react-in-jsx-scope": "off",
             "react/require-default-props": "off",
             "react/require-optimization": "warn",
-            "react/self-closing-comp": "warn",
+            "react/self-closing-comp": "off",
             "react/sort-comp": "warn",
             "react/sort-default-props": "warn",
             "react/sort-prop-types": "warn",
@@ -8893,7 +8963,8 @@ export default /** @type {EslintConfig} */ [
             "id-length": "off",
             "import-x/consistent-type-specifier-style": "off",
             "import-x/default": "warn",
-            "import-x/dynamic-import-chunkname": "warn",
+            // Webpack-only guidance; disabled for Vite/Electron.
+            "import-x/dynamic-import-chunkname": "off",
             "import-x/export": "warn",
             "import-x/exports-last": "off",
             // "write-good-comments/write-good-comments": "warn",
@@ -10308,6 +10379,26 @@ export default /** @type {EslintConfig} */ [
             "uptime-watcher/no-regexp-v-flag": "error",
         },
     },
+    {
+        files: ["**/**"],
+        name: "Stylistic Overrides",
+        plugins: {
+            "@stylistic": stylistic,
+        },
+        rules: {
+            "@stylistic/exp-list-style": "off",
+            "@stylistic/spaced-comment": [
+                "error",
+                "always",
+                {
+                    exceptions: [
+                        "-",
+                        "+",
+                    ],
+                },
+            ],
+        },
+    },
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Global Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10337,22 +10428,11 @@ export default /** @type {EslintConfig} */ [
             "functional/type-declaration-immutability": "off",
             "no-hardcoded-strings/no-hardcoded-strings": "off", // Will use i18n in future
             "prefer-arrow/prefer-arrow-functions": "off", // Too strict
-            // React
-            "@stylistic/spaced-comment": [
-                "error",
-                "always",
-                {
-                    exceptions: [
-                        "-",
-                        "+",
-                    ],
-                },
-            ],
             // Styled-components-a11y (and jsx-a11y equivalents)
             "styled-components-a11y/lang": "off",
             "write-good-comments/write-good-comments": "off", // Too strict
         },
-    }, // eslint-config-prettier MUST be last to override conflicting rules
+    },
     {
         files: [
             "electron/**/*.{ts,tsx}",

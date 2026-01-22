@@ -794,7 +794,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                         timeout: baseMonitor.timeout,
                         retryAttempts: baseMonitor.retryAttempts,
                         monitoring: true,
-                        history: Array.from(baseMonitor.history),
+                        history: [...baseMonitor.history],
                         responseTime: baseMonitor.responseTime,
                         status: baseMonitor.status,
                     },

@@ -1041,7 +1041,7 @@ describe("SiteWriterService Coverage Tests", () => {
             await annotate("Type: Monitoring", "type");
 
             const originalSite = { ...mockSite };
-            const newMonitors = Array.from(mockSite.monitors); // Same intervals
+            const newMonitors = [...mockSite.monitors]; // Same intervals
 
             await siteWriterService.handleMonitorIntervalChanges(
                 "test-site",

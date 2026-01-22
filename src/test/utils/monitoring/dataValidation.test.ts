@@ -15,7 +15,7 @@ import { logger } from "../../../services/logger";
 
 const alphaNumericChars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
-const alphaNumCharArb = fc.constantFrom(...alphaNumericChars.split(""));
+const alphaNumCharArb = fc.constantFrom(...alphaNumericChars);
 const safeSegmentArb = fc
     .array(alphaNumCharArb, { minLength: 1, maxLength: 8 })
     .map((chars) => chars.join(""));

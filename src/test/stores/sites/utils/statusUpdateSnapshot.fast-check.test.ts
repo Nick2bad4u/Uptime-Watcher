@@ -77,7 +77,7 @@ const createSite = (
     ({
         identifier,
         monitoring: overrides.monitoring ?? true,
-        monitors: overrides.monitors ?? Array.from(monitors),
+        monitors: overrides.monitors ?? [...monitors],
         name: overrides.name ?? `Site ${identifier}`,
     }) as Site;
 

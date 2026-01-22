@@ -95,7 +95,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             const values = FALLBACK_MONITOR_TYPE_OPTIONS.map(
                 (option) => option.value
             );
-            const uniqueValues = Array.from(new Set(values));
+            const uniqueValues = [...new Set(values)];
 
             expect(values).toHaveLength(uniqueValues.length);
         });
@@ -104,7 +104,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             const labels = FALLBACK_MONITOR_TYPE_OPTIONS.map(
                 (option) => option.label
             );
-            const uniqueLabels = Array.from(new Set(labels));
+            const uniqueLabels = [...new Set(labels)];
 
             expect(labels).toHaveLength(uniqueLabels.length);
         });

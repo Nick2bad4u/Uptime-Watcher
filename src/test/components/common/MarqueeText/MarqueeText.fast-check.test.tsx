@@ -223,7 +223,7 @@ describe("MarqueeText fast-check coverage", () => {
             const segments = wrapper.querySelectorAll(".marquee-text__segment");
             expect(segments).toHaveLength(2);
 
-            const [primarySegment, cloneSegment] = Array.from(segments) as [
+            const [primarySegment, cloneSegment] = [...segments] as [
                 HTMLElement,
                 HTMLElement,
             ];

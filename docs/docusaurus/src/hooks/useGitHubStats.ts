@@ -43,9 +43,9 @@ function isGitHubStats(data: unknown): data is GitHubStats {
         data !== null &&
         "stargazers_count" in data &&
         "watchers_count" in data &&
-        typeof (data as Record<string, unknown>)["stargazers_count"] ===
+        typeof (data as Record<string, unknown>).stargazers_count ===
             "number" &&
-        typeof (data as Record<string, unknown>)["watchers_count"] === "number"
+        typeof (data as Record<string, unknown>).watchers_count === "number"
     );
 }
 
@@ -54,7 +54,7 @@ function isPackageInfo(data: unknown): data is PackageInfo {
         typeof data === "object" &&
         data !== null &&
         "version" in data &&
-        typeof (data as Record<string, unknown>)["version"] === "string"
+        typeof (data as Record<string, unknown>).version === "string"
     );
 }
 

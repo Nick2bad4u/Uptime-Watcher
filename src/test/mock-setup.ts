@@ -169,7 +169,7 @@ const cloneMonitor = (monitor: Monitor): Monitor => {
 
     return {
         ...clonedMonitor,
-        activeOperations: Array.from(monitor.activeOperations),
+        activeOperations: [...monitor.activeOperations],
     };
 };
 

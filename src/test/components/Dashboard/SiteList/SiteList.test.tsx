@@ -223,7 +223,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -251,7 +251,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -280,7 +280,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             // Act
@@ -383,7 +383,7 @@ describe(SiteList, () => {
 
             // Arrange
             const mockStore = {
-                sites: Array.from(mockSites),
+                sites: [...mockSites],
                 otherProperty: "test",
             };
             setSitesSnapshot(mockStore.sites);
@@ -417,7 +417,7 @@ describe(SiteList, () => {
                 ...createMockTheme(true),
                 otherProperty: "test",
             };
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(mockTheme);
 
             // Act
@@ -445,7 +445,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -515,7 +515,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -540,7 +540,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             // Act
@@ -590,7 +590,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -692,7 +692,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot(Array.from(mockSites));
+            setSitesSnapshot([...mockSites]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act

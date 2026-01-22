@@ -324,7 +324,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
                     return;
                 }
 
-                for (const key of Array.from(this.intervals.keys())) {
+                for (const key of this.intervals.keys()) {
                     if (key.startsWith(`${siteIdentifier}|`)) {
                         this.intervals.delete(key);
                     }
@@ -356,9 +356,9 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
 
         public readonly getActiveCount = vi.fn(() => this.intervals.size);
 
-        public readonly getActiveMonitors = vi.fn(() =>
-            Array.from(this.intervals.keys())
-        );
+        public readonly getActiveMonitors = vi.fn(() => [
+            ...this.intervals.keys(),
+        ]);
 
         public readonly performImmediateCheck = vi.fn(
             async (siteIdentifier: string, monitorId: string) => {

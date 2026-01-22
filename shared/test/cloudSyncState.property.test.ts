@@ -10,7 +10,7 @@ import {
 import { applyCloudSyncOperations } from "@shared/utils/cloudSyncState";
 
 const hexCharArb = fc.constantFrom(
-    ...("0123456789abcdef".split("") as readonly string[])
+    ...([..."0123456789abcdef"] as readonly string[])
 );
 
 const deviceIdArb = fc

@@ -204,41 +204,56 @@ async function checkDnsResolution(
 ): Promise<DnsCheckResult> {
     const startTime = performance.now();
 
-    const timeoutSignal = AbortSignal.timeout(timeout);
-    const combinedSignal = signal
-        ? AbortSignal.any([timeoutSignal, signal])
-        : timeoutSignal;
-    let abortReject: ((reason?: unknown) => void) | undefined = undefined;
+    const TIMEOUT = Symbol("dns-timeout");
+    const ABORTED = Symbol("dns-aborted");
 
-    const handleAbort = (): void => {
-        const error = signal?.aborted
-            ? new Error("Operation was aborted")
-            : new Error(`DNS resolution timeout after ${timeout}ms`);
+    const timeoutPromise: Promise<typeof TIMEOUT> = (async (): Promise<
+        typeof TIMEOUT
+    > => {
+        await delay(timeout);
+        return TIMEOUT;
+    })();
 
-        abortReject?.(error);
-    };
+    const abortPromise: Promise<typeof ABORTED> | undefined = signal
+        ? new Promise((resolve) => {
+              if (signal.aborted) {
+                  resolve(ABORTED);
+                  return;
+              }
+
+              signal.addEventListener(
+                  "abort",
+                  () => {
+                      resolve(ABORTED);
+                  },
+                  {
+                      once: true,
+                  }
+              );
+          })
+        : undefined;
 
     try {
-        const abortPromise = new Promise<string[]>((_resolve, reject): void => {
-            abortReject = reject;
+        const raceCandidates: Array<
+            Promise<string[] | typeof ABORTED | typeof TIMEOUT>
+        > = [dns.resolve4(host), timeoutPromise];
 
-            if (combinedSignal.aborted) {
-                handleAbort();
-                return;
-            }
+        if (abortPromise) {
+            raceCandidates.push(abortPromise);
+        }
 
-            combinedSignal.addEventListener("abort", handleAbort, {
-                once: true,
-            });
-        });
+        const result = await Promise.race(raceCandidates);
 
-        const addresses = await Promise.race([
-            dns.resolve4(host),
-            abortPromise,
-        ]);
+        if (result === TIMEOUT) {
+            throw new Error(`DNS resolution timeout after ${timeout}ms`);
+        }
+
+        if (result === ABORTED) {
+            throw new Error("Operation was aborted");
+        }
 
         return {
-            addresses,
+            addresses: result,
             alive: true,
             responseTime: performance.now() - startTime,
         };
@@ -247,9 +262,6 @@ async function checkDnsResolution(
             alive: false,
             responseTime: performance.now() - startTime,
         };
-    } finally {
-        abortReject = undefined;
-        combinedSignal.removeEventListener("abort", handleAbort);
     }
 }
 

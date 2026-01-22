@@ -96,7 +96,7 @@ describe("main.ts - Missing Branch Coverage", () => {
     let originalArgv: string[];
 
     beforeEach(() => {
-        originalArgv = Array.from(process.argv);
+        originalArgv = [...process.argv];
 
         // Clear all mocks and reset modules
         vi.resetAllMocks();

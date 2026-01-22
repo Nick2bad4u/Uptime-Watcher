@@ -23,8 +23,8 @@ const Feature: FC<FeatureProperties> = ({
     title,
 }: Readonly<FeatureProperties>) => (
     <div className={clsx("col col--4")} style={style}>
-        <div className={clsx("text--center", styles["featureCard"])}>
-            <div className={styles["featureIcon"]}>{icon}</div>
+        <div className={clsx("text--center", styles.featureCard)}>
+            <div className={styles.featureIcon}>{icon}</div>
             <div className="padding-horiz--md">
                 <Heading as="h3">{title}</Heading>
                 <p>{description}</p>
@@ -110,13 +110,13 @@ const FeatureList: FeatureItem[] = [
  */
 export default function HomepageFeatures(): ReactNode {
     return (
-        <section className={styles["features"]}>
+        <section className={styles.features}>
             <div className="container">
-                <div className={styles["featuresHeader"]}>
-                    <Heading as="h2" className={styles["featuresTitle"]}>
+                <div className={styles.featuresHeader}>
+                    <Heading as="h2" className={styles.featuresTitle}>
                         Why it doesn&apos;t suck
                     </Heading>
-                    <p className={styles["featuresSubtitle"]}>
+                    <p className={styles.featuresSubtitle}>
                         Most monitoring tools are either too expensive, too
                         complicated, or too cloudy. This one is none of those
                         things.

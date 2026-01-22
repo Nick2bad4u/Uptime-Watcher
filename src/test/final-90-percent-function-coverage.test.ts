@@ -300,7 +300,7 @@ describe("Final 90% Function Coverage Push", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test array utility functions
-            const unique = <T>(arr: T[]) => Array.from(new Set(arr));
+            const unique = <T>(arr: T[]) => [...new Set(arr)];
             const groupBy = <T>(arr: T[], key: keyof T) => {
                 const groups: Record<string, T[]> = {};
                 for (const item of arr) {

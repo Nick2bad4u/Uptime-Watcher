@@ -343,11 +343,11 @@ describe(ScreenshotThumbnail, () => {
                             expect(matchingImage).toBeUndefined();
                         }
 
-                        const captionElements = Array.from(
-                            document.querySelectorAll(
+                        const captionElements = [
+                            ...document.querySelectorAll(
                                 ".site-details-thumbnail-caption"
-                            )
-                        );
+                            ),
+                        ];
                         expect(captionElements.length).toBeGreaterThan(0);
                         expect(
                             captionElements.some(

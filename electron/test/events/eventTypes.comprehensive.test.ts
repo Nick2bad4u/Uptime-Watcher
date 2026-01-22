@@ -784,7 +784,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // This test ensures the for loop in getEventPriority processes all entries
                 const allPriorityEvents =
                     Object.values(EVENT_PRIORITIES).flat();
-                const uniqueEvents = Array.from(new Set(allPriorityEvents));
+                const uniqueEvents = [...new Set(allPriorityEvents)];
 
                 // Test each event returns its correct priority
                 for (const eventName of uniqueEvents) {

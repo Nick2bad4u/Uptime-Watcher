@@ -107,7 +107,7 @@ beforeAll(() => {
                 this.rootMargin = options.rootMargin ?? "";
                 const threshold = options.threshold;
                 if (Array.isArray(threshold)) {
-                    this.thresholds = Object.freeze(Array.from(threshold));
+                    this.thresholds = Object.freeze([...threshold]);
                 } else if (typeof threshold === "number") {
                     this.thresholds = Object.freeze([threshold]);
                 } else {

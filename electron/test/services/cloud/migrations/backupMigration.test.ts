@@ -72,7 +72,7 @@ class InMemoryBackupProvider implements CloudStorageProvider {
     }
 
     public async listBackups(): Promise<CloudBackupEntry[]> {
-        return Array.from(this.backups).toSorted(
+        return [...this.backups].toSorted(
             (a, b) => b.metadata.createdAt - a.metadata.createdAt
         );
     }

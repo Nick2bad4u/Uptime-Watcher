@@ -210,7 +210,7 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         ).toEqual([]);
 
         // Test array deduplication utility
-        const unique = <T>(array: T[]): T[] => Array.from(new Set(array));
+        const unique = <T>(array: T[]): T[] => [...new Set(array)];
 
         expect(
             unique([

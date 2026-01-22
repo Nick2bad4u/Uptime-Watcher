@@ -406,7 +406,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 monitors: mockSiteWithMultipleMonitors.monitors.map(
                     (monitor) => ({
                         ...monitor,
-                        history: Array.from(monitor.history),
+                        history: [...monitor.history],
                     })
                 ),
             };

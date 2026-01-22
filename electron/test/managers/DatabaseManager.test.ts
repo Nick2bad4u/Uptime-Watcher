@@ -134,8 +134,8 @@ vi.mock("../../services/database/serviceFactory", () => ({
                     store.set(key, data);
                 }
             }),
-            keys: vi.fn(() => Array.from(store.keys())),
-            values: vi.fn(() => Array.from(store.values())),
+            keys: vi.fn(() => [...store.keys()]),
+            values: vi.fn(() => [...store.values()]),
             entries: vi.fn(() => store.entries()),
             get size() {
                 return store.size;

@@ -773,7 +773,7 @@ describe(HistoryTab, () => {
             render(<HistoryTab {...defaultProps} />);
 
             const buttons = document.querySelectorAll(".themed-button");
-            for (const button of Array.from(buttons)) {
+            for (const button of buttons) {
                 expect(button).toBeInTheDocument();
                 expect(button.tagName).toBe("BUTTON");
             }

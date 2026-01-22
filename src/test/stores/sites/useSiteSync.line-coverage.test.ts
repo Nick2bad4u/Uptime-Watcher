@@ -297,7 +297,9 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             (
                 statusUpdateHandlerModule.StatusUpdateManager as any
-            ).mockReturnValue(mockStatusUpdateManager);
+            ).mockImplementation(function StatusUpdateManagerCtorMock() {
+                return mockStatusUpdateManager;
+            });
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);

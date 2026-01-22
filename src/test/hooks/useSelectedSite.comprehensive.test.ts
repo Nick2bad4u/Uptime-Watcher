@@ -356,7 +356,7 @@ describe("useSelectedSite", () => {
             const { rerender } = renderHook(() => useSelectedSite());
 
             findSpy.mockClear();
-            mockUseSitesStore.mockReturnValue(Array.from(mockSites));
+            mockUseSitesStore.mockReturnValue([...mockSites]);
             rerender();
 
             expect(findSpy).toHaveBeenCalledTimes(1);

@@ -241,7 +241,7 @@ const createStorageShim = (): StorageShim => {
             return storage.has(key) ? (storage.get(key) ?? null) : null;
         },
         key(index: number): string | null {
-            return Array.from(storage.keys())[index] ?? null;
+            return [...storage.keys()][index] ?? null;
         },
         removeItem(key: string): void {
             storage.delete(key);

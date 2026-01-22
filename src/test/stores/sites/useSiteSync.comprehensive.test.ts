@@ -436,7 +436,9 @@ describe("useSiteSync", () => {
 
             (
                 statusUpdateHandlerModule.StatusUpdateManager as any
-            ).mockReturnValue(mockStatusUpdateManager);
+            ).mockImplementation(function StatusUpdateManagerCtorMock() {
+                return mockStatusUpdateManager;
+            });
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);
@@ -1076,9 +1078,7 @@ describe("useSiteSync", () => {
                     (site: Site) => site.identifier
                 );
 
-                const uniqueIdentifiers = Array.from(
-                    new Set(identifiers)
-                ).toSorted();
+                const uniqueIdentifiers = [...new Set(identifiers)].toSorted();
                 const sortedSanitized = sanitizedIdentifiers.toSorted();
 
                 expect(sortedSanitized).toEqual(uniqueIdentifiers);

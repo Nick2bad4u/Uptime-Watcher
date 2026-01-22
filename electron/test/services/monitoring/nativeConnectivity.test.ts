@@ -21,6 +21,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { performance } from "node:perf_hooks";
 // Mock Node.js modules with inline functions to avoid hoisting issues
 vi.mock("node:dns/promises", () => ({
+    __esModule: true,
     resolve4: vi.fn(),
 }));
 vi.mock("node:net", () => {
@@ -34,7 +35,7 @@ vi.mock("node:net", () => {
         };
     });
 
-    return { Socket };
+    return { __esModule: true, Socket };
 });
 vi.mock("node:perf_hooks", () => ({
     performance: {

@@ -556,7 +556,7 @@ describe("Cache Utils Property-Based Tests", () => {
                 }
 
                 // Each unique key should have the last value set
-                const uniqueKeys = Array.from(new Set(keys));
+                const uniqueKeys = [...new Set(keys)];
                 for (const key of uniqueKeys) {
                     expect(cache.get(key)).toBe(keys.length - 1);
                 }

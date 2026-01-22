@@ -538,7 +538,7 @@ describe("Function Coverage Boost Tests", () => {
                     isLoading: false,
                     lastError: undefined,
                     loadMonitorTypes,
-                    monitorTypes: Array.from(monitorTypes),
+                    monitorTypes: [...monitorTypes],
                     refreshMonitorTypes: vi.fn(),
                     setError: vi.fn(),
                     setLoading: vi.fn(),
@@ -560,7 +560,7 @@ describe("Function Coverage Boost Tests", () => {
                         .mockResolvedValue("suffix"),
                     getMonitorTypes: vi
                         .fn()
-                        .mockResolvedValue(Array.from(monitorTypes)),
+                        .mockResolvedValue([...monitorTypes]),
                     validateMonitorData: vi
                         .fn()
                         .mockResolvedValue({ success: true, errors: [] }),

@@ -85,6 +85,7 @@ document its own APIs!)
  *  ```ts
  *
  *
+ *
  *  // Prints "true" if comment contains "@internal"
  *  console.log(isApiInternal(input));
  *  ```;

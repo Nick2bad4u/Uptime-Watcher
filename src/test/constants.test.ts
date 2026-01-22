@@ -700,7 +700,7 @@ describe("Application Constants", () => {
             );
 
             // Ensure all fallback types are unique
-            const uniqueTypes = Array.from(new Set(fallbackTypes));
+            const uniqueTypes = [...new Set(fallbackTypes)];
             expect(uniqueTypes).toHaveLength(fallbackTypes.length);
         });
 

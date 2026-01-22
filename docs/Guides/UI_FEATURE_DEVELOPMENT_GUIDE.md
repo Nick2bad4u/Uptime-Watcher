@@ -85,11 +85,10 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 
 
-// ✅ Good: Use shared validation schemasimport {import { useEffect } from "react";import { setupCacheSync } from "@/utils/cacheSync";import { useSitesStore } from "@/stores/sites/useSitesStore";/** * Establish site + monitor subscriptions once during app bootstrap. * * See `src/App.tsx` for the real integration. */export function useSitesEventBootstrap(): void { const sitesStore = useSitesStore(); useEffect(() => {  const cacheSyncCleanup = setupCacheSync();
-  const syncEventsCleanup = sitesStore.subscribeToSyncEvents();
 
-  // Monitor updates (down/up/status-changed + manual checks)
-  void sitesStore.subscribeToStatusUpdates();
+
+
+// ✅ Good: Use shared validation schemasimport {import { useEffect } from "react";import { setupCacheSync } from "@/utils/cacheSync";import { useSitesStore } from "@/stores/sites/useSitesStore";/** * Establish site + monitor subscriptions once during app bootstrap. * * See `src/App.tsx` for the real integration. */export function useSitesEventBootstrap(): void { const sitesStore = useSitesStore(); useEffect(() => {  const cacheSyncCleanup = setupCacheSync();  const syncEventsCleanup = sitesStore.subscribeToSyncEvents();  // Monitor updates (down/up/status-changed + manual checks)  void sitesStore.subscribeToStatusUpdates();
 
   return () => {
    cacheSyncCleanup();
@@ -204,6 +203,7 @@ import { useCallback, useEffect, useState } from "react";
  *
  * @example
  *  ```tsx
+ *
  *
  *
  *  <MyComponent

@@ -70,6 +70,7 @@ Consider a hypothetical input:
  * @example
  *  Prints
  *
+ *
  *  "true" for `{@link}` but "false" for `@internal`:
  *  ```ts
  *  console.log(isInlineTag('{@link}'));

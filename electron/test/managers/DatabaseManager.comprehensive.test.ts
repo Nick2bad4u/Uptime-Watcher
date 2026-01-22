@@ -155,8 +155,8 @@ vi.mock("../../services/database/serviceFactory", () => ({
                     store.set(key, data);
                 }
             }),
-            keys: vi.fn(() => Array.from(store.keys())),
-            values: vi.fn(() => Array.from(store.values())),
+            keys: vi.fn(() => [...store.keys()]),
+            values: vi.fn(() => [...store.values()]),
             entries: vi.fn(() => store.entries()),
             get size() {
                 return store.size;
@@ -298,6 +298,23 @@ const createSiteLoadingOrchestratorMock = (overrides = {}) => ({
     ...overrides,
 });
 
+/**
+ * Configure the mocked {@link SiteLoadingOrchestrator} constructor.
+ *
+ * @remarks
+ * `mockReturnValue` internally sets an arrow implementation (`() => value`)
+ * which is not constructable and breaks `new SiteLoadingOrchestrator(...)`.
+ */
+const setSiteLoadingOrchestratorMock = (
+    orchestrator: ReturnType<typeof createSiteLoadingOrchestratorMock>
+): void => {
+    (SiteLoadingOrchestrator as any).mockImplementation(
+        function SiteLoadingOrchestratorCtorMock() {
+            return orchestrator as any;
+        }
+    );
+};
+
 const createDataImportExportServiceMock = (overrides = {}) => ({
     importDataFromJson: vi.fn(),
     persistImportedData: vi.fn(),
@@ -319,9 +336,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
         // Set up the orchestrator mock before creating DatabaseManager
         mockOrchestrator = createSiteLoadingOrchestratorMock();
-        vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-            mockOrchestrator as any
-        );
+        setSiteLoadingOrchestratorMock(mockOrchestrator);
 
         vi.mocked(mockEventEmitter.emitTyped).mockResolvedValue(undefined);
 
@@ -383,9 +398,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Success",
                 }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             // Mock event emission to fail for specific database events only
             vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
@@ -425,9 +438,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Success",
                 }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             await databaseManager.initialize();
 
@@ -564,9 +575,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             // Initialize first
             await databaseManager.initialize();
@@ -587,9 +596,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             await databaseManager.initialize();
             const result = await databaseManager.refreshSites();
@@ -669,9 +676,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             (databaseManager as any).siteLoadingOrchestrator =
                 mockOrchestrator as any;
@@ -868,9 +873,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             // Should complete without errors
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -899,9 +902,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             (databaseManager as any).siteLoadingOrchestrator =
                 mockOrchestrator as any;
@@ -949,9 +950,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
         });
@@ -990,9 +989,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
-                mockOrchestrator as any
-            );
+            setSiteLoadingOrchestratorMock(mockOrchestrator);
 
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
         });

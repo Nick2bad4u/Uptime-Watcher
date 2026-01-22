@@ -19,9 +19,9 @@ export default function GitHubStatsComponent(): ReactNode {
 
     if (statsLoading || versionLoading) {
         return (
-            <div className={styles["githubStats"]}>
-                <span className={styles["stat"]}>⭐ Loading...</span>
-                <span className={styles["stat"]}>🔧 Loading...</span>
+            <div className={styles.githubStats}>
+                <span className={styles.stat}>⭐ Loading...</span>
+                <span className={styles.stat}>🔧 Loading...</span>
             </div>
         );
     }
@@ -31,18 +31,18 @@ export default function GitHubStatsComponent(): ReactNode {
         starCount === 1 ? "1 GitHub star" : `${starCount} GitHub stars`;
 
     return (
-        <div className={styles["githubStats"]}>
-            <div className={styles["statGroup"]}>
-                <span className={styles["stat"]}>⭐ {starText}</span>
+        <div className={styles.githubStats}>
+            <div className={styles.statGroup}>
+                <span className={styles.stat}>⭐ {starText}</span>
                 <Link
                     href={`https://github.com/Nick2bad4u/Uptime-Watcher/releases/tag/v${version}`}
-                    className={styles["stat"] || ""}
+                    className={styles.stat || ""}
                     style={{ color: "inherit", textDecoration: "none" }}
                 >
                     🔧 v{version}
                 </Link>
             </div>
-            <div className={styles["starButtonContainer"]}>
+            <div className={styles.starButtonContainer}>
                 <GitHubButton
                     href="https://github.com/nick2bad4u/uptime-watcher"
                     data-color-scheme="no-preference: dark; light: light; dark: dark;"

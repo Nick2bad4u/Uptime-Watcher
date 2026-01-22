@@ -463,7 +463,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     const mapped = array.map((x) => x);
                     const hasSome = array.some(Boolean);
                     const hasAll = array.every((x) => x !== null);
-                    const spread = Array.from(array);
+                    const spread = [...array];
 
                     // Use results to avoid unused variable warnings
                     expect(typeof length).toBe("number");

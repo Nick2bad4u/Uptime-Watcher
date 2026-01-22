@@ -73,7 +73,7 @@ const cacheMocks = vi.hoisted(() => {
             cacheStore.clear();
         }),
         keys: vi.fn(() => cacheStore.keys()),
-        getAll: vi.fn(() => Array.from(cacheStore.values())),
+        getAll: vi.fn(() => [...cacheStore.values()]),
         entries: vi.fn(() => cacheStore.entries()),
         bulkUpdate: vi.fn(
             (items: { key: string; data: Site; ttl?: number }[]) => {
@@ -237,7 +237,7 @@ describe("SiteManager - Comprehensive", () => {
         mockCache.clear.mockImplementation(() => {
             cacheStore.clear();
         });
-        mockCache.getAll.mockReturnValue(Array.from(cacheStore.values()));
+        mockCache.getAll.mockReturnValue([...cacheStore.values()]);
         mockCache.entries.mockReturnValue(cacheStore.entries());
         mockCache.bulkUpdate.mockImplementation(
             (items: { key: string; data: Site; ttl?: number }[]) => {

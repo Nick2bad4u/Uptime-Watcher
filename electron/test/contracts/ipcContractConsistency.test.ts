@@ -100,10 +100,10 @@ describe("IPC contract consistency", () => {
 
         const registeredChannels = extractRegisteredChannelNames();
 
-        const missingHandlers = Array.from(sharedChannels).filter(
+        const missingHandlers = [...sharedChannels].filter(
             (channel) => !registeredChannels.has(channel)
         );
-        const extraneousHandlers = Array.from(registeredChannels).filter(
+        const extraneousHandlers = [...registeredChannels].filter(
             (channel) => !sharedChannels.has(channel)
         );
 

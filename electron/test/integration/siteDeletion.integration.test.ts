@@ -164,7 +164,7 @@ describe("Site deletion orchestration", () => {
         const sampleSite = createSampleSite(siteIdentifier);
 
         const monitorsBySite = new Map<string, Site["monitors"]>([
-            [siteIdentifier, Array.from(sampleSite.monitors)],
+            [siteIdentifier, [...sampleSite.monitors]],
         ]);
 
         const sites = new Map<string, Site>([

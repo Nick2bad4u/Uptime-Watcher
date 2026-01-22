@@ -42,7 +42,11 @@
         "jsx": "react-jsx",
         "jsxImportSource": "react",
         "keyofStringsOnly": false,
-        "lib": ["DOM", "ESNext"],
+        "lib": [
+            "DOM",
+            "DOM.Iterable",
+            "ESNext"
+        ],
         "libReplacement": true,
         "listEmittedFiles": false,
         "listFiles": false,

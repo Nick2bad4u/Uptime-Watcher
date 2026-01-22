@@ -53,6 +53,7 @@ For stores with straightforward state that don't require modular composition:
  *  ```typescript
  *
  *
+ *
  *  import { useExampleStore } from "./stores/useExampleStore";
  *
  *  function MyComponent() {

@@ -478,7 +478,9 @@ class Main {
     private static readonly FATAL_SHUTDOWN_TIMEOUT_MS = 5000;
 
     /** Application service instance for managing app lifecycle and features */
-    private readonly applicationService: ApplicationService | null;
+    private readonly applicationService: null | {
+        cleanup: () => Promise<void>;
+    };
 
     /** Flag to ensure cleanup is only called once */
     private cleanedUp = false;
@@ -601,6 +603,24 @@ class Main {
         }
     };
 
+    /**
+     * Runtime check for a cleanup-capable ApplicationService.
+     *
+     * @remarks
+     * Tests may mock `new ApplicationService()` to return a non-instance value
+     * (including `null`). We therefore treat the constructor result as
+     * `unknown` and validate the minimal capability we need.
+     */
+    private static isCleanupCapable(
+        value: unknown
+    ): value is { cleanup: () => Promise<void> } {
+        if (!isPlainRecord(value)) {
+            return false;
+        }
+
+        return typeof value["cleanup"] === "function";
+    }
+
     private async performFatalShutdown(
         reason: "uncaughtException" | "unhandledRejection",
         error: Error
@@ -652,13 +672,7 @@ class Main {
                 return;
             }
 
-            const {cleanup} = (this.applicationService as Partial<ApplicationService>);
-
-            if (typeof cleanup !== "function") {
-                return;
-            }
-
-            await cleanup.call(this.applicationService);
+            await this.applicationService.cleanup();
         } catch (error) {
             logger.error("[Main] Cleanup failed", error);
             // Don't re-throw as this is called during shutdown
@@ -682,14 +696,10 @@ class Main {
     public constructor() {
         logger.info("Starting Uptime Watcher application");
 
-        const candidate = new ApplicationService() as unknown;
-        const cleanup = (candidate as null | Partial<ApplicationService>)
-            ?.cleanup;
-
-        this.applicationService =
-            candidate && typeof cleanup === "function"
-                ? (candidate as ApplicationService)
-                : null;
+        const candidate: unknown = new ApplicationService();
+        this.applicationService = Main.isCleanupCapable(candidate)
+            ? candidate
+            : null;
 
         // Crash resilience: ensure unexpected errors are logged and we exit
         // cleanly rather than leaving the app in a corrupted state.

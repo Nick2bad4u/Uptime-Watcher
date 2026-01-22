@@ -866,7 +866,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             // Ensure representative monitor configurations exist
             const monitorTypes = result.data.map((config: any) => config.type);
             expect(monitorTypes).toEqual(
-                expect.arrayContaining(Array.from(BASE_MONITOR_TYPES))
+                expect.arrayContaining([...BASE_MONITOR_TYPES])
             );
 
             // Check serialized config structure
