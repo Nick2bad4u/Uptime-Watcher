@@ -38,6 +38,7 @@ import * as pluginDesignTokens from "@metamask/eslint-plugin-design-tokens";
 // @ts-expect-error -- No Types for this Package
 import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
 import rushStackSecurity from "@rushstack/eslint-plugin-security";
+import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
 import vitest from "@vitest/eslint-plugin";
@@ -51,6 +52,7 @@ import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCanonical from "eslint-plugin-canonical";
+import pluginCasePolice from "eslint-plugin-case-police";
 // @ts-expect-error -- No Types for this Package
 import * as pluginCleanCode from "eslint-plugin-clean-code";
 // New plugins from user request
@@ -82,29 +84,6 @@ import importZod from "eslint-plugin-import-zod";
 // @ts-expect-error -- No Types for this Package
 import istanbul from "eslint-plugin-istanbul";
 import jsdocPlugin from "eslint-plugin-jsdoc";
-// NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
-// at lint time. That makes linting flaky/offline-hostile.
-// Keep it opt-in via UW_ENABLE_JSON_SCHEMA_VALIDATION=1.
-const enableJsonSchemaValidation =
-    process.env["UW_ENABLE_JSON_SCHEMA_VALIDATION"] === "1";
-
-let eslintPluginJsonSchemaValidator = undefined;
-
-if (enableJsonSchemaValidation) {
-    eslintPluginJsonSchemaValidator = (
-        await import("eslint-plugin-json-schema-validator")
-    ).default;
-}
-
-const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
-    ? { "json-schema-validator": eslintPluginJsonSchemaValidator }
-    : {};
-
-const jsonSchemaValidatorRules = enableJsonSchemaValidation
-    ? { "json-schema-validator/no-invalid": "error" }
-    : {};
-import stylistic from "@stylistic/eslint-plugin";
-import pluginCasePolice from "eslint-plugin-case-police";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 // @ts-expect-error -- No Types for this Package
@@ -235,6 +214,28 @@ import * as yamlEslintParser from "yaml-eslint-parser";
 
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract-interfaces.mjs";
+
+// NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
+// at lint time. That makes linting flaky/offline-hostile.
+// Keep it opt-in via UW_ENABLE_JSON_SCHEMA_VALIDATION=1.
+const enableJsonSchemaValidation =
+    process.env["UW_ENABLE_JSON_SCHEMA_VALIDATION"] === "1";
+
+let eslintPluginJsonSchemaValidator = undefined;
+
+if (enableJsonSchemaValidation) {
+    eslintPluginJsonSchemaValidator = (
+        await import("eslint-plugin-json-schema-validator")
+    ).default;
+}
+
+const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
+    ? { "json-schema-validator": eslintPluginJsonSchemaValidator }
+    : {};
+
+const jsonSchemaValidatorRules = enableJsonSchemaValidation
+    ? { "json-schema-validator/no-invalid": "error" }
+    : {};
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
 // import pluginPii from "eslint-plugin-pii"; - broken
@@ -1470,7 +1471,7 @@ export default /** @type {EslintConfig} */ [
             ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
-            ...pluginRegexp.configs["flat/all"].rules,
+            ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
@@ -1706,7 +1707,16 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
             "@typescript-eslint/default-param-last": "warn",
-            "@typescript-eslint/dot-notation": "warn",
+            "@typescript-eslint/dot-notation": [
+                "warn",
+                {
+                    // Allow bracket notation for ENV-style keys (UPPER_SNAKE_CASE).
+                    // This prevents ESLint from auto-fixing `process.env["FOO"]`
+                    // into `process.env.FOO`, which breaks under TS
+                    // `noPropertyAccessFromIndexSignature` (TS4111).
+                    allowPattern: "^[A-Z0-9_]+$",
+                },
+            ],
             "@typescript-eslint/explicit-function-return-type": [
                 "warn",
                 {
@@ -2926,7 +2936,7 @@ export default /** @type {EslintConfig} */ [
             ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
-            ...pluginRegexp.configs["flat/all"].rules,
+            ...pluginRegexp.configs.all.rules,
             ...reactRefresh.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
@@ -3193,7 +3203,12 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
             "@typescript-eslint/default-param-last": "warn",
-            "@typescript-eslint/dot-notation": "warn",
+            "@typescript-eslint/dot-notation": [
+                "warn",
+                {
+                    allowPattern: "^[A-Z0-9_]+$",
+                },
+            ],
             "@typescript-eslint/explicit-function-return-type": [
                 "warn",
                 {
@@ -4596,7 +4611,7 @@ export default /** @type {EslintConfig} */ [
             ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
-            ...pluginRegexp.configs["flat/all"].rules,
+            ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
@@ -4834,7 +4849,12 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
             "@typescript-eslint/default-param-last": "warn",
-            "@typescript-eslint/dot-notation": "warn",
+            "@typescript-eslint/dot-notation": [
+                "warn",
+                {
+                    allowPattern: "^[A-Z0-9_]+$",
+                },
+            ],
             "@typescript-eslint/explicit-function-return-type": [
                 "warn",
                 {
@@ -6044,7 +6064,7 @@ export default /** @type {EslintConfig} */ [
             ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
-            ...pluginRegexp.configs["flat/all"].rules,
+            ...pluginRegexp.configs.all.rules,
             ...reactRefresh.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
@@ -6308,7 +6328,12 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/consistent-type-exports": "warn",
             "@typescript-eslint/consistent-type-imports": "warn",
             "@typescript-eslint/default-param-last": "warn",
-            "@typescript-eslint/dot-notation": "warn",
+            "@typescript-eslint/dot-notation": [
+                "warn",
+                {
+                    allowPattern: "^[A-Z0-9_]+$",
+                },
+            ],
             "@typescript-eslint/explicit-function-return-type": [
                 "warn",
                 {
@@ -8810,7 +8835,7 @@ export default /** @type {EslintConfig} */ [
             ...tseslint.configs["stylisticTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
-            ...pluginRegexp.configs["flat/all"].rules,
+            ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
@@ -9715,7 +9740,7 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             ...js.configs.all.rules,
-            ...pluginRegexp.configs["flat/all"].rules,
+            ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
