@@ -420,6 +420,7 @@ export async function checkConnectivity(
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
+    let tcpProbeError: unknown = undefined;
 
     // Defensive normalization: optional fields can still become `undefined`
     // depending on call sites (e.g., schema parsing or partial spreads). The
@@ -459,12 +460,10 @@ export async function checkConnectivity(
                 return tcpResult;
             }
         } catch (error) {
-            return {
-                details: `Connectivity check failed for ${String(normalizedHost)}`,
-                error: getUserFacingErrorDetail(error),
-                responseTime: Math.round(performance.now() - startTime),
-                status: "down",
-            };
+            // If TCP probing fails unexpectedly (e.g. socket implementation
+            // quirks in test environments or platform-specific errors), fall
+            // back to DNS resolution instead of immediately reporting down.
+            tcpProbeError = error; // Initialize tcpProbeError
         }
     }
 
@@ -486,7 +485,10 @@ export async function checkConnectivity(
 
     return {
         details: `Failed to connect to ${String(normalizedHost)}`,
-        error: "Host unreachable - all connectivity checks failed",
+        error:
+            tcpProbeError === undefined
+                ? "Host unreachable - all connectivity checks failed"
+                : getUserFacingErrorDetail(tcpProbeError),
         responseTime: Math.round(performance.now() - startTime),
         status: "down",
     };

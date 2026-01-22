@@ -258,19 +258,23 @@ describe("Native Connectivity with Degraded State", () => {
         it("should succeed on retry if connection improves", async () => {
             // Arrange
             let callCount = 0;
+            const listeners = new Map<string, (...args: unknown[]) => void>();
             const mockSocket = {
                 setTimeout: vi.fn(),
                 on: vi.fn((event, callback) => {
-                    if (event === "connect" && callCount >= 1) {
-                        // Succeed on second attempt
-                        setTimeout(() => callback(), 10);
-                    } else if (event === "error" && callCount === 0) {
-                        // Fail on first attempt
-                        setTimeout(() => callback(), 10);
-                    }
+                    listeners.set(event, callback);
                 }),
                 connect: vi.fn(() => {
                     callCount++;
+
+                    if (callCount === 1) {
+                        // Fail on first attempt
+                        setTimeout(() => listeners.get("error")?.(), 10);
+                        return;
+                    }
+
+                    // Succeed on second attempt
+                    setTimeout(() => listeners.get("connect")?.(), 10);
                 }),
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),

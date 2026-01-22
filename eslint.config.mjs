@@ -294,7 +294,11 @@ if (!process.env["RECHECK_JAR"]) {
         process.env["RECHECK_JAR"] = path.normalize(resolvedRecheckJarPath);
     }
 }
-export default /** @type {EslintConfig} */ [
+
+import { defineConfig, globalIgnores } from "@eslint/config-helpers";
+
+export default defineConfig([
+    globalIgnores(["**/CHANGELOG.md"]),
     gitignore({
         name: "Global .gitignore Rules",
         root: true,
@@ -10538,4 +10542,4 @@ export default /** @type {EslintConfig} */ [
         },
     },
     eslintConfigPrettier,
-];
+]);
