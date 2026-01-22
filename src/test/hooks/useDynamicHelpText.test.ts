@@ -40,8 +40,8 @@ describe("useDynamicHelpText Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Initialization", "type");
 
-            vi.mocked(getMonitorHelpTexts).mockImplementation(
-                () => new Promise(() => {})
+            vi.mocked(getMonitorHelpTexts).mockReturnValue(
+                new Promise(() => {})
             ); // Never resolves
 
             const { result } = renderHook(() => useDynamicHelpText("http"));

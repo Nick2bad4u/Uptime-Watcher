@@ -121,13 +121,13 @@ import type { UptimeEvents } from "../../events/eventTypes.js";
 
 // Mock DataImportExportService
 vi.mock("../../services/database/DataImportExportService", () => ({
-    DataImportExportService: vi.fn().mockImplementation(() => ({
+    DataImportExportService: vi.fn().mockReturnValue({
         importDataFromJson: vi.fn(),
         persistImportedData: vi.fn(),
         exportDataToJson: vi.fn(),
         downloadBackup: vi.fn(),
         validateImportData: vi.fn(),
-    })),
+    }),
 }));
 
 // Import the mocked classes for use in tests
@@ -319,10 +319,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
         // Set up the orchestrator mock before creating DatabaseManager
         mockOrchestrator = createSiteLoadingOrchestratorMock();
-        vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-            function SiteLoadingOrchestratorBaseMock() {
-                return mockOrchestrator as any;
-            }
+        vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+            mockOrchestrator as any
         );
 
         vi.mocked(mockEventEmitter.emitTyped).mockResolvedValue(undefined);
@@ -385,10 +383,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Success",
                 }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorInitializeMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             // Mock event emission to fail for specific database events only
@@ -429,10 +425,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     message: "Success",
                 }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorSettingsMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             await databaseManager.initialize();
@@ -570,10 +564,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorLoadSitesMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             // Initialize first
@@ -595,10 +587,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Reset and configure the SiteLoadingOrchestrator mock
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorCacheMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             await databaseManager.initialize();
@@ -679,10 +669,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorHistoryMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             (databaseManager as any).siteLoadingOrchestrator =
@@ -722,8 +710,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     .fn()
                     .mockRejectedValue(new Error("Import failed")),
             });
-            vi.mocked(DataImportExportService).mockImplementation(
-                () => mockImportService as any
+            vi.mocked(DataImportExportService).mockReturnValue(
+                mockImportService as any
             );
 
             const mockExecute = vi
@@ -759,8 +747,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     .mockResolvedValue({ sites: [], settings: [] }),
                 persistImportedData: vi.fn().mockResolvedValue(undefined),
             });
-            vi.mocked(DataImportExportService).mockImplementation(
-                () => mockImportService as any
+            vi.mocked(DataImportExportService).mockReturnValue(
+                mockImportService as any
             );
 
             // Mock the command executor to succeed for ImportDataCommand
@@ -880,10 +868,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorMonitoringMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             // Should complete without errors
@@ -913,10 +899,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorStopFailureMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             (databaseManager as any).siteLoadingOrchestrator =
@@ -965,10 +949,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorIntegrationMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -1008,10 +990,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                         };
                     }),
             });
-            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
-                function SiteLoadingOrchestratorEdgeCaseMock() {
-                    return mockOrchestrator as any;
-                }
+            vi.mocked(SiteLoadingOrchestrator).mockReturnValue(
+                mockOrchestrator as any
             );
 
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -1098,8 +1078,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     .fn()
                     .mockRejectedValue(new Error("File system error")),
             });
-            vi.mocked(DataImportExportService).mockImplementation(
-                () => mockImportService as any
+            vi.mocked(DataImportExportService).mockReturnValue(
+                mockImportService as any
             );
 
             await expect(databaseManager.downloadBackup()).rejects.toThrowError(

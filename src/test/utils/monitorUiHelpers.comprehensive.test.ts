@@ -272,7 +272,7 @@ describe(supportsAdvancedAnalytics, () => {
 
     it("fetches configuration when cache is empty", async () => {
         configMap.clear();
-        mockCacheGet.mockImplementation(() => undefined);
+        mockCacheGet.mockReturnValue(undefined);
 
         mockGetMonitorTypeConfig.mockResolvedValueOnce(
             createConfig("http", {
@@ -298,7 +298,7 @@ describe(supportsAdvancedAnalytics, () => {
 
     it("returns false when fetching configuration throws", async () => {
         configMap.clear();
-        mockCacheGet.mockImplementation(() => undefined);
+        mockCacheGet.mockReturnValue(undefined);
         mockGetMonitorTypeConfig.mockRejectedValueOnce(new Error("boom"));
 
         const result = await supportsAdvancedAnalytics("http");
@@ -331,7 +331,7 @@ describe(supportsResponseTime, () => {
 
     it("returns false when configuration retrieval fails", async () => {
         configMap.clear();
-        mockCacheGet.mockImplementation(() => undefined);
+        mockCacheGet.mockReturnValue(undefined);
         mockGetMonitorTypeConfig.mockRejectedValueOnce(new Error("failed"));
 
         const result = await supportsResponseTime("ping");
@@ -473,7 +473,7 @@ describe(getAnalyticsLabel, () => {
 
     it("stores fetched configuration in the cache on miss", async () => {
         configMap.clear();
-        mockCacheGet.mockImplementation(() => undefined);
+        mockCacheGet.mockReturnValue(undefined);
 
         mockGetMonitorTypeConfig.mockResolvedValueOnce(
             createConfig("http", {

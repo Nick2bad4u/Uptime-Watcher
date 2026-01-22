@@ -555,27 +555,23 @@ describe(ApplicationService, () => {
             const customSignal = abortController.signal;
 
             // Mock a long-running cleanup operation
-            mockUptimeOrchestrator.stopMonitoring.mockImplementationOnce(
-                () =>
-                    new Promise((resolve, reject) => {
-                        // Simulate async operation that can be cancelled
-                        const timeout = setTimeout(
-                            () => resolve(undefined),
-                            1000
-                        );
+            mockUptimeOrchestrator.stopMonitoring.mockReturnValueOnce(
+                new Promise((resolve, reject) => {
+                    // Simulate async operation that can be cancelled
+                    const timeout = setTimeout(() => resolve(undefined), 1000);
 
-                        // Handle cancellation properly
-                        customSignal.addEventListener("abort", () => {
-                            clearTimeout(timeout);
-                            reject(new Error("Operation aborted"));
-                        });
+                    // Handle cancellation properly
+                    customSignal.addEventListener("abort", () => {
+                        clearTimeout(timeout);
+                        reject(new Error("Operation aborted"));
+                    });
 
-                        // If already aborted when this runs
-                        if (customSignal.aborted) {
-                            clearTimeout(timeout);
-                            reject(new Error("Operation aborted"));
-                        }
-                    })
+                    // If already aborted when this runs
+                    if (customSignal.aborted) {
+                        clearTimeout(timeout);
+                        reject(new Error("Operation aborted"));
+                    }
+                })
             );
 
             // Act - Start cleanup and then abort it
@@ -865,15 +861,14 @@ describe(ApplicationService, () => {
             const abortController = new AbortController();
             const customSignal = abortController.signal;
 
-            mockAutoUpdaterService.checkForUpdates.mockImplementation(
-                () =>
-                    new Promise((resolve, reject) => {
-                        const timeout = setTimeout(resolve, 1000);
-                        customSignal.addEventListener("abort", () => {
-                            clearTimeout(timeout);
-                            reject(new Error("Update check cancelled"));
-                        });
-                    })
+            mockAutoUpdaterService.checkForUpdates.mockReturnValue(
+                new Promise((resolve, reject) => {
+                    const timeout = setTimeout(resolve, 1000);
+                    customSignal.addEventListener("abort", () => {
+                        clearTimeout(timeout);
+                        reject(new Error("Update check cancelled"));
+                    });
+                })
             );
 
             // Create new instance

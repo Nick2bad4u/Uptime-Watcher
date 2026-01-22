@@ -219,4 +219,120 @@ describe(MonitorScheduler, () => {
         expect(scheduler.isMonitoring("site-1", "monitor-1")).toBeFalsy();
         expect(scheduler.isMonitoring("site-2", "monitor-2")).toBeTruthy();
     });
+
+    it("queues an immediate check while a job is running and executes it after the in-flight check completes", async () => {
+        const jobKey = "site-1|monitor-1";
+
+        let resolveFirstCheck: (() => void) | undefined;
+        const firstCheckGate = new Promise<void>((resolve) => {
+            resolveFirstCheck = resolve;
+        });
+
+        const observedCorrelationIds: string[] = [];
+        mockCheckCallback = createCheckCallbackMock().mockImplementation(
+            async () => {
+                const correlationId = scheduler
+                    .getJobsForTesting()
+                    .get(jobKey)?.correlationId;
+
+                if (typeof correlationId === "string") {
+                    observedCorrelationIds.push(correlationId);
+                }
+
+                if (observedCorrelationIds.length === 1) {
+                    await firstCheckGate;
+                }
+            }
+        );
+        scheduler.setCheckCallback(mockCheckCallback);
+
+        scheduler.startMonitor("site-1", createMonitor());
+        await flushAsync();
+
+        expect(mockCheckCallback).toHaveBeenCalledTimes(1);
+        const initialCorrelationId = scheduler
+            .getJobsForTesting()
+            .get(jobKey)?.correlationId;
+        expect(initialCorrelationId).toEqual(expect.any(String));
+
+        eventEmitter.emitTyped.mockClear();
+        await scheduler.performImmediateCheck("site-1", "monitor-1");
+        await flushAsync();
+
+        const snapshotAfterQueue = scheduler.getJobsForTesting().get(jobKey);
+        const queuedCorrelationId =
+            snapshotAfterQueue?.pendingManualCheckCorrelationId;
+
+        expect(snapshotAfterQueue?.correlationId).toBe(initialCorrelationId);
+        expect(queuedCorrelationId).toEqual(expect.any(String));
+
+        const manualCheckEvent = eventEmitter.emitTyped.mock.calls.find(
+            ([eventName]) => eventName === "monitor:manual-check-started"
+        );
+
+        expect(manualCheckEvent?.[1]).toMatchObject({
+            correlationId: queuedCorrelationId,
+            monitorId: "monitor-1",
+            siteIdentifier: "site-1",
+            timestamp: FIXED_NOW,
+        });
+
+        resolveFirstCheck?.();
+        await flushAsync();
+        await flushAsync();
+
+        expect(mockCheckCallback).toHaveBeenCalledTimes(2);
+        expect(observedCorrelationIds).toHaveLength(2);
+        expect(observedCorrelationIds[0]).toBe(initialCorrelationId);
+        expect(observedCorrelationIds[1]).toBe(queuedCorrelationId);
+        expect(
+            scheduler.getJobsForTesting().get(jobKey)
+                ?.pendingManualCheckCorrelationId
+        ).toBeUndefined();
+    });
+
+    it("dedupes repeated immediate check requests while the job is running", async () => {
+        const jobKey = "site-1|monitor-1";
+
+        let resolveFirstCheck: (() => void) | undefined;
+        const firstCheckGate = new Promise<void>((resolve) => {
+            resolveFirstCheck = resolve;
+        });
+
+        let callbackCalls = 0;
+        mockCheckCallback = createCheckCallbackMock().mockImplementation(
+            async () => {
+                callbackCalls += 1;
+                if (callbackCalls === 1) {
+                    await firstCheckGate;
+                }
+            }
+        );
+        scheduler.setCheckCallback(mockCheckCallback);
+
+        scheduler.startMonitor("site-1", createMonitor());
+        await flushAsync();
+
+        eventEmitter.emitTyped.mockClear();
+        await scheduler.performImmediateCheck("site-1", "monitor-1");
+        await scheduler.performImmediateCheck("site-1", "monitor-1");
+        await flushAsync();
+
+        const manualEvents = eventEmitter.emitTyped.mock.calls.filter(
+            ([eventName]) => eventName === "monitor:manual-check-started"
+        );
+        expect(manualEvents).toHaveLength(1);
+
+        const pendingCorrelationId = scheduler
+            .getJobsForTesting()
+            .get(jobKey)?.pendingManualCheckCorrelationId;
+        expect(pendingCorrelationId).toEqual(expect.any(String));
+
+        // Let the first check settle; the queued manual check should run once.
+        resolveFirstCheck?.();
+        await flushAsync();
+        await flushAsync();
+
+        expect(mockCheckCallback).toHaveBeenCalledTimes(2);
+    });
 });

@@ -19,8 +19,10 @@ import {
  * rules to fight normal property access.
  */
 export interface StatusUpdateSnapshotPayload {
-    /** Optional diagnostic message describing the update (mirrors
-StatusUpdate.details). */
+    /**
+     * Optional diagnostic message describing the update (mirrors
+     * StatusUpdate.details).
+     */
     readonly details?: string;
     /** Optional snapshot of the monitor at update-time. */
     readonly monitor?: Monitor;

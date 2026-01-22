@@ -54,8 +54,8 @@ describe("MonitorUiComponents", () => {
             annotate("Type: Data Loading", "type");
 
             // Mock a promise that never resolves to simulate loading
-            vi.mocked(supportsResponseTime).mockImplementation(
-                () => new Promise(() => {})
+            vi.mocked(supportsResponseTime).mockReturnValue(
+                new Promise(() => {})
             );
 
             render(<ConditionalResponseTime {...defaultProps} />);

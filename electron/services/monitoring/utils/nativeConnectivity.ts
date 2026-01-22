@@ -408,12 +408,28 @@ export async function checkConnectivity(
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
+
+    // Defensive normalization: optional fields can still become `undefined`
+    // depending on call sites (e.g., schema parsing or partial spreads). The
+    // connectivity pipeline should never throw for malformed options; it
+    // should degrade gracefully and fall back to other methods.
+    const timeoutMs =
+        typeof opts.timeout === "number" &&
+        Number.isFinite(opts.timeout) &&
+        opts.timeout > 0
+            ? opts.timeout
+            : DEFAULT_OPTIONS.timeout;
+
+    const ports =
+        Array.isArray(opts.ports) && opts.ports.length > 0
+            ? opts.ports
+            : DEFAULT_OPTIONS.ports;
     const startTime = performance.now();
 
     const normalizedHost: string = host.trim();
 
     if (isValidUrl(normalizedHost)) {
-        return checkHttpConnectivity(normalizedHost, opts.timeout, signal);
+        return checkHttpConnectivity(normalizedHost, timeoutMs, signal);
     }
 
     const cleanHost: string = stripHttpScheme(normalizedHost);
@@ -422,8 +438,8 @@ export async function checkConnectivity(
         try {
             const tcpResult = await checkTcpPorts(
                 cleanHost,
-                opts.ports,
-                opts.timeout,
+                ports,
+                timeoutMs,
                 signal
             );
 
@@ -443,7 +459,7 @@ export async function checkConnectivity(
     if (opts.method === "dns" || opts.method === "tcp") {
         const dnsResult = await checkDnsResolution(
             cleanHost,
-            opts.timeout,
+            timeoutMs,
             signal
         );
 

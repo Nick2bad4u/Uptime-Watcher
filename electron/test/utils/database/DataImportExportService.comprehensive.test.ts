@@ -284,9 +284,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Export", "category");
 
-            const { safeJsonStringifyWithFallback } = await import(
-                "@shared/utils/jsonSafety"
-            );
+            const { safeJsonStringifyWithFallback } =
+                await import("@shared/utils/jsonSafety");
             const safeJsonStringifyWithFallbackMock = vi.mocked(
                 safeJsonStringifyWithFallback
             );
@@ -301,12 +300,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             mockRepositories.site.exportAllRows.mockResolvedValue([]);
             safeJsonStringifyWithFallbackMock.mockReturnValue(
-                "{\"exported\":true}"
+                '{"exported":true}'
             );
 
             const output = await service.exportAllData();
 
-            expect(output).toBe("{\"exported\":true}");
+            expect(output).toBe('{"exported":true}');
 
             const calls = safeJsonStringifyWithFallbackMock.mock.calls;
             expect(calls).toHaveLength(1);

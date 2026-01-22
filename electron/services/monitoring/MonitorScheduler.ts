@@ -43,6 +43,7 @@ interface MonitorJob {
     isRunning: boolean;
     monitorId: string;
     needsReschedule: boolean;
+    pendingManualCheckCorrelationId: string | undefined;
     siteIdentifier: string;
     timeoutMs: number;
     timer: NodeJS.Timeout | undefined;
@@ -57,6 +58,7 @@ interface MonitorJobSnapshot {
     isRunning: boolean;
     monitorId: string;
     needsReschedule: boolean;
+    pendingManualCheckCorrelationId: string | undefined;
     siteIdentifier: string;
     timeoutMs: number;
 }
@@ -187,7 +189,16 @@ export class MonitorScheduler {
 
                     if (timeoutState.timedOut) {
                         currentJob.isRunning = false;
-                        if (currentJob.needsReschedule) {
+                        const startedQueuedManual =
+                            this.startQueuedManualCheckIfAny(
+                                intervalKey,
+                                currentJob
+                            );
+
+                        if (
+                            !startedQueuedManual &&
+                            currentJob.needsReschedule
+                        ) {
                             currentJob.needsReschedule = false;
                             this.scheduleNextRun(intervalKey);
                         }
@@ -261,7 +272,14 @@ export class MonitorScheduler {
             // If we timed out, rescheduling is deferred until the underlying
             // check settles (see checkPromise.finally) to avoid timer churn.
             if (currentJob === job && !timeoutState.timedOut) {
-                this.scheduleNextRun(intervalKey);
+                const startedQueuedManual = this.startQueuedManualCheckIfAny(
+                    intervalKey,
+                    currentJob
+                );
+
+                if (!startedQueuedManual) {
+                    this.scheduleNextRun(intervalKey);
+                }
             }
         }
     }
@@ -278,6 +296,24 @@ export class MonitorScheduler {
         const job = this.jobs.get(intervalKey);
 
         if (job) {
+            // If a check is already in flight, queue exactly one manual check
+            // to run immediately after the current check settles.
+            if (job.isRunning) {
+                if (job.pendingManualCheckCorrelationId) {
+                    return;
+                }
+
+                this.clearJobTimer(job);
+                const correlationId = generateCorrelationId();
+                job.pendingManualCheckCorrelationId = correlationId;
+                this.emitManualCheckStartedEvent({
+                    correlationId,
+                    monitorId: job.monitorId,
+                    siteIdentifier: job.siteIdentifier,
+                });
+                return;
+            }
+
             this.clearJobTimer(job);
             job.backoffAttempt = 0;
             job.correlationId = generateCorrelationId();
@@ -342,6 +378,43 @@ export class MonitorScheduler {
     }
 
     /**
+     * Attempts to start a queued manual check for the specified job.
+     *
+     * @remarks
+     * Manual checks are allowed to be requested while a job is already
+     * executing. In that case, we queue exactly one pending manual check and
+     * run it immediately after the current check settles.
+     *
+     * This prevents clobbering the in-flight correlation ID (used by timeout
+     * and schedule telemetry) while still honoring the manual check request.
+     */
+    private startQueuedManualCheckIfAny(
+        intervalKey: string,
+        job: MonitorJob
+    ): boolean {
+        if (job.isRunning) {
+            return false;
+        }
+
+        const correlationId = job.pendingManualCheckCorrelationId;
+        if (!correlationId) {
+            return false;
+        }
+
+        job.pendingManualCheckCorrelationId = undefined;
+        job.needsReschedule = false;
+        job.backoffAttempt = 0;
+        this.clearJobTimer(job);
+
+        // Important: set correlation ID only for the manual run that is about
+        // to begin.
+        job.correlationId = correlationId;
+
+        void this.runJob(intervalKey);
+        return true;
+    }
+
+    /**
      * Creates a new {@link MonitorScheduler}.
      *
      * @param loggerInstance - Optional logger implementation to use for
@@ -400,6 +473,8 @@ export class MonitorScheduler {
                     isRunning: job.isRunning,
                     monitorId: job.monitorId,
                     needsReschedule: job.needsReschedule,
+                    pendingManualCheckCorrelationId:
+                        job.pendingManualCheckCorrelationId,
                     siteIdentifier: job.siteIdentifier,
                     timeoutMs: job.timeoutMs,
                 },
@@ -542,6 +617,7 @@ export class MonitorScheduler {
             isRunning: false,
             monitorId: monitor.id,
             needsReschedule: false,
+            pendingManualCheckCorrelationId: undefined,
             siteIdentifier,
             timeoutMs,
             timer: undefined,

@@ -2,6 +2,7 @@ import type { SiteSchemaType } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
@@ -71,12 +72,10 @@ export function validateSiteData(data: unknown): ValidationResult {
             };
         }
 
+        const safeError = ensureError(error);
+
         return {
-            errors: [
-                `Validation failed: ${
-                    error instanceof Error ? error.message : String(error)
-                }`,
-            ],
+            errors: [`Validation failed: ${safeError.message}`],
             metadata: {},
             success: false,
             warnings: [],

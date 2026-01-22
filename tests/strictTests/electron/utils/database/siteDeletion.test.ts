@@ -164,7 +164,7 @@ describe("deleteSiteWithAdapters", () => {
         const errorModule = await import(errorUtilsPath);
         const ensureErrorSpy = vi.spyOn(errorModule, "ensureError");
         const normalized = new Error("normalized cause");
-        ensureErrorSpy.mockImplementation(() => normalized);
+        ensureErrorSpy.mockReturnValue(normalized);
         const { adapter: monitorAdapter } = createMonitorAdapter({
             deleteBySiteIdentifier: vi.fn(() => {
                 throw "boom";

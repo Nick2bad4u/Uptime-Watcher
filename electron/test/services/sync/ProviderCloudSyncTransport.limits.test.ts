@@ -318,7 +318,12 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
     it("rejects operation objects containing invalid UTF-8", async () => {
         const provider = createProvider({
-            downloadObject: async () => Buffer.from([0xff, 0xfe, 0xfd]),
+            downloadObject: async () =>
+                Buffer.from([
+                    0xff,
+                    0xfe,
+                    0xfd,
+                ]),
         });
 
         const transport = ProviderCloudSyncTransport.create(provider);
@@ -334,7 +339,11 @@ describe("ProviderCloudSyncTransport.readManifest decoding", () => {
         const provider = createProvider({
             downloadObject: async (key) => {
                 if (key === "manifest.json") {
-                    return Buffer.from([0xff, 0xfe, 0xfd]);
+                    return Buffer.from([
+                        0xff,
+                        0xfe,
+                        0xfd,
+                    ]);
                 }
                 return Buffer.from("", "utf8");
             },
@@ -348,7 +357,12 @@ describe("ProviderCloudSyncTransport.readManifest decoding", () => {
 describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
     it("rejects snapshots containing invalid UTF-8", async () => {
         const provider = createProvider({
-            downloadObject: async () => Buffer.from([0xff, 0xfe, 0xfd]),
+            downloadObject: async () =>
+                Buffer.from([
+                    0xff,
+                    0xfe,
+                    0xfd,
+                ]),
         });
 
         const transport = ProviderCloudSyncTransport.create(provider);

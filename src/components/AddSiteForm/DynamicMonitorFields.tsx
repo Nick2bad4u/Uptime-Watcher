@@ -133,7 +133,11 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
                     void loadMonitorTypes();
                 }
             },
-            [isLoaded, loadMonitorTypes, monitorTypesError]
+            [
+                isLoaded,
+                loadMonitorTypes,
+                monitorTypesError,
+            ]
         );
 
         // Memoized default onChange handler to prevent new function creation on

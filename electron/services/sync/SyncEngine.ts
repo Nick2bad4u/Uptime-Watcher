@@ -377,7 +377,7 @@ export class SyncEngine {
         };
     }
 
-private async applyMergedState(
+    private async applyMergedState(
         state: CloudSyncState,
         existingSettings: Record<string, string>
     ): Promise<CloudSyncBaseline> {
@@ -478,7 +478,7 @@ private async applyMergedState(
         };
     }
 
-private async applySettings(
+    private async applySettings(
         existing: Record<string, string>,
         desired: CloudSyncSettingsConfig
     ): Promise<void> {
@@ -504,7 +504,7 @@ private async applySettings(
         /* eslint-enable no-await-in-loop -- Settings reconciliation complete */
     }
 
-private async loadSnapshotState(
+    private async loadSnapshotState(
         transport: ProviderCloudSyncTransport,
         manifest: CloudSyncManifest
     ): Promise<
@@ -540,7 +540,7 @@ private async loadSnapshotState(
         }
     }
 
-private async getOrCreateDeviceId(): Promise<string> {
+    private async getOrCreateDeviceId(): Promise<string> {
         const existing = await this.settings.get(SETTINGS_KEY_DEVICE_ID);
         if (existing && isValidPersistedDeviceId(existing)) {
             return existing;
@@ -564,13 +564,13 @@ private async getOrCreateDeviceId(): Promise<string> {
         return deviceId;
     }
 
-private async getNextOpId(): Promise<number> {
+    private async getNextOpId(): Promise<number> {
         const raw = await this.settings.get(SETTINGS_KEY_NEXT_OP_ID);
         const value = raw ? Number(raw) : 0;
         return Number.isFinite(value) && value >= 0 ? value : 0;
     }
 
-private async getBaseline(): Promise<CloudSyncBaseline> {
+    private async getBaseline(): Promise<CloudSyncBaseline> {
         const raw = await this.settings.get(SETTINGS_KEY_BASELINE);
         if (!raw) {
             return createEmptyBaseline();
@@ -590,14 +590,14 @@ private async getBaseline(): Promise<CloudSyncBaseline> {
         return parsed.baseline;
     }
 
-private async setBaseline(baseline: CloudSyncBaseline): Promise<void> {
+    private async setBaseline(baseline: CloudSyncBaseline): Promise<void> {
         await this.settings.set(
             SETTINGS_KEY_BASELINE,
             stringifyBaseline(baseline)
         );
     }
 
-private async enqueueSyncRun<Result>(
+    private async enqueueSyncRun<Result>(
         fn: () => Promise<Result>
     ): Promise<Result> {
         const previous = this.syncQueue;
@@ -639,22 +639,6 @@ private async enqueueSyncRun<Result>(
         this.syncNowByProviderKind.set(providerKind, runner);
         return runner;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Removes invalid sites/monitors from a merged sync state before we compact

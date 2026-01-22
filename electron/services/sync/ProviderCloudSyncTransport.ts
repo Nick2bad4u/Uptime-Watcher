@@ -291,7 +291,11 @@ function assertSnapshotKey(key: string): void {
 
     const stem = fileName.slice(0, -".json".length);
 
-    const [createdAtRaw, nonceRaw, ...rest] = stem.split("-");
+    const [
+        createdAtRaw,
+        nonceRaw,
+        ...rest
+    ] = stem.split("-");
     if (!createdAtRaw || rest.length > 0) {
         throw new Error(`Invalid snapshot key: ${key}`);
     }
@@ -537,7 +541,9 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
     public async listOperationObjects(): Promise<CloudObjectEntry[]> {
         const objects = await this.provider.listObjects(`${OPS_PREFIX}/`);
-        const filtered = objects.filter((entry) => isValidOpsObjectKey(entry.key));
+        const filtered = objects.filter((entry) =>
+            isValidOpsObjectKey(entry.key)
+        );
 
         // Providers may return keys in arbitrary order or even duplicate keys.
         // Deduplicate by key and sort deterministically.
@@ -736,7 +742,9 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
             return parseCloudSyncSnapshot(JSON.parse(raw));
         } catch (error) {
-            if (ensureError(error) instanceof CloudSyncCorruptRemoteObjectError) {
+            if (
+                ensureError(error) instanceof CloudSyncCorruptRemoteObjectError
+            ) {
                 throw error;
             }
 

@@ -790,7 +790,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 await annotate("Category: Hook", "category");
                 await annotate("Type: Monitoring", "type");
 
-                mockGetFields.mockImplementation(() => [
+                mockGetFields.mockReturnValue([
                     { name: "optional", required: false },
                 ]);
 
@@ -1076,7 +1076,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.isFormValid()).toBeTruthy();
 
             // Change getFields mock to require different fields
-            mockGetFields.mockImplementation(() => [
+            mockGetFields.mockReturnValue([
                 { name: "host", required: true },
                 { name: "port", required: true },
             ]);

@@ -197,9 +197,11 @@ export async function connectDropbox(
     ctx: CloudServiceOperationContext
 ): Promise<CloudStatusSummary> {
     return ctx.runCloudOperation("connectDropbox", async () => {
-        const previousProvider = (await ctx.settings.get(SETTINGS_KEY_PROVIDER)) ?? "";
+        const previousProvider =
+            (await ctx.settings.get(SETTINGS_KEY_PROVIDER)) ?? "";
         const previousFilesystemBaseDirectory =
-            (await ctx.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ?? "";
+            (await ctx.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ??
+            "";
         const previousStoredTokens = await ctx.secretStore.getSecret(
             SETTINGS_KEY_DROPBOX_TOKENS
         );

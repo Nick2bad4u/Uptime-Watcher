@@ -24,12 +24,17 @@ export const loadDropboxProviderDeps =
             providerModule,
             tokenModule,
         ] = await Promise.all([
+            import(
+                /* WebpackChunkName: "cloudDropboxAuth" */ "../providers/dropbox/DropboxAuthFlow"
+            ),
 
-            import(/* webpackChunkName: "cloudDropboxAuth" */ "../providers/dropbox/DropboxAuthFlow"),
+            import(
+                /* WebpackChunkName: "cloudDropboxProvider" */ "../providers/dropbox/DropboxCloudStorageProvider"
+            ),
 
-            import(/* webpackChunkName: "cloudDropboxProvider" */ "../providers/dropbox/DropboxCloudStorageProvider"),
-
-            import(/* webpackChunkName: "cloudDropboxTokens" */ "../providers/dropbox/DropboxTokenManager"),
+            import(
+                /* WebpackChunkName: "cloudDropboxTokens" */ "../providers/dropbox/DropboxTokenManager"
+            ),
         ]);
 
         return {
@@ -59,12 +64,17 @@ export const loadGoogleDriveProviderDeps =
             tokenModule,
             labelModule,
         ] = await Promise.all([
+            import(
+                /* WebpackChunkName: "cloudGdriveAuth" */ "../providers/googleDrive/GoogleDriveAuthFlow"
+            ),
 
-            import(/* webpackChunkName: "cloudGdriveAuth" */ "../providers/googleDrive/GoogleDriveAuthFlow"),
+            import(
+                /* WebpackChunkName: "cloudGdriveTokens" */ "../providers/googleDrive/GoogleDriveTokenManager"
+            ),
 
-            import(/* webpackChunkName: "cloudGdriveTokens" */ "../providers/googleDrive/GoogleDriveTokenManager"),
-
-            import(/* webpackChunkName: "cloudGdriveLabel" */ "../providers/googleDrive/fetchGoogleAccountLabel"),
+            import(
+                /* WebpackChunkName: "cloudGdriveLabel" */ "../providers/googleDrive/fetchGoogleAccountLabel"
+            ),
         ]);
 
         return {

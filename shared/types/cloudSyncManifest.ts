@@ -87,8 +87,8 @@ export const cloudSyncManifestSchema: z.ZodType<CloudSyncManifest> =
 export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
     const parsed = cloudSyncManifestInternalSchema.parse(candidate);
 
-    const validEntries = Object.entries(parsed.devices).filter(
-        ([deviceId]) => isValidPersistedDeviceId(deviceId)
+    const validEntries = Object.entries(parsed.devices).filter(([deviceId]) =>
+        isValidPersistedDeviceId(deviceId)
     );
 
     const limited =

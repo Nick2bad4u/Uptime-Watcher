@@ -295,11 +295,9 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 unsubscribe: vi.fn(),
             } as unknown as StatusUpdateManager;
 
-            vi.mocked(
-                statusUpdateHandlerModule.StatusUpdateManager
-            ).mockImplementation(function StatusUpdateManagerErrorMock() {
-                return mockStatusUpdateManager;
-            });
+            (
+                statusUpdateHandlerModule.StatusUpdateManager as any
+            ).mockReturnValue(mockStatusUpdateManager);
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);

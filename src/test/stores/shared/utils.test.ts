@@ -43,7 +43,7 @@ describe("Store Utils", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        vi.spyOn(logger, "info").mockImplementation(() => undefined);
+        vi.spyOn(logger, "info").mockReturnValue(undefined);
 
         // Default to development mode (logStoreAction should log).
         setProcessSnapshotOverrideForTesting({

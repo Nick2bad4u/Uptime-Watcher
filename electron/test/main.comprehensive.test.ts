@@ -610,10 +610,12 @@ describe("main.ts - Electron Main Process", () => {
             vi.resetModules();
             const { ApplicationService } =
                 await import("../services/application/ApplicationService");
-            (ApplicationService as any).mockImplementation(
-                function NullApplicationServiceMock() {
-                    return null as unknown as ApplicationServiceType;
-                }
+
+            // IMPORTANT: ApplicationService is instantiated with `new`.
+            // `mockReturnValue` uses a non-constructable arrow implementation.
+            // We use a constructable function implementation instead.
+            (ApplicationService as any).mockReturnValue(
+                null as any
             );
 
             const processOnSpy = vi.spyOn(process, "on");
@@ -630,10 +632,8 @@ describe("main.ts - Electron Main Process", () => {
             }).not.toThrowError();
 
             // Restore default implementation for subsequent tests
-            vi.mocked(ApplicationService).mockImplementation(
-                function ApplicationServiceResetMock() {
-                    return mockApplicationService as unknown as ApplicationServiceType;
-                }
+            (ApplicationService as any).mockReturnValue(
+                mockApplicationService as unknown as ApplicationServiceType
             );
         });
     });

@@ -299,7 +299,7 @@ describe("App Component - Comprehensive Coverage", () => {
         vi.clearAllMocks();
 
         // Reset all mocks to default state
-        mockUseErrorStore.mockImplementation(() => defaultErrorStore);
+        mockUseErrorStore.mockReturnValue(defaultErrorStore);
         mockUseSettingsStore.mockImplementation((selector?: unknown) =>
             typeof selector === "function"
                 ? (selector as (state: typeof defaultSettingsStore) => unknown)(
@@ -317,7 +317,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 ? selector(defaultUIStore)
                 : defaultUIStore
         );
-        mockUseUpdatesStore.mockImplementation(() => defaultUpdatesStore);
+        mockUseUpdatesStore.mockReturnValue(defaultUpdatesStore);
         mockUseTheme.mockReturnValue(createMockTheme());
 
         // Set up getState mocks

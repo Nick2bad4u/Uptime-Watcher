@@ -44,7 +44,13 @@ describe("cloudServicePrimitives base64", () => {
     });
 
     it("decodeStrictBase64 enforces byte length", () => {
-        const value = encodeBase64(Buffer.from([1, 2, 3]));
+        const value = encodeBase64(
+            Buffer.from([
+                1,
+                2,
+                3,
+            ])
+        );
         expect(
             decodeStrictBase64({
                 expectedBytes: 3,

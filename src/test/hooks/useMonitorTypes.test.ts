@@ -1016,11 +1016,10 @@ describe("useMonitorTypes Hook", () => {
 
             const mockOptions = [{ label: "Delayed", value: "delayed" }];
 
-            mockGetMonitorTypeOptions.mockImplementation(
-                () =>
-                    new Promise((resolve) =>
-                        setTimeout(() => resolve(mockOptions), delayMs)
-                    )
+            mockGetMonitorTypeOptions.mockReturnValue(
+                new Promise((resolve) =>
+                    setTimeout(() => resolve(mockOptions), delayMs)
+                )
             );
 
             const { result } = renderHook(() => useMonitorTypes());

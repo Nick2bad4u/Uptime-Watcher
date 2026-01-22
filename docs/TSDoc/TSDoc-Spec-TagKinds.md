@@ -35,6 +35,7 @@ appearing prior to the first block tag is interpreted as the special
  *
  * @example
  *  Logging
+ *
  *  a warning
  *  ```ts
  *  logger.warn('Something happened');
@@ -42,6 +43,7 @@ appearing prior to the first block tag is interpreted as the special
  *
  * @example
  *  Logging
+ *
  *  an error
  *  ```ts
  *  logger.error('Something happened');

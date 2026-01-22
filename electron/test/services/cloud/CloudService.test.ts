@@ -106,8 +106,12 @@ describe("CloudService", () => {
         });
         expect(status.provider).toBe("filesystem");
 
-        await expect(secretStore.getSecret("cloud.dropbox.tokens")).resolves.toBeUndefined();
-        await expect(secretStore.getSecret("cloud.googleDrive.tokens")).resolves.toBeUndefined();
+        await expect(
+            secretStore.getSecret("cloud.dropbox.tokens")
+        ).resolves.toBeUndefined();
+        await expect(
+            secretStore.getSecret("cloud.googleDrive.tokens")
+        ).resolves.toBeUndefined();
         expect(settings.get("cloud.googleDrive.accountLabel")).toBe("");
 
         const syncStatus = await cloudService.enableSync({ enabled: true });

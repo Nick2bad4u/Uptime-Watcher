@@ -390,7 +390,7 @@ describe("AddSiteForm behavioral coverage", () => {
         themedButtonProps = undefined;
         errorAlertProps = undefined;
 
-        useAddSiteFormMock.mockImplementation(() => createFormState());
+        useAddSiteFormMock.mockReturnValue(createFormState());
         useSitesStoreMock.mockClear();
         updateSitesStoreMock(sitesStoreState, {
             addMonitorToSite: vi.fn(),
@@ -509,7 +509,7 @@ describe("AddSiteForm behavioral coverage", () => {
     });
 
     it("renders existing-site pathway with selection handlers", () => {
-        useAddSiteFormMock.mockImplementation(() =>
+        useAddSiteFormMock.mockReturnValue(
             createFormState({
                 addMode: "existing",
                 selectedExistingSite: "site-1",
@@ -575,7 +575,7 @@ describe("AddSiteForm behavioral coverage", () => {
             isLoading: false,
             lastError: "remote failure",
         });
-        useAddSiteFormMock.mockImplementation(() =>
+        useAddSiteFormMock.mockReturnValue(
             createFormState({
                 formError: "validation failed",
                 setFormError: setFormErrorSpy,

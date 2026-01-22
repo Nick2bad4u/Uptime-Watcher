@@ -39,6 +39,7 @@ import type {
 } from "@shared/types/events";
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -986,14 +987,13 @@ export class EnhancedMonitorChecker {
                 serviceResult,
             };
         } catch (error) {
+            const safeError = ensureError(error);
             logger.error(
                 `Monitor check failed for ${args.context.monitor.id}`,
-                error
+                safeError
             );
 
-            const serviceResult = toFailure(
-                error instanceof Error ? error.message : undefined
-            );
+            const serviceResult = toFailure(safeError.message);
 
             return {
                 checkResult: this.buildCheckResultFromServiceResult({

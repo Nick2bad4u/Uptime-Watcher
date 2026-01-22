@@ -92,7 +92,7 @@ describe("MonitorRepository simple orchestration", () => {
                 },
                 "updateInternal"
             )
-            .mockImplementation(() => undefined);
+            .mockReturnValue(undefined);
 
         await repository.clearActiveOperations("monitor-123");
 
@@ -123,7 +123,7 @@ describe("MonitorRepository simple orchestration", () => {
                 },
                 "deleteBySiteIdentifierInternal"
             )
-            .mockImplementation(() => undefined);
+            .mockReturnValue(undefined);
 
         await repository.deleteBySiteIdentifier("site-007");
 
@@ -154,7 +154,7 @@ describe("MonitorRepository simple orchestration", () => {
                 },
                 "deleteBySiteIdentifierInternal"
             )
-            .mockImplementation(() => undefined);
+            .mockReturnValue(undefined);
 
         await expect(
             repository.deleteBySiteIdentifier("faulty-site")

@@ -19,6 +19,7 @@ import type {
 import type { ValidationResult } from "@shared/types/validation";
 import type { Jsonify, UnknownRecord } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
@@ -489,12 +490,10 @@ export function validateMonitorData(
             };
         }
 
+        const safeError = ensureError(error);
+
         return {
-            errors: [
-                `Validation failed: ${
-                    error instanceof Error ? error.message : String(error)
-                }`,
-            ],
+            errors: [`Validation failed: ${safeError.message}`],
             metadata: { monitorType: type },
             success: false,
             warnings: [],
@@ -583,12 +582,10 @@ export function validateMonitorField(
             throw error;
         }
 
+        const safeError = ensureError(error);
+
         return {
-            errors: [
-                `Field validation failed: ${
-                    error instanceof Error ? error.message : String(error)
-                }`,
-            ],
+            errors: [`Field validation failed: ${safeError.message}`],
             metadata: { fieldName, monitorType: type },
             success: false,
             warnings: [],

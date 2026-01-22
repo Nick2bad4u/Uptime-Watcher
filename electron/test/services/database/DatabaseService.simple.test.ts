@@ -240,7 +240,7 @@ describe("DatabaseService Coverage Tests", () => {
         createDatabaseSchemaSpy.mockImplementationOnce(() => {
             throw lockedError;
         });
-        createDatabaseSchemaSpy.mockImplementationOnce(() => undefined);
+        createDatabaseSchemaSpy.mockReturnValueOnce(undefined);
 
         const instance = DatabaseService.getInstance();
         instance.close();

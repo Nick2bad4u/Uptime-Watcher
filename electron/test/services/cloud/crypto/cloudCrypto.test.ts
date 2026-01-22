@@ -77,10 +77,13 @@ describe("cloudCrypto", () => {
             })
         ).toBeFalsy();
 
+        // Deterministic corruption: replace the first character with an
+        // invalid base64 character. This must always invalidate the payload,
+        // regardless of the randomized ciphertext/IV.
         expect(
             verifyKeyCheckBase64({
                 key,
-                keyCheckBase64: keyCheckBase64.replaceAll("A", "@"),
+                keyCheckBase64: `@${keyCheckBase64.slice(1)}`,
             })
         ).toBeFalsy();
     });

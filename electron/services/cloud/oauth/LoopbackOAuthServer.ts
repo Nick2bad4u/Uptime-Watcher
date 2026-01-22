@@ -393,7 +393,9 @@ export async function startLoopbackOAuthServer(args?: {
 
     const [primaryServer] = servers;
     if (!primaryServer) {
-        throw new Error("OAuth loopback server did not initialize any listeners");
+        throw new Error(
+            "OAuth loopback server did not initialize any listeners"
+        );
     }
 
     const port = resolvePortFromServer(primaryServer.server);

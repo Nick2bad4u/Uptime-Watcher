@@ -63,9 +63,11 @@ describe(generateUuid, () => {
                 "abcdef12-3456-7890-abcd-ef1234567890",
             ];
             let callCount = 0;
-            const mockRandomUuid = vi
-                .fn()
-                .mockImplementation(() => mockUuids[callCount++]);
+            const mockRandomUuid = vi.fn().mockImplementation(() => {
+                const value = mockUuids[callCount];
+                callCount += 1;
+                return value;
+            });
 
             globalThis.crypto = {
                 randomUUID: mockRandomUuid,

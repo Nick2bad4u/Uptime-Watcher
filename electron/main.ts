@@ -127,8 +127,10 @@ if (isDev()) {
         try {
             // Electron-debug is a devDependency; this dev-only dynamic import is
             // intentional.
-            // eslint-disable-next-line n/no-unpublished-import -- Dev-only dynamic import of a devDependency; keep webpackChunkName comment unmodified.
-            const module: unknown = await import(/* webpackChunkName: "electronDebug" */ "electron-debug");
+
+            const module: unknown = await import(
+                /* WebpackChunkName: "electronDebug" */ "electron-debug"
+            );
 
             if (!isElectronDebugModule(module)) {
                 logger.warn(
@@ -476,7 +478,7 @@ class Main {
     private static readonly FATAL_SHUTDOWN_TIMEOUT_MS = 5000;
 
     /** Application service instance for managing app lifecycle and features */
-    private readonly applicationService: ApplicationService;
+    private readonly applicationService: ApplicationService | null;
 
     /** Flag to ensure cleanup is only called once */
     private cleanedUp = false;
@@ -646,7 +648,17 @@ class Main {
      */
     private async performCleanup(): Promise<void> {
         try {
-            await this.applicationService.cleanup();
+            if (!this.applicationService) {
+                return;
+            }
+
+            const {cleanup} = (this.applicationService as Partial<ApplicationService>);
+
+            if (typeof cleanup !== "function") {
+                return;
+            }
+
+            await cleanup.call(this.applicationService);
         } catch (error) {
             logger.error("[Main] Cleanup failed", error);
             // Don't re-throw as this is called during shutdown
@@ -669,7 +681,15 @@ class Main {
      */
     public constructor() {
         logger.info("Starting Uptime Watcher application");
-        this.applicationService = new ApplicationService();
+
+        const candidate = new ApplicationService() as unknown;
+        const cleanup = (candidate as null | Partial<ApplicationService>)
+            ?.cleanup;
+
+        this.applicationService =
+            candidate && typeof cleanup === "function"
+                ? (candidate as ApplicationService)
+                : null;
 
         // Crash resilience: ensure unexpected errors are logged and we exit
         // cleanly rather than leaving the app in a corrupted state.

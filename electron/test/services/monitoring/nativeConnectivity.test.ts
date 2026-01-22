@@ -168,9 +168,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockImplementation(function MockSocket() {
-                return mockSocket as any;
-            });
+            mockNet.Socket.mockReturnValue(mockSocket as any);
             // Act
             const result = await checkConnectivity("example.com", {
                 method: "tcp",
@@ -199,9 +197,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockImplementation(function MockSocket() {
-                return mockSocket as any;
-            });
+            mockNet.Socket.mockReturnValue(mockSocket as any);
             // Act
             const result = await checkConnectivity("nonexistent.example.com", {
                 method: "tcp",
@@ -214,11 +210,10 @@ describe("Native Connectivity with Degraded State", () => {
         });
         it("should handle DNS timeout with Promise.race", async () => {
             // Arrange
-            mockDns.resolve4.mockImplementation(
-                () =>
-                    new Promise((resolve) =>
-                        setTimeout(() => resolve(["192.168.1.1"]), 2000)
-                    )
+            mockDns.resolve4.mockReturnValue(
+                new Promise((resolve) =>
+                    setTimeout(() => resolve(["192.168.1.1"]), 2000)
+                )
             );
             // Act
             const result = await checkConnectivity("slow-dns.example.com", {
@@ -247,9 +242,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockImplementation(function MockSocket() {
-                return mockSocket as any;
-            });
+            mockNet.Socket.mockReturnValue(mockSocket as any);
             // Act
             const result = await checkConnectivityWithRetry("example.com", {
                 retries: 2,
@@ -281,9 +274,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockImplementation(function MockSocket() {
-                return mockSocket as any;
-            });
+            mockNet.Socket.mockReturnValue(mockSocket as any);
             // Act
             const result = await checkConnectivityWithRetry("example.com", {
                 retries: 2,
@@ -323,9 +314,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockImplementation(function MockSocket() {
-                return mockSocket as any;
-            });
+            mockNet.Socket.mockReturnValue(mockSocket as any);
             const tcpResult = await checkConnectivity("example.com");
             expect([
                 "up",

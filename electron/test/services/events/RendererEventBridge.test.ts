@@ -134,9 +134,9 @@ describe(RendererEventBridge, () => {
             getAllWindows: vi.fn(() => []),
         };
 
-        vi.spyOn(logger, "debug").mockImplementation(() => undefined);
-        vi.spyOn(logger, "error").mockImplementation(() => undefined);
-        vi.spyOn(logger, "warn").mockImplementation(() => undefined);
+        vi.spyOn(logger, "debug").mockReturnValue(undefined);
+        vi.spyOn(logger, "error").mockReturnValue(undefined);
+        vi.spyOn(logger, "warn").mockReturnValue(undefined);
 
         bridge = new RendererEventBridge(
             mockWindowService as unknown as WindowService

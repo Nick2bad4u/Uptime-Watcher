@@ -52,6 +52,7 @@ For stores with straightforward state that don't require modular composition:
  * @example
  *  ```typescript
  *
+ *
  *  import { useExampleStore } from "./stores/useExampleStore";
  *
  *  function MyComponent() {
@@ -160,8 +161,8 @@ const buildErrorHandler = (operation: string) =>
 /**
  * Example store for managing [DOMAIN] state and interactions.
  *
- * @remarks {undefined}
- *   DETAILED DESCRIPTION OF STORE PURPOSE AND USAGE
+ * @remarks
+ *   {undefined} DETAILED DESCRIPTION OF STORE PURPOSE AND USAGE
  *
  * @public
  */

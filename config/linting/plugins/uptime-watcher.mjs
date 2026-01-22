@@ -4041,6 +4041,154 @@ const storeActionsRequireFinallyResetRule = {
 };
 
 /**
+ * ESLint rule requiring caught `unknown` errors to be normalized before
+ * accessing properties.
+ *
+ * @remarks
+ * This is an AI guardrail: a common failure mode is `catch (error) {
+ * logger.error(error.message) }` which is unsafe when catch variables are
+ * `unknown` (as they should be under strict TypeScript).
+ *
+ * The rule only triggers when code directly accesses properties on the caught
+ * identifier (e.g., `error.message`, `err.stack`, `error.name`). It does not
+ * require normalization if the caught value is only passed around.
+ *
+ * Compliance can be achieved by calling `ensureError(error)` anywhere in the
+ * catch block (typically assigning it to a local like `const safeError =
+ * ensureError(error)`), and then using that normalized error.
+ */
+const requireEnsureErrorInCatchRule = {
+    meta: {
+        docs: {
+            description:
+                "Require ensureError() before accessing properties on caught errors",
+            recommended: false,
+        },
+        messages: {
+            requireEnsureError:
+                "Caught error '{{name}}' is used with property access; normalize it first with ensureError({{name}}).",
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.includes("/src/") &&
+                !normalizedFilename.includes("/electron/") &&
+                !normalizedFilename.includes("/shared/"))
+        ) {
+            return {};
+        }
+
+        if (
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx")
+        ) {
+            return {};
+        }
+
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        const visitorKeys = sourceCode.visitorKeys;
+
+        function isEnsureErrorCall(node, caughtName) {
+            return (
+                node?.type === "CallExpression" &&
+                node.callee?.type === "Identifier" &&
+                node.callee.name === "ensureError" &&
+                node.arguments?.[0]?.type === "Identifier" &&
+                node.arguments[0].name === caughtName
+            );
+        }
+
+        function isDirectPropertyAccess(node, caughtName) {
+            if (node?.type !== "MemberExpression") {
+                return false;
+            }
+
+            if (node.object?.type !== "Identifier") {
+                return false;
+            }
+
+            if (node.object.name !== caughtName) {
+                return false;
+            }
+
+            // If computed, we cannot reliably reason about the property.
+            if (node.computed) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function walk(node, state) {
+            if (!node || typeof node !== "object") {
+                return;
+            }
+
+            if (!state.ensureErrorCall && isEnsureErrorCall(node, state.name)) {
+                state.ensureErrorCall = true;
+            }
+
+            if (
+                !state.firstPropertyAccess &&
+                isDirectPropertyAccess(node, state.name)
+            ) {
+                state.firstPropertyAccess = node;
+            }
+
+            const keys = visitorKeys[node.type] ?? [];
+            for (const key of keys) {
+                const value = node[key];
+                if (!value) {
+                    continue;
+                }
+                if (Array.isArray(value)) {
+                    for (const child of value) {
+                        walk(child, state);
+                    }
+                    continue;
+                }
+                walk(value, state);
+            }
+        }
+
+        return {
+            CatchClause(node) {
+                const param = node.param;
+                if (!param || param.type !== "Identifier") {
+                    return;
+                }
+
+                const caughtName = param.name;
+                const state = {
+                    ensureErrorCall: false,
+                    firstPropertyAccess: null,
+                    name: caughtName,
+                };
+
+                walk(node.body, state);
+
+                if (state.firstPropertyAccess && !state.ensureErrorCall) {
+                    context.report({
+                        data: { name: caughtName },
+                        messageId: "requireEnsureError",
+                        node: state.firstPropertyAccess,
+                    });
+                }
+            },
+        };
+    },
+};
+
+/**
  * ESLint rule requiring Electron runtime code to use the centralized
  * `readProcessEnv()` helper instead of direct `process.env` reads.
  *
@@ -4285,6 +4433,7 @@ const uptimeWatcherPlugin = {
         "logger-no-error-in-context": loggerNoErrorInContextRule,
         "store-actions-require-finally-reset":
             storeActionsRequireFinallyResetRule,
+        "require-ensureError-in-catch": requireEnsureErrorInCatchRule,
         "no-onedrive": noOneDriveRule,
     },
 };

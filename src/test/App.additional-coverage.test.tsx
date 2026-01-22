@@ -522,11 +522,11 @@ describe("App Additional Coverage Tests", () => {
         });
 
         // Mock the store hooks to return the reactive state objects
-        mockUseUpdatesStore.mockImplementation(() => mockUpdatesStoreState);
+        mockUseUpdatesStore.mockReturnValue(mockUpdatesStoreState);
         mockUseSitesStore.mockImplementation((selector: any) =>
             selector ? selector(mockSitesStoreState) : mockSitesStoreState
         );
-        mockUseErrorStore.mockImplementation(() => mockErrorStoreState);
+        mockUseErrorStore.mockReturnValue(mockErrorStoreState);
 
         // Mock the getState method for useErrorStore (needed by createStoreErrorHandler)
         (mockUseErrorStore as any).getState = vi
@@ -551,17 +551,17 @@ describe("App Additional Coverage Tests", () => {
         mockUseUIStore.mockImplementation((selector: any) =>
             selector ? selector(mockUIStoreState) : mockUIStoreState
         );
-        mockUseTheme.mockImplementation(() => mockThemeState);
+        mockUseTheme.mockReturnValue(mockThemeState);
 
         // Mock useAvailabilityColors hook
-        mockUseAvailabilityColors.mockImplementation(() => ({
+        mockUseAvailabilityColors.mockReturnValue({
             getAvailabilityColor: vi.fn().mockReturnValue("#00ff00"),
             getAvailabilityDescription: vi.fn().mockReturnValue("Excellent"),
             getAvailabilityVariant: vi.fn().mockReturnValue("success"),
-        }));
+        });
 
         // Mock useThemeClasses hook
-        mockUseThemeClasses.mockImplementation(() => ({
+        mockUseThemeClasses.mockReturnValue({
             getBackgroundClass: vi.fn().mockReturnValue({
                 backgroundColor: "var(--color-background-primary)",
             }),
@@ -578,7 +578,7 @@ describe("App Additional Coverage Tests", () => {
             getTextClass: vi
                 .fn()
                 .mockReturnValue({ color: "var(--color-text-primary)" }),
-        }));
+        });
 
         // Mock environment as production by default
         mockIsDevelopment.mockReturnValue(false);

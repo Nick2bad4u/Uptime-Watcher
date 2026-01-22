@@ -12,8 +12,6 @@ import {
 } from "../../oauth/LoopbackOAuthServer";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
 
-
-
 const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 
 const LOOPBACK_IP_HOST_4 = "127.0.0.1" as const;
@@ -94,7 +92,9 @@ export class DropboxAuthFlow {
         timeoutMs: number;
     }): Promise<{ code: string; redirectUri: string }> {
         const redirectHost =
-            this.loopbackPort === 0 ? LOOPBACK_IP_HOST_4 : LOOPBACK_REDIRECT_HOST;
+            this.loopbackPort === 0
+                ? LOOPBACK_IP_HOST_4
+                : LOOPBACK_REDIRECT_HOST;
 
         const server = await startLoopbackOAuthServer({
             port: this.loopbackPort,
@@ -103,7 +103,7 @@ export class DropboxAuthFlow {
         });
 
         try {
-            const {redirectUri} = server;
+            const { redirectUri } = server;
             const authorizeUrl = String(
                 await args.auth.getAuthenticationUrl(
                     redirectUri,
@@ -155,7 +155,9 @@ export class DropboxAuthFlow {
                 }
 
                 if (resolved.message === "OAuth loopback timeout") {
-                    throw new Error("Dropbox OAuth timed out", { cause: error });
+                    throw new Error("Dropbox OAuth timed out", {
+                        cause: error,
+                    });
                 }
 
                 throw resolved;

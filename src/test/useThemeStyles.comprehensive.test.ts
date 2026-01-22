@@ -302,17 +302,14 @@ describe(useThemeStyles, () => {
         await annotate("Type: Business Logic", "type");
 
         // Test light mode
-        vi.mocked(globalThis.matchMedia).mockImplementation(
-            () =>
-                ({
-                    addEventListener: vi.fn(),
-                    dispatchEvent: vi.fn(),
-                    matches: false,
-                    media: "",
-                    onchange: null,
-                    removeEventListener: vi.fn(),
-                }) as unknown as MediaQueryList
-        );
+        vi.mocked(globalThis.matchMedia).mockReturnValue({
+            addEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+            matches: false,
+            media: "",
+            onchange: null,
+            removeEventListener: vi.fn(),
+        } as unknown as MediaQueryList);
 
         const { result: lightResult } = renderHook(() => useThemeStyles());
 

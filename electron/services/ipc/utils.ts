@@ -15,6 +15,7 @@ import type { UnknownRecord } from "type-fest";
 import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     normalizeLogValue,
     withLogContext,
@@ -773,9 +774,10 @@ export function registerStandardizedIpcHandler<
             try {
                 assertChannelParams(channelName, args, handler);
             } catch (error: unknown) {
+                const safeError = ensureError(error);
                 const message =
-                    error instanceof Error
-                        ? error.message
+                    safeError.message.length > 0
+                        ? safeError.message
                         : `Invalid IPC parameters for ${channelName}`;
 
                 logger.warn(

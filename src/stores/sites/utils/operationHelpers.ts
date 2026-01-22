@@ -317,20 +317,19 @@ export const updateMonitorAndSave = async (
 
         applySavedSiteToStore(savedSite, deps);
     } catch (error) {
-        if (
-            error instanceof Error &&
-            error.message === SITE_NOT_FOUND_MESSAGE
-        ) {
+        const safeError = ensureError(error);
+
+        if (safeError.message === SITE_NOT_FOUND_MESSAGE) {
             logger.error(
                 `Failed to find site with identifier ${siteIdentifier}:`,
-                error
+                safeError
             );
             throw new Error(`Site not found: ${siteIdentifier}`, {
                 cause: error,
             });
         }
         // Re-throw other errors
-        throw error;
+        throw safeError;
     }
 };
 

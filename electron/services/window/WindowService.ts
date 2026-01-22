@@ -424,13 +424,14 @@ export class WindowService {
                     clearTimeout(timeoutId);
                 }
             } catch (error) {
+                const resolved = ensureError(error);
                 // Log only significant errors or last attempt
                 if (
                     attempt === MAX_RETRIES - 1 ||
-                    !(error instanceof Error && error.name === "AbortError")
+                    resolved.name !== "AbortError"
                 ) {
                     logger.debug(
-                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${getUnknownErrorMessage(error)}`
+                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${getUnknownErrorMessage(resolved)}`
                     );
                 }
             }

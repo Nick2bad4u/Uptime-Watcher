@@ -223,11 +223,10 @@ describe("useSiteSync", () => {
             };
 
             let resolveSync: (() => void) | undefined;
-            mockStateSyncService.requestFullSync.mockImplementation(
-                () =>
-                    new Promise((resolve) => {
-                        resolveSync = () => resolve(fullSyncResult);
-                    })
+            mockStateSyncService.requestFullSync.mockReturnValue(
+                new Promise((resolve) => {
+                    resolveSync = () => resolve(fullSyncResult);
+                })
             );
 
             const firstCall = syncActions.fullResyncSites();
@@ -435,11 +434,9 @@ describe("useSiteSync", () => {
                 unsubscribe: vi.fn(),
             } as unknown as StatusUpdateManager;
 
-            vi.mocked(
-                statusUpdateHandlerModule.StatusUpdateManager
-            ).mockImplementation(function StatusUpdateManagerErrorMock() {
-                return mockStatusUpdateManager;
-            });
+            (
+                statusUpdateHandlerModule.StatusUpdateManager as any
+            ).mockReturnValue(mockStatusUpdateManager);
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);
@@ -596,11 +593,10 @@ describe("useSiteSync", () => {
             const cleanupSpy = vi.fn();
             let resolveCleanup: ((cleanup: () => void) => void) | undefined;
 
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                () =>
-                    new Promise<() => void>((resolve) => {
-                        resolveCleanup = resolve;
-                    })
+            mockStateSyncService.onStateSyncEvent.mockReturnValue(
+                new Promise<() => void>((resolve) => {
+                    resolveCleanup = resolve;
+                })
             );
 
             const unsubscribe = syncActions.subscribeToSyncEvents();

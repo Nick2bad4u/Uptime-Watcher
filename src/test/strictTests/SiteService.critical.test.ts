@@ -305,14 +305,13 @@ describe("SiteService Critical Coverage Tests", () => {
             mockWaitForElectronBridge.mockResolvedValue(undefined);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
-            ).mockImplementation(
-                () =>
-                    new Promise((_, reject) => {
-                        setTimeout(
-                            () => reject(new Error("Operation timeout")),
-                            100
-                        );
-                    })
+            ).mockReturnValue(
+                new Promise((_, reject) => {
+                    setTimeout(
+                        () => reject(new Error("Operation timeout")),
+                        100
+                    );
+                })
             );
 
             // Act & Assert

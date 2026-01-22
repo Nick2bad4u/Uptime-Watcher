@@ -125,8 +125,8 @@ describe(WindowService, () => {
         ).mockImplementation(() => {
             // Default noop
         });
-        vi.mocked(mockWindowRef.webContents.openDevTools).mockImplementation(
-            () => undefined
+        vi.mocked(mockWindowRef.webContents.openDevTools).mockReturnValue(
+            undefined
         );
 
         // Create new service instance

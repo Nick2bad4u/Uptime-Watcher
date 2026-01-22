@@ -105,7 +105,11 @@ export class SiteManagerStateSync {
             hasChanges = true;
         }
 
-        const shouldEmit = args.action === "bulk-sync" || hasChanges;
+        const shouldEmit =
+            args.action === "bulk-sync" ||
+            args.action === "update" ||
+            args.action === "delete" ||
+            hasChanges;
 
         if (!shouldEmit) {
             this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>

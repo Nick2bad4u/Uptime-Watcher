@@ -58,7 +58,7 @@ describe("src/stores/utils", () => {
                 },
             });
 
-            vi.spyOn(logger, "info").mockImplementation(() => undefined);
+            vi.spyOn(logger, "info").mockReturnValue(undefined);
         });
 
         afterEach(() => {

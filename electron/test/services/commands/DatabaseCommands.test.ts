@@ -409,7 +409,7 @@ describe("DatabaseCommands", () => {
 
             const loggerSpy = vi
                 .spyOn(backendLogger, "error")
-                .mockImplementation(() => undefined);
+                .mockReturnValue(undefined);
             mockCommand.execute = vi
                 .fn()
                 .mockRejectedValue(new Error("Execution failed"));

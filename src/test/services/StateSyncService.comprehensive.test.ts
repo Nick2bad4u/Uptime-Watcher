@@ -276,11 +276,10 @@ describe("StateSyncService", () => {
             synchronized: true,
         };
 
-        mockElectronAPI.stateSync.requestFullSync.mockImplementation(
-            () =>
-                new Promise((resolve) => {
-                    resolveFullSync = () => resolve(fullSyncPayload);
-                })
+        mockElectronAPI.stateSync.requestFullSync.mockReturnValue(
+            new Promise((resolve) => {
+                resolveFullSync = () => resolve(fullSyncPayload);
+            })
         );
 
         await StateSyncService.onStateSyncEvent(callback);
@@ -392,11 +391,10 @@ describe("StateSyncService", () => {
         };
 
         let resolveFullSync: (() => void) | undefined;
-        mockElectronAPI.stateSync.requestFullSync.mockImplementationOnce(
-            () =>
-                new Promise((resolve) => {
-                    resolveFullSync = () => resolve(fullSyncPayload);
-                })
+        mockElectronAPI.stateSync.requestFullSync.mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolveFullSync = () => resolve(fullSyncPayload);
+            })
         );
 
         const cleanup = await StateSyncService.onStateSyncEvent(callback);

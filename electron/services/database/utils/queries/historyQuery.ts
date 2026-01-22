@@ -1,6 +1,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -118,9 +119,11 @@ export function getHistoryCount(db: Database, monitorId: string): number {
 
         return result?.count ?? 0;
     } catch (error) {
+        const safeError = ensureError(error);
+
         if (
-            error instanceof TypedQueryRowValidationError &&
-            error.label === "CountResult"
+            safeError instanceof TypedQueryRowValidationError &&
+            safeError.label === "CountResult"
         ) {
             const logWarnOrError =
                 typeof logger.warn === "function"
@@ -128,16 +131,16 @@ export function getHistoryCount(db: Database, monitorId: string): number {
                     : logger.error.bind(logger);
             logWarnOrError(
                 `[HistoryQuery] Invalid count result for monitor: ${monitorId}`,
-                error
+                safeError
             );
             return 0;
         }
 
         logger.error(
             `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
-            error
+            safeError
         );
-        throw error;
+        throw safeError;
     }
 }
 

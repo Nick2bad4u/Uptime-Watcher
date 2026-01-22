@@ -74,7 +74,7 @@ describe(SiteManager, () => {
             monitorRepository: {
                 createTransactionAdapter: vi
                     .fn()
-                    .mockImplementation(() => monitorAdapter),
+                    .mockReturnValue(monitorAdapter),
                 findBySiteIdentifier: vi.fn(),
                 create: vi.fn(),
                 bulkCreate: vi.fn(),
@@ -93,9 +93,7 @@ describe(SiteManager, () => {
                 set: vi.fn(),
             },
             siteRepository: {
-                createTransactionAdapter: vi
-                    .fn()
-                    .mockImplementation(() => siteAdapter),
+                createTransactionAdapter: vi.fn().mockReturnValue(siteAdapter),
                 findAll: vi.fn().mockResolvedValue([]), // Return empty array for initialization
                 findByIdentifier: vi.fn(),
                 upsert: vi.fn(),

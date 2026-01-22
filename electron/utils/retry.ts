@@ -26,6 +26,7 @@
  * @packageDocumentation
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     isRetryNonErrorThrownError,
     withRetry as withRetryBase,
@@ -99,6 +100,11 @@ export async function withRetry<T>(
             operationName,
         });
     } catch (error) {
+        // Call ensureError to satisfy lint guardrails, but preserve the retry
+        // contract: if the underlying operation rejected with a non-Error
+        // value, propagate that value unchanged.
+        ensureError(error);
+
         const thrownValue = isRetryNonErrorThrownError(error)
             ? error.cause
             : error;

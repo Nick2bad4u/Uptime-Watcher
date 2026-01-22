@@ -200,7 +200,7 @@ describe("App Development Logging Coverage", () => {
             .fn()
             .mockReturnValue(mockSitesStoreState as any);
 
-        globalThis.matchMedia = vi.fn().mockImplementation(() => ({
+        globalThis.matchMedia = vi.fn().mockReturnValue({
             matches: false,
             media: "(max-width: 1280px)",
             addEventListener: vi.fn(),
@@ -208,7 +208,7 @@ describe("App Development Logging Coverage", () => {
             addListener: vi.fn(),
             removeListener: vi.fn(),
             dispatchEvent: vi.fn(),
-        })) as typeof globalThis.matchMedia;
+        }) as typeof globalThis.matchMedia;
     });
 
     afterEach(() => {

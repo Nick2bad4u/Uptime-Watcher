@@ -271,7 +271,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             const select = screen.getByTestId("themed-select");
             const focusSpy = vi
                 .spyOn(select, "focus")
-                .mockImplementation(() => undefined);
+                .mockReturnValue(undefined);
             const wrapper = select.closest(
                 ".monitor-selector__wrapper"
             ) as HTMLElement;

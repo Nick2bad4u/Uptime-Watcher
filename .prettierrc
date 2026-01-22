@@ -8,6 +8,10 @@
     "embeddedLanguageFormatting": "auto",
     "endOfLine": "auto",
     "experimentalOperatorPosition": "end",
+    "experimentalTernaries": false,
+    "htmlWhitespaceSensitivity": "css",
+    "insertPragma": false,
+    "jsxSingleQuote": false,
     "multilineArraysWrapThreshold": 2,
     "objectWrap": "preserve",
     "overrides": [

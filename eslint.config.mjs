@@ -81,7 +81,7 @@ import { importX } from "eslint-plugin-import-x";
 import importZod from "eslint-plugin-import-zod";
 // @ts-expect-error -- No Types for this Package
 import istanbul from "eslint-plugin-istanbul";
-import eslintPluginJsdoc from "eslint-plugin-jsdoc";
+import jsdocPlugin from "eslint-plugin-jsdoc";
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
 // Keep it opt-in via UW_ENABLE_JSON_SCHEMA_VALIDATION=1.
@@ -227,6 +227,7 @@ import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
 import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
+import stylistic from "@stylistic/eslint-plugin";
 import { createRequire } from "node:module";
 import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
@@ -247,7 +248,6 @@ import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract
 // eslint-plugin-react-native
 // eslint-plugin-react-x
 // eslint-plugin-no-inferred-method-name
-// @stylistic/eslint-plugin
 // eslint-plugin-fsecond
 // eslint-plugin-es-x
 // @dword-design/import-alias
@@ -299,6 +299,76 @@ export default /** @type {EslintConfig} */ [
         root: true,
         strict: true,
     }), // MARK: Global Configs and Rules
+    stylistic.configs.customize({
+        // the following options are the default values
+        indent: 4,
+        quotes: 'double',
+        semi: true,
+        jsx: true,
+        arrowParens: true,
+        blockSpacing: true,
+        braceStyle: "stroustrup",
+        commaDangle: "always-multiline",
+        experimental: true,
+        pluginName: "@stylistic",
+        quoteProps: "as-needed",
+        severity: "warn",
+        // ...
+      }),
+    {
+        // NOTE: In ESLint flat config, ignore-only entries are safest when
+        // placed near the start of the config array.
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // MARK: Global Ignore Patterns
+        // Add patterns here to ignore files and directories globally
+        // ═══════════════════════════════════════════════════════════════════════════════
+        ignores: [
+            "**/**-instructions.md",
+            "**/**.instructions.md",
+            "**/**dist**/**",
+            "**/.agentic-tools*",
+            "**/.cache/**",
+            "**/Coverage/**",
+            "**/_ZENTASKS*",
+            "**/chatproject.md",
+            "**/coverage-results.json",
+            "**/coverage/**",
+            "**/dist-scripts/**",
+            "**/dist/**",
+            "**/html/**",
+            "**/node_modules/**",
+            "**/package-lock.json",
+            "**/release/**",
+            ".devskim.json",
+            ".github/ISSUE_TEMPLATE/**",
+            ".github/PULL_REQUEST_TEMPLATE/**",
+            ".github/chatmodes/**",
+            ".github/instructions/**",
+            ".github/prompts/**",
+            ".stryker-tmp/**",
+            "**/CHANGELOG.md",
+            "coverage-report.json",
+            "docs/Archive/**",
+            "docs/Logger-Error-report.md",
+            "docs/Packages/**",
+            "docs/Reviews/**",
+            "docs/docusaurus/.docusaurus/**",
+            "docs/docusaurus/build/**",
+            "docs/docusaurus/docs/**",
+            "docs/docusaurus/static/eslint-inspector/**",
+            "report/**",
+            "reports/**",
+            "scripts/devtools-snippets/**",
+            "storybook-static/**",
+            "playwright/reports/**",
+            "playwright/test-results/**",
+            "public/mockServiceWorker.js",
+            "storybook/test-runner-jest.config.js",
+            "temp/**",
+            ".temp/**",
+        ],
+        name: "Global Ignore Patterns **/**",
+    },
     sharedContractInterfaceGuard,
     {
         files: ["src/constants.ts"],
@@ -412,6 +482,17 @@ export default /** @type {EslintConfig} */ [
         },
     },
     {
+        files: ["src/stores/**/*.{ts,tsx}"],
+        ignores: ["src/test/**/*"],
+        name: "Zustand Stores: Busy flags must reset",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/store-actions-require-finally-reset": "error",
+        },
+    },
+    {
         files: [
             "electron/**/*.{ts,tsx}",
             "shared/**/*.{ts,tsx}",
@@ -435,6 +516,7 @@ export default /** @type {EslintConfig} */ [
             "uptime-watcher/no-local-record-guards": "error",
             "uptime-watcher/no-onedrive": "error",
             "uptime-watcher/prefer-app-alias": "error",
+            "uptime-watcher/require-ensureError-in-catch": "error",
         },
     },
     importX.flatConfigs.typescript,
@@ -446,66 +528,7 @@ export default /** @type {EslintConfig} */ [
     arrayFunc.configs.all,
     ...storybook.configs["flat/recommended"],
     ...pluginCasePolice.configs.recommended,
-    // ═══════════════════════════════════════════════════════════════════════════════
-    // MARK: Global Ignore Patterns
-    // Add patterns here to ignore files and directories globally
-    // ═══════════════════════════════════════════════════════════════════════════════
-    {
-        ignores: [
-            "**/**-instructions.md",
-            "**/**.instructions.md",
-            "**/**dist**/**",
-            "**/.agentic-tools*",
-            "**/.cache/**",
-            "**/Coverage/**",
-            "**/_ZENTASKS*",
-            "**/chatproject.md",
-            "**/coverage-results.json",
-            "**/coverage/**",
-            "**/dist-scripts/**",
-            "**/dist/**",
-            "**/html/**",
-            "**/node_modules/**",
-            "**/package-lock.json",
-            "**/release/**",
-            ".agentic-tools*",
-            ".devskim.json",
-            ".github/ISSUE_TEMPLATE/**",
-            ".github/PULL_REQUEST_TEMPLATE/**",
-            ".github/chatmodes/**",
-            ".github/instructions/**",
-            ".github/prompts/**",
-            ".stryker-tmp/**",
-            "CHANGELOG.md",
-            "Coverage/",
-            "_ZENTASKS*",
-            "coverage-report.json",
-            "coverage/",
-            "dist/",
-            "docs/Archive/**",
-            "docs/Logger-Error-report.md",
-            "docs/Packages/**",
-            "docs/Reviews/**",
-            "docs/docusaurus/.docusaurus/**",
-            "docs/docusaurus/build/**",
-            "docs/docusaurus/docs/**",
-            "docs/docusaurus/static/eslint-inspector/**",
-            "html/**",
-            "node_modules/**",
-            "release/",
-            "report/**",
-            "reports/**",
-            "scripts/devtools-snippets/**",
-            "storybook-static/**",
-            "playwright/reports/**",
-            "playwright/test-results/**",
-            "public/mockServiceWorker.js",
-            "storybook/test-runner-jest.config.js",
-            "temp/**",
-            ".temp/**",
-        ],
-        name: "Global Ignore Patterns **/**",
-    },
+    ...jsdocPlugin.configs["examples-and-default-expressions"],
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Global Language Options
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -843,7 +866,6 @@ export default /** @type {EslintConfig} */ [
             "package-json/valid-name": "warn",
             "package-json/valid-optionalDependencies": "warn",
             "package-json/valid-os": "warn",
-            "package-json/valid-package-definition": "warn",
             "package-json/valid-peerDependencies": "warn",
             "package-json/valid-private": "warn",
             "package-json/valid-publishConfig": "warn",
@@ -1186,7 +1208,6 @@ export default /** @type {EslintConfig} */ [
             "toml/precision-of-fractional-seconds": "warn",
             "toml/precision-of-integer": "warn",
             "toml/quoted-keys": "warn",
-            "toml/space-eq-sign": "warn",
             "toml/spaced-comment": "warn",
             "toml/table-bracket-spacing": "warn",
             "toml/tables-order": "warn",
@@ -1254,9 +1275,11 @@ export default /** @type {EslintConfig} */ [
                 },
             ],
             "react-19-upgrade/no-default-props": "error",
+            "react-19-upgrade/no-defaultprops": "error",
             "react-19-upgrade/no-factories": "error",
             "react-19-upgrade/no-legacy-context": "error",
             "react-19-upgrade/no-prop-types": "warn",
+            "react-19-upgrade/no-proptypes": "warn",
             "react-19-upgrade/no-string-refs": "error",
             // No Hardcoded Strings Plugin Rules (no-hardcoded-strings/*)
             // "no-hardcoded-strings/no-hardcoded-strings": [
@@ -1423,6 +1446,7 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
+            '@stylistic': stylistic,
         },
         rules: {
             // TypeScript backend rules
@@ -1512,7 +1536,6 @@ export default /** @type {EslintConfig} */ [
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
             "@eslint-react/no-missing-context-display-name": "warn",
@@ -1724,7 +1747,6 @@ export default /** @type {EslintConfig} */ [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
-            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -1817,7 +1839,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "off",
+            "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "boundaries/element-types": [
                 "off",
@@ -2144,7 +2166,7 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/no-aria-hidden-on-focusable": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
-            "lines-around-comment": [
+            "@stylistic/lines-around-comment": [
                 "off",
                 {
                     afterBlockComment: false,
@@ -2163,7 +2185,7 @@ export default /** @type {EslintConfig} */ [
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
-            "lines-between-class-members": [
+            "@stylistic/lines-between-class-members": [
                 "warn",
                 "always",
                 {
@@ -2307,7 +2329,7 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "padding-line-between-statements": [
+            "@stylistic/padding-line-between-statements": [
                 "warn",
                 {
                     blankLine: "always",
@@ -2873,6 +2895,7 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
+            "@stylistic": stylistic,
         },
         rules: {
             // TypeScript rules
@@ -2967,7 +2990,6 @@ export default /** @type {EslintConfig} */ [
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
             "@eslint-react/no-missing-context-display-name": "warn",
@@ -3191,7 +3213,6 @@ export default /** @type {EslintConfig} */ [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
-            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -3283,7 +3304,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "off",
+            "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "antfu/consistent-chaining": "warn",
             "antfu/consistent-list-newline": "off",
@@ -3540,7 +3561,7 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/no-autofocus": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
-            "lines-around-comment": [
+            "@stylistic/lines-around-comment": [
                 "off",
                 {
                     afterBlockComment: false,
@@ -3559,7 +3580,7 @@ export default /** @type {EslintConfig} */ [
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
-            "lines-between-class-members": [
+            "@stylistic/lines-between-class-members": [
                 "warn",
                 "always",
                 {
@@ -3706,7 +3727,7 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "padding-line-between-statements": [
+            "@stylistic/padding-line-between-statements": [
                 "warn",
                 {
                     blankLine: "always",
@@ -3819,9 +3840,11 @@ export default /** @type {EslintConfig} */ [
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
             "react-19-upgrade/no-default-props": "error",
+            "react-19-upgrade/no-defaultprops": "error",
             "react-19-upgrade/no-factories": "error",
             "react-19-upgrade/no-legacy-context": "error",
             "react-19-upgrade/no-prop-types": "warn",
+            "react-19-upgrade/no-proptypes": "warn",
             "react-19-upgrade/no-string-refs": "error",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
@@ -4516,6 +4539,7 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
+            "@stylistic": stylistic,
         },
         rules: {
             // TypeScript Backend (Electron) Rules
@@ -4600,7 +4624,6 @@ export default /** @type {EslintConfig} */ [
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
             "@eslint-react/no-missing-context-display-name": "warn",
@@ -4823,7 +4846,6 @@ export default /** @type {EslintConfig} */ [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
-            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -4915,7 +4937,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "off",
+            "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "antfu/consistent-chaining": "warn",
             "antfu/consistent-list-newline": "off",
@@ -5245,7 +5267,7 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/no-aria-hidden-on-focusable": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
-            "lines-around-comment": [
+            "@stylistic/lines-around-comment": [
                 "off",
                 {
                     afterBlockComment: false,
@@ -5264,7 +5286,7 @@ export default /** @type {EslintConfig} */ [
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
-            "lines-between-class-members": [
+            "@stylistic/lines-between-class-members": [
                 "warn",
                 "always",
                 {
@@ -5412,7 +5434,7 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "padding-line-between-statements": [
+            "@stylistic/padding-line-between-statements": [
                 "warn",
                 {
                     blankLine: "always",
@@ -5963,6 +5985,7 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
             xss: xss,
             zod: zod,
+            "@stylistic": stylistic,
         },
         rules: {
             // TypeScript rules
@@ -6054,7 +6077,6 @@ export default /** @type {EslintConfig} */ [
             "@eslint-react/no-children-prop": "warn",
             "@eslint-react/no-class-component": "warn",
             "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-forbidden-props": "off",
             "@eslint-react/no-leaked-conditional-rendering": "warn",
             "@eslint-react/no-missing-component-display-name": "warn",
             "@eslint-react/no-missing-context-display-name": "warn",
@@ -6278,7 +6300,6 @@ export default /** @type {EslintConfig} */ [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
-            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -6370,7 +6391,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "off",
+            "@typescript-eslint/unified-signatures": "warn",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "antfu/consistent-chaining": "warn",
             "antfu/consistent-list-newline": "off",
@@ -6655,7 +6676,7 @@ export default /** @type {EslintConfig} */ [
             "jsx-a11y/no-autofocus": "warn",
             "jsx-a11y/prefer-tag-over-role": "warn",
             // Code spacing and formatting rules
-            "lines-around-comment": [
+            "@stylistic/lines-around-comment": [
                 "off",
                 {
                     afterBlockComment: false,
@@ -6674,7 +6695,7 @@ export default /** @type {EslintConfig} */ [
                     ignorePattern: String.raw`^\s*@`, // Ignore TSDoc tags like @param, @returns
                 },
             ],
-            "lines-between-class-members": [
+            "@stylistic/lines-between-class-members": [
                 "warn",
                 "always",
                 {
@@ -6822,7 +6843,7 @@ export default /** @type {EslintConfig} */ [
             "observers/matching-unobserve-target": "error",
             "observers/no-missing-unobserve-or-disconnect": "error",
             "one-var": "off",
-            "padding-line-between-statements": [
+            "@stylistic/padding-line-between-statements": [
                 "warn",
                 {
                     blankLine: "always",
@@ -6935,9 +6956,11 @@ export default /** @type {EslintConfig} */ [
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
             "react-19-upgrade/no-default-props": "error",
+            "react-19-upgrade/no-defaultprops": "error",
             "react-19-upgrade/no-factories": "error",
             "react-19-upgrade/no-legacy-context": "error",
             "react-19-upgrade/no-prop-types": "warn",
+            "react-19-upgrade/no-proptypes": "warn",
             "react-19-upgrade/no-string-refs": "error",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
@@ -7776,6 +7799,7 @@ export default /** @type {EslintConfig} */ [
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-mock-return-shorthand": "warn",
             "vitest/prefer-spy-on": "off",
             "vitest/prefer-strict-boolean-matchers": "off",
             "vitest/prefer-to-be": "off",
@@ -8057,6 +8081,7 @@ export default /** @type {EslintConfig} */ [
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-mock-return-shorthand": "warn",
             "vitest/prefer-spy-on": "off",
             "vitest/prefer-strict-boolean-matchers": "off",
             "vitest/prefer-to-be": "off",
@@ -8315,6 +8340,7 @@ export default /** @type {EslintConfig} */ [
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
+            "vitest/prefer-mock-return-shorthand": "warn",
             "vitest/prefer-spy-on": "off",
             "vitest/prefer-strict-boolean-matchers": "off",
             "vitest/prefer-to-be": "off",
@@ -8437,7 +8463,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-useless-default-assignment": "warn",
             "@typescript-eslint/require-await": "off", // Benchmarks may have async patterns
             "@typescript-eslint/strict-void-return": "warn",
-            "@typescript-eslint/unified-signatures": "off",
+            "@typescript-eslint/unified-signatures": "warn",
             camelcase: "off",
             "capitalized-comments": [
                 "error",
@@ -9486,7 +9512,7 @@ export default /** @type {EslintConfig} */ [
         },
         name: "JS JSDoc - **/*.{JS,CJS}",
         plugins: {
-            jsdoc: eslintPluginJsdoc,
+            jsdoc: jsdocPlugin,
         },
         rules: {
             "jsdoc/check-access": "warn", // Recommended
@@ -9901,6 +9927,7 @@ export default /** @type {EslintConfig} */ [
                     ],
                 },
             ],
+            "playwright/no-restricted-locators": "off", // Disabling - restricting locators is often unnecessary
             "playwright/no-restricted-matchers": "off", // Disabling - restricting matchers is often unnecessary
             "playwright/no-skipped-test": "warn",
             "playwright/no-slowed-test": "off",
@@ -10294,15 +10321,6 @@ export default /** @type {EslintConfig} */ [
             "@eslint-react/debug/is-from-react": "off", // Debugging not needed
             "@eslint-react/debug/jsx": "off", // Debugging not needed
             "@eslint-react/debug/react-hooks": "off", // Debugging not needed
-            "@typescript-eslint/dot-notation": "off", // Deprecated
-            "@typescript-eslint/no-empty-interface": "off", // Deprecated
-            "@typescript-eslint/no-loss-of-precision": "off", // Deprecated
-            "@typescript-eslint/no-type-aliases": "off", // Deprecated
-            "@typescript-eslint/no-var-requires": "off", // Allow require for dynamic imports
-            "@typescript-eslint/prefer-ts-expect-error": "off", // Deprecated
-            "@typescript-eslint/sort-type-constituents": "off", // Deprecated
-            "@typescript-eslint/typedef": "off", // Deprecated
-            "@typescript-eslint/unified-signatures": "off", // Broken due to: TypeError: typeParameters.params is not iterable
             // Better-tailwindcss
             "better-tailwindcss/multiline": "off",
             "better-tailwindcss/sort-classes": "off",
@@ -10314,45 +10332,13 @@ export default /** @type {EslintConfig} */ [
             "functional/no-try-statements": "off",
             "functional/prefer-property-signatures": "off",
             // Functional
-            "functional/prefer-readonly-type": "off",
             "functional/prefer-tacit": "off",
             "functional/readonly-type": "off",
             "functional/type-declaration-immutability": "off",
-            "global-require": "off",
-            "handle-callback-err": "off",
-            "id-blacklist": "off",
-            // Import-x
-            "import-x/imports-first": "off",
-            "jsx-a11y/accessible-emoji": "off",
-            "jsx-a11y/no-onchange": "off",
-            "line-comment-position": "off",
-            "lines-around-directive": "off",
-            "multiline-comment-style": "off",
-            // N (Node plugin)
-            "n/no-hide-core-modules": "off",
-            "n/shebang": "off",
-            "newline-after-var": "off",
-            "newline-before-return": "off",
-            "no-buffer-constructor": "off",
-            "no-catch-shadow": "off",
             "no-hardcoded-strings/no-hardcoded-strings": "off", // Will use i18n in future
-            "no-mixed-requires": "off",
-            "no-native-reassign": "off",
-            "no-negated-in-lhs": "off",
-            "no-new-object": "off",
-            "no-new-require": "off",
-            "no-new-symbol": "off",
-            "no-path-concat": "off",
-            "no-process-env": "off",
-            "no-process-exit": "off",
-            "no-restricted-modules": "off",
-            "no-return-await": "off",
-            "no-sync": "off",
             "prefer-arrow/prefer-arrow-functions": "off", // Too strict
-            "prefer-reflect": "off",
             // React
-            "react/jsx-sort-default-props": "off",
-            "spaced-comment": [
+            "@stylistic/spaced-comment": [
                 "error",
                 "always",
                 {
@@ -10362,15 +10348,8 @@ export default /** @type {EslintConfig} */ [
                     ],
                 },
             ],
-            "styled-components-a11y/accessible-emoji": "off",
             // Styled-components-a11y (and jsx-a11y equivalents)
             "styled-components-a11y/lang": "off",
-            "styled-components-a11y/no-onchange": "off",
-            "unicorn/no-array-push-push": "off",
-            // Unicorn (deprecated / replaced rules)
-            "unicorn/no-instanceof-array": "off",
-            "unicorn/no-length-as-slice-end": "off",
-            "unicorn/prefer-spread": "off", // Prefer Array.from
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules

@@ -184,7 +184,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await annotate("Type: IPC Response Handling", "type");
 
             // Mock safeExtractIpcData to return empty array (simulating failed extraction for loadMonitorTypes)
-            originalSafeExtractIpcData.mockImplementationOnce(() => []);
+            originalSafeExtractIpcData.mockReturnValueOnce([]);
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue([]);
 
@@ -724,7 +724,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockImplementationOnce(() => completeValidationData);
+            originalSafeExtractIpcData.mockReturnValueOnce(completeValidationData);
 
             let result1: ValidationResult;
             await act(async () => {
@@ -752,7 +752,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockImplementationOnce(() => minimalValidationData);
+            originalSafeExtractIpcData.mockReturnValueOnce(minimalValidationData);
 
             let result2: ValidationResult;
             await act(async () => {
@@ -833,7 +833,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockImplementationOnce(() => complexValidationResult);
+            originalSafeExtractIpcData.mockReturnValueOnce(complexValidationResult);
 
             let result1: ValidationResult;
             await act(async () => {
@@ -913,7 +913,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockImplementationOnce(() => mockValidationResult);
+            originalSafeExtractIpcData.mockReturnValueOnce(mockValidationResult);
 
             await act(async () => {
                 await result.current.validateMonitorData("http", {});
@@ -1046,9 +1046,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Set up mock to resolve after a delay
             let resolveCount = 0;
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(
-                () =>
-                    new Promise((resolve) => {
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValue(
+                new Promise((resolve) => {
                         setTimeout(() => {
                             resolve([
                                 createMonitorTypeConfig({

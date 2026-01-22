@@ -974,11 +974,10 @@ describe(useMonitorTypesStore, () => {
             ];
 
             // Delay the first call
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(
-                () =>
-                    new Promise((resolve) =>
-                        setTimeout(() => resolve(mockMonitorTypes), 100)
-                    )
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValue(
+                new Promise((resolve) =>
+                    setTimeout(() => resolve(mockMonitorTypes), 100)
+                )
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());

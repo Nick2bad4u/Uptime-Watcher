@@ -143,7 +143,7 @@ fc.configureGlobal({
 let windowOpenSpy: MockInstance | undefined;
 
 if (typeof window !== "undefined" && typeof window.open === "function") {
-    windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    windowOpenSpy = vi.spyOn(window, "open").mockReturnValue(null);
 }
 
 beforeEach(() => {

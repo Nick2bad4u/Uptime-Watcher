@@ -592,9 +592,8 @@ export class DataBackupService {
                     // from cloud storage). Always compute the schema version
                     // from the actual SQLite file so a forged schemaVersion
                     // cannot bypass compatibility checks.
-                    const schemaVersion = readDatabaseSchemaVersionFromFile(
-                        tempFilePath
-                    );
+                    const schemaVersion =
+                        readDatabaseSchemaVersionFromFile(tempFilePath);
 
                     const effectiveBackup: DatabaseBackupResult = {
                         ...normalizedBackup,

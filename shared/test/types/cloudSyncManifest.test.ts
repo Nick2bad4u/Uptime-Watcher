@@ -27,7 +27,10 @@ describe("cloudSyncManifest", () => {
     });
 
     it("caps the devices map to the most recently seen devices", () => {
-        const devices: Record<string, { compactedUpToOpId: number; lastSeenAt: number }> = {};
+        const devices: Record<
+            string,
+            { compactedUpToOpId: number; lastSeenAt: number }
+        > = {};
         for (let index = 0; index < 600; index += 1) {
             devices[`device-${index}`] = {
                 compactedUpToOpId: index,

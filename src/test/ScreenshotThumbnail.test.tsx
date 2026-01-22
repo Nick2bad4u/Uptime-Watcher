@@ -140,7 +140,7 @@ describe(ScreenshotThumbnail, () => {
         // Mock ElementInternals for the anchor element
         Element.prototype.getBoundingClientRect = vi
             .fn()
-            .mockImplementation(() => createMockBoundingClientRect());
+            .mockReturnValue(createMockBoundingClientRect());
 
         // Mock location methods to prevent navigation errors in JSDOM
         Object.defineProperty(globalThis, "location", {

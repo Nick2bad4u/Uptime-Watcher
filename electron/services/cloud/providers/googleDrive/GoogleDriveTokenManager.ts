@@ -1,3 +1,4 @@
+import { ensureError } from "@shared/utils/errorHandling";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import axios from "axios";
@@ -124,6 +125,12 @@ export class GoogleDriveTokenManager {
 
             return googleTokenResponseSchema.parse(response.data);
         } catch (error) {
+            // Ensure we normalize the caught value so downstream logging or
+            // rethrowing remains Error-shaped, but keep Axios shape checks on
+            // the original value. In practice, some callers/tests provide
+            // Axios-like objects that are not `instanceof Error`.
+            const safeError = ensureError(error);
+
             if (axios.isAxiosError(error)) {
                 const oauthError = tryParseGoogleOAuthErrorResponse(
                     error.response?.data
@@ -148,7 +155,7 @@ export class GoogleDriveTokenManager {
                 }
             }
 
-            throw error;
+            throw safeError;
         }
     }
 
