@@ -15,6 +15,7 @@ import type {
     StateSyncSource,
 } from "@shared/types/stateSync";
 
+import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import {
     hasSiteSyncChanges,
     prepareSiteSyncSnapshot,
@@ -96,7 +97,11 @@ export class SiteManagerStateSync {
         let effectiveDelta: SiteSyncDelta = delta;
         let hasChanges = hasSiteSyncChanges(effectiveDelta);
 
-        if (args.action === "delete" && !hasChanges && args.siteIdentifier) {
+        if (
+            args.action === STATE_SYNC_ACTION.DELETE &&
+            !hasChanges &&
+            args.siteIdentifier
+        ) {
             effectiveDelta = {
                 addedSites: [],
                 removedSiteIdentifiers: [args.siteIdentifier],
@@ -110,8 +115,8 @@ export class SiteManagerStateSync {
         // Delete actions still require a meaningful delta, which we normalize
         // above when a siteIdentifier is available.
         const shouldEmit =
-            args.action === "bulk-sync" ||
-            args.action === "update" ||
+            args.action === STATE_SYNC_ACTION.BULK_SYNC ||
+            args.action === STATE_SYNC_ACTION.UPDATE ||
             hasChanges;
 
         if (!shouldEmit) {
@@ -128,7 +133,7 @@ export class SiteManagerStateSync {
         this.stateSyncRevision += 1;
         const revision = this.stateSyncRevision;
 
-        if (args.action === "bulk-sync") {
+        if (args.action === STATE_SYNC_ACTION.BULK_SYNC) {
             await this.eventEmitter.emitTyped("sites:state-synchronized", {
                 action: args.action,
                 revision,

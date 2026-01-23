@@ -19,21 +19,22 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { performance } from "node:perf_hooks";
+
+import { createMockConstructor } from "../../utils/vitestConstructors";
+
 // Mock Node.js modules with inline functions to avoid hoisting issues
 vi.mock("node:dns/promises", () => ({
     __esModule: true,
     resolve4: vi.fn(),
 }));
 vi.mock("node:net", () => {
-    const Socket = vi.fn(function MockSocket() {
-        return {
-            setTimeout: vi.fn(),
-            on: vi.fn(),
-            connect: vi.fn(),
-            destroy: vi.fn(),
-            removeAllListeners: vi.fn(),
-        };
-    });
+    const Socket = createMockConstructor(() => ({
+        setTimeout: vi.fn(),
+        on: vi.fn(),
+        connect: vi.fn(),
+        destroy: vi.fn(),
+        removeAllListeners: vi.fn(),
+    }));
 
     return { __esModule: true, Socket };
 });
@@ -169,7 +170,10 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockReturnValue(mockSocket as any);
+            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+            mockNet.Socket.mockImplementation(function MockSocketInstance() {
+                return mockSocket as unknown as net.Socket;
+            });
             // Act
             const result = await checkConnectivity("example.com", {
                 method: "tcp",
@@ -198,7 +202,10 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockReturnValue(mockSocket as any);
+            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+            mockNet.Socket.mockImplementation(function MockSocketInstance() {
+                return mockSocket as unknown as net.Socket;
+            });
             // Act
             const result = await checkConnectivity("nonexistent.example.com", {
                 method: "tcp",
@@ -243,7 +250,10 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockReturnValue(mockSocket as any);
+            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+            mockNet.Socket.mockImplementation(function MockSocketInstance() {
+                return mockSocket as unknown as net.Socket;
+            });
             // Act
             const result = await checkConnectivityWithRetry("example.com", {
                 retries: 2,
@@ -279,7 +289,10 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockReturnValue(mockSocket as any);
+            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+            mockNet.Socket.mockImplementation(function MockSocketInstance() {
+                return mockSocket as unknown as net.Socket;
+            });
             // Act
             const result = await checkConnectivityWithRetry("example.com", {
                 retries: 2,
@@ -319,7 +332,10 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            mockNet.Socket.mockReturnValue(mockSocket as any);
+            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+            mockNet.Socket.mockImplementation(function MockSocketInstance() {
+                return mockSocket as unknown as net.Socket;
+            });
             const tcpResult = await checkConnectivity("example.com");
             expect([
                 "up",

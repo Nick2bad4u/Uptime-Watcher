@@ -1,11 +1,11 @@
 import type { Monitor, Site } from "@shared/types";
-import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 import {
     RENDERER_EVENT_CHANNELS,
     type RendererEventChannel,
     type RendererEventPayload,
 } from "@shared/ipc/rendererEvents";
+import { type SiteSyncDelta, STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import {
     getNodeEnv,
     readBooleanEnv,
@@ -120,7 +120,7 @@ const compactStateSyncPayload = (
     payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC>,
     maxHistoryEntriesPerMonitor: number
 ): RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC> => {
-    if (payload.action === "bulk-sync") {
+    if (payload.action === STATE_SYNC_ACTION.BULK_SYNC) {
         return {
             ...payload,
             sites: payload.sites.map((site) =>
@@ -236,9 +236,10 @@ function buildStateSyncPayloadDiagnostics(
     const payloadAction = payload.action;
     const payloadSource = payload.source;
 
-    const sites: Site[] = payload.action === "bulk-sync" ? payload.sites : [];
+    const sites: Site[] =
+        payload.action === STATE_SYNC_ACTION.BULK_SYNC ? payload.sites : [];
     const delta: SiteSyncDelta | undefined =
-        payload.action === "bulk-sync" ? undefined : payload.delta;
+        payload.action === STATE_SYNC_ACTION.BULK_SYNC ? undefined : payload.delta;
 
     const topDetailsStrings: StateSyncLargeStringDiagnostic[] = [];
     const topMonitorsByHistory: StateSyncMonitorHistoryDiagnostic[] = [];
@@ -540,7 +541,7 @@ export class RendererEventBridge {
                         compactedBytes
                     );
                     const siteCount =
-                        payload.action === "bulk-sync"
+                        payload.action === STATE_SYNC_ACTION.BULK_SYNC
                             ? payload.siteCount
                             : undefined;
 
@@ -568,7 +569,9 @@ export class RendererEventBridge {
             }
 
             const siteCount =
-                payload.action === "bulk-sync" ? payload.siteCount : undefined;
+                payload.action === STATE_SYNC_ACTION.BULK_SYNC
+                    ? payload.siteCount
+                    : undefined;
 
             logger.warn(
                 "[RendererEventBridge] State-sync payload exceeds size budget; broadcasting truncated marker",
@@ -587,10 +590,12 @@ export class RendererEventBridge {
             const truncatedPayload: RendererEventPayload<
                 typeof RENDERER_EVENT_CHANNELS.STATE_SYNC
             > = {
-                action: "bulk-sync",
+                action: STATE_SYNC_ACTION.BULK_SYNC,
                 revision: payload.revision,
                 siteCount:
-                    payload.action === "bulk-sync" ? payload.siteCount : 0,
+                    payload.action === STATE_SYNC_ACTION.BULK_SYNC
+                        ? payload.siteCount
+                        : 0,
                 siteIdentifier: payload.siteIdentifier,
                 sites: [],
                 source: payload.source,

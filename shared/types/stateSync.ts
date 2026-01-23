@@ -40,6 +40,8 @@ const STATE_SYNC_SOURCE_VALUES = [
     "cache",
     "database",
     "frontend",
+    "import",
+    "monitor-update",
 ] as const;
 
 /**
@@ -64,14 +66,20 @@ export const stateSyncSourceSchema: typeof stateSyncSourceInternalSchema =
  *
  * @public
  */
-export const STATE_SYNC_SOURCE: Readonly<{
-    readonly CACHE: StateSyncSource;
-    readonly DATABASE: StateSyncSource;
-    readonly FRONTEND: StateSyncSource;
-}> = Object.freeze({
+export type StateSyncSourceConstants = Readonly<{
+    CACHE: (typeof STATE_SYNC_SOURCE_VALUES)[0];
+    DATABASE: (typeof STATE_SYNC_SOURCE_VALUES)[1];
+    FRONTEND: (typeof STATE_SYNC_SOURCE_VALUES)[2];
+    IMPORT: (typeof STATE_SYNC_SOURCE_VALUES)[3];
+    MONITOR_UPDATE: (typeof STATE_SYNC_SOURCE_VALUES)[4];
+}>;
+
+export const STATE_SYNC_SOURCE: StateSyncSourceConstants = Object.freeze({
     CACHE: "cache",
     DATABASE: "database",
     FRONTEND: "frontend",
+    IMPORT: "import",
+    MONITOR_UPDATE: "monitor-update",
 });
 
 /**
@@ -111,11 +119,13 @@ export const stateSyncActionSchema: typeof stateSyncActionInternalSchema =
  *
  * @public
  */
-export const STATE_SYNC_ACTION: Readonly<{
-    readonly BULK_SYNC: StateSyncAction;
-    readonly DELETE: StateSyncAction;
-    readonly UPDATE: StateSyncAction;
-}> = Object.freeze({
+export type StateSyncActionConstants = Readonly<{
+    BULK_SYNC: (typeof STATE_SYNC_ACTION_VALUES)[0];
+    DELETE: (typeof STATE_SYNC_ACTION_VALUES)[1];
+    UPDATE: (typeof STATE_SYNC_ACTION_VALUES)[2];
+}>;
+
+export const STATE_SYNC_ACTION: StateSyncActionConstants = Object.freeze({
     BULK_SYNC: "bulk-sync",
     DELETE: "delete",
     UPDATE: "update",
@@ -126,8 +136,31 @@ export const STATE_SYNC_ACTION: Readonly<{
  *
  * @public
  */
-export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] =
-    STATE_SYNC_ACTION_VALUES;
+export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] = Object.freeze(
+    Array.from(STATE_SYNC_ACTION_VALUES)
+);
+
+/**
+ * Type guard ensuring a candidate is a valid {@link StateSyncAction}.
+ *
+ * @param candidate - Value to check.
+ */
+export function isStateSyncAction(
+    candidate: unknown
+): candidate is StateSyncAction {
+    return stateSyncActionSchema.safeParse(candidate).success;
+}
+
+/**
+ * Type guard for the bulk-sync action.
+ *
+ * @param candidate - Value to check.
+ */
+export function isBulkStateSyncAction(
+    candidate: unknown
+): candidate is typeof STATE_SYNC_ACTION.BULK_SYNC {
+    return candidate === STATE_SYNC_ACTION.BULK_SYNC;
+}
 
 const siteOutputSchema: z.ZodType<Site> = siteSchema.transform(
     (site): Site => site

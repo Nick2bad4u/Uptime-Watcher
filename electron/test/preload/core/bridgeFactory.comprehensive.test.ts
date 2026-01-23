@@ -171,11 +171,40 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 .mockRejectedValueOnce(error);
 
             const invoke = createTypedInvoker(startMonitoringChannel);
-
             await expect(invoke()).rejects.toMatchObject({
                 message: expect.stringContaining("ipc failure"),
                 channel: startMonitoringChannel,
             });
+        });
+
+        it("times out if the invoke never resolves", async () => {
+            vi.useFakeTimers();
+            try {
+                vi.mocked(ipcRenderer.invoke).mockImplementation(
+                    (channel: unknown) => {
+                        if (channel === DIAGNOSTICS_CHANNELS.verifyIpcHandler) {
+                            return Promise.resolve(
+                                createHandshakeSuccess(formatDetailChannel)
+                            );
+                        }
+
+                        // Simulate a stalled main-process handler.
+                        return new Promise(() => undefined);
+                    }
+                );
+
+                const invoke = createTypedInvoker(formatDetailChannel, {
+                    timeoutMs: 1000,
+                });
+                const promise = invoke("http", "detail");
+
+                await vi.advanceTimersByTimeAsync(1001);
+                await expect(promise).rejects.toMatchObject({
+                    channel: formatDetailChannel,
+                });
+            } finally {
+                vi.useRealTimers();
+            }
         });
 
         it("validates successful responses contain data", async () => {
@@ -284,6 +313,33 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
             const reset = createVoidInvoker(resetSettingsChannel);
             await expect(reset()).rejects.toBeInstanceOf(IpcError);
+        });
+
+        it("times out if the invoke never resolves", async () => {
+            vi.useFakeTimers();
+            try {
+                vi.mocked(ipcRenderer.invoke).mockImplementation(
+                    (channel: unknown) => {
+                        if (channel === DIAGNOSTICS_CHANNELS.verifyIpcHandler) {
+                            return Promise.resolve(
+                                createHandshakeSuccess(resetSettingsChannel)
+                            );
+                        }
+
+                        return new Promise(() => undefined);
+                    }
+                );
+
+                const reset = createVoidInvoker(resetSettingsChannel, {
+                    timeoutMs: 1000,
+                });
+                const promise = reset();
+
+                await vi.advanceTimersByTimeAsync(1001);
+                await expect(promise).rejects.toBeInstanceOf(IpcError);
+            } finally {
+                vi.useRealTimers();
+            }
         });
     });
 

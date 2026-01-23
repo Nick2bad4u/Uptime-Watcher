@@ -3,6 +3,7 @@ import {
     type RendererEventChannel,
     type RendererEventPayload,
 } from "@shared/ipc/rendererEvents";
+import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 /**
  * Main application service that orchestrates all other services and coordinates
  * application lifecycle across the Electron backend.
@@ -753,11 +754,13 @@ export class ApplicationService {
             );
             try {
                 const sitesCount =
-                    payload.action === "bulk-sync"
+                    payload.action === STATE_SYNC_ACTION.BULK_SYNC
                         ? payload.sites.length
                         : undefined;
                 const delta =
-                    payload.action === "bulk-sync" ? undefined : payload.delta;
+                    payload.action === STATE_SYNC_ACTION.BULK_SYNC
+                        ? undefined
+                        : payload.delta;
 
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_STATE_SYNC,

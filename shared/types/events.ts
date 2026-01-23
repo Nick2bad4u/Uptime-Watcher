@@ -29,6 +29,8 @@ import * as z from "zod";
 import {
     type SiteSyncDelta,
     siteSyncDeltaSchema,
+    STATE_SYNC_ACTION,
+    type StateSyncAction,
     type StateSyncSource,
     stateSyncSourceSchema,
 } from "./stateSync";
@@ -189,7 +191,7 @@ export const SITE_ADDED_SOURCES: readonly SiteAddedSource[] = Object.freeze(
  */
 interface BaseStateSyncEventData extends BaseEventData {
     /** The synchronization action being performed */
-    readonly action: "bulk-sync" | "delete" | "update";
+    readonly action: StateSyncAction;
     /**
      * Monotonic revision counter incremented by the backend for each emitted
      * state sync event.
@@ -205,7 +207,7 @@ interface BaseStateSyncEventData extends BaseEventData {
 
 /** Bulk sync event containing a full snapshot. */
 export interface BulkStateSyncEventData extends BaseStateSyncEventData {
-    readonly action: "bulk-sync";
+    readonly action: typeof STATE_SYNC_ACTION.BULK_SYNC;
     /** Total number of sites in the snapshot. */
     readonly siteCount: number;
     /** Complete site dataset after the sync operation */
@@ -214,7 +216,9 @@ export interface BulkStateSyncEventData extends BaseStateSyncEventData {
 
 /** Incremental update/delete event containing a delta. */
 export interface DeltaStateSyncEventData extends BaseStateSyncEventData {
-    readonly action: "delete" | "update";
+    readonly action:
+        | typeof STATE_SYNC_ACTION.DELETE
+        | typeof STATE_SYNC_ACTION.UPDATE;
     /** Structured delta describing how the site collection changed */
     readonly delta: SiteSyncDelta;
     readonly truncated?: false | undefined;
@@ -229,7 +233,7 @@ const stateSyncSitesArraySchema = siteSchema.array();
 
 const bulkStateSyncEventDataSchema = baseEventDataSchema
     .extend({
-        action: z.literal("bulk-sync"),
+        action: z.literal(STATE_SYNC_ACTION.BULK_SYNC),
         revision: z.int().nonnegative(),
         siteCount: z.int().nonnegative(),
         siteIdentifier: z.string().min(1).optional(),
@@ -261,7 +265,7 @@ const bulkStateSyncEventDataSchema = baseEventDataSchema
 
 const updateStateSyncEventDataSchema = baseEventDataSchema
     .extend({
-        action: z.literal("update"),
+        action: z.literal(STATE_SYNC_ACTION.UPDATE),
         delta: siteSyncDeltaSchema,
         revision: z.int().nonnegative(),
         siteIdentifier: z.string().min(1).optional(),
@@ -286,7 +290,7 @@ const updateStateSyncEventDataSchema = baseEventDataSchema
 
 const deleteStateSyncEventDataSchema = baseEventDataSchema
     .extend({
-        action: z.literal("delete"),
+        action: z.literal(STATE_SYNC_ACTION.DELETE),
         delta: siteSyncDeltaSchema,
         revision: z.int().nonnegative(),
         siteIdentifier: z.string().min(1).optional(),

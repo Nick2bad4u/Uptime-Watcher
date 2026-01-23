@@ -229,7 +229,8 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                 <td className="site-table__cell site-table__cell--response">
                     <ThemedText size="sm">
                         {typeof responseTime === "number" &&
-                        Number.isFinite(responseTime)
+                        Number.isFinite(responseTime) &&
+                        responseTime > 0
                             ? `${responseTime} ms`
                             : "—"}
                     </ThemedText>

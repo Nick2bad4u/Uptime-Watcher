@@ -25,6 +25,7 @@ import {
 import {
     parseStateSyncFullSyncResult,
     parseStateSyncStatusSummary,
+    STATE_SYNC_ACTION,
     type StateSyncFullSyncResult,
     type StateSyncStatusSummary,
 } from "@shared/types/stateSync";
@@ -238,7 +239,7 @@ export const StateSyncService: StateSyncServiceContract = {
                         }
 
                         const synthesizedEvent: StateSyncEventData = {
-                            action: "bulk-sync",
+                            action: STATE_SYNC_ACTION.BULK_SYNC,
                             revision: fullSync.revision,
                             siteCount: fullSync.siteCount,
                             siteIdentifier: "all",
@@ -373,7 +374,8 @@ export const StateSyncService: StateSyncServiceContract = {
                             {
                                 revision: parsedEvent.data.revision,
                                 siteCount:
-                                    parsedEvent.data.action === "bulk-sync"
+                                    parsedEvent.data.action ===
+                                    STATE_SYNC_ACTION.BULK_SYNC
                                         ? parsedEvent.data.siteCount
                                         : undefined,
                                 source: parsedEvent.data.source,

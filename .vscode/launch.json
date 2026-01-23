@@ -54,8 +54,7 @@
                 "order": 1
             },
             "request": "launch",
-            "runtimeArgs": ["run",
-"dev:with-sqlite3"],
+            "runtimeArgs": ["run", "dev:with-sqlite3"],
             "runtimeExecutable": "npm",
             "skipFiles": ["<node_internals>/**"],
             "sourceMaps": true,
@@ -78,8 +77,7 @@
                 "order": 1
             },
             "request": "launch",
-            "runtimeArgs": ["run",
-"dev:with-sqlite3"],
+            "runtimeArgs": ["run", "dev:with-sqlite3"],
             "runtimeExecutable": "npm",
             "skipFiles": ["<node_internals>/**"],
             "sourceMaps": true,
@@ -102,15 +100,11 @@
                 "order": 1
             },
             "request": "launch",
-            "runtimeArgs": ["run",
-"electron-dev"],
+            "runtimeArgs": ["run", "electron-dev"],
             "runtimeExecutable": "npm",
             "skipFiles": ["<node_internals>/**"],
             "sourceMaps": true,
-            "type": "node",
-            "windows": {
-                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
-            }
+            "type": "node"
         },
         {
             "autoAttachChildProcesses": true,
@@ -219,14 +213,12 @@
                 "order": 1
             },
             "request": "launch",
-            "runtimeArgs": ["run",
-"test"],
+            "runtimeArgs": ["run", "test"],
             "runtimeExecutable": "npm",
             "type": "node"
         },
         {
-            "args": ["run",
-"${relativeFile}"],
+            "args": ["run", "${relativeFile}"],
             "autoAttachChildProcesses": true,
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -240,8 +232,7 @@
             },
             "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
             "request": "launch",
-            "skipFiles": ["<node_internals>/**",
-"**/node_modules/**"],
+            "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
             "smartStep": true,
             "sourceMaps": true,
             "type": "node"

@@ -16,8 +16,7 @@ import type {
     IpcInvokeChannel,
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
-    IpcResponse as SharedIpcResponse,
-    VoidIpcInvokeChannel,
+    IpcResponse as SharedIpcResponse, VoidIpcInvokeChannel
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
 import type { UnknownRecord } from "type-fest";
@@ -138,6 +137,7 @@ export function createSafeParseAdapter<T>(
     safeParse: (candidate: unknown) => SafeParseResultLike<T>
 ): (candidate: unknown) => SafeParseLike<T> {
     return (candidate): SafeParseLike<T> => {
+
         const parsed = safeParse(candidate);
         if (!isSafeParseResultFailure(parsed)) {
             return { data: parsed.data, success: true };
@@ -156,6 +156,7 @@ export function safeParseBooleanResult(
     if (typeof candidate === "boolean") {
         return { data: candidate, success: true };
     }
+
 
     return {
         error: new Error(
@@ -334,9 +335,73 @@ export class IpcError extends Error {
     }
 }
 
+/**
+ * Options for IPC invokers created via {@link createTypedInvoker} and
+ * {@link createVoidInvoker}.
+ */
+export interface IpcInvokeOptions {
+    /**
+     * Client-side invoke timeout in milliseconds.
+     *
+     * @remarks
+     * Electron `ipcRenderer.invoke()` calls are not cancellable, so timing out
+     * does not stop the main-process handler. It only prevents the renderer
+     * from waiting forever.
+     */
+    readonly timeoutMs?: number;
+}
+
 const DEFAULT_MAX_INVOKE_ARGS_BYTES = 5_000_000;
 const MAX_IMPORT_DATA_ARGS_BYTES = MAX_IPC_JSON_IMPORT_BYTES;
 const MAX_SQLITE_RESTORE_ARGS_BYTES = MAX_IPC_SQLITE_RESTORE_BYTES;
+
+const DEFAULT_INVOKE_TIMEOUT_MS = 60_000;
+const LONG_INVOKE_TIMEOUT_MS = 5 * 60_000;
+const DIAGNOSTICS_VERIFY_TIMEOUT_MS = 10_000;
+
+function getInvokeTimeoutMs(channel: string): number {
+    switch (channel) {
+        case DATA_CHANNELS.downloadSqliteBackup:
+        case DATA_CHANNELS.exportData:
+        case DATA_CHANNELS.importData:
+        case DATA_CHANNELS.restoreSqliteBackup:
+        case DATA_CHANNELS.saveSqliteBackup: {
+            return LONG_INVOKE_TIMEOUT_MS;
+        }
+        default: {
+            return DEFAULT_INVOKE_TIMEOUT_MS;
+        }
+    }
+}
+
+async function withTimeout<T>(args: {
+    readonly onTimeout: () => Error;
+    readonly promise: Promise<T>;
+    readonly timeoutMs: number;
+}): Promise<T> {
+    const { onTimeout, promise, timeoutMs } = args;
+    let timeoutId: NodeJS.Timeout | undefined = undefined;
+    const TIMEOUT = Symbol("timeout");
+
+    try {
+        const raced = await Promise.race([
+            promise,
+            new Promise<typeof TIMEOUT>((resolve) => {
+                timeoutId = setTimeout(() => { resolve(TIMEOUT); }, timeoutMs);
+            }),
+        ]);
+
+        if (raced === TIMEOUT) {
+            throw onTimeout();
+        }
+
+        return raced as T;
+    } finally {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+    }
+}
 
 function getInvokeArgsByteBudget(channel: string): number {
     switch (channel) {
@@ -396,10 +461,20 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
     if (!verification) {
         verification = (async (): Promise<void> => {
             try {
-                const rawResponse: unknown = await ipcRenderer.invoke(
-                    DIAGNOSTICS_CHANNEL,
-                    channel
-                );
+                const rawResponse: unknown = await withTimeout({
+                    onTimeout: () =>
+                        new IpcError(
+                            `Timed out verifying IPC handler for channel '${channel}'`,
+                            channel,
+                            undefined,
+                            {
+                                diagnosticsChannel: DIAGNOSTICS_CHANNEL,
+                                timeoutMs: DIAGNOSTICS_VERIFY_TIMEOUT_MS,
+                            }
+                        ),
+                    promise: ipcRenderer.invoke(DIAGNOSTICS_CHANNEL, channel),
+                    timeoutMs: DIAGNOSTICS_VERIFY_TIMEOUT_MS,
+                });
 
                 const verificationResult =
                     extractIpcResponseData<IpcHandlerVerificationResult>(
@@ -474,13 +549,28 @@ async function invokeWithValidation<T>(
     invoke: (
         correlationId: ReturnType<typeof generateCorrelationId>
     ) => Promise<unknown>,
-    validate: (response: unknown) => T
+    validate: (response: unknown) => T,
+    options?: IpcInvokeOptions
 ): Promise<T> {
     await verifyChannelOrThrow(channel);
 
     try {
         const correlationId = generateCorrelationId();
-        const response = await invoke(correlationId);
+        const timeoutMs = options?.timeoutMs ?? getInvokeTimeoutMs(channel);
+        const response = await withTimeout({
+            onTimeout: () =>
+                new IpcError(
+                    `IPC call timed out after ${timeoutMs}ms for channel '${channel}'`,
+                    channel,
+                    undefined,
+                    {
+                        correlationId,
+                        timeoutMs,
+                    }
+                ),
+            promise: invoke(correlationId),
+            timeoutMs,
+        });
         return validate(response);
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
@@ -502,7 +592,8 @@ async function invokeWithValidation<T>(
  * @returns A function that safely invokes the IPC channel with validation
  */
 export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
-    channel: TChannel
+    channel: TChannel,
+    options?: IpcInvokeOptions
 ): (
     ...args: IpcInvokeChannelParams<TChannel>
 ) => Promise<IpcInvokeChannelResult<TChannel>> {
@@ -530,7 +621,8 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
                 extractIpcResponseData<IpcInvokeChannelResult<TChannel>>(
                     response,
                     { requireData }
-                )
+                ),
+            options
         );
     };
 }
@@ -544,7 +636,8 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
  *   response
  */
 export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
-    channel: TChannel
+    channel: TChannel,
+    options?: IpcInvokeOptions
 ): (...args: IpcInvokeChannelParams<TChannel>) => Promise<void> {
     return async function invokeVoidChannel(
         ...args: IpcInvokeChannelParams<TChannel>
@@ -561,7 +654,8 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
                 ),
             (response) => {
                 validateVoidIpcResponse(response);
-            }
+            },
+            options
         );
     };
 }

@@ -6,7 +6,7 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 
-import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -38,7 +38,7 @@ import { registerSystemHandlers } from "./handlers/systemHandlers";
 type NormalizedStateSyncStatusEvent =
     | {
           readonly _meta?: EventMetadata | undefined;
-          readonly action: "bulk-sync";
+          readonly action: typeof STATE_SYNC_ACTION.BULK_SYNC;
           readonly revision: number;
           readonly siteCount: number;
           readonly sites: readonly SiteIdentifierSnapshot[];
@@ -48,7 +48,9 @@ type NormalizedStateSyncStatusEvent =
       }
     | {
           readonly _meta?: EventMetadata | undefined;
-          readonly action: "delete" | "update";
+          readonly action:
+              | typeof STATE_SYNC_ACTION.DELETE
+              | typeof STATE_SYNC_ACTION.UPDATE;
           readonly delta: {
               readonly addedSites: readonly SiteIdentifierSnapshot[];
               readonly removedSiteIdentifiers: readonly string[];
@@ -102,7 +104,9 @@ export class IpcService {
         return (
             candidate === STATE_SYNC_SOURCE.CACHE ||
             candidate === STATE_SYNC_SOURCE.DATABASE ||
-            candidate === STATE_SYNC_SOURCE.FRONTEND
+            candidate === STATE_SYNC_SOURCE.FRONTEND ||
+            candidate === STATE_SYNC_SOURCE.IMPORT ||
+            candidate === STATE_SYNC_SOURCE.MONITOR_UPDATE
         );
     }
 
@@ -142,9 +146,9 @@ export class IpcService {
         const { action, revision, source, timestamp } = candidate;
 
         if (
-            (action !== "bulk-sync" &&
-                action !== "delete" &&
-                action !== "update") ||
+            (action !== STATE_SYNC_ACTION.BULK_SYNC &&
+                action !== STATE_SYNC_ACTION.DELETE &&
+                action !== STATE_SYNC_ACTION.UPDATE) ||
             !IpcService.isValidStateSyncSource(source) ||
             typeof timestamp !== "number" ||
             !Number.isFinite(timestamp) ||
@@ -154,7 +158,7 @@ export class IpcService {
             return null;
         }
 
-        if (action === "bulk-sync") {
+        if (action === STATE_SYNC_ACTION.BULK_SYNC) {
             const {
                 siteCount: siteCountCandidate,
                 sites: sitesCandidate,
@@ -364,7 +368,7 @@ export class IpcService {
     ): void {
         const { action, source, timestamp } = event;
 
-        if (action === "bulk-sync") {
+        if (action === STATE_SYNC_ACTION.BULK_SYNC) {
             const { siteCount, sites, truncated } = event;
 
             if (truncated === true) {

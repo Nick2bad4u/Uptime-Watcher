@@ -26,6 +26,7 @@ import type {
 } from "@shared/types/stateSync";
 import type { UnknownRecord } from "type-fest";
 
+import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import {
     deriveSiteSnapshot,
@@ -594,7 +595,7 @@ export const createSiteSyncActions = (
                     } = event;
 
                     let sitesCount: number | undefined = undefined;
-                    if (action === "bulk-sync") {
+                    if (action === STATE_SYNC_ACTION.BULK_SYNC) {
                         const { sites } = event;
                         sitesCount = sites.length;
                     }
@@ -845,7 +846,7 @@ export const createSiteSyncActions = (
                             return;
                         }
 
-                        if (event.action === "bulk-sync") {
+                        if (event.action === STATE_SYNC_ACTION.BULK_SYNC) {
                             applySnapshotEvent(event);
                             return;
                         }

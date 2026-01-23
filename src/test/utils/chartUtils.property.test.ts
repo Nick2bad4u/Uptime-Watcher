@@ -522,16 +522,16 @@ describe("Chart Utils Property-Based Tests", () => {
                     (config, axis, property) => {
                         const result = getScaleProperty(config, axis, property);
 
-                        if (
-                            config.scales &&
-                            config.scales[axis] &&
-                            property in config.scales[axis]
-                        ) {
-                            expect(result).toBeDefined();
-                            // Type property should always be string for valid configs
-                            if (property === "type") {
-                                expect(typeof result).toBe("string");
-                            }
+                        // Always assert something (repo enforces requireAssertions).
+                        const scale = config.scales?.[axis] as
+                            | Record<string, unknown>
+                            | undefined;
+                        const expected = scale?.[property];
+                        expect(result).toEqual(expected);
+
+                        // Type property should always be string for valid configs
+                        if (property === "type" && expected !== undefined) {
+                            expect(typeof result).toBe("string");
                         }
                     }
                 )

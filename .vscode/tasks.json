@@ -188,15 +188,26 @@
             "problemMatcher": {
                 "applyTo": "allDocuments",
                 "owner": "typescript",
-                "pattern": {
-                    "code": 5,
-                    "column": 3,
-                    "file": 1,
-                    "line": 2,
-                    "message": 6,
-                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
-                    "severity": 4
-                },
+                "pattern": [
+                    {
+                        "code": 5,
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?):(\\d+):(\\d+)\\s+-\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                        "severity": 4
+                    },
+                    {
+                        "code": 5,
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                        "severity": 4
+                    }
+                ],
                 "source": "typescript"
             },
             "runOptions": {
@@ -596,15 +607,26 @@
                 {
                     "applyTo": "allDocuments",
                     "owner": "typescript",
-                    "pattern": {
-                        "code": 5,
-                        "column": 3,
-                        "file": 1,
-                        "line": 2,
-                        "message": 6,
-                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
-                        "severity": 4
-                    },
+                    "pattern": [
+                        {
+                            "code": 5,
+                            "column": 3,
+                            "file": 1,
+                            "line": 2,
+                            "message": 6,
+                            "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?):(\\d+):(\\d+)\\s+-\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                            "severity": 4
+                        },
+                        {
+                            "code": 5,
+                            "column": 3,
+                            "file": 1,
+                            "line": 2,
+                            "message": 6,
+                            "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                            "severity": 4
+                        }
+                    ],
                     "source": "typescript"
                 },
                 {
@@ -664,7 +686,7 @@
                         "file": 1,
                         "line": 2,
                         "message": 4,
-                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?):(\\d+):(\\d+)\\s+(.*)$"
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(?!.*\\b(?:error|warning|info)\\s+TS\\d+:)(.+?):(\\d+):(\\d+)\\s+(.*)$"
                     },
                     "severity": "warning",
                     "source": "knip"
@@ -701,15 +723,26 @@
             "problemMatcher": {
                 "applyTo": "allDocuments",
                 "owner": "typescript",
-                "pattern": {
-                    "code": 5,
-                    "column": 3,
-                    "file": 1,
-                    "line": 2,
-                    "message": 6,
-                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
-                    "severity": 4
-                },
+                "pattern": [
+                    {
+                        "code": 5,
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?):(\\d+):(\\d+)\\s+-\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                        "severity": 4
+                    },
+                    {
+                        "code": 5,
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                        "severity": 4
+                    }
+                ],
                 "source": "typescript"
             },
             "runOptions": {
@@ -743,15 +776,26 @@
             "problemMatcher": {
                 "applyTo": "allDocuments",
                 "owner": "typescript",
-                "pattern": {
-                    "code": 5,
-                    "column": 3,
-                    "file": 1,
-                    "line": 2,
-                    "message": 6,
-                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
-                    "severity": 4
-                },
+                "pattern": [
+                    {
+                        "code": 5,
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?):(\\d+):(\\d+)\\s+-\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                        "severity": 4
+                    },
+                    {
+                        "code": 5,
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                        "severity": 4
+                    }
+                ],
                 "source": "typescript"
             },
             "runOptions": {
