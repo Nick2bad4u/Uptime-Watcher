@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[2f3e758](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2f3e758a8895fb56998174a16aef8c1c70c8fdbb)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...2f3e758a8895fb56998174a16aef8c1c70c8fdbb))
+[df5cf3f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df5cf3f08a1ab7b4a2df7110b354885886e27b22)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...df5cf3f08a1ab7b4a2df7110b354885886e27b22))
 
 
 ### ✨ Features
@@ -419,6 +419,65 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2
 
 
 ### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improves cancellation safety
+
+🛠️ [fix] Improves cancellation handling across monitoring and retries
+ - Standardizes abort errors and propagates cancelled state in results and logs
+ - Prevents timeout timers and queued waits from keeping the app alive
+🛠️ [fix] Guards configuration writes and sync resets
+ - Rolls back provider settings when persistence fails
+ - Deletes only validated sync keys during resets
+🛠️ [fix] Ensures legacy schemas upgrade before version bumps
+🚜 [refactor] Hardens IPC invoke parameter validation
+ - Enforces runtime parameter counts per channel
+🚜 [refactor] Redacts auth secrets in log messages and metadata
+🧪 [test] Expands coverage for cancellation, logging, IPC, and migrations
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(df5cf3f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df5cf3f08a1ab7b4a2df7110b354885886e27b22)
+
+
+- 🛠️ [fix] Adds IPC timeouts and sync actions
+
+🛠️ [fix] Adds configurable IPC invoke timeouts to avoid hangs and surface clearer failures
+ - Applies timeouts to handler verification and long-running operations
+🚜 [refactor] Standardizes state sync actions and sources with shared constants and guards for safer validation
+🔧 [build] Adds static guard checks to centralize external navigation and window-open handling while verifying invoke coverage
+🎨 [style] Avoids showing non-positive response times in the dashboard
+🧪 [test] Adds timeout coverage and constructable mock helpers for IPC and networking tests
+🧹 [chore] Aligns editor launch/task formatting and TypeScript problem matchers
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4eaaa22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4eaaa22c1ba9d625c546e28e65e08cb0a844ee75)
+
+
+- 🛠️ [fix] Improves shutdown and DNS checks ⚡
+
+🛠️ [fix] Adds runtime cleanup checks 🧹 so shutdown only calls valid handlers
+ - Avoids failures when mocked services return non-instances 🧪
+🛠️ [fix] Reworks DNS resolution to race timeout/abort 🕒 without leaked listeners
+ - Returns explicit timeout/abort errors for clearer monitoring results 📡
+🛠️ [fix] Ensures state sync emits for bulk/update actions 🔄 to keep revision streams monotonic
+ - Keeps delete emissions gated on meaningful deltas 🧭
+🚜 [refactor] Standardizes iterable copies and validator options 🧰 for clarity
+ - Prefers spread for iterables and aligns option keys ✨
+🧹 [chore] Updates linting, config, and docs styling 🎛️ for consistency
+ - Enables stylistic rules and disables webpack-only chunk naming 🧩
+ - Adds iterable DOM libs and normalizes CSS module access 📚
+ - Expands documentation spacing for clearer examples 📝
+🧪 [test] Aligns mocks and fixtures with constructable services 🧰
+ - Switches test data to spread-based copies to mirror runtime paths 🔁
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(341bc67)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/341bc677466b43426f1c94fb0e39d7a756859435)
+
+
+- 🛠️ [fix] Improve error safety and scheduling
+
+🛠️ [fix] Adds catch normalization guardrail and uses safe errors to prevent unsafe property access.
+🚜 [refactor] Queues manual checks after running jobs and hardens connectivity option defaults for reliable runs.
+🧹 [chore] Updates lint/style tooling and dependency versions to keep formatting consistent.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ae2de8e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ae2de8ec549291007858cc0b9580e1812b575f3b)
+
 
 - 🛠️ [fix] Improves OAuth loopback stability
 
@@ -1252,6 +1311,12 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7f0a
  - Updated linting scripts in `package.json` to improve code quality checks.
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d436)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/da1d4366a166b8bf4754db2cdf2f62d5471d61a1)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v20.9.0 [skip ci] [`(a4fc51a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a4fc51ab5357f54cecc2c18188bf6e683d58100d)
 
 
 

@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[fce0f49](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fce0f49b18f68bed6873bc4fffa061b0b4f2299c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...fce0f49b18f68bed6873bc4fffa061b0b4f2299c))
+[df5cf3f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df5cf3f08a1ab7b4a2df7110b354885886e27b22)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...df5cf3f08a1ab7b4a2df7110b354885886e27b22))
 
 
 ### ✨ Features
@@ -41,6 +41,32 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1f4d
 
 
 ### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improves cancellation safety
+
+🛠️ [fix] Improves cancellation handling across monitoring and retries
+ - Standardizes abort errors and propagates cancelled state in results and logs
+ - Prevents timeout timers and queued waits from keeping the app alive
+🛠️ [fix] Guards configuration writes and sync resets
+ - Rolls back provider settings when persistence fails
+ - Deletes only validated sync keys during resets
+🛠️ [fix] Ensures legacy schemas upgrade before version bumps
+🚜 [refactor] Hardens IPC invoke parameter validation
+ - Enforces runtime parameter counts per channel
+🚜 [refactor] Redacts auth secrets in log messages and metadata
+🧪 [test] Expands coverage for cancellation, logging, IPC, and migrations
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(df5cf3f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df5cf3f08a1ab7b4a2df7110b354885886e27b22)
+
+
+- 🛠️ [fix] Improve error safety and scheduling
+
+🛠️ [fix] Adds catch normalization guardrail and uses safe errors to prevent unsafe property access.
+🚜 [refactor] Queues manual checks after running jobs and hardens connectivity option defaults for reliable runs.
+🧹 [chore] Updates lint/style tooling and dependency versions to keep formatting consistent.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ae2de8e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ae2de8ec549291007858cc0b9580e1812b575f3b)
+
 
 - 🛠️ [fix] Harden data integrity, backoff logic, and logging safety
 
@@ -469,6 +495,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 
 ### 🧹 Chores
+
+- Update changelogs for v20.9.0 [skip ci] [`(a4fc51a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a4fc51ab5357f54cecc2c18188bf6e683d58100d)
+
 
 - 🧹 [chore] Update package.json and vite.config.ts to remove googleapis dependency
 
