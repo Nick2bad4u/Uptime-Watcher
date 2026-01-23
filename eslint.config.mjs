@@ -1054,7 +1054,7 @@ export default defineConfig([
             ...json.configs.recommended.rules,
             "jsonc/array-bracket-newline": "warn",
             "jsonc/array-bracket-spacing": "warn",
-            "jsonc/array-element-newline": "warn",
+            "jsonc/array-element-newline": "off", // Handled by Prettier
             "jsonc/auto": "warn",
             "jsonc/comma-dangle": "warn",
             "jsonc/comma-style": "warn",
@@ -4509,7 +4509,7 @@ export default defineConfig([
                 },
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
-                project: "tsconfig.electron.json",
+                project: ["tsconfig.electron.json", "tsconfig.shared.json"],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,

@@ -453,6 +453,37 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         return createEmptyManifest();
     }
 
+    /**
+     * Returns true if the key represents a cloud-sync object that this transport
+     * is willing to delete.
+     *
+     * @remarks
+     * This is intended for maintenance operations (e.g. remote sync reset) that
+     * may enumerate provider keys in bulk. Using this helper avoids relying on
+     * string-matching error messages from {@link deleteObject}.
+     */
+    public static isDeletableSyncKey(key: string): boolean {
+        try {
+            if (key === MANIFEST_KEY) {
+                return true;
+            }
+
+            if (key.endsWith(OPS_OBJECT_SUFFIX)) {
+                assertOpsObjectKey(key);
+                return true;
+            }
+
+            if (key.endsWith(".json")) {
+                assertSnapshotKey(key);
+                return true;
+            }
+
+            return false;
+        } catch {
+            return false;
+        }
+    }
+
     public static createSnapshot(
         createdAt: number,
         state: CloudSyncSnapshot["state"]

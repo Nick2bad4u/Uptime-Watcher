@@ -25,6 +25,9 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
+import { normalizeLogValue } from "@shared/utils/loggingContext";
+import { serializeError } from "@shared/utils/logger/common";
+
 // Mock electron-log/renderer
 vi.mock("electron-log/renderer", () => ({
     default: {
@@ -218,7 +221,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockLog.debug).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`
                 );
             }
         );
@@ -231,7 +234,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`
                 );
             }
         );
@@ -244,7 +247,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockWarn).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`
                 );
             }
         );
@@ -257,12 +260,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockError).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`,
-                    {
-                        message: error.message,
-                        name: error.name,
-                        stack: error.stack,
-                    }
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`,
+                    serializeError(error)
                 );
             }
         );
@@ -275,7 +274,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockError).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`
                 );
             }
         );
@@ -290,16 +289,16 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 expect(() => logger.error(emptyMessage)).not.toThrowError();
 
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${emptyMessage}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(emptyMessage) as string}`
                 );
                 expect(mockDebug).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${emptyMessage}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(emptyMessage) as string}`
                 );
                 expect(mockWarn).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${emptyMessage}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(emptyMessage) as string}`
                 );
                 expect(mockError).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${emptyMessage}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(emptyMessage) as string}`
                 );
             }
         );
@@ -314,8 +313,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockDebug).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`,
-                    ...args
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`,
+                    ...args.map((arg) => normalizeLogValue(arg))
                 );
             }
         );
@@ -328,8 +327,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`,
-                    ...args
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`,
+                    ...args.map((arg) => normalizeLogValue(arg))
                 );
             }
         );
@@ -346,13 +345,9 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockError).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`,
-                    {
-                        message: error.message,
-                        name: error.name,
-                        stack: error.stack,
-                    },
-                    ...args
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`,
+                    serializeError(error),
+                    ...args.map((arg) => normalizeLogValue(arg))
                 );
             }
         );
@@ -365,8 +360,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`,
-                    data
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`,
+                    normalizeLogValue(data)
                 );
             }
         );
@@ -609,7 +604,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             expect(mockInfo).toHaveBeenCalledTimes(messages.length);
             for (const message of messages) {
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] ${message}`
+                    `[UPTIME-WATCHER] ${normalizeLogValue(message) as string}`
                 );
             }
         });

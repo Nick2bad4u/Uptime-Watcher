@@ -163,8 +163,38 @@ describe(HttpStatusMonitor, () => {
         expect(result.responseTime).toBe(90);
         expect(scheduleMock).toHaveBeenCalledWith(
             "https://example.com/api",
-            expect.any(Function)
+            expect.any(Function),
+            undefined
         );
+    });
+
+    it("returns canceled error result when aborted while waiting in the rate limiter", async () => {
+        const abortError = new Error("Operation was aborted");
+        abortError.name = "AbortError";
+        scheduleMock.mockRejectedValueOnce(abortError);
+
+        handleCheckErrorMock.mockReturnValueOnce({
+            details: "Error",
+            error: "Request canceled",
+            responseTime: 0,
+            status: "down",
+        });
+
+        const controller = new AbortController();
+        controller.abort("stop monitoring");
+
+        const result = await monitorService.check(monitor, controller.signal);
+
+        expect(handleCheckErrorMock).toHaveBeenCalledWith(
+            abortError,
+            "https://example.com/api"
+        );
+        expect(result).toEqual({
+            details: "Error",
+            error: "Request canceled",
+            responseTime: 0,
+            status: "down",
+        });
     });
 
     it("returns degraded when status code differs", async () => {

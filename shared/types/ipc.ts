@@ -479,6 +479,82 @@ export interface IpcInvokeChannelMap {
 export type IpcInvokeChannel = keyof IpcInvokeChannelMap;
 
 /**
+ * Runtime parameter-count mapping for each IPC invoke channel.
+ *
+ * @remarks
+ * The IPC boundary is a trust boundary: callers can always supply too many or
+ * too few parameters at runtime.
+ *
+ * Relying on `handler.length` is not sufficient because:
+ *
+ * - JavaScript functions can be invoked with missing parameters (they become
+ *   `undefined`),
+ * - tooling/mocks (e.g. Vitest) frequently report `length === 0`,
+ * - refactors can accidentally desynchronize handler arity from the shared
+ *   contract.
+ *
+ * This constant is intentionally co-located with {@link IpcInvokeChannelMap}
+ * so that TypeScript will fail compilation whenever a channel is added or
+ * removed but the runtime mapping is not updated.
+ *
+ * @public
+ */
+export const IPC_INVOKE_CHANNEL_PARAM_COUNTS: Readonly<
+    Record<IpcInvokeChannel, number>
+> = {
+    "add-site": 1,
+    "check-site-now": 2,
+    "cloud-clear-encryption-key": 0,
+    "cloud-configure-filesystem-provider": 1,
+    "cloud-connect-dropbox": 0,
+    "cloud-connect-google-drive": 0,
+    "cloud-delete-backup": 1,
+    "cloud-disconnect": 0,
+    "cloud-enable-sync": 1,
+    "cloud-get-status": 0,
+    "cloud-list-backups": 0,
+    "cloud-migrate-backups": 1,
+    "cloud-preview-reset-remote-sync": 0,
+    "cloud-request-sync-now": 0,
+    "cloud-reset-remote-sync": 0,
+    "cloud-restore-backup": 1,
+    "cloud-set-encryption-passphrase": 1,
+    "cloud-upload-latest-backup": 0,
+    "delete-all-sites": 0,
+    "diagnostics-report-preload-guard": 1,
+    "diagnostics-verify-ipc-handler": 1,
+    "download-sqlite-backup": 0,
+    "export-data": 0,
+    "format-monitor-detail": 2,
+    "format-monitor-title-suffix": 2,
+    "get-history-limit": 0,
+    "get-monitor-types": 0,
+    "get-sites": 0,
+    "get-sync-status": 0,
+    "import-data": 1,
+    "notify-app-event": 1,
+    "open-external": 1,
+    "quit-and-install": 0,
+    "remove-monitor": 2,
+    "remove-site": 1,
+    "request-full-sync": 0,
+    "reset-settings": 0,
+    "restore-sqlite-backup": 1,
+    "save-sqlite-backup": 0,
+    "start-monitoring": 0,
+    "start-monitoring-for-monitor": 2,
+    "start-monitoring-for-site": 1,
+    "stop-monitoring": 0,
+    "stop-monitoring-for-monitor": 2,
+    "stop-monitoring-for-site": 1,
+    "update-history-limit": 1,
+    "update-notification-preferences": 1,
+    "update-site": 2,
+    "validate-monitor-data": 2,
+    "write-clipboard-text": 1,
+};
+
+/**
  * Mutable clone of a readonly tuple.
  *
  * @internal

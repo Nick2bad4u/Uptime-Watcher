@@ -186,7 +186,7 @@ describe("WebsocketKeepaliveMonitor service", () => {
 
         expect(socketInstances).toHaveLength(0);
         expect(result.status).toBe("down");
-        expect(result.details ?? result.error).toContain("aborted");
+        expect(result.details ?? result.error).toContain("canceled");
     });
 
     it("terminates the socket when aborted during the check", async () => {
@@ -204,7 +204,7 @@ describe("WebsocketKeepaliveMonitor service", () => {
 
         const result = await checkPromise;
         expect(result.status).toBe("down");
-        expect(result.details ?? result.error).toContain("aborted");
+        expect(result.details ?? result.error).toContain("canceled");
         expect(socket!.terminate).toHaveBeenCalled();
     });
 });

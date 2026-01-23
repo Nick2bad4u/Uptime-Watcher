@@ -397,9 +397,7 @@ async function withTimeout<T>(args: {
 
         return raced as T;
     } finally {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
-        }
+        clearTimeout(timeoutId);
     }
 }
 

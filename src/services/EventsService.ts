@@ -73,11 +73,19 @@ type HistoryLimitUpdatedEventPayload =
  * @returns A no-op cleanup function that logs a descriptive error when invoked.
  */
 const createInvalidCleanupFallback =
-    (eventName: string): (() => void) =>
-    (): void => {
-        logger.error(
-            `[EventsService] Cleanup skipped for ${eventName}: invalid cleanup handler returned by preload bridge`
-        );
+    (eventName: string): (() => void) => {
+        let hasLogged = false;
+
+        return (): void => {
+            if (hasLogged) {
+                return;
+            }
+
+            hasLogged = true;
+            logger.debug(
+                `[EventsService] Cleanup skipped for ${eventName}: invalid cleanup handler returned by preload bridge`
+            );
+        };
     };
 
 /**

@@ -49,6 +49,7 @@
  * @see {@link checkHttpConnectivity} - HTTP/HTTPS connectivity checking
  */
 
+import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
@@ -95,7 +96,9 @@ export async function performSinglePingCheck(
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     if (signal?.aborted) {
-        throw new Error("Operation was aborted");
+        throw createAbortError({
+            cause: Reflect.get(signal, "reason"),
+        });
     }
 
     try {
@@ -134,6 +137,10 @@ export async function performSinglePingCheck(
 
         return result;
     } catch (error) {
+        if (isAbortError(error)) {
+            throw error;
+        }
+
         const errorMessage = getUserFacingErrorDetail(error);
 
         throw new Error(`Connectivity check failed: ${errorMessage}`, {

@@ -21,7 +21,10 @@ import {
     type StatusHistoryStatus,
     type StatusUpdate,
 } from "@shared/types";
-import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
+import {
+    createIpcCorrelationEnvelope,
+    IPC_INVOKE_CHANNEL_PARAM_COUNTS,
+} from "@shared/types/ipc";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import type { IpcInvokeChannel, IpcInvokeChannelMap } from "../../types/ipc";
 
@@ -94,12 +97,37 @@ const toIsoStringSafe = (value: Date): string => {
 };
 
 // Custom arbitraries for IPC testing
-const arbitraryChannelName = fc
+const arbitraryEventChannelName = fc
     .string({ minLength: 5, maxLength: 50 })
     .filter((s) => /^[A-Za-z][\w:-]*$/.test(s));
 
-const asInvokeChannel = (channel: string): IpcInvokeChannel =>
-    channel as IpcInvokeChannel;
+const INVOKE_CHANNELS = Object.keys(
+    IPC_INVOKE_CHANNEL_PARAM_COUNTS
+) as IpcInvokeChannel[];
+
+const ZERO_PARAM_INVOKE_CHANNELS = INVOKE_CHANNELS.filter(
+    (channel) => IPC_INVOKE_CHANNEL_PARAM_COUNTS[channel] === 0
+);
+
+const ONE_PARAM_INVOKE_CHANNELS = INVOKE_CHANNELS.filter(
+    (channel) =>
+        IPC_INVOKE_CHANNEL_PARAM_COUNTS[channel] === 1 && channel !== "add-site"
+);
+
+const arbitraryInvokeChannel = fc.constantFrom(
+    ...(INVOKE_CHANNELS as [IpcInvokeChannel, ...IpcInvokeChannel[]])
+);
+
+const arbitraryZeroParamInvokeChannel = fc.constantFrom(
+    ...(ZERO_PARAM_INVOKE_CHANNELS as [
+        IpcInvokeChannel,
+        ...IpcInvokeChannel[],
+    ])
+);
+
+const arbitraryOneParamInvokeChannel = fc.constantFrom(
+    ...(ONE_PARAM_INVOKE_CHANNELS as [IpcInvokeChannel, ...IpcInvokeChannel[]])
+);
 
 type GenericInvokeResult = IpcInvokeChannelMap[IpcInvokeChannel]["result"];
 
@@ -113,13 +141,13 @@ type NonNullIpcValidator = Exclude<IpcValidatorParam, null>;
 const acceptAnyParamsValidator: NonNullIpcValidator = () => null;
 
 const registerTestHandler = (
-    channel: string,
+    channel: IpcInvokeChannel,
     handler: (...args: unknown[]) => unknown | Promise<unknown>,
     validator: Parameters<typeof registerStandardizedIpcHandler>[2],
     handlers: Parameters<typeof registerStandardizedIpcHandler>[3]
 ) =>
     registerStandardizedIpcHandler(
-        asInvokeChannel(channel),
+        channel,
         async (...params) => {
             const result = (await handler(...params)) as GenericInvokeResult;
 
@@ -269,19 +297,23 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("IPC Handler Registration and Management", () => {
-        fcTest.prop([arbitraryChannelName])(
+        fcTest.prop([arbitraryInvokeChannel])(
             "should handle channel registration",
             (channel) => {
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
 
                 const handler = vi.fn(() => Promise.resolve(undefined));
+                const validator =
+                    IPC_INVOKE_CHANNEL_PARAM_COUNTS[channel] === 0
+                        ? null
+                        : acceptAnyParamsValidator;
 
                 expect(() => {
                     registerTestHandler(
                         channel,
                         handler,
-                        null,
+                        validator,
                         registeredHandlers
                     );
                 }).not.toThrowError();
@@ -293,7 +325,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([arbitraryChannelName, arbitraryValidationInput])(
+        fcTest.prop([arbitraryOneParamInvokeChannel, arbitraryValidationInput])(
             "should handle handler validation",
             async (channel, input) => {
                 const handler = vi.fn(() => Promise.resolve("success"));
@@ -349,7 +381,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
         );
 
         fcTest.prop([
-            fc.array(arbitraryChannelName, { minLength: 1, maxLength: 10 }),
+            fc.array(arbitraryInvokeChannel, { minLength: 1, maxLength: 10 }),
         ])("should handle multiple handler registrations", (channels) => {
             // Reset mock between tests to avoid accumulation
             mockIpcMain.handle.mockClear();
@@ -359,12 +391,16 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
             for (const channel of uniqueChannels) {
                 const handler = vi.fn(() => Promise.resolve(undefined));
+                const validator =
+                    IPC_INVOKE_CHANNEL_PARAM_COUNTS[channel] === 0
+                        ? null
+                        : acceptAnyParamsValidator;
 
                 expect(() => {
                     registerTestHandler(
                         channel,
                         handler,
-                        null,
+                        validator,
                         registeredHandlers
                     );
                 }).not.toThrowError();
@@ -375,7 +411,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             );
         });
 
-        fcTest.prop([arbitraryChannelName, arbitraryIpcEventData])(
+        fcTest.prop([arbitraryZeroParamInvokeChannel, arbitraryIpcEventData])(
             "should handle IPC response formatting",
             async (channel, data) => {
                 // Reset mocks for clean state
@@ -403,7 +439,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("IPC Event Communication and Forwarding", () => {
-        fcTest.prop([arbitraryChannelName, arbitraryIpcEventData])(
+        fcTest.prop([arbitraryEventChannelName, arbitraryIpcEventData])(
             "should handle event forwarding",
             (channel, eventData) => {
                 // Test event forwarding capability
@@ -442,7 +478,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([arbitraryChannelName])(
+        fcTest.prop([arbitraryEventChannelName])(
             "should handle missing web contents",
             (channel) => {
                 const originalWebContents = mockBrowserWindow.webContents;
@@ -461,7 +497,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([arbitraryChannelName, arbitraryIpcEventData])(
+        fcTest.prop([arbitraryEventChannelName, arbitraryIpcEventData])(
             "should handle IPC renderer communication",
             (channel, _eventData) => {
                 // Test IPC renderer methods
@@ -490,22 +526,22 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([arbitraryValidationInput])(
             "should validate all inputs",
             async (input) => {
-                const channel = "test:validation";
+                const channel: IpcInvokeChannel = "notify-app-event";
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
                 const handler = vi.fn(() => Promise.resolve("success"));
                 const strictValidator = (
                     data: unknown
-                ): data is { required: string } =>
+                ): data is { name: string } =>
                     typeof data === "object" &&
                     data !== null &&
-                    "required" in data &&
-                    typeof (data as any).required === "string";
+                    "name" in data &&
+                    typeof (data as any).name === "string";
 
                 const validateParams: NonNullIpcValidator = (params) =>
                     strictValidator(params[0])
                         ? null
-                        : ["Input must contain required: string"];
+                        : ["Input must contain name: string"];
 
                 registerTestHandler(
                     channel,
@@ -543,7 +579,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([arbitraryChannelName])(
+        fcTest.prop([arbitraryZeroParamInvokeChannel])(
             "should handle handler errors",
             async (channel) => {
                 mockIpcMain.handle.mockClear();
@@ -552,12 +588,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Handler error");
                 });
 
-                registerTestHandler(
-                    channel,
-                    errorHandler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, errorHandler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -576,26 +607,10 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        test("should prevent code injection in channels", () => {
-            const maliciousChannels = [
-                "'; DROP TABLE sites; --",
-                "<script>alert('xss')</script>",
-                'test\neval("malicious code")',
-                String.raw`test\${process.exit()}`,
-            ];
-
-            mockIpcMain.handle.mockClear();
-            registeredHandlers.clear();
-
-            for (const maliciousChannel of maliciousChannels) {
-                expect(() => {
-                    registerTestHandler(
-                        maliciousChannel,
-                        vi.fn(),
-                        null,
-                        registeredHandlers
-                    );
-                }).not.toThrowError(); // Should handle gracefully
+        test("should prevent code injection in invoke channel names", () => {
+            for (const channel of INVOKE_CHANNELS) {
+                expect(channel).toMatch(/^[A-Za-z][\w:-]*$/);
+                expect(channel).not.toMatch(/[\s"'<>`]/);
             }
         });
 
@@ -642,7 +657,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([fc.integer({ min: 1, max: 50 })])(
             "should handle high volume IPC calls",
             async (callCount) => {
-                const channel = "test:volume";
+                const channel: IpcInvokeChannel = "get-sites";
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
                 const handler = vi.fn(() => Promise.resolve("response"));
@@ -674,7 +689,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
         );
 
         fcTest.prop([
-            fc.array(arbitraryChannelName, { minLength: 5, maxLength: 30 }),
+            fc.array(arbitraryInvokeChannel, { minLength: 5, maxLength: 30 }),
         ])("should handle many registered handlers", (channels) => {
             // Reset mock and handlers for clean state
             mockIpcMain.handle.mockClear();
@@ -684,10 +699,15 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
             // Register many handlers
             for (const channel of uniqueChannels) {
+                const validator =
+                    IPC_INVOKE_CHANNEL_PARAM_COUNTS[channel] === 0
+                        ? null
+                        : acceptAnyParamsValidator;
+
                 registerTestHandler(
                     channel,
                     vi.fn(() => Promise.resolve(undefined)),
-                    null,
+                    validator,
                     registeredHandlers
                 );
             }
@@ -697,7 +717,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             );
         });
 
-        fcTest.prop([arbitraryChannelName])(
+        fcTest.prop([arbitraryZeroParamInvokeChannel])(
             "should handle async handler errors",
             async (channel) => {
                 mockIpcMain.handle.mockClear();
@@ -707,12 +727,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Async error");
                 });
 
-                registerTestHandler(
-                    channel,
-                    asyncErrorHandler,
-                    null,
-                    registeredHandlers
-                );
+                registerTestHandler(channel, asyncErrorHandler, null, registeredHandlers);
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -732,7 +747,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             mockIpcMain.handle.mockClear();
             registeredHandlers.clear();
 
-            const channel = "test:circular";
+            const channel: IpcInvokeChannel = "get-sites";
             const handler = vi.fn(() => {
                 const circular: any = {};
                 circular.self = circular;
@@ -827,7 +842,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
 
-                const channel = "monitoring:status";
+                const channel: IpcInvokeChannel =
+                    "update-notification-preferences";
                 const handler = vi.fn(() => Promise.resolve("updated"));
                 const monitoringValidator = (
                     data: unknown
@@ -880,7 +896,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
 
-                const channel = "settings:update";
+                const channel: IpcInvokeChannel = "cloud-enable-sync";
                 const handler = vi.fn(() => Promise.resolve(undefined));
                 const settingsValidator = (
                     data: unknown
@@ -925,7 +941,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
 
-                const channel = "test:edge-cases";
+                const channel: IpcInvokeChannel =
+                    "diagnostics-report-preload-guard";
                 const handler = vi.fn(() => Promise.resolve("success"));
 
                 registerTestHandler(

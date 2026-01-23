@@ -392,14 +392,6 @@ export function synchronizeDatabaseSchemaVersion(database: Database): void {
     const currentVersion =
         typeof userVersionValue === "number" ? userVersionValue : 0;
 
-    if (currentVersion === 0) {
-        logger.info(
-            `[DatabaseSchema] Initializing schema user_version to ${DATABASE_SCHEMA_VERSION}`
-        );
-        database.run(`PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`);
-        return;
-    }
-
     if (currentVersion > DATABASE_SCHEMA_VERSION) {
         throw new Error(
             `Database schema version ${currentVersion} is newer than this build (expected ${DATABASE_SCHEMA_VERSION}). ` +
@@ -411,10 +403,21 @@ export function synchronizeDatabaseSchemaVersion(database: Database): void {
         return;
     }
 
-    logger.warn("[DatabaseSchema] Upgrading schema", {
-        currentVersion,
-        targetVersion: DATABASE_SCHEMA_VERSION,
-    });
+    // NOTE:
+    // `user_version === 0` is not always a "fresh" database.
+    // It can also mean a legacy/unknown schema where the version was never
+    // initialized. In that case we must still run additive upgrades (tables,
+    // indexes, dynamic monitor columns) *before* setting the version, or we
+    // risk permanently marking an incomplete schema as "up-to-date".
+    const isLegacyUnknownVersion = currentVersion === 0;
+
+    (isLegacyUnknownVersion ? logger.info : logger.warn)(
+        "[DatabaseSchema] Upgrading schema",
+        {
+            currentVersion,
+            targetVersion: DATABASE_SCHEMA_VERSION,
+        }
+    );
 
     try {
         database.run(SCHEMA_QUERIES.BEGIN_TRANSACTION);

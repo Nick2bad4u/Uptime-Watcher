@@ -60,7 +60,9 @@ const SECRET_QUERY_KEYS = new Set([
     "code_challenge",
     "code_verifier",
     "id_token",
+    "passphrase",
     "password",
+    "recovery_key",
     "refresh_token",
     "state",
     "token",
@@ -78,8 +80,12 @@ const SECRET_METADATA_KEYS = new Set([
     "codeverifier",
     "cookie",
     "csrftoken",
+    "encryptionkey",
+    "encryptionpassphrase",
     "idtoken",
+    "passphrase",
     "password",
+    "recoverykey",
     "refreshtoken",
     "secret",
     "session",
@@ -87,7 +93,10 @@ const SECRET_METADATA_KEYS = new Set([
     "setcookie",
     "state",
     "token",
+    "xamzsecuritytoken",
+    "xapikey",
     "xcsrftoken",
+    "xgoogapikey",
     "xsrftoken",
 ]);
 
@@ -202,18 +211,15 @@ const applySecretReplacements = (
     return result;
 };
 
-const maskBearerTokens = (value: string): string => {
-    const bearerMasked = value.replaceAll(
+const maskAuthTokens = (value: string): string => {
+    const masked = value.replaceAll(
         // Strip the entire scheme+token (policy/tests prefer not leaking even
-        // the presence of a Bearer header).
-        /bearer\s+[-\w.~+/]+=*/giu,
+        // the presence of auth headers).
+        /(?:basic|bearer|token)\s+[-\w.~+/]+=*/giu,
         SECRET_PLACEHOLDER
     );
 
-    return applySecretReplacements(
-        bearerMasked,
-        collectSecretReplacements(bearerMasked)
-    );
+    return applySecretReplacements(masked, collectSecretReplacements(masked));
 };
 
 const maskUrlSecrets = (value: string): string => {
@@ -245,7 +251,7 @@ const maskUrlSecrets = (value: string): string => {
 };
 
 const normalizeLogString = (value: string): string =>
-    maskBearerTokens(maskUrlSecrets(value));
+    maskAuthTokens(maskUrlSecrets(value));
 
 const computeIdentifierHash = (value: string): string => {
     let hash = 0;

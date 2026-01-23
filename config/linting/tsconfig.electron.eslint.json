@@ -1,0 +1,39 @@
+{
+    "$schema": "https://www.schemastore.org/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "../..",
+        "noEmit": true,
+        "paths": {
+            "@app/*": ["src/*"],
+            "@assets/*": ["assets/*"],
+            "@electron/*": ["electron/*"],
+            "@shared/*": ["shared/*"]
+        },
+        "rootDir": "../.."
+    },
+    "exclude": [
+        "../../.cache",
+        "../../coverage",
+        "../../dist",
+        "../../docs",
+        "../../node_modules",
+        "../../out",
+        "../../release",
+        "../../storybook",
+        "../../storybook-static",
+        "../../temp",
+        "../../tests",
+        "../../electron/**/*.spec.*",
+        "../../electron/**/*.test.*",
+        "../../electron/test/**/*",
+        "../../shared/**/*.spec.*",
+        "../../shared/**/*.test.*",
+        "../../shared/test/**/*"
+    ],
+    "extends": "../../tsconfig.json",
+    "include": [
+        "../../global.d.ts",
+        "../../electron/**/*",
+        "../../shared/**/*"
+    ]
+}

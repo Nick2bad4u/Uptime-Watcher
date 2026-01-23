@@ -91,7 +91,12 @@ export async function resetProviderCloudSyncState(args: {
     const resetAt = Date.now();
 
     const syncObjects = await provider.listObjects("sync/");
-    const keysToDelete = syncObjects.map((entry) => entry.key);
+    // Filter out unexpected keys before attempting deletion.
+    // The sync reset operation is intentionally conservative and only deletes
+    // keys that match the sync transport's strict schema.
+    const keysToDelete = syncObjects
+        .map((entry) => entry.key)
+        .filter((key) => ProviderCloudSyncTransport.isDeletableSyncKey(key));
 
     const deletionResult = await deleteObjectsBestEffort({
         concurrency: 4,

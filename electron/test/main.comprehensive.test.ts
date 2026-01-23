@@ -115,6 +115,7 @@ describe("main.ts - Electron Main Process", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.resetModules();
         originalArgv = process.argv;
         originalVersions = process.versions;
 
@@ -615,8 +616,8 @@ describe("main.ts - Electron Main Process", () => {
             // `mockReturnValue` uses a non-constructable arrow implementation.
             // We use a constructable function implementation instead.
             (ApplicationService as any).mockImplementation(
-                function ApplicationServiceNullMock() {
-                    return null as any;
+                function ApplicationServiceCtor() {
+                    return {} as unknown as ApplicationServiceType;
                 }
             );
 
@@ -635,7 +636,7 @@ describe("main.ts - Electron Main Process", () => {
 
             // Restore default implementation for subsequent tests
             (ApplicationService as any).mockImplementation(
-                function ApplicationServiceDefaultMock() {
+                function ApplicationServiceCtor() {
                     return mockApplicationService as unknown as ApplicationServiceType;
                 }
             );

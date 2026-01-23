@@ -12,6 +12,7 @@
 import type { Site } from "@shared/types";
 import type { AxiosResponse } from "axios";
 
+import { createAbortError } from "@shared/utils/abortError";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -182,9 +183,18 @@ export function createHttpMonitorService<
                 url: string;
             };
 
-            return rateLimiter.schedule(url, () =>
-                this.performCheckWithRetry(retryParams)
-            );
+            try {
+                return await rateLimiter.schedule(
+                    url,
+                    () => this.performCheckWithRetry(retryParams),
+                    signal ? { signal } : undefined
+                );
+            } catch (error) {
+                // The monitor service contract expects checks to resolve to a
+                // result object (not reject). Convert cancellation or other
+                // rate-limiter failures into a standard error result.
+                return handleCheckError(error, url);
+            }
         }
 
         private async performCheckWithRetry(params: {
@@ -200,7 +210,7 @@ export function createHttpMonitorService<
 
             try {
                 if (signal?.aborted) {
-                    throw new Error("Operation was aborted");
+                    throw createAbortError();
                 }
 
                 const totalAttempts = maxRetries + 1;

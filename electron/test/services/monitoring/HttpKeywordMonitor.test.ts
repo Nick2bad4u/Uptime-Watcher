@@ -163,7 +163,8 @@ describe(HttpKeywordMonitor, () => {
         expect(result.details).toContain('Keyword "success" found');
         expect(scheduleMock).toHaveBeenCalledWith(
             "https://example.com/health",
-            expect.any(Function)
+            expect.any(Function),
+            undefined
         );
         expect(withOperationalHooksMock).toHaveBeenCalled();
     });

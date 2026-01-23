@@ -115,18 +115,21 @@ vi.mock("../../services/database/SiteRepositoryService", () => ({
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { DatabaseManager } from "../../managers/DatabaseManager";
+import type { DatabaseManager as DatabaseManagerType } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
 import { TypedEventBus } from "../../events/TypedEventBus";
 import type { UptimeEvents } from "../../events/eventTypes.js";
 
 // Mock DataImportExportService
 vi.mock("../../services/database/DataImportExportService", () => ({
-    DataImportExportService: vi.fn().mockReturnValue({
-        importDataFromJson: vi.fn(),
-        persistImportedData: vi.fn(),
-        exportDataToJson: vi.fn(),
-        downloadBackup: vi.fn(),
-        validateImportData: vi.fn(),
+    DataImportExportService: vi.fn(function DataImportExportServiceMock() {
+        return {
+            importDataFromJson: vi.fn(),
+            persistImportedData: vi.fn(),
+            exportDataToJson: vi.fn(),
+            downloadBackup: vi.fn(),
+            validateImportData: vi.fn(),
+        };
     }),
 }));
 
@@ -309,7 +312,7 @@ const setSiteLoadingOrchestratorMock = (
     orchestrator: ReturnType<typeof createSiteLoadingOrchestratorMock>
 ): void => {
     (SiteLoadingOrchestrator as any).mockImplementation(
-        function SiteLoadingOrchestratorCtorMock() {
+        function SiteLoadingOrchestratorCtor() {
             return orchestrator as any;
         }
     );
@@ -325,7 +328,7 @@ const createDataImportExportServiceMock = (overrides = {}) => ({
 });
 
 describe("DatabaseManager - Comprehensive Error Coverage", () => {
-    let databaseManager: DatabaseManager;
+    let databaseManager: DatabaseManagerType;
     let mockDeps: DatabaseManagerDependencies;
     let mockOrchestrator: ReturnType<typeof createSiteLoadingOrchestratorMock>;
 

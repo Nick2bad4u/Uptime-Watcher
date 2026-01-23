@@ -1,3 +1,4 @@
+import { createAbortError } from "@shared/utils/abortError";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
 
 /**
@@ -226,7 +227,12 @@ async function sleepInternal(
 ): Promise<void> {
     return new Promise((resolve, reject) => {
         if (signal?.aborted) {
-            reject(new Error("Sleep was aborted"));
+            reject(
+                createAbortError({
+                    cause: Reflect.get(signal, "reason"),
+                    message: "Sleep was aborted",
+                })
+            );
             return;
         }
 
@@ -245,7 +251,12 @@ async function sleepInternal(
                 clearTimeout(state.timeoutId);
             }
             signal?.removeEventListener("abort", handleAbort);
-            reject(new Error("Sleep was aborted"));
+            reject(
+                createAbortError({
+                    cause: signal ? Reflect.get(signal, "reason") : undefined,
+                    message: "Sleep was aborted",
+                })
+            );
         };
 
         state.timeoutId = setTimeout(() => {
@@ -386,7 +397,7 @@ export async function retryWithAbort<T>(
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         // Check if operation was aborted
         if (signal?.aborted) {
-            throw new Error("Operation was aborted");
+            throw createAbortError({ cause: Reflect.get(signal, "reason") });
         }
 
         try {
@@ -406,7 +417,7 @@ export async function retryWithAbort<T>(
                 // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
                 await sleep(delay, signal);
             } catch (sleepError) {
-                throw new Error("Operation was aborted", { cause: sleepError });
+                throw createAbortError({ cause: sleepError });
             }
             delay = Math.min(delay * backoffMultiplier, maxDelay);
         }
@@ -448,21 +459,36 @@ export async function retryWithAbort<T>(
  */
 export function isAbortError(error: unknown): boolean {
     if (error instanceof Error) {
+        const codeCandidate: unknown = Reflect.get(error, "code");
+        if (codeCandidate === "ERR_CANCELED") {
+            return true;
+        }
+
+        const message = error.message.toLowerCase();
         return (
             error.name === "AbortError" ||
             error.name === "TimeoutError" ||
-            error.message.toLowerCase().includes("aborted") ||
-            error.message.toLowerCase().includes("cancelled")
+            message.includes("aborted") ||
+            // Support both spellings.
+            message.includes("cancelled") ||
+            message.includes("canceled")
         );
     }
 
     // Handle DOMException (e.g., from fetch AbortController)
     if (error instanceof DOMException) {
+        const codeCandidate: unknown = Reflect.get(error, "code");
+        if (codeCandidate === "ERR_CANCELED") {
+            return true;
+        }
+
+        const message = error.message.toLowerCase();
         return (
             error.name === "AbortError" ||
             error.name === "TimeoutError" ||
-            error.message.toLowerCase().includes("aborted") ||
-            error.message.toLowerCase().includes("cancelled")
+            message.includes("aborted") ||
+            message.includes("cancelled") ||
+            message.includes("canceled")
         );
     }
 
@@ -504,7 +530,7 @@ export async function raceWithAbort<T>(
     signal: AbortSignal
 ): Promise<T> {
     if (signal.aborted) {
-        throw new Error("Operation was aborted");
+        throw createAbortError({ cause: Reflect.get(signal, "reason") });
     }
 
     return new Promise<T>((resolve, reject) => {
@@ -527,7 +553,7 @@ export async function raceWithAbort<T>(
                 listenerAttached = false;
                 signal.removeEventListener("abort", handleAbort);
             }
-            rejectWith(new Error("Operation was aborted"));
+            rejectWith(createAbortError({ cause: Reflect.get(signal, "reason") }));
         }
 
         function settleResolved(value: T): void {

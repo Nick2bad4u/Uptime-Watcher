@@ -11,6 +11,7 @@ import {
     withDatabaseOperation,
 } from "../../utils/operationalHooks";
 import { logger } from "../../utils/logger";
+import { createAbortError } from "@shared/utils/abortError";
 
 describe(createOperationalHookContext, () => {
     it("should freeze and brand plain context objects", () => {
@@ -93,7 +94,7 @@ describe("Operational Hooks", () => {
                     emitEvents: false,
                     signal: controller.signal,
                 })
-            ).rejects.toThrowError(/aborted/i);
+            ).rejects.toMatchObject({ name: "AbortError" });
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
@@ -159,6 +160,87 @@ describe("Operational Hooks", () => {
 
             warnSpy.mockRestore();
             errorSpy.mockRestore();
+        });
+
+        it("downgrades AbortError logging to debug", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Cancellation", "type");
+
+            const abortError = createAbortError();
+            const mockOperation = vi.fn().mockRejectedValue(abortError);
+
+            const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {
+                // no-op
+            });
+            const errorSpy = vi.spyOn(logger, "error").mockImplementation(() => {
+                // no-op
+            });
+            const debugSpy = vi.spyOn(logger, "debug").mockImplementation(() => {
+                // no-op
+            });
+
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    operationName: "abort-log-level",
+                    maxRetries: 1,
+                    emitEvents: false,
+                    failureLogLevel: () => "error",
+                })
+            ).rejects.toMatchObject({ name: "AbortError" });
+
+            expect(warnSpy).not.toHaveBeenCalled();
+            expect(errorSpy).not.toHaveBeenCalled();
+
+            const debugMessages = debugSpy.mock.calls
+                .map((call) => call[0])
+                .filter((value): value is string => typeof value === "string");
+            expect(
+                debugMessages.some((message) =>
+                    message.includes("abort-log-level")
+                )
+            ).toBeTruthy();
+
+            warnSpy.mockRestore();
+            errorSpy.mockRestore();
+            debugSpy.mockRestore();
+        });
+
+        it("marks AbortError lifecycle emissions as cancelled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Cancellation", "type");
+
+            const abortError = createAbortError();
+            const mockOperation = vi.fn().mockRejectedValue(abortError);
+
+            const eventEmitter = {
+                emitTyped: vi.fn().mockResolvedValue(undefined),
+            } as unknown as TypedEventBus<UptimeEvents>;
+
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    operationName: "abort-event",
+                    maxRetries: 1,
+                    emitEvents: true,
+                    eventEmitter,
+                })
+            ).rejects.toMatchObject({ name: "AbortError" });
+
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    cancelled: true,
+                    lifecycleStage: "failure",
+                    operation: "abort-event:failed",
+                    success: false,
+                })
+            );
         });
         it("should call callbacks correctly", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

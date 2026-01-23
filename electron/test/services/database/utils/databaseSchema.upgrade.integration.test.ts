@@ -95,4 +95,77 @@ describe("databaseSchema upgrades (node-sqlite3-wasm)", () => {
             db.close();
         }
     });
+
+    it("upgrades legacy user_version=0 schemas without skipping additive migrations", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: databaseSchema", "component");
+        await annotate("Category: Database", "category");
+        await annotate("Type: Migration", "type");
+
+        const sqliteModule =
+            await vi.importActual<typeof import("node-sqlite3-wasm")>(
+                "node-sqlite3-wasm"
+            );
+
+        const db = new sqliteModule.Database(":memory:");
+
+        try {
+            // Simulate a legacy schema created before we managed PRAGMA
+            // user_version. By default PRAGMA user_version is 0.
+            expect(
+                (db.get("PRAGMA user_version") as { user_version?: unknown })
+                    .user_version
+            ).toBe(0);
+
+            // Create an old monitors table missing dynamic fields (e.g. `url`).
+            db.run(
+                `CREATE TABLE IF NOT EXISTS monitors (
+                    id TEXT PRIMARY KEY,
+                    site_identifier TEXT NOT NULL,
+                    type TEXT NOT NULL,
+                    enabled BOOLEAN NOT NULL DEFAULT 1,
+                    check_interval INTEGER NOT NULL DEFAULT 300000,
+                    timeout INTEGER NOT NULL DEFAULT 30000,
+                    retry_attempts INTEGER NOT NULL DEFAULT 3,
+                    status TEXT DEFAULT 'pending',
+                    last_checked INTEGER,
+                    next_check INTEGER,
+                    response_time INTEGER,
+                    last_error TEXT,
+                    active_operations TEXT DEFAULT '[]',
+                    created_at INTEGER NOT NULL,
+                    updated_at INTEGER NOT NULL
+                )`
+            );
+
+            expect(() =>
+                synchronizeDatabaseSchemaVersion(db)
+            ).not.toThrowError();
+
+            const pragmaAfter = db.get("PRAGMA user_version") as {
+                user_version?: unknown;
+            };
+
+            expect(pragmaAfter.user_version).toBe(DATABASE_SCHEMA_VERSION);
+
+            const columns = db.all(
+                "PRAGMA table_info(monitors)"
+            ) as TableInfoRow[];
+            const names = new Set(
+                columns
+                    .map((row) => row.name)
+                    .filter(
+                        (value): value is string => typeof value === "string"
+                    )
+            );
+
+            // Dynamic column expected for HTTP monitors.
+            expect(names.has("url")).toBeTruthy();
+        } finally {
+            db.close();
+        }
+    });
 });

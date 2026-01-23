@@ -89,6 +89,17 @@ describe("AbortUtils Function Coverage Tests", () => {
             expect(isAbortError(error)).toBeTruthy();
         });
 
+        test("should return true for Error with canceled message", () => {
+            const error = new Error("Request was canceled");
+            expect(isAbortError(error)).toBeTruthy();
+        });
+
+        test("should return true for Error with ERR_CANCELED code", () => {
+            const error = new Error("Request canceled");
+            Reflect.set(error, "code", "ERR_CANCELED");
+            expect(isAbortError(error)).toBeTruthy();
+        });
+
         test("should return true for Error with mixed case cancelled message", () => {
             const error = new Error("Request was CANCELLED by user");
             expect(isAbortError(error)).toBeTruthy();

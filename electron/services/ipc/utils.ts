@@ -12,7 +12,10 @@ import type {
 } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
-import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
+import {
+    IPC_INVOKE_CHANNEL_PARAM_COUNTS,
+    isIpcCorrelationEnvelope,
+} from "@shared/types/ipc";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -39,6 +42,9 @@ const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
     MONITOR_TYPES_CHANNELS.formatMonitorDetail,
     MONITOR_TYPES_CHANNELS.getMonitorTypes,
 ]);
+
+const getExpectedParamCount = (channelName: IpcInvokeChannel): number =>
+    IPC_INVOKE_CHANNEL_PARAM_COUNTS[channelName];
 
 /**
  * Maximum byte length accepted for URL parameters passed through IPC.
@@ -158,8 +164,7 @@ export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
 
 function assertChannelParams<TChannel extends IpcInvokeChannel>(
     channelName: TChannel,
-    params: readonly unknown[],
-    handler: StrictIpcInvokeHandler<TChannel>
+    params: readonly unknown[]
 ): asserts params is ChannelParams<TChannel> {
     if (!Array.isArray(params)) {
         throw new TypeError(
@@ -167,14 +172,9 @@ function assertChannelParams<TChannel extends IpcInvokeChannel>(
         );
     }
 
-    const expectedParamCount = handler.length;
-    // NOTE: We only enforce arity when the handler declares an explicit
-    // parameter list.
-    //
-    // Vitest mocks and rest-parameter handlers commonly report `length === 0`
-    // even when they can accept parameters. In those cases, the runtime arity
-    // is not meaningful, so we skip strict enforcement here.
-    if (expectedParamCount > 0 && params.length !== expectedParamCount) {
+    const expectedParamCount = getExpectedParamCount(channelName);
+
+    if (params.length !== expectedParamCount) {
         throw new Error(
             `[IpcService] Channel ${channelName} expects exactly ${expectedParamCount} parameter(s) but received ${params.length}`
         );
@@ -698,7 +698,9 @@ export function registerStandardizedIpcHandler<
     validateParams: IpcParameterValidator | null,
     registeredHandlers: Set<IpcInvokeChannel>
 ): void {
-    if (validateParams === null && handler.length > 0) {
+    const expectedParamCount = getExpectedParamCount(channelName);
+
+    if (validateParams === null && expectedParamCount > 0) {
         const errorMessage = `[IpcService] Missing validateParams for '${channelName}'. Handlers that accept parameters must provide runtime validation.`;
 
         logger.error(
@@ -747,7 +749,7 @@ export function registerStandardizedIpcHandler<
 
             // Preserve the dedicated error message for "no-param" channels that
             // do not use validators.
-            if (validateParams === null && args.length > 0) {
+            if (validateParams === null && expectedParamCount === 0 && args.length > 0) {
                 logger.warn(
                     "[IpcHandler] Rejected IPC invocation with unexpected parameters",
                     withLogContext({
@@ -772,7 +774,7 @@ export function registerStandardizedIpcHandler<
             }
 
             try {
-                assertChannelParams(channelName, args, handler);
+                assertChannelParams(channelName, args);
             } catch (error: unknown) {
                 const safeError = ensureError(error);
                 const message =

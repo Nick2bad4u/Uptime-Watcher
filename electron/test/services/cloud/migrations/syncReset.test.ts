@@ -109,6 +109,8 @@ describe(resetProviderCloudSyncState, () => {
         provider.seedObject("sync/devices/a/ops/1-1-1.ndjson", "{}");
         provider.seedObject("sync/snapshots/1/1.json", "{}");
         provider.seedObject("sync/other.bin", "{}");
+        // JSON-looking but invalid for sync transport (not under sync/snapshots).
+        provider.seedObject("sync/other.json", "{}");
 
         const encryption: CloudEncryptionConfigPassphrase = {
             configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
@@ -156,6 +158,11 @@ describe(resetProviderCloudSyncState, () => {
         // Unknown extensions are ignored during cleanup.
         await expect(
             provider.downloadObject("sync/other.bin")
+        ).resolves.toBeTruthy();
+
+        // Invalid-but-JSON-looking keys are also ignored.
+        await expect(
+            provider.downloadObject("sync/other.json")
         ).resolves.toBeTruthy();
 
         expect(syncEngine.syncNow).toHaveBeenCalledTimes(1);

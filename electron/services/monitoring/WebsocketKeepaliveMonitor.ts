@@ -11,6 +11,7 @@
 
 import type { MonitorType, Site } from "@shared/types";
 
+import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
@@ -84,6 +85,13 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                 }
             );
         } catch (error) {
+            if (isAbortError(error)) {
+                return {
+                    ...createMonitorErrorResult("Request canceled", 0),
+                    details: "Request canceled",
+                };
+            }
+
             const normalized = ensureError(error);
             return {
                 ...createMonitorErrorResult(normalized.message, 0),
@@ -102,7 +110,11 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
 
         return new Promise<MonitorCheckResult>((resolve, reject) => {
             if (signal?.aborted) {
-                reject(new Error("Operation was aborted"));
+                reject(
+                    createAbortError({
+                        cause: Reflect.get(signal, "reason"),
+                    })
+                );
                 return;
             }
 
@@ -248,7 +260,11 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     } catch {
                         // Ignore termination errors
                     }
-                    rejectOnce(new Error("Operation was aborted"));
+                    rejectOnce(
+                        createAbortError({
+                            cause: Reflect.get(signal as object, "reason"),
+                        })
+                    );
                 };
                 signal.addEventListener("abort", abortHandler, {
                     once: true,

@@ -224,4 +224,98 @@ describe("CloudService.providerOperations", () => {
             settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
         ).resolves.toBe("existing-label");
     });
+
+    it("restores previous provider settings when Google Drive persistence fails after token storage", async () => {
+        const secretStore = new InMemorySecretStore();
+        const baseSettings = createSettingsAdapter({
+            [SETTINGS_KEY_PROVIDER]: "filesystem",
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/uw",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "existing-label",
+        });
+
+        const settings: CloudServiceOperationContext["settings"] & {
+            snapshot: () => Record<string, string>;
+        } = {
+            ...baseSettings,
+            set: async (key, value) => {
+                if (key === SETTINGS_KEY_PROVIDER && value === "google-drive") {
+                    throw new Error("settings failed");
+                }
+                await baseSettings.set(key, value);
+            },
+        };
+
+        await secretStore.setSecret(
+            SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+            "old-google-tokens"
+        );
+        await secretStore.setSecret(SETTINGS_KEY_DROPBOX_TOKENS, "dropbox");
+
+        const loadGoogleDriveDeps = vi
+            .fn<CloudServiceOperationContext["loadGoogleDriveDeps"]>()
+            .mockResolvedValue({
+                fetchGoogleAccountLabel: async () => "new-label",
+                GoogleDriveAuthFlow: class {
+                    public async run(): Promise<{
+                        accessToken: string;
+                        expiresAt: number;
+                        refreshToken: string;
+                        scope?: string;
+                        tokenType?: string;
+                    }> {
+                        return {
+                            accessToken: "access",
+                            expiresAt: Date.now() + 60_000,
+                            refreshToken: "refresh",
+                            scope: "scope",
+                            tokenType: "Bearer",
+                        };
+                    }
+                },
+                GoogleDriveTokenManager: class {
+                    public async setTokens(tokens: unknown): Promise<void> {
+                        await secretStore.setSecret(
+                            SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                            JSON.stringify(tokens)
+                        );
+                    }
+                },
+            } as never);
+
+        const ctx = createOperationContext({
+            loadDropboxDeps: async () => {
+                throw new Error("not used");
+            },
+            loadGoogleDriveDeps,
+            secretStore,
+            settings,
+        });
+
+        await expect(connectGoogleDrive(ctx)).rejects.toThrowError(
+            "Google Drive connect failed while persisting configuration: settings failed"
+        );
+
+        // Provider + filesystem config should remain intact.
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "filesystem"
+        );
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("/tmp/uw");
+
+        // Account label should be restored.
+        await expect(
+            settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+        ).resolves.toBe("existing-label");
+
+        // Google Drive tokens should be restored.
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS)
+        ).resolves.toBe("old-google-tokens");
+
+        // Dropbox tokens should not be cleared on failed Google Drive attempt.
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+        ).resolves.toBe("dropbox");
+    });
 });

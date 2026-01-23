@@ -288,13 +288,17 @@ describe("EventsService", () => {
             );
             expect(typeof cleanup).toBe("function");
 
-            mockLogger.error.mockClear();
+            mockLogger.debug.mockClear();
 
             cleanup();
 
-            expect(mockLogger.error).toHaveBeenCalledWith(
+            expect(mockLogger.debug).toHaveBeenCalledWith(
                 "[EventsService] Cleanup skipped for onCacheInvalidated: invalid cleanup handler returned by preload bridge"
             );
+
+            mockLogger.debug.mockClear();
+            cleanup();
+            expect(mockLogger.debug).not.toHaveBeenCalled();
         });
 
         it("should log when the cleanup handler throws", async () => {

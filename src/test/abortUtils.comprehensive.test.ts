@@ -227,6 +227,12 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
             const controller = new AbortController();
             controller.abort();
 
+            await expect(sleep(1000, controller.signal)).rejects.toMatchObject(
+                {
+                    name: "AbortError",
+                }
+            );
+
             await expect(sleep(1000, controller.signal)).rejects.toThrowError(
                 "Sleep was aborted"
             );

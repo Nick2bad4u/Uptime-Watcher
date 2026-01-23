@@ -1,4 +1,15 @@
-import { sleep } from "@shared/utils/abortUtils";
+import { createAbortError } from "@shared/utils/abortError";
+import { sleepUnref } from "@shared/utils/abortUtils";
+
+function assertNotAborted(signal: AbortSignal | undefined): void {
+    if (!signal?.aborted) {
+        return;
+    }
+
+    throw createAbortError({
+        cause: Reflect.get(signal, "reason"),
+    });
+}
 
 /**
  * Configuration for {@link HttpRateLimiter}.
@@ -54,12 +65,16 @@ export class HttpRateLimiter {
 
     public async schedule<T>(
         url: string,
-        operation: () => Promise<T>
+        operation: () => Promise<T>,
+        options?: { readonly signal?: AbortSignal }
     ): Promise<T> {
         const key = this.toKey(url);
         const startWaitMs = Date.now();
+        const signal = options?.signal;
 
         while (true) {
+            assertNotAborted(signal);
+
             const nowMs = Date.now();
             const lastStartTimeMs = this.lastInvocationByKey.get(key) ?? 0;
 
@@ -81,6 +96,9 @@ export class HttpRateLimiter {
 
             const waitedMs = Date.now() - startWaitMs;
             if (waitedMs > this.maxWaitMs) {
+                // Respect cancellation even when failing open.
+                assertNotAborted(signal);
+
                 this.config.onMaxWaitExceeded?.({ key, waitedMs });
 
                 // Fail-open: proceed rather than risking deadlock.
@@ -98,8 +116,16 @@ export class HttpRateLimiter {
                 ? 25
                 : Math.max(0, this.config.minIntervalMs - sinceLastStartMs);
 
-            // eslint-disable-next-line no-await-in-loop -- scheduling loop requires sequential delays
-            await sleep(waitForMs);
+            try {
+                // eslint-disable-next-line no-await-in-loop -- scheduling loop requires sequential delays
+                await sleepUnref(waitForMs, signal);
+            } catch (error) {
+                // Normalize abort errors coming from the sleep helper so
+                // callers can consistently treat queue cancellation as an
+                // AbortError.
+                assertNotAborted(signal);
+                throw error;
+            }
         }
     }
 

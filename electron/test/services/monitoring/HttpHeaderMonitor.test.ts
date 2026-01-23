@@ -167,7 +167,8 @@ describe(HttpHeaderMonitor, () => {
         expect(result.responseTime).toBe(120);
         expect(scheduleMock).toHaveBeenCalledWith(
             "https://example.com/health",
-            expect.any(Function)
+            expect.any(Function),
+            undefined
         );
     });
 

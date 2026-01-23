@@ -257,6 +257,16 @@ declare module "./eventTypes" {
          */
         "database:transaction-completed": {
             /**
+             * True when the transaction/operation ended due to cancellation.
+             *
+             * @remarks
+             * This flag allows consumers to distinguish between an actual
+             * failure (e.g. query errors) and expected cancellation (e.g.
+             * shutdown, user-initiated stop, or abort propagation).
+             */
+            cancelled?: boolean;
+
+            /**
              * Duration (ms) of the transaction.
              *
              * @remarks

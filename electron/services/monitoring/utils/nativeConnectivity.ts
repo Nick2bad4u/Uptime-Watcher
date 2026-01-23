@@ -20,6 +20,7 @@
  * @packageDocumentation
  */
 
+import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import * as dns from "node:dns/promises";
@@ -127,7 +128,7 @@ async function checkTcpPort(
 ): Promise<TcpCheckResult> {
     const startTime = performance.now();
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const socket = new net.Socket();
         let resolved = false;
 
@@ -150,8 +151,17 @@ async function checkTcpPort(
             });
         };
 
+        const rejectAbort = (listener?: () => void): void => {
+            cleanup(listener);
+            reject(
+                createAbortError({
+                    cause: signal ? Reflect.get(signal, "reason") : undefined,
+                })
+            );
+        };
+
         const abortListener = (): void => {
-            resolveFailure(abortListener);
+            rejectAbort(abortListener);
         };
 
         if (signal?.aborted) {
@@ -249,7 +259,9 @@ async function checkDnsResolution(
         }
 
         if (result === ABORTED) {
-            throw new Error("Operation was aborted");
+            throw createAbortError({
+                cause: signal ? Reflect.get(signal, "reason") : undefined,
+            });
         }
 
         return {
@@ -257,7 +269,10 @@ async function checkDnsResolution(
             alive: true,
             responseTime: performance.now() - startTime,
         };
-    } catch {
+    } catch (error) {
+        if (isAbortError(error)) {
+            throw error;
+        }
         return {
             alive: false,
             responseTime: performance.now() - startTime,
@@ -419,6 +434,12 @@ export async function checkConnectivity(
     options: ConnectivityOptions = {},
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
+    if (signal?.aborted) {
+        throw createAbortError({
+            cause: Reflect.get(signal, "reason"),
+        });
+    }
+
     const opts = { ...DEFAULT_OPTIONS, ...options };
     let tcpProbeError: unknown = undefined;
 
@@ -460,6 +481,9 @@ export async function checkConnectivity(
                 return tcpResult;
             }
         } catch (error) {
+            if (isAbortError(error)) {
+                throw error;
+            }
             // If TCP probing fails unexpectedly (e.g. socket implementation
             // quirks in test environments or platform-specific errors), fall
             // back to DNS resolution instead of immediately reporting down.
@@ -524,7 +548,9 @@ export async function checkConnectivityWithRetry(
         attemptsLeft: number
     ): Promise<MonitorCheckResult> => {
         if (signal?.aborted) {
-            throw new Error("Operation was aborted");
+            throw createAbortError({
+                cause: Reflect.get(signal, "reason"),
+            });
         }
 
         try {
@@ -553,7 +579,7 @@ export async function checkConnectivityWithRetry(
             return await attemptCheck(attemptsLeft - 1);
         } catch (error) {
             if (signal?.aborted) {
-                throw new Error("Operation was aborted", { cause: error });
+                throw createAbortError({ cause: error });
             }
             const errorResult: MonitorCheckResult = {
                 details: `Check failed on attempt ${opts.retries - attemptsLeft + 2}`,

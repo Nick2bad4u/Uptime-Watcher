@@ -1600,7 +1600,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const registeredHandlers = new Set<TestChannel>();
 
-                // Function length must be > 0 to trigger the guard.
+                // Any channel with declared parameters must provide a validator.
                 const paramHandler = async (_value: string) => "param handler";
 
                 expect(() =>
@@ -1645,10 +1645,20 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(handleCall).toBeDefined();
 
                 const registeredFunction = handleCall![1];
-                const result = await registeredFunction({} as any, "validArg");
+                const result = await registeredFunction(
+                    {} as any,
+                    "site-identifier",
+                    "monitor-id"
+                );
 
-                expect(mockValidator).toHaveBeenCalledWith(["validArg"]);
-                expect(mockHandler).toHaveBeenCalledWith("validArg");
+                expect(mockValidator).toHaveBeenCalledWith([
+                    "site-identifier",
+                    "monitor-id",
+                ]);
+                expect(mockHandler).toHaveBeenCalledWith(
+                    "site-identifier",
+                    "monitor-id"
+                );
                 expect(result.success).toBeTruthy();
                 expect(result.data).toBe("validated execution");
             });
@@ -1688,7 +1698,8 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const registeredFunction = handleCall![1];
                 const result = await registeredFunction(
                     {} as any,
-                    "validArg",
+                    "site-identifier",
+                    "monitor-id",
                     "unexpected"
                 );
 
@@ -1765,7 +1776,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 registerStandardizedIpcHandler(
                     CHANNELS_FOR_TESTS.handlerThree,
                     vi.fn(),
-                    null,
+                    vi.fn().mockReturnValue(null),
                     registeredHandlers
                 );
 
@@ -1846,7 +1857,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     registerStandardizedIpcHandler(
                         CHANNELS_FOR_TESTS.failure,
                         vi.fn(),
-                        null,
+                        vi.fn().mockReturnValue(null),
                         registeredHandlers
                     )
                 ).toThrowError(registrationError);

@@ -282,6 +282,18 @@ export async function connectGoogleDrive(
     ctx: CloudServiceOperationContext
 ): Promise<CloudStatusSummary> {
     return ctx.runCloudOperation("connectGoogleDrive", async () => {
+        const previousProvider =
+            (await ctx.settings.get(SETTINGS_KEY_PROVIDER)) ?? "";
+        const previousFilesystemBaseDirectory =
+            (await ctx.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ??
+            "";
+        const previousAccountLabel =
+            (await ctx.settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)) ??
+            "";
+        const previousStoredTokens = await ctx.secretStore.getSecret(
+            SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
+        );
+
         const {
             fetchGoogleAccountLabel,
             GoogleDriveAuthFlow,
@@ -313,21 +325,56 @@ export async function connectGoogleDrive(
             storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
         });
 
-        await tokenManager.setTokens({
-            accessToken: auth.accessToken,
-            expiresAt: auth.expiresAt,
-            refreshToken: auth.refreshToken,
-            scope: auth.scope,
-            tokenType: auth.tokenType,
-        });
+        try {
+            await tokenManager.setTokens({
+                accessToken: auth.accessToken,
+                expiresAt: auth.expiresAt,
+                refreshToken: auth.refreshToken,
+                scope: auth.scope,
+                tokenType: auth.tokenType,
+            });
 
-        await ctx.settings.set(
-            SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
-            accountLabel ?? ""
-        );
+            await ctx.settings.set(
+                SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+                accountLabel ?? ""
+            );
 
-        await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
-        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "google-drive");
+            await ctx.settings.set(
+                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+                ""
+            );
+            await ctx.settings.set(SETTINGS_KEY_PROVIDER, "google-drive");
+        } catch (error: unknown) {
+            // Roll back any partial state so a previously configured provider
+            // remains intact.
+            if (previousStoredTokens) {
+                await ctx.secretStore.setSecret(
+                    SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                    previousStoredTokens
+                );
+            } else {
+                await ctx.secretStore.deleteSecret(
+                    SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
+                );
+            }
+
+            // Restore settings (do not run in parallel).
+            await ctx.settings.set(
+                SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+                previousAccountLabel
+            );
+            await ctx.settings.set(SETTINGS_KEY_PROVIDER, previousProvider);
+            await ctx.settings.set(
+                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+                previousFilesystemBaseDirectory
+            );
+
+            const resolved = ensureError(error);
+            throw new Error(
+                `Google Drive connect failed while persisting configuration: ${resolved.message}`,
+                { cause: error }
+            );
+        }
 
         // Clear Dropbox secrets after a successful provider switch.
         await ctx.secretStore

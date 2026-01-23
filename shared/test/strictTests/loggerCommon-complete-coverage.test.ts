@@ -89,6 +89,36 @@ describe(buildLogArguments, () => {
             { context: "bootstrap" },
         ]);
     });
+
+    it("redacts secrets in messages and arguments", () => {
+        const args = buildLogArguments(
+            "CORE",
+            "Authorization: Basic dGVzdDp0ZXN0",
+            [
+                {
+                    Authorization: "Bearer secret",
+                    refresh_token: "abc",
+                    "x-api-key": "abc",
+                },
+                "https://example.com?access_token=abc&passphrase=def",
+            ]
+        );
+
+        const [formattedMessage, metadata, urlCandidate] = args;
+
+        expect(formattedMessage).toBe("[CORE] Authorization: [redacted]");
+        expect(metadata).toStrictEqual({
+            Authorization: "[redacted]",
+            refresh_token: "[redacted]",
+            "x-api-key": "[redacted]",
+        });
+
+        expect(typeof urlCandidate).toBe("string");
+        expect(urlCandidate).toContain("access_token=[redacted]");
+        expect(urlCandidate).toContain("passphrase=[redacted]");
+        expect(urlCandidate).not.toContain("access_token=abc");
+        expect(urlCandidate).not.toContain("passphrase=def");
+    });
 });
 
 describe(buildErrorLogArguments, () => {

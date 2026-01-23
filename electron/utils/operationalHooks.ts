@@ -60,7 +60,8 @@
 
 import type { Tagged, UnknownRecord } from "type-fest";
 
-import { sleep } from "@shared/utils/abortUtils";
+import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { sleepUnref } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 import * as z from "zod";
 
@@ -406,6 +407,7 @@ async function handleFailure<T>(
         try {
             await eventEmitter.emitTyped("database:transaction-completed", {
                 duration,
+                ...(isAbortError(error) ? { cancelled: true } : {}),
                 lifecycleStage: "failure",
                 operation: `${operationName}:failed`,
                 success: false,
@@ -428,7 +430,9 @@ async function handleFailure<T>(
         operationId,
     } as const;
 
-    switch (logLevel) {
+    const effectiveLogLevel = isAbortError(error) ? "debug" : logLevel;
+
+    switch (effectiveLogLevel) {
         case "debug": {
             /* V8 ignore next 2 */ logger.debug(logMessage, logMetadata);
             break;
@@ -504,7 +508,7 @@ async function handleRetry<T>(
     const delay = calculateDelay(attempt, initialDelay, backoff);
 
     if (signal?.aborted) {
-        throw new Error("Operation was aborted");
+        throw createAbortError();
     }
 
     if (delay > 0) {
@@ -517,10 +521,10 @@ async function handleRetry<T>(
         );
 
         try {
-            await sleep(delay, signal);
+            await sleepUnref(delay, signal);
         } catch {
             if (signal?.aborted) {
-                throw new Error("Operation was aborted");
+                throw createAbortError({ cause: error });
             }
 
             throw error;
@@ -621,7 +625,7 @@ export async function withOperationalHooks<T>(
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         if (signal?.aborted) {
-            const abortError = new Error("Operation was aborted");
+            const abortError = createAbortError();
             return handleFailure(
                 abortError,
                 config,
@@ -663,9 +667,7 @@ export async function withOperationalHooks<T>(
                 // Prefer a consistent cancellation message over surfacing an
                 // unrelated exception that happened to be thrown around the
                 // same time the signal aborted.
-                const abortError = new Error("Operation was aborted", {
-                    cause: lastError,
-                });
+                const abortError = createAbortError({ cause: lastError });
                 return handleFailure(
                     abortError,
                     config,

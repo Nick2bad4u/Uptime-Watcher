@@ -86,7 +86,7 @@ function safeSerializeErrorInternal(
  * @returns Formatted log message.
  */
 export const formatLogMessage = (prefix: string, message: string): string =>
-    `[${prefix}] ${message}`;
+    `[${prefix}] ${safeNormalizeLogString(message)}`;
 
 /**
  * Serializes unknown error input into a structured payload suitable for
@@ -118,7 +118,10 @@ export const buildLogArguments = (
     prefix: string,
     message: string,
     args: readonly unknown[]
-): readonly unknown[] => [formatLogMessage(prefix, message), ...args];
+): readonly unknown[] => [
+    formatLogMessage(prefix, message),
+    ...args.map((arg) => safeNormalizeLogValue(arg)),
+];
 
 /**
  * Builds structured log arguments for error logging methods.
@@ -137,9 +140,10 @@ export const buildErrorLogArguments = (
     args: readonly unknown[]
 ): readonly unknown[] => {
     const baseMessage = formatLogMessage(prefix, message);
+    const normalizedArgs = args.map((arg) => safeNormalizeLogValue(arg));
 
     if (error === undefined) {
-        return [baseMessage, ...args];
+        return [baseMessage, ...normalizedArgs];
     }
 
     const serialized = serializeError(error);
@@ -148,13 +152,13 @@ export const buildErrorLogArguments = (
         return [
             baseMessage,
             safeNormalizeLogValue(error),
-            ...args,
+            ...normalizedArgs,
         ];
     }
 
     return [
         baseMessage,
         safeNormalizeLogValue(serialized),
-        ...args,
+        ...normalizedArgs,
     ];
 };
