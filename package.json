@@ -898,7 +898,7 @@
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-import-zod": "^1.2.1",
     "eslint-plugin-istanbul": "^0.1.2",
-    "eslint-plugin-jsdoc": "^62.4.0",
+    "eslint-plugin-jsdoc": "^62.4.1",
     "eslint-plugin-json-schema-validator": "^6.0.3",
     "eslint-plugin-jsonc": "^2.21.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
