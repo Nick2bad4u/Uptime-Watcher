@@ -122,6 +122,7 @@ import {
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
 import { UptimeOrchestratorEventHandlers } from "./UptimeOrchestratorEventHandlers";
+import { runIdempotentInitialization } from "./utils/idempotentInitialization";
 import { diagnosticsLogger, logger } from "./utils/logger";
 
 /** Logical event bus identifier applied to forwarded renderer events. */
@@ -378,12 +379,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws When validation of initialized managers fails
      */
     public async initialize(): Promise<void> {
-        if (this.initializationPromise) {
-            await this.initializationPromise;
-            return;
-        }
-
-        const promise = (async (): Promise<void> => {
+        await runIdempotentInitialization(
+            () => this.initializationPromise,
+            (promise) => {
+                this.initializationPromise = promise;
+            },
+            async () => {
             try {
                 logger.info("[UptimeOrchestrator] Starting initialization...");
 
@@ -417,16 +418,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     operation: "orchestrator.initialize",
                 });
             }
-        })();
-
-        this.initializationPromise = promise;
-
-        try {
-            await promise;
-        } catch (error) {
-            this.initializationPromise = undefined;
-            throw error;
-        }
+            }
+        );
     }
 
     /**

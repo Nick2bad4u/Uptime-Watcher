@@ -29,6 +29,7 @@ import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
+import { runIdempotentInitialization } from "../utils/idempotentInitialization";
 import { logger } from "../utils/logger";
 import { CloudService } from "./cloud/CloudService";
 import { CloudSyncScheduler } from "./cloud/CloudSyncScheduler";
@@ -304,12 +305,12 @@ export class ServiceContainer {
      * Initializes all core services and orchestrators in dependency order.
      */
     public async initialize(): Promise<void> {
-        if (this.initializationPromise) {
-            await this.initializationPromise;
-            return;
-        }
-
-        const promise = (async (): Promise<void> => {
+        await runIdempotentInitialization(
+            () => this.initializationPromise,
+            (promise) => {
+                this.initializationPromise = promise;
+            },
+            async () => {
             logger.info("[ServiceContainer] Initializing services");
             this.getDatabaseService().initialize();
             await this.tryInitializeService(
@@ -335,17 +336,8 @@ export class ServiceContainer {
             logger.info(
                 "[ServiceContainer] All services initialized successfully"
             );
-        })();
-
-        this.initializationPromise = promise;
-
-        try {
-            await promise;
-        } catch (error) {
-            // Allow retry after a failed initialization attempt.
-            this.initializationPromise = undefined;
-            throw error;
-        }
+            }
+        );
     }
 
     /**
