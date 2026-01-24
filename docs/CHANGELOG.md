@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[e2ba768](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e2ba768d15e51cb231d2e47b8a058add6aef9956)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...e2ba768d15e51cb231d2e47b8a058add6aef9956))
+[341bc67](https://github.com/Nick2bad4u/Uptime-Watcher/commit/341bc677466b43426f1c94fb0e39d7a756859435)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...341bc677466b43426f1c94fb0e39d7a756859435))
 
 
 ### ✨ Features
@@ -199,6 +199,35 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2
 
 
 ### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improves shutdown and DNS checks ⚡
+
+🛠️ [fix] Adds runtime cleanup checks 🧹 so shutdown only calls valid handlers
+ - Avoids failures when mocked services return non-instances 🧪
+🛠️ [fix] Reworks DNS resolution to race timeout/abort 🕒 without leaked listeners
+ - Returns explicit timeout/abort errors for clearer monitoring results 📡
+🛠️ [fix] Ensures state sync emits for bulk/update actions 🔄 to keep revision streams monotonic
+ - Keeps delete emissions gated on meaningful deltas 🧭
+🚜 [refactor] Standardizes iterable copies and validator options 🧰 for clarity
+ - Prefers spread for iterables and aligns option keys ✨
+🧹 [chore] Updates linting, config, and docs styling 🎛️ for consistency
+ - Enables stylistic rules and disables webpack-only chunk naming 🧩
+ - Adds iterable DOM libs and normalizes CSS module access 📚
+ - Expands documentation spacing for clearer examples 📝
+🧪 [test] Aligns mocks and fixtures with constructable services 🧰
+ - Switches test data to spread-based copies to mirror runtime paths 🔁
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(341bc67)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/341bc677466b43426f1c94fb0e39d7a756859435)
+
+
+- 🛠️ [fix] Improve error safety and scheduling
+
+🛠️ [fix] Adds catch normalization guardrail and uses safe errors to prevent unsafe property access.
+🚜 [refactor] Queues manual checks after running jobs and hardens connectivity option defaults for reliable runs.
+🧹 [chore] Updates lint/style tooling and dependency versions to keep formatting consistent.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ae2de8e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ae2de8ec549291007858cc0b9580e1812b575f3b)
+
 
 - 🛠️ [fix] Improves UI state tracking
 
@@ -625,6 +654,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v20.9.0 [skip ci] [`(a4fc51a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a4fc51ab5357f54cecc2c18188bf6e683d58100d)
+
 
 - 🧹 [chore] Update dev dependencies
 
