@@ -99,7 +99,16 @@ vi.mock("../../services/database/SiteRepositoryService", () => ({
             getSitesFromDatabase: vi.fn().mockResolvedValue([]),
         };
     }),
-    SiteLoadingOrchestrator: vi.fn(function SiteLoadingOrchestratorMock() {
+    SiteLoadingOrchestrator: vi.fn(function SiteLoadingOrchestratorMock(
+        siteRepositoryService: unknown
+    ) {
+        const record = siteRepositoryService as Record<string, unknown>;
+
+        const getSitesFromDatabase =
+            typeof record["getSitesFromDatabase"] === "function"
+                ? (record["getSitesFromDatabase"] as ReturnType<typeof vi.fn>)
+                : vi.fn().mockResolvedValue([]);
+
         return {
             loadSitesFromDatabase: vi.fn().mockResolvedValue({
                 success: true,
@@ -107,7 +116,7 @@ vi.mock("../../services/database/SiteRepositoryService", () => ({
                 message: "Success",
             }),
             siteRepositoryService: {
-                getSitesFromDatabase: vi.fn().mockResolvedValue([]),
+                getSitesFromDatabase,
             },
         };
     }),
@@ -311,10 +320,8 @@ const createSiteLoadingOrchestratorMock = (overrides = {}) => ({
 const setSiteLoadingOrchestratorMock = (
     orchestrator: ReturnType<typeof createSiteLoadingOrchestratorMock>
 ): void => {
-    (SiteLoadingOrchestrator as any).mockImplementation(
-        function SiteLoadingOrchestratorCtor() {
-            return orchestrator as any;
-        }
+    (SiteLoadingOrchestrator as any).mockReturnValue(
+        orchestrator as any
     );
 };
 

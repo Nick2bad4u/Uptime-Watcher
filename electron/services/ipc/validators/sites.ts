@@ -5,12 +5,12 @@
 import type { IpcParameterValidator } from "../types";
 
 import {
-    createNoParamsValidator,
     createSiteIdentifierAndMonitorIdValidator,
     createSiteIdentifierValidator,
     validateSitePayload,
     validateSiteUpdatePayload,
 } from "./shared";
+import { createNoParamsValidator } from "./utils/commonValidators";
 
 /**
  * Interface for site handler validators.

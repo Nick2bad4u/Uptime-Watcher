@@ -4,13 +4,13 @@
 
 import type { IpcParameterValidator } from "../types";
 
+import { createPreloadGuardReportValidator } from "./shared";
 import {
     createClipboardTextValidator,
     createNoParamsValidator,
-    createPreloadGuardReportValidator,
     createSingleExternalOpenUrlValidator,
     createSingleStringValidator,
-} from "./shared";
+} from "./utils/commonValidators";
 
 /**
  * Interface for system handler validators.

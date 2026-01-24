@@ -6,10 +6,12 @@ import type { IpcParameterValidator } from "../types";
 
 import {
     createMonitorValidationPayloadValidator,
+} from "./shared";
+import {
     createNoParamsValidator,
     createStringObjectValidator,
     createTwoStringValidator,
-} from "./shared";
+} from "./utils/commonValidators";
 
 /**
  * Interface for monitor type handler validators.

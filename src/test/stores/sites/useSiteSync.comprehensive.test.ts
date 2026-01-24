@@ -436,9 +436,7 @@ describe("useSiteSync", () => {
 
             (
                 statusUpdateHandlerModule.StatusUpdateManager as any
-            ).mockImplementationOnce(function StatusUpdateManagerCtor() {
-                return mockStatusUpdateManager;
-            });
+            ).mockReturnValueOnce(mockStatusUpdateManager);
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);

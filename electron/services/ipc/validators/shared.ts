@@ -12,16 +12,14 @@
  * @see {@link IpcParameterValidator}
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import {
     MAX_IPC_JSON_IMPORT_BYTES,
     MAX_IPC_SQLITE_RESTORE_BYTES,
 } from "@shared/constants/backup";
-import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
@@ -39,85 +37,25 @@ import {
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 
 import type { IpcParameterValidator } from "../types";
+import type {
+    ParameterValueValidationResult,
+} from "./utils/parameterValidation";
 
 import {
-    getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,
     MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
 } from "../diagnosticsLimits";
 import { IpcValidators } from "../utils";
-
-type ParameterValueValidator = (
-    value: unknown
-) => ParameterValueValidationResult;
-
-type ParameterValueValidationResult = null | readonly string[];
-
-function toValidationResult(
-    error: null | readonly string[] | string
-): ParameterValueValidationResult {
-    if (error === null) {
-        return null;
-    }
-    return typeof error === "string" ? [error] : error;
-}
-
-type RequiredRecordResult =
-    | { readonly error: ParameterValueValidationResult; readonly ok: false }
-    | { readonly ok: true; readonly record: UnknownRecord };
-
-const isRequiredRecordError = (
-    result: RequiredRecordResult
-): result is Extract<RequiredRecordResult, { readonly ok: false }> =>
-    !result.ok;
-
-const FORBIDDEN_RECORD_KEYS = new Set<string>([
-    "__proto__",
-    "constructor",
-    "prototype",
-]);
-
-function getForbiddenRecordKeyErrors(
-    record: UnknownRecord,
-    paramName: string
-): string[] {
-    const errors: string[] = [];
-
-    for (const key of FORBIDDEN_RECORD_KEYS) {
-        if (Object.hasOwn(record, key)) {
-            errors.push(`${paramName} must not include reserved key '${key}'`);
-        }
-    }
-
-    return errors;
-}
-
-const requireRecordParam = (
-    value: unknown,
-    paramName: string
-): RequiredRecordResult => {
-    if (!isRecord(value)) {
-        return {
-            error: toValidationResult(`${paramName} must be a valid object`),
-            ok: false,
-        };
-    }
-
-    const forbiddenKeyErrors = getForbiddenRecordKeyErrors(value, paramName);
-    if (forbiddenKeyErrors.length > 0) {
-        return { error: forbiddenKeyErrors, ok: false };
-    }
-
-    return { ok: true, record: value };
-};
-
-interface CreateParamValidatorOptions {
-    /**
-     * When true, do not run per-parameter validators when the parameter count
-     * is invalid.
-     */
-    readonly stopOnCountMismatch?: boolean;
-}
+import { createStringWithBudgetedObjectValidator } from "./utils/commonValidators";
+import {
+    createParamValidator,
+    toValidationResult,
+} from "./utils/parameterValidation";
+import {
+    getForbiddenRecordKeyErrors,
+    isRequiredRecordError,
+    requireRecordParam,
+} from "./utils/recordValidation";
 
 /**
  * Maximum byte budget accepted for JSON import payloads transported over IPC.
@@ -136,9 +74,6 @@ const MAX_BACKUP_KEY_BYTES: number = 2048;
 /** Maximum byte budget accepted for encryption passphrases. */
 const MAX_ENCRYPTION_PASSPHRASE_BYTES: number = 1024;
 
-/** Maximum byte budget accepted for clipboard payloads transported over IPC. */
-const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
-
 /** Maximum byte budget accepted for user-supplied restore filenames. */
 const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
 
@@ -147,46 +82,6 @@ const MAX_MONITOR_VALIDATION_DATA_BYTES: number = 256 * 1024;
 
 // NOTE: filesystem path validation helpers are centralized in
 // @shared/validation/filesystemBaseDirectoryValidation.
-
-function createParamValidator(
-    expectedCount: number,
-    validators: readonly ParameterValueValidator[] = [],
-    options: CreateParamValidatorOptions = {}
-): IpcParameterValidator {
-    let countMessage = "No parameters expected";
-
-    if (expectedCount !== 0) {
-        const suffix = expectedCount === 1 ? "" : "s";
-        countMessage = `Expected exactly ${expectedCount} parameter${suffix}`;
-    }
-
-    return (params: readonly unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== expectedCount) {
-            errors.push(countMessage);
-
-            if (options.stopOnCountMismatch) {
-                return errors;
-            }
-        }
-
-        validators.forEach((validate, index) => {
-            const error = validate(params[index]);
-            if (!error) {
-                return;
-            }
-
-            errors.push(...error);
-        });
-
-        return errors.length > 0 ? errors : null;
-    };
-}
-
-function createNoParamsValidator(): IpcParameterValidator {
-    return createParamValidator(0);
-}
 
 const validateSiteIdentifierCandidate = (
     value: unknown,
@@ -274,20 +169,6 @@ const validateSiteUpdatePayload: IpcParameterValidator = createParamValidator(
         },
     ]
 );
-
-/**
- * Helper function to create validators for single number parameters.
- *
- * @param paramName - Name of the parameter for error messages
- *
- * @returns A validator function that validates a single number parameter
- */
-function createSingleNumberValidator(paramName: string): IpcParameterValidator {
-    return createParamValidator(1, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(IpcValidators.requiredNumber(value, paramName)),
-    ]);
-}
 
 const validateCloudFilesystemProviderConfig: IpcParameterValidator =
     createParamValidator(1, [
@@ -734,42 +615,6 @@ const validateEncryptionPassphrasePayload: IpcParameterValidator =
         },
     ]);
 
-/**
- * Helper function to create validators for handlers expecting a single string
- * parameter.
- *
- * @param paramName - Name of the parameter for error messages
- *
- * @returns A validator function that validates a single string parameter
- */
-function createSingleStringValidator(paramName: string): IpcParameterValidator {
-    return createParamValidator(1, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(IpcValidators.requiredString(value, paramName)),
-    ]);
-}
-
-function createClipboardTextValidator(): IpcParameterValidator {
-    return createParamValidator(1, [
-        (value): ParameterValueValidationResult => {
-            const error = IpcValidators.requiredString(value, "text");
-            if (error) {
-                return toValidationResult(error);
-            }
-
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
-            const text = value as string;
-            if (getUtfByteLength(text) > MAX_CLIPBOARD_TEXT_BYTES) {
-                return toValidationResult(
-                    `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`
-                );
-            }
-
-            return null;
-        },
-    ]);
-}
-
 function createBackupKeyValidator(paramName: string): IpcParameterValidator {
     return createParamValidator(1, [
         (value): ParameterValueValidationResult => {
@@ -844,96 +689,6 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
     ]);
 }
 
-function createSingleExternalOpenUrlValidator(
-    paramName: string
-): IpcParameterValidator {
-    return createParamValidator(1, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredExternalOpenUrl(value, paramName)
-            ),
-    ]);
-}
-
-/**
- * Helper function to create validators for string and object parameter pairs.
- *
- * @param stringParamName - Name of the string parameter for error messages
- * @param objectParamName - Name of the object parameter for error messages
- *
- * @returns A validator function that validates string and object parameters
- */
-function createStringObjectValidator(
-    stringParamName: string,
-    objectParamName: string
-): IpcParameterValidator {
-    return createParamValidator(2, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(value, stringParamName)
-            ),
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredObject(value, objectParamName)
-            ),
-    ]);
-}
-
-/**
- * Helper function to create validators for handlers with validated first
- * parameter and unvalidated second.
- *
- * @param firstParamName - Name of the required first parameter
- *
- * @returns A validator function that validates first parameter only
- */
-function createStringWithUnvalidatedSecondValidator(
-    firstParamName: string
-): IpcParameterValidator {
-    return createParamValidator(2, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(value, firstParamName)
-            ),
-        (): ParameterValueValidationResult => null,
-    ]);
-}
-
-/**
- * Helper function to create validators for handlers expecting a string
- * parameter and a record-like object payload with a strict byte budget.
- *
- * @remarks
- * This is intended for renderer-supplied objects that should be treated as
- * untrusted input even though they originate from the app UI.
- */
-function createStringWithBudgetedObjectValidator(
-    stringParamName: string,
-    objectParamName: string,
-    maxBytes: number
-): IpcParameterValidator {
-    return createParamValidator(2, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(value, stringParamName)
-            ),
-        (value): ParameterValueValidationResult => {
-            const recordResult = requireRecordParam(value, objectParamName);
-            if (isRequiredRecordError(recordResult)) {
-                return recordResult.error;
-            }
-
-            if (isJsonByteBudgetExceeded(recordResult.record, maxBytes)) {
-                return toValidationResult(
-                    `${objectParamName} must not exceed ${maxBytes} bytes`
-                );
-            }
-
-            return null;
-        },
-    ]);
-}
-
 function createMonitorValidationPayloadValidator(
     monitorTypeParamName: string,
     dataParamName: string
@@ -945,46 +700,21 @@ function createMonitorValidationPayloadValidator(
     );
 }
 
-/**
- * Helper function to create validators for handlers expecting two string
- * parameters.
- *
- * @param firstParamName - Name of the first parameter for error messages
- * @param secondParamName - Name of the second parameter for error messages
- *
- * @returns A validator function that validates two string parameters
- */
-function createTwoStringValidator(
-    firstParamName: string,
-    secondParamName: string
-): IpcParameterValidator {
-    return createParamValidator(2, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(value, firstParamName)
-            ),
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(value, secondParamName)
-            ),
-    ]);
-}
-
 export {
     createBackupKeyValidator,
-    createClipboardTextValidator,
+
     createMonitorValidationPayloadValidator,
-    createNoParamsValidator,
+
     createPreloadGuardReportValidator,
-    createSingleExternalOpenUrlValidator,
-    createSingleNumberValidator,
-    createSingleStringValidator,
+
+
+
     createSiteIdentifierAndMonitorIdValidator,
     createSiteIdentifierValidator,
-    createStringObjectValidator,
-    createStringWithBudgetedObjectValidator,
-    createStringWithUnvalidatedSecondValidator,
-    createTwoStringValidator,
+
+
+
+
     validateCloudBackupMigrationRequest,
     validateCloudEnableSyncConfig,
     validateCloudFilesystemProviderConfig,

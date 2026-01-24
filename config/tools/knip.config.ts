@@ -85,7 +85,6 @@ const knipConfig: KnipConfig = {
         "@snyk/protect",
         "@storybook.*",
         "@stylelint.*",
-        "@stylistic/eslint-plugin",
         "@tailwindcss/forms",
         "@tailwindcss/typography",
         "@types.*",

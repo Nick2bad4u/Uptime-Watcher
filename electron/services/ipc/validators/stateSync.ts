@@ -4,7 +4,7 @@
 
 import type { IpcParameterValidator } from "../types";
 
-import { createNoParamsValidator } from "./shared";
+import { createNoParamsValidator } from "./utils/commonValidators";
 
 /**
  * Interface for state sync handler validators.

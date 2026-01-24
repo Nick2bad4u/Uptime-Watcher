@@ -6,12 +6,12 @@ import type { IpcParameterValidator } from "../types";
 
 import {
     createBackupKeyValidator,
-    createNoParamsValidator,
     validateCloudBackupMigrationRequest,
     validateCloudEnableSyncConfig,
     validateCloudFilesystemProviderConfig,
     validateEncryptionPassphrasePayload,
 } from "./shared";
+import { createNoParamsValidator } from "./utils/commonValidators";
 
 /**
  * Interface for cloud handler validators.

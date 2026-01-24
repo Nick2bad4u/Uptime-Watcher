@@ -22,11 +22,9 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
-import { ensureError } from "@shared/utils/errorHandling";
-
 import { logger } from "./logger";
-import { subscribeWithValidatedCleanup } from "./utils/cleanupHandlers";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { subscribeWithCleanupValidation } from "./utils/preloadSubscriptions";
 
 // eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
 const { ensureInitialized, wrap } = getIpcServiceHelpers("EventsService", {
@@ -64,61 +62,15 @@ type HistoryLimitUpdatedEventPayload =
 // (electron/preload/domains/eventsApi.ts). The renderer should treat the preload
 // bridge as a trusted interface and focus on cleanup contract validation.
 
-/**
- * Builds a defensive cleanup handler used when the preload bridge returns an
- * invalid cleanup value.
- *
- * @param eventName - Name of the event whose cleanup failed validation.
- *
- * @returns A no-op cleanup function that logs a descriptive error when invoked.
- */
-const createInvalidCleanupFallback =
-    (eventName: string): (() => void) => {
-        let hasLogged = false;
-
-        return (): void => {
-            if (hasLogged) {
-                return;
-            }
-
-            hasLogged = true;
-            logger.debug(
-                `[EventsService] Cleanup skipped for ${eventName}: invalid cleanup handler returned by preload bridge`
-            );
-        };
-    };
-
-/**
- * Subscribes to a preload-managed event while enforcing cleanup contract
- * expectations using the shared cleanup validation utilities.
- *
- * @param eventName - Name of the event being subscribed to.
- * @param register - Callback invoking the preload registration function.
- *
- * @returns A promise resolving to a validated cleanup function.
- */
 const subscribeWithValidation = async (
     eventName: string,
     register: () => unknown
 ): Promise<() => void> =>
-    subscribeWithValidatedCleanup(register, {
-        handleCleanupError: (error: unknown) => {
-            logger.error(
-                `[EventsService] Failed to cleanup ${eventName} listener:`,
-                ensureError(error)
-            );
-        },
-        handleInvalidCleanup: ({ actualType, cleanupCandidate }) => {
-            logger.error(
-                `[EventsService] Preload bridge returned an invalid cleanup handler for ${eventName}`,
-                {
-                    actualType,
-                    value: cleanupCandidate,
-                }
-            );
-
-            return createInvalidCleanupFallback(eventName);
-        },
+    subscribeWithCleanupValidation({
+        eventName,
+        logger,
+        register,
+        serviceName: "EventsService",
     });
 
 /**

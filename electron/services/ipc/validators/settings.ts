@@ -4,7 +4,10 @@
 
 import type { IpcParameterValidator } from "../types";
 
-import { createNoParamsValidator, createSingleNumberValidator } from "./shared";
+import {
+    createNoParamsValidator,
+    createSingleNumberValidator,
+} from "./utils/commonValidators";
 
 /**
  * Interface for settings handler validators.

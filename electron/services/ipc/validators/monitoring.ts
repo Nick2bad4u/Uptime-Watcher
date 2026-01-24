@@ -5,10 +5,10 @@
 import type { IpcParameterValidator } from "../types";
 
 import {
-    createNoParamsValidator,
     createSiteIdentifierAndMonitorIdValidator,
     createSiteIdentifierValidator,
 } from "./shared";
+import { createNoParamsValidator } from "./utils/commonValidators";
 
 /**
  * Interface for monitoring handler validators.

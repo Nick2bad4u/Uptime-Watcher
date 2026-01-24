@@ -5,10 +5,10 @@
 import type { IpcParameterValidator } from "../types";
 
 import {
-    createNoParamsValidator,
     validateImportDataPayload,
     validateRestorePayload,
 } from "./shared";
+import { createNoParamsValidator } from "./utils/commonValidators";
 
 /**
  * Interface for data handler validators.

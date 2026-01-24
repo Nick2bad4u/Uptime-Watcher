@@ -59,7 +59,6 @@ import * as pluginCleanCode from "eslint-plugin-clean-code";
 // @ts-expect-error -- No Types for this Package
 import pluginCleanTimer from "eslint-plugin-clean-timer";
 import eslintPluginCommentLength from "eslint-plugin-comment-length";
-// eslint-disable-next-line import-x/no-unresolved -- Works fine
 import pluginCompat from "eslint-plugin-compat";
 // @ts-expect-error -- No Types for this Package
 import * as pluginCssModules from "eslint-plugin-css-modules";
