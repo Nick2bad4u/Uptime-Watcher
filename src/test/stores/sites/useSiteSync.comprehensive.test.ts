@@ -17,6 +17,7 @@ import { fc, test } from "@fast-check/vitest";
 import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
+import { mockConstructableReturnValueOnce } from "@shared/test/helpers/vitestConstructors";
 import { createMockFunction } from "../../utils/mockFactories";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 
@@ -434,9 +435,10 @@ describe("useSiteSync", () => {
                 unsubscribe: vi.fn(),
             } as unknown as StatusUpdateManager;
 
-            (
-                statusUpdateHandlerModule.StatusUpdateManager as any
-            ).mockReturnValueOnce(mockStatusUpdateManager);
+            mockConstructableReturnValueOnce(
+                statusUpdateHandlerModule.StatusUpdateManager as any,
+                mockStatusUpdateManager
+            );
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);

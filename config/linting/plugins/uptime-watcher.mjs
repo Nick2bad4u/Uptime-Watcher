@@ -3505,6 +3505,599 @@ const noLocalIdentifiersRule = {
 };
 
 /**
+ * ESLint rule preventing redeclaration of canonical shared contract interfaces.
+ *
+ * @remarks
+ * Some DTO/contract interfaces must remain single-sourced in `@shared` to avoid
+ * type drift between renderer/electron layers. This rule prevents accidentally
+ * reintroducing local copies.
+ */
+const noRedeclareSharedContractInterfacesRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow redeclaring shared contract interfaces that must be imported from @shared",
+            recommended: false,
+        },
+        schema: [
+            {
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                    names: {
+                        type: "array",
+                        items: { type: "string", minLength: 1 },
+                    },
+                },
+            },
+        ],
+        messages: {
+            redeclare:
+                'Do not redeclare the shared interface "{{name}}". Import it from @shared instead.',
+        },
+    },
+    create(context) {
+        const option = context.options?.[0];
+        const configuredNames = Array.isArray(option?.names)
+            ? option.names
+            : [];
+
+        const bannedNames = new Set([
+            // Default allowlist of canonical contracts.
+            "MonitorTypeOption",
+            ...configuredNames,
+        ]);
+
+        return {
+            TSInterfaceDeclaration(node) {
+                const id = node?.id;
+                if (!id || id.type !== "Identifier") {
+                    return;
+                }
+
+                if (!bannedNames.has(id.name)) {
+                    return;
+                }
+
+                context.report({
+                    node: id,
+                    messageId: "redeclare",
+                    data: {
+                        name: id.name,
+                    },
+                });
+            },
+        };
+    },
+};
+
+/**
+ * Drift guard: disallow local `hasAsciiControlCharacters` implementations in
+ * Electron services.
+ */
+const electronNoLocalStringSafetyHelpersRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow local string-safety helper implementations in electron/services",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            banned:
+                "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts instead of defining local implementations.",
+        },
+    },
+    create(context) {
+        const filename = normalizePath(context.getFilename());
+
+        if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/services/`)) {
+            return {};
+        }
+
+        // Allowed source of truth.
+        if (filename.endsWith("/electron/services/sync/syncEngineUtils.ts")) {
+            return {};
+        }
+
+        const reportIfNameMatches = (id) => {
+            if (!id || id.type !== "Identifier") {
+                return;
+            }
+            if (id.name !== "hasAsciiControlCharacters") {
+                return;
+            }
+            context.report({
+                node: id,
+                messageId: "banned",
+            });
+        };
+
+        return {
+            FunctionDeclaration(node) {
+                reportIfNameMatches(node?.id);
+            },
+            VariableDeclarator(node) {
+                reportIfNameMatches(node?.id);
+            },
+        };
+    },
+};
+
+/**
+ * Drift guard: disallow ad-hoc error code suffix formatting in electron/services.
+ *
+ * @remarks
+ * Targets patterns like: `code ? \` (${code})\` : ""`.
+ */
+const electronNoAdHocErrorCodeSuffixRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Prefer getElectronErrorCodeSuffix over ad-hoc error code suffix formatting",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            banned:
+                "Use getElectronErrorCodeSuffix from electron/services/shell/openExternalUtils.ts instead of ad-hoc error code suffix formatting.",
+        },
+    },
+    create(context) {
+        const filename = normalizePath(context.getFilename());
+
+        if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/services/`)) {
+            return {};
+        }
+
+        // Allowed source of truth.
+        if (
+            filename.endsWith(
+                "/electron/services/shell/openExternalUtils.ts"
+            )
+        ) {
+            return {};
+        }
+
+        const isEmptyStringLiteral = (node) =>
+            node?.type === "Literal" && node.value === "";
+
+        const isCodeSuffixTemplate = (node) => {
+            if (!node || node.type !== "TemplateLiteral") {
+                return false;
+            }
+
+            const hasCodeIdentifier = (node.expressions ?? []).some(
+                (expr) => expr?.type === "Identifier" && expr.name === "code"
+            );
+
+            if (!hasCodeIdentifier) {
+                return false;
+            }
+
+            return (node.quasis ?? []).some((quasi) => {
+                const raw = quasi?.value?.raw;
+                return typeof raw === "string" && raw.includes(" (");
+            });
+        };
+
+        return {
+            ConditionalExpression(node) {
+                const consequent = node?.consequent;
+                const alternate = node?.alternate;
+
+                const matches =
+                    (isCodeSuffixTemplate(consequent) &&
+                        isEmptyStringLiteral(alternate)) ||
+                    (isCodeSuffixTemplate(alternate) &&
+                        isEmptyStringLiteral(consequent));
+
+                if (!matches) {
+                    return;
+                }
+
+                context.report({
+                    node,
+                    messageId: "banned",
+                });
+            },
+        };
+    },
+};
+
+/**
+ * Drift guard: disallow local `isAsciiDigits` implementations in
+ * electron/services/sync.
+ */
+const electronSyncNoLocalAsciiDigitsRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow local isAsciiDigits implementations in electron/services/sync",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            banned:
+                "Use isAsciiDigits from electron/services/sync/syncEngineUtils.ts (avoid duplicated validation policies).",
+        },
+    },
+    create(context) {
+        const filename = normalizePath(context.getFilename());
+
+        if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/services/sync/`)) {
+            return {};
+        }
+
+        // Allowed source of truth.
+        if (filename.endsWith("/electron/services/sync/syncEngineUtils.ts")) {
+            return {};
+        }
+
+        const reportIfNameMatches = (id) => {
+            if (!id || id.type !== "Identifier") {
+                return;
+            }
+            if (id.name !== "isAsciiDigits") {
+                return;
+            }
+            context.report({
+                node: id,
+                messageId: "banned",
+            });
+        };
+
+        return {
+            FunctionDeclaration(node) {
+                reportIfNameMatches(node?.id);
+            },
+            VariableDeclarator(node) {
+                reportIfNameMatches(node?.id);
+            },
+        };
+    },
+};
+
+/**
+ * Drift guard preset for electron/services/cloud/providers.
+ *
+ * @remarks
+ * Collapses the legacy `no-call-identifiers` + `no-local-identifiers` config
+ * blocks into a single rule.
+ */
+const electronCloudProvidersDriftGuardsRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Prevent drift in electron/services/cloud/providers by banning known duplicated helpers",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            bannedCall:
+                "Use validateOAuthAuthorizeUrl (OAuth flows) or validateExternalOpenUrlCandidate (general external navigation) instead of calling isAllowedExternalOpenUrl directly.",
+            bannedLocal:
+                "Local definition of '{{name}}' is not allowed. {{details}}",
+        },
+    },
+    create(context) {
+        const filename = normalizePath(context.getFilename());
+
+        if (
+            !filename.startsWith(
+                `${NORMALIZED_ELECTRON_DIR}/services/cloud/providers/`
+            )
+        ) {
+            return {};
+        }
+
+        const localBans = new Map([
+            [
+                "tryParseJsonRecord",
+                "Use tryParseJsonRecord from shared/utils/jsonSafety.ts instead of defining local JSON parsing helpers.",
+            ],
+            [
+                "isPlainObject",
+                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+            ],
+        ]);
+
+        const reportLocal = (id) => {
+            if (!id || id.type !== "Identifier") {
+                return;
+            }
+
+            const details = localBans.get(id.name);
+            if (!details) {
+                return;
+            }
+
+            context.report({
+                node: id,
+                messageId: "bannedLocal",
+                data: {
+                    name: id.name,
+                    details,
+                },
+            });
+        };
+
+        return {
+            CallExpression(node) {
+                const callee = node?.callee;
+                if (!callee || callee.type !== "Identifier") {
+                    return;
+                }
+
+                if (callee.name !== "isAllowedExternalOpenUrl") {
+                    return;
+                }
+
+                context.report({
+                    node: callee,
+                    messageId: "bannedCall",
+                });
+            },
+            FunctionDeclaration(node) {
+                reportLocal(node?.id);
+            },
+            VariableDeclarator(node) {
+                reportLocal(node?.id);
+            },
+        };
+    },
+};
+
+/**
+ * Drift guard: disallow local `isPlainObject` variable definitions inside
+ * shared/types.
+ */
+const sharedTypesNoLocalIsPlainObjectRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow local isPlainObject definitions in shared/types",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            banned:
+                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+        },
+    },
+    create(context) {
+        const filename = normalizePath(context.getFilename());
+        if (!filename.startsWith(`${NORMALIZED_SHARED_DIR}/types/`)) {
+            return {};
+        }
+
+        return {
+            VariableDeclarator(node) {
+                const id = node?.id;
+                if (!id || id.type !== "Identifier") {
+                    return;
+                }
+
+                if (id.name !== "isPlainObject") {
+                    return;
+                }
+
+                context.report({
+                    node: id,
+                    messageId: "banned",
+                });
+            },
+        };
+    },
+};
+
+/**
+ * Drift guard: disallow local `isPlainObject` variable definitions inside
+ * electron/preload.
+ */
+const preloadNoLocalIsPlainObjectRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow local isPlainObject definitions in electron/preload",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            banned:
+                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+        },
+    },
+    create(context) {
+        const filename = normalizePath(context.getFilename());
+        if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/preload/`)) {
+            return {};
+        }
+
+        return {
+            VariableDeclarator(node) {
+                const id = node?.id;
+                if (!id || id.type !== "Identifier") {
+                    return;
+                }
+
+                if (id.name !== "isPlainObject") {
+                    return;
+                }
+
+                context.report({
+                    node: id,
+                    messageId: "banned",
+                });
+            },
+        };
+    },
+};
+
+/**
+ * Vitest safety guard.
+ *
+ * @remarks
+ * Vitest implements `mockReturnValue*` as `mockImplementation(() => value)`.
+ * Arrow functions are not constructible, so mocking a class/constructor this
+ * way can crash code paths that call `new` on the mocked symbol:
+ *
+ * `() => value is not a constructor`
+ *
+ * This rule flags `mockReturnValue` / `mockReturnValueOnce` when used on a
+ * likely-constructible mock target (PascalCase identifier).
+ */
+const testNoMockReturnValueConstructorsRule = {
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "Disallow mockReturnValue/mockReturnValueOnce on likely constructors (use constructible helper/mockImplementation(function...))",
+            recommended: false,
+        },
+        schema: [],
+        messages: {
+            banned:
+                "Avoid {{method}} on '{{name}}'. Vitest implements it with an arrow function, which cannot be used with `new`. Prefer {{replacement}} instead.",
+        },
+    },
+    create(context) {
+        const unwrapExpression = (node) => {
+            let current = node;
+            // Unwrap TS wrappers commonly produced by @typescript-eslint parser
+            // and optional chaining wrappers.
+
+            while (true) {
+                if (!current) {
+                    return current;
+                }
+
+                if (current.type === "ChainExpression") {
+                    current = current.expression;
+                    continue;
+                }
+
+                if (current.type === "TSAsExpression") {
+                    current = current.expression;
+                    continue;
+                }
+
+                if (current.type === "TSTypeAssertion") {
+                    current = current.expression;
+                    continue;
+                }
+
+                if (current.type === "TSNonNullExpression") {
+                    current = current.expression;
+                    continue;
+                }
+
+                return current;
+            }
+        };
+
+        const isPascalCase = (name) =>
+            typeof name === "string" && /^[A-Z][A-Za-z0-9]*$/.test(name);
+
+        const isViMockedCall = (node) => {
+            if (!node || node.type !== "CallExpression") {
+                return false;
+            }
+
+            const callee = unwrapExpression(node.callee);
+
+            // vi.mocked(...)
+            if (
+                callee?.type === "MemberExpression" &&
+                callee.object?.type === "Identifier" &&
+                callee.object.name === "vi" &&
+                callee.property?.type === "Identifier" &&
+                callee.property.name === "mocked"
+            ) {
+                return true;
+            }
+
+            return false;
+        };
+
+        const extractMockTargetName = (node) => {
+            const unwrapped = unwrapExpression(node);
+            if (!unwrapped) {
+                return undefined;
+            }
+
+            if (unwrapped.type === "Identifier") {
+                return unwrapped.name;
+            }
+
+            if (unwrapped.type === "MemberExpression") {
+                // Prefer the property name (e.g. BrowserWindow.getAllWindows)
+                if (unwrapped.property?.type === "Identifier") {
+                    return unwrapped.property.name;
+                }
+
+                return undefined;
+            }
+
+            if (isViMockedCall(unwrapped)) {
+                const arg = unwrapped.arguments?.[0];
+                return extractMockTargetName(arg);
+            }
+
+            return undefined;
+        };
+
+        return {
+            CallExpression(node) {
+                const callee = unwrapExpression(node.callee);
+                if (!callee || callee.type !== "MemberExpression") {
+                    return;
+                }
+
+                if (callee.computed) {
+                    return;
+                }
+
+                const property = callee.property;
+                if (!property || property.type !== "Identifier") {
+                    return;
+                }
+
+                const method = property.name;
+                if (method !== "mockReturnValue" && method !== "mockReturnValueOnce") {
+                    return;
+                }
+
+                const targetName = extractMockTargetName(callee.object);
+                if (!isPascalCase(targetName)) {
+                    return;
+                }
+
+                context.report({
+                    node: property,
+                    messageId: "banned",
+                    data: {
+                        method,
+                        name: targetName,
+                        replacement:
+                            method === "mockReturnValue"
+                                ? "mockConstructableReturnValue(mock, value)"
+                                : "mockConstructableReturnValueOnce(mock, value)",
+                    },
+                });
+            },
+        };
+    },
+};
+
+/**
  * ESLint rule disallowing calling certain imported identifiers.
  */
 const noCallIdentifiersRule = {
@@ -4429,6 +5022,21 @@ const uptimeWatcherPlugin = {
         "no-regexp-v-flag": noRegexpVFlagRule,
         "no-local-identifiers": noLocalIdentifiersRule,
         "no-call-identifiers": noCallIdentifiersRule,
+        "no-redeclare-shared-contract-interfaces":
+            noRedeclareSharedContractInterfacesRule,
+        "electron-no-local-string-safety-helpers":
+            electronNoLocalStringSafetyHelpersRule,
+        "electron-no-ad-hoc-error-code-suffix":
+            electronNoAdHocErrorCodeSuffixRule,
+        "electron-sync-no-local-ascii-digits":
+            electronSyncNoLocalAsciiDigitsRule,
+        "electron-cloud-providers-drift-guards":
+            electronCloudProvidersDriftGuardsRule,
+        "shared-types-no-local-isPlainObject":
+            sharedTypesNoLocalIsPlainObjectRule,
+        "preload-no-local-isPlainObject": preloadNoLocalIsPlainObjectRule,
+        "test-no-mock-return-value-constructors":
+            testNoMockReturnValueConstructorsRule,
         "prefer-try-get-error-code": preferTryGetErrorCodeRule,
         "logger-no-error-in-context": loggerNoErrorInContextRule,
         "store-actions-require-finally-reset":

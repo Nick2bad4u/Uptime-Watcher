@@ -20,7 +20,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { performance } from "node:perf_hooks";
 
-import { createMockConstructor } from "../../utils/vitestConstructors";
+import { createMockConstructor } from "@shared/test/helpers/vitestConstructors";
 
 // Mock Node.js modules with inline functions to avoid hoisting issues
 vi.mock("node:dns/promises", () => ({
@@ -170,7 +170,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+
             mockNet.Socket.mockImplementation(function MockSocketInstance() {
                 return mockSocket as unknown as net.Socket;
             });
@@ -202,7 +202,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+
             mockNet.Socket.mockImplementation(function MockSocketInstance() {
                 return mockSocket as unknown as net.Socket;
             });
@@ -250,7 +250,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+
             mockNet.Socket.mockImplementation(function MockSocketInstance() {
                 return mockSocket as unknown as net.Socket;
             });
@@ -289,7 +289,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+
             mockNet.Socket.mockImplementation(function MockSocketInstance() {
                 return mockSocket as unknown as net.Socket;
             });
@@ -332,7 +332,7 @@ describe("Native Connectivity with Degraded State", () => {
                 destroy: vi.fn(),
                 removeAllListeners: vi.fn(),
             };
-            // eslint-disable-next-line vitest/prefer-mock-return-shorthand -- Constructable mocks require a classic function implementation.
+
             mockNet.Socket.mockImplementation(function MockSocketInstance() {
                 return mockSocket as unknown as net.Socket;
             });

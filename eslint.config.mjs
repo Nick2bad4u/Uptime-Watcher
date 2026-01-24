@@ -212,7 +212,6 @@ import * as tomlEslintParser from "toml-eslint-parser";
 import * as yamlEslintParser from "yaml-eslint-parser";
 
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
-import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract-interfaces.mjs";
 
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
@@ -299,7 +298,7 @@ import { defineConfig, globalIgnores } from "@eslint/config-helpers";
 export default defineConfig([
     globalIgnores(["**/CHANGELOG.md"]),
     gitignore({
-        name: "Global .gitignore Rules",
+        name: "Global - .gitignore Rules",
         root: true,
         strict: true,
     }), // MARK: Global Configs and Rules
@@ -371,12 +370,24 @@ export default defineConfig([
             "temp/**",
             ".temp/**",
         ],
-        name: "Global Ignore Patterns **/**",
+        name: "Global: Ignore Patterns **/**",
     },
-    sharedContractInterfaceGuard,
+    {
+        files: [
+            "src/**/*.{ts,tsx}",
+            "electron/**/*.{ts,tsx}",
+            "docs/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx}",
+        ],
+        ignores: ["shared/types/**/*", "**/*.d.ts"],
+        name: "Shared Contract Interface Guard",
+        rules: {
+            "uptime-watcher/no-redeclare-shared-contract-interfaces": "error",
+        },
+    },
     {
         files: ["src/constants.ts"],
-        name: "Monitor Fallback Consistency",
+        name: "Src: Monitor Fallback Consistency",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -387,7 +398,7 @@ export default defineConfig([
     {
         files: ["electron/services/ipc/handlers/**/*.{ts,tsx}"],
         ignores: ["electron/test/**/*"],
-        name: "Electron IPC Handler Validation Guardrails",
+        name: "Electron: IPC Handler Validation Guardrails",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -398,7 +409,7 @@ export default defineConfig([
     {
         files: ["electron/**/*.{ts,tsx}"],
         ignores: ["electron/test/**/*"],
-        name: "Electron Logger Enforcement",
+        name: "Electron: Logger Enforcement",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -421,7 +432,7 @@ export default defineConfig([
     },
     {
         files: ["**/*.{ts,tsx}"],
-        name: "TSDoc Logger Examples",
+        name: "TSDoc: Logger Examples",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -437,7 +448,7 @@ export default defineConfig([
             "storybook/**/*.{ts,tsx}",
         ],
         ignores: ["shared/**/*"],
-        name: "Shared Alias Imports",
+        name: "Shared: Alias Imports",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -447,7 +458,7 @@ export default defineConfig([
     },
     {
         files: ["storybook/**/*.{ts,tsx,js,jsx,mts,mjs}"],
-        name: "Storybook Dev Helpers - storybook/**/*.{ts,tsx,js,jsx,mts,mjs}",
+        name: "Storybook: Dev Helpers - storybook/**/*.{ts,tsx,js,jsx,mts,mjs}",
         rules: {
             "import-x/no-extraneous-dependencies": "off",
             "n/no-extraneous-import": "off",
@@ -456,7 +467,7 @@ export default defineConfig([
     },
     {
         files: ["shared/**/*.{ts,tsx,cts,mts}"],
-        name: "Shared Layer Isolation",
+        name: "Shared: Layer Isolation",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -467,7 +478,7 @@ export default defineConfig([
     {
         files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: ["src/test/**/*"],
-        name: "Renderer Electron Isolation",
+        name: "Renderer: Electron Isolation",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -509,7 +520,7 @@ export default defineConfig([
             "src/test/**/*",
             "shared/test/**/*",
         ],
-        name: "No Deprecated Exports",
+        name: "Global: No Deprecated Exports",
         plugins: {
             "uptime-watcher": uptimeWatcherPlugin,
         },
@@ -1639,8 +1650,6 @@ export default defineConfig([
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@rushstack/security/no-unsafe-regexp": "warn",
-            "@stylistic/jsx-props-no-multi-spaces": "warn",
-            "@stylistic/jsx-sort-props": "off",
             // Code spacing and formatting rules
             "@stylistic/lines-around-comment": [
                 "off",
@@ -1668,6 +1677,7 @@ export default defineConfig([
                     exceptAfterSingleLine: false,
                 },
             ],
+            "@stylistic/no-multi-spaces": "warn",
             "@stylistic/padding-line-between-statements": [
                 "warn",
                 {
@@ -3126,15 +3136,13 @@ export default defineConfig([
             "@stylistic/jsx-curly-spacing": "off",
             "@stylistic/jsx-equals-spacing": "off",
             "@stylistic/jsx-first-prop-new-line": "off",
-            "@stylistic/jsx-indent": "off",
+            "@stylistic/jsx-function-call-newline": "off",
             "@stylistic/jsx-indent-props": "off",
             "@stylistic/jsx-max-props-per-line": "off",
             "@stylistic/jsx-newline": "off",
             "@stylistic/jsx-one-expression-per-line": "off",
             "@stylistic/jsx-pascal-case": "warn",
-            "@stylistic/jsx-props-no-multi-spaces": "warn",
             "@stylistic/jsx-self-closing-comp": "warn",
-            "@stylistic/jsx-sort-props": "off",
             "@stylistic/jsx-tag-spacing": "warn",
             "@stylistic/jsx-wrap-multilines": "warn",
             // Code spacing and formatting rules
@@ -3164,6 +3172,7 @@ export default defineConfig([
                     exceptAfterSingleLine: false,
                 },
             ],
+            "@stylistic/no-multi-spaces": "warn",
             "@stylistic/padding-line-between-statements": [
                 "warn",
                 {
@@ -6251,15 +6260,13 @@ export default defineConfig([
             "@stylistic/jsx-curly-spacing": "off",
             "@stylistic/jsx-equals-spacing": "off",
             "@stylistic/jsx-first-prop-new-line": "off",
-            "@stylistic/jsx-indent": "off",
+            "@stylistic/jsx-function-call-newline": "off",
             "@stylistic/jsx-indent-props": "off",
             "@stylistic/jsx-max-props-per-line": "off",
             "@stylistic/jsx-newline": "off",
             "@stylistic/jsx-one-expression-per-line": "off",
             "@stylistic/jsx-pascal-case": "warn",
-            "@stylistic/jsx-props-no-multi-spaces": "warn",
             "@stylistic/jsx-self-closing-comp": "warn",
-            "@stylistic/jsx-sort-props": "off",
             "@stylistic/jsx-tag-spacing": "warn",
             "@stylistic/jsx-wrap-multilines": "warn",
             // Code spacing and formatting rules
@@ -6289,6 +6296,7 @@ export default defineConfig([
                     exceptAfterSingleLine: false,
                 },
             ],
+            "@stylistic/no-multi-spaces": "warn",
             "@stylistic/padding-line-between-statements": [
                 "warn",
                 {
@@ -7707,6 +7715,7 @@ export default defineConfig([
             "undefined-css-classes": pluginUndefinedCss,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
+            "uptime-watcher": uptimeWatcherPlugin,
             vitest: vitest,
         },
         rules: {
@@ -7880,6 +7889,7 @@ export default defineConfig([
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
+            "uptime-watcher/test-no-mock-return-value-constructors": "error",
             "vitest/no-alias-methods": "warn",
             "vitest/no-commented-out-tests": "warn",
             "vitest/no-conditional-expect": "off",
@@ -7897,7 +7907,11 @@ export default defineConfig([
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
-            "vitest/prefer-mock-return-shorthand": "warn",
+            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors.
+            // When running with --fix, this rule rewrites safe constructible
+            // mocks back into `mockReturnValue*`, which can crash when the mock
+            // is used with `new`.
+            "vitest/prefer-mock-return-shorthand": "off",
             "vitest/prefer-spy-on": "off",
             "vitest/prefer-strict-boolean-matchers": "off",
             "vitest/prefer-to-be": "off",
@@ -7989,6 +8003,7 @@ export default defineConfig([
             "testing-library": pluginTestingLibrary,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
+            "uptime-watcher": uptimeWatcherPlugin,
             vitest: vitest,
         },
         rules: {
@@ -8162,6 +8177,7 @@ export default defineConfig([
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
+            "uptime-watcher/test-no-mock-return-value-constructors": "error",
             "vitest/no-alias-methods": "warn",
             "vitest/no-commented-out-tests": "warn",
             "vitest/no-conditional-expect": "off",
@@ -8179,7 +8195,8 @@ export default defineConfig([
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
-            "vitest/prefer-mock-return-shorthand": "warn",
+            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors.
+            "vitest/prefer-mock-return-shorthand": "off",
             "vitest/prefer-spy-on": "off",
             "vitest/prefer-strict-boolean-matchers": "off",
             "vitest/prefer-to-be": "off",
@@ -8272,6 +8289,7 @@ export default defineConfig([
             "undefined-css-classes": pluginUndefinedCss,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
+            "uptime-watcher": uptimeWatcherPlugin,
             vitest: vitest,
         },
         rules: {
@@ -8421,6 +8439,7 @@ export default defineConfig([
             "unicorn/no-unused-properties": "off", // Allow unused properties in test setups
             "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
+            "uptime-watcher/test-no-mock-return-value-constructors": "error",
             "vitest/no-alias-methods": "warn",
             "vitest/no-commented-out-tests": "warn",
             "vitest/no-conditional-expect": "off",
@@ -8438,7 +8457,11 @@ export default defineConfig([
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
-            "vitest/prefer-mock-return-shorthand": "warn",
+            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors.
+            // When running with --fix, this rule rewrites safe constructible
+            // mocks back into `mockReturnValue*`, which can crash when the mock
+            // is used with `new`.
+            "vitest/prefer-mock-return-shorthand": "off",
             "vitest/prefer-spy-on": "off",
             "vitest/prefer-strict-boolean-matchers": "off",
             "vitest/prefer-to-be": "off",
@@ -10250,7 +10273,7 @@ export default defineConfig([
             "**/package.json",
             "**/package-lock.json",
         ],
-        name: "JSON Files - Disables",
+        name: "JSON: Files - Disables",
         rules: {
             "json/sort-keys": "off",
         },
@@ -10265,156 +10288,67 @@ export default defineConfig([
     {
         files: ["electron/services/sync/**/*.{ts,tsx}"],
         ignores: ["electron/services/sync/syncEngineUtils.ts"],
-        name: "Cloud Sync Drift Guards",
+        name: "Electron: Cloud Sync Drift Guards",
         rules: {
-            "uptime-watcher/no-local-identifiers": [
-                "error",
-                {
-                    banned: [
-                        {
-                            kinds: ["function"],
-                            message:
-                                "Use isAsciiDigits from electron/services/sync/syncEngineUtils.ts (avoid duplicated validation policies).",
-                            name: "isAsciiDigits",
-                        },
-                        {
-                            kinds: ["function"],
-                            message:
-                                "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts (avoid duplicated validation policies).",
-                            name: "hasAsciiControlCharacters",
-                        },
-                    ],
-                },
-            ],
+            "uptime-watcher/electron-sync-no-local-ascii-digits": "error",
         },
     },
     {
         files: ["electron/services/cloud/providers/**/*.{ts,tsx}"],
-        name: "Cloud Providers Drift Guards",
+        name: "Electron: Cloud Providers Drift Guards",
         rules: {
-            "uptime-watcher/no-call-identifiers": [
-                "error",
-                {
-                    banned: [
-                        {
-                            message:
-                                "Use validateOAuthAuthorizeUrl (OAuth flows) or validateExternalOpenUrlCandidate (general external navigation) instead of calling isAllowedExternalOpenUrl directly.",
-                            name: "isAllowedExternalOpenUrl",
-                        },
-                    ],
-                },
-            ],
-            "uptime-watcher/no-local-identifiers": [
-                "error",
-                {
-                    banned: [
-                        {
-                            kinds: ["function"],
-                            message:
-                                "Use tryParseJsonRecord from shared/utils/jsonSafety.ts instead of defining local JSON parsing helpers.",
-                            name: "tryParseJsonRecord",
-                        },
-                        {
-                            kinds: ["function"],
-                            message:
-                                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
-                            name: "isPlainObject",
-                        },
-                    ],
-                },
-            ],
+            "uptime-watcher/electron-cloud-providers-drift-guards": "error",
         },
     },
     {
         files: ["shared/types/**/*.{ts,tsx}"],
-        name: "Shared Types Drift Guards",
+        name: "Shared: Types Drift Guards",
         rules: {
-            "uptime-watcher/no-local-identifiers": [
-                "error",
-                {
-                    banned: [
-                        {
-                            kinds: ["variable"],
-                            message:
-                                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
-                            name: "isPlainObject",
-                        },
-                    ],
-                },
-            ],
+            "uptime-watcher/shared-types-no-local-isPlainObject": "error",
         },
     },
     {
         files: ["electron/preload/**/*.{ts,tsx}"],
-        name: "Preload Drift Guards",
+        name: "Preload: Drift Guards",
         rules: {
-            "uptime-watcher/no-local-identifiers": [
-                "error",
-                {
-                    banned: [
-                        {
-                            kinds: ["variable"],
-                            message:
-                                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
-                            name: "isPlainObject",
-                        },
-                    ],
-                },
-            ],
+            "uptime-watcher/preload-no-local-isPlainObject": "error",
         },
     },
     {
         files: ["electron/services/**/*.{ts,tsx}"],
         ignores: ["electron/services/sync/syncEngineUtils.ts"],
-        name: "String Safety Drift Guards",
+        name: "Electron: String Safety Drift Guards",
         rules: {
-            "uptime-watcher/no-local-identifiers": [
-                "error",
-                {
-                    banned: [
-                        {
-                            kinds: ["function"],
-                            message:
-                                "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts instead of defining local implementations.",
-                            name: "hasAsciiControlCharacters",
-                        },
-                    ],
-                },
-            ],
+            "uptime-watcher/electron-no-local-string-safety-helpers": "error",
         },
     },
     {
         files: ["electron/services/**/*.{ts,tsx}"],
         ignores: ["electron/services/shell/openExternalUtils.ts"],
-        name: "Electron Error Formatting Drift Guards",
+        name: "Electron: Error Formatting Drift Guards",
         rules: {
-            "no-restricted-syntax": [
-                "error",
-                {
-                    message:
-                        "Use getElectronErrorCodeSuffix from electron/services/shell/openExternalUtils.ts instead of ad-hoc error code suffix formatting.",
-                    selector:
-                        "ConditionalExpression:has(TemplateLiteral:has(Identifier[name='code']):has(TemplateElement[value.raw=' ('])):has(Literal[value=''])",
-                },
-            ],
+            "uptime-watcher/electron-no-ad-hoc-error-code-suffix": "error",
             "uptime-watcher/prefer-try-get-error-code": "error",
         },
     },
     {
         files: ["**/*.{ts,tsx}"],
-        name: "Regex Drift Guards",
+        name: "Global: Regex Drift Guards",
         rules: {
             "uptime-watcher/no-regexp-v-flag": "error",
         },
     },
     {
         files: ["**/**"],
-        name: "Stylistic Overrides",
+        name: "Global: Stylistic Overrides",
         plugins: {
             "@stylistic": stylistic,
         },
         rules: {
+            "@stylistic/curly-newline": "off",
             "@stylistic/exp-list-style": "off",
+            "@stylistic/line-comment-position": "off",
+            "@stylistic/multiline-comment-style": "off",
             "@stylistic/spaced-comment": [
                 "error",
                 "always",
@@ -10432,7 +10366,7 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/**"],
-        name: "Globals",
+        name: "Global: Globals",
         rules: {
             "@eslint-react/debug/class-component": "off", // Debugging not needed
             "@eslint-react/debug/function-component": "off", // Debugging not needed
@@ -10479,7 +10413,7 @@ export default defineConfig([
             "storybook/**",
             "docs/**",
         ],
-        name: "AI Agent Guardrails (production)",
+        name: "Global: AI Agent Guardrails (production)",
         plugins: {
             "@typescript-eslint": tseslint,
             canonical: pluginCanonical,
@@ -10500,7 +10434,7 @@ export default defineConfig([
             "**/*.test.{ts,tsx}",
             "**/*.spec.{ts,tsx}",
         ],
-        name: "AI Agent Guardrails (tests)",
+        name: "Global: AI Agent Guardrails (tests)",
         plugins: {
             "@typescript-eslint": tseslint,
             canonical: pluginCanonical,
@@ -10519,7 +10453,7 @@ export default defineConfig([
             "src/test/**/*.{ts,tsx}",
             "tests/**/*.{ts,tsx}",
         ],
-        name: "Tests - relax strict void rules",
+        name: "Tests: relax strict void rules",
         rules: {
             // This rule is extremely noisy in tests (especially property-based
             // tests) where callback return values are often incidental.
@@ -10532,7 +10466,7 @@ export default defineConfig([
             "electron/test/**/*.{ts,tsx}",
             "scripts/**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}",
         ],
-        name: "Benchmarks/Scripts - relax strict void rules",
+        name: "Benchmarks/Scripts: relax strict void rules",
         rules: {
             // Benchmarks frequently return measurement values from callbacks.
             // Scripts commonly use void/Promise-returning callbacks where the

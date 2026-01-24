@@ -50,7 +50,7 @@ import { SITES_CHANNELS } from "@shared/types/preload";
 ## Where the rules live
 
 - Plugin implementation: `config/linting/plugins/uptime-watcher.mjs`
-- Additional guard config: `config/linting/rules/shared-contract-interfaces.mjs`
+- Shared contract interface guard: `uptime-watcher/no-redeclare-shared-contract-interfaces` (implemented in the plugin)
 - Configuration: `eslint.config.mjs`
 
 ## Current custom rule inventory (enforced)
@@ -88,6 +88,29 @@ The following `uptime-watcher/*` rules currently exist and are enabled in
   - `uptime-watcher/no-local-record-guards`
   - `uptime-watcher/no-local-error-normalizers`
   - `uptime-watcher/no-deprecated-exports`
+  - `uptime-watcher/no-redeclare-shared-contract-interfaces`
+  - `uptime-watcher/electron-no-local-string-safety-helpers`
+  - `uptime-watcher/electron-no-ad-hoc-error-code-suffix`
+  - `uptime-watcher/electron-sync-no-local-ascii-digits`
+  - `uptime-watcher/electron-cloud-providers-drift-guards`
+  - `uptime-watcher/shared-types-no-local-isPlainObject`
+  - `uptime-watcher/preload-no-local-isPlainObject`
+
+- Test stability helpers
+  - `uptime-watcher/test-no-mock-return-value-constructors`
+
+### Vitest constructor mocks
+
+When you need a mocked constructor to be usable with `new`, **do not** use
+`mockReturnValue` / `mockReturnValueOnce` (Vitest implements those with an
+arrow function).
+
+Prefer the shared helper:
+
+- `@shared/test/helpers/vitestConstructors`
+  - `mockConstructableReturnValue(mock, value)`
+  - `mockConstructableReturnValueOnce(mock, value)`
+  - `createMockConstructor(factory)`
 
 - Logging / docs guardrails
   - `uptime-watcher/electron-no-console`

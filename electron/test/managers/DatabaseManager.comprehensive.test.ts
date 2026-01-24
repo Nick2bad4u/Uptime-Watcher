@@ -5,6 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Site } from "@shared/types";
+import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
 
 // Mock database commands FIRST using vi.hoisted
 const { DatabaseCommandExecutor } = vi.hoisted(() => {
@@ -320,7 +321,8 @@ const createSiteLoadingOrchestratorMock = (overrides = {}) => ({
 const setSiteLoadingOrchestratorMock = (
     orchestrator: ReturnType<typeof createSiteLoadingOrchestratorMock>
 ): void => {
-    (SiteLoadingOrchestrator as any).mockReturnValue(
+    mockConstructableReturnValue(
+        SiteLoadingOrchestrator as any,
         orchestrator as any
     );
 };
@@ -725,8 +727,10 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     .fn()
                     .mockRejectedValue(new Error("Import failed")),
             });
-            vi.mocked(DataImportExportService).mockReturnValue(
-                mockImportService as any
+            vi.mocked(DataImportExportService).mockImplementation(
+                function DataImportExportServiceCtorMock() {
+                    return mockImportService as any;
+                }
             );
 
             const mockExecute = vi
@@ -762,8 +766,10 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     .mockResolvedValue({ sites: [], settings: [] }),
                 persistImportedData: vi.fn().mockResolvedValue(undefined),
             });
-            vi.mocked(DataImportExportService).mockReturnValue(
-                mockImportService as any
+            vi.mocked(DataImportExportService).mockImplementation(
+                function DataImportExportServiceCtorMock() {
+                    return mockImportService as any;
+                }
             );
 
             // Mock the command executor to succeed for ImportDataCommand
@@ -1085,8 +1091,10 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                     .fn()
                     .mockRejectedValue(new Error("File system error")),
             });
-            vi.mocked(DataImportExportService).mockReturnValue(
-                mockImportService as any
+            vi.mocked(DataImportExportService).mockImplementation(
+                function DataImportExportServiceCtorMock() {
+                    return mockImportService as any;
+                }
             );
 
             await expect(databaseManager.downloadBackup()).rejects.toThrowError(

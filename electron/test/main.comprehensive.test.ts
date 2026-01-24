@@ -6,6 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { App } from "electron";
 import type { ApplicationService as ApplicationServiceType } from "../services/application/ApplicationService";
+import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
 
 // ========================================
 // MOCK ALL DEPENDENCIES BEFORE MAIN.TS IMPORT
@@ -615,7 +616,8 @@ describe("main.ts - Electron Main Process", () => {
             // IMPORTANT: ApplicationService is instantiated with `new`.
             // `mockReturnValue` uses a non-constructable arrow implementation.
             // We use a constructable function implementation instead.
-            (ApplicationService as any).mockReturnValue(
+            mockConstructableReturnValue(
+                ApplicationService as any,
                 {} as unknown as ApplicationServiceType
             );
 
@@ -633,7 +635,8 @@ describe("main.ts - Electron Main Process", () => {
             }).not.toThrowError();
 
             // Restore default implementation for subsequent tests
-            (ApplicationService as any).mockReturnValue(
+            mockConstructableReturnValue(
+                ApplicationService as any,
                 mockApplicationService as unknown as ApplicationServiceType
             );
         });

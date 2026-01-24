@@ -10,6 +10,9 @@ import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
+import {
+    mockConstructableReturnValue,
+} from "@shared/test/helpers/vitestConstructors";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
@@ -322,8 +325,12 @@ describe(DatabaseManager, () => {
                 await import("../../services/database/DataBackupService");
 
             // Setup mocks to return our mock instances
-            vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
-            vi.mocked(DataBackupService).mockReturnValue(
+            mockConstructableReturnValue(
+                vi.mocked(LoggerAdapter) as any,
+                mockLoggerAdapter as any
+            );
+            mockConstructableReturnValue(
+                vi.mocked(DataBackupService) as any,
                 mockDataBackupService as any
             );
 
@@ -391,8 +398,12 @@ describe(DatabaseManager, () => {
                 await import("../../services/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
-            vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
-            vi.mocked(DataImportExportService).mockReturnValue(
+            mockConstructableReturnValue(
+                vi.mocked(LoggerAdapter) as any,
+                mockLoggerAdapter as any
+            );
+            mockConstructableReturnValue(
+                vi.mocked(DataImportExportService) as any,
                 mockDataImportExportService as any
             );
 
@@ -457,8 +468,12 @@ describe(DatabaseManager, () => {
                 await import("../../services/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
-            vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
-            vi.mocked(DataImportExportService).mockReturnValue(
+            mockConstructableReturnValue(
+                vi.mocked(LoggerAdapter) as any,
+                mockLoggerAdapter as any
+            );
+            mockConstructableReturnValue(
+                vi.mocked(DataImportExportService) as any,
                 mockDataImportExportService as any
             );
 
@@ -507,8 +522,12 @@ describe(DatabaseManager, () => {
                 await import("../../services/database/DataImportExportService");
 
             // Setup mocks to return our mock instances
-            vi.mocked(LoggerAdapter).mockReturnValue(mockLoggerAdapter as any);
-            vi.mocked(DataImportExportService).mockReturnValue(
+            mockConstructableReturnValue(
+                vi.mocked(LoggerAdapter) as any,
+                mockLoggerAdapter as any
+            );
+            mockConstructableReturnValue(
+                vi.mocked(DataImportExportService) as any,
                 mockDataImportExportService as any
             );
 
@@ -652,7 +671,8 @@ describe(DatabaseManager, () => {
                     fileName: "backup-test.db",
                 }),
             };
-            vi.mocked(DataBackupService).mockReturnValue(
+            mockConstructableReturnValue(
+                vi.mocked(DataBackupService) as any,
                 mockBackupService as any
             );
 
@@ -678,7 +698,8 @@ describe(DatabaseManager, () => {
                     .fn()
                     .mockResolvedValue('{"sites": [], "settings": []}'),
             };
-            vi.mocked(DataImportExportService).mockReturnValue(
+            mockConstructableReturnValue(
+                vi.mocked(DataImportExportService) as any,
                 mockExportService as any
             );
 
