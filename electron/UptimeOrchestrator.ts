@@ -85,6 +85,9 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
+import type {
+    ApplicationError,
+} from "@shared/utils/errorHandling";
 
 import {
     STATE_SYNC_ACTION,
@@ -92,10 +95,6 @@ import {
     type StateSyncAction,
     type StateSyncSource,
 } from "@shared/types/stateSync";
-import {
-    ApplicationError,
-    type ApplicationErrorOptions,
-} from "@shared/utils/errorHandling";
 
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
@@ -121,6 +120,8 @@ import {
     createLoggingMiddleware,
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
+import { UptimeOrchestratorSubscriptions } from "./orchestrator/UptimeOrchestratorSubscriptions";
+import { createContextualApplicationError } from "./orchestrator/utils/createContextualApplicationError";
 import { UptimeOrchestratorEventHandlers } from "./UptimeOrchestratorEventHandlers";
 import { runIdempotentInitialization } from "./utils/idempotentInitialization";
 import { diagnosticsLogger, logger } from "./utils/logger";
@@ -182,6 +183,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
     /** Bound event-handler callbacks for internal orchestration events. */
     private readonly eventHandlers: UptimeOrchestratorEventHandlers;
+
+    /** Registers/unregisters orchestrator event subscriptions. */
+    private readonly subscriptions: UptimeOrchestratorSubscriptions;
 
     /**
      * Cached initialization promise for idempotent startup.
@@ -530,8 +534,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         try {
             logger.info("[UptimeOrchestrator] Starting shutdown...");
 
-            // Remove specific event listeners using the named handler references
-            this.removeEventHandlers();
+            this.subscriptions.unregister();
 
             // Clear all middleware
             this.clearMiddleware();
@@ -821,32 +824,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         message: string;
         operation: string;
     }): ApplicationError {
-        const { cause, code, details, message, operation } = options;
-
-        const errorOptions: ApplicationErrorOptions = {
-            cause,
-            code,
-            message,
-            operation,
-            ...(details ? { details } : {}),
-        };
-
-        const appError = new ApplicationError(errorOptions);
-
-        logger.error(appError.message, {
-            code,
-            details,
-            error: cause,
-            operation,
+        return createContextualApplicationError({
+            ...options,
+            diagnosticsLogger,
+            diagnosticsPrefix: "[UptimeOrchestrator]",
+            logger,
         });
-
-        diagnosticsLogger.error(`[UptimeOrchestrator] ${operation} failed`, {
-            code,
-            details,
-            error: appError,
-        });
-
-        return appError;
     }
 
     // Named event handlers for database events
@@ -869,58 +852,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public get historyLimit(): number {
         return this.databaseManager.getHistoryLimit();
-    }
-
-    /**
-     * Removes all event handlers to prevent memory leaks during shutdown.
-     *
-     * @remarks
-     * Systematically removes all event listeners that were registered during
-     * initialization to ensure proper cleanup and prevent memory leaks.
-     *
-     * @private
-     */
-    private removeEventHandlers(): void {
-        this.historyLimitCoordinator.unregister();
-        this.eventForwardingCoordinator.unregister();
-
-        // Remove database event handlers
-        this.off(
-            "internal:database:update-sites-cache-requested",
-            this.eventHandlers.handleUpdateSitesCacheRequestedEvent
-        );
-        this.off(
-            "internal:database:get-sites-from-cache-requested",
-            this.eventHandlers.handleGetSitesFromCacheRequestedEvent
-        );
-        this.off(
-            "internal:database:initialized",
-            this.eventHandlers.handleDatabaseInitializedEvent
-        );
-
-        // Remove monitoring event handlers
-        this.off(
-            "internal:monitor:manual-check-completed",
-            this.eventHandlers.handleManualCheckCompletedEvent
-        );
-
-        // Remove site management event handlers
-        this.off(
-            "internal:site:start-monitoring-requested",
-            this.eventHandlers.handleStartMonitoringRequestedEvent
-        );
-        this.off(
-            "internal:site:stop-monitoring-requested",
-            this.eventHandlers.handleStopMonitoringRequestedEvent
-        );
-        this.off(
-            "internal:site:is-monitoring-active-requested",
-            this.eventHandlers.handleIsMonitoringActiveRequestedEvent
-        );
-        this.off(
-            "internal:site:restart-monitoring-requested",
-            this.eventHandlers.handleRestartMonitoringRequestedEvent
-        );
     }
 
     /**
@@ -1010,8 +941,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             snapshotSyncCoordinator: this.snapshotSyncCoordinator,
         });
 
+        this.subscriptions = new UptimeOrchestratorSubscriptions({
+            eventBus: this,
+            eventForwardingCoordinator: this.eventForwardingCoordinator,
+            eventHandlers: this.eventHandlers,
+            historyLimitCoordinator: this.historyLimitCoordinator,
+        });
+
         // Set up event-driven communication between managers
-        this.setupEventHandlers();
+        this.subscriptions.register();
     }
 
     /**
@@ -1030,40 +968,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Set up database manager event handlers.
-     */
-    private setupDatabaseEventHandlers(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:database:update-sites-cache-requested",
-            this.eventHandlers.handleUpdateSitesCacheRequestedEvent
-        );
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:database:get-sites-from-cache-requested",
-            this.eventHandlers.handleGetSitesFromCacheRequestedEvent
-        );
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:database:initialized",
-            this.eventHandlers.handleDatabaseInitializedEvent
-        );
-    }
-
-    /**
-     * Set up event handlers for inter-manager communication.
-     */
-    private setupEventHandlers(): void {
-        this.setupDatabaseEventHandlers();
-        this.historyLimitCoordinator.register();
-        this.eventForwardingCoordinator.register();
-        this.setupMonitoringEventHandlers();
-        this.setupSiteEventHandlers();
-    }
-
-    /**
      * Set up middleware for the event bus.
      *
      * @remarks
@@ -1075,46 +979,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         );
         this.registerMiddleware(
             createLoggingMiddleware({ includeData: false, level: "info" })
-        );
-    }
-
-    /**
-     * Set up monitoring event handlers.
-     */
-    private setupMonitoringEventHandlers(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:monitor:manual-check-completed",
-            this.eventHandlers.handleManualCheckCompletedEvent
-        );
-    }
-
-    /**
-     * Set up site manager event handlers.
-     */
-    private setupSiteEventHandlers(): void {
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:site:start-monitoring-requested",
-            this.eventHandlers.handleStartMonitoringRequestedEvent
-        );
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:site:stop-monitoring-requested",
-            this.eventHandlers.handleStopMonitoringRequestedEvent
-        );
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:site:is-monitoring-active-requested",
-            this.eventHandlers.handleIsMonitoringActiveRequestedEvent
-        );
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Site management event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
-            "internal:site:restart-monitoring-requested",
-            this.eventHandlers.handleRestartMonitoringRequestedEvent
         );
     }
 

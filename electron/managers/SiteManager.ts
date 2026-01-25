@@ -47,7 +47,6 @@
 
 import type { Site } from "@shared/types";
 import type { StateSyncAction, StateSyncSource } from "@shared/types/stateSync";
-import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
@@ -57,7 +56,6 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
-import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -75,16 +73,14 @@ import { SiteWriterService } from "../services/database/SiteWriterService";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
+import { createSiteMonitoringConfig } from "./siteManager/createSiteMonitoringConfig";
+import { formatSiteValidationErrors } from "./siteManager/formatSiteValidationErrors";
+import { loadSiteInBackground } from "./siteManager/loadSiteInBackground";
+import {
+    updateSitesCache,
+    type UpdateSitesCacheOptions,
+} from "./siteManager/updateSitesCache";
 import { SiteManagerStateSync } from "./SiteManagerStateSync";
-
-interface UpdateSitesCacheOptions {
-    readonly action?: StateSyncAction;
-    readonly emitSyncEvent?: boolean;
-    readonly siteIdentifier?: string;
-    readonly sites?: Site[];
-    readonly source?: StateSyncSource;
-    readonly timestamp?: number;
-}
 
 /**
  * @remarks
@@ -702,70 +698,26 @@ export class SiteManager {
         context?: string,
         options?: UpdateSitesCacheOptions
     ): Promise<void> {
-        const snapshot = deriveSiteSnapshot(sites);
+        const cacheUpdateInput: {
+            readonly context?: string;
+            readonly options?: UpdateSitesCacheOptions;
+            readonly sites: Site[];
+        } = {
+            sites,
+            ...(typeof context === "string" ? { context } : {}),
+            ...(options ? { options } : {}),
+        };
 
-        if (snapshot.duplicates.length > 0) {
-            logger.error(
-                "[SiteManager] Duplicate site identifiers detected while updating cache",
-                {
-                    context: context ?? "SiteManager.updateSitesCache",
-                    droppedIdentifiers: snapshot.duplicates.map(
-                        (entry: DuplicateSiteIdentifier) => entry.identifier
-                    ),
-                    duplicates: snapshot.duplicates,
-                }
-            );
-        }
-
-        this.sitesCache.replaceAll(
-            snapshot.sanitizedSites.map((site: Site) => ({
-                data: site,
-                key: site.identifier,
-            }))
+        await updateSitesCache(
+            {
+                emitSiteCacheUpdated: async (args): Promise<void> =>
+                    this.emitSiteCacheUpdated(args),
+                emitSitesStateSynchronized: async (payload): Promise<unknown> =>
+                    this.emitSitesStateSynchronized(payload),
+                sitesCache: this.sitesCache,
+            },
+            cacheUpdateInput
         );
-
-        // Emit cache updated event
-        await this.emitSiteCacheUpdated({
-            identifier: "all",
-            operation: "cache-updated",
-        });
-
-        if (options?.emitSyncEvent) {
-            const syncSourceSites = options.sites ?? snapshot.sanitizedSites;
-            const syncSnapshot = deriveSiteSnapshot(syncSourceSites);
-
-            if (syncSnapshot.duplicates.length > 0) {
-                logger.error(
-                    "[SiteManager] Duplicate site identifiers detected in synchronization payload",
-                    {
-                        context: context ?? "SiteManager.updateSitesCache",
-                        droppedIdentifiers: syncSnapshot.duplicates.map(
-                            (entry: DuplicateSiteIdentifier) => entry.identifier
-                        ),
-                        duplicates: syncSnapshot.duplicates,
-                    }
-                );
-            }
-
-            const syncPayload: {
-                action: StateSyncAction;
-                siteIdentifier: string;
-                sites: Site[];
-                source: StateSyncSource;
-                timestamp?: number;
-            } = {
-                action: options.action ?? STATE_SYNC_ACTION.BULK_SYNC,
-                siteIdentifier: options.siteIdentifier ?? "all",
-                sites: syncSnapshot.sanitizedSites,
-                source: options.source ?? STATE_SYNC_SOURCE.CACHE,
-            };
-
-            if (typeof options.timestamp === "number") {
-                syncPayload.timestamp = options.timestamp;
-            }
-
-            await this.emitSitesStateSynchronized(syncPayload);
-        }
     }
 
     /**
@@ -783,75 +735,17 @@ export class SiteManager {
      * @internal
      */
     private async loadSiteInBackground(identifier: string): Promise<void> {
-        try {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.BACKGROUND_LOAD_START,
-                    { identifier }
-                )
-            );
-
-            const site =
-                await this.siteRepositoryService.getSiteFromDatabase(
-                    identifier
-                );
-
-            if (site) {
-                this.sitesCache.set(identifier, site);
-
-                const timestamp = Date.now();
-
-                await this.emitSitesStateSynchronized({
-                    action: STATE_SYNC_ACTION.UPDATE,
-                    siteIdentifier: identifier,
-                    source: STATE_SYNC_SOURCE.DATABASE,
-                    timestamp,
-                });
-
-                await this.emitSiteCacheUpdated({
-                    identifier,
-                    operation: "background-load",
-                    timestamp,
-                });
-
-                logger.debug(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.debug.BACKGROUND_LOAD_COMPLETE,
-                        { identifier }
-                    )
-                );
-            } else {
-                logger.debug(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.debug.SITE_BACKGROUND_LOAD_FAILED,
-                        { identifier }
-                    )
-                );
-
-                // Emit not found event for observability
-                await this.emitSiteCacheMissSafe({
-                    backgroundLoading: false,
-                    identifier,
-                    operation: "cache-lookup",
-                });
-            }
-        } catch (error) {
-            // Emit error event for observability while maintaining
-            // non-blocking behavior
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED,
-                    { identifier }
-                ),
-                error
-            );
-
-            await this.emitSiteCacheMissSafe({
-                backgroundLoading: false,
-                identifier,
-                operation: "cache-lookup",
-            });
-        }
+        await loadSiteInBackground({
+            emitSiteCacheMissSafe: async (args): Promise<void> =>
+                this.emitSiteCacheMissSafe(args),
+            emitSiteCacheUpdated: async (args): Promise<void> =>
+                this.emitSiteCacheUpdated(args),
+            emitSitesStateSynchronized: async (payload): Promise<unknown> =>
+                this.emitSitesStateSynchronized(payload),
+            identifier,
+            siteRepositoryService: this.siteRepositoryService,
+            sitesCache: this.sitesCache,
+        });
     }
 
     /**
@@ -1005,38 +899,38 @@ export class SiteManager {
 
         if (!site) {
             // Emit cache miss event
-                fireAndForget(
-                    async () => {
-                        await this.emitSiteCacheMissSafe({
-                            backgroundLoading: true,
-                            identifier,
-                            operation: "cache-lookup",
-                        });
+            fireAndForget(
+                async () => {
+                    await this.emitSiteCacheMissSafe({
+                        backgroundLoading: true,
+                        identifier,
+                        operation: "cache-lookup",
+                    });
+                },
+                {
+                    onError: (error) => {
+                        logger.debug(
+                            LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
+                            error
+                        );
                     },
-                    {
-                        onError: (error) => {
-                            logger.debug(
-                                LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
-                                error
-                            );
-                        },
-                    }
-                );
+                }
+            );
 
             // Trigger background loading without blocking
-                fireAndForget(
-                    async () => {
-                        await this.loadSiteInBackground(identifier);
+            fireAndForget(
+                async () => {
+                    await this.loadSiteInBackground(identifier);
+                },
+                {
+                    onError: (error) => {
+                        logger.debug(
+                            LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
+                            error
+                        );
                     },
-                    {
-                        onError: (error) => {
-                            logger.debug(
-                                LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
-                                error
-                            );
-                        },
-                    }
-                );
+                }
+            );
         }
 
         return site;
@@ -1091,67 +985,9 @@ export class SiteManager {
      * @internal
      */
     private createMonitoringConfig(): MonitoringConfig {
-        return {
-            setHistoryLimit: async (limit: number): Promise<void> => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for setHistoryLimit"
-                    );
-                }
-
-                try {
-                    await this.monitoringOperations.setHistoryLimit(limit);
-                } catch (error) {
-                    logger.error(
-                        LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED,
-                        error
-                    );
-                    throw error;
-                }
-            },
-            setupNewMonitors: async (
-                site: Site,
-                newMonitorIds: string[]
-            ): Promise<void> => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for setupNewMonitors"
-                    );
-                }
-                await this.monitoringOperations.setupNewMonitors(
-                    site,
-                    newMonitorIds
-                );
-            },
-            startMonitoring: async (
-                identifier: string,
-                monitorId: string
-            ): Promise<boolean> => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for startMonitoring"
-                    );
-                }
-                return this.monitoringOperations.startMonitoringForSite(
-                    identifier,
-                    monitorId
-                );
-            },
-            stopMonitoring: async (
-                identifier: string,
-                monitorId: string
-            ): Promise<boolean> => {
-                if (!this.monitoringOperations) {
-                    throw new Error(
-                        "MonitoringOperations not available but required for stopMonitoring"
-                    );
-                }
-                return this.monitoringOperations.stopMonitoringForSite(
-                    identifier,
-                    monitorId
-                );
-            },
-        };
+        return createSiteMonitoringConfig({
+            monitoringOperations: this.monitoringOperations,
+        });
     }
 
     /**
@@ -1169,13 +1005,6 @@ export class SiteManager {
     private formatValidationErrors(
         errors: readonly string[] | undefined
     ): string {
-        if (!errors || errors.length === 0) {
-            return "";
-        }
-        if (errors.length === 1) {
-            // Ensure fallback to empty string if errors[0] is undefined
-            return errors[0] ?? "";
-        }
-        return `\n  - ${errors.join("\n  - ")}`;
+        return formatSiteValidationErrors(errors);
     }
 }

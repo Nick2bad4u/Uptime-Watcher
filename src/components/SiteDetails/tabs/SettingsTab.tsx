@@ -9,50 +9,25 @@ import type { ChangeEvent, JSX } from "react";
 
 import { useCallback, useMemo } from "react";
 
-import {
-    CHECK_INTERVALS,
-    RETRY_CONSTRAINTS,
-    TIMEOUT_CONSTRAINTS,
-} from "../../../constants";
 import { logger } from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import { ThemedBadge } from "../../../theme/components/ThemedBadge";
-import { ThemedBox } from "../../../theme/components/ThemedBox";
-import { ThemedButton } from "../../../theme/components/ThemedButton";
-import { ThemedCard } from "../../../theme/components/ThemedCard";
-import { ThemedInput } from "../../../theme/components/ThemedInput";
-import { ThemedSelect } from "../../../theme/components/ThemedSelect";
-import { ThemedText } from "../../../theme/components/ThemedText";
-import { useTheme } from "../../../theme/useTheme";
-import { AppIcons, getIconSize } from "../../../utils/icons";
-import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
-import {
-    calculateMaxCheckDurationSeconds,
-    formatSecondsWithMinutes,
-    getDisplayIdentifier,
-    useIdentifierLabel,
-} from "./SettingsTab.utils";
-import { SiteSettingsHelpText } from "./SiteSettingsHelpText";
-import { SiteSettingsNumberField } from "./SiteSettingsNumberField";
+import { SettingsTabDangerZoneCard } from "./SettingsTab.DangerZoneCard";
+import { SettingsTabMonitoringConfigurationCard } from "./SettingsTab.MonitoringConfigurationCard";
+import { SettingsTabNotificationsCard } from "./SettingsTab.NotificationsCard";
+import { SettingsTabSiteConfigurationCard } from "./SettingsTab.SiteConfigurationCard";
+import { SettingsTabSiteInformationCard } from "./SettingsTab.SiteInformationCard";
+import { getDisplayIdentifier, useIdentifierLabel } from "./SettingsTab.utils";
 
-const WarningIcon = AppIcons.status.warning;
-const DurationIcon = AppIcons.metrics.time;
-const BellIcon = AppIcons.ui.bell;
-const IdentifierIcon = AppIcons.ui.link;
-const HistoryIcon = AppIcons.ui.history;
-const LockIcon = AppIcons.ui.lock;
-const LastCheckedIcon = AppIcons.metrics.activity;
-const RetryIcon = AppIcons.actions.refreshAlt;
-const SiteIcon = AppIcons.ui.site;
-const UnlockIcon = AppIcons.ui.unlock;
+type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
 
-const DangerZoneIcon = AppIcons.status.downFilled;
-const InfoIcon = AppIcons.ui.info;
-const SaveIcon = AppIcons.actions.save;
-const SettingsIcon = AppIcons.settings.gear;
-const TrashIcon = AppIcons.actions.remove;
+const selectMutedSiteNotificationIdentifiers = (
+    state: SettingsStoreState
+): SettingsStoreState["settings"]["mutedSiteNotificationIdentifiers"] =>
+    state.settings.mutedSiteNotificationIdentifiers;
 
-const CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS = 15;
+const selectUpdateSettings = (
+    state: SettingsStoreState
+): SettingsStoreState["updateSettings"] => state.updateSettings;
 
 /**
  * Props for the SettingsTab component.
@@ -146,23 +121,6 @@ export const SettingsTab = ({
     setLocalName,
     timeoutChanged,
 }: SettingsTabProperties): JSX.Element => {
-    const { currentTheme } = useTheme();
-    type SettingsStoreState = ReturnType<typeof useSettingsStore.getState>;
-
-    const selectMutedSiteNotificationIdentifiers = useCallback(
-        (
-            state: SettingsStoreState
-        ): SettingsStoreState["settings"]["mutedSiteNotificationIdentifiers"] =>
-            state.settings.mutedSiteNotificationIdentifiers,
-        []
-    );
-
-    const selectUpdateSettings = useCallback(
-        (state: SettingsStoreState): SettingsStoreState["updateSettings"] =>
-            state.updateSettings,
-        []
-    );
-
     const mutedSiteNotificationIdentifiers = useSettingsStore(
         selectMutedSiteNotificationIdentifiers
     );
@@ -170,24 +128,6 @@ export const SettingsTab = ({
     const identifierLabel = useIdentifierLabel(selectedMonitor);
     const trimmedSiteName = localName.trim();
     const isSiteNameValid = trimmedSiteName.length > 0;
-    const isTimeoutValid =
-        localTimeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN &&
-        localTimeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX;
-    const isRetryAttemptsValid =
-        localRetryAttempts >= RETRY_CONSTRAINTS.MIN &&
-        localRetryAttempts <= RETRY_CONSTRAINTS.MAX;
-
-    const iconColors = useMemo(
-        () => ({
-            danger: currentTheme.colors.error,
-            info: currentTheme.colors.info,
-            monitoring: currentTheme.colors.primary[600],
-            settings: currentTheme.colors.primary[500],
-            timing: currentTheme.colors.warning,
-        }),
-        [currentTheme.colors]
-    );
-
     const loggedHandleSaveName = useCallback(async () => {
         logger.user.action("Settings: Save site name initiated", {
             newName: trimmedSiteName,
@@ -312,581 +252,55 @@ export const SettingsTab = ({
         void loggedHandleRemoveSite();
     }, [loggedHandleRemoveSite]);
 
-    const buttonIconSize = getIconSize("sm");
-    const fieldIconSize = getIconSize("xs");
-
-    const settingsIcon = useMemo(
-        () => <SettingsIcon color={iconColors.settings} />,
-        [iconColors.settings]
-    );
-    const saveIcon = useMemo(
-        () => <SaveIcon aria-hidden size={buttonIconSize} />,
-        [buttonIconSize]
-    );
-    const timerIcon = useMemo(
-        () => <DurationIcon color={iconColors.timing} size={18} />,
-        [iconColors.timing]
-    );
-    const notificationsIcon = useMemo(
-        () => <BellIcon color={iconColors.info} size={18} />,
-        [iconColors.info]
-    );
-    const infoIcon = useMemo(
-        () => <InfoIcon color={iconColors.info} />,
-        [iconColors.info]
-    );
-    const dangerIcon = useMemo(
-        () => <DangerZoneIcon color={iconColors.danger} />,
-        [iconColors.danger]
-    );
-    const trashIcon = useMemo(
-        () => <TrashIcon aria-hidden size={buttonIconSize} />,
-        [buttonIconSize]
+    const displayIdentifier = useMemo(
+        () => getDisplayIdentifier(currentSite, selectedMonitor),
+        [currentSite, selectedMonitor]
     );
 
-    const muteToggleIcon = useMemo(() => {
-        const IconComponent = isSiteMuted ? UnlockIcon : LockIcon;
-        return <IconComponent aria-hidden size={buttonIconSize} />;
-    }, [buttonIconSize, isSiteMuted]);
-
-    const nameLabelIcon = useMemo(
-        () => <SiteIcon aria-hidden size={fieldIconSize} />,
-        [fieldIconSize]
-    );
-    const identifierLabelIcon = useMemo(
-        () => <IdentifierIcon aria-hidden size={fieldIconSize} />,
-        [fieldIconSize]
-    );
-    const intervalLabelIcon = useMemo(
-        () => <DurationIcon aria-hidden size={fieldIconSize} />,
-        [fieldIconSize]
-    );
-    const timeoutLabelIcon = useMemo(
-        () => <DurationIcon aria-hidden size={fieldIconSize} />,
-        [fieldIconSize]
-    );
-    const retryLabelIcon = useMemo(
-        () => <RetryIcon aria-hidden size={fieldIconSize} />,
-        [fieldIconSize]
-    );
-
-    const timeoutFieldLabel = useMemo(
-        () => (
-            <span className="inline-flex items-center gap-2">
-                {timeoutLabelIcon}
-                Timeout (seconds)
-            </span>
-        ),
-        [timeoutLabelIcon]
-    );
-
-    const retryAttemptsFieldLabel = useMemo(
-        () => (
-            <span className="inline-flex items-center gap-2">
-                {retryLabelIcon}
-                Retry attempts
-            </span>
-        ),
-        [retryLabelIcon]
-    );
-
-    const maxCheckDuration = useMemo(
-        () =>
-            calculateMaxCheckDurationSeconds({
-                retryAttempts: localRetryAttempts,
-                timeoutSeconds: localTimeoutSeconds,
-            }),
-        [localRetryAttempts, localTimeoutSeconds]
-    );
-
-    const maxDurationVariant = useMemo(() => {
-        if (
-            maxCheckDuration.backoffSeconds >= 16 ||
-            maxCheckDuration.totalSeconds >= 180
-        ) {
-            return "error";
-        }
-
-        if (
-            maxCheckDuration.backoffSeconds >= 8 ||
-            maxCheckDuration.totalSeconds >= 60
-        ) {
-            return "warning";
-        }
-
-        return "success";
-    }, [maxCheckDuration.backoffSeconds, maxCheckDuration.totalSeconds]);
-
-    const maxDurationLabel = useMemo(
-        () => formatSecondsWithMinutes(maxCheckDuration.totalSeconds),
-        [maxCheckDuration.totalSeconds]
-    );
-
-    const timeoutHelperText = useMemo(
-        () => (
-            <span>
-                Maximum time to wait per attempt before it is treated as failed.
-                <span className="ml-2 inline-flex items-center gap-1 font-medium">
-                    <DurationIcon aria-hidden size={14} />
-                    Current: {formatSecondsWithMinutes(localTimeoutSeconds)}
-                </span>
-                <span className="ml-2 inline-flex items-center gap-1">
-                    <DurationIcon aria-hidden size={14} />
-                    Max: {formatSecondsWithMinutes(TIMEOUT_CONSTRAINTS.MAX)}
-                </span>
-            </span>
-        ),
-        [localTimeoutSeconds]
-    );
-
-    const retryAttemptsHelperText = useMemo(
-        () => (
-            <span>
-                {formatRetryAttemptsText(localRetryAttempts)}.
-                <span className="ml-2">Range: 0–{RETRY_CONSTRAINTS.MAX}.</span>
-                <span className="ml-2">
-                    Values above {RETRY_CONSTRAINTS.MAX} are clamped.
-                </span>
-            </span>
-        ),
-        [localRetryAttempts]
-    );
     return (
         <div className="space-y-6" data-testid="settings-tab">
-            {/* Site Configuration */}
-            <ThemedCard icon={settingsIcon} title="Site Configuration">
-                <div className="site-settings-section">
-                    {/* Site Name */}
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="site-settings-field__label"
-                            size="sm"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            <span className="inline-flex items-center gap-2">
-                                {nameLabelIcon}
-                                Site name
-                            </span>
-                        </ThemedText>
-                        <div className="site-settings-field__controls">
-                            <ThemedInput
-                                className="flex-1"
-                                onChange={handleNameChange}
-                                placeholder="Enter a custom name for this site"
-                                type="text"
-                                value={localName}
-                            />
-                            <ThemedButton
-                                disabled={
-                                    !hasUnsavedChanges ||
-                                    isLoading ||
-                                    !isSiteNameValid
-                                }
-                                icon={saveIcon}
-                                loading={isLoading}
-                                onClick={handleSaveNameClick}
-                                size="sm"
-                                variant={
-                                    hasUnsavedChanges ? "primary" : "secondary"
-                                }
-                            >
-                                Save
-                            </ThemedButton>
-                        </div>
-                        {hasUnsavedChanges ? (
-                            <ThemedBadge size="sm" variant="warning">
-                                <WarningIcon size={14} />
-                                <span className="ml-1">Unsaved changes</span>
-                            </ThemedBadge>
-                        ) : null}
-                        {isSiteNameValid ? null : (
-                            <ThemedText size="xs" variant="error">
-                                Enter a name before saving.
-                            </ThemedText>
-                        )}
-                    </div>
+            <SettingsTabSiteConfigurationCard
+                displayIdentifier={displayIdentifier}
+                hasUnsavedChanges={hasUnsavedChanges}
+                identifierLabel={identifierLabel}
+                isLoading={isLoading}
+                isSiteNameValid={isSiteNameValid}
+                localName={localName}
+                onNameChange={handleNameChange}
+                onSaveName={handleSaveNameClick}
+            />
 
-                    {/* Site Identifier */}
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="site-settings-field__label"
-                            size="sm"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            <span className="inline-flex items-center gap-2">
-                                {identifierLabelIcon}
-                                {identifierLabel}
-                            </span>
-                        </ThemedText>
-                        <ThemedInput
-                            className="opacity-70"
-                            disabled
-                            type="text"
-                            value={getDisplayIdentifier(
-                                currentSite,
-                                selectedMonitor
-                            )}
-                        />
-                        <div className="mt-2">
-                            <SiteSettingsHelpText icon={InfoIcon}>
-                                Generated when this site is created and cannot
-                                be changed.
-                            </SiteSettingsHelpText>
-                        </div>
-                    </div>
-                </div>
-            </ThemedCard>
+            <SettingsTabNotificationsCard
+                isLoading={isLoading}
+                isSiteMuted={isSiteMuted}
+                onToggleSiteMute={handleToggleSiteMute}
+            />
 
-            <ThemedCard
-                className="site-settings-section"
-                icon={notificationsIcon}
-                title="Notifications"
-            >
-                <div className="site-settings-field">
-                    <ThemedText className="mb-2" size="sm" variant="secondary">
-                        System notifications
-                    </ThemedText>
-                    <div className="mb-4">
-                        <SiteSettingsHelpText icon={BellIcon}>
-                            {isSiteMuted
-                                ? "Notifications for this site are muted. This overrides global notification settings."
-                                : "This site follows your global notification settings."}
-                        </SiteSettingsHelpText>
-                    </div>
-                    <ThemedButton
-                        className="site-settings-field__cta"
-                        icon={muteToggleIcon}
-                        loading={isLoading}
-                        onClick={handleToggleSiteMute}
-                        size="sm"
-                        variant={isSiteMuted ? "secondary" : "primary"}
-                    >
-                        {isSiteMuted
-                            ? "Unmute notifications for this site"
-                            : "Mute notifications for this site"}
-                    </ThemedButton>
-                </div>
-            </ThemedCard>
+            <SettingsTabMonitoringConfigurationCard
+                handleIntervalChange={handleIntervalChange}
+                handleRetryAttemptsChange={handleRetryAttemptsChange}
+                handleTimeoutChange={handleTimeoutChange}
+                intervalChanged={intervalChanged}
+                localCheckIntervalMs={localCheckIntervalMs}
+                localRetryAttempts={localRetryAttempts}
+                localTimeoutSeconds={localTimeoutSeconds}
+                onSaveInterval={loggedHandleSaveInterval}
+                onSaveRetryAttempts={handleSaveRetryAttemptsClick}
+                onSaveTimeout={handleSaveTimeoutClick}
+                retryAttemptsChanged={retryAttemptsChanged}
+                timeoutChanged={timeoutChanged}
+            />
 
-            {/* Monitoring Configuration */}
-            <ThemedCard icon={timerIcon} title="Monitoring Configuration">
-                <div className="site-settings-section">
-                    {/* Check Interval */}
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="site-settings-field__label"
-                            size="sm"
-                            variant="secondary"
-                            weight="medium"
-                        >
-                            <span className="inline-flex items-center gap-2">
-                                {intervalLabelIcon}
-                                Check interval
-                            </span>
-                        </ThemedText>
-                        <div className="site-settings-field__controls">
-                            <ThemedSelect
-                                className="flex-1"
-                                onChange={handleIntervalChange}
-                                value={localCheckIntervalMs}
-                            >
-                                {CHECK_INTERVALS.map((interval) => {
-                                    const value =
-                                        typeof interval === "number"
-                                            ? interval
-                                            : interval.value;
-                                    const label = getIntervalLabel(interval);
-                                    return (
-                                        <option key={value} value={value}>
-                                            {label}
-                                        </option>
-                                    );
-                                })}
-                            </ThemedSelect>
-                            <ThemedButton
-                                disabled={!intervalChanged}
-                                icon={saveIcon}
-                                onClick={loggedHandleSaveInterval}
-                                size="sm"
-                                variant={
-                                    intervalChanged ? "primary" : "secondary"
-                                }
-                            >
-                                Save
-                            </ThemedButton>
-                        </div>
-                        <div className="mt-2">
-                            <SiteSettingsHelpText>
-                                How often Uptime Watcher runs a check for this
-                                monitor.
-                                <span className="ml-2 inline-flex items-center gap-1 font-medium">
-                                    <DurationIcon aria-hidden size={14} />
-                                    Current:{" "}
-                                    {formatSecondsWithMinutes(
-                                        Math.round(localCheckIntervalMs / 1000)
-                                    )}
-                                </span>
-                            </SiteSettingsHelpText>
-                        </div>
+            <SettingsTabSiteInformationCard
+                displayIdentifier={displayIdentifier}
+                identifierLabel={identifierLabel}
+                selectedMonitor={selectedMonitor}
+            />
 
-                        {Math.round(localCheckIntervalMs / 1000) <
-                        CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS ? (
-                            <div className="mt-2">
-                                <SiteSettingsHelpText
-                                    icon={WarningIcon}
-                                    tone="warning"
-                                >
-                                    Intervals below{" "}
-                                    {CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS}s
-                                    may cause multiple in-flight checks if a
-                                    request takes longer than the interval. Not
-                                    recommended.
-                                </SiteSettingsHelpText>
-                            </div>
-                        ) : null}
-                    </div>
-
-                    {/* Timeout Configuration */}
-                    <SiteSettingsNumberField
-                        errorText={`Allowed range: ${TIMEOUT_CONSTRAINTS.MIN}-${TIMEOUT_CONSTRAINTS.MAX} seconds.`}
-                        helperText={timeoutHelperText}
-                        isChanged={timeoutChanged}
-                        isValid={isTimeoutValid}
-                        label={timeoutFieldLabel}
-                        max={TIMEOUT_CONSTRAINTS.MAX}
-                        min={TIMEOUT_CONSTRAINTS.MIN}
-                        onChange={handleTimeoutChange}
-                        onSave={handleSaveTimeoutClick}
-                        placeholder="Enter timeout in seconds"
-                        saveIcon={saveIcon}
-                        step={TIMEOUT_CONSTRAINTS.STEP}
-                        value={localTimeoutSeconds}
-                    />
-
-                    {/* Retry Attempts Configuration */}
-                    <SiteSettingsNumberField
-                        errorText={`Retry attempts must be between ${RETRY_CONSTRAINTS.MIN} and ${RETRY_CONSTRAINTS.MAX}.`}
-                        helperText={retryAttemptsHelperText}
-                        isChanged={retryAttemptsChanged}
-                        isValid={isRetryAttemptsValid}
-                        label={retryAttemptsFieldLabel}
-                        max={RETRY_CONSTRAINTS.MAX}
-                        min={RETRY_CONSTRAINTS.MIN}
-                        onChange={handleRetryAttemptsChange}
-                        onSave={handleSaveRetryAttemptsClick}
-                        placeholder="Enter retry attempts"
-                        saveIcon={saveIcon}
-                        step={RETRY_CONSTRAINTS.STEP}
-                        value={localRetryAttempts}
-                    />
-
-                    {/* Total monitoring time indicator */}
-                    {localRetryAttempts > 0 ? (
-                        <ThemedBox
-                            className="site-settings-duration"
-                            padding="md"
-                            rounded="lg"
-                            variant="tertiary"
-                        >
-                            <div className="site-settings-duration__body">
-                                <span
-                                    aria-hidden="true"
-                                    className="site-settings-duration__icon"
-                                >
-                                    <DurationIcon size={18} />
-                                </span>
-                                <div className="site-settings-duration__content">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <ThemedText
-                                            size="sm"
-                                            variant="secondary"
-                                            weight="medium"
-                                        >
-                                            Maximum check duration
-                                        </ThemedText>
-                                        <ThemedBadge
-                                            className="shrink-0"
-                                            size="sm"
-                                            variant={maxDurationVariant}
-                                        >
-                                            <span className="inline-flex items-center gap-1">
-                                                <DurationIcon
-                                                    aria-hidden
-                                                    size={14}
-                                                />
-                                                ~ {maxDurationLabel}
-                                            </span>
-                                        </ThemedBadge>
-                                    </div>
-                                    <ThemedText
-                                        className="site-settings-duration__meta"
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        <span className="inline-flex items-center gap-1">
-                                            <DurationIcon
-                                                aria-hidden
-                                                size={14}
-                                            />
-                                            {formatSecondsWithMinutes(
-                                                localTimeoutSeconds
-                                            )}
-                                        </span>
-                                        <span> per attempt</span>
-                                        <span className="mx-1">×</span>
-                                        <span className="inline-flex items-center gap-1">
-                                            <RetryIcon aria-hidden size={14} />
-                                            {
-                                                maxCheckDuration.totalAttempts
-                                            }{" "}
-                                            attempts
-                                        </span>
-                                        <span className="mx-1">+</span>
-                                        <span className="inline-flex items-center gap-1">
-                                            <LastCheckedIcon
-                                                aria-hidden
-                                                size={14}
-                                            />
-                                            {formatSecondsWithMinutes(
-                                                maxCheckDuration.backoffSeconds
-                                            )}{" "}
-                                            backoff
-                                        </span>
-                                    </ThemedText>
-                                    <div className="mt-2">
-                                        <SiteSettingsHelpText icon={InfoIcon}>
-                                            This estimate updates automatically
-                                            based on Timeout and Retry attempts
-                                            above.
-                                        </SiteSettingsHelpText>
-                                    </div>
-                                </div>
-                            </div>
-                        </ThemedBox>
-                    ) : null}
-                </div>
-            </ThemedCard>
-
-            {/* Site Information */}
-            <ThemedCard icon={infoIcon} title="Site Information">
-                <div className="site-settings-info-grid">
-                    <div className="site-settings-info-grid__column">
-                        <div className="site-settings-info-item">
-                            <span
-                                aria-hidden="true"
-                                className="site-settings-info-item__icon"
-                            >
-                                <IdentifierIcon size={18} />
-                            </span>
-                            <div className="site-settings-info-item__content">
-                                <ThemedText
-                                    className="site-settings-info-item__label"
-                                    size="sm"
-                                    variant="secondary"
-                                >
-                                    {identifierLabel}
-                                </ThemedText>
-                                <ThemedBadge size="sm" variant="secondary">
-                                    {getDisplayIdentifier(
-                                        currentSite,
-                                        selectedMonitor
-                                    )}
-                                </ThemedBadge>
-                            </div>
-                        </div>
-                        <div className="site-settings-info-item">
-                            <span
-                                aria-hidden="true"
-                                className="site-settings-info-item__icon"
-                            >
-                                <HistoryIcon size={18} />
-                            </span>
-                            <div className="site-settings-info-item__content">
-                                <ThemedText
-                                    className="site-settings-info-item__label"
-                                    size="sm"
-                                    variant="secondary"
-                                >
-                                    History Records
-                                </ThemedText>
-                                <ThemedBadge size="sm" variant="info">
-                                    {selectedMonitor.history.length}
-                                </ThemedBadge>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="site-settings-info-grid__column">
-                        <div className="site-settings-info-item">
-                            <span
-                                aria-hidden="true"
-                                className="site-settings-info-item__icon"
-                            >
-                                <LastCheckedIcon size={18} />
-                            </span>
-                            <div className="site-settings-info-item__content">
-                                <ThemedText
-                                    className="site-settings-info-item__label"
-                                    size="sm"
-                                    variant="secondary"
-                                >
-                                    Last Checked
-                                </ThemedText>
-                                <ThemedText
-                                    className="site-settings-info-item__value"
-                                    size="xs"
-                                    variant="primary"
-                                >
-                                    {selectedMonitor.lastChecked
-                                        ? new Date(
-                                              selectedMonitor.lastChecked
-                                          ).toLocaleString()
-                                        : "Never"}
-                                </ThemedText>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </ThemedCard>
-
-            {/* Danger Zone */}
-            <ThemedCard
-                className="border-error/30 bg-error/5 border-2"
-                icon={dangerIcon}
-                title="Danger Zone"
-            >
-                <div className="site-settings-section">
-                    <div className="site-settings-field">
-                        <ThemedText
-                            className="mb-2"
-                            size="sm"
-                            variant="error"
-                            weight="medium"
-                        >
-                            Remove Site
-                        </ThemedText>
-                        <ThemedText
-                            className="mb-4"
-                            size="xs"
-                            variant="tertiary"
-                        >
-                            This action cannot be undone. All history data for
-                            this site will be lost.
-                        </ThemedText>
-                        <ThemedButton
-                            className="site-settings-field__cta"
-                            icon={trashIcon}
-                            loading={isLoading}
-                            onClick={handleRemoveSiteClick}
-                            size="md"
-                            variant="error"
-                        >
-                            Remove Site
-                        </ThemedButton>
-                    </div>
-                </div>
-            </ThemedCard>
+            <SettingsTabDangerZoneCard
+                isLoading={isLoading}
+                onRemoveSite={handleRemoveSiteClick}
+            />
         </div>
     );
 };
