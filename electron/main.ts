@@ -26,6 +26,7 @@ import * as path from "node:path";
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { ServiceContainer } from "./services/ServiceContainer";
+import { fireAndForget } from "./utils/fireAndForget";
 import { logger } from "./utils/logger";
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
@@ -123,8 +124,8 @@ if (isDev()) {
         return typeof value["default"] === "function";
     };
 
-    void (async (): Promise<void> => {
-        try {
+    fireAndForget(
+        async () => {
             // Electron-debug is a devDependency; this dev-only dynamic import is
             // intentional.
 
@@ -144,13 +145,16 @@ if (isDev()) {
                 isEnabled: true,
                 showDevTools: true,
             });
-        } catch (error: unknown) {
-            logger.warn(
-                "[Main] Failed to load electron-debug",
-                ensureError(error)
-            );
+        },
+        {
+            onError: (error) => {
+                logger.warn(
+                    "[Main] Failed to load electron-debug",
+                    ensureError(error)
+                );
+            },
         }
-    })();
+    );
 }
 
 // Configure electron-log for main process
@@ -564,17 +568,20 @@ class Main {
             // Handle cleanup asynchronously without blocking process exit
             // Use setImmediate to avoid blocking the event loop
             setImmediate((): void => {
-                void (async (): Promise<void> => {
-                    try {
+                fireAndForget(
+                    async () => {
                         await this.performCleanup();
-                    } catch (error: unknown) {
-                        logger.error(
-                            "[Main] Unexpected error during process exit cleanup",
-                            error
-                        );
-                        // Log the error but don't prevent process exit
+                    },
+                    {
+                        onError: (error) => {
+                            logger.error(
+                                "[Main] Unexpected error during process exit cleanup",
+                                error
+                            );
+                            // Log the error but don't prevent process exit
+                        },
                     }
-                })();
+                );
             });
         }
     };
@@ -587,18 +594,21 @@ class Main {
             this.cleanedUp = true;
             // Handle cleanup asynchronously during app quit
             setImmediate((): void => {
-                void (async (): Promise<void> => {
-                    try {
+                fireAndForget(
+                    async () => {
                         await this.performCleanup();
-                    } catch (error: unknown) {
-                        logger.error(
-                            "[Main] Unexpected error during app quit cleanup",
-                            error
-                        );
-                        // Don't throw - app is already quitting, just exit with error code
-                        app.exit(1);
+                    },
+                    {
+                        onError: (error) => {
+                            logger.error(
+                                "[Main] Unexpected error during app quit cleanup",
+                                error
+                            );
+                            // Don't throw - app is already quitting, just exit with error code
+                            app.exit(1);
+                        },
                     }
-                })();
+                );
             });
         }
     };
@@ -770,16 +780,20 @@ if (process.versions.electron) {
      * @returns `Promise<Array<{id: string; name: string}>>` The installed
      *   extension references, or an empty array in production or on failure.
      */
-    void (async (): Promise<void> => {
-        await app.whenReady();
-        // Wait a bit for the main window to be created and ready
-        await new Promise<void>((resolve) => {
-            // Timer will complete immediately, cleanup not needed
-            // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
-            setTimeout(resolve, 1);
-        });
+    fireAndForget(
+        async () => {
+            await app.whenReady();
+            // Wait a bit for the main window to be created and ready
+            await new Promise<void>((resolve) => {
+                // Timer will complete immediately, cleanup not needed
+                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
+                setTimeout(resolve, 1);
+            });
 
-        if (isDev()) {
+            if (!isDev()) {
+                return;
+            }
+
             try {
                 const extensions = await installExtension(
                     [
@@ -800,6 +814,14 @@ if (process.versions.electron) {
                     error
                 );
             }
+        },
+        {
+            onError: (error) => {
+                logger.warn(
+                    "[Main] Failed to install dev extensions (this is normal in production)",
+                    ensureError(error)
+                );
+            },
         }
-    })();
+    );
 }

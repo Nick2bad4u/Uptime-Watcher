@@ -17,6 +17,7 @@ import type { DatabaseManager } from "../managers/DatabaseManager";
 import type { OrchestratorEvents } from "../UptimeOrchestrator.types";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
+import { fireAndForgetLogged } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 
 /**
@@ -56,16 +57,14 @@ export class HistoryLimitCoordinator {
     private readonly handleHistoryLimitUpdatedEvent = (
         eventData: OrchestratorEvents["internal:database:history-limit-updated"]
     ): void => {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[HistoryLimitCoordinator] Unhandled error processing history limit update",
+            task: async () => {
                 await this.processHistoryLimitUpdate(eventData);
-            } catch (error: unknown) {
-                logger.error(
-                    "[HistoryLimitCoordinator] Unhandled error processing history limit update",
-                    ensureError(error)
-                );
-            }
-        })();
+            },
+        });
     };
 
     /**

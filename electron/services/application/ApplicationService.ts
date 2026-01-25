@@ -68,6 +68,7 @@ import type { RendererEventBridge } from "../events/RendererEventBridge";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
 import { stripForwardedEventMetadata } from "../../utils/eventMetadataForwarding";
+import { fireAndForgetLogged } from "../../utils/fireAndForget";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
@@ -111,16 +112,13 @@ export class ApplicationService {
      * Named event handler for app ready event.
      */
     private readonly handleAppReady = (): void => {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message: LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR,
+            task: async () => {
                 await this.onAppReady();
-            } catch (error) {
-                logger.error(
-                    LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR,
-                    error
-                );
-            }
-        })();
+            },
+        });
     };
 
     /**
@@ -370,16 +368,13 @@ export class ApplicationService {
         });
 
         autoUpdater.initialize();
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message: LOG_TEMPLATES.errors.APPLICATION_UPDATE_CHECK_ERROR,
+            task: async () => {
                 await autoUpdater.checkForUpdates();
-            } catch (error) {
-                logger.error(
-                    LOG_TEMPLATES.errors.APPLICATION_UPDATE_CHECK_ERROR,
-                    error
-                );
-            }
-        })();
+            },
+        });
     }
 
     /**

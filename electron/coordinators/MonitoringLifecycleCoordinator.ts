@@ -17,6 +17,7 @@ import type {
     StopMonitoringRequestData,
 } from "../UptimeOrchestrator.types";
 
+import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 
 type EmitTyped = <TEventName extends EventKey<UptimeEvents>>(
@@ -296,85 +297,144 @@ export class MonitoringLifecycleCoordinator {
     public handleStartMonitoringRequestedEvent(
         data: StartMonitoringRequestData
     ): void {
-        void (async (): Promise<void> => {
-            await this.handleSiteMonitoringToggleRequested({
-                identifier: data.identifier,
-                kind: "start",
-                ...(data.monitorId ? { monitorId: data.monitorId } : {}),
-            });
-        })();
+        fireAndForget(
+            async () => {
+                await this.handleSiteMonitoringToggleRequested({
+                    identifier: data.identifier,
+                    kind: "start",
+                    ...(data.monitorId ? { monitorId: data.monitorId } : {}),
+                });
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        "[MonitoringLifecycleCoordinator] Unhandled error starting monitoring",
+                        error
+                    );
+                },
+            }
+        );
     }
 
     /** Event handler for monitoring stop requests. */
     public handleStopMonitoringRequestedEvent(
         data: StopMonitoringRequestData
     ): void {
-        void (async (): Promise<void> => {
-            await this.handleSiteMonitoringToggleRequested({
-                identifier: data.identifier,
-                kind: "stop",
-                ...(data.monitorId ? { monitorId: data.monitorId } : {}),
-            });
-        })();
+        fireAndForget(
+            async () => {
+                await this.handleSiteMonitoringToggleRequested({
+                    identifier: data.identifier,
+                    kind: "stop",
+                    ...(data.monitorId ? { monitorId: data.monitorId } : {}),
+                });
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        "[MonitoringLifecycleCoordinator] Unhandled error stopping monitoring",
+                        error
+                    );
+                },
+            }
+        );
     }
 
     /** Event handler for monitoring status check requests. */
     public handleIsMonitoringActiveRequestedEvent(
         data: IsMonitoringActiveRequestData
     ): void {
-        void (async (): Promise<void> => {
-            const isActive = this.monitorManager.isMonitorActiveInScheduler(
-                data.identifier,
-                data.monitorId
-            );
-            await this.emitTyped(
-                "internal:site:is-monitoring-active-response",
-                {
-                    identifier: data.identifier,
-                    isActive,
-                    monitorId: data.monitorId,
-                    operation: "is-monitoring-active-response",
-                    timestamp: Date.now(),
+        fireAndForget(
+            async () => {
+                try {
+                    const isActive =
+                        this.monitorManager.isMonitorActiveInScheduler(
+                            data.identifier,
+                            data.monitorId
+                        );
+                    await this.emitTyped(
+                        "internal:site:is-monitoring-active-response",
+                        {
+                            identifier: data.identifier,
+                            isActive,
+                            monitorId: data.monitorId,
+                            operation: "is-monitoring-active-response",
+                            timestamp: Date.now(),
+                        }
+                    );
+                } catch (error) {
+                    logger.error(
+                        "[MonitoringLifecycleCoordinator] Error handling is-monitoring-active request",
+                        error
+                    );
+                    await this.emitTyped(
+                        "internal:site:is-monitoring-active-response",
+                        {
+                            identifier: data.identifier,
+                            isActive: false,
+                            monitorId: data.monitorId,
+                            operation: "is-monitoring-active-response",
+                            timestamp: Date.now(),
+                        }
+                    );
                 }
-            );
-        })();
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        "[MonitoringLifecycleCoordinator] Unhandled error in is-monitoring-active handler",
+                        error
+                    );
+                },
+            }
+        );
     }
 
     /** Event handler for monitoring restart requests. */
     public handleRestartMonitoringRequestedEvent(
         data: RestartMonitoringRequestData
     ): void {
-        void (async (): Promise<void> => {
-            try {
-                // Note: restartMonitorWithNewConfig is intentionally
-                // synchronous as it only updates scheduler configuration
-                // without async I/O
-                const success = this.monitorManager.restartMonitorWithNewConfig(
-                    data.identifier,
-                    data.monitor
-                );
-                await this.emitTyped(
-                    "internal:site:restart-monitoring-response",
-                    this.buildRestartMonitoringResponse({
-                        identifier: data.identifier,
-                        monitorId: data.monitor.id,
-                        success,
-                    })
-                );
-            } catch (error) {
-                logger.error(
-                    `[UptimeOrchestrator] Error restarting monitoring for site ${data.identifier}:`,
-                    error
-                );
-                await this.emitTyped(
-                    "internal:site:restart-monitoring-response",
-                    this.buildRestartMonitoringResponse({
-                        identifier: data.identifier,
-                        monitorId: data.monitor.id,
-                        success: false,
-                    })
-                );
+        fireAndForget(
+            async () => {
+                try {
+                    // Note: restartMonitorWithNewConfig is intentionally
+                    // synchronous as it only updates scheduler configuration
+                    // without async I/O
+                    const success =
+                        this.monitorManager.restartMonitorWithNewConfig(
+                            data.identifier,
+                            data.monitor
+                        );
+                    await this.emitTyped(
+                        "internal:site:restart-monitoring-response",
+                        this.buildRestartMonitoringResponse({
+                            identifier: data.identifier,
+                            monitorId: data.monitor.id,
+                            success,
+                        })
+                    );
+                } catch (error) {
+                    logger.error(
+                        `[UptimeOrchestrator] Error restarting monitoring for site ${data.identifier}:`,
+                        error
+                    );
+                    await this.emitTyped(
+                        "internal:site:restart-monitoring-response",
+                        this.buildRestartMonitoringResponse({
+                            identifier: data.identifier,
+                            monitorId: data.monitor.id,
+                            success: false,
+                        })
+                    );
+                }
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        "[MonitoringLifecycleCoordinator] Unhandled error restarting monitoring",
+                        error
+                    );
+                },
             }
-        })();
+        );
     }
 }

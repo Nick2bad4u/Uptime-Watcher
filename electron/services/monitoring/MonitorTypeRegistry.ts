@@ -28,6 +28,7 @@ import {
     monitorSchemas,
 } from "@shared/validation/monitorSchemas";
 
+import type { MonitorUIConfig } from "./monitorUiConfig";
 import type {
     IMonitorService,
     MonitorConfiguration,
@@ -48,6 +49,16 @@ import { PortMonitor } from "./PortMonitor";
 import { ReplicationMonitor } from "./ReplicationMonitor";
 import { ServerHeartbeatMonitor } from "./ServerHeartbeatMonitor";
 import { SslMonitor } from "./SslMonitor";
+import {
+    createHttpMonitorUiConfig,
+    type HttpMonitorUiOverrides,
+} from "./utils/httpMonitorUiConfig";
+import {
+    createHostPortTitleSuffixResolver,
+    createHostTitleSuffixResolver,
+    createRecordTypeHostTitleSuffixResolver,
+    createTlsTitleSuffixResolver,
+} from "./utils/monitorTitleSuffixResolvers";
 import { WebsocketKeepaliveMonitor } from "./WebsocketKeepaliveMonitor";
 
 // Base monitor type definition
@@ -72,44 +83,6 @@ import { WebsocketKeepaliveMonitor } from "./WebsocketKeepaliveMonitor";
  *
  * @public
  */
-type SharedMonitorUiConfig = NonNullable<MonitorTypeConfig["uiConfig"]>;
-
-/**
- * Extended UI configuration used by the renderer when displaying monitors.
- *
- * @remarks
- * Augments the shared monitor type configuration with additional metadata that
- * is only meaningful to the desktop renderer layer, such as historical detail
- * formatters and analytics toggles.
- */
-export interface MonitorUIConfig extends SharedMonitorUiConfig {
-    /** Chart data formatters */
-    chartFormatters?: {
-        advanced?: boolean;
-        responseTime?: boolean;
-        uptime?: boolean;
-    };
-    /** Detail formats with optional history formatter */
-    detailFormats?: SharedMonitorUiConfig["detailFormats"] & {
-        historyDetail?: (details: string) => string;
-    };
-    /** Detail label formatter function name */
-    detailLabelFormatter?: string;
-    /** Display preferences including optional port display */
-    display?: SharedMonitorUiConfig["display"] & {
-        showPort?: boolean;
-    };
-    /**
-     * Function to format detail display in history (e.g., "Port: 80", "Response
-     * Code: 200")
-     */
-    formatDetail?: (details: string) => string;
-    /**
-     * Function to format title suffix for history charts (e.g., "
-     * (https://example.com)")
-     */
-    formatTitleSuffix?: (monitor: Monitor) => string;
-}
 
 /**
  * Configuration contract required to register a monitor type in the system.
@@ -294,52 +267,6 @@ export function getMonitorServiceFactory(
  */
 export function registerMonitorType(config: BaseMonitorConfig): void {
     monitorTypes.set(config.type, config);
-}
-
-type HttpMonitorUiOverrides = Partial<MonitorUIConfig>;
-
-function createUrlSuffixResolver(type: string): (monitor: Monitor) => string {
-    return (monitor: Monitor) => {
-        const hasMatchingType = monitor.type === type;
-        const urlValue = monitor.url;
-
-        if (!hasMatchingType || typeof urlValue !== "string") {
-            return "";
-        }
-
-        return urlValue.length > 0 ? ` (${urlValue})` : "";
-    };
-}
-
-function createHttpMonitorUiConfig(
-    type: string,
-    overrides: HttpMonitorUiOverrides = {}
-): MonitorUIConfig {
-    const {
-        detailFormats,
-        display,
-        formatDetail,
-        formatTitleSuffix,
-        helpTexts,
-        supportsAdvancedAnalytics,
-        supportsResponseTime,
-    } = overrides;
-
-    return {
-        ...(detailFormats ? { detailFormats } : {}),
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-            ...display,
-        },
-        ...(formatDetail ? { formatDetail } : {}),
-        formatTitleSuffix: formatTitleSuffix ?? createUrlSuffixResolver(type),
-        ...(helpTexts ? { helpTexts } : {}),
-        ...(supportsAdvancedAnalytics === undefined
-            ? {}
-            : { supportsAdvancedAnalytics }),
-        ...(supportsResponseTime === undefined ? {} : { supportsResponseTime }),
-    };
 }
 
 interface HttpMonitorRegistration extends Omit<BaseMonitorConfig, "uiConfig"> {
@@ -663,14 +590,9 @@ registerMonitorType({
             showUrl: false,
         },
         formatDetail: (details: string) => `Port: ${details}`,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type === "port") {
-                return monitor.host && monitor.port
-                    ? ` (${monitor.host}:${monitor.port})`
-                    : "";
-            }
-            return "";
-        },
+        formatTitleSuffix: createHostPortTitleSuffixResolver({
+            monitorType: "port",
+        }),
         helpTexts: {
             primary: "Enter a valid host (domain or IP)",
             secondary: "Enter a port number (1-65535)",
@@ -707,12 +629,9 @@ registerMonitorType({
             showUrl: false,
         },
         formatDetail: (details: string) => `Ping: ${details}`,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type === "ping") {
-                return monitor.host ? ` (${monitor.host})` : "";
-            }
-            return "";
-        },
+        formatTitleSuffix: createHostTitleSuffixResolver({
+            monitorType: "ping",
+        }),
         helpTexts: {
             primary: "Enter a valid host (domain or IP)",
             secondary:
@@ -788,14 +707,9 @@ registerMonitorType({
             showUrl: false,
         },
         formatDetail: (details: string) => `DNS: ${details}`,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type === "dns") {
-                return monitor.host && monitor.recordType
-                    ? ` (${monitor.recordType} ${monitor.host})`
-                    : "";
-            }
-            return "";
-        },
+        formatTitleSuffix: createRecordTypeHostTitleSuffixResolver({
+            monitorType: "dns",
+        }),
         helpTexts: {
             primary: "Enter a valid host (domain or IP)",
             secondary: "Select the DNS record type to monitor",
@@ -853,20 +767,9 @@ registerMonitorType({
             showUrl: false,
         },
         formatDetail: (details: string) => `Certificate: ${details}`,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type !== "ssl") {
-                return "";
-            }
-
-            const hostValue = monitor.host ?? "";
-            if (hostValue.trim().length === 0) {
-                return "";
-            }
-
-            const portSegment =
-                monitor.port === undefined ? "" : `:${monitor.port}`;
-            return ` (${hostValue}${portSegment})`;
-        },
+        formatTitleSuffix: createTlsTitleSuffixResolver({
+            monitorType: "ssl",
+        }),
         helpTexts: {
             primary:
                 "Provide the host and port of the TLS endpoint you want to monitor",

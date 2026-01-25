@@ -29,6 +29,7 @@ import type {
 } from "../UptimeOrchestrator.types";
 
 import { attachForwardedMetadata } from "../utils/eventMetadataForwarding";
+import { fireAndForgetLogged } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 
 /** Construction options for {@link OrchestratorEventForwardingCoordinator}. */
@@ -81,7 +82,11 @@ export class OrchestratorEventForwardingCoordinator {
     private readonly handleSiteAddedEvent = (
         data: SiteEventData & { _meta?: unknown }
     ): void => {
-        void (async (): Promise<void> => {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[OrchestratorEventForwardingCoordinator] Error handling internal:site:added",
+            task: async () => {
             if (!data.site) {
                 logger.error(
                     "[OrchestratorEventForwardingCoordinator] Received internal:site:added without site payload",
@@ -105,7 +110,8 @@ export class OrchestratorEventForwardingCoordinator {
             });
 
             await this.eventBus.emitTyped("site:added", payload);
-        })();
+            },
+        });
     };
 
     /**
@@ -114,7 +120,11 @@ export class OrchestratorEventForwardingCoordinator {
     private readonly handleSiteRemovedEvent = (
         data: SiteEventData & { _meta?: unknown }
     ): void => {
-        void (async (): Promise<void> => {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[OrchestratorEventForwardingCoordinator] Error handling internal:site:removed",
+            task: async () => {
             const siteIdentifier =
                 data.identifier ?? data.site?.identifier ?? "unknown-site";
             const siteName = data.site?.name ?? "Unknown";
@@ -142,7 +152,8 @@ export class OrchestratorEventForwardingCoordinator {
             });
 
             await this.eventBus.emitTyped("site:removed", payload);
-        })();
+            },
+        });
     };
 
     /**
@@ -151,7 +162,11 @@ export class OrchestratorEventForwardingCoordinator {
     private readonly handleSiteUpdatedEvent = (
         data: SiteEventData & { _meta?: unknown; previousSite?: Site }
     ): void => {
-        void (async (): Promise<void> => {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[OrchestratorEventForwardingCoordinator] Error handling internal:site:updated",
+            task: async () => {
             if (!data.site) {
                 logger.error(
                     "[OrchestratorEventForwardingCoordinator] Received internal:site:updated without site payload",
@@ -175,7 +190,8 @@ export class OrchestratorEventForwardingCoordinator {
             });
 
             await this.eventBus.emitTyped("site:updated", payload);
-        })();
+            },
+        });
     };
 
     /**
@@ -186,8 +202,11 @@ export class OrchestratorEventForwardingCoordinator {
             _meta?: unknown;
         }
     ): void => {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[OrchestratorEventForwardingCoordinator] Error handling internal:monitor:started:",
+            task: async () => {
                 const { identifier, monitorId, summary } = eventData;
                 const scope = determineMonitoringScope(identifier, monitorId);
 
@@ -232,13 +251,8 @@ export class OrchestratorEventForwardingCoordinator {
                 });
 
                 await this.eventBus.emitTyped("monitoring:started", payload);
-            } catch (error) {
-                logger.error(
-                    "[OrchestratorEventForwardingCoordinator] Error handling internal:monitor:started:",
-                    error
-                );
-            }
-        })();
+            },
+        });
     };
 
     /**
@@ -249,8 +263,11 @@ export class OrchestratorEventForwardingCoordinator {
             _meta?: unknown;
         }
     ): void => {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[OrchestratorEventForwardingCoordinator] Error handling internal:monitor:stopped:",
+            task: async () => {
                 const { identifier, monitorId, reason, summary } = eventData;
                 const scope = determineMonitoringScope(identifier, monitorId);
 
@@ -287,13 +304,8 @@ export class OrchestratorEventForwardingCoordinator {
                 });
 
                 await this.eventBus.emitTyped("monitoring:stopped", payload);
-            } catch (error) {
-                logger.error(
-                    "[OrchestratorEventForwardingCoordinator] Error handling internal:monitor:stopped:",
-                    error
-                );
-            }
-        })();
+            },
+        });
     };
 
     public constructor(options: OrchestratorEventForwardingCoordinatorOptions) {

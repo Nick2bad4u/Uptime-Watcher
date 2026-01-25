@@ -35,6 +35,10 @@ import { SelectField } from "./SelectField";
 import { handleSubmit } from "./Submit";
 import { TextField } from "./TextField";
 import "./AddSiteForm.css";
+import {
+    buildAddSiteFormHelperBullets,
+    type HelperBullet,
+} from "./utils/helperBullets";
 
 /**
  * Props accepted by the {@link AddSiteForm} component.
@@ -44,16 +48,6 @@ import "./AddSiteForm.css";
 export interface AddSiteFormProperties {
     /** Optional callback invoked after a successful submission. */
     readonly onSuccess?: () => void;
-}
-
-/**
- * Metadata for helper bullet text displayed beneath the form actions.
- */
-interface HelperBullet {
-    /** Unique identifier used for list rendering keys. */
-    readonly id: string;
-    /** Display text shown to the user. */
-    readonly text: string;
 }
 
 const MONITOR_TYPE_SET = new Set<string>(BASE_MONITOR_TYPES);
@@ -239,121 +233,18 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             );
         }, [checkIntervalMs]);
 
-        const helperBullets = useMemo<HelperBullet[]>(() => {
-            const normalizeText = (value: string): string => {
-                const lower = value.trim().toLowerCase();
-                let collapsedWhitespace = "";
-                let lastWasWhitespace = false;
-
-                for (const character of lower) {
-                    const isWhitespace =
-                        character === " " ||
-                        character === "\n" ||
-                        character === "\t" ||
-                        character === "\r";
-
-                    if (isWhitespace) {
-                        if (!lastWasWhitespace) {
-                            collapsedWhitespace += " ";
-                            lastWasWhitespace = true;
-                        }
-                    } else {
-                        collapsedWhitespace += character;
-                        lastWasWhitespace = false;
-                    }
-                }
-
-                while (
-                    collapsedWhitespace.endsWith(".") ||
-                    collapsedWhitespace.endsWith("!")
-                ) {
-                    collapsedWhitespace = collapsedWhitespace.slice(0, -1);
-                }
-
-                return collapsedWhitespace;
-            };
-
-            const shouldHideFooterHelpText = (value: string): boolean => {
-                const normalized = normalizeText(value);
-
-                // URL guidance is already rendered directly beneath the URL
-                // field via field-level helpText.
-                if (
-                    normalized.includes("://") ||
-                    normalized.includes("full url")
-                ) {
-                    return true;
-                }
-
-                // Interval guidance is shown as an explicit, more actionable
-                // footer bullet below.
-                if (
-                    normalized.includes("monitoring interval") ||
-                    normalized.includes("check interval")
-                ) {
-                    return true;
-                }
-
-                return false;
-            };
-
-            const seen = new Set<string>();
-            const modeBulletText =
-                addMode === "new"
-                    ? "Provide a descriptive site name for new entries"
-                    : "Select a site to add the monitor to";
-            const bullets: HelperBullet[] = [
-                {
-                    id: "mode",
-                    text: modeBulletText,
-                },
-            ];
-
-            seen.add(normalizeText(modeBulletText));
-
-            const addUniqueBullet = (id: string, text: string): void => {
-                const normalized = normalizeText(text);
-                if (normalized.length === 0 || seen.has(normalized)) return;
-                seen.add(normalized);
-                bullets.push({ id, text });
-            };
-
-            let preferredHelpText: HelperBullet | null = null;
-
-            if (
-                helpTexts.primary &&
-                !shouldHideFooterHelpText(helpTexts.primary)
-            ) {
-                preferredHelpText = {
-                    id: `primary-${helpTexts.primary}`,
-                    text: helpTexts.primary,
-                };
-            } else if (
-                helpTexts.secondary &&
-                !shouldHideFooterHelpText(helpTexts.secondary)
-            ) {
-                preferredHelpText = {
-                    id: `secondary-${helpTexts.secondary}`,
-                    text: helpTexts.secondary,
-                };
-            }
-
-            if (preferredHelpText) {
-                addUniqueBullet(preferredHelpText.id, preferredHelpText.text);
-            }
-
-            addUniqueBullet(
-                "interval",
-                `Checks run every ${checkIntervalLabel}. You can change this later.`
-            );
-
-            return bullets;
-        }, [
-            addMode,
-            checkIntervalLabel,
-            helpTexts.primary,
-            helpTexts.secondary,
-        ]);
+        const helperBullets = useMemo<HelperBullet[]>(
+            () =>
+                buildAddSiteFormHelperBullets({
+                    addMode,
+                    checkIntervalLabel,
+                    helpTexts: {
+                        primary: helpTexts.primary ?? "",
+                        secondary: helpTexts.secondary ?? "",
+                    },
+                }),
+            [addMode, checkIntervalLabel, helpTexts.primary, helpTexts.secondary]
+        );
 
         // Normalize potential undefined values from the store for robust
         // tests and edge cases.

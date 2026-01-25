@@ -52,6 +52,11 @@ import { fileURLToPath } from "node:url";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { openExternalOrThrow } from "../shell/openExternalUtils";
+import { getProductionDistDirectory, isPathWithinDirectory } from "./utils/pathGuards";
+import {
+    applyProductionDocumentSecurityHeaders,
+    getProductionCspHeaderValue,
+} from "./utils/productionSecurityHeaders";
 
 // ESM equivalent of currentDirectory
 // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
@@ -59,37 +64,7 @@ const currentFilename = fileURLToPath(import.meta.url);
 // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
 const currentDirectory = path.dirname(currentFilename);
 
-const normalizePathForComparison = (value: string): string =>
-    process.platform === "win32" ? value.toLowerCase() : value;
-
-/**
- * Returns true when `targetPath` is inside `directoryPath`.
- *
- * @remarks
- * Used to ensure we never allow navigations to arbitrary `file://` URLs outside
- * the packaged renderer bundle.
- */
-const isPathWithinDirectory = (args: {
-    readonly directoryPath: string;
-    readonly targetPath: string;
-}): boolean => {
-    const resolvedTarget = normalizePathForComparison(
-        path.resolve(args.targetPath)
-    );
-    let resolvedDirectory = normalizePathForComparison(
-        path.resolve(args.directoryPath)
-    );
-
-    if (!resolvedDirectory.endsWith(path.sep)) {
-        resolvedDirectory = `${resolvedDirectory}${path.sep}`;
-    }
-
-    return resolvedTarget.startsWith(resolvedDirectory);
-};
-
-const PRODUCTION_DIST_DIRECTORY = path.resolve(
-    path.join(currentDirectory, "../dist")
-);
+const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(currentDirectory);
 
 /**
  * Service responsible for window management and lifecycle.
@@ -496,10 +471,10 @@ export class WindowService {
                 }
 
                 const targetPath = fileURLToPath(parsed);
-                return isPathWithinDirectory({
-                    directoryPath: PRODUCTION_DIST_DIRECTORY,
+                return isPathWithinDirectory(
                     targetPath,
-                });
+                    PRODUCTION_DIST_DIRECTORY
+                );
             }
 
             // In development, allow navigation within the Vite dev server origin.
@@ -648,20 +623,7 @@ export class WindowService {
             // Keep this policy intentionally conservative. If a new renderer
             // feature requires expanding it, do so intentionally and with a
             // targeted allow-list.
-            const productionCsp = [
-                "default-src 'self'",
-                "base-uri 'none'",
-                "form-action 'none'",
-                "frame-ancestors 'none'",
-                "object-src 'none'",
-                "script-src 'self'",
-                "style-src 'self' 'unsafe-inline'",
-                "img-src 'self' data: blob: https://api.microlink.io",
-                "font-src 'self' data:",
-                "connect-src 'self'",
-                "worker-src 'self' blob:",
-                "media-src 'self' blob:",
-            ].join("; ");
+            const productionCsp = getProductionCspHeaderValue();
 
             try {
                 const sess = this.mainWindow.webContents.session;
@@ -697,22 +659,19 @@ export class WindowService {
                         }
                     }
 
-                    const headers = {
-                        ...details.responseHeaders,
-                    } as Record<string, string | string[]>;
+                    const headers = details.responseHeaders as
+                        | Record<string, string | string[]>
+                        | undefined;
 
-                    // Apply strict security headers in production
-                    headers["X-Content-Type-Options"] = ["nosniff"];
-                    headers["X-Frame-Options"] = ["DENY"];
-                    headers["Referrer-Policy"] = ["no-referrer"];
-                    headers["Permissions-Policy"] = [
-                        "camera=(), microphone=(), geolocation=(), fullscreen=()",
-                    ];
-                    headers["Content-Security-Policy"] = [productionCsp];
+                    const responseHeaders =
+                        applyProductionDocumentSecurityHeaders({
+                            productionCsp,
+                            responseHeaders: headers,
+                        });
 
                     callback({
                         cancel: false,
-                        responseHeaders: headers,
+                        responseHeaders,
                     });
                 });
 

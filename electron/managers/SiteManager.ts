@@ -73,6 +73,7 @@ import { LoggerAdapter } from "../services/database/serviceFactory";
 import { SiteRepositoryService } from "../services/database/SiteRepositoryService";
 import { SiteWriterService } from "../services/database/SiteWriterService";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
+import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 import { SiteManagerStateSync } from "./SiteManagerStateSync";
 
@@ -1004,25 +1005,38 @@ export class SiteManager {
 
         if (!site) {
             // Emit cache miss event
-            void (async (): Promise<void> => {
-                await this.emitSiteCacheMissSafe({
-                    backgroundLoading: true,
-                    identifier,
-                    operation: "cache-lookup",
-                });
-            })();
+                fireAndForget(
+                    async () => {
+                        await this.emitSiteCacheMissSafe({
+                            backgroundLoading: true,
+                            identifier,
+                            operation: "cache-lookup",
+                        });
+                    },
+                    {
+                        onError: (error) => {
+                            logger.debug(
+                                LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
+                                error
+                            );
+                        },
+                    }
+                );
 
             // Trigger background loading without blocking
-            void (async (): Promise<void> => {
-                try {
-                    await this.loadSiteInBackground(identifier);
-                } catch (error) {
-                    logger.debug(
-                        LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
-                        error
-                    );
-                }
-            })();
+                fireAndForget(
+                    async () => {
+                        await this.loadSiteInBackground(identifier);
+                    },
+                    {
+                        onError: (error) => {
+                            logger.debug(
+                                LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
+                                error
+                            );
+                        },
+                    }
+                );
         }
 
         return site;

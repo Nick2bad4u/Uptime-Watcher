@@ -25,6 +25,7 @@ import {
     ORIGINAL_METADATA_PROPERTY_KEY,
     stripForwardedEventMetadata,
 } from "../utils/eventMetadataForwarding";
+import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 import {
     type ForwardableEventPayload,
@@ -184,21 +185,24 @@ export class ServiceContainerEventForwarder {
         const sanitizedPayload = this.stripEventMetadata(eventName, payload);
         const eventLabel = eventName;
 
-        void (async (): Promise<void> => {
-            try {
+        fireAndForget(
+            async () => {
                 await mainOrchestrator.emitTyped(eventName, sanitizedPayload);
-            } catch (error: unknown) {
-                const normalizedError = ensureError(error);
-                logger.error(
-                    `[ServiceContainer] Error forwarding ${eventLabel} from ${managerName}`,
-                    normalizedError,
-                    {
-                        event: eventLabel,
-                        manager: managerName,
-                    }
-                );
+            },
+            {
+                onError: (error: unknown) => {
+                    const normalizedError = ensureError(error);
+                    logger.error(
+                        `[ServiceContainer] Error forwarding ${eventLabel} from ${managerName}`,
+                        normalizedError,
+                        {
+                            event: eventLabel,
+                            manager: managerName,
+                        }
+                    );
+                },
             }
-        })();
+        );
 
         if (this.enableDebugLogging) {
             logger.debug(

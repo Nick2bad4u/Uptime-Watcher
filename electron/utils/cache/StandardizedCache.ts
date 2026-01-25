@@ -15,6 +15,7 @@ import type { Promisable } from "type-fest";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
+import { fireAndForget, fireAndForgetLogged } from "../fireAndForget";
 import { diagnosticsLogger, logger } from "../logger";
 
 const hasThenProperty = (candidate: unknown): candidate is { then: unknown } =>
@@ -522,24 +523,27 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         }
 
         const payload = this.buildCacheEventPayload(eventType, data);
-        void (async (): Promise<void> => {
-            try {
+        fireAndForget(
+            async () => {
                 await eventEmitter.emitTyped(eventType, payload);
-            } catch (error) {
-                logger.error(
-                    `[Cache:${name}] Failed to emit cache event '${eventType}'`,
-                    error
-                );
-                diagnosticsLogger.error(
-                    `[Cache:${name}] Event emission failure`,
-                    error,
-                    {
-                        eventType,
-                        payload,
-                    }
-                );
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        `[Cache:${name}] Failed to emit cache event '${eventType}'`,
+                        error
+                    );
+                    diagnosticsLogger.error(
+                        `[Cache:${name}] Event emission failure`,
+                        error,
+                        {
+                            eventType,
+                            payload,
+                        }
+                    );
+                },
             }
-        })();
+        );
     }
 
     /**
@@ -635,16 +639,13 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
             try {
                 const result = handler(key);
                 if (isPromiseLike(result)) {
-                    void (async (): Promise<void> => {
-                        try {
+                    fireAndForgetLogged({
+                        logger,
+                        message: `[Cache:${this.config.name}] Error in async invalidation callback:`,
+                        task: async () => {
                             await result;
-                        } catch (error: unknown) {
-                            logger.error(
-                                `[Cache:${this.config.name}] Error in async invalidation callback:`,
-                                error
-                            );
-                        }
-                    })();
+                        },
+                    });
                 }
             } catch (error) {
                 logger.error(

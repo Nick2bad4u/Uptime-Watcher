@@ -20,6 +20,7 @@ import type { SiteManager } from "../managers/SiteManager";
 import type { UpdateSitesCacheRequestData } from "../UptimeOrchestrator.types";
 
 import { attachForwardedMetadata } from "../utils/eventMetadataForwarding";
+import { fireAndForgetLogged } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 
 type ManualCheckCompletedPayload = UptimeEvents["monitor:check-completed"];
@@ -212,8 +213,11 @@ export class SnapshotSyncCoordinator {
             _meta?: unknown;
         }
     ): void {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[UptimeOrchestrator] Error handling internal:monitor:manual-check-completed:",
+            task: async () => {
                 const {
                     identifier,
                     monitorId: manualMonitorId,
@@ -367,42 +371,31 @@ export class SnapshotSyncCoordinator {
                 });
 
                 await this.emitTyped("monitor:check-completed", payload);
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling internal:monitor:manual-check-completed:",
-                    error
-                );
-            }
-        })();
+            },
+        });
     }
 
     /** Event handler for sites cache update requests. */
     public handleUpdateSitesCacheRequestedEvent(
         data: UpdateSitesCacheRequestData
     ): void {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message: "[UptimeOrchestrator] Error handling update-sites-cache-requested:",
+            task: async () => {
                 await this.handleUpdateSitesCacheRequest(data);
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling update-sites-cache-requested:",
-                    error
-                );
-            }
-        })();
+            },
+        });
     }
 
     /** Event handler for retrieving sites from cache. */
     public handleGetSitesFromCacheRequestedEvent(): void {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message: "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
+            task: async () => {
                 await this.handleGetSitesFromCacheRequest();
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
-                    error
-                );
-            }
-        })();
+            },
+        });
     }
 }

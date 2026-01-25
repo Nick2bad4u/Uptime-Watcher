@@ -44,7 +44,6 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
-import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { EnhancedMonitoringDependencies } from "./EnhancedMonitoringDependencies";
 import type {
@@ -67,6 +66,12 @@ import {
     createMonitorStrategyRegistry,
     type MonitorStrategyRegistry,
 } from "./strategies/MonitorStrategyRegistry";
+import {
+    buildStatusUpdateMonitorCheckResult,
+    isValidServiceResult,
+    resolveStatusUpdateDetails,
+    toFailure,
+} from "./utils/monitorCheckResultNormalization";
 
 /**
  * Configuration interface for enhanced monitor checking with comprehensive
@@ -558,7 +563,7 @@ export class EnhancedMonitorChecker {
             return undefined;
         }
 
-        const details = this.resolveStatusUpdateDetails({
+        const details = resolveStatusUpdateDetails({
             status: checkResult.status,
         });
 
@@ -727,7 +732,7 @@ export class EnhancedMonitorChecker {
             };
 
             const statusUpdateBase: StatusUpdate = {
-                details: this.resolveStatusUpdateDetails(
+                details: resolveStatusUpdateDetails(
                     finalStatus === "paused"
                         ? { status: finalStatus }
                         : {
@@ -945,29 +950,6 @@ export class EnhancedMonitorChecker {
         readonly checkResult: StatusUpdateMonitorCheckResult;
         readonly serviceResult: MonitorCheckResult;
     }> {
-        const toFailure = (details?: string): MonitorCheckResult => ({
-            ...(details ? { details } : {}),
-            responseTime: 0,
-            status: "down",
-        });
-
-        const isValidServiceResult = (
-            value: unknown
-        ): value is MonitorCheckResult => {
-            if (!isRecord(value)) {
-                return false;
-            }
-
-            const { responseTime, status } = value;
-
-            return (
-                (status === "up" ||
-                    status === "down" ||
-                    status === "degraded") &&
-                typeof responseTime === "number"
-            );
-        };
-
         try {
             const raw: unknown = await this.strategyRegistry.execute(
                 args.context.monitor,
@@ -979,7 +961,7 @@ export class EnhancedMonitorChecker {
                 : toFailure("Invalid monitor check result");
 
             return {
-                checkResult: this.buildCheckResultFromServiceResult({
+                checkResult: buildStatusUpdateMonitorCheckResult({
                     monitorId: args.context.monitor.id,
                     operationId: args.operationId,
                     serviceResult,
@@ -996,7 +978,7 @@ export class EnhancedMonitorChecker {
             const serviceResult = toFailure(safeError.message);
 
             return {
-                checkResult: this.buildCheckResultFromServiceResult({
+                checkResult: buildStatusUpdateMonitorCheckResult({
                     monitorId: args.context.monitor.id,
                     operationId: args.operationId,
                     serviceResult,
@@ -1006,72 +988,8 @@ export class EnhancedMonitorChecker {
         }
     }
 
-    /**
-     * Builds a status-update check result from the raw service result.
-     *
-     * @remarks
-     * Both correlated and direct/manual checks construct the same
-     * {@link StatusUpdateMonitorCheckResult} shape. Centralizing this prevents
-     * subtle drift (default details strings, timestamps, etc.).
-     */
-    private buildCheckResultFromServiceResult(args: {
-        readonly monitorId: string;
-        readonly operationId: string;
-        readonly serviceResult: MonitorCheckResult;
-    }): StatusUpdateMonitorCheckResult {
-        return {
-            details:
-                args.serviceResult.details ??
-                (args.serviceResult.status === "up"
-                    ? "Check successful"
-                    : "Check failed"),
-            monitorId: args.monitorId,
-            operationId: args.operationId,
-            responseTime: args.serviceResult.responseTime,
-            status: args.serviceResult.status,
-            timestamp: new Date(),
-        };
-    }
-
-    /**
-     * Resolves the human-facing details string used in status update events.
-     *
-     * @remarks
-     * Correlated checks intentionally use a consistent, user-friendly message
-     * derived from status. Direct/manual checks may also include a
-     * monitor-provided detail string, except when the resulting status is
-     * `paused`.
-     */
-    private resolveStatusUpdateDetails(args: {
-        readonly serviceDetails?: string;
-        readonly status: StatusUpdate["status"];
-    }): string {
-        const trimmed = args.serviceDetails?.trim();
-        if (trimmed) {
-            return trimmed;
-        }
-
-        switch (args.status) {
-            case "degraded": {
-                return "Monitor is partially responding";
-            }
-            case "down": {
-                return "Monitor is not responding";
-            }
-            case "paused": {
-                return "Monitor is paused";
-            }
-            case "pending": {
-                return "Monitor check pending";
-            }
-            case "up": {
-                return "Monitor is responding";
-            }
-            default: {
-                return "Monitor check completed";
-            }
-        }
-    }
+    // NOTE: buildCheckResultFromServiceResult/resolveStatusUpdateDetails are
+    // extracted to ./utils/monitorCheckResultNormalization.
 
     public constructor(config: EnhancedMonitorCheckConfig) {
         this.config = config;

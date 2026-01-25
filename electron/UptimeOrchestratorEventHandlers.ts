@@ -9,6 +9,7 @@ import type {
     UpdateSitesCacheRequestData,
 } from "./UptimeOrchestrator.types";
 
+import { fireAndForgetLogged } from "./utils/fireAndForget";
 import { logger } from "./utils/logger";
 
 /**
@@ -49,16 +50,14 @@ export class UptimeOrchestratorEventHandlers {
 
     /** Event handler for database initialization completion. */
     public readonly handleDatabaseInitializedEvent = (): void => {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[UptimeOrchestrator] Error handling internal:database:initialized:",
+            task: async () => {
                 await this.onDatabaseInitialized();
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling internal:database:initialized:",
-                    error
-                );
-            }
-        })();
+            },
+        });
     };
 
     /** Event handler for manual monitor check completion events. */
