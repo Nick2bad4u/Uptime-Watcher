@@ -33,11 +33,11 @@
  * @packageDocumentation
  */
 
-import { sleep } from "@shared/utils/abortUtils";
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { withRetry } from "@shared/utils/retry";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
@@ -375,66 +375,91 @@ export class WindowService {
             SERVER_URL,
         } = WindowService.VITE_SERVER_CONFIG;
 
-        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-            try {
-                // Create AbortController for fetch timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => {
-                    controller.abort();
-                }, FETCH_TIMEOUT);
+        class ViteDevServerNotReadyError extends Error {
+            public override readonly name = "ViteDevServerNotReadyError";
 
-                try {
-                    // eslint-disable-next-line no-await-in-loop -- Sequential server readiness check required
-                    const response = await fetch(SERVER_URL, {
-                        signal: controller.signal,
-                    });
-
-                    if (response.ok) {
-                        logger.debug(
-                            "[WindowService] Vite dev server is ready"
-                        );
-                        return;
-                    }
-                } finally {
-                    clearTimeout(timeoutId);
-                }
-            } catch (error) {
-                const resolved = ensureError(error);
-                // Log only significant errors or last attempt
-                if (
-                    attempt === MAX_RETRIES - 1 ||
-                    resolved.name !== "AbortError"
-                ) {
-                    logger.debug(
-                        `[WindowService] Vite server not ready (attempt ${attempt + 1}/${MAX_RETRIES}): ${getUnknownErrorMessage(resolved)}`
-                    );
-                }
-            }
-
-            if (attempt < MAX_RETRIES - 1) {
-                // Don't wait after the last attempt
-                // Calculate exponential backoff delay with jitter
-                const exponentialDelay = Math.min(
-                    BASE_DELAY * 2 ** attempt,
-                    MAX_DELAY
-                );
-                // Using crypto for better randomness would be overkill for
-                // jitter - Math.random is sufficient
-                // eslint-disable-next-line sonarjs/pseudo-random -- dev only
-                const jitter = Math.random() * 200; // Add up to 200ms jitter
-                const totalDelay = exponentialDelay + jitter;
-
-                logger.debug(
-                    `[WindowService] Waiting ${Math.round(totalDelay)}ms before retry ${attempt + 2}/${MAX_RETRIES}`
-                );
-                // eslint-disable-next-line no-await-in-loop -- Sequential retry delay required
-                await sleep(totalDelay);
+            public constructor(message: string) {
+                super(message);
             }
         }
 
-        throw new Error(
-            `Vite dev server did not become available after ${MAX_RETRIES} attempts`
-        );
+        const JITTER_MS = 200;
+
+        try {
+            await withRetry(
+                async () => {
+                    // Create AbortController for fetch timeout
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => {
+                        controller.abort();
+                    }, FETCH_TIMEOUT);
+
+                    try {
+                        const response = await fetch(SERVER_URL, {
+                            signal: controller.signal,
+                        });
+
+                        if (response.ok) {
+                            logger.debug(
+                                "[WindowService] Vite dev server is ready"
+                            );
+                            return;
+                        }
+
+                        // Preserve previous behavior: non-OK responses are
+                        // treated as "not ready" without log spam.
+                        throw new ViteDevServerNotReadyError(
+                            `Vite dev server returned ${response.status}`
+                        );
+                    } finally {
+                        clearTimeout(timeoutId);
+                    }
+                },
+                {
+                    delayMs: ({ attempt }) => {
+                        // Calculate exponential backoff delay with jitter.
+                        const exponentialDelay = Math.min(
+                            BASE_DELAY * 2 ** (attempt - 1),
+                            MAX_DELAY
+                        );
+
+                        // Using crypto for better randomness would be overkill
+                        // for jitter - Math.random is sufficient.
+                        // eslint-disable-next-line sonarjs/pseudo-random -- dev only
+                        const jitter = Math.random() * JITTER_MS;
+
+                        return exponentialDelay + jitter;
+                    },
+                    maxRetries: MAX_RETRIES,
+                    onError: (error, attempt) => {
+                        const resolved = ensureError(error);
+                        // Log only significant errors or last attempt.
+                        if (
+                            attempt === MAX_RETRIES ||
+                            (resolved.name !== "AbortError" &&
+                                resolved.name !==
+                                    "ViteDevServerNotReadyError")
+                        ) {
+                            logger.debug(
+                                `[WindowService] Vite server not ready (attempt ${attempt}/${MAX_RETRIES}): ${getUnknownErrorMessage(resolved)}`
+                            );
+                        }
+                    },
+                    onFailedAttempt: ({ attempt, delayMs }) => {
+                        logger.debug(
+                            `[WindowService] Waiting ${Math.round(delayMs)}ms before retry ${attempt + 1}/${MAX_RETRIES}`
+                        );
+                    },
+                }
+            );
+
+
+        } catch (error) {
+            throw new Error(
+                `Vite dev server did not become available after ${MAX_RETRIES} attempts`,
+                { cause: error }
+            );
+        }
     }
 
     /**

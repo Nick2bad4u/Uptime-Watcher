@@ -7,9 +7,9 @@
  * database operations.
  */
 
-import { sleep } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { withRetry } from "@shared/utils/retry";
 import { isSqliteLockedError } from "@shared/utils/sqliteErrors";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
@@ -193,7 +193,7 @@ export class DatabaseService {
             }
         }
 
-        const attemptTransaction = async (attempt: number): Promise<T> => {
+        const executeSingleAttempt = async (): Promise<T> => {
             try {
                 db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
                 logger.debug("[DatabaseService] Started new transaction");
@@ -209,22 +209,6 @@ export class DatabaseService {
                 });
             } catch (error) {
                 const normalizedError = ensureError(error);
-                const canRetry =
-                    attempt < TRANSACTION_MAX_ATTEMPTS &&
-                    isSqliteLockedError(normalizedError);
-
-                if (canRetry) {
-                    logger.warn(
-                        `[DatabaseService] Transaction encountered SQLITE_BUSY/SQLITE_LOCKED; rolling back and retrying (attempt ${attempt}/${TRANSACTION_MAX_ATTEMPTS})`,
-                        normalizedError
-                    );
-                } else {
-                    // Enhanced error logging to understand what's causing transaction failures
-                    logger.error(
-                        "[DatabaseService] Transaction operation failed",
-                        normalizedError
-                    );
-                }
 
                 // Only attempt rollback if a transaction is actually active.
                 // This prevents "cannot rollback - no transaction is active" errors.
@@ -246,20 +230,40 @@ export class DatabaseService {
                     );
                 }
 
-                if (!canRetry) {
-                    throw normalizedError;
-                }
-
-                const delay = Math.min(
-                    TRANSACTION_RETRY_INITIAL_DELAY_MS * 2 ** (attempt - 1),
-                    TRANSACTION_RETRY_MAX_DELAY_MS
-                );
-                await sleep(delay);
-                return attemptTransaction(attempt + 1);
+                throw normalizedError;
             }
         };
 
-        return attemptTransaction(1);
+        return withRetry(executeSingleAttempt, {
+            delayMs: ({ attempt }) =>
+                Math.min(
+                    TRANSACTION_RETRY_INITIAL_DELAY_MS * 2 ** (attempt - 1),
+                    TRANSACTION_RETRY_MAX_DELAY_MS
+                ),
+            maxRetries: TRANSACTION_MAX_ATTEMPTS,
+            onError: (error, attempt) => {
+                const normalizedError = ensureError(error);
+                const canRetry =
+                    attempt < TRANSACTION_MAX_ATTEMPTS &&
+                    isSqliteLockedError(normalizedError);
+
+                if (canRetry) {
+                    logger.warn(
+                        `[DatabaseService] Transaction encountered SQLITE_BUSY/SQLITE_LOCKED; rolling back and retrying (attempt ${attempt}/${TRANSACTION_MAX_ATTEMPTS})`,
+                        normalizedError
+                    );
+                } else {
+                    // Enhanced error logging to understand what's causing transaction failures
+                    logger.error(
+                        "[DatabaseService] Transaction operation failed",
+                        normalizedError
+                    );
+                }
+            },
+            shouldRetry: (error, attempt) =>
+                attempt < TRANSACTION_MAX_ATTEMPTS &&
+                isSqliteLockedError(ensureError(error)),
+        });
     }
 
     /**

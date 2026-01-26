@@ -38,12 +38,8 @@ function calculateBackoffSeconds(retryAttempts: number): number {
         return 0;
     }
 
-    let backoffSeconds = 0;
-    for (let i = 0; i < retryAttempts; i += 1) {
-        backoffSeconds += 2 ** i;
-    }
-
-    return backoffSeconds;
+    // Sum of exponential backoff delays: 2^0 + 2^1 + ... + 2^(n-1) = 2^n - 1
+    return 2 ** retryAttempts - 1;
 }
 
 /**

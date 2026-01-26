@@ -1,6 +1,5 @@
 import { logger } from "@electron/utils/logger";
-import { sleepUnref } from "@shared/utils/abortUtils";
-import { ensureError } from "@shared/utils/errorHandling";
+import { withRetry } from "@shared/utils/retry";
 import { isRecord } from "@shared/utils/typeHelpers";
 import axios from "axios";
 import { DropboxResponseError } from "dropbox";
@@ -169,18 +168,11 @@ export async function withDropboxRetry<T>(args: {
     const initialDelayMs = args.initialDelayMs ?? DEFAULT_INITIAL_DELAY_MS;
     const maxDelayMs = args.maxDelayMs ?? DEFAULT_MAX_DELAY_MS;
 
-    let attempt = 0;
-
-    while (true) {
-        try {
-            // eslint-disable-next-line no-await-in-loop -- Retry loop is intentionally sequential.
-            return await args.fn();
-        } catch (error) {
-            attempt += 1;
+    return withRetry(args.fn, {
+        delayMs: ({ attempt, error }) => {
             const retryable = extractRetryableHttpFailure(error);
-
-            if (!retryable || attempt >= maxAttempts) {
-                throw ensureError(error);
+            if (!retryable) {
+                return 0;
             }
 
             const computedDelay = computeBackoffDelayMs({
@@ -189,20 +181,25 @@ export async function withDropboxRetry<T>(args: {
                 maxDelayMs,
             });
 
-            const delayMs =
-                typeof retryable.retryAfterMs === "number"
-                    ? Math.max(computedDelay, retryable.retryAfterMs)
-                    : computedDelay;
+            return typeof retryable.retryAfterMs === "number"
+                ? Math.max(computedDelay, retryable.retryAfterMs)
+                : computedDelay;
+        },
+        maxRetries: maxAttempts,
+        onFailedAttempt: ({ attempt, delayMs, error }) => {
+            const retryable = extractRetryableHttpFailure(error);
 
             logger.warn("[Dropbox] Retrying operation", {
                 attempt,
                 delayMs,
                 operation: args.operationName,
-                status: retryable.status,
+                status: retryable?.status,
             });
-
-            // eslint-disable-next-line no-await-in-loop -- Retry loop is intentionally sequential.
-            await sleepUnref(delayMs);
-        }
-    }
+        },
+            shouldRetry: (error: unknown, attempt: number) => {
+            const retryable = extractRetryableHttpFailure(error);
+            return retryable !== null && attempt < maxAttempts;
+        },
+        unrefDelay: true,
+    });
 }

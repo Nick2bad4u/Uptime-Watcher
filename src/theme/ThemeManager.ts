@@ -16,6 +16,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import deepEqual from "fast-deep-equal";
 
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
@@ -93,7 +94,7 @@ export class ThemeManager {
         return (
             theme1.name === theme2.name &&
             theme1.isDark === theme2.isDark &&
-            JSON.stringify(theme1.colors) === JSON.stringify(theme2.colors)
+            deepEqual(theme1.colors, theme2.colors)
         );
     }
 

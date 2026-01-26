@@ -6,7 +6,7 @@
  * Logging is intentionally caller-provided.
  */
 
-import { sleep } from "@shared/utils/abortUtils";
+import { sleep, sleepUnref } from "@shared/utils/abortUtils";
 
 const RETRY_NON_ERROR_THROWN_MARKER: unique symbol = Symbol(
     "shared.utils.retry.nonErrorThrown"
@@ -47,9 +47,14 @@ export interface RetryOptions {
     /**
      * Delay between attempts in milliseconds.
      *
+     * @remarks
+     * Can be a constant or a function for exponential backoff / jitter.
+     *
      * @defaultValue 300
      */
-    delayMs?: number;
+    delayMs?:
+        | ((args: { readonly attempt: number; readonly error: unknown }) => number)
+        | number;
 
     /**
      * Maximum number of attempts (including the first attempt).
@@ -67,8 +72,130 @@ export interface RetryOptions {
      */
     onError?: (error: unknown, attempt: number) => void;
 
+    /**
+     * Optional hook invoked after a failed attempt and after the delay for the
+     * next attempt is computed.
+     */
+    onFailedAttempt?: (args: {
+        readonly attempt: number;
+        readonly delayMs: number;
+        readonly error: unknown;
+    }) => void;
+
     /** Optional label for debugging/logging by callers. */
     operationName?: string;
+
+    /**
+     * Optional predicate to stop retrying for specific errors.
+     *
+     * @remarks
+     * Returning false stops retrying and rethrows the most recent error.
+     */
+    shouldRetry?: (error: unknown, attempt: number) => boolean;
+
+    /**
+     * When true, uses an unref'd timer for the delay between retries so the
+     * process can exit naturally.
+     */
+    unrefDelay?: boolean;
+}
+
+function resolveDelayMs(args: {
+    readonly attempt: number;
+    readonly delay:
+        | ((args: { readonly attempt: number; readonly error: unknown }) => number)
+        | number;
+    readonly error: unknown;
+}): number {
+    const value =
+        typeof args.delay === "function"
+            ? args.delay({ attempt: args.attempt, error: args.error })
+            : args.delay;
+
+    if (!Number.isFinite(value) || value <= 0) {
+        return 0;
+    }
+
+    return value;
+}
+
+function raiseNonRetryableRetryError(error: unknown): never {
+    if (error instanceof Error) {
+        throw error;
+    }
+
+    throw wrapNonErrorThrownValue(error);
+}
+
+function shouldRetrySafely(
+    predicate: RetryOptions["shouldRetry"] | undefined,
+    error: unknown,
+    attempt: number
+): boolean {
+    if (!predicate) {
+        return true;
+    }
+
+    try {
+        return predicate(error, attempt);
+    } catch {
+        // Swallow callback errors: retry logic should not be interrupted by
+        // logging/telemetry failures.
+        return true;
+    }
+}
+
+function callOnErrorHook(
+    onError: RetryOptions["onError"] | undefined,
+    error: unknown,
+    attempt: number
+): void {
+    if (!onError) {
+        return;
+    }
+
+    try {
+        onError(error, attempt);
+    } catch {
+        // Swallow callback errors: retry logic should not be interrupted by
+        // logging/telemetry failures.
+    }
+}
+
+function callOnFailedAttemptHook(
+    onFailedAttempt: RetryOptions["onFailedAttempt"] | undefined,
+    args: {
+        readonly attempt: number;
+        readonly delayMs: number;
+        readonly error: unknown;
+    }
+): void {
+    if (!onFailedAttempt) {
+        return;
+    }
+
+    try {
+        onFailedAttempt(args);
+    } catch {
+        // Swallow callback errors: retry logic should not be interrupted by
+        // logging/telemetry failures.
+    }
+}
+
+async function waitBeforeRetry(args: {
+    readonly attempt: number;
+    readonly computedDelayMs: number;
+    readonly error: unknown;
+    readonly onFailedAttempt: RetryOptions["onFailedAttempt"] | undefined;
+    readonly unrefDelay: boolean;
+}): Promise<void> {
+    callOnFailedAttemptHook(args.onFailedAttempt, {
+        attempt: args.attempt,
+        delayMs: args.computedDelayMs,
+        error: args.error,
+    });
+
+    await (args.unrefDelay ? sleepUnref : sleep)(args.computedDelayMs);
 }
 
 /**
@@ -80,10 +207,13 @@ export async function withRetry<T>(
     operation: () => Promise<T>,
     options: RetryOptions = {}
 ): Promise<T> {
-    const { onError } = options;
-
-    // Treat negative delays as 0 to avoid scheduling oddities.
-    const delayMs = Math.max(0, options.delayMs ?? 300);
+    const {
+        delayMs: delayConfig = 300,
+        onError,
+        onFailedAttempt,
+        shouldRetry,
+        unrefDelay = false,
+    } = options;
 
     // `maxRetries` is the maximum number of attempts (including the first).
     const maxRetries = options.maxRetries ?? 5;
@@ -102,18 +232,27 @@ export async function withRetry<T>(
         } catch (error) {
             errors.push(error);
 
-            if (onError) {
-                try {
-                    onError(error, attempt);
-                } catch {
-                    // Swallow callback errors: retry logic should not be
-                    // interrupted by logging/telemetry failures.
-                }
-            }
+            callOnErrorHook(onError, error, attempt);
 
             if (attempt < maxRetries) {
+                if (!shouldRetrySafely(shouldRetry, error, attempt)) {
+                    raiseNonRetryableRetryError(error);
+                }
+
+                const computedDelayMs = resolveDelayMs({
+                    attempt,
+                    delay: delayConfig,
+                    error,
+                });
+
                 // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
-                await sleep(delayMs);
+                await waitBeforeRetry({
+                    attempt,
+                    computedDelayMs,
+                    error,
+                    onFailedAttempt,
+                    unrefDelay,
+                });
             }
         }
     }

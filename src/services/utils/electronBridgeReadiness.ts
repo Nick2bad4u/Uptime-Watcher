@@ -11,7 +11,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { sleep } from "@shared/utils/abortUtils";
+import { ensureError } from "@shared/utils/errorHandling";
+import { withRetry } from "@shared/utils/retry";
 
 const DEFAULT_MAX_ATTEMPTS = 50;
 const DEFAULT_BASE_DELAY = 100;
@@ -19,6 +20,16 @@ const MAX_DELAY = 2000;
 const BACKOFF_FACTOR = 1.5;
 const BASE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
+
+class BridgeNotReadyYetError extends Error {
+    public readonly diagnostics: BridgeReadinessDiagnostics;
+
+    public constructor(diagnostics: BridgeReadinessDiagnostics) {
+        super("Electron bridge not ready yet");
+        this.name = "BridgeNotReadyYetError";
+        this.diagnostics = diagnostics;
+    }
+}
 
 /**
  * Electron bridge domains exposed by the preload script.
@@ -81,8 +92,11 @@ export class ElectronBridgeNotReadyError extends Error {
     /** Diagnostics collected from the last readiness evaluation. */
     public readonly diagnostics: BridgeReadinessDiagnostics;
 
-    public constructor(diagnostics: BridgeReadinessDiagnostics) {
-        super(BASE_ERROR_MESSAGE);
+    public constructor(
+        diagnostics: BridgeReadinessDiagnostics,
+        options?: { readonly cause?: unknown }
+    ) {
+        super(BASE_ERROR_MESSAGE, options);
         this.name = "ElectronBridgeNotReadyError";
         this.diagnostics = diagnostics;
     }
@@ -193,26 +207,13 @@ const evaluateContracts = (
     };
 };
 
-const pollBridgeReadiness = async (
-    attempt: number,
-    maxAttempts: number,
-    baseDelay: number,
-    contracts: readonly ElectronBridgeContract[]
-): Promise<BridgeReadinessDiagnostics & { readonly isReady: boolean }> => {
-    const evaluation = evaluateContracts(obtainBridgeRoot(), contracts);
-
-    if (evaluation.isReady || attempt + 1 >= maxAttempts) {
-        return evaluation;
-    }
-
-    const delayDuration = Math.min(
-        baseDelay * BACKOFF_FACTOR ** attempt,
-        MAX_DELAY
-    );
-
-    await sleep(delayDuration);
-
-    return pollBridgeReadiness(attempt + 1, maxAttempts, baseDelay, contracts);
+const computeDelayMs = (args: {
+    readonly attempt: number;
+    readonly baseDelay: number;
+}): number => {
+    // `attempt` is 1-indexed in withRetry.
+    const exponent = Math.max(0, args.attempt - 1);
+    return Math.min(args.baseDelay * BACKOFF_FACTOR ** exponent, MAX_DELAY);
 };
 
 /**
@@ -233,14 +234,38 @@ export async function waitForElectronBridge(
     } = options;
 
     const attempts = Math.max(1, maxAttempts);
-    const evaluation = await pollBridgeReadiness(
-        0,
-        attempts,
-        baseDelay,
-        contracts
-    );
 
-    if (!evaluation.isReady) {
-        throw new ElectronBridgeNotReadyError(evaluation);
+    try {
+        await withRetry(
+            () => {
+                const evaluation = evaluateContracts(
+                    obtainBridgeRoot(),
+                    contracts
+                );
+
+                if (evaluation.isReady) {
+                    return Promise.resolve();
+                }
+
+                return Promise.reject(new BridgeNotReadyYetError(evaluation));
+            },
+            {
+                delayMs: ({ attempt }) =>
+                    computeDelayMs({ attempt, baseDelay }),
+                maxRetries: attempts,
+                shouldRetry: (error) => error instanceof BridgeNotReadyYetError,
+            }
+        );
+    } catch (error: unknown) {
+        const normalized = ensureError(error);
+        if (normalized instanceof BridgeNotReadyYetError) {
+            throw new ElectronBridgeNotReadyError(normalized.diagnostics, {
+                cause: error,
+            });
+        }
+
+        throw new Error("waitForElectronBridge failed", {
+            cause: error,
+        });
     }
 }
