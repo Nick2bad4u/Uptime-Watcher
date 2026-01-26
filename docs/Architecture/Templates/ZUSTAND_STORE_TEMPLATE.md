@@ -54,6 +54,7 @@ For stores with straightforward state that don't require modular composition:
  *
  *
  *
+ *
  *  import { useExampleStore } from "./stores/useExampleStore";
  *
  *  function MyComponent() {

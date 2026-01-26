@@ -47,7 +47,6 @@ import {
 import { useCallback, useMemo, useState } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
-import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
@@ -65,6 +64,7 @@ import { HistoryTab } from "./tabs/HistoryTab";
 import { OverviewTab } from "./tabs/OverviewTab";
 import { SettingsTab } from "./tabs/SettingsTab";
 import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
+import { useSiteDetailsCharts } from "./useSiteDetailsCharts";
 
 /**
  * Props for the SiteDetails component
@@ -188,113 +188,17 @@ export const SiteDetails = ({
         siteDetailsChartTimeRange,
         siteExists,
         timeoutChanged,
-        // eslint-disable-next-line ex/no-unhandled -- Site prop is guaranteed to be valid by parent component's site selection logic and type validation
+
     } = useSiteDetails(useMemo(() => ({ site }), [site]));
 
-    // Create chart config service instance
-    const chartConfig = useMemo(
-        () => new ChartConfigService(currentTheme),
-        [currentTheme]
-    );
-
-    // Chart configurations using the service
-    const lineChartOptions = useMemo(
-        () => chartConfig.getLineChartConfig(),
-        [chartConfig]
-    );
-    const barChartOptions = useMemo(
-        () => chartConfig.getBarChartConfig(),
-        [chartConfig]
-    );
-    const doughnutOptions = useMemo(
-        () => chartConfig.getDoughnutChartConfig(analytics.totalChecks),
-        [analytics.totalChecks, chartConfig]
-    );
-
-    // Chart data using analytics
-    const lineChartData = useMemo(
-        () => ({
-            datasets: [
-                {
-                    backgroundColor: `${currentTheme.colors.primary[500]}20`,
-                    borderColor: currentTheme.colors.primary[500],
-                    data: analytics.filteredHistory.map((h) => h.responseTime),
-                    fill: true,
-                    label: "Response Time (ms)",
-                    tension: 0.1,
-                },
-            ],
-            labels: analytics.filteredHistory.map((h) => new Date(h.timestamp)),
-        }),
-        [analytics.filteredHistory, currentTheme]
-    );
-
-    const statusDistribution = useMemo(() => {
-        const labels: string[] = [];
-        const data: number[] = [];
-        const backgroundColors: string[] = [];
-        const borderColors: string[] = [];
-
-        labels.push("Up");
-        data.push(analytics.upCount);
-        backgroundColors.push(currentTheme.colors.success);
-        borderColors.push(currentTheme.colors.success);
-
-        if (analytics.degradedCount > 0) {
-            labels.push("Degraded");
-            data.push(analytics.degradedCount);
-            backgroundColors.push(currentTheme.colors.warning);
-            borderColors.push(currentTheme.colors.warning);
-        }
-
-        labels.push("Down");
-        data.push(analytics.downCount);
-        backgroundColors.push(currentTheme.colors.error);
-        borderColors.push(currentTheme.colors.error);
-
-        return {
-            backgroundColors,
-            borderColors,
-            data,
-            labels,
-        };
-    }, [
-        analytics.degradedCount,
-        analytics.downCount,
-        analytics.upCount,
-        currentTheme,
-    ]);
-
-    const barChartData = useMemo(
-        () => ({
-            datasets: [
-                {
-                    backgroundColor: statusDistribution.backgroundColors,
-                    borderColor: statusDistribution.borderColors,
-                    borderWidth: 1,
-                    data: statusDistribution.data,
-                    label: "Status Distribution",
-                },
-            ],
-            labels: statusDistribution.labels,
-        }),
-        [statusDistribution]
-    );
-
-    const doughnutChartData = useMemo(
-        () => ({
-            datasets: [
-                {
-                    backgroundColor: statusDistribution.backgroundColors,
-                    borderColor: statusDistribution.borderColors,
-                    borderWidth: 1,
-                    data: statusDistribution.data,
-                },
-            ],
-            labels: statusDistribution.labels,
-        }),
-        [statusDistribution]
-    );
+    const {
+        barChartData,
+        barChartOptions,
+        doughnutChartData,
+        doughnutOptions,
+        lineChartData,
+        lineChartOptions,
+    } = useSiteDetailsCharts(analytics, currentTheme);
 
     const handleCheckNowClick = useCallback(() => {
         void handleCheckNow();

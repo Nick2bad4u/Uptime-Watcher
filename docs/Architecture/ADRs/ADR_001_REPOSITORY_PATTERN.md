@@ -106,6 +106,7 @@ import type { DatabaseService } from "@electron/services/database/DatabaseServic
  *
  *
  *
+ *
  *  const repository = new ExampleRepository({ databaseService });
  *
  *  // Public async method - creates its own transaction
@@ -138,6 +139,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  const repository = new ExampleRepository({
   *   databaseService: serviceContainer.getDatabaseService(),
   *  });
@@ -161,6 +163,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
@@ -208,6 +211,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  // Use within an existing transaction
   *  await databaseService.executeTransaction((db) => {
   *   repository.bulkInsertInternal(db, records);
@@ -251,6 +255,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  const allRecords = await repository.findAll();
   *  ```;
   *
@@ -277,6 +282,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
@@ -319,6 +325,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  // Use within an existing transaction
   *  await databaseService.executeTransaction((db) => {
   *   repository.deleteAllInternal(db);
@@ -351,6 +358,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *

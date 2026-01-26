@@ -33,10 +33,18 @@ import type { EnhancedMonitoringServices } from "../services/monitoring/Enhanced
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
-import { isDev } from "../electronUtils";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { logger } from "../utils/logger";
-import { withDatabaseOperation } from "../utils/operationalHooks";
+import { applyDefaultIntervalsOperation } from "./monitorManager/applyDefaultIntervalsOperation";
+import { applyMonitorStateOperation } from "./monitorManager/applyMonitorStateOperation";
+import {
+    autoStartMonitoringIfAppropriateOperation,
+    autoStartNewMonitorsOperation,
+} from "./monitorManager/autoStartMonitoring";
+import { checkSiteManuallyOperation } from "./monitorManager/checkSiteManuallyOperation";
+import { setupIndividualNewMonitorsOperation } from "./monitorManager/setupIndividualNewMonitorsOperation";
+import { setupNewMonitorsOperation } from "./monitorManager/setupNewMonitorsOperation";
+import { setupSiteForMonitoringOperation } from "./monitorManager/setupSiteForMonitoringOperation";
 import {
     type EnhancedLifecycleConfig,
     type EnhancedLifecycleHost,
@@ -145,55 +153,21 @@ export class MonitorManager {
         identifier: string,
         monitorId?: string
     ): Promise<StatusUpdate | undefined> {
-        // Use enhanced monitoring for manual checks
-        if (monitorId) {
-            const site = this.dependencies.getSitesCache().get(identifier);
-            if (site) {
-                const result =
-                    await this.enhancedMonitoringServices.checker.checkMonitor(
-                        site,
-                        monitorId,
-                        true
-                    );
-
-                // Only emit event if result is available
-                if (result) {
-                    // Emit manual check completed event
-                    await this.eventEmitter.emitTyped(
-                        "internal:monitor:manual-check-completed",
-                        {
-                            identifier,
-                            monitorId,
-                            operation: "manual-check-completed",
-                            result,
-                            timestamp: Date.now(),
-                        }
-                    );
-                }
-
-                return result;
-            }
-        }
-
-        // For site-wide checks without specific monitorId, check all monitors
-        const site = this.dependencies.getSitesCache().get(identifier);
-        if (!site?.monitors.length) {
-            logger.warn(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.warnings.SITE_NOT_FOUND_MANUAL,
-                    { identifier }
-                )
-            );
-            return undefined;
-        }
-
-        // Check the first monitor (or could iterate through all)
-        const [firstMonitor] = site.monitors;
-        if (firstMonitor?.id) {
-            return this.checkSiteManually(identifier, firstMonitor.id);
-        }
-
-        return undefined;
+        return checkSiteManuallyOperation({
+            dependencies: {
+                checkMonitor: (siteArg, monitorIdArg, isManual) =>
+                    this.enhancedMonitoringServices.checker.checkMonitor(
+                        siteArg,
+                        monitorIdArg,
+                        isManual
+                    ),
+                eventEmitter: this.eventEmitter,
+                logger,
+                sitesCache: this.dependencies.getSitesCache(),
+            },
+            identifier,
+            monitorId,
+        });
     }
 
     /**
@@ -206,39 +180,12 @@ export class MonitorManager {
         site: Site,
         newMonitorIds: string[]
     ): Promise<void> {
-        logger.debug(
-            interpolateLogTemplate(
-                LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS,
-                {
-                    count: newMonitorIds.length,
-                    identifier: site.identifier,
-                }
-            )
-        );
-
-        // Filter to only the new monitors
-        const newMonitors = site.monitors.filter(
-            (m) => m.id && newMonitorIds.includes(m.id)
-        );
-
-        if (newMonitors.length === 0) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,
-                    {
-                        identifier: site.identifier,
-                    }
-                )
-            );
-            return;
-        }
-
-        // Apply default intervals and perform setup for each new monitor
-        await this.setupIndividualNewMonitors(site, newMonitors);
-
-        logger.info(
-            `[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${site.identifier}`
-        );
+        await setupNewMonitorsOperation({
+            newMonitorIds,
+            setupIndividualNewMonitors: (siteArg, newMonitors) =>
+                this.setupIndividualNewMonitors(siteArg, newMonitors),
+            site,
+        });
     }
 
     /**
@@ -248,23 +195,13 @@ export class MonitorManager {
      * @param site - Site to prime before monitoring begins.
      */
     public async setupSiteForMonitoring(site: Site): Promise<void> {
-        // Apply business rules for default intervals
-        await this.applyDefaultIntervals(site);
-
-        // Apply business rules for auto-starting monitoring
-        // Note: Initial checks are handled by MonitorScheduler when monitoring
-        // starts
-        await this.autoStartMonitoringIfAppropriate(site);
-
-        // Emit site setup completed event
-        await this.eventEmitter.emitTyped(
-            "internal:monitor:site-setup-completed",
-            {
-                identifier: site.identifier,
-                operation: "site-setup-completed",
-                timestamp: Date.now(),
-            }
-        );
+        await setupSiteForMonitoringOperation({
+            applyDefaultIntervals: (siteArg) => this.applyDefaultIntervals(siteArg),
+            autoStartMonitoringIfAppropriate: (siteArg) =>
+                this.autoStartMonitoringIfAppropriate(siteArg),
+            eventEmitter: this.eventEmitter,
+            site,
+        });
     }
 
     /**
@@ -461,88 +398,18 @@ export class MonitorManager {
      * @param site - Site whose monitors need remediation.
      */
     private async applyDefaultIntervals(site: Site): Promise<void> {
-        logger.debug(
-            interpolateLogTemplate(
-                LOG_TEMPLATES.debug.MONITOR_MANAGER_INTERVALS_SETTING,
-                {
-                    identifier: site.identifier,
-                }
-            )
-        );
-
-        const monitorsNeedingRemediation = site.monitors.filter(
-            (monitor): monitor is Site["monitors"][0] & { id: string } =>
-                Boolean(monitor.id) && this.shouldApplyDefaultInterval(monitor)
-        );
-
-        if (monitorsNeedingRemediation.length === 0) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,
-                    {
-                        identifier: site.identifier,
-                    }
-                )
-            );
-            return;
-        }
-
-        await withDatabaseOperation(
-            () =>
-                this.dependencies.databaseService.executeTransaction((db) => {
-                    const monitorTx =
-                        this.dependencies.repositories.monitor.createTransactionAdapter(
-                            db
-                        );
-
-                    for (const monitor of monitorsNeedingRemediation) {
-                        monitorTx.update(monitor.id, {
-                            checkInterval: DEFAULT_CHECK_INTERVAL,
-                        });
-
-                        logger.debug(
-                            interpolateLogTemplate(
-                                LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED,
-                                {
-                                    interval: DEFAULT_CHECK_INTERVAL / 1000,
-                                    monitorId: monitor.id,
-                                }
-                            )
-                        );
-                    }
-
-                    return Promise.resolve();
-                }),
-            "monitor-manager-apply-default-interval",
-            undefined,
-            {
-                identifier: site.identifier,
-                interval: DEFAULT_CHECK_INTERVAL,
-                monitorCount: monitorsNeedingRemediation.length,
-            }
-        );
-
-        for (const monitor of monitorsNeedingRemediation) {
-            monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
-        }
-
-        const updatedSite: Site = {
-            ...site,
-            monitors: Array.from(site.monitors),
-        };
-
-        site.monitors = updatedSite.monitors;
-
-        this.dependencies.getSitesCache().set(site.identifier, updatedSite);
-
-        logger.info(
-            interpolateLogTemplate(
-                LOG_TEMPLATES.services.MONITOR_MANAGER_APPLYING_INTERVALS,
-                {
-                    identifier: site.identifier,
-                }
-            )
-        );
+        await applyDefaultIntervalsOperation({
+            defaultCheckIntervalMs: DEFAULT_CHECK_INTERVAL,
+            dependencies: {
+                databaseService: this.dependencies.databaseService,
+                logger,
+                monitorRepository: this.dependencies.repositories.monitor,
+                sitesCache: this.dependencies.getSitesCache(),
+            },
+            shouldApplyDefaultInterval: (monitor) =>
+                this.shouldApplyDefaultInterval(monitor),
+            site,
+        });
     }
 
     /**
@@ -569,78 +436,12 @@ export class MonitorManager {
 
     /** Applies auto-start rules for a site that has newly loaded monitors. */
     private async autoStartMonitoringIfAppropriate(site: Site): Promise<void> {
-        logger.debug(
-            `[MonitorManager] Evaluating auto-start for site: ${site.identifier} (site.monitoring: ${site.monitoring})`
-        );
-
-        // Site-level monitoring acts as a master switch
-        if (!site.monitoring) {
-            logger.debug(
-                `[MonitorManager] Site monitoring disabled, skipping all monitors for site: ${site.identifier}`
-            );
-            return;
-        }
-
-        // Only process sites that have monitors
-        if (site.monitors.length === 0) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_MANAGER_NO_MONITORS_FOUND,
-                    {
-                        identifier: site.identifier,
-                    }
-                )
-            );
-            return;
-        }
-
-        logger.debug(
-            interpolateLogTemplate(
-                LOG_TEMPLATES.debug.MONITOR_MANAGER_AUTO_STARTING_SITE,
-                {
-                    identifier: site.identifier,
-                }
-            )
-        );
-
-        // Start only monitors that have monitoring enabled (respecting
-        // individual monitor states) - run in parallel for better performance
-        const startPromises = site.monitors.map(async (monitor) => {
-            if (monitor.id && monitor.monitoring) {
-                await this.startMonitoringForSite(site.identifier, monitor.id);
-
-                if (isDev()) {
-                    logger.debug(
-                        `[MonitorManager] Auto-started monitoring for monitor ${monitor.id} with interval ${monitor.checkInterval}ms`
-                    );
-                }
-            } else if (monitor.id && !monitor.monitoring) {
-                logger.debug(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_INDIVIDUAL,
-                        {
-                            monitorId: monitor.id,
-                        }
-                    )
-                );
-            } else {
-                // Monitor has no valid ID or is in an unknown state
-                logger.warn(
-                    `[MonitorManager] Skipping monitor without valid ID or in unknown state`
-                );
-            }
+        await autoStartMonitoringIfAppropriateOperation({
+            logger,
+            site,
+            startMonitoringForSite: (siteIdentifier, monitorId) =>
+                this.startMonitoringForSite(siteIdentifier, monitorId),
         });
-
-        await Promise.all(startPromises);
-
-        logger.info(
-            interpolateLogTemplate(
-                LOG_TEMPLATES.services.MONITOR_MANAGER_AUTO_STARTING,
-                {
-                    identifier: site.identifier,
-                }
-            )
-        );
     }
 
     /**
@@ -667,29 +468,13 @@ export class MonitorManager {
         site: Site,
         newMonitors: Site["monitors"]
     ): Promise<void> {
-        // Start new monitors in parallel for better performance
-        const startPromises = newMonitors.map(async (monitor) => {
-            if (monitor.id && monitor.monitoring) {
-                await this.startMonitoringForSite(site.identifier, monitor.id);
-                logger.debug(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.debug.MONITOR_AUTO_STARTED,
-                        { monitorId: monitor.id }
-                    )
-                );
-            } else if (monitor.id && !monitor.monitoring) {
-                logger.debug(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_NEW_INDIVIDUAL,
-                        {
-                            monitorId: monitor.id,
-                        }
-                    )
-                );
-            }
+        await autoStartNewMonitorsOperation({
+            logger,
+            newMonitors,
+            siteIdentifier: site.identifier,
+            startMonitoringForSite: (siteIdentifier, monitorId) =>
+                this.startMonitoringForSite(siteIdentifier, monitorId),
         });
-
-        await Promise.all(startPromises);
     }
 
     /**
@@ -802,34 +587,15 @@ export class MonitorManager {
         site: Site,
         newMonitors: Site["monitors"]
     ): Promise<void> {
-        // Apply default intervals for new monitors that don't have one
-        // Note: For new monitors, direct assignment is acceptable as they
-        // haven't been persisted yet and will be saved through the normal
-        // persistence flow
-        for (const monitor of newMonitors) {
-            if (this.shouldApplyDefaultInterval(monitor)) {
-                monitor.checkInterval = DEFAULT_CHECK_INTERVAL;
-                logger.debug(
-                    `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`
-                );
-            }
-        }
-
-        // Auto-start monitoring for new monitors if appropriate
-        // Note: Initial checks are handled by MonitorScheduler when monitoring
-        // starts
-        if (site.monitoring) {
-            await this.autoStartNewMonitors(site, newMonitors);
-        } else {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_AUTO_START,
-                    {
-                        identifier: site.identifier,
-                    }
-                )
-            );
-        }
+        await setupIndividualNewMonitorsOperation({
+            autoStartNewMonitors: (siteArg, newMonitorsArg) =>
+                this.autoStartNewMonitors(siteArg, newMonitorsArg),
+            defaultCheckIntervalMs: DEFAULT_CHECK_INTERVAL,
+            newMonitors,
+            shouldApplyDefaultInterval: (monitor) =>
+                this.shouldApplyDefaultInterval(monitor),
+            site,
+        });
     }
 
     /**
@@ -846,55 +612,18 @@ export class MonitorManager {
         changes: Partial<Monitor>,
         newStatus: MonitorStatus
     ): Promise<void> {
-        const previousStatus = monitor.status;
-
-        // Update cached monitor object
-        Object.assign(monitor, changes);
-
-        // Update monitor in cached site
-        const monitorIndex = site.monitors.findIndex(
-            (m) => m.id === monitor.id
-        );
-        if (monitorIndex !== -1) {
-            site.monitors[monitorIndex] = monitor;
-        }
-
-        // Update cached site
-        this.dependencies.getSitesCache().set(site.identifier, site);
-
-        // Persist to database within transaction
-        await withDatabaseOperation(
-            async () =>
-                this.dependencies.databaseService.executeTransaction((db) => {
-                    const monitorTx =
-                        this.dependencies.repositories.monitor.createTransactionAdapter(
-                            db
-                        );
-
-                    monitorTx.update(monitor.id, changes);
-                    return Promise.resolve();
-                }),
-            "monitor-manager-apply-state-change",
-            this.eventEmitter,
-            { changes, monitorId: monitor.id }
-        );
-
-        // Emit status-changed event with full payload
-        const statusUpdate: StatusUpdate = {
+        await applyMonitorStateOperation({
+            changes,
+            dependencies: {
+                databaseService: this.dependencies.databaseService,
+                eventEmitter: this.eventEmitter,
+                monitorRepository: this.dependencies.repositories.monitor,
+                sitesCache: this.dependencies.getSitesCache(),
+            },
             monitor,
-            monitorId: monitor.id,
-            previousStatus,
-            responseTime: monitor.responseTime,
+            newStatus,
             site,
-            siteIdentifier: site.identifier,
-            status: newStatus,
-            timestamp: new Date().toISOString(),
-        };
-
-        await this.eventEmitter.emitTyped(
-            "monitor:status-changed",
-            statusUpdate
-        );
+        });
     }
 
     /**

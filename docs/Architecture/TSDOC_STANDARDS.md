@@ -43,8 +43,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
  *  // Basic usage example
  *  const result = await functionName(requiredParam, optionalParam);
  *  console.log(result);
@@ -52,6 +50,8 @@ tags:
  *
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -102,6 +102,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  // Basic repository usage
  *  const repository = new ExampleRepository({ databaseService });
  *
@@ -121,8 +123,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
  *
  *  // Transaction usage with multiple operations
  *  await databaseService.executeTransaction(async (db) => {
@@ -209,6 +209,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  // Define typed event map
  *  interface MyEvents {
  *   "user:login": { userId: string; timestamp: number };
@@ -227,6 +229,8 @@ tags:
  *
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -269,6 +273,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  // Object event (typical case)
  *  await bus.emitTyped("user:login", {
  *   userId: "123",
@@ -287,6 +293,8 @@ tags:
  *
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -338,6 +346,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  // Basic store usage
  *  import { useExampleStore } from "./stores/useExampleStore";
  *
@@ -366,6 +376,8 @@ tags:
  *
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -416,6 +428,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  // Frontend usage with store integration
  *  const handleUserAction = async () => {
  *   await withErrorHandling(async () => {
@@ -428,6 +442,8 @@ tags:
  *
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -446,6 +462,8 @@ tags:
  *
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -500,6 +518,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  import { SITES_CHANNELS } from "@shared/types/preload";
  *  import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
  *
@@ -520,6 +540,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  import { SITES_CHANNELS } from "@shared/types/preload";
  *  import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
  *
@@ -534,6 +556,8 @@ tags:
  *
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -573,6 +597,8 @@ tags:
  *
  *
  *
+ *
+ *
  *  // Brief description of what this example shows
  *  const result = await functionName(param1, param2);
  *  console.log(result);
@@ -587,6 +613,8 @@ tags:
 /**
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -615,6 +643,8 @@ tags:
 /**
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -648,6 +678,8 @@ Show the most common, straightforward usage:
  *
  *
  *
+ *
+ *
  *  // Basic repository usage
  *  const user = await userRepository.findById("user-123");
  *  if (user) {
@@ -666,6 +698,8 @@ Demonstrate proper error handling patterns:
 /**
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *
@@ -691,6 +725,8 @@ Show complex scenarios and integration patterns:
 /**
  * @example
  *  ```typescript
+ *
+ *
  *
  *
  *

@@ -327,6 +327,8 @@ export interface ComponentProperties {
   *
   *
   *
+  *
+  *
   *  <Component onClick={() => console.log("Clicked!")} />;
   *  ```;
   */
@@ -365,6 +367,8 @@ export interface ComponentProperties {
  *  With
  *
  *
+ *
+ *
  *  loading state:
  *
  *  ```tsx
@@ -397,6 +401,8 @@ export interface ComponentProperties {
  *
  * @example
  *  ```tsx
+ *
+ *
  *
  *
  *

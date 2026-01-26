@@ -95,6 +95,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  const repo = new ExampleRepository({ databaseService });
   *  ```;
   *
@@ -109,6 +110,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
@@ -162,6 +164,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  const examples = await repo.findAll();
   *  ```;
   *
@@ -181,6 +184,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
@@ -209,6 +213,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
@@ -270,6 +275,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  await repo.deleteById("123");
   *  ```;
   *
@@ -313,6 +319,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  await repo.deleteAll();
   *  ```;
   *
@@ -351,6 +358,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
