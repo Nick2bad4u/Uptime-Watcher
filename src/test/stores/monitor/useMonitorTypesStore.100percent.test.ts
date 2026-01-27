@@ -2,12 +2,13 @@
  * Complete 100% test coverage for useMonitorTypesStore
  *
  * This test suite provides exhaustive coverage for the MonitorTypesStore,
- * testing all code paths, edge cases, and error scenarios to achieve 100%
- * line, branch, and function coverage.
+ * testing all code paths, edge cases, and error scenarios to achieve 100% line,
+ * branch, and function coverage.
  *
  * @remarks
  * This suite specifically targets areas not covered by the existing
  * comprehensive tests, including:
+ *
  * - IPC response edge cases and error scenarios
  * - Config filtering with various malformed data types
  * - Error handling wrapper scenarios
@@ -19,10 +20,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import type {
-    Monitor,
-    MonitorType,
-} from "@shared/types";
+import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
@@ -133,30 +131,30 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
         });
 
         // Set up default withErrorHandling behavior
-        originalWithErrorHandling.mockImplementation(async (operation, store) => {
-            try {
-                store.clearError();
-                store.setLoading(true);
-                return await operation();
-            } catch (error: unknown) {
-                const errorMessage =
-                    error instanceof Error ? error.message : String(error);
-                store.setError(errorMessage);
-                throw error;
-            } finally {
-                store.setLoading(false);
-            }
-        });
-
-        // Set up default safeExtractIpcData behavior to match the real implementation
-        originalSafeExtractIpcData.mockImplementation(
-            (response, fallback) => {
-                if (response && response.data !== undefined) {
-                    return response.data;
+        originalWithErrorHandling.mockImplementation(
+            async (operation, store) => {
+                try {
+                    store.clearError();
+                    store.setLoading(true);
+                    return await operation();
+                } catch (error: unknown) {
+                    const errorMessage =
+                        error instanceof Error ? error.message : String(error);
+                    store.setError(errorMessage);
+                    throw error;
+                } finally {
+                    store.setLoading(false);
                 }
-                return fallback;
             }
         );
+
+        // Set up default safeExtractIpcData behavior to match the real implementation
+        originalSafeExtractIpcData.mockImplementation((response, fallback) => {
+            if (response && response.data !== undefined) {
+                return response.data;
+            }
+            return fallback;
+        });
 
         // Reset Zustand store to initial state
         useMonitorTypesStore.setState({
@@ -172,8 +170,6 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
     });
 
     describe("IPC Response Edge Cases", () => {
-
-
         it("should handle safeExtractIpcData returning null", async ({
             task,
             annotate,
@@ -218,10 +214,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Should throw error when API fails
             await act(async () => {
-                await expect(result.current.formatMonitorDetail(
-                    "http",
-                    "original"
-                )).rejects.toThrowError("API error");
+                await expect(
+                    result.current.formatMonitorDetail("http", "original")
+                ).rejects.toThrowError("API error");
             });
 
             // Test formatMonitorTitleSuffix with API error - should throw
@@ -231,10 +226,12 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Should throw error when API fails
             await act(async () => {
-                await expect(result.current.formatMonitorTitleSuffix(
-                    "http",
-                    {} as Monitor
-                )).rejects.toThrowError("API error");
+                await expect(
+                    result.current.formatMonitorTitleSuffix(
+                        "http",
+                        {} as Monitor
+                    )
+                ).rejects.toThrowError("API error");
             });
         });
 
@@ -266,9 +263,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 const { result } = renderHook(() => useMonitorTypesStore());
 
                 await act(async () => {
-                        await expect(result.current.loadMonitorTypes()).rejects.toThrowError(
-                        "invalid payload"
-                    );
+                    await expect(
+                        result.current.loadMonitorTypes()
+                    ).rejects.toThrowError("invalid payload");
                 });
 
                 expect(result.current.monitorTypes).toEqual([]);
@@ -291,9 +288,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             expect(emptyResult.current.monitorTypes).toEqual([]);
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                undefined
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe(undefined);
         });
     });
 
@@ -352,15 +349,15 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             await act(async () => {
-                await expect(result.current.loadMonitorTypes()).rejects.toThrowError(
-                    "invalid payload"
-                );
+                await expect(
+                    result.current.loadMonitorTypes()
+                ).rejects.toThrowError("invalid payload");
             });
 
             expect(result.current.monitorTypes).toEqual([]);
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toContain(
-                "invalid payload"
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toContain("invalid payload");
         });
 
         it("should handle configs with complex field structures", async ({
@@ -505,9 +502,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     }
                 });
 
-                expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                    String(errorType)
-                );
+                expect(
+                    useErrorStore.getState().getStoreError("monitor-types")
+                ).toBe(String(errorType));
                 expect(
                     useErrorStore
                         .getState()
@@ -573,9 +570,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             ).toBeTruthy();
 
             // The store error should be set since our mock calls setError
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                "Operation failed"
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Operation failed");
         });
     });
 
@@ -686,9 +683,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             }
 
             // Final state should be consistent
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                undefined
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe(undefined);
             expect(
                 typeof useErrorStore
                     .getState()
@@ -724,7 +721,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockReturnValueOnce(completeValidationData);
+            originalSafeExtractIpcData.mockReturnValueOnce(
+                completeValidationData
+            );
 
             let result1: ValidationResult;
             await act(async () => {
@@ -752,7 +751,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockReturnValueOnce(minimalValidationData);
+            originalSafeExtractIpcData.mockReturnValueOnce(
+                minimalValidationData
+            );
 
             let result2: ValidationResult;
             await act(async () => {
@@ -781,7 +782,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             );
 
             // Mock safeExtractIpcData to return the validation result
-            originalSafeExtractIpcData.mockReturnValueOnce(nullValidationResult);
+            originalSafeExtractIpcData.mockReturnValueOnce(
+                nullValidationResult
+            );
 
             let result3: ValidationResult;
             await act(async () => {
@@ -811,7 +814,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     nested: {
                         deeply: {
                             object: true,
-                            array: [1, 2, 3],
+                            array: [
+                                1,
+                                2,
+                                3,
+                            ],
                             nullValue: null,
                         },
                     },
@@ -833,7 +840,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockReturnValueOnce(complexValidationResult);
+            originalSafeExtractIpcData.mockReturnValueOnce(
+                complexValidationResult
+            );
 
             let result1: ValidationResult;
             await act(async () => {
@@ -913,7 +922,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
-            originalSafeExtractIpcData.mockReturnValueOnce(mockValidationResult);
+            originalSafeExtractIpcData.mockReturnValueOnce(
+                mockValidationResult
+            );
 
             await act(async () => {
                 await result.current.validateMonitorData("http", {});
@@ -1011,13 +1022,15 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             ];
 
             for (const edgeType of edgeCaseTypes) {
-                mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce({
-                    success: false,
-                    data: null,
-                    errors: ["Type validation failed"],
-                    warnings: [],
-                    metadata: {},
-                });
+                mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
+                    {
+                        success: false,
+                        data: null,
+                        errors: ["Type validation failed"],
+                        warnings: [],
+                        metadata: {},
+                    }
+                );
 
                 await act(async () => {
                     await result.current.validateMonitorData(edgeType, {});
@@ -1048,16 +1061,16 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             let resolveCount = 0;
             mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValue(
                 new Promise((resolve) => {
-                        setTimeout(() => {
-                            resolve([
-                                createMonitorTypeConfig({
-                                    type: `type-${++resolveCount}`,
-                                    displayName: `Type ${resolveCount}`,
-                                    description: "Test type",
-                                }),
-                            ]);
-                        }, 10);
-                    })
+                    setTimeout(() => {
+                        resolve([
+                            createMonitorTypeConfig({
+                                type: `type-${++resolveCount}`,
+                                displayName: `Type ${resolveCount}`,
+                                description: "Test type",
+                            }),
+                        ]);
+                    }, 10);
+                })
             );
 
             // Make rapid successive calls sequentially to avoid overlapping acts
@@ -1137,7 +1150,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                         type: "text",
                         required: fieldIndex % 2 === 0,
                         label: `Field ${fieldIndex}`,
-                        description: `Field description ${fieldIndex}`.repeat(20),
+                        description: `Field description ${fieldIndex}`.repeat(
+                            20
+                        ),
                     })),
                 })
             );
@@ -1147,7 +1162,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 largeDataset
             );
 
-            const { result, unmount } = renderHook(() => useMonitorTypesStore());
+            const { result, unmount } = renderHook(() =>
+                useMonitorTypesStore()
+            );
 
             await act(async () => {
                 await result.current.loadMonitorTypes();
@@ -1183,20 +1200,24 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await annotate("Type: Comprehensive Error Handling", "type");
 
             // Reset withErrorHandling mock to default behavior
-            originalWithErrorHandling.mockImplementation(async (operation, store) => {
-                try {
-                    store.clearError();
-                    store.setLoading(true);
-                    return await operation();
-                } catch (error: unknown) {
-                    const errorMessage =
-                        error instanceof Error ? error.message : String(error);
-                    store.setError(errorMessage);
-                    throw error;
-                } finally {
-                    store.setLoading(false);
+            originalWithErrorHandling.mockImplementation(
+                async (operation, store) => {
+                    try {
+                        store.clearError();
+                        store.setLoading(true);
+                        return await operation();
+                    } catch (error: unknown) {
+                        const errorMessage =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+                        store.setError(errorMessage);
+                        throw error;
+                    } finally {
+                        store.setLoading(false);
+                    }
                 }
-            });
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -1212,9 +1233,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Test network timeouts
             await act(async () => {
-                mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(async () => {
-                    throw "Network timeout";
-                });
+                mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(
+                    async () => {
+                        throw "Network timeout";
+                    }
+                );
                 try {
                     await result.current.loadMonitorTypes();
                 } catch {
@@ -1222,15 +1245,17 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                "Network timeout"
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Network timeout");
 
             // Test permission errors
             await act(async () => {
-                mockElectronAPI.monitorTypes.validateMonitorData.mockImplementation(async () => {
-                    throw "Permission denied";
-                });
+                mockElectronAPI.monitorTypes.validateMonitorData.mockImplementation(
+                    async () => {
+                        throw "Permission denied";
+                    }
+                );
                 try {
                     await result.current.validateMonitorData("http", {});
                 } catch {
@@ -1238,14 +1263,16 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                "Permission denied"
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Permission denied");
 
             // Test service unavailable errors
-            mockElectronAPI.monitorTypes.formatMonitorDetail.mockImplementation(async () => {
-                throw "Service unavailable";
-            });
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockImplementation(
+                async () => {
+                    throw "Service unavailable";
+                }
+            );
 
             await act(async () => {
                 try {
@@ -1255,14 +1282,16 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                "Service unavailable"
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Service unavailable");
 
             // Test corrupted response errors
-            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockImplementation(async () => {
-                throw "Corrupted response";
-            });
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockImplementation(
+                async () => {
+                    throw "Corrupted response";
+                }
+            );
 
             await act(async () => {
                 try {
@@ -1274,9 +1303,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 }
             });
 
-            expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-                "Corrupted response"
-            );
+            expect(
+                useErrorStore.getState().getStoreError("monitor-types")
+            ).toBe("Corrupted response");
         });
     });
 
@@ -1290,7 +1319,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: State Subscriptions", "type");
 
-            const stateChanges: { storeErrors: Record<string, string | undefined> }[] = [];
+            const stateChanges: {
+                storeErrors: Record<string, string | undefined>;
+            }[] = [];
 
             // Subscribe to ErrorStore changes (source of truth for errors/loading)
             const unsubscribe = useErrorStore.subscribe((state) => {
@@ -1299,7 +1330,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Make changes and verify subscriptions fire
             act(() => {
-                useErrorStore.getState().setStoreError("monitor-types", "Test error");
+                useErrorStore
+                    .getState()
+                    .setStoreError("monitor-types", "Test error");
             });
 
             act(() => {
@@ -1316,12 +1349,14 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             expect(stateChanges.length).toBeGreaterThan(0);
             expect(
                 stateChanges.some(
-                    (change) => change.storeErrors["monitor-types"] === "Test error"
+                    (change) =>
+                        change.storeErrors["monitor-types"] === "Test error"
                 )
             ).toBeTruthy();
             expect(
                 stateChanges.some(
-                    (change) => change.storeErrors["monitor-types"] === undefined
+                    (change) =>
+                        change.storeErrors["monitor-types"] === undefined
                 )
             ).toBeTruthy();
 

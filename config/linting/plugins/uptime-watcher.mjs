@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Custom ESLint rules enforcing Uptime Watcher architectural conventions.
@@ -54,11 +53,10 @@ const NORMALIZED_ELECTRON_DIR = normalizePath(ELECTRON_DIR);
 /**
  * Lazily loads and caches canonical monitor type identifiers for rule
  * evaluations.
- *
- * @remarks
- * Parsed once from the shared TypeScript source to avoid repeated filesystem
- * reads when multiple files trigger the rule. This avoids blocking the event
- * loop at module initialization.
+ * @remarks Parsed once from the shared TypeScript source to avoid repeated filesystem
+reads when multiple files trigger the rule. This avoids blocking the event
+loop at module initialization.
+ * @type {readonly string[] | null}
  */
 let BASE_MONITOR_TYPES_CACHE = null;
 
@@ -263,6 +261,9 @@ const monitorFallbackConsistencyRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { messageId: string; node: any; data?: { type: string; } | { type: string; } | { types: string; } | { type: string; }; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
         if (!filename.endsWith("/src/constants.ts")) {
@@ -273,6 +274,9 @@ const monitorFallbackConsistencyRule = {
         const baseMonitorTypeSet = new Set(baseMonitorTypes);
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.VariableDeclarator} node
+             */
             VariableDeclarator(node) {
                 if (
                     node.id.type !== "Identifier" ||
@@ -398,6 +402,9 @@ const electronNoConsoleRule = {
         schema: [],
         type: "suggestion",
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { data: { method: string; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
 
@@ -410,6 +417,9 @@ const electronNoConsoleRule = {
         }
 
         return {
+            /**
+             * @param {{ callee: { type: string; object: { type: string; name: string; }; computed: any; property: { type: string; name: any; }; }; }} node
+             */
             CallExpression(node) {
                 if (
                     node.callee.type === "MemberExpression" &&
@@ -447,6 +457,16 @@ const rendererNoElectronImportRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{
+     *   getFilename: () => string;
+     *   report: (descriptor: {
+     *     messageId: string;
+     *     node: import("@typescript-eslint/utils").TSESTree.Node;
+     *     data?: Record<string, unknown>;
+     *   }) => void;
+     * }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -543,6 +563,9 @@ const rendererNoElectronImportRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type === "Literal" &&
@@ -551,6 +574,9 @@ const rendererNoElectronImportRule = {
                     handleStaticSpecifier(node.source, node.source.value);
                 }
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.ImportExpression} node
+             */
             ImportExpression(node) {
                 if (
                     node.source.type === "Literal" &&
@@ -559,6 +585,9 @@ const rendererNoElectronImportRule = {
                     handleStaticSpecifier(node.source, node.source.value);
                 }
             },
+            /**
+             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; }} node
+             */
             CallExpression(node) {
                 if (
                     node.callee.type === "Identifier" &&
@@ -599,6 +628,16 @@ const sharedNoOutsideImportsRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{
+     *   getFilename: () => string;
+     *   report: (descriptor: {
+     *     messageId: string;
+     *     node: import("@typescript-eslint/utils").TSESTree.Node;
+     *     data?: Record<string, unknown>;
+     *   }) => void;
+     * }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -672,6 +711,9 @@ const sharedNoOutsideImportsRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type === "Literal" &&
@@ -680,6 +722,9 @@ const sharedNoOutsideImportsRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.ImportExpression} node
+             */
             ImportExpression(node) {
                 if (
                     node.source.type === "Literal" &&
@@ -688,6 +733,9 @@ const sharedNoOutsideImportsRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+            /**
+             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; }} node
+             */
             CallExpression(node) {
                 if (
                     node.callee.type === "Identifier" &&
@@ -727,6 +775,9 @@ const electronNoRendererImportRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { data: { module: any; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -743,6 +794,9 @@ const electronNoRendererImportRule = {
 
         const importerDirectory = path.dirname(rawFilename);
 
+        /**
+         * @param {string} moduleName
+         */
         function referencesRenderer(moduleName) {
             if (moduleName === "@app" || moduleName.startsWith("@app/")) {
                 return true;
@@ -766,6 +820,10 @@ const electronNoRendererImportRule = {
             );
         }
 
+        /**
+         * @param {any} node
+         * @param {any} moduleName
+         */
         function handleModuleSpecifier(node, moduleName) {
             if (referencesRenderer(moduleName)) {
                 context.report({
@@ -777,6 +835,9 @@ const electronNoRendererImportRule = {
         }
 
         return {
+            /**
+             * @param {{ source: { type: string; value: any; }; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type === "Literal" &&
@@ -785,6 +846,9 @@ const electronNoRendererImportRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+            /**
+             * @param {{ source: { type: string; value: any; }; }} node
+             */
             ImportExpression(node) {
                 if (
                     node.source.type === "Literal" &&
@@ -793,6 +857,9 @@ const electronNoRendererImportRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+            /**
+             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; }} node
+             */
             CallExpression(node) {
                 if (
                     node.callee.type === "Identifier" &&
@@ -839,6 +906,9 @@ const electronNoDirectIpcHandleRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { data: { method: any; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -861,6 +931,9 @@ const electronNoDirectIpcHandleRule = {
         const forbiddenMethods = new Set(["handle", "handleOnce"]);
 
         return {
+            /**
+             * @param {{ callee: { type?: any; computed?: any; object?: any; property?: any; }; }} node
+             */
             CallExpression(node) {
                 if (node.callee.type !== "MemberExpression") {
                     return;
@@ -913,6 +986,9 @@ const electronNoDirectIpcMainImportRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -937,6 +1013,9 @@ const electronNoDirectIpcMainImportRule = {
         }
 
         return {
+            /**
+             * @param {{ source: { type: string; value: string; }; specifiers: any; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -967,6 +1046,9 @@ const electronNoDirectIpcMainImportRule = {
                     });
                 }
             },
+            /**
+             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; parent: any; }} node
+             */
             CallExpression(node) {
                 // Guard against `const { ipcMain } = require("electron")`.
                 if (
@@ -997,7 +1079,7 @@ const electronNoDirectIpcMainImportRule = {
                     parent.id &&
                     parent.id.type === "ObjectPattern" &&
                     parent.id.properties.some(
-                        (property) =>
+                        (/** @type {{ type: string; computed: any; key: { type: string; name: string; }; }} */ property) =>
                             property.type === "Property" &&
                             !property.computed &&
                             property.key.type === "Identifier" &&
@@ -1038,6 +1120,9 @@ const electronNoInlineIpcChannelLiteralRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1085,6 +1170,9 @@ const electronNoInlineIpcChannelLiteralRule = {
         }
 
         return {
+            /**
+             * @param {{ callee: { type: string; name: string; }; arguments: any[]; }} node
+             */
             CallExpression(node) {
                 if (node.callee.type !== "Identifier") {
                     return;
@@ -1131,6 +1219,9 @@ const electronPreloadNoInlineIpcChannelConstantRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1188,6 +1279,9 @@ const electronPreloadNoInlineIpcChannelConstantRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.VariableDeclarator} node
+             */
             VariableDeclarator(node) {
                 if (node.id.type !== "Identifier") {
                     return;
@@ -1235,6 +1329,9 @@ const electronNoInlineIpcChannelTypeArgumentRule = {
         schema: [],
         type: "suggestion",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: object; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1276,6 +1373,9 @@ const electronNoInlineIpcChannelTypeArgumentRule = {
         }
 
         return {
+            /**
+             * @param {{ callee: { type: string; name: string; }; typeArguments: any; typeParameters: any; }} node
+             */
             CallExpression(node) {
                 if (node.callee.type !== "Identifier") {
                     return;
@@ -1294,19 +1394,45 @@ const electronNoInlineIpcChannelTypeArgumentRule = {
                 }
 
                 const firstTypeArg = args[0];
-                if (
-                    firstTypeArg &&
-                    typeof firstTypeArg === "object" &&
-                    firstTypeArg.type === "TSLiteralType" &&
-                    firstTypeArg.literal &&
-                    firstTypeArg.literal.type === "Literal" &&
-                    typeof firstTypeArg.literal.value === "string"
-                ) {
-                    context.report({
-                        messageId: "noInlineTypeChannel",
-                        node: firstTypeArg,
-                    });
+                if (!firstTypeArg || typeof firstTypeArg !== "object") {
+                    return;
                 }
+
+                if (!("type" in firstTypeArg)) {
+                    return;
+                }
+
+                if (firstTypeArg.type !== "TSLiteralType") {
+                    return;
+                }
+
+                if (!("literal" in firstTypeArg)) {
+                    return;
+                }
+
+                const literal = firstTypeArg.literal;
+                if (!literal || typeof literal !== "object") {
+                    return;
+                }
+
+                if (!("type" in literal)) {
+                    return;
+                }
+
+                if (literal.type !== "Literal") {
+                    return;
+                }
+
+                if (!("value" in literal) || typeof literal.value !== "string") {
+                    return;
+                }
+
+                context.report({
+                    messageId: "noInlineTypeChannel",
+                    node: /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
+                        firstTypeArg
+                    ),
+                });
             },
         };
     },
@@ -1341,6 +1467,9 @@ const noInlineIpcChannelTypeLiteralsRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1377,14 +1506,28 @@ const noInlineIpcChannelTypeLiteralsRule = {
                 return false;
             }
 
+            if (!("type" in node)) {
+                return false;
+            }
+
             if (node.type !== "TSLiteralType") {
                 return false;
             }
 
-            const literal = node.literal;
+            const literal = /** @type {{ literal?: unknown }} */ (node).literal;
+
+            if (!literal || typeof literal !== "object") {
+                return false;
+            }
+
+            if (!("type" in literal)) {
+                return false;
+            }
 
             return (
-                literal?.type === "Literal" && typeof literal.value === "string"
+                literal.type === "Literal" &&
+                "value" in literal &&
+                typeof literal.value === "string"
             );
         }
 
@@ -1397,6 +1540,7 @@ const noInlineIpcChannelTypeLiteralsRule = {
             return Boolean(
                 node &&
                 typeof node === "object" &&
+                "type" in node &&
                 node.type === "TSTypeReference"
             );
         }
@@ -1408,20 +1552,10 @@ const noInlineIpcChannelTypeLiteralsRule = {
          */
         function isIdentifier(node) {
             return Boolean(
-                node && typeof node === "object" && node.type === "Identifier"
-            );
-        }
-
-        /**
-         * @param {unknown} expression
-         *
-         * @returns {expression is import("@typescript-eslint/utils").TSESTree.Expression}
-         */
-        function isExpression(expression) {
-            return Boolean(
-                expression &&
-                typeof expression === "object" &&
-                "type" in expression
+                node &&
+                    typeof node === "object" &&
+                    "type" in node &&
+                    node.type === "Identifier"
             );
         }
 
@@ -1443,6 +1577,9 @@ const noInlineIpcChannelTypeLiteralsRule = {
         }
 
         return {
+            /**
+             * @param {{ typeName: unknown; typeArguments: { params: any; }; }} node
+             */
             TSTypeReference(node) {
                 // Extract<IpcInvokeChannel, "some-channel">
                 if (
@@ -1478,6 +1615,9 @@ const noInlineIpcChannelTypeLiteralsRule = {
                     node: secondParam,
                 });
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.TSSatisfiesExpression} node
+             */
             TSSatisfiesExpression(node) {
                 // "some-channel" satisfies IpcInvokeChannel
                 const annotation = node.typeAnnotation;
@@ -1499,6 +1639,9 @@ const noInlineIpcChannelTypeLiteralsRule = {
                     });
                 }
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.TSAsExpression} node
+             */
             TSAsExpression(node) {
                 // "some-channel" as IpcInvokeChannel
                 if (!isInlineStringExpression(node.expression)) {
@@ -1548,6 +1691,9 @@ const electronPreloadNoDirectIpcRendererUsageRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1574,6 +1720,9 @@ const electronPreloadNoDirectIpcRendererUsageRule = {
         }
 
         return {
+            /**
+             * @param {{ source: { type: string; value: string; }; specifiers: any; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -1602,6 +1751,9 @@ const electronPreloadNoDirectIpcRendererUsageRule = {
                     }
                 }
             },
+            /**
+             * @param {{ object: { type: string; name: string; }; }} node
+             */
             MemberExpression(node) {
                 // Any usage of a free identifier `ipcRenderer` in preload domain
                 // code is banned.
@@ -1643,6 +1795,9 @@ const rendererNoDirectPreloadBridgeRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { data: { owner: string; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1722,6 +1877,9 @@ const rendererNoDirectPreloadBridgeRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} node
+             */
             MemberExpression(node) {
                 const match = matchElectronApiMember(node);
                 if (!match) {
@@ -1759,6 +1917,9 @@ const rendererNoPreloadBridgeWritesRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1789,6 +1950,9 @@ const rendererNoPreloadBridgeWritesRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.AssignmentExpression} node
+             */
             AssignmentExpression(node) {
                 if (node.left.type !== "MemberExpression") {
                     return;
@@ -1812,6 +1976,9 @@ const rendererNoPreloadBridgeWritesRule = {
                     });
                 }
             },
+            /**
+             * @param {{ callee: { type: string; computed: any; object: { type: string; name: string; }; property: { type: string; name: string; }; }; arguments: [any, any]; }} node
+             */
             CallExpression(node) {
                 // Object.defineProperty(window, "electronAPI", ...)
                 if (
@@ -1879,6 +2046,9 @@ const rendererNoDirectElectronLogRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { data: { module: any; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1907,6 +2077,9 @@ const rendererNoDirectElectronLogRule = {
         ]);
 
         return {
+            /**
+             * @param {{ source: { type: string; value: any; }; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -1948,6 +2121,9 @@ const rendererNoImportInternalServiceUtilsRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -1966,6 +2142,9 @@ const rendererNoImportInternalServiceUtilsRule = {
         }
 
         return {
+            /**
+             * @param {{ source: { type: string; value: any; }; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -2017,6 +2196,9 @@ const rendererNoDirectNetworkingRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ sourceCode: any; getSourceCode: () => any; getFilename: () => any; report: (arg0: { data: { api: string; } | { api: string; } | { api: string; } | { api: string; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const sourceCode = context.sourceCode ?? context.getSourceCode();
         const rawFilename = context.getFilename();
@@ -2038,6 +2220,10 @@ const rendererNoDirectNetworkingRule = {
         /** @type {Set<string>} */
         const axiosLocalNames = new Set();
 
+        /**
+         * @param {string} name
+         * @param {any} node
+         */
         function hasLocalBinding(name, node) {
             let scope = sourceCode.getScope(node);
             while (scope) {
@@ -2051,6 +2237,9 @@ const rendererNoDirectNetworkingRule = {
         }
 
         return {
+            /**
+             * @param {{ source: { type: string; value: string; }; specifiers: any; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -2084,6 +2273,9 @@ const rendererNoDirectNetworkingRule = {
                     node: node.source,
                 });
             },
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 const callee = node.callee;
 
@@ -2152,6 +2344,18 @@ const rendererNoIpcRendererUsageRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{
+     *   getFilename: () => string;
+     *   getSourceCode: () => any;
+     *   sourceCode?: any;
+     *   report: (descriptor: {
+     *     messageId: string;
+     *     node: import("@typescript-eslint/utils").TSESTree.Node;
+     *     data?: Record<string, unknown>;
+     *   }) => void;
+     * }} context
+     */
     create(context) {
         const sourceCode = context.sourceCode ?? context.getSourceCode();
         const rawFilename = context.getFilename();
@@ -2168,6 +2372,10 @@ const rendererNoIpcRendererUsageRule = {
         /** @type {Set<string>} */
         const electronModuleBindings = new Set();
 
+        /**
+         * @param {string} name
+         * @param {any} node
+         */
         function hasLocalBinding(name, node) {
             let scope = sourceCode.getScope(node);
             while (scope) {
@@ -2206,6 +2414,7 @@ const rendererNoIpcRendererUsageRule = {
 
         /**
          * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} member
+         * @param {string | number | bigint | boolean | RegExp | null} name
          */
         function isPropertyNamed(member, name) {
             if (member.computed) {
@@ -2222,6 +2431,9 @@ const rendererNoIpcRendererUsageRule = {
         }
 
         return {
+            /**
+             * @param {{ source: { type: string; value: any; }; specifiers: any; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -2261,6 +2473,9 @@ const rendererNoIpcRendererUsageRule = {
                     }
                 }
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.VariableDeclarator} node
+             */
             VariableDeclarator(node) {
                 if (!node.init || node.id.type !== "Identifier") {
                     return;
@@ -2272,8 +2487,11 @@ const rendererNoIpcRendererUsageRule = {
 
                 electronModuleBindings.add(node.id.name);
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
+             */
             CallExpression(node) {
-                // const { ipcRenderer } = require("electron")
+                // Detect destructuring `require("electron")` that pulls `ipcRenderer`.
                 if (
                     node.callee.type !== "Identifier" ||
                     node.callee.name !== "require" ||
@@ -2297,17 +2515,27 @@ const rendererNoIpcRendererUsageRule = {
                     parent.type === "VariableDeclarator" &&
                     parent.id &&
                     parent.id.type === "ObjectPattern" &&
-                    parent.id.properties.some(
-                        (property) =>
-                            property.type === "Property" &&
-                            !property.computed &&
+                    parent.id.properties.some((property) => {
+                        if (property.type !== "Property") {
+                            return false;
+                        }
+
+                        if (property.computed) {
+                            return false;
+                        }
+
+                        return (
                             property.key.type === "Identifier" &&
                             property.key.name === "ipcRenderer"
-                    )
+                        );
+                    })
                 ) {
                     report(node);
                 }
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} node
+             */
             MemberExpression(node) {
                 // ipcRenderer.invoke(...)
                 if (node.object.type === "Identifier") {
@@ -2373,6 +2601,9 @@ const rendererNoBrowserDialogsRule = {
         schema: [],
         type: "suggestion",
     },
+    /**
+     * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { dialog: any; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -2386,6 +2617,10 @@ const rendererNoBrowserDialogsRule = {
             return {};
         }
 
+        /**
+         * @param {any} name
+         * @param {any} node
+         */
         function hasLocalBinding(name, node) {
             let scope = sourceCode.getScope(node);
             while (scope) {
@@ -2398,12 +2633,20 @@ const rendererNoBrowserDialogsRule = {
             return false;
         }
 
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} expression
+         *
+         * @returns {import("@typescript-eslint/utils").TSESTree.Node}
+         */
         function unwrapChain(expression) {
             return expression.type === "ChainExpression"
                 ? unwrapChain(expression.expression)
                 : expression;
         }
 
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} memberExpression
+         */
         function getMemberPropertyName(memberExpression) {
             if (memberExpression.computed) {
                 if (
@@ -2422,6 +2665,10 @@ const rendererNoBrowserDialogsRule = {
             return null;
         }
 
+        /**
+         * @param {any} callee
+         * @param {any} node
+         */
         function getForbiddenDialogFromCallee(callee, node) {
             const unwrapped = unwrapChain(callee);
 
@@ -2462,6 +2709,9 @@ const rendererNoBrowserDialogsRule = {
         }
 
         return {
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 const dialog = getForbiddenDialogFromCallee(node.callee, node);
                 if (!dialog) {
@@ -2500,6 +2750,9 @@ const rendererNoWindowOpenRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -2513,6 +2766,10 @@ const rendererNoWindowOpenRule = {
             return {};
         }
 
+        /**
+         * @param {string} name
+         * @param {any} node
+         */
         function hasLocalBinding(name, node) {
             let scope = sourceCode.getScope(node);
             while (scope) {
@@ -2525,12 +2782,20 @@ const rendererNoWindowOpenRule = {
             return false;
         }
 
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} expression
+         *
+         * @returns {import("@typescript-eslint/utils").TSESTree.Node}
+         */
         function unwrapChain(expression) {
             return expression.type === "ChainExpression"
                 ? unwrapChain(expression.expression)
                 : expression;
         }
 
+        /**
+         * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} memberExpression
+         */
         function getMemberPropertyName(memberExpression) {
             if (memberExpression.computed) {
                 if (
@@ -2549,6 +2814,10 @@ const rendererNoWindowOpenRule = {
             return null;
         }
 
+        /**
+         * @param {any} callee
+         * @param {any} node
+         */
         function isForbiddenWindowOpenCallee(callee, node) {
             const unwrapped = unwrapChain(callee);
 
@@ -2580,6 +2849,9 @@ const rendererNoWindowOpenRule = {
         }
 
         return {
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 if (!isForbiddenWindowOpenCallee(node.callee, node)) {
                     return;
@@ -2618,6 +2890,16 @@ const electronNoDirectIpcHandlerWrappersRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{
+     *   getFilename: () => string;
+     *   report: (descriptor: {
+     *     messageId: string;
+     *     node: import("@typescript-eslint/utils").TSESTree.Node;
+     *     data?: Record<string, unknown>;
+     *   }) => void;
+     * }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -2660,6 +2942,9 @@ const electronNoDirectIpcHandlerWrappersRule = {
         }
 
         return {
+            /**
+             * @param {{ source: { type: string; }; specifiers: any; }} node
+             */
             ImportDeclaration(node) {
                 if (!node.source || node.source.type !== "Literal") {
                     return;
@@ -2688,6 +2973,9 @@ const electronNoDirectIpcHandlerWrappersRule = {
                     forbiddenLocalIdentifiers.add(specifier.local.name);
                 }
             },
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 const callee = node.callee;
 
@@ -2736,6 +3024,9 @@ const rendererNoDirectBridgeReadinessRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { data: { callee: any; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
@@ -2763,6 +3054,10 @@ const rendererNoDirectBridgeReadinessRule = {
         /** @type {Set<string>} */
         const notReadyErrorLocals = new Set();
 
+        /**
+         * @param {any} node
+         * @param {string} callee
+         */
         function report(node, callee) {
             context.report({
                 data: { callee },
@@ -2772,6 +3067,9 @@ const rendererNoDirectBridgeReadinessRule = {
         }
 
         return {
+            /**
+             * @param {{ specifiers: any; }} node
+             */
             ImportDeclaration(node) {
                 for (const specifier of node.specifiers) {
                     if (specifier.type !== "ImportSpecifier") {
@@ -2798,6 +3096,9 @@ const rendererNoDirectBridgeReadinessRule = {
                     }
                 }
             },
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 const callee = node.callee;
                 if (callee.type === "Identifier") {
@@ -2820,6 +3121,9 @@ const rendererNoDirectBridgeReadinessRule = {
                     }
                 }
             },
+            /**
+             * @param {{ callee: any; }} node
+             */
             NewExpression(node) {
                 const callee = node.callee;
                 if (callee.type === "Identifier") {
@@ -2854,6 +3158,9 @@ const tsdocNoConsoleExampleRule = {
         schema: [],
         type: "suggestion",
     },
+    /**
+     * @param {{ getSourceCode: () => any; report: (arg0: { loc: { end: any; start: any; }; messageId: string; }) => void; }} context
+     */
     create(context) {
         const sourceCode = context.getSourceCode();
 
@@ -2915,6 +3222,9 @@ const preferSharedAliasRule = {
         schema: [],
         type: "suggestion",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { fix(fixer: any): any; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const filename = context.getFilename();
         const normalizedFilename = normalizePath(filename);
@@ -2929,6 +3239,9 @@ const preferSharedAliasRule = {
         const importerDirectory = path.dirname(filename);
 
         return {
+            /**
+             * @param {{ source: { type: string; value: any; raw: any; extra: { raw: any; }; }; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -2978,6 +3291,9 @@ const preferSharedAliasRule = {
                 const quote = rawSource?.startsWith("'") ? "'" : '"';
 
                 context.report({
+                    /**
+                     * @param {{ replaceText: (arg0: any, arg1: string) => any; }} fixer
+                     */
                     fix(fixer) {
                         return fixer.replaceText(
                             node.source,
@@ -3012,6 +3328,9 @@ const preferAppAliasRule = {
         schema: [],
         type: "suggestion",
     },
+    /**
+     * @param {{ getFilename: () => any; report: (arg0: { fix(fixer: any): any; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const filename = context.getFilename();
         const normalizedFilename = normalizePath(filename);
@@ -3026,6 +3345,9 @@ const preferAppAliasRule = {
         const importerDirectory = path.dirname(filename);
 
         return {
+            /**
+             * @param {{ source: { type: string; value: any; raw: any; extra: { raw: any; }; }; }} node
+             */
             ImportDeclaration(node) {
                 if (
                     node.source.type !== "Literal" ||
@@ -3074,6 +3396,9 @@ const preferAppAliasRule = {
                 const quote = rawSource?.startsWith("'") ? "'" : '"';
 
                 context.report({
+                    /**
+                     * @param {{ replaceText: (arg0: any, arg1: string) => any; }} fixer
+                     */
                     fix(fixer) {
                         return fixer.replaceText(
                             node.source,
@@ -3104,6 +3429,16 @@ const noDeprecatedExportsRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{
+     *   sourceCode?: any;
+     *   getSourceCode?: () => any;
+     *   report: (descriptor: {
+     *     messageId: string;
+     *     node: import("@typescript-eslint/utils").TSESTree.Node;
+     *   }) => void;
+     * }} context
+     */
     create(context) {
         const sourceCode = context.sourceCode ?? context.getSourceCode?.();
         const inspectedNodes = new WeakSet();
@@ -3188,6 +3523,9 @@ const noDeprecatedExportsRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.ExportDefaultDeclaration} node
+             */
             ExportDefaultDeclaration(node) {
                 if (
                     node.declaration &&
@@ -3199,6 +3537,9 @@ const noDeprecatedExportsRule = {
 
                 reportIfDeprecated(node, node);
             },
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.ExportNamedDeclaration} node
+             */
             ExportNamedDeclaration(node) {
                 if (node.declaration) {
                     reportIfDeprecated(node.declaration, node);
@@ -3225,6 +3566,9 @@ const noLocalRecordGuardsRule = {
         },
         schema: [],
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: import("estree").Identifier; messageId: string; data: { name: string; }; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -3274,11 +3618,17 @@ const noLocalRecordGuardsRule = {
         };
 
         return {
+            /**
+             * @param {{ id: import("estree").Identifier; }} node
+             */
             FunctionDeclaration(node) {
                 if (node.id?.type === "Identifier") {
                     reportIdentifier(node.id);
                 }
             },
+            /**
+             * @param {{ id: import("estree").Identifier; }} node
+             */
             VariableDeclarator(node) {
                 if (node.id?.type === "Identifier") {
                     reportIdentifier(node.id);
@@ -3302,6 +3652,9 @@ const noLocalErrorNormalizersRule = {
         },
         schema: [],
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: import("estree").Identifier; messageId: string; data: { name: string; }; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -3343,11 +3696,17 @@ const noLocalErrorNormalizersRule = {
         };
 
         return {
+            /**
+             * @param {{ id: import("estree").Identifier; }} node
+             */
             FunctionDeclaration(node) {
                 if (node.id?.type === "Identifier") {
                     reportIdentifier(node.id);
                 }
             },
+            /**
+             * @param {{ id: import("estree").Identifier; }} node
+             */
             VariableDeclarator(node) {
                 if (node.id?.type === "Identifier") {
                     reportIdentifier(node.id);
@@ -3378,8 +3737,14 @@ const noRegexpVFlagRule = {
                 "RegExp flag 'v' is not allowed. Use 'u'/'gu' or rewrite the regex.",
         },
     },
+    /**
+     * @param {{ report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         return {
+            /**
+             * @param {{ regex: any; }} node
+             */
             Literal(node) {
                 const regex = node?.regex;
                 if (!regex || typeof regex.flags !== "string") {
@@ -3442,24 +3807,30 @@ const noLocalIdentifiersRule = {
             banned: "Local definition of '{{name}}' is not allowed. {{details}}",
         },
     },
+    /**
+     * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; details: any; } | { name: any; details: any; }; }) => void; }} context
+     */
     create(context) {
         const option = context.options?.[0];
         const banned = Array.isArray(option?.banned) ? option.banned : [];
         const bannedByName = new Map(
-            banned.map((entry) => [entry.name, entry])
+            banned.map((/** @type {{ name: any; }} */ entry) => [entry.name, entry])
         );
 
-        const shouldReport = (entry, kind) => {
+        const shouldReport = (/** @type {{ kinds: any; }} */ entry, /** @type {string} */ kind) => {
             const kinds = entry.kinds;
             return !Array.isArray(kinds) || kinds.includes(kind);
         };
 
-        const detailsFor = (entry) =>
+        const detailsFor = (/** @type {{ message: string | any[]; }} */ entry) =>
             typeof entry.message === "string" && entry.message.length > 0
                 ? entry.message
                 : "Import and reuse the shared helper instead.";
 
         return {
+            /**
+             * @param {{ id: any; }} node
+             */
             FunctionDeclaration(node) {
                 const id = node?.id;
                 if (!id || id.type !== "Identifier") {
@@ -3480,6 +3851,9 @@ const noLocalIdentifiersRule = {
                     },
                 });
             },
+            /**
+             * @param {{ id: any; }} node
+             */
             VariableDeclarator(node) {
                 const id = node?.id;
                 if (!id || id.type !== "Identifier") {
@@ -3537,6 +3911,9 @@ const noRedeclareSharedContractInterfacesRule = {
                 'Do not redeclare the shared interface "{{name}}". Import it from @shared instead.',
         },
     },
+    /**
+     * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; }; }) => void; }} context
+     */
     create(context) {
         const option = context.options?.[0];
         const configuredNames = Array.isArray(option?.names)
@@ -3550,6 +3927,9 @@ const noRedeclareSharedContractInterfacesRule = {
         ]);
 
         return {
+            /**
+             * @param {{ id: any; }} node
+             */
             TSInterfaceDeclaration(node) {
                 const id = node?.id;
                 if (!id || id.type !== "Identifier") {
@@ -3586,10 +3966,12 @@ const electronNoLocalStringSafetyHelpersRule = {
         },
         schema: [],
         messages: {
-            banned:
-                "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts instead of defining local implementations.",
+            banned: "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts instead of defining local implementations.",
         },
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
 
@@ -3602,7 +3984,7 @@ const electronNoLocalStringSafetyHelpersRule = {
             return {};
         }
 
-        const reportIfNameMatches = (id) => {
+        const reportIfNameMatches = (/** @type {{ type: string; name: string; }} */ id) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -3616,9 +3998,15 @@ const electronNoLocalStringSafetyHelpersRule = {
         };
 
         return {
+            /**
+             * @param {{ id: any; }} node
+             */
             FunctionDeclaration(node) {
                 reportIfNameMatches(node?.id);
             },
+            /**
+             * @param {{ id: any; }} node
+             */
             VariableDeclarator(node) {
                 reportIfNameMatches(node?.id);
             },
@@ -3627,10 +4015,11 @@ const electronNoLocalStringSafetyHelpersRule = {
 };
 
 /**
- * Drift guard: disallow ad-hoc error code suffix formatting in electron/services.
+ * Drift guard: disallow ad-hoc error code suffix formatting in
+ * electron/services.
  *
  * @remarks
- * Targets patterns like: `code ? \` (${code})\` : ""`.
+ * Targets patterns like: `code ? \` (${code})` : ""`.
  */
 const electronNoAdHocErrorCodeSuffixRule = {
     meta: {
@@ -3642,10 +4031,12 @@ const electronNoAdHocErrorCodeSuffixRule = {
         },
         schema: [],
         messages: {
-            banned:
-                "Use getElectronErrorCodeSuffix from electron/services/shell/openExternalUtils.ts instead of ad-hoc error code suffix formatting.",
+            banned: "Use getElectronErrorCodeSuffix from electron/services/shell/openExternalUtils.ts instead of ad-hoc error code suffix formatting.",
         },
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
 
@@ -3655,36 +4046,37 @@ const electronNoAdHocErrorCodeSuffixRule = {
 
         // Allowed source of truth.
         if (
-            filename.endsWith(
-                "/electron/services/shell/openExternalUtils.ts"
-            )
+            filename.endsWith("/electron/services/shell/openExternalUtils.ts")
         ) {
             return {};
         }
 
-        const isEmptyStringLiteral = (node) =>
+        const isEmptyStringLiteral = (/** @type {{ type: string; value: string; }} */ node) =>
             node?.type === "Literal" && node.value === "";
 
-        const isCodeSuffixTemplate = (node) => {
+        const isCodeSuffixTemplate = (/** @type {{ type: string; expressions: any; quasis: any; }} */ node) => {
             if (!node || node.type !== "TemplateLiteral") {
                 return false;
             }
 
             const hasCodeIdentifier = (node.expressions ?? []).some(
-                (expr) => expr?.type === "Identifier" && expr.name === "code"
+                (/** @type {{ type: string; name: string; }} */ expr) => expr?.type === "Identifier" && expr.name === "code"
             );
 
             if (!hasCodeIdentifier) {
                 return false;
             }
 
-            return (node.quasis ?? []).some((quasi) => {
+            return (node.quasis ?? []).some((/** @type {{ value: { raw: any; }; }} */ quasi) => {
                 const raw = quasi?.value?.raw;
                 return typeof raw === "string" && raw.includes(" (");
             });
         };
 
         return {
+            /**
+             * @param {{ consequent: any; alternate: any; }} node
+             */
             ConditionalExpression(node) {
                 const consequent = node?.consequent;
                 const alternate = node?.alternate;
@@ -3722,10 +4114,12 @@ const electronSyncNoLocalAsciiDigitsRule = {
         },
         schema: [],
         messages: {
-            banned:
-                "Use isAsciiDigits from electron/services/sync/syncEngineUtils.ts (avoid duplicated validation policies).",
+            banned: "Use isAsciiDigits from electron/services/sync/syncEngineUtils.ts (avoid duplicated validation policies).",
         },
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
 
@@ -3738,7 +4132,7 @@ const electronSyncNoLocalAsciiDigitsRule = {
             return {};
         }
 
-        const reportIfNameMatches = (id) => {
+        const reportIfNameMatches = (/** @type {{ type: string; name: string; }} */ id) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -3752,9 +4146,15 @@ const electronSyncNoLocalAsciiDigitsRule = {
         };
 
         return {
+            /**
+             * @param {{ id: any; }} node
+             */
             FunctionDeclaration(node) {
                 reportIfNameMatches(node?.id);
             },
+            /**
+             * @param {{ id: any; }} node
+             */
             VariableDeclarator(node) {
                 reportIfNameMatches(node?.id);
             },
@@ -3785,6 +4185,9 @@ const electronCloudProvidersDriftGuardsRule = {
                 "Local definition of '{{name}}' is not allowed. {{details}}",
         },
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; data?: { name: any; details: string; }; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
 
@@ -3807,7 +4210,7 @@ const electronCloudProvidersDriftGuardsRule = {
             ],
         ]);
 
-        const reportLocal = (id) => {
+        const reportLocal = (/** @type {{ type: string; name: string; }} */ id) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -3828,6 +4231,9 @@ const electronCloudProvidersDriftGuardsRule = {
         };
 
         return {
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 const callee = node?.callee;
                 if (!callee || callee.type !== "Identifier") {
@@ -3843,9 +4249,15 @@ const electronCloudProvidersDriftGuardsRule = {
                     messageId: "bannedCall",
                 });
             },
+            /**
+             * @param {{ id: any; }} node
+             */
             FunctionDeclaration(node) {
                 reportLocal(node?.id);
             },
+            /**
+             * @param {{ id: any; }} node
+             */
             VariableDeclarator(node) {
                 reportLocal(node?.id);
             },
@@ -3867,10 +4279,12 @@ const sharedTypesNoLocalIsPlainObjectRule = {
         },
         schema: [],
         messages: {
-            banned:
-                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+            banned: "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
         },
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
         if (!filename.startsWith(`${NORMALIZED_SHARED_DIR}/types/`)) {
@@ -3878,6 +4292,9 @@ const sharedTypesNoLocalIsPlainObjectRule = {
         }
 
         return {
+            /**
+             * @param {{ id: any; }} node
+             */
             VariableDeclarator(node) {
                 const id = node?.id;
                 if (!id || id.type !== "Identifier") {
@@ -3911,10 +4328,12 @@ const preloadNoLocalIsPlainObjectRule = {
         },
         schema: [],
         messages: {
-            banned:
-                "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+            banned: "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
         },
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const filename = normalizePath(context.getFilename());
         if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/preload/`)) {
@@ -3922,6 +4341,9 @@ const preloadNoLocalIsPlainObjectRule = {
         }
 
         return {
+            /**
+             * @param {{ id: any; }} node
+             */
             VariableDeclarator(node) {
                 const id = node?.id;
                 if (!id || id.type !== "Identifier") {
@@ -3964,12 +4386,14 @@ const testNoMockReturnValueConstructorsRule = {
         },
         schema: [],
         messages: {
-            banned:
-                "Avoid {{method}} on '{{name}}'. Vitest implements it with an arrow function, which cannot be used with `new`. Prefer {{replacement}} instead.",
+            banned: "Avoid {{method}} on '{{name}}'. Vitest implements it with an arrow function, which cannot be used with `new`. Prefer {{replacement}} instead.",
         },
     },
+    /**
+     * @param {{ report: (arg0: { node: any; messageId: string; data: { method: any; name: any; replacement: string; }; }) => void; }} context
+     */
     create(context) {
-        const unwrapExpression = (node) => {
+        const unwrapExpression = (/** @type {any} */ node) => {
             let current = node;
             // Unwrap TS wrappers commonly produced by @typescript-eslint parser
             // and optional chaining wrappers.
@@ -4003,10 +4427,10 @@ const testNoMockReturnValueConstructorsRule = {
             }
         };
 
-        const isPascalCase = (name) =>
+        const isPascalCase = (/** @type {string} */ name) =>
             typeof name === "string" && /^[A-Z][A-Za-z0-9]*$/.test(name);
 
-        const isViMockedCall = (node) => {
+        const isViMockedCall = (/** @type {{ type: string; callee: any; }} */ node) => {
             if (!node || node.type !== "CallExpression") {
                 return false;
             }
@@ -4027,7 +4451,7 @@ const testNoMockReturnValueConstructorsRule = {
             return false;
         };
 
-        const extractMockTargetName = (node) => {
+        const extractMockTargetName = (/** @type {any} */ node) => {
             const unwrapped = unwrapExpression(node);
             if (!unwrapped) {
                 return undefined;
@@ -4055,6 +4479,9 @@ const testNoMockReturnValueConstructorsRule = {
         };
 
         return {
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 const callee = unwrapExpression(node.callee);
                 if (!callee || callee.type !== "MemberExpression") {
@@ -4071,7 +4498,10 @@ const testNoMockReturnValueConstructorsRule = {
                 }
 
                 const method = property.name;
-                if (method !== "mockReturnValue" && method !== "mockReturnValueOnce") {
+                if (
+                    method !== "mockReturnValue" &&
+                    method !== "mockReturnValueOnce"
+                ) {
                     return;
                 }
 
@@ -4133,14 +4563,20 @@ const noCallIdentifiersRule = {
                 "Calling '{{name}}' directly is not allowed. {{details}}",
         },
     },
+    /**
+     * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; details: any; }; }) => void; }} context
+     */
     create(context) {
         const option = context.options?.[0];
         const banned = Array.isArray(option?.banned) ? option.banned : [];
         const bannedByName = new Map(
-            banned.map((entry) => [entry.name, entry])
+            banned.map((/** @type {{ name: any; }} */ entry) => [entry.name, entry])
         );
 
         return {
+            /**
+             * @param {{ callee: any; }} node
+             */
             CallExpression(node) {
                 const callee = node?.callee;
                 if (!callee || callee.type !== "Identifier") {
@@ -4171,6 +4607,9 @@ const noCallIdentifiersRule = {
     },
 };
 
+/**
+ * @param {{ type: any; typeAnnotation: any; types: any; members: any; }} typeNode
+ */
 function typeContainsCodeProperty(typeNode) {
     if (!typeNode || typeof typeNode !== "object") {
         return false;
@@ -4182,7 +4621,7 @@ function typeContainsCodeProperty(typeNode) {
         case "TSIntersectionType":
             return (typeNode.types ?? []).some(typeContainsCodeProperty);
         case "TSTypeLiteral":
-            return (typeNode.members ?? []).some((member) => {
+            return (typeNode.members ?? []).some((/** @type {{ type: string; key: { type: string; name: string; }; }} */ member) => {
                 if (!member || member.type !== "TSPropertySignature") {
                     return false;
                 }
@@ -4213,8 +4652,11 @@ const preferTryGetErrorCodeRule = {
             prefer: "Use tryGetErrorCode() from shared/utils/errorCodes.ts instead of asserting a `{ code?: unknown }` type.",
         },
     },
+    /**
+     * @param {{ report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
-        const check = (typeAnnotation) => {
+        const check = (/** @type {any} */ typeAnnotation) => {
             if (!typeAnnotation || !typeContainsCodeProperty(typeAnnotation)) {
                 return;
             }
@@ -4226,9 +4668,15 @@ const preferTryGetErrorCodeRule = {
         };
 
         return {
+            /**
+             * @param {{ typeAnnotation: any; }} node
+             */
             TSAsExpression(node) {
                 check(node.typeAnnotation);
             },
+            /**
+             * @param {{ typeAnnotation: any; }} node
+             */
             TSTypeAssertion(node) {
                 check(node.typeAnnotation);
             },
@@ -4264,6 +4712,9 @@ const loggerNoErrorInContextRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -4289,6 +4740,9 @@ const loggerNoErrorInContextRule = {
             "loggingError",
         ]);
 
+        /**
+         * @param {{ type: string; callee: { type: string; name: string; }; }} node
+         */
         function isEnsureErrorCall(node) {
             if (!node || node.type !== "CallExpression") {
                 return false;
@@ -4301,6 +4755,9 @@ const loggerNoErrorInContextRule = {
             return false;
         }
 
+        /**
+         * @param {{ type: string; callee: { type: string; name: string; }; name: string; }} node
+         */
         function isSuspiciousErrorValue(node) {
             if (!node) {
                 return false;
@@ -4325,6 +4782,9 @@ const loggerNoErrorInContextRule = {
             return false;
         }
 
+        /**
+         * @param {{ type: string; object: { type: string; name: string; }; property: { type: string; name: string; }; }} callee
+         */
         function isLoggerErrorOrWarnCall(callee) {
             if (!callee || callee.type !== "MemberExpression") {
                 return false;
@@ -4345,6 +4805,9 @@ const loggerNoErrorInContextRule = {
             return loggerMethodNames.has(callee.property.name);
         }
 
+        /**
+         * @param {{ properties: any; }} objectExpression
+         */
         function getErrorPropertyFromObjectExpression(objectExpression) {
             for (const property of objectExpression.properties) {
                 if (property.type !== "Property") {
@@ -4370,6 +4833,9 @@ const loggerNoErrorInContextRule = {
         }
 
         return {
+            /**
+             * @param {{ callee: any; arguments: any; }} node
+             */
             CallExpression(node) {
                 if (!isLoggerErrorOrWarnCall(node.callee)) {
                     return;
@@ -4427,6 +4893,9 @@ const storeActionsRequireFinallyResetRule = {
         schema: [],
         type: "problem",
     },
+    /**
+     * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { flag: any; }; messageId: string; node: any; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -4452,111 +4921,172 @@ const storeActionsRequireFinallyResetRule = {
          *
          * Supports:
          *
-         * - Set({ ... })
-         * - Set(() => ({ ... }))
+         * - set({ ... })
+         * - set(() => ({ ... }))
+         * - set(() => { return { ... }; })
+         *
+         * @param {unknown} argument
+         *
+         * @returns {import("@typescript-eslint/utils").TSESTree.ObjectExpression | null}
          */
         function getSetObjectExpression(argument) {
-            if (!argument) {
+            if (!argument || typeof argument !== "object" || !("type" in argument)) {
                 return null;
             }
 
-            if (argument.type === "ObjectExpression") {
-                return argument;
+            const node = /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
+                argument
+            );
+
+            if (node.type === "ObjectExpression") {
+                return node;
             }
 
-            if (argument.type === "ArrowFunctionExpression") {
-                if (argument.body?.type === "ObjectExpression") {
-                    return argument.body;
+            if (node.type !== "ArrowFunctionExpression") {
+                return null;
+            }
+
+            const body = node.body;
+            if (body.type === "ObjectExpression") {
+                return body;
+            }
+
+            if (body.type !== "BlockStatement") {
+                return null;
+            }
+
+            for (const statement of body.body) {
+                if (statement.type !== "ReturnStatement") {
+                    continue;
                 }
 
-                if (argument.body?.type === "BlockStatement") {
-                    for (const statement of argument.body.body) {
-                        if (statement.type !== "ReturnStatement") {
-                            continue;
-                        }
-
-                        if (
-                            statement.argument &&
-                            statement.argument.type === "ObjectExpression"
-                        ) {
-                            return statement.argument;
-                        }
-                    }
+                const argumentNode = statement.argument;
+                if (argumentNode?.type === "ObjectExpression") {
+                    return argumentNode;
                 }
             }
 
             return null;
         }
 
+        /**
+         * @param {unknown} node
+         *
+         * @returns {boolean | null}
+         */
         function getBooleanLiteralValue(node) {
-            if (!node) {
+            if (!node || typeof node !== "object" || !("type" in node)) {
                 return null;
             }
 
-            if (node.type === "Literal" && typeof node.value === "boolean") {
-                return node.value;
+            if (node.type !== "Literal" || !("value" in node)) {
+                return null;
             }
 
-            return null;
+            return typeof node.value === "boolean" ? node.value : null;
         }
 
+        /**
+         * @param {unknown} property
+         *
+         * @returns {string | null}
+         */
         function getPropertyName(property) {
+            if (!property || typeof property !== "object") {
+                return null;
+            }
+
+            if (!("computed" in property) || !("key" in property)) {
+                return null;
+            }
+
             if (property.computed) {
                 return null;
             }
 
-            if (property.key.type === "Identifier") {
-                return property.key.name;
+            const key = property.key;
+            if (!key || typeof key !== "object" || !("type" in key)) {
+                return null;
+            }
+
+            if (key.type === "Identifier" && "name" in key) {
+                return typeof key.name === "string" ? key.name : null;
             }
 
             if (
-                property.key.type === "Literal" &&
-                typeof property.key.value === "string"
+                key.type === "Literal" &&
+                "value" in key &&
+                typeof key.value === "string"
             ) {
-                return property.key.value;
+                return key.value;
             }
 
             return null;
         }
 
+        /**
+         * @param {unknown} node
+         *
+         * @returns {node is import("@typescript-eslint/utils").TSESTree.CallExpression}
+         */
         function isSetCall(node) {
-            return (
-                node.type === "CallExpression" &&
-                node.callee.type === "Identifier" &&
-                node.callee.name === "set"
+            if (!node || typeof node !== "object" || !("type" in node)) {
+                return false;
+            }
+
+            if (node.type !== "CallExpression" || !("callee" in node)) {
+                return false;
+            }
+
+            const callee = node.callee;
+            return Boolean(
+                callee &&
+                    typeof callee === "object" &&
+                    "type" in callee &&
+                    callee.type === "Identifier" &&
+                    "name" in callee &&
+                    callee.name === "set"
             );
         }
 
+        /**
+         * @param {unknown} node
+         * @param {{ flagsResetInFinally: Set<string>; flagsSet: Map<string, unknown>; inFinally: boolean; root: unknown; }} state
+         */
         function walk(node, state) {
-            if (!node || typeof node !== "object") {
+            if (!node || typeof node !== "object" || !("type" in node)) {
                 return;
             }
+
+            const typedNode = /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
+                node
+            );
 
             // Do not traverse into nested functions; each action function is
             // analyzed independently.
             if (
                 state.root !== node &&
-                (node.type === "FunctionDeclaration" ||
-                    node.type === "FunctionExpression" ||
-                    node.type === "ArrowFunctionExpression")
+                (typedNode.type === "FunctionDeclaration" ||
+                    typedNode.type === "FunctionExpression" ||
+                    typedNode.type === "ArrowFunctionExpression")
             ) {
                 return;
             }
 
-            if (node.type === "TryStatement") {
-                walk(node.block, state);
-                if (node.handler) {
-                    walk(node.handler, state);
+            if (typedNode.type === "TryStatement") {
+                walk(typedNode.block, state);
+                if (typedNode.handler) {
+                    walk(typedNode.handler, state);
                 }
-                if (node.finalizer) {
-                    walk(node.finalizer, { ...state, inFinally: true });
+                if (typedNode.finalizer) {
+                    walk(typedNode.finalizer, { ...state, inFinally: true });
                 }
                 return;
             }
 
-            if (isSetCall(node)) {
+            if (isSetCall(typedNode)) {
                 const objectExpression = getSetObjectExpression(
-                    node.arguments?.[0]
+                    typedNode.arguments?.[0]
                 );
 
                 if (objectExpression) {
@@ -4573,7 +5103,7 @@ const storeActionsRequireFinallyResetRule = {
                         const value = getBooleanLiteralValue(property.value);
                         if (value === true) {
                             if (!state.flagsSet.has(name)) {
-                                state.flagsSet.set(name, node);
+                                state.flagsSet.set(name, typedNode);
                             }
                         }
 
@@ -4584,9 +5114,11 @@ const storeActionsRequireFinallyResetRule = {
                 }
             }
 
-            const keys = visitorKeys[node.type] ?? [];
+            const keys = visitorKeys[typedNode.type] ?? [];
             for (const key of keys) {
-                const value = node[key];
+                const value = /** @type {Record<string, unknown>} */ (
+                    /** @type {unknown} */ (typedNode)
+                )[key];
                 if (!value) {
                     continue;
                 }
@@ -4600,6 +5132,9 @@ const storeActionsRequireFinallyResetRule = {
             }
         }
 
+        /**
+         * @param {{ body: any; }} node
+         */
         function analyzeFunction(node) {
             if (!node.body) {
                 return;
@@ -4664,6 +5199,9 @@ const requireEnsureErrorInCatchRule = {
         schema: [],
         type: "problem",
     },
+    /**
+        * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { name: any; }; messageId: string; node: import("@typescript-eslint/utils").TSESTree.Node; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -4690,56 +5228,108 @@ const requireEnsureErrorInCatchRule = {
         const sourceCode = context.sourceCode ?? context.getSourceCode();
         const visitorKeys = sourceCode.visitorKeys;
 
+        /**
+         * @param {unknown} node
+         * @param {string} caughtName
+         */
         function isEnsureErrorCall(node, caughtName) {
-            return (
-                node?.type === "CallExpression" &&
-                node.callee?.type === "Identifier" &&
-                node.callee.name === "ensureError" &&
-                node.arguments?.[0]?.type === "Identifier" &&
-                node.arguments[0].name === caughtName
+            if (!node || typeof node !== "object" || !("type" in node)) {
+                return false;
+            }
+
+            if (node.type !== "CallExpression") {
+                return false;
+            }
+
+            const call = /** @type {import("@typescript-eslint/utils").TSESTree.CallExpression} */ (
+                node
+            );
+
+            if (call.callee.type !== "Identifier") {
+                return false;
+            }
+
+            if (call.callee.name !== "ensureError") {
+                return false;
+            }
+
+            const firstArg = call.arguments?.[0];
+            return Boolean(
+                firstArg?.type === "Identifier" && firstArg.name === caughtName
             );
         }
 
+        /**
+         * @param {unknown} node
+         * @param {string} caughtName
+         *
+         * @returns {node is import("@typescript-eslint/utils").TSESTree.MemberExpression}
+         */
         function isDirectPropertyAccess(node, caughtName) {
-            if (node?.type !== "MemberExpression") {
+            if (!node || typeof node !== "object" || !("type" in node)) {
                 return false;
             }
 
-            if (node.object?.type !== "Identifier") {
+            if (node.type !== "MemberExpression") {
                 return false;
             }
 
-            if (node.object.name !== caughtName) {
+            const member = /** @type {import("@typescript-eslint/utils").TSESTree.MemberExpression} */ (
+                node
+            );
+
+            if (member.object.type !== "Identifier") {
+                return false;
+            }
+
+            if (member.object.name !== caughtName) {
                 return false;
             }
 
             // If computed, we cannot reliably reason about the property.
-            if (node.computed) {
-                return false;
-            }
-
-            return true;
+            return !member.computed;
         }
 
+        /**
+         * @typedef {{
+         *   ensureErrorCall: boolean;
+         *   firstPropertyAccess: import("@typescript-eslint/utils").TSESTree.MemberExpression | null;
+         *   name: string;
+         * }} EnsureErrorState
+         */
+
+        /**
+         * @param {unknown} node
+         * @param {EnsureErrorState} state
+         */
         function walk(node, state) {
-            if (!node || typeof node !== "object") {
+            if (!node || typeof node !== "object" || !("type" in node)) {
                 return;
             }
 
-            if (!state.ensureErrorCall && isEnsureErrorCall(node, state.name)) {
+            const typedNode = /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
+                node
+            );
+
+            if (
+                !state.ensureErrorCall &&
+                isEnsureErrorCall(typedNode, state.name)
+            ) {
                 state.ensureErrorCall = true;
             }
 
             if (
                 !state.firstPropertyAccess &&
-                isDirectPropertyAccess(node, state.name)
+                isDirectPropertyAccess(typedNode, state.name)
             ) {
-                state.firstPropertyAccess = node;
+                state.firstPropertyAccess = typedNode;
             }
 
-            const keys = visitorKeys[node.type] ?? [];
+            const keys = visitorKeys[typedNode.type] ?? [];
             for (const key of keys) {
-                const value = node[key];
+                const value = /** @type {Record<string, unknown>} */ (
+                    /** @type {unknown} */ (typedNode)
+                )[key];
                 if (!value) {
                     continue;
                 }
@@ -4754,6 +5344,9 @@ const requireEnsureErrorInCatchRule = {
         }
 
         return {
+            /**
+             * @param {{ param: any; body: any; }} node
+             */
             CatchClause(node) {
                 const param = node.param;
                 if (!param || param.type !== "Identifier") {
@@ -4761,11 +5354,11 @@ const requireEnsureErrorInCatchRule = {
                 }
 
                 const caughtName = param.name;
-                const state = {
+                const state = /** @type {EnsureErrorState} */ ({
                     ensureErrorCall: false,
                     firstPropertyAccess: null,
                     name: caughtName,
-                };
+                });
 
                 walk(node.body, state);
 
@@ -4804,6 +5397,9 @@ const electronPreferReadProcessEnvRule = {
         },
         schema: [],
     },
+    /**
+     * @param {{ getFilename: () => string; getSourceCode: () => { (): any; new (): any; getText: { (): any; new (): any; }; }; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -4832,6 +5428,9 @@ const electronPreferReadProcessEnvRule = {
         const bannedPattern = /\bprocess\s*\.\s*env\b/gu;
 
         return {
+            /**
+             * @param {any} node
+             */
             Program(node) {
                 const text = context.getSourceCode().getText();
                 if (!bannedPattern.test(text)) {
@@ -4869,6 +5468,9 @@ const electronIpcHandlerRequireValidatorRule = {
         },
         schema: [],
     },
+    /**
+     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -4888,17 +5490,24 @@ const electronIpcHandlerRequireValidatorRule = {
             return {};
         }
 
+        /**
+         * @param {unknown} arg
+         */
         const isMissingValidatorArg = (arg) => {
-            if (!arg) {
+            if (!arg || typeof arg !== "object" || !("type" in arg)) {
                 return true;
             }
 
             // `null` validator is never valid.
-            if (arg.type === "Literal" && arg.value === null) {
+            if (arg.type === "Literal" && "value" in arg && arg.value === null) {
                 return true;
             }
 
-            if (arg.type === "Identifier" && arg.name === "undefined") {
+            if (
+                arg.type === "Identifier" &&
+                "name" in arg &&
+                arg.name === "undefined"
+            ) {
                 return true;
             }
 
@@ -4906,6 +5515,9 @@ const electronIpcHandlerRequireValidatorRule = {
         };
 
         return {
+            /**
+             * @param {{ callee: { type: string; name: string; }; arguments: any[]; }} node
+             */
             CallExpression(node) {
                 if (node.callee?.type !== "Identifier") {
                     return;
@@ -4941,6 +5553,9 @@ const noOneDriveRule = {
         },
         schema: [],
     },
+    /**
+     * @param {{ getFilename: () => string; getSourceCode: () => any; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
@@ -4962,6 +5577,9 @@ const noOneDriveRule = {
         const bannedPattern = /\bonedrive\b|\bone\s*drive\b/iu;
 
         return {
+            /**
+             * @param {any} node
+             */
             Program(node) {
                 const sourceCode = context.getSourceCode();
                 const text = sourceCode.getText();

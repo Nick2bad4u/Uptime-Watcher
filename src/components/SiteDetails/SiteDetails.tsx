@@ -49,7 +49,6 @@ import { useCallback, useMemo, useState } from "react";
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
-import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import {
     formatDuration,
     formatFullTimestamp,
@@ -59,11 +58,7 @@ import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
-import { AnalyticsTab } from "./tabs/AnalyticsTab";
-import { HistoryTab } from "./tabs/HistoryTab";
-import { OverviewTab } from "./tabs/OverviewTab";
-import { SettingsTab } from "./tabs/SettingsTab";
-import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
+import { SiteDetailsTabContent } from "./SiteDetailsTabContent";
 import { useSiteDetailsCharts } from "./useSiteDetailsCharts";
 
 /**
@@ -240,98 +235,6 @@ export const SiteDetails = ({
         [handleClose]
     );
 
-    // Extract tab JSX to avoid IIFE pattern and complex conditional rendering
-    const monitorOverviewTab =
-        activeSiteDetailsTab === "monitor-overview" && selectedMonitor ? (
-            <OverviewTab
-                avgResponseTime={analytics.avgResponseTime}
-                fastestResponse={analytics.fastestResponse}
-                formatResponseTime={formatResponseTime}
-                handleIntervalChange={handleIntervalChange}
-                handleRemoveMonitor={handleRemoveMonitor}
-                handleSaveInterval={handleSaveInterval}
-                handleSaveTimeout={handleSaveTimeout}
-                handleTimeoutChange={handleTimeoutChange}
-                intervalChanged={intervalChanged}
-                isLoading={isLoading}
-                localCheckIntervalMs={localCheckIntervalMs}
-                localTimeoutSeconds={localTimeoutSeconds}
-                onCheckNow={handleCheckNowClick}
-                selectedMonitor={selectedMonitor}
-                slowestResponse={analytics.slowestResponse}
-                timeoutChanged={timeoutChanged}
-                totalChecks={analytics.totalChecks}
-                uptime={analytics.uptime}
-            />
-        ) : null;
-
-    const analyticsTab =
-        activeSiteDetailsTab === `${selectedMonitorId}-analytics` &&
-        selectedMonitor ? (
-            <AnalyticsTab
-                avgResponseTime={analytics.avgResponseTime}
-                barChartData={barChartData}
-                barChartOptions={barChartOptions}
-                doughnutOptions={doughnutOptions}
-                downCount={analytics.downCount}
-                downtimePeriods={analytics.downtimePeriods}
-                formatDuration={formatDuration}
-                formatResponseTime={formatResponseTime}
-                getAvailabilityDescription={getAvailabilityDescription}
-                lineChartData={lineChartData}
-                lineChartOptions={lineChartOptions}
-                monitorType={selectedMonitor.type}
-                mttr={analytics.mttr}
-                p50={analytics.percentileMetrics.p50}
-                p95={analytics.percentileMetrics.p95}
-                p99={analytics.percentileMetrics.p99}
-                setShowAdvancedMetrics={setShowAdvancedMetrics}
-                setSiteDetailsChartTimeRange={setSiteDetailsChartTimeRange}
-                showAdvancedMetrics={showAdvancedMetrics}
-                siteDetailsChartTimeRange={siteDetailsChartTimeRange}
-                totalChecks={analytics.totalChecks}
-                totalDowntime={analytics.totalDowntime}
-                upCount={analytics.upCount}
-                uptime={analytics.uptime}
-                uptimeChartData={doughnutChartData}
-            />
-        ) : null;
-
-    const historyTab =
-        activeSiteDetailsTab === "history" && selectedMonitor ? (
-            <HistoryTab
-                formatFullTimestamp={formatFullTimestamp}
-                formatResponseTime={formatResponseTime}
-                selectedMonitor={selectedMonitor}
-            />
-        ) : null;
-
-    const settingsTab =
-        activeSiteDetailsTab === "settings" && selectedMonitor ? (
-            <SettingsTab
-                currentSite={currentSite}
-                handleIntervalChange={handleIntervalChange}
-                handleRemoveSite={handleRemoveSite}
-                handleRetryAttemptsChange={handleRetryAttemptsChange}
-                handleSaveInterval={handleSaveIntervalClick}
-                handleSaveName={handleSaveName}
-                handleSaveRetryAttempts={handleSaveRetryAttempts}
-                handleSaveTimeout={handleSaveTimeout}
-                handleTimeoutChange={handleTimeoutChange}
-                hasUnsavedChanges={hasUnsavedChanges}
-                intervalChanged={intervalChanged}
-                isLoading={isLoading}
-                localCheckIntervalMs={localCheckIntervalMs}
-                localName={localName}
-                localRetryAttempts={localRetryAttempts}
-                localTimeoutSeconds={localTimeoutSeconds}
-                retryAttemptsChanged={retryAttemptsChanged}
-                selectedMonitor={selectedMonitor}
-                setLocalName={setLocalName}
-                timeoutChanged={timeoutChanged}
-            />
-        ) : null;
-
     const activeTabId = useMemo(
         () => `site-details-tab-${activeSiteDetailsTab}`,
         [activeSiteDetailsTab]
@@ -404,30 +307,50 @@ export const SiteDetails = ({
                             surface="elevated"
                             variant="primary"
                         >
-                            {activeSiteDetailsTab === "site-overview" && (
-                                <SiteOverviewTab
-                                    avgResponseTime={analytics.avgResponseTime}
-                                    handleRemoveSite={handleRemoveSite}
-                                    handleStartSiteMonitoring={
-                                        handleStartSiteMonitoring
-                                    }
-                                    handleStopSiteMonitoring={
-                                        handleStopSiteMonitoring
-                                    }
-                                    isLoading={isLoading}
-                                    site={currentSite}
-                                    totalChecks={analytics.totalChecks}
-                                    uptime={parseUptimeValue(analytics.uptime)}
-                                />
-                            )}
-
-                            {monitorOverviewTab}
-
-                            {analyticsTab}
-
-                            {historyTab}
-
-                            {settingsTab}
+                            <SiteDetailsTabContent
+                                activeSiteDetailsTab={activeSiteDetailsTab}
+                                analytics={analytics}
+                                barChartData={barChartData}
+                                barChartOptions={barChartOptions}
+                                doughnutChartData={doughnutChartData}
+                                doughnutOptions={doughnutOptions}
+                                formatDuration={formatDuration}
+                                formatFullTimestamp={formatFullTimestamp}
+                                formatResponseTime={formatResponseTime}
+                                getAvailabilityDescription={getAvailabilityDescription}
+                                handleCheckNow={handleCheckNowClick}
+                                handleIntervalChange={handleIntervalChange}
+                                handleRemoveMonitor={handleRemoveMonitor}
+                                handleRemoveSite={handleRemoveSite}
+                                handleRetryAttemptsChange={handleRetryAttemptsChange}
+                                handleSaveInterval={handleSaveInterval}
+                                handleSaveIntervalClick={handleSaveIntervalClick}
+                                handleSaveName={handleSaveName}
+                                handleSaveRetryAttempts={handleSaveRetryAttempts}
+                                handleSaveTimeout={handleSaveTimeout}
+                                handleStartSiteMonitoring={handleStartSiteMonitoring}
+                                handleStopSiteMonitoring={handleStopSiteMonitoring}
+                                handleTimeoutChange={handleTimeoutChange}
+                                hasUnsavedChanges={hasUnsavedChanges}
+                                intervalChanged={intervalChanged}
+                                isLoading={isLoading}
+                                lineChartData={lineChartData}
+                                lineChartOptions={lineChartOptions}
+                                localCheckIntervalMs={localCheckIntervalMs}
+                                localName={localName}
+                                localRetryAttempts={localRetryAttempts}
+                                localTimeoutSeconds={localTimeoutSeconds}
+                                retryAttemptsChanged={retryAttemptsChanged}
+                                selectedMonitor={selectedMonitor}
+                                selectedMonitorId={selectedMonitorId}
+                                setLocalName={setLocalName}
+                                setShowAdvancedMetrics={setShowAdvancedMetrics}
+                                setSiteDetailsChartTimeRange={setSiteDetailsChartTimeRange}
+                                showAdvancedMetrics={showAdvancedMetrics}
+                                site={currentSite}
+                                siteDetailsChartTimeRange={siteDetailsChartTimeRange}
+                                timeoutChanged={timeoutChanged}
+                            />
                         </SurfaceContainer>
                     </div>
                 </div>

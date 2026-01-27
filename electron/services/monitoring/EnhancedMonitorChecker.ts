@@ -18,15 +18,11 @@
  * - Comprehensive error handling and logging
  *
  * @example
- *
  * ```typescript
  * const checker = new EnhancedMonitorChecker(config);
- * const result = await checker.checkMonitor(site, monitorId, false);
  * ```
  *
  * @public
- *
- * @see {@link MonitorOperationRegistry} for operation correlation details
  * @see {@link MonitorStatusUpdateService} for status update safety
  * @see {@link OperationTimeoutManager} for timeout management
  */
@@ -36,6 +32,7 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import { BASE_MONITOR_TYPES } from "@shared/types";
 
 import type { MonitorCheckContext } from "./checkContext";
+import type { MonitorOperationCoordinator } from "./coordinators/MonitorOperationCoordinator";
 import type { HistoryPruneState } from "./enhancedMonitorChecker/historyPruningState";
 import type { EnhancedMonitoringDependencies } from "./EnhancedMonitoringDependencies";
 import type {
@@ -43,29 +40,24 @@ import type {
     StatusUpdateMonitorCheckResult,
 } from "./MonitorStatusUpdateService";
 import type { OperationTimeoutManager } from "./OperationTimeoutManager";
+import type { MonitorStrategyRegistry } from "./strategies/MonitorStrategyRegistry";
 import type { IMonitorService, MonitorCheckResult } from "./types";
 
 import { monitorLogger as logger } from "../../utils/logger";
-import { MonitorOperationCoordinator } from "./coordinators/MonitorOperationCoordinator";
+import { MonitorOperationCoordinator as MonitorOperationCoordinatorImpl } from "./coordinators/MonitorOperationCoordinator";
+import { createServicesByTypeAndStrategyRegistry } from "./enhancedMonitorChecker/createServicesByTypeAndStrategyRegistry";
 import { emitStatusChangeEvents as emitStatusChangeEventsImpl } from "./enhancedMonitorChecker/emitStatusChangeEvents";
 import { fetchFreshMonitorWithHistory as fetchFreshMonitorWithHistoryImpl } from "./enhancedMonitorChecker/fetchFreshMonitorWithHistory";
 import { handleSuccessfulCheck as handleSuccessfulCheckImpl } from "./enhancedMonitorChecker/handleSuccessfulCheck";
 import { performCorrelatedCheck as performCorrelatedCheckImpl } from "./enhancedMonitorChecker/performCorrelatedCheck";
 import { performDirectCheck as performDirectCheckImpl } from "./enhancedMonitorChecker/performDirectCheck";
+import { performManualCheckOperation } from "./enhancedMonitorChecker/performManualCheck";
+import { performScheduledCheckOperation } from "./enhancedMonitorChecker/performScheduledCheck";
 import { runServiceCheckOperation } from "./enhancedMonitorChecker/runServiceCheck";
 import { saveMonitorHistoryEntry } from "./enhancedMonitorChecker/saveHistoryEntry";
-import {
-    startMonitoringOperation,
-    stopMonitoringOperation,
-} from "./enhancedMonitorChecker/toggleMonitoring";
+import { startMonitoringOperation, stopMonitoringOperation } from "./enhancedMonitorChecker/toggleMonitoring";
 import { validateMonitorForCheck as validateMonitorForCheckImpl } from "./enhancedMonitorChecker/validateMonitorForCheck";
 import { getMonitor } from "./MonitorFactory";
-import { createTimeoutSignal } from "./shared/abortSignalUtils";
-import { resolveMonitorBaseTimeoutMs } from "./shared/timeoutUtils";
-import {
-    createMonitorStrategyRegistry,
-    type MonitorStrategyRegistry,
-} from "./strategies/MonitorStrategyRegistry";
 
 /**
  * Configuration interface for enhanced monitor checking with comprehensive
@@ -197,11 +189,19 @@ export class EnhancedMonitorChecker {
      * Service instances keyed by monitor type.
      *
      * @remarks
-     * Seeded from {@link getMonitor} so we don't have multiple instantiation
-     * code paths (MonitorTypeRegistry factories vs direct `new FooMonitor()` in
-     * this class). The map also provides a single override surface for tests.
+     * Tests use this as an override surface for injecting fake monitor
+     * services.
      */
-    private readonly servicesByType: Map<Monitor["type"], IMonitorService>;
+    /**
+     * Service instances keyed by monitor type.
+     *
+     * @remarks
+     * This is intentionally public so tests (and internal tooling) can inject
+     * fake monitor services without having to re-create the checker.
+     *
+     * @internal
+     */
+    public readonly servicesByType: Map<Monitor["type"], IMonitorService>;
 
     private readonly historyPruneState = new Map<
         string,
@@ -307,31 +307,35 @@ export class EnhancedMonitorChecker {
 
         // For manual checks, don't use operation correlation
         if (isManualCheck) {
-            // Manual checks can race with scheduled correlated checks.
-            // Cancel correlated operations to avoid overlapping writes.
-            this.config.operationRegistry.cancelOperations(monitorId);
-
-            // Ensure active operation IDs don't accumulate if a cancelled
-            // operation never settles.
-            await this.config.monitorRepository.clearActiveOperations(
-                monitorId
-            );
-
-            const timeoutSignal = createTimeoutSignal(
-                resolveMonitorBaseTimeoutMs(monitor.timeout),
-                signal
-            );
-
-            return this.performDirectCheck(site, monitor, true, timeoutSignal);
+            return performManualCheckOperation({
+                config: {
+                    monitorRepository: this.config.monitorRepository,
+                    operationRegistry: this.config.operationRegistry,
+                },
+                monitor,
+                monitorId,
+                performDirectCheck: (siteArg, monitorArg, manual, signalArg) =>
+                    this.performDirectCheck(siteArg, monitorArg, manual, signalArg),
+                signal,
+                site,
+            });
         }
 
-        // Only proceed if monitor is currently monitoring
-        if (!monitor.monitoring) {
-            logger.debug(`Monitor ${monitorId} not monitoring, skipping check`);
-            return undefined;
-        }
 
-        return this.performCorrelatedCheck(site, monitor, monitorId, signal);
+        return performScheduledCheckOperation({
+            logger,
+            monitor,
+            monitorId,
+            performCorrelatedCheck: (siteArg, monitorArg, monitorIdArg, signalArg) =>
+                this.performCorrelatedCheck(
+                    siteArg,
+                    monitorArg,
+                    monitorIdArg,
+                    signalArg
+                ),
+            signal,
+            site,
+        });
     }
 
     /**
@@ -625,37 +629,22 @@ export class EnhancedMonitorChecker {
 
     public constructor(config: EnhancedMonitorCheckConfig) {
         this.config = config;
-        this.operationCoordinator = new MonitorOperationCoordinator({
+        this.operationCoordinator = new MonitorOperationCoordinatorImpl({
             monitorRepository: config.monitorRepository,
             operationRegistry: config.operationRegistry,
             timeoutManager: config.timeoutManager,
         });
 
-        // Build the monitor strategy registry from the canonical registry.
-        //
-        // This removes the duplicate monitor instantiation and monitor-type
-        // list that previously lived in this class.
         const registeredTypes = BASE_MONITOR_TYPES;
 
-        this.servicesByType = new Map(
-            registeredTypes.map((type) => [type, getMonitor(type)])
-        );
+        const { servicesByType, strategyRegistry } =
+            createServicesByTypeAndStrategyRegistry({
+                getServiceForType: (type) => getMonitor(type),
+                registeredTypes,
+            });
 
-        this.strategyRegistry = createMonitorStrategyRegistry(
-            registeredTypes.map((type) => ({
-                getService: (): IMonitorService => this.getServiceOrThrow(type),
-                type,
-            }))
-        );
-    }
-
-    private getServiceOrThrow(type: Monitor["type"]): IMonitorService {
-        const service = this.servicesByType.get(type);
-        if (!service) {
-            throw new Error(`No monitor service registered for type: ${type}`);
-        }
-
-        return service;
+        this.servicesByType = servicesByType;
+        this.strategyRegistry = strategyRegistry;
     }
 
     /**

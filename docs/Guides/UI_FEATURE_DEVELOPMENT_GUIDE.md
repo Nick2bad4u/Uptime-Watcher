@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "UI Feature Development Guide"
 summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
 created: "2025-08-02"
-last_reviewed: "2025-11-17"
+ last_reviewed: "2026-01-26"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -72,12 +72,37 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 **Always use the shared validation schemas for consistent behavior:**
 
-````typescript
-// ✅ Good: Use shared validation schemasimport {import { useEffect } from "react";import { setupCacheSync } from "@/utils/cacheSync";import { useSitesStore } from "@/stores/sites/useSitesStore";/** * Establish site + monitor subscriptions once during app bootstrap. * * See `src/App.tsx` for the real integration. */export function useSitesEventBootstrap(): void { const sitesStore = useSitesStore(); useEffect(() => {  const cacheSyncCleanup = setupCacheSync();  const syncEventsCleanup = sitesStore.subscribeToSyncEvents();  // Monitor updates (down/up/status-changed + manual checks)  void sitesStore.subscribeToStatusUpdates();  return () => {   cacheSyncCleanup();   syncEventsCleanup();
-   sitesStore.unsubscribeFromStatusUpdates();
-  };
- }, [sitesStore]);
+```ts
+// ✅ Good: Use shared validation schemas
+import { useEffect } from "react";
+
+import { useSitesStore } from "@/stores/sites/useSitesStore";
+import { setupCacheSync } from "@/utils/cacheSync";
+
+/**
+ * Establish site + monitor subscriptions once during app bootstrap.
+ *
+ * @remarks
+ * See `src/App.tsx` for the real integration.
+ */
+export function useSitesEventBootstrap(): void {
+  const sitesStore = useSitesStore();
+
+  useEffect(() => {
+    const cacheSyncCleanup = setupCacheSync();
+    const syncEventsCleanup = sitesStore.subscribeToSyncEvents();
+
+    // Monitor updates (down/up/status-changed + manual checks)
+    void sitesStore.subscribeToStatusUpdates();
+
+    return () => {
+      cacheSyncCleanup();
+      syncEventsCleanup();
+      sitesStore.unsubscribeFromStatusUpdates();
+    };
+  }, [sitesStore]);
 }
+```
 
 **Benefits of Shared Validation:**
 
@@ -122,7 +147,7 @@ const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
 
  return { errors, validateField };
 };
-````
+```
 
 ## Development Process
 

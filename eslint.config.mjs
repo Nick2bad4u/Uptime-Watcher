@@ -1280,7 +1280,7 @@ export default defineConfig([
             // TypeScript rules
             ...css.configs.recommended.rules,
             ...pluginUndefinedCss.configs["with-tailwind"].rules,
-            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // Note: plugin typings used to be incomplete; if this regresses, prefer fixing types upstream.
             ...pluginBetterTailwindcss.configs["correctness"].rules,
             "better-tailwindcss/enforce-canonical-classes": "warn",
             "better-tailwindcss/enforce-consistent-class-order": "warn",
@@ -2987,7 +2987,7 @@ export default defineConfig([
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
-            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // Note: plugin typings used to be incomplete; if this regresses, prefer fixing types upstream.
             ...pluginBetterTailwindcss.configs["correctness"].rules,
             ...zod.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "off",

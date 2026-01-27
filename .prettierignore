@@ -27,8 +27,7 @@ docs/Guides/
 # Ignore package in electron-app
 electron-app/package.json
 electron-app/package-lock.json
-package-lock.json
-package.json
+
 
 # Ignore specific files
 **/coverage-results.json
@@ -42,9 +41,6 @@ package.json
 
 # Ignore Sonar properties (not compatible with prettier-ini parser)
 sonar-project.properties
-
-# Prettier fails on this for some reason
-useMonitorTypesStore.100percent.test.ts
 
 # covered by remark lint / remark
 .gitleaks.toml

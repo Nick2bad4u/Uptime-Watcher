@@ -38,11 +38,11 @@
                 "jsdocSpaces": 1,
                 "jsdocVerticalAlignment": false,
                 "plugins": [
-                    "prettier-plugin-multiline-arrays",
                     "prettier-plugin-interpolated-html-tags",
                     "@softonus/prettier-plugin-duplicate-remover",
                     "prettier-plugin-jsdoc",
                     "prettier-plugin-jsdoc-type",
+                    "prettier-plugin-multiline-arrays",
                     "prettier-plugin-tailwindcss",
                     "prettier-plugin-merge"
                 ],
@@ -284,6 +284,7 @@
         {
             "files": "**/package.json, **/package-lock.json",
             "options": {
+                "tabWidth": 2,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
                     "prettier-plugin-packagejson"
