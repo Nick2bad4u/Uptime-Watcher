@@ -18,10 +18,6 @@ import type {
 } from "@shared/types";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
-import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "@shared/utils/logTemplates";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -42,9 +38,20 @@ import {
     autoStartNewMonitorsOperation,
 } from "./monitorManager/autoStartMonitoring";
 import { checkSiteManuallyOperation } from "./monitorManager/checkSiteManuallyOperation";
+import {
+    createEnhancedLifecycleConfigOperation,
+    createEnhancedLifecycleHostOperation,
+} from "./monitorManager/createEnhancedLifecycle";
+import { createMonitorActionDelegate } from "./monitorManager/createMonitorActionDelegate";
+import { handleScheduledCheckOperation } from "./monitorManager/handleScheduledCheckOperation";
 import { setupIndividualNewMonitorsOperation } from "./monitorManager/setupIndividualNewMonitorsOperation";
 import { setupNewMonitorsOperation } from "./monitorManager/setupNewMonitorsOperation";
 import { setupSiteForMonitoringOperation } from "./monitorManager/setupSiteForMonitoringOperation";
+import {
+    startMonitoringAllOperation,
+    stopMonitoringAllOperation,
+} from "./monitorManager/toggleMonitoringAllOperation";
+import { toggleMonitoringForSiteOperation } from "./monitorManager/toggleMonitoringForSiteOperation";
 import {
     type EnhancedLifecycleConfig,
     type EnhancedLifecycleHost,
@@ -210,48 +217,16 @@ export class MonitorManager {
      * @returns Summary describing attempted and successful starts.
      */
     public async startMonitoring(): Promise<MonitoringStartSummary> {
-        const summary = await this.startAllMonitoringEnhanced(
-            this.createEnhancedLifecycleConfig(),
-            this.isMonitoring
-        );
+        const summary = await startMonitoringAllOperation({
+            config: this.createEnhancedLifecycleConfig(),
+            eventEmitter: this.eventEmitter,
+            isMonitoring: this.isMonitoring,
+            logger,
+            startAllMonitoringEnhanced: (config, isMonitoring) =>
+                this.startAllMonitoringEnhanced(config, isMonitoring),
+        });
 
         this.isMonitoring = summary.isMonitoring;
-
-        if (summary.partialFailures) {
-            logger.warn(
-                "[MonitorManager] startMonitoring completed with partial failures",
-                summary
-            );
-        }
-
-        if (
-            !summary.isMonitoring &&
-            summary.attempted > 0 &&
-            !summary.alreadyActive
-        ) {
-            logger.error(
-                "[MonitorManager] No monitors transitioned to an active state during startMonitoring",
-                summary
-            );
-            const error = new Error(
-                "Failed to start monitoring: no monitors reported as active"
-            );
-            // Attach summary for upstream error handling and diagnostics.
-            (error as Error & { summary?: MonitoringStartSummary }).summary =
-                summary;
-            throw error;
-        }
-
-        // Emit internal monitoring started event for orchestrator forwarding
-        if (summary.isMonitoring || summary.alreadyActive) {
-            await this.eventEmitter.emitTyped("internal:monitor:started", {
-                identifier: "all",
-                operation: "started",
-                summary,
-                timestamp: Date.now(),
-            });
-        }
-
         return summary;
     }
 
@@ -266,31 +241,28 @@ export class MonitorManager {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        // Proceed with enhanced monitoring lifecycle which handles
-        // operation cleanup
-        const result = await this.startMonitoringForSiteEnhanced(
-            this.createEnhancedLifecycleConfig(),
+        return toggleMonitoringForSiteOperation({
+            eventEmitter: this.eventEmitter,
             identifier,
             monitorId,
-            this.createMonitorActionDelegate(
-                identifier,
-                monitorId,
-                (recursiveId, recursiveMonitorId) =>
-                    this.startMonitoringForSite(recursiveId, recursiveMonitorId)
-            )
-        );
-
-        if (result) {
-            // Emit monitoring started event
-            await this.eventEmitter.emitTyped("internal:monitor:started", {
-                identifier,
-                ...(monitorId && { monitorId }),
-                operation: "started",
-                timestamp: Date.now(),
-            });
-        }
-
-        return result;
+            operation: "started",
+            toggle: () =>
+                this.startMonitoringForSiteEnhanced(
+                    this.createEnhancedLifecycleConfig(),
+                    identifier,
+                    monitorId,
+                    createMonitorActionDelegate({
+                        action: (recursiveId, recursiveMonitorId) =>
+                            this.startMonitoringForSite(
+                                recursiveId,
+                                recursiveMonitorId
+                            ),
+                        identifier,
+                        logger,
+                        monitorId,
+                    })
+                ),
+        });
     }
 
     /**
@@ -299,44 +271,15 @@ export class MonitorManager {
      * @returns Breakdown of attempted and successful stops.
      */
     public async stopMonitoring(): Promise<MonitoringStopSummary> {
-        const summary = await this.stopAllMonitoringEnhanced(
-            this.createEnhancedLifecycleConfig()
-        );
-
-        this.isMonitoring = summary.isMonitoring;
-
-        if (summary.partialFailures) {
-            logger.warn(
-                "[MonitorManager] stopMonitoring completed with partial failures",
-                summary
-            );
-        }
-
-        if (
-            summary.isMonitoring &&
-            summary.attempted > 0 &&
-            !summary.alreadyInactive
-        ) {
-            logger.error(
-                "[MonitorManager] Some monitors failed to stop during stopMonitoring",
-                summary
-            );
-            const error = new Error(
-                "Failed to stop monitoring: one or more monitors remain active"
-            );
-            (error as Error & { summary?: MonitoringStopSummary }).summary =
-                summary;
-            throw error;
-        }
-
-        await this.eventEmitter.emitTyped("internal:monitor:stopped", {
-            identifier: "all",
-            operation: "stopped",
-            reason: "user",
-            summary,
-            timestamp: Date.now(),
+        const summary = await stopMonitoringAllOperation({
+            config: this.createEnhancedLifecycleConfig(),
+            eventEmitter: this.eventEmitter,
+            logger,
+            stopAllMonitoringEnhanced: (config) =>
+                this.stopAllMonitoringEnhanced(config),
         });
 
+        this.isMonitoring = summary.isMonitoring;
         return summary;
     }
 
@@ -351,32 +294,29 @@ export class MonitorManager {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        // Proceed with enhanced monitoring lifecycle which handles
-        // operation cleanup
-        const result = await this.stopMonitoringForSiteEnhanced(
-            this.createEnhancedLifecycleConfig(),
+        return toggleMonitoringForSiteOperation({
+            eventEmitter: this.eventEmitter,
             identifier,
             monitorId,
-            this.createMonitorActionDelegate(
-                identifier,
-                monitorId,
-                (recursiveId, recursiveMonitorId) =>
-                    this.stopMonitoringForSite(recursiveId, recursiveMonitorId)
-            )
-        );
-
-        if (result) {
-            // Emit monitoring stopped event
-            await this.eventEmitter.emitTyped("internal:monitor:stopped", {
-                identifier,
-                ...(monitorId && { monitorId }),
-                operation: "stopped",
-                reason: "user",
-                timestamp: Date.now(),
-            });
-        }
-
-        return result;
+            operation: "stopped",
+            reason: "user",
+            toggle: () =>
+                this.stopMonitoringForSiteEnhanced(
+                    this.createEnhancedLifecycleConfig(),
+                    identifier,
+                    monitorId,
+                    createMonitorActionDelegate({
+                        action: (recursiveId, recursiveMonitorId) =>
+                            this.stopMonitoringForSite(
+                                recursiveId,
+                                recursiveMonitorId
+                            ),
+                        identifier,
+                        logger,
+                        monitorId,
+                    })
+                ),
+        });
     }
 
     /**
@@ -524,34 +464,14 @@ export class MonitorManager {
         monitorId: string,
         signal: AbortSignal
     ): Promise<void> {
-        const site = this.dependencies.getSitesCache().get(siteIdentifier);
-        if (!site) {
-            logger.warn(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.warnings.SITE_NOT_FOUND_SCHEDULED,
-                    { siteIdentifier }
-                )
-            );
-            return;
-        }
-
-        // Use enhanced monitoring for scheduled checks
-        try {
-            await this.enhancedMonitoringServices.checker.checkMonitor(
-                site,
-                monitorId,
-                false,
-                signal
-            );
-        } catch (error) {
-            logger.error(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.errors.MONITOR_CHECK_ENHANCED_FAILED,
-                    { monitorId }
-                ),
-                error
-            );
-        }
+        await handleScheduledCheckOperation({
+            checker: this.enhancedMonitoringServices.checker,
+            logger,
+            monitorId,
+            signal,
+            siteIdentifier,
+            sitesCache: this.dependencies.getSitesCache(),
+        });
     }
 
     /**
@@ -632,53 +552,14 @@ export class MonitorManager {
      * @returns Immutable configuration snapshot for lifecycle flows.
      */
     private createEnhancedLifecycleConfig(): EnhancedLifecycleConfig {
-        return {
+        return createEnhancedLifecycleConfigOperation({
             databaseService: this.dependencies.databaseService,
             eventEmitter: this.eventEmitter,
             logger,
             monitorRepository: this.dependencies.repositories.monitor,
             monitorScheduler: this.monitorScheduler,
             sites: this.dependencies.getSitesCache(),
-        } satisfies EnhancedLifecycleConfig;
-    }
-
-    /**
-     * Produces a recursion-safe delegate for nested monitor operations.
-     *
-     * @param identifier - Site identifier initiating the action.
-     * @param monitorId - Optional monitor identifier initiating the action.
-     * @param action - Callback invoked when recursion targets a different
-     *   monitor.
-     *
-     * @returns Delegate guarding against infinite recursion.
-     */
-    private createMonitorActionDelegate(
-        identifier: string,
-        monitorId: string | undefined,
-        action: (
-            siteIdentifier: string,
-            monitorIdentifier?: string
-        ) => Promise<boolean>
-    ): MonitorActionDelegate {
-        return async (recursiveId, recursiveMonitorId) => {
-            if (
-                recursiveId !== identifier ||
-                recursiveMonitorId !== monitorId
-            ) {
-                return action(recursiveId, recursiveMonitorId);
-            }
-
-            logger.warn(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
-                    {
-                        identifier,
-                        monitorId: monitorId ?? "all",
-                    }
-                )
-            );
-            return false;
-        };
+        });
     }
 
     /**
@@ -687,11 +568,11 @@ export class MonitorManager {
      * @returns Bound callbacks and services required for helper execution.
      */
     private createEnhancedLifecycleHost(): EnhancedLifecycleHost {
-        return {
+        return createEnhancedLifecycleHostOperation({
             applyMonitorState: this.applyMonitorState.bind(this),
             runSequentially: this.runSequentially.bind(this),
             services: this.enhancedMonitoringServices,
-        };
+        });
     }
 
     /**

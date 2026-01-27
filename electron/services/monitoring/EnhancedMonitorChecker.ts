@@ -491,8 +491,10 @@ export class EnhancedMonitorChecker {
         externalSignal?: AbortSignal
     ): Promise<StatusUpdate | undefined> {
         return performCorrelatedCheckImpl({
-            cleanupOperation: (operationId) =>
-                { this.operationCoordinator.cleanupOperation(operationId); },
+            cleanupOperation:
+                this.operationCoordinator.cleanupOperation.bind(
+                    this.operationCoordinator
+                ),
             executeMonitorCheck: (context) => this.executeMonitorCheck(context),
             ...(externalSignal ? { externalSignal } : {}),
             handleSuccessfulCheck: (siteArg, monitorArg, checkResult) =>

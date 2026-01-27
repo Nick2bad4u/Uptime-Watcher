@@ -41,7 +41,7 @@ import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { safeInteger } from "@shared/validation/validatorUtils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
 
@@ -67,6 +67,8 @@ import {
     MonitoringSection,
     NotificationSection,
 } from "./SettingsSections";
+import { useInAppAlertTonePreview } from "./useInAppAlertTonePreview";
+import { useSettingsChangeHandlers } from "./useSettingsChangeHandlers";
 import { useSettingsModel } from "./useSettingsModel";
 import "./Settings.css";
 
@@ -96,22 +98,6 @@ const formatBackupSize = (bytes: number): string => {
 /**
  * Allowed settings keys that can be updated
  */
-const ALLOWED_SETTINGS_KEY_LIST = [
-    "autoStart",
-    "historyLimit",
-    "inAppAlertsEnabled",
-    "inAppAlertsSoundEnabled",
-    "inAppAlertVolume",
-    "minimizeToTray",
-    "systemNotificationsEnabled",
-    "systemNotificationsSoundEnabled",
-    "theme",
-] as const satisfies ReadonlyArray<keyof AppSettings>;
-
-const ALLOWED_SETTINGS_KEY_STRINGS = new Set(
-    ALLOWED_SETTINGS_KEY_LIST.map(String)
-);
-
 /**
  * Props for the Settings component
  *
@@ -180,136 +166,29 @@ export const Settings = ({
         systemNotificationsSoundEnabled,
         theme: currentThemeName,
     } = settings;
+
     const prefersReducedMotion = usePrefersReducedMotion();
 
-    const volumePreviewTimeoutRef = useRef<number | undefined>(undefined);
-    const pendingVolumeRef = useRef(inAppAlertVolume);
+    const {
+        clearVolumePreviewTimeout,
+        playPreviewAtVolume,
+        scheduleVolumePreview,
+        setPendingVolume,
+    } = useInAppAlertTonePreview(useMemo(() => ({
+        inAppAlertsSoundEnabled,
+        inAppAlertVolume,
+        playInAppAlertTone,
+        prefersReducedMotion,
+    }), [
+        inAppAlertsSoundEnabled,
+        inAppAlertVolume,
+        prefersReducedMotion,
+    ]));
 
-    const clearVolumePreviewTimeout = useCallback((): void => {
-        if (volumePreviewTimeoutRef.current !== undefined) {
-            window.clearTimeout(volumePreviewTimeoutRef.current);
-            volumePreviewTimeoutRef.current = undefined;
-        }
-    }, []);
-
-    const scheduleVolumePreview = useCallback(
-        (volume: number) => {
-            if (!inAppAlertsSoundEnabled) {
-                return;
-            }
-
-            if (prefersReducedMotion) {
-                clearVolumePreviewTimeout();
-                pendingVolumeRef.current = volume;
-                return;
-            }
-
-            const previousVolume = pendingVolumeRef.current;
-            const volumeDelta = Math.abs(volume - previousVolume);
-
-            if (volumeDelta < 0.005) {
-                return;
-            }
-
-            pendingVolumeRef.current = volume;
-            clearVolumePreviewTimeout();
-
-            if (volume <= 0) {
-                return;
-            }
-
-            volumePreviewTimeoutRef.current = window.setTimeout(() => {
-                volumePreviewTimeoutRef.current = undefined;
-                void playInAppAlertTone();
-            }, 180);
-        },
-        [
-            clearVolumePreviewTimeout,
-            inAppAlertsSoundEnabled,
-            prefersReducedMotion,
-        ]
-    );
-
-    useEffect(
-        function syncPendingVolumeWithState(): void {
-            pendingVolumeRef.current = inAppAlertVolume;
-        },
-        [inAppAlertVolume]
-    );
-
-    useEffect(
-        function stopPreviewWhenSoundDisabled(): void {
-            if (!inAppAlertsSoundEnabled) {
-                clearVolumePreviewTimeout();
-            }
-        },
-        [clearVolumePreviewTimeout, inAppAlertsSoundEnabled]
-    );
-
-    useEffect(
-        function cleanupVolumePreviewOnUnmount(): () => void {
-            return () => {
-                clearVolumePreviewTimeout();
-            };
-        },
-        [clearVolumePreviewTimeout]
-    );
-
-    const applySettingChanges = useCallback(
-        (
-            changes: Partial<AppSettings>,
-            options?: { forceKeys?: Array<keyof AppSettings> }
-        ) => {
-            const updateEntries: Array<
-                [keyof AppSettings, AppSettings[keyof AppSettings]]
-            > = [];
-            const forcedKeys = new Set(options?.forceKeys);
-
-            for (const key of ALLOWED_SETTINGS_KEY_LIST) {
-                if (Object.hasOwn(changes, key)) {
-                    const nextValue = changes[key];
-                    if (nextValue !== undefined) {
-                        const previousValue = settings[key];
-                        if (
-                            previousValue !== nextValue ||
-                            forcedKeys.has(key)
-                        ) {
-                            const typedValue = nextValue;
-                            updateEntries.push([key, typedValue]);
-                            logger.user.settingsChange(
-                                key,
-                                previousValue,
-                                nextValue
-                            );
-                        }
-                    }
-                }
-            }
-
-            for (const rawKey of Object.keys(changes)) {
-                if (!ALLOWED_SETTINGS_KEY_STRINGS.has(rawKey)) {
-                    logger.warn(
-                        "Attempted to update invalid settings key",
-                        rawKey
-                    );
-                }
-            }
-
-            if (updateEntries.length > 0) {
-                updateSettings(
-                    Object.fromEntries(updateEntries) as Partial<AppSettings>
-                );
-            }
-        },
-        [settings, updateSettings]
-    );
-
-    const handleSettingChange = useCallback(
-        <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
-            applySettingChanges({ [key]: value });
-        },
-        [applySettingChanges]
-    );
+    const { applySettingChanges, handleSettingChange } = useSettingsChangeHandlers(useMemo(() => ({
+        settings,
+        updateSettings,
+    }), [settings, updateSettings]));
 
     const handleHistoryLimitChange = useCallback(
         async (limit: number) => {
@@ -432,7 +311,7 @@ export const Settings = ({
             });
 
             if (prefersReducedMotion) {
-                pendingVolumeRef.current = normalizedVolume;
+                setPendingVolume(normalizedVolume);
                 clearVolumePreviewTimeout();
                 return;
             }
@@ -446,6 +325,7 @@ export const Settings = ({
             inAppAlertsSoundEnabled,
             prefersReducedMotion,
             scheduleVolumePreview,
+            setPendingVolume,
         ]
     );
 
@@ -462,13 +342,13 @@ export const Settings = ({
             return;
         }
 
-        pendingVolumeRef.current = normalizedVolume;
-        void playInAppAlertTone();
+        playPreviewAtVolume(normalizedVolume);
     }, [
         clearVolumePreviewTimeout,
         inAppAlertsEnabled,
         inAppAlertsSoundEnabled,
         inAppAlertVolume,
+        playPreviewAtVolume,
     ]);
 
     const handleSystemNotificationsChange = useCallback(

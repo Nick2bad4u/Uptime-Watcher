@@ -22,14 +22,12 @@ import type { Monitor, Site } from "@shared/types";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { type ChangeEvent, useEffect, useState } from "react";
-import { useShallow } from "zustand/react/shallow";
 
 import type { ChartTimeRange } from "../../constants";
-import type { SiteDetailsTab, UIStore } from "../../stores/ui/types";
+import type { SiteDetailsTab } from "../../stores/ui/types";
 
 import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import { useErrorStore } from "../../stores/error/useErrorStore";
-import { useUIStore } from "../../stores/ui/useUiStore";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
 import { getTimeoutSeconds } from "../../utils/timeoutUtils";
 import { useConfirmDialog } from "../ui/useConfirmDialog";
@@ -42,41 +40,11 @@ import {
     useSiteDetailsSettingsHandlers,
 } from "./useSiteDetails.handlers";
 import { useSiteDetailsSitesStore } from "./useSiteDetails.sitesStore";
+import { useSiteDetailsUiStore } from "./useSiteDetails.uiStore";
 import {
     DEFAULT_MONITOR_EDIT_STATE,
     type MonitorEditState,
 } from "./useSiteDetails.utils";
-
-type SiteDetailsUiStoreSlice = Pick<
-    UIStore,
-    | "activeSiteDetailsTab"
-    | "setActiveSiteDetailsTab"
-    | "setShowAdvancedMetrics"
-    | "setSiteDetailsChartTimeRange"
-    | "showAdvancedMetrics"
-    | "siteDetailsChartTimeRange"
-    | "syncActiveSiteDetailsTab"
->;
-
-const noopSyncActiveSiteDetailsTab: UIStore["syncActiveSiteDetailsTab"] = (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- no-op fallback for tests/mocks
-    _siteIdentifier
-) => {
-    // no-op
-};
-
-const selectSiteDetailsUiStoreSlice = (state: UIStore): SiteDetailsUiStoreSlice => ({
-    activeSiteDetailsTab: state.activeSiteDetailsTab,
-    setActiveSiteDetailsTab: state.setActiveSiteDetailsTab,
-    setShowAdvancedMetrics: state.setShowAdvancedMetrics,
-    setSiteDetailsChartTimeRange: state.setSiteDetailsChartTimeRange,
-    showAdvancedMetrics: state.showAdvancedMetrics,
-    siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
-    syncActiveSiteDetailsTab:
-        typeof state.syncActiveSiteDetailsTab === "function"
-            ? state.syncActiveSiteDetailsTab
-            : noopSyncActiveSiteDetailsTab,
-});
 
 const resolveHasUnsavedChanges = (
     nameChanged: boolean,
@@ -253,9 +221,7 @@ export function useSiteDetails({
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
         syncActiveSiteDetailsTab,
-    } = useUIStore(
-        useShallow(selectSiteDetailsUiStoreSlice)
-    );
+    } = useSiteDetailsUiStore();
 
     const requestConfirmation = useConfirmDialog();
 
