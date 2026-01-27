@@ -11,6 +11,14 @@ import { createSanitizedFileName } from "./sanitizeBackupFileName";
 const SNAPSHOT_BUSY_TIMEOUT_MS = 10_000;
 
 function escapeSqlStringLiteral(value: string): string {
+    // Defensive hardening: NUL bytes can behave unexpectedly across native
+    // boundaries (SQLite bindings ultimately cross into C/C++). While Windows
+    // paths cannot contain NUL bytes, JS strings can, and we never want such
+    // values to reach SQLite.
+    if (value.includes("\0")) {
+        throw new Error("SQLite string literal cannot contain NUL bytes");
+    }
+
     return `'${value.replaceAll("'", "''")}'`;
 }
 

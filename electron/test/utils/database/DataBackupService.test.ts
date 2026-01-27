@@ -108,6 +108,7 @@ import {
     readDatabaseSchemaVersionFromFile,
     validateDatabaseBackupPayload,
 } from "../../../services/database/utils/backup/databaseBackup";
+import { createVacuumSnapshot } from "../../../services/database/dataBackupService/snapshot";
 import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
 
 // Test utilities and mocks
@@ -137,6 +138,29 @@ const createMockDatabaseService = () => ({
 });
 
 describe(DataBackupService, () => {
+    describe("Snapshot hardening", () => {
+        it("rejects NUL bytes in snapshotPath and closes the temp connection", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataBackupService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            expect(() => {
+                createVacuumSnapshot({
+                    dbPath: "/tmp/mock-db.sqlite",
+                    snapshotPath: "/tmp/backup\0snapshot.sqlite",
+                });
+            }).toThrowError(/nul bytes/i);
+
+            // Even when failing early, we should still close the transient
+            // connection created for VACUUM INTO.
+            expect(mockDatabaseInstance.close).toHaveBeenCalledTimes(1);
+        });
+    });
+
     let mockEventEmitter: ReturnType<typeof createMockEventEmitter>;
     let mockLogger: ReturnType<typeof createMockLogger>;
     let mockDatabaseService: ReturnType<typeof createMockDatabaseService>;
