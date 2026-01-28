@@ -15,6 +15,7 @@ import type { ChartScalesConfig } from "@shared/types/chartConfig";
 import type { Simplify, UnknownRecord } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
+import { ensureRecordLike } from "@shared/utils/typeHelpers";
 
 /**
  * Type-safe scale configuration result describing lookup outcomes.
@@ -133,11 +134,8 @@ export function getNestedScalePropertySafe(
     const validPath: string[] = [];
 
     for (const part of pathParts) {
-        if (
-            typeof current !== "object" ||
-            current === null ||
-            !Object.hasOwn(current, part)
-        ) {
+        const record = ensureRecordLike(current);
+        if (!record || !Object.hasOwn(record, part)) {
             return {
                 exists: false,
                 validPath,
@@ -146,8 +144,7 @@ export function getNestedScalePropertySafe(
         }
 
         validPath.push(part);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: current is validated as object above, accessing known property
-        current = (current as UnknownRecord)[part];
+        current = record[part];
     }
 
     return {
@@ -198,12 +195,15 @@ export function getScaleProperty(
         return undefined;
     }
 
-    // Check if property exists safely
-    if (!Object.hasOwn(scale, property)) {
+    const record = ensureRecordLike(scale);
+    if (!record) {
         return undefined;
     }
 
-    // Scale is guaranteed to be an object here, safe to access property
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: scale validated as object with hasOwn check above
-    return (scale as UnknownRecord)[property];
+    // Check if property exists safely
+    if (!Object.hasOwn(record, property)) {
+        return undefined;
+    }
+
+    return record[property];
 }

@@ -535,10 +535,8 @@ export function interpolateLogTemplate(
     return template.replaceAll(
         // eslint-disable-next-line regexp/strict, regexp/require-unicode-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag, require-unicode wants u flag
         /{(?<variableName>[$_a-z][\w$]*)}/gi,
-        (match, key) => {
-            // Type assertion is safe here as we're accessing with a string key
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for string key from regex match to access object properties
-            const value = variables[key as keyof typeof variables];
+        (match: string, key: string): string => {
+            const value = variables[key];
             return value === undefined || value === null
                 ? match
                 : formatValue(value);

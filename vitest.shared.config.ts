@@ -1,5 +1,4 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- needed for standalone config*/
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
 /**
  * Vitest configuration for shared utility tests. Standalone config file that
@@ -9,6 +8,7 @@
  */
 
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 import { normalizePath, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -18,7 +18,7 @@ import {
     defineConfig,
 } from "vitest/config";
 
-const dirname = import.meta.dirname;
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Vitest configuration for shared utility and cross-process test suites.
@@ -129,7 +129,8 @@ const vitestConfig = defineConfig({
                 lines: 95, // Very high line coverage for shared code
                 statements: 95, // Very high statement coverage for shared code
             },
-        } as any, // Cast: @vitest/coverage-v8 typings omit several runtime-supported options.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @vitest/coverage-v8 typings omit runtime-supported options.
+        } as any,
         dangerouslyIgnoreUnhandledErrors: false,
         deps: {
             optimizer: {
@@ -236,6 +237,7 @@ const vitestConfig = defineConfig({
             spawnTimeout: 10_000,
             tsconfig: "./config/testing/tsconfig.shared.test.json",
         },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
     } as any,
 }) satisfies UserConfig as UserConfig;
 

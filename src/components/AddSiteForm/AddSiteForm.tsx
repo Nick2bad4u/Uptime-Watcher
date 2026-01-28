@@ -1,4 +1,4 @@
-import type { FormEvent, NamedExoticComponent } from "react";
+import type { NamedExoticComponent, SyntheticEvent } from "react";
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -412,7 +412,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
          * @param event - The form submission event.
          */
         const onSubmit = useCallback(
-            async (event: FormEvent) => {
+            async (event: SyntheticEvent<HTMLFormElement>) => {
                 try {
                     await handleSubmit(event, {
                         addMode,
@@ -529,7 +529,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         );
 
         const handleFormSubmit = useCallback(
-            (e: FormEvent) => {
+            (e: SyntheticEvent<HTMLFormElement>) => {
                 e.preventDefault();
                 setHasSubmitted(true);
 

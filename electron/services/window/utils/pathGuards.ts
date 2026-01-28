@@ -8,9 +8,12 @@ import * as path from "node:path";
  * - Normalizes path separators
  * - On Windows, comparisons are case-insensitive
  */
-export function normalizePathForComparison(value: string): string {
+export function normalizePathForComparison(
+    value: string,
+    platform: NodeJS.Platform = process.platform
+): string {
     const normalized = path.resolve(value);
-    return process.platform === "win32"
+    return platform === "win32"
         ? normalized.toLowerCase()
         : normalized;
 }
@@ -20,10 +23,11 @@ export function normalizePathForComparison(value: string): string {
  */
 export function isPathWithinDirectory(
     value: string,
-    directory: string
+    directory: string,
+    platform: NodeJS.Platform = process.platform
 ): boolean {
-    const normalizedValue = normalizePathForComparison(value);
-    const normalizedDirectory = normalizePathForComparison(directory);
+    const normalizedValue = normalizePathForComparison(value, platform);
+    const normalizedDirectory = normalizePathForComparison(directory, platform);
 
     if (normalizedValue === normalizedDirectory) {
         return true;

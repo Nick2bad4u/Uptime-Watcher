@@ -10,9 +10,6 @@
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
 
-/* eslint-disable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Defensive programming for test edge cases and cross-environment compatibility */
-// Defensive programming for test edge cases and cross-environment compatibility
-
 import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -58,9 +55,17 @@ export class ThemeManager {
     }
 
     /**
+     * Type guard for concrete theme registry keys.
+     */
+    private isThemeRegistryKey(value: string): value is keyof typeof themes {
+        return Object.hasOwn(themes, value);
+    }
+
+    /**
      * Apply theme to document - only if different from currently applied theme
      */
     public applyTheme(theme: Theme): void {
+
         if (typeof document === "undefined") {
             return;
         }
@@ -144,8 +149,9 @@ export class ThemeManager {
      * @returns Array of available theme names including system
      */
     public getAvailableThemes(): ThemeName[] {
-        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.keys of themes returns the exact keys that match ThemeName type */
-        const themeNames = Object.keys(themes) as ThemeName[];
+        const themeNames = Object.keys(themes).filter(
+            (name): name is keyof typeof themes => this.isThemeRegistryKey(name)
+        );
         return [...themeNames, "system"];
     }
 
@@ -190,16 +196,19 @@ export class ThemeManager {
             return themes[systemPreference];
         }
 
-        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- name is validated as ThemeName or falls back above, safe to use as themes key */
-        return themes[name as keyof typeof themes];
+        if (!this.isThemeRegistryKey(name)) {
+            const systemPreference = this.getSystemThemePreference();
+            return themes[systemPreference];
+        }
+
+        return themes[name];
     }
 
     /**
      * Validate if theme name is valid
      */
     public isValidThemeName(name: string): name is ThemeName {
-        /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion needed for includes check, result determines type guard */
-        return this.getAvailableThemes().includes(name as ThemeName);
+        return name === "system" || this.isThemeRegistryKey(name);
     }
 
     /**
@@ -220,15 +229,8 @@ export class ThemeManager {
      * Add border radius CSS variables from theme.
      */
     private addBorderRadiusVariables(theme: Theme, variables: string[]): void {
-        // Border radius - all themes have borderRadius property
-
-        if (
-            typeof theme.borderRadius === "object" &&
-            theme.borderRadius !== null
-        ) {
-            for (const [size, value] of Object.entries(theme.borderRadius)) {
-                variables.push(`  --radius-${size}: ${value};`);
-            }
+        for (const [size, value] of Object.entries(theme.borderRadius)) {
+            variables.push(`  --radius-${size}: ${value};`);
         }
     }
 
@@ -290,11 +292,8 @@ export class ThemeManager {
      * Add shadow CSS variables from theme.
      */
     private addShadowVariables(theme: Theme, variables: string[]): void {
-        // Shadows - all themes have shadows property
-        if (typeof theme.shadows === "object" && theme.shadows !== null) {
-            for (const [size, value] of Object.entries(theme.shadows)) {
-                variables.push(`  --shadow-${size}: ${value};`);
-            }
+        for (const [size, value] of Object.entries(theme.shadows)) {
+            variables.push(`  --shadow-${size}: ${value};`);
         }
     }
 
@@ -302,11 +301,8 @@ export class ThemeManager {
      * Add spacing CSS variables from theme.
      */
     private addSpacingVariables(theme: Theme, variables: string[]): void {
-        // Spacing - all themes have spacing property
-        if (typeof theme.spacing === "object" && theme.spacing !== null) {
-            for (const [size, value] of Object.entries(theme.spacing)) {
-                variables.push(`  --spacing-${size}: ${value};`);
-            }
+        for (const [size, value] of Object.entries(theme.spacing)) {
+            variables.push(`  --spacing-${size}: ${value};`);
         }
     }
 
@@ -314,13 +310,9 @@ export class ThemeManager {
      * Add typography CSS variables from theme.
      */
     private addTypographyVariables(theme: Theme, variables: string[]): void {
-        // Typography - all themes have typography property with required
-        // sub-properties
-        if (typeof theme.typography === "object" && theme.typography !== null) {
-            this.addFontSizeVariables(theme.typography, variables);
-            this.addFontWeightVariables(theme.typography, variables);
-            this.addLineHeightVariables(theme.typography, variables);
-        }
+        this.addFontSizeVariables(theme.typography, variables);
+        this.addFontWeightVariables(theme.typography, variables);
+        this.addLineHeightVariables(theme.typography, variables);
     }
 
     /**
@@ -330,13 +322,8 @@ export class ThemeManager {
         typography: Theme["typography"],
         variables: string[]
     ): void {
-        if (
-            typeof typography.fontSize === "object" &&
-            typography.fontSize !== null
-        ) {
-            for (const [size, value] of Object.entries(typography.fontSize)) {
-                variables.push(`  --font-size-${size}: ${value};`);
-            }
+        for (const [size, value] of Object.entries(typography.fontSize)) {
+            variables.push(`  --font-size-${size}: ${value};`);
         }
     }
 
@@ -347,15 +334,8 @@ export class ThemeManager {
         typography: Theme["typography"],
         variables: string[]
     ): void {
-        if (
-            typeof typography.fontWeight === "object" &&
-            typography.fontWeight !== null
-        ) {
-            for (const [weight, value] of Object.entries(
-                typography.fontWeight
-            )) {
-                variables.push(`  --font-weight-${weight}: ${value};`);
-            }
+        for (const [weight, value] of Object.entries(typography.fontWeight)) {
+            variables.push(`  --font-weight-${weight}: ${value};`);
         }
     }
 
@@ -366,15 +346,8 @@ export class ThemeManager {
         typography: Theme["typography"],
         variables: string[]
     ): void {
-        if (
-            typeof typography.lineHeight === "object" &&
-            typography.lineHeight !== null
-        ) {
-            for (const [height, value] of Object.entries(
-                typography.lineHeight
-            )) {
-                variables.push(`  --line-height-${height}: ${value};`);
-            }
+        for (const [height, value] of Object.entries(typography.lineHeight)) {
+            variables.push(`  --line-height-${height}: ${value};`);
         }
     }
 
@@ -385,10 +358,8 @@ export class ThemeManager {
         root: HTMLElement,
         borderRadius: Theme["borderRadius"]
     ): void {
-        if (typeof borderRadius === "object" && borderRadius !== null) {
-            for (const [size, value] of Object.entries(borderRadius)) {
-                root.style.setProperty(`--radius-${size}`, String(value));
-            }
+        for (const [size, value] of Object.entries(borderRadius)) {
+            root.style.setProperty(`--radius-${size}`, String(value));
         }
     }
 
@@ -412,10 +383,8 @@ export class ThemeManager {
      * Apply shadow CSS custom properties
      */
     private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
-        if (typeof shadows === "object" && shadows !== null) {
-            for (const [size, value] of Object.entries(shadows)) {
-                root.style.setProperty(`--shadow-${size}`, String(value));
-            }
+        for (const [size, value] of Object.entries(shadows)) {
+            root.style.setProperty(`--shadow-${size}`, String(value));
         }
     }
 
@@ -423,10 +392,8 @@ export class ThemeManager {
      * Apply spacing CSS custom properties
      */
     private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
-        if (typeof spacing === "object" && spacing !== null) {
-            for (const [size, value] of Object.entries(spacing)) {
-                root.style.setProperty(`--spacing-${size}`, String(value));
-            }
+        for (const [size, value] of Object.entries(spacing)) {
+            root.style.setProperty(`--spacing-${size}`, String(value));
         }
     }
 
@@ -441,6 +408,7 @@ export class ThemeManager {
      * @param theme - Theme to apply classes for
      */
     private applyThemeClasses(theme: Theme): void {
+
         if (typeof document === "undefined") {
             return;
         }
@@ -480,11 +448,9 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (typeof typography === "object" && typography !== null) {
-            this.applyFontSizeProperties(root, typography);
-            this.applyFontWeightProperties(root, typography);
-            this.applyLineHeightProperties(root, typography);
-        }
+        this.applyFontSizeProperties(root, typography);
+        this.applyFontWeightProperties(root, typography);
+        this.applyLineHeightProperties(root, typography);
     }
 
     /**
@@ -494,13 +460,8 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (
-            typeof typography.fontSize === "object" &&
-            typography.fontSize !== null
-        ) {
-            for (const [size, value] of Object.entries(typography.fontSize)) {
-                root.style.setProperty(`--font-size-${size}`, value);
-            }
+        for (const [size, value] of Object.entries(typography.fontSize)) {
+            root.style.setProperty(`--font-size-${size}`, value);
         }
     }
 
@@ -511,15 +472,8 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (
-            typeof typography.fontWeight === "object" &&
-            typography.fontWeight !== null
-        ) {
-            for (const [weight, value] of Object.entries(
-                typography.fontWeight
-            )) {
-                root.style.setProperty(`--font-weight-${weight}`, value);
-            }
+        for (const [weight, value] of Object.entries(typography.fontWeight)) {
+            root.style.setProperty(`--font-weight-${weight}`, value);
         }
     }
 
@@ -530,15 +484,8 @@ export class ThemeManager {
         root: HTMLElement,
         typography: Theme["typography"]
     ): void {
-        if (
-            typeof typography.lineHeight === "object" &&
-            typography.lineHeight !== null
-        ) {
-            for (const [height, value] of Object.entries(
-                typography.lineHeight
-            )) {
-                root.style.setProperty(`--line-height-${height}`, value);
-            }
+        for (const [height, value] of Object.entries(typography.lineHeight)) {
+            root.style.setProperty(`--line-height-${height}`, value);
         }
     }
 }
@@ -572,5 +519,3 @@ export class ThemeManager {
  * @public
  */
 export const themeManager: ThemeManager = ThemeManager.getInstance();
-
-/* eslint-enable @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison -- Re-enable after defensive programming section */

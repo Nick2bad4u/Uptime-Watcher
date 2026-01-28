@@ -6,9 +6,9 @@ import type { JSX } from "react/jsx-runtime";
 
 import {
     type ChangeEvent,
-    type FormEvent,
     memo,
     type NamedExoticComponent,
+    type SyntheticEvent,
     useCallback,
     useId,
     useMemo,
@@ -36,7 +36,7 @@ export const PromptDialog: NamedExoticComponent = memo(
         );
 
         const handleSubmit = useCallback(
-            (event: FormEvent<HTMLFormElement>): void => {
+            (event: SyntheticEvent<HTMLFormElement>): void => {
                 event.preventDefault();
 
                 if (value.trim().length === 0) {

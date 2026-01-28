@@ -15,10 +15,10 @@ import type {
     ChangeEvent,
     CSSProperties,
     FocusEvent,
-    FormEvent,
     KeyboardEvent,
     MouseEvent,
     ReactNode,
+    SyntheticEvent,
 } from "react";
 import type { SetOptional, SetRequired, UnknownRecord } from "type-fest";
 
@@ -305,7 +305,7 @@ export namespace EventHandlers {
  *
  * @public
  */
-export type SubmitHandler = (event: FormEvent<HTMLFormElement>) => void;
+export type SubmitHandler = (event: SyntheticEvent<HTMLFormElement>) => void;
 
 /**
  * Focus handler for input components.

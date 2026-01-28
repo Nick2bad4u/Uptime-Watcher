@@ -246,13 +246,10 @@ function toPartialMonitorFormData<
     fieldName: TField,
     value: OptionalMonitorFieldValue<TType, TField>
 ): PartialMonitorFormDataByType<TType> {
-    // The computed property name tied to the generic field name cannot be
-    // expressed without a type assertion, but the resulting object is safely
-    // assignable to PartialMonitorFormDataByType<TType>.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Narrowing computed generic field name to PartialMonitorFormDataByType<TType> is safe here
-    return {
-        [fieldName]: value,
-    } as PartialMonitorFormDataByType<TType>;
+    // eslint-disable-next-line nitpick/no-redundant-vars -- We need a named object to safely assign a computed generic key without unsafe type assertions.
+    const payload: PartialMonitorFormDataByType<TType> = {};
+    payload[fieldName] = value;
+    return payload;
 }
 
 /**

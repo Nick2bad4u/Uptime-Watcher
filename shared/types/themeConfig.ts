@@ -10,14 +10,13 @@
  */
 
 import type {
-    Merge,
     PartialDeep,
     SetOptional,
-    Simplify,
     UnknownRecord,
 } from "type-fest";
 
 import { isObject } from "../utils/typeGuards";
+import { ensureRecordLike } from "../utils/typeHelpers";
 
 /**
  * Animation configuration interface.
@@ -604,13 +603,11 @@ export type ThemeMode = "dark" | "light";
  * @public
  */
 export function isColorPalette(obj: unknown): obj is ColorPalette {
-    if (typeof obj !== "object" || obj === null) {
+    const palette = ensureRecordLike(obj);
+    if (!palette) {
         return false;
     }
 
-    // Safe assertion after type and null checks
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe after runtime type validation of object structure
-    const palette = obj as UnknownRecord;
     const requiredColors = [
         "error",
         "info",
@@ -637,13 +634,11 @@ export function isColorPalette(obj: unknown): obj is ColorPalette {
  * @public
  */
 export function isThemeConfig(obj: unknown): obj is ThemeConfig {
-    if (typeof obj !== "object" || obj === null) {
+    const theme = ensureRecordLike(obj);
+    if (!theme) {
         return false;
     }
 
-    // Safe assertion after type and null checks
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion is safe after runtime type validation of theme structure
-    const theme = obj as UnknownRecord;
     const requiredProps = [
         "animation",
         "borderRadius",
@@ -856,24 +851,31 @@ export function createThemeConfig(
  *
  * @public
  */
-export function mergeThemeConfig<
-    T extends ThemeConfig,
-    U extends ThemeOverride,
->(baseTheme: T, overrides: U): Simplify<Merge<T, U>> {
+export function mergeThemeConfig(
+    baseTheme: ThemeConfig,
+    overrides: ThemeOverride
+): ThemeConfig {
     return {
-        ...baseTheme,
-        ...overrides,
-        animation: mergeSection(baseTheme.animation, overrides.animation),
-        borderRadius: mergeSection(
+        animation: mergeSection<AnimationConfig>(
+            baseTheme.animation,
+            overrides.animation
+        ),
+        borderRadius: mergeSection<BorderRadiusConfig>(
             baseTheme.borderRadius,
             overrides.borderRadius
         ),
-        colors: mergeSection(baseTheme.colors, overrides.colors),
-        components: mergeSection(baseTheme.components, overrides.components),
-        shadows: mergeSection(baseTheme.shadows, overrides.shadows),
-        spacing: mergeSection(baseTheme.spacing, overrides.spacing),
-        typography: mergeSection(baseTheme.typography, overrides.typography),
-    } as Simplify<Merge<T, U>>;
+        colors: mergeSection<ThemeColors>(baseTheme.colors, overrides.colors),
+        components: mergeSection<ComponentConfig>(
+            baseTheme.components,
+            overrides.components
+        ),
+        shadows: mergeSection<ShadowConfig>(baseTheme.shadows, overrides.shadows),
+        spacing: mergeSection<SpacingConfig>(baseTheme.spacing, overrides.spacing),
+        typography: mergeSection<TypographyConfig>(
+            baseTheme.typography,
+            overrides.typography
+        ),
+    };
 }
 
 /**

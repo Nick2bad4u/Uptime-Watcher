@@ -3,7 +3,7 @@
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
-import type { FormEvent } from "react";
+import type { SyntheticEvent } from "react";
 import type { Simplify, UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
@@ -480,7 +480,7 @@ async function validateMonitorType<TType extends MonitorType>(
  * @example
  *
  * ```tsx
- * const handleFormSubmit = (e: FormEvent) => {
+ * const handleFormSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
  *     handleSubmit(e, {
  *         ...formState,
  *         ...formActions,
@@ -498,7 +498,7 @@ async function validateMonitorType<TType extends MonitorType>(
  * @returns Promise that resolves when submission is complete
  */
 export async function handleSubmit(
-    event: FormEvent,
+    event: SyntheticEvent<HTMLFormElement>,
     properties: FormSubmitProperties
 ): Promise<void> {
     const {

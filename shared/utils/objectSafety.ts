@@ -11,6 +11,24 @@ import type { UnknownRecord } from "type-fest";
 import { isObject } from "./typeGuards";
 
 /**
+ * Creates a null-prototype object with a specific compile-time shape.
+ *
+ * @remarks
+ * This centralizes the only “unsafe” assertion needed for prototype-pollution
+ * hardening so callers do not need their own eslint-disable comments.
+ */
+function createNullPrototypeObject<T extends object>(shape?: T): T {
+    if (shape) {
+        // Touch the phantom parameter in a side-effect-free way so lints do not
+        // treat it as unused.
+        Object.keys(shape);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.create(null) is intentionally used to prevent prototype pollution; shape is provided by the generic.
+    return Object.create(null) as T;
+}
+
+/**
  * Type-safe object property access with fallback.
  *
  * @remarks
@@ -75,7 +93,7 @@ export function safeObjectAccess<T>(
  */
 export function safeObjectIteration(
     obj: unknown,
-    callback: (key: string, value: unknown) => void,
+    visitor: (key: string, value: unknown) => void,
     context = "Safe object iteration"
 ): void {
     if (!isObject(obj)) {
@@ -87,8 +105,7 @@ export function safeObjectIteration(
 
     try {
         for (const [key, value] of Object.entries(obj)) {
-            // eslint-disable-next-line n/callback-return -- Callback doesn't need to return a value
-            callback(key, value);
+            visitor(key, value);
         }
     } catch (error) {
         // Use basic console for shared utilities to avoid dependencies
@@ -123,12 +140,19 @@ export function safeObjectOmit<T extends UnknownRecord, K extends keyof T>(
 ): Omit<T, K> {
     // Handle null/undefined inputs by returning empty object
     if (obj === null || obj === undefined) {
-        // Type assertion is safe as we're creating an empty object to match the expected structure
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for empty object creation with omitted keys
-        return {} as Omit<T, K>;
+        return createNullPrototypeObject<Omit<T, K>>();
     }
 
-    const keysToOmit = new Set(keys);
+    const stringKeysToOmit = new Set<string>();
+    const symbolKeysToOmit = new Set<symbol>();
+
+    for (const key of keys) {
+        if (typeof key === "symbol") {
+            symbolKeysToOmit.add(key);
+        } else {
+            stringKeysToOmit.add(String(key));
+        }
+    }
 
     // IMPORTANT: Use a null-prototype object and defineProperty to avoid
     // prototype-pollution edge cases such as "__proto__".
@@ -138,14 +162,11 @@ export function safeObjectOmit<T extends UnknownRecord, K extends keyof T>(
     // - `Object.defineProperty` on a null-prototype object always defines an
     //   own property.
     //
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for null-prototype object used as a plain record
-    const result = Object.create(null) as Omit<T, K>;
+    const result = createNullPrototypeObject<Omit<T, K>>();
 
     // Copy enumerable string/number properties
     for (const [key, value] of Object.entries(obj)) {
-        // Type assertion is safe as we're checking string keys from Object.entries
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for string key from Object.entries to generic key type
-        if (!keysToOmit.has(key as K)) {
+        if (!stringKeysToOmit.has(key)) {
             Object.defineProperty(result, key, {
                 configurable: true,
                 enumerable: true,
@@ -157,9 +178,7 @@ export function safeObjectOmit<T extends UnknownRecord, K extends keyof T>(
 
     // Copy symbol properties
     for (const symbol of Object.getOwnPropertySymbols(obj)) {
-        // Type assertion is safe as we're checking symbol keys
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for symbol key to generic key type for omit operation
-        if (!keysToOmit.has(symbol as K)) {
+        if (!symbolKeysToOmit.has(symbol)) {
             Object.defineProperty(result, symbol, {
                 configurable: true,
                 enumerable: true,
@@ -200,8 +219,7 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
     // IMPORTANT: Use a null-prototype object and defineProperty to avoid
     // prototype-pollution edge cases such as "__proto__".
     //
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for null-prototype object used as a plain record
-    const result = Object.create(null) as Pick<T, K>;
+    const result = createNullPrototypeObject<Pick<T, K>>();
 
     for (const key of keys) {
         if (Object.hasOwn(obj, key)) {

@@ -1,5 +1,5 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file overrides for config typings */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- vitest/config mergeConfig typing currently widens configs to any. */
 /**
  * Specialized Vitest configuration optimized for zero-coverage detection runs.
  *
@@ -56,11 +56,13 @@ const zeroCoverageConfig: ViteUserConfigFnObject = defineConfig((env) =>
                         lines: 0,
                         statements: 0,
                     },
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Coverage config typing omits supported options.
                 } as any,
                 name: {
                     color: "magenta",
                     label: "ZeroCoverage",
                 },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing omits supported options.
             } as any,
         })
     )

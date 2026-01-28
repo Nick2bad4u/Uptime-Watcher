@@ -9,6 +9,7 @@ import * as fc from "fast-check";
 import { AppCaches } from "../../utils/cache";
 import * as errorHandling from "@shared/utils/errorHandling";
 import * as ipcTypes from "../../types/ipc";
+import type { MonitorFieldDefinition } from "@shared/types";
 import {
     clearMonitorTypeCache,
     getAvailableMonitorTypes,
@@ -549,14 +550,14 @@ describe("monitorTypeHelper", () => {
                     displayName: "HTTP Monitor (Advanced)",
                     description: "Advanced HTTP monitoring",
                     version: "2.0.0",
-                    fields: [],
+                    fields: mockMonitorTypes[0]!.fields,
                 },
                 {
                     type: "custom_ping",
                     displayName: "Custom Ping Service",
                     description: "Custom ping implementation",
                     version: "1.1.0",
-                    fields: [],
+                    fields: mockMonitorTypes[0]!.fields,
                 },
             ];
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(complexTypes);
@@ -603,31 +604,45 @@ describe("monitorTypeHelper", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            const typesWithEmptyNames: MonitorTypeConfig[] = [
+            // Empty display names violate the shared MonitorTypeConfig runtime
+            // guard (isMonitorTypeConfig). When encountered in cache, the helper
+            // should treat the cached value as invalid, clear the cache, and
+            // fall back to the monitor types store.
+            const invalidCachedTypes: MonitorTypeConfig[] = [
                 {
                     type: "empty-name",
                     displayName: "",
                     description: "Monitor with empty display name",
                     version: "1.0.0",
-                    fields: [],
+                    fields: mockMonitorTypes[0]!.fields,
                 },
                 {
                     type: "normal",
                     displayName: "Normal Monitor",
                     description: "Normal monitor",
                     version: "1.0.0",
-                    fields: [],
+                    fields: mockMonitorTypes[0]!.fields,
                 },
             ];
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
-                typesWithEmptyNames
+                invalidCachedTypes
             );
+
+            // Configure mock store to return the expected monitor types.
+            mockMonitorTypesStore.monitorTypes = mockMonitorTypes;
+            mockMonitorTypesStore.isLoaded = true;
+
+            vi.mocked(
+                errorHandling.withUtilityErrorHandling
+            ).mockImplementation(async (fn) => await fn());
 
             const result = await getMonitorTypeOptions();
 
+            expect(AppCaches.monitorTypes.clear).toHaveBeenCalledTimes(1);
             expect(result).toEqual([
-                { label: "", value: "empty-name" },
-                { label: "Normal Monitor", value: "normal" },
+                { label: "HTTP Monitor", value: "http" },
+                { label: "Ping Monitor", value: "ping" },
+                { label: "TCP Monitor", value: "tcp" },
             ]);
         });
 
@@ -646,7 +661,7 @@ describe("monitorTypeHelper", () => {
                     displayName: "Monitor (v2.0) - Advanced & Fast",
                     description: "Special monitor",
                     version: "2.0.0",
-                    fields: [],
+                    fields: mockMonitorTypes[0]!.fields,
                 },
             ];
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(specialTypes);
@@ -740,6 +755,86 @@ describe("monitorTypeHelper", () => {
 
     // Property-based Tests
     describe("Property-based Tests", () => {
+        const safeMonitorTypeKey = fc
+            .string({ minLength: 1, maxLength: 20 })
+            .filter(
+                (value) =>
+                    ![
+                        "__proto__",
+                        "constructor",
+                        "prototype",
+                    ].includes(value)
+            );
+
+        const monitorFieldOptionArb = fc.record({
+            label: fc.string({ minLength: 1, maxLength: 20 }),
+            value: fc.string({ minLength: 1, maxLength: 20 }),
+        });
+
+        const monitorFieldOptionalPropsArb: fc.Arbitrary<
+            Partial<MonitorFieldDefinition>
+        > = fc
+            .record({
+                helpText: fc.option(
+                    fc.string({ minLength: 1, maxLength: 100 }),
+                    { nil: null }
+                ),
+                max: fc.option(fc.integer({ min: -10_000, max: 10_000 }), {
+                    nil: null,
+                }),
+                min: fc.option(fc.integer({ min: -10_000, max: 10_000 }), {
+                    nil: null,
+                }),
+                options: fc.option(
+                    fc.array(monitorFieldOptionArb, {
+                        minLength: 1,
+                        maxLength: 5,
+                    }),
+                    { nil: null }
+                ),
+                placeholder: fc.option(
+                    fc.string({ minLength: 1, maxLength: 50 }),
+                    { nil: null }
+                ),
+            })
+            .map(({ helpText, max, min, options, placeholder }) => ({
+                ...(helpText === null ? {} : { helpText }),
+                ...(max === null ? {} : { max }),
+                ...(min === null ? {} : { min }),
+                ...(options === null ? {} : { options }),
+                ...(placeholder === null ? {} : { placeholder }),
+            }));
+
+        const monitorFieldDefinitionArb: fc.Arbitrary<MonitorFieldDefinition> =
+            fc.tuple(
+                fc.record({
+                    label: fc.string({ minLength: 1, maxLength: 50 }),
+                    name: fc.string({ minLength: 1, maxLength: 30 }),
+                    required: fc.boolean(),
+                    type: fc.constantFrom(
+                        "number",
+                        "select",
+                        "text",
+                        "url"
+                    ),
+                }),
+                monitorFieldOptionalPropsArb
+            ).map(([requiredProps, optionalProps]) => ({
+                ...requiredProps,
+                ...optionalProps,
+            }));
+
+        const monitorTypeConfigArb: fc.Arbitrary<MonitorTypeConfig> = fc.record({
+            description: fc.string({ minLength: 5, maxLength: 200 }),
+            displayName: fc.string({ minLength: 1, maxLength: 50 }),
+            fields: fc.array(monitorFieldDefinitionArb, {
+                minLength: 1,
+                maxLength: 5,
+            }),
+            type: safeMonitorTypeKey,
+            version: fc.string({ minLength: 1, maxLength: 20 }),
+        });
+
         describe("clearMonitorTypeCache property tests", () => {
             test.prop([fc.constantFrom("test", "reset", "clear", "refresh")])(
                 "should always clear the cache regardless of input context",
@@ -764,36 +859,7 @@ describe("monitorTypeHelper", () => {
 
         describe("getAvailableMonitorTypes property tests", () => {
             test.prop([
-                fc.array(
-                    fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }),
-                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                        description: fc.string({
-                            minLength: 5,
-                            maxLength: 200,
-                        }),
-                        fields: fc.array(
-                            fc.record({
-                                name: fc.string({
-                                    minLength: 1,
-                                    maxLength: 30,
-                                }),
-                                type: fc.constantFrom(
-                                    "string",
-                                    "number",
-                                    "boolean"
-                                ),
-                                required: fc.boolean(),
-                                label: fc.string({
-                                    minLength: 1,
-                                    maxLength: 50,
-                                }),
-                            }),
-                            { maxLength: 10 }
-                        ),
-                    }),
-                    { minLength: 1, maxLength: 5 }
-                ),
+                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
             ])(
                 "should return monitor type configurations from cache or store",
                 async (mockTypes) => {
@@ -808,7 +874,7 @@ describe("monitorTypeHelper", () => {
                         errorHandling.withUtilityErrorHandling
                     ).mockImplementation(async (fn) => await fn());
 
-                    mockMonitorTypesStore.monitorTypes = mockTypes as any[];
+                    mockMonitorTypesStore.monitorTypes = mockTypes;
                     mockMonitorTypesStore.isLoaded = true;
 
                     const result = await getAvailableMonitorTypes();
@@ -819,17 +885,7 @@ describe("monitorTypeHelper", () => {
             );
 
             test.prop([
-                fc.array(
-                    fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }),
-                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                        description: fc.string({
-                            minLength: 5,
-                            maxLength: 200,
-                        }),
-                    }),
-                    { minLength: 0, maxLength: 3 }
-                ),
+                fc.array(monitorTypeConfigArb, { minLength: 0, maxLength: 3 }),
             ])(
                 "should return cached monitor types when available",
                 async (cachedTypes) => {
@@ -852,24 +908,7 @@ describe("monitorTypeHelper", () => {
 
         describe("getMonitorTypeConfig property tests", () => {
             test.prop([
-                fc.array(
-                    fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }).filter(
-                            (s) =>
-                                ![
-                                    "__proto__",
-                                    "constructor",
-                                    "prototype",
-                                ].includes(s)
-                        ),
-                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                        description: fc.string({
-                            minLength: 5,
-                            maxLength: 200,
-                        }),
-                    }),
-                    { minLength: 1, maxLength: 5 }
-                ),
+                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
                 fc.integer({ min: 0, max: 4 }),
             ])(
                 "should find monitor type config when type exists",
@@ -895,27 +934,8 @@ describe("monitorTypeHelper", () => {
             );
 
             test.prop([
-                fc.array(
-                    fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }).filter(
-                            (s) =>
-                                ![
-                                    "__proto__",
-                                    "constructor",
-                                    "prototype",
-                                ].includes(s)
-                        ),
-                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                        description: fc.string({
-                            minLength: 5,
-                            maxLength: 200,
-                        }),
-                    }),
-                    { minLength: 1, maxLength: 5 }
-                ),
-                fc
-                    .string({ minLength: 1, maxLength: 30 })
-                    .filter((_type) => true), // We'll filter in the test
+                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
+                fc.string({ minLength: 1, maxLength: 30 }),
             ])(
                 "should return undefined when monitor type not found",
                 async (mockTypes, searchType) => {
@@ -939,24 +959,7 @@ describe("monitorTypeHelper", () => {
 
         describe("getMonitorTypeOptions property tests", () => {
             test.prop([
-                fc.array(
-                    fc.record({
-                        type: fc.string({ minLength: 1, maxLength: 20 }).filter(
-                            (s) =>
-                                ![
-                                    "__proto__",
-                                    "constructor",
-                                    "prototype",
-                                ].includes(s)
-                        ),
-                        displayName: fc.string({ minLength: 1, maxLength: 50 }),
-                        description: fc.string({
-                            minLength: 5,
-                            maxLength: 200,
-                        }),
-                    }),
-                    { minLength: 1, maxLength: 5 }
-                ),
+                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
             ])(
                 "should transform monitor types to option format",
                 async (mockTypes) => {

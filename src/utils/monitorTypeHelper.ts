@@ -10,12 +10,17 @@ import type {
     MonitorTypeOption,
 } from "@shared/types/monitorTypes";
 
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 
 import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
+
+function isMonitorTypeConfigArray(value: unknown): value is MonitorTypeConfig[] {
+    return Array.isArray(value) && value.every(isMonitorTypeConfig);
+}
 
 /**
  * Frontend representation of monitor type configuration.
@@ -54,13 +59,19 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
     const cacheKey = CacheKeys.config.byName("all-monitor-types");
 
     // Try cache first
-    /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Cache stores typed data, safe to assert known cache value type */
-    const cached = AppCaches.monitorTypes.get(cacheKey) as
-        | MonitorTypeConfig[]
-        | null
-        | undefined;
-    if (cached) {
+    const cached = AppCaches.monitorTypes.get(cacheKey);
+    if (isMonitorTypeConfigArray(cached)) {
         return cached;
+    }
+
+    if (cached !== undefined) {
+        logger.warn(
+            "Monitor type cache contained unexpected value; clearing cache entry",
+            {
+                cacheKey,
+            }
+        );
+        AppCaches.monitorTypes.clear();
     }
 
     // Fetch from store instead of direct IPC call
