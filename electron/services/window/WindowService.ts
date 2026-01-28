@@ -59,10 +59,10 @@ import {
 } from "./utils/productionSecurityHeaders";
 
 // ESM equivalent of currentDirectory
-// eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
+/* eslint-disable unicorn/prefer-import-meta-properties -- Node.js types still lag on import.meta.dirname; fileURLToPath is the typed equivalent. */
 const currentFilename = fileURLToPath(import.meta.url);
-// eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
 const currentDirectory = path.dirname(currentFilename);
+/* eslint-enable unicorn/prefer-import-meta-properties -- Restore default rule behavior after path derivation. */
 
 const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(currentDirectory);
 

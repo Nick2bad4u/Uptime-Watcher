@@ -88,7 +88,7 @@ const isImportValidationFailure = (
     result: ImportValidationResult
 ): result is ImportValidationFailureResult => !result.ok;
 
-// eslint-disable-next-line sonarjs/function-return-type -- This helper intentionally returns the wide Jsonifiable union to normalize arbitrary inputs.
+// eslint-disable-next-line sonarjs/function-return-type -- Returns a Jsonifiable union (object/array/primitive) by design.
 const toJsonifiable = (value: unknown): Jsonifiable => {
     if (value === null) {
         return null;
@@ -454,51 +454,48 @@ export class DataImportExportService {
             const { identifier } = site;
             const monitors = Array.isArray(site.monitors) ? site.monitors : [];
 
-            if (monitors.length === 0) {
-                // No monitors to import for this site.
-                continue; // eslint-disable-line no-continue -- Early exit keeps the main logic flatter and avoids deeply nested blocks.
-            }
+            if (monitors.length > 0) {
+                try {
+                    const createdMonitors = monitors.map((monitor) => {
+                        const newId = monitorRepositoryTransaction.create(
+                            identifier,
+                            monitor
+                        );
 
-            try {
-                const createdMonitors = monitors.map((monitor) => {
-                    const newId = monitorRepositoryTransaction.create(
-                        identifier,
-                        monitor
+                        return {
+                            ...monitor,
+                            id: newId,
+                        } as Site["monitors"][0];
+                    });
+
+                    this.importHistoryForMonitors(
+                        historyRepositoryTransaction,
+                        createdMonitors,
+                        monitors
                     );
 
-                    return {
-                        ...monitor,
-                        id: newId,
-                    } as Site["monitors"][0];
-                });
+                    this.logger.debug(
+                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${identifier}`
+                    );
+                } catch (error) {
+                    // This entire import is destructive (deleteAll + bulkInsert).
+                    // If any site fails to import monitors/history, abort so the
+                    // transaction can rollback and the existing dataset remains
+                    // intact.
+                    this.logger.error(
+                        `[DataImportExportService] Failed to import monitors for site ${identifier}:`,
+                        error
+                    );
 
-                this.importHistoryForMonitors(
-                    historyRepositoryTransaction,
-                    createdMonitors,
-                    monitors
-                );
+                    const errorDetail = getUserFacingErrorDetail(error);
 
-                this.logger.debug(
-                    `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${identifier}`
-                );
-            } catch (error) {
-                // This entire import is destructive (deleteAll + bulkInsert).
-                // If any site fails to import monitors/history, abort so the
-                // transaction can rollback and the existing dataset remains
-                // intact.
-                this.logger.error(
-                    `[DataImportExportService] Failed to import monitors for site ${identifier}:`,
-                    error
-                );
-
-                const errorDetail = getUserFacingErrorDetail(error);
-
-                throw new Error(
-                    `Monitor import failed for site '${identifier}': ${errorDetail}`,
-                    {
-                        cause: error,
-                    }
-                );
+                    throw new Error(
+                        `Monitor import failed for site '${identifier}': ${errorDetail}`,
+                        {
+                            cause: error,
+                        }
+                    );
+                }
             }
         }
     }

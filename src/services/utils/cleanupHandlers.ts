@@ -119,10 +119,13 @@ export const resolveCleanupHandler = (
             if (isPromiseLike(cleanupResult)) {
                 // Cleanup must remain synchronous. We still attach a rejection
                 // handler to prevent unhandled promise rejections.
-                // eslint-disable-next-line promise/prefer-await-to-then -- Cleanup cannot be awaited; attach best-effort rejection handler.
-                Promise.resolve(cleanupResult).catch((error: unknown) => {
-                    handlers.handleCleanupError(error);
-                });
+                void (async (): Promise<void> => {
+                    try {
+                        await cleanupResult;
+                    } catch (error: unknown) {
+                        handlers.handleCleanupError(error);
+                    }
+                })();
             }
         } catch (error) {
             handlers.handleCleanupError(error);

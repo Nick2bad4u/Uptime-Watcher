@@ -1,5 +1,4 @@
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- theme styles require CSS variable and color manipulation overrides
-/* eslint-disable @metamask/design-tokens/color-no-hex -- theme system requires direct hex color manipulation */
+/* eslint-disable @metamask/design-tokens/color-no-hex -- Theme style helpers intentionally use hex literals. */
 /**
  * Custom hook for theme-aware CSS-in-JS styles.
  *
@@ -333,3 +332,5 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
         [isCollapsed, isDarkMode]
     );
 }
+
+/* eslint-enable @metamask/design-tokens/color-no-hex -- Restore default token lint after theme style helpers. */

@@ -16,6 +16,7 @@ import {
     type CloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
@@ -804,8 +805,7 @@ export class SyncEngine {
         // `siteIdentifier` is a cloud-sync routing field (monitors are stored
         // inside their parent site locally). It must never be passed into the
         // orchestrator, because strict monitor validation rejects unknown keys.
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, sonarjs/no-unused-vars -- Omit cloud-only routing field.
-        const { siteIdentifier: _, ...monitorFields } = config;
+        const monitorFields = safeObjectOmit(config, ["siteIdentifier"] as const);
 
         const base: Monitor = existing ?? {
             checkInterval: config.checkInterval,

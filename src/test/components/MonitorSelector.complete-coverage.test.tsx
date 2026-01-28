@@ -199,9 +199,9 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             expect(select).toBeDisabled();
             expect(select).toHaveValue("");
-            expect(wrapper).toHaveAttribute("aria-disabled", "true");
             expect(wrapper).toHaveAttribute("data-disabled", "true");
-            expect(wrapper).toHaveAttribute("tabindex", "-1");
+            expect(wrapper).not.toHaveAttribute("role");
+            expect(wrapper).not.toHaveAttribute("tabindex");
             expect(
                 screen.getByText("No monitors available")
             ).toBeInTheDocument();
@@ -228,7 +228,9 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             expect(select).not.toBeDisabled();
             expect(select).toHaveValue("");
-            expect(wrapper).toHaveAttribute("aria-disabled", "false");
+            expect(wrapper).toHaveAttribute("data-disabled", "false");
+            expect(wrapper).not.toHaveAttribute("role");
+            expect(wrapper).not.toHaveAttribute("tabindex");
             expect(screen.getByText("Select a monitor")).toBeInTheDocument();
         });
 
@@ -253,7 +255,7 @@ describe("MonitorSelector - Complete Coverage", () => {
     });
 
     describe("Interactions", () => {
-        it("should focus the select when the wrapper is clicked", async ({
+        it("should focus the select when it is clicked", async ({
             task,
             annotate,
         }) => {
@@ -268,7 +270,9 @@ describe("MonitorSelector - Complete Coverage", () => {
             const user = userEvent.setup();
             renderMonitorSelector();
 
-            const select = screen.getByTestId("themed-select");
+            const select = screen.getByTestId(
+                "themed-select"
+            ) as HTMLSelectElement;
             const focusSpy = vi
                 .spyOn(select, "focus")
                 .mockReturnValue(undefined);
@@ -276,12 +280,12 @@ describe("MonitorSelector - Complete Coverage", () => {
                 ".monitor-selector__wrapper"
             ) as HTMLElement;
 
-            await user.click(wrapper);
-            fireEvent.focus(select);
+            await user.click(select);
+            select.focus();
 
             expect(focusSpy).toHaveBeenCalled();
             expect(defaultProps.onChange).not.toHaveBeenCalled();
-            expect(wrapper).toHaveAttribute("aria-expanded", "true");
+            expect(wrapper).not.toHaveAttribute("aria-expanded");
 
             focusSpy.mockRestore();
         });

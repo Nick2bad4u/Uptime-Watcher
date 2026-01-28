@@ -388,18 +388,17 @@ export function formatErrorMessage(
     let result = template;
     for (const [key, value] of Object.entries(params)) {
         // Skip dangerous keys for security (prevent prototype pollution)
-        if (
+        const isDangerousKey =
             key === "__proto__" ||
             key === "constructor" ||
-            key === "prototype"
-        ) {
-            // eslint-disable-next-line no-continue -- Security skip for dangerous prototype keys
-            continue;
+            key === "prototype";
+
+        if (!isDangerousKey) {
+            const placeholder = `{${key}}`;
+            const stringValue = String(value);
+            // Use replacement function to avoid special replacement pattern interpretation
+            result = result.replaceAll(placeholder, () => stringValue);
         }
-        const placeholder = `{${key}}`;
-        const stringValue = String(value);
-        // Use replacement function to avoid special replacement pattern interpretation
-        result = result.replaceAll(placeholder, () => stringValue);
     }
     return result;
 }

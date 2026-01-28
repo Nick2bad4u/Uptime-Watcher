@@ -33,7 +33,7 @@ export type DbValue = null | number | string;
  * Prefer this helper instead of ad-hoc `typeof` chains so the conversion rules
  * stay consistent across repositories and mappers.
  */
-// eslint-disable-next-line sonarjs/function-return-type -- DbValue is intentionally a union (null | number | string) and this helper returns DbValue | undefined.
+// eslint-disable-next-line sonarjs/function-return-type -- Returns a DbValue union (null | number | string) or undefined by design.
 export function convertToDbValue(value: unknown): DbValue | undefined {
     let result: DbValue | undefined = undefined;
 

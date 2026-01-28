@@ -451,17 +451,17 @@ async function validateCheckInterval(
  *
  * @returns Promise resolving to array of validation error messages
  */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Generic preserves precise builder-to-schema linkage for each monitor type.
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Generic needed to keep `type` narrowed for exactOptionalPropertyTypes and schema typing.
 async function validateMonitorType<TType extends MonitorType>(
     monitorType: TType,
     fields: MonitorValidationFieldValues
 ): Promise<readonly string[]> {
     const builderCandidate = resolveMonitorValidationBuilder(monitorType);
     const partialData = builderCandidate(fields);
-    const formData: PartialMonitorFormDataByType<TType> = {
+    const formData = {
         ...partialData,
         type: monitorType,
-    };
+    } as PartialMonitorFormDataByType<TType>;
 
     const result = await validateMonitorFormData(monitorType, formData);
     return result.errors;

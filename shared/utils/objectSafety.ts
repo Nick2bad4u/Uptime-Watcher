@@ -134,7 +134,7 @@ export function safeObjectIteration(
  *
  * @returns New object without the specified keys
  */
-export function safeObjectOmit<T extends UnknownRecord, K extends keyof T>(
+export function safeObjectOmit<T extends object, K extends keyof T>(
     obj: null | T | undefined,
     keys: readonly K[]
 ): Omit<T, K> {
@@ -163,9 +163,10 @@ export function safeObjectOmit<T extends UnknownRecord, K extends keyof T>(
     //   own property.
     //
     const result = createNullPrototypeObject<Omit<T, K>>();
+    const record = castUnchecked<UnknownRecord>(obj);
 
     // Copy enumerable string/number properties
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [key, value] of Object.entries(record)) {
         if (!stringKeysToOmit.has(key)) {
             Object.defineProperty(result, key, {
                 configurable: true,
@@ -182,7 +183,7 @@ export function safeObjectOmit<T extends UnknownRecord, K extends keyof T>(
             Object.defineProperty(result, symbol, {
                 configurable: true,
                 enumerable: true,
-                value: obj[symbol],
+                value: record[symbol],
                 writable: true,
             });
         }

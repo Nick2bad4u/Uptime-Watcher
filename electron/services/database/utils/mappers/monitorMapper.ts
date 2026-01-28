@@ -249,7 +249,7 @@ export function buildMonitorParameters(
         const { columns } = generateSqlParameters();
 
         // Return values in the same order as columns
-        // eslint-disable-next-line sonarjs/function-return-type -- DbValue is intentionally a union (null | number | string) for SQLite parameters.
+        // eslint-disable-next-line sonarjs/function-return-type -- Returns a DbValue union (null | number | string) by design.
         return columns.map((column): DbValue => {
             const value = row[column];
             return convertToDbValue(value) ?? null;

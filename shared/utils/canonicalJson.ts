@@ -15,7 +15,7 @@ function isJsonRecord(value: JsonValue): value is JsonObject {
 /**
  * Returns a JSON value with all object keys sorted recursively.
  */
-// eslint-disable-next-line sonarjs/function-return-type -- Returns JsonValue union by design (primitives/arrays/objects).
+// eslint-disable-next-line sonarjs/function-return-type -- Returns a JsonValue union (object/array/primitive) by design.
 export function createCanonicalJsonValue(value: JsonValue): JsonValue {
     if (Array.isArray(value)) {
         return value.map((entry) => createCanonicalJsonValue(entry));

@@ -28,14 +28,10 @@ export function calculateMaxDuration(
 
     // Calculate exponential backoff time with cap at 5 seconds per retry
     // Formula: 0.5 * 2^index with max of 5 seconds per attempt
-    const backoffTime =
-        retryAttempts > 0
-            ? // eslint-disable-next-line math/prefer-math-sum-precise -- Math.sumPrecise is not available in standard JavaScript environments; reduce() is the standard approach
-              Array.from(
-                  { length: retryAttempts },
-                  (_, index) => Math.min(0.5 * 2 ** index, 5) // Exponential backoff capped at 5s
-              ).reduce((a, b) => a + b, 0)
-            : 0;
+    let backoffTime = 0;
+    for (let index = 0; index < retryAttempts; index++) {
+        backoffTime += Math.min(0.5 * 2 ** index, 5); // Exponential backoff capped at 5s
+    }
 
     const totalTime = Math.ceil(timeoutTime + backoffTime);
 

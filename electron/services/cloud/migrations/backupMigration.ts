@@ -139,6 +139,7 @@ export async function migrateProviderBackups(args: {
         }
     }
 
+    /* eslint-disable no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple. */
     for (const entry of selected) {
         processed += 1;
 
@@ -157,7 +158,6 @@ export async function migrateProviderBackups(args: {
                         message: `Target backup already exists (${targetKey}); refusing to overwrite`,
                     });
                 } else {
-                    // eslint-disable-next-line no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple.
                     const downloaded = await provider.downloadBackup(entry.key);
 
                     const plaintext = downloaded.entry.encrypted
@@ -174,7 +174,6 @@ export async function migrateProviderBackups(args: {
                           })
                         : plaintext;
 
-                    // eslint-disable-next-line no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple.
                     await provider.uploadBackup({
                         buffer: targetBuffer,
                         encrypted: targetEncrypted,
@@ -185,7 +184,6 @@ export async function migrateProviderBackups(args: {
                     migrated += 1;
                     existingBackupKeys.add(targetKey);
 
-                    // eslint-disable-next-line no-await-in-loop -- Delete is conditional on the just-completed upload.
                     await deleteSourceIfRequested(entry.key);
                 }
             } catch (error) {
@@ -199,6 +197,8 @@ export async function migrateProviderBackups(args: {
             skipped += 1;
         }
     }
+
+    /* eslint-enable no-await-in-loop -- Restore default rule behavior after migration loop. */
 
     return {
         completedAt: Date.now(),

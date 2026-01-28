@@ -5,9 +5,9 @@
 
 import type { Monitor } from "@shared/types";
 import type { EventHandlers } from "@shared/types/componentProps";
-import type { KeyboardEvent, MouseEvent, NamedExoticComponent } from "react";
+import type { MouseEvent, NamedExoticComponent } from "react";
 
-import { memo, useCallback, useId, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useId, useMemo, useRef } from "react";
 
 import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 import {
@@ -113,13 +113,8 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
             () => `monitor-selector-${rawGeneratedId.replaceAll(":", "")}`,
             [rawGeneratedId]
         );
-        const [isSelectFocused, setIsSelectFocused] = useState(false);
-        const resetFocusState = useCallback(() => {
-            setIsSelectFocused(false);
-        }, []);
 
         const isDisabled = (disabled ?? false) || monitors.length === 0;
-        const isFocusActive = isSelectFocused && !isDisabled;
 
         const hasSelection = useMemo(
             () => monitors.some((monitor) => monitor.id === selectedMonitorId),
@@ -141,90 +136,6 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
         const handleMouseDown = useCallback((event: MouseEvent) => {
             event.stopPropagation();
         }, []);
-
-        const handleSelectFocus = useCallback(() => {
-            if (isDisabled) {
-                return;
-            }
-            setIsSelectFocused(true);
-        }, [isDisabled]);
-
-        const handleSelectBlur = useCallback(() => {
-            resetFocusState();
-        }, [resetFocusState]);
-
-        const openSelect = useCallback(() => {
-            const selectElement = selectRef.current;
-            if (!selectElement || selectElement.disabled) {
-                return;
-            }
-
-            try {
-                if (typeof selectElement.showPicker === "function") {
-                    selectElement.showPicker();
-                    return;
-                }
-            } catch {
-                // Fallback for environments without showPicker support.
-            }
-
-            selectElement.focus({ preventScroll: true });
-
-            try {
-                selectElement.dispatchEvent(
-                    new window.MouseEvent("mousedown", {
-                        bubbles: true,
-                        cancelable: true,
-                    })
-                );
-            } catch {
-                // Ignore synthetic dispatch failures (e.g., JSDOM)
-            }
-
-            selectElement.click();
-        }, []);
-
-        const handleWrapperClick = useCallback(
-            (event: MouseEvent<HTMLDivElement>) => {
-                if (isDisabled) {
-                    return;
-                }
-
-                const selectElement = selectRef.current;
-                if (!selectElement || selectElement.disabled) {
-                    return;
-                }
-
-                if (
-                    event.target instanceof Element &&
-                    selectElement.contains(event.target)
-                ) {
-                    return;
-                }
-
-                event.preventDefault();
-                event.stopPropagation();
-                openSelect();
-            },
-            [isDisabled, openSelect]
-        );
-
-        const handleWrapperKeyDown = useCallback(
-            (event: KeyboardEvent<HTMLDivElement>) => {
-                if (isDisabled) {
-                    return;
-                }
-
-                if (event.key !== "Enter" && event.key !== " ") {
-                    return;
-                }
-
-                event.preventDefault();
-                event.stopPropagation();
-                openSelect();
-            },
-            [isDisabled, openSelect]
-        );
 
         // Memoize the option formatting to avoid recalculation
         const formatMonitorOption = useCallback((monitor: Monitor): string => {
@@ -288,19 +199,10 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
         const ChevronIcon = AppIcons.ui.expand;
 
         return (
-            // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Div wrapper is required to nest the native select control.
             <div
-                aria-controls={controlId}
-                aria-disabled={isDisabled}
-                aria-expanded={isFocusActive}
-                aria-haspopup="listbox"
                 className={wrapperClassName}
                 data-disabled={isDisabled}
                 data-prevent-row-activation="true"
-                onClick={handleWrapperClick}
-                onKeyDown={handleWrapperKeyDown}
-                role="button"
-                tabIndex={isDisabled ? -1 : 0}
                 title={selectedMonitorText}
             >
                 <span
@@ -315,10 +217,8 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                     disabled={isDisabled}
                     fluid={false}
                     id={controlId}
-                    onBlur={handleSelectBlur}
                     onChange={onChange}
                     onClick={handleClick}
-                    onFocus={handleSelectFocus}
                     onMouseDown={handleMouseDown}
                     ref={selectRef}
                     tone="transparent"

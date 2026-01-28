@@ -623,6 +623,7 @@ export async function withOperationalHooks<T>(
 
     const { signal } = config;
 
+    /* eslint-disable no-await-in-loop -- Retry operations require sequential awaits (attempt ordering, backoff timing, and side-effect semantics). */
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         if (signal?.aborted) {
             const abortError = createAbortError();
@@ -648,9 +649,7 @@ export async function withOperationalHooks<T>(
                 }
             );
 
-            // eslint-disable-next-line no-await-in-loop -- retry operations require sequential awaits
             const result = await operation();
-            // eslint-disable-next-line no-await-in-loop -- success handling requires sequential await
             return await handleSuccess(
                 result,
                 config,
@@ -714,7 +713,6 @@ export async function withOperationalHooks<T>(
 
             // Handle retry - intentionally sequential for retry logic
             try {
-                // eslint-disable-next-line no-await-in-loop -- retry handling requires sequential await
                 await handleRetry(
                     lastError,
                     config,
@@ -740,6 +738,8 @@ export async function withOperationalHooks<T>(
             }
         }
     }
+
+    /* eslint-enable no-await-in-loop -- Restore default rule behavior after retry loop. */
 
     // This should never be reached, but TypeScript needs it
     throw (

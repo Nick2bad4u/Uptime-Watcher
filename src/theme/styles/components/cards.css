@@ -471,6 +471,8 @@
     }
 
     & .monitor-selector__icon {
+        position: absolute;
+        z-index: 2;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -479,7 +481,18 @@
             var(--color-primary-400) 72%,
             rgb(255 255 255) 28%
         );
+        inset-block-start: 50%;
+        pointer-events: none;
+        transform: translateY(-50%);
         transition: color var(--transition-fast);
+
+        &:not(.monitor-selector__icon--trailing) {
+            inset-inline-start: 0.85rem;
+        }
+
+        &.monitor-selector__icon--trailing {
+            inset-inline-end: 0.85rem;
+        }
     }
 
     &:hover .monitor-selector__icon,
@@ -493,7 +506,8 @@
 }
 
 .monitor-selector__input {
-    flex: 1 1 auto;
+    position: absolute;
+    z-index: 1;
     border: none;
     appearance: none;
     background-color: transparent;
@@ -501,8 +515,9 @@
     color: inherit;
     cursor: pointer;
     font: inherit;
-    min-inline-size: 0;
-    padding-inline: 0;
+    inline-size: 100%;
+    inset: 0;
+    padding-inline: 2.35rem;
 
     &::-ms-expand {
         display: none;
@@ -514,9 +529,7 @@
     }
 }
 
-.monitor-selector__icon--trailing {
-    padding-inline-start: 0.25rem;
-}
+/* trailing icon is absolutely positioned within the wrapper */
 
 .site-card--modern .site-card__status {
     display: flex;
