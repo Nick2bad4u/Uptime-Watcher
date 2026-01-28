@@ -12,33 +12,6 @@
 import type { UnknownRecord } from "type-fest";
 
 /**
- * Safely casts IPC response to expected type with basic validation.
- *
- * @remarks
- * Use this for IPC responses where we have a contract but can't guarantee
- * types. The validator provides additional runtime safety if provided.
- *
- * @param response - IPC response of unknown type
- * @param validator - Optional validation function
- *
- * @returns Response cast to expected type
- */
-export function castIpcResponse<T>(
-    response: unknown,
-    validator?: (val: unknown) => val is T
-): T {
-    if (validator && !validator(response)) {
-        throw new Error("IPC response validation failed");
-    }
-
-    // This assertion is necessary for IPC boundaries where TypeScript can't
-    // verify types Runtime validation via validator parameter provides
-    // additional safety
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion with runtime validation for IPC boundaries
-    return response as T;
-}
-
-/**
  * Performs an unchecked cast of an unknown value to type {@link T}.
  *
  * @remarks
@@ -61,6 +34,29 @@ export function castIpcResponse<T>(
 export function castUnchecked<T>(value: unknown): T {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Centralized unchecked cast for validated/dynamic boundaries.
     return value as T;
+}
+
+/**
+ * Safely casts IPC response to expected type with basic validation.
+ *
+ * @remarks
+ * Use this for IPC responses where we have a contract but can't guarantee
+ * types. The validator provides additional runtime safety if provided.
+ *
+ * @param response - IPC response of unknown type
+ * @param validator - Optional validation function
+ *
+ * @returns Response cast to expected type
+ */
+export function castIpcResponse<T>(
+    response: unknown,
+    validator?: (val: unknown) => val is T
+): T {
+    if (validator && !validator(response)) {
+        throw new Error("IPC response validation failed");
+    }
+
+    return castUnchecked<T>(response);
 }
 
 /**

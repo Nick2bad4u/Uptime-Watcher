@@ -3,7 +3,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
 import {
-    type MouseEvent as ReactMouseEvent,
     type ReactNode,
     useCallback,
     useEffect,
@@ -503,26 +502,17 @@ export const Modal = ({
         [isOpen, modalId]
     );
 
-    const handleOverlayClick = useCallback(
-        (event: ReactMouseEvent<HTMLDivElement>): void => {
-            if (!closeOnOverlayClick) {
-                return;
-            }
+    const handleOverlayDismissClick = useCallback((): void => {
+        if (!closeOnOverlayClick) {
+            return;
+        }
 
-            if (!isTopModal(modalId)) {
-                return;
-            }
+        if (!isTopModal(modalId)) {
+            return;
+        }
 
-            if (event.target === event.currentTarget) {
-                onRequestClose();
-            }
-        },
-        [
-            closeOnOverlayClick,
-            modalId,
-            onRequestClose,
-        ]
-    );
+        onRequestClose();
+    }, [closeOnOverlayClick, modalId, onRequestClose]);
 
     const handleCloseButtonClick = useCallback((): void => {
         handleCloseTopMost();
@@ -559,12 +549,16 @@ export const Modal = ({
         .join(" ");
 
     return createPortal(
-        // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- Overlay click-to-close is optional and Escape is handled.
-        <div
-            className={overlayClassNames}
-            data-testid={overlayTestId}
-            onClick={handleOverlayClick}
-        >
+        <div className={overlayClassNames} data-testid={overlayTestId}>
+            {closeOnOverlayClick ? (
+                <button
+                    aria-label="Close modal"
+                    className="modal-overlay__dismiss"
+                    onClick={handleOverlayDismissClick}
+                    tabIndex={-1}
+                    type="button"
+                />
+            ) : null}
             <dialog
                 aria-describedby={ariaDescribedById}
                 aria-labelledby={titleId}

@@ -27,8 +27,7 @@ export function createNullPrototypeObject<T extends object>(shape?: T): T {
         Object.keys(shape);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.create(null) is intentionally used to prevent prototype pollution; shape is provided by the generic.
-    return Object.create(null) as T;
+    return castUnchecked<T>(Object.create(null));
 }
 
 /**
@@ -260,9 +259,7 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
 export function typedObjectEntries<T extends UnknownRecord>(
     obj: T
 ): Array<[keyof T, T[keyof T]]> {
-    // Type assertion is safe as Object.entries returns correct key-value pairs for the object
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for Object.entries result to preserve key types
-    return Object.entries(obj) as Array<[keyof T, T[keyof T]]>;
+    return castUnchecked<Array<[keyof T, T[keyof T]]>>(Object.entries(obj));
 }
 
 /**
@@ -318,7 +315,5 @@ export function typedObjectKeys<T extends UnknownRecord>(
 export function typedObjectValues<T extends UnknownRecord>(
     obj: T
 ): Array<T[keyof T]> {
-    // Type assertion is safe as Object.values returns correct values for the object
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast for Object.values result to preserve value types
-    return Object.values(obj) as Array<T[keyof T]>;
+    return castUnchecked<Array<T[keyof T]>>(Object.values(obj));
 }

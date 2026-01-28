@@ -12,7 +12,7 @@ import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons, getIconSize } from "../../../utils/icons";
 import { ErrorAlert } from "../../common/ErrorAlert/ErrorAlert";
 import { SettingItem } from "../../shared/SettingItem";
-import { SettingsSection } from "../SettingsSections";
+import { SettingsSection } from "../sections/SettingsSection";
 import { BackupMigrationPanel } from "./BackupMigrationPanel";
 import { CloudProviderSetupPanel } from "./CloudProviderSetupPanel";
 import { CloudSyncMaintenanceControl } from "./CloudSyncMaintenanceControl";

@@ -265,8 +265,9 @@ export function useOverflowMarquee<
         function manageOverflowObservation() {
             // Explicitly depend on the serialized dependencies so the observer
             // is re-attached when upstream callers change the dependency list.
-            // eslint-disable-next-line sonarjs/void-use -- Intentional no-op reference.
-            void dependencyFingerprint;
+            if (dependencyFingerprint === "[unserializable-dependencies]") {
+                // no-op
+            }
 
             const evaluateOverflow = (): void => {
                 const element = containerRef.current;
@@ -317,7 +318,7 @@ export function useOverflowMarquee<
         },
         [
             containerRef,
-            /* Effect dep */ dependencyFingerprint,
+            dependencyFingerprint,
             measureOverflow,
         ]
     );

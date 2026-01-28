@@ -51,6 +51,7 @@ import type { Site } from "@shared/types";
 
 import { normalizeHistoryLimit } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -61,7 +62,7 @@ import type {
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
 } from "../services/database/utils/backup/databaseBackup";
-import type { ConfigurationManager } from "./ConfigurationManager";
+import type { ConfigurationManager, HistoryRetentionConfig } from "./ConfigurationManager";
 import type { DatabaseManagerRepositories } from "./databaseRepositorySets";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
@@ -79,6 +80,20 @@ import { SiteLoadingOrchestrator } from "../services/database/SiteRepositoryServ
 import { DatabaseServiceFactory } from "../services/factories/DatabaseServiceFactory";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { monitorLogger } from "../utils/logger";
+
+function isHistoryRetentionConfig(
+    value: unknown
+): value is HistoryRetentionConfig {
+    return (
+        isRecord(value) &&
+        typeof value["defaultLimit"] === "number" &&
+        Number.isFinite(value["defaultLimit"]) &&
+        typeof value["maxLimit"] === "number" &&
+        Number.isFinite(value["maxLimit"]) &&
+        typeof value["minLimit"] === "number" &&
+        Number.isFinite(value["minLimit"])
+    );
+}
 
 /**
  * Defines the dependencies required to construct a {@link DatabaseManager}
@@ -580,15 +595,15 @@ export class DatabaseManager {
             );
         }
 
-        const historyRules =
+        const historyRulesCandidate: unknown =
             this.configurationManager.getHistoryRetentionRules();
-
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Configuration manager may temporarily return undefined during development-time schema transitions; surface an explicit error for diagnostics.
-        if (!historyRules) {
+        if (!isHistoryRetentionConfig(historyRulesCandidate)) {
             throw new TypeError(
                 "[DatabaseManager.setHistoryLimit] History retention rules are not configured"
             );
         }
+
+        const historyRules = historyRulesCandidate;
 
         await setHistoryLimitUtil({
             databaseService: this.dependencies.repositories.database,

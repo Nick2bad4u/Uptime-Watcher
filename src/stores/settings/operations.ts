@@ -29,6 +29,12 @@ const historyLimitSubscriptionRef: {
     current: undefined,
 };
 
+const historyLimitSubscriptionInitRef: {
+    current: Promise<void> | undefined;
+} = {
+    current: undefined,
+};
+
 /**
  * Resets the cached history-limit subscription.
  *
@@ -43,6 +49,7 @@ const historyLimitSubscriptionRef: {
 export function resetHistoryLimitSubscriptionForTesting(): void {
     historyLimitSubscriptionRef.current?.();
     historyLimitSubscriptionRef.current = undefined;
+    historyLimitSubscriptionInitRef.current = undefined;
 }
 
 /**
@@ -63,56 +70,65 @@ export const createSettingsOperationsSlice = (
             return;
         }
 
-        try {
-            const cleanup = await EventsService.onHistoryLimitUpdated(
-                (event) => {
-                    const currentSettings = getState().settings;
+        let initPromise = historyLimitSubscriptionInitRef.current;
+        if (!initPromise) {
+            initPromise = (async (): Promise<void> => {
+                try {
+                    const cleanup = await EventsService.onHistoryLimitUpdated(
+                        (event) => {
+                            const currentSettings = getState().settings;
 
-                    if (currentSettings.historyLimit === event.limit) {
-                        return;
-                    }
+                            if (currentSettings.historyLimit === event.limit) {
+                                return;
+                            }
 
-                    logStoreAction(
-                        "SettingsStore",
-                        "historyLimitUpdatedEvent",
-                        {
-                            limit: event.limit,
-                            previousLimit: event.previousLimit,
-                            timestamp: event.timestamp,
+                            logStoreAction(
+                                "SettingsStore",
+                                "historyLimitUpdatedEvent",
+                                {
+                                    limit: event.limit,
+                                    previousLimit: event.previousLimit,
+                                    timestamp: event.timestamp,
+                                }
+                            );
+
+                            logger.debug(
+                                "[SettingsStore] Applying history limit update from backend",
+                                {
+                                    limit: event.limit,
+                                    previousLimit: event.previousLimit,
+                                    timestamp: event.timestamp,
+                                }
+                            );
+
+                            setState({
+                                settings: normalizeAppSettings({
+                                    ...currentSettings,
+                                    historyLimit: event.limit,
+                                }),
+                            });
                         }
                     );
 
-                    logger.debug(
-                        "[SettingsStore] Applying history limit update from backend",
-                        {
-                            limit: event.limit,
-                            previousLimit: event.previousLimit,
-                            timestamp: event.timestamp,
-                        }
+                    historyLimitSubscriptionRef.current = cleanup;
+                } catch (error: unknown) {
+                    const normalizedError = ensureError(error);
+                    logger.error(
+                        "[SettingsStore] Failed to subscribe to history limit updates",
+                        normalizedError
                     );
-
-                    setState({
-                        settings: normalizeAppSettings({
-                            ...currentSettings,
-                            historyLimit: event.limit,
-                        }),
-                    });
                 }
-            );
+            })();
 
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Guard against race conditions when concurrent callers initialize after await.
-            if (historyLimitSubscriptionRef.current) {
-                cleanup();
-                return;
+            historyLimitSubscriptionInitRef.current = initPromise;
+        }
+
+        try {
+            await initPromise;
+        } finally {
+            if (historyLimitSubscriptionInitRef.current === initPromise) {
+                historyLimitSubscriptionInitRef.current = undefined;
             }
-
-            historyLimitSubscriptionRef.current = cleanup;
-        } catch (error: unknown) {
-            const normalizedError = ensureError(error);
-            logger.error(
-                "[SettingsStore] Failed to subscribe to history limit updates",
-                normalizedError
-            );
         }
     };
 

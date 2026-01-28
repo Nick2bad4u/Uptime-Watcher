@@ -8,7 +8,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import "@testing-library/jest-dom";
 
@@ -132,7 +132,10 @@ describe(PromptDialog, () => {
         fireEvent.click(screen.getByTestId("prompt-dialog"));
         expect(promptControls.cancel).not.toHaveBeenCalled();
 
-        fireEvent.click(screen.getByTestId("prompt-dialog-overlay"));
+        const overlay = screen.getByTestId("prompt-dialog-overlay");
+        fireEvent.click(
+            within(overlay).getByRole("button", { name: /close modal/i })
+        );
         expect(promptControls.cancel).toHaveBeenCalledTimes(1);
     });
 });

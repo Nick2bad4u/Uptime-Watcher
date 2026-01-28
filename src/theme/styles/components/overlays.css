@@ -17,6 +17,24 @@
     inset: 0;
 }
 
+.modal-overlay__dismiss {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.modal-overlay dialog,
+.modal-overlay .modal-shell,
+.modal-overlay .modal-overlay__content {
+    position: relative;
+    z-index: 2;
+}
+
 .modal-overlay--closing {
     animation: fade-out 0.3s ease-in-out forwards;
 }

@@ -467,11 +467,11 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
             render(<AddSiteModal onClose={mockOnClose} />);
 
-            // Get the backdrop by testing the event directly
-            const backdrop = document.querySelector(".modal-overlay");
-            expect(backdrop).not.toBeNull();
+            const dismissButton = screen.getByRole("button", {
+                name: /close add site modal/i,
+            });
             const user = userEvent.setup();
-            await user.click(backdrop as Element);
+            await user.click(dismissButton);
 
             await waitFor(() => {
                 expect(mockOnClose).toHaveBeenCalledTimes(1);

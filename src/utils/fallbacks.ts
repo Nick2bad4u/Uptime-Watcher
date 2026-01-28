@@ -488,8 +488,7 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                 const titleCase = monitorType
 
                     .replaceAll(/[_-]/gu, " ") // Replace underscores and hyphens with spaces
-                    // eslint-disable-next-line no-lookahead-lookbehind-regexp/no-lookahead-lookbehind-regexp -- Environment compatibility
-                    .replaceAll(/(?<=[a-z])(?=[A-Z])/gu, " ") // Add space before capitals
+                    .replaceAll(/([a-z])([A-Z])/gu, "$1 $2") // Add space before capitals (no lookbehind)
                     .split(" ")
                     .map((word) => formatMonitorTypeSegment(word))
                     .join(" ");

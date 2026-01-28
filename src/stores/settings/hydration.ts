@@ -14,9 +14,14 @@ const hasOwn = <T extends object>(
     property: keyof T | string
 ): boolean => Object.hasOwn(target, property);
 
-// Store timer reference for cleanup capability
-// eslint-disable-next-line eslint-plugin-toplevel/no-toplevel-let -- Mutable state required for timer management
-let settingsSyncTimer: null | ReturnType<typeof setTimeout> = null;
+// Store timer reference for cleanup capability.
+// Use a const ref object to avoid top-level `let` while still allowing
+// deterministic cleanup in tests.
+const settingsSyncTimer: {
+    current: null | ReturnType<typeof setTimeout>;
+} = {
+    current: null,
+};
 
 /**
  * Clears the pending settings hydration sync timer.
@@ -30,12 +35,12 @@ let settingsSyncTimer: null | ReturnType<typeof setTimeout> = null;
  * @internal
  */
 export function resetSettingsHydrationTimerForTesting(): void {
-    if (!settingsSyncTimer) {
+    if (!settingsSyncTimer.current) {
         return;
     }
 
-    clearTimeout(settingsSyncTimer);
-    settingsSyncTimer = null;
+    clearTimeout(settingsSyncTimer.current);
+    settingsSyncTimer.current = null;
 }
 
 /**
@@ -89,12 +94,12 @@ export const syncSettingsAfterRehydration = (
         return;
     }
 
-    if (settingsSyncTimer) {
-        clearTimeout(settingsSyncTimer);
-        settingsSyncTimer = null;
+    if (settingsSyncTimer.current) {
+        clearTimeout(settingsSyncTimer.current);
+        settingsSyncTimer.current = null;
     }
 
-    settingsSyncTimer = setTimeout(() => {
+    settingsSyncTimer.current = setTimeout(() => {
         void (async (): Promise<void> => {
             try {
                 logger.info(
@@ -123,7 +128,7 @@ export const syncSettingsAfterRehydration = (
                     historyLimit: defaultSettings.historyLimit,
                 });
             }
-            settingsSyncTimer = null;
+            settingsSyncTimer.current = null;
         })();
     }, 100);
 };

@@ -15,7 +15,6 @@
 
 import {
     memo,
-    type MouseEvent,
     type NamedExoticComponent,
     useCallback,
     useState,
@@ -70,28 +69,20 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
             handleClose();
         }, [handleClose]);
 
-        /**
-         * Handles overlay clicks to support closing the modal when the user
-         * clicks outside the dialog content.
-         */
-        const handleOverlayClick = useCallback(
-            (event: MouseEvent<HTMLDivElement>) => {
-                if (event.target === event.currentTarget) {
-                    handleClose();
-                }
-            },
-            [handleClose]
-        );
-
         return (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler for UX; keyboard support provided by modal focus management
             <div
                 className={`modal-overlay modal-overlay--frosted ${
                     isDark ? "dark" : ""
                 } ${isClosing ? "modal-overlay--closing" : ""}`}
                 data-testid="add-site-modal-overlay"
-                onClick={handleOverlayClick}
             >
+                <button
+                    aria-label="Close add site modal"
+                    className="modal-overlay__dismiss"
+                    onClick={handleCloseButtonClick}
+                    tabIndex={-1}
+                    type="button"
+                />
                 <ThemedBox
                     as="dialog"
                     className={`modal-shell modal-shell--form modal-shell--accent-success add-site-modal ${
@@ -115,12 +106,9 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                                     <div className="modal-shell__accent-icon add-site-modal__header-icon">
                                         <AddIcon size={22} />
                                     </div>
-                                    {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
                                     <ThemedText
-                                        aria-level={1}
                                         as="h2"
                                         className="modal-shell__title"
-                                        role="heading"
                                         size="xl"
                                         weight="semibold"
                                     >

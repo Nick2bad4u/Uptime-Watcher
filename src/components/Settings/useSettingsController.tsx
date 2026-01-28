@@ -9,7 +9,7 @@ import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
-import type { BackupSummary } from "./SettingsSections";
+import type { BackupSummary } from "./sections/BackupSummary";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";

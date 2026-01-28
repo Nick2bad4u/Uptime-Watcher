@@ -25,7 +25,7 @@
  * @packageDocumentation
  */
 
-import type { ChartData, ChartOptions } from "chart.js";
+import type { ChartData, ChartOptions, FontSpec } from "chart.js";
 
 import type { Theme } from "../theme/types";
 
@@ -184,8 +184,8 @@ export interface ChartFontConfig {
     family: string;
     /** Font size in pixels */
     size: number;
-    /** Font weight (normal, bold, etc.) */
-    weight: string;
+    /** Font weight (normal, bold, numeric, etc.). */
+    weight: FontSpec["weight"];
 }
 
 /**
@@ -205,10 +205,33 @@ export interface ChartTitleConfig {
         /** Font size in pixels */
         size: number;
         /** Font weight (normal, bold, etc.) */
-        weight: string;
+        weight: FontSpec["weight"];
     };
     /** The text content of the chart title */
     text: string;
+}
+
+interface BaseChartConfigCommon {
+    maintainAspectRatio: boolean;
+    plugins: {
+        legend: {
+            labels: {
+                color: string;
+                font: {
+                    family: string;
+                    size: number;
+                };
+            };
+        };
+        tooltip: {
+            backgroundColor: string;
+            bodyColor: string;
+            borderColor: string;
+            borderWidth: number;
+            titleColor: string;
+        };
+    };
+    responsive: boolean;
 }
 
 /**
@@ -245,24 +268,25 @@ export class ChartConfigService {
      *
      * @public
      */
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Chart.js configuration object type assertions */
     public getBarChartConfig(): ChartOptions<"bar"> {
+        const baseConfig = this.getBaseConfigCommon();
+
         return {
-            ...this.getBaseConfig(),
+            ...baseConfig,
             plugins: {
-                ...this.getBaseConfig().plugins,
+                ...baseConfig.plugins,
                 legend: { display: false },
                 title: this.getChartTitle("Status Distribution"),
             },
             scales: {
                 x: this.getBaseScale(),
                 y: {
+                    ...this.getBaseScale(),
                     beginAtZero: true,
                     title: this.getAxisTitle("Count"),
-                    ...this.getBaseScale(),
                 },
             },
-        } as ChartOptions<"bar">;
+        } satisfies ChartOptions<"bar">;
     }
 
     /**
@@ -278,7 +302,7 @@ export class ChartConfigService {
         totalChecks: number
     ): ChartOptions<"doughnut"> {
         // Store base config to avoid redundant calls
-        const baseConfig = this.getBaseConfig();
+        const baseConfig = this.getBaseConfigCommon();
 
         return {
             ...baseConfig,
@@ -293,9 +317,9 @@ export class ChartConfigService {
                 },
                 title: this.getChartTitle("Uptime Distribution"),
                 tooltip: {
-                    ...baseConfig.plugins?.tooltip,
+                    ...baseConfig.plugins.tooltip,
                     callbacks: {
-                        label: (context) => {
+                        label: (context): string => {
                             const percentage =
                                 totalChecks > 0
                                     ? (
@@ -308,7 +332,7 @@ export class ChartConfigService {
                     },
                 },
             },
-        } as ChartOptions<"doughnut">;
+        } satisfies ChartOptions<"doughnut">;
     }
 
     /**
@@ -320,14 +344,16 @@ export class ChartConfigService {
      * @public
      */
     public getLineChartConfig(): ChartOptions<"line"> {
+        const baseConfig = this.getBaseConfigCommon();
+
         return {
-            ...this.getBaseConfig(),
+            ...baseConfig,
             interaction: {
                 intersect: false,
                 mode: "index",
             },
             plugins: {
-                ...this.getBaseConfig().plugins,
+                ...baseConfig.plugins,
                 title: this.getChartTitle("Response Time Over Time"),
                 zoom: {
                     pan: {
@@ -359,9 +385,8 @@ export class ChartConfigService {
                     ...this.getBaseScale(),
                 },
             },
-        } as ChartOptions<"line">;
+        } satisfies ChartOptions<"line">;
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe Chart.js configuration type assertion */
 
     /**
      * Get common axis title configuration.
@@ -393,7 +418,7 @@ export class ChartConfigService {
      *
      * @internal
      */
-    private getBaseConfig(): Partial<ChartOptions> {
+    private getBaseConfigCommon(): BaseChartConfigCommon {
         return {
             maintainAspectRatio: false,
             plugins: {
@@ -452,7 +477,10 @@ export class ChartConfigService {
      *
      * @internal
      */
-    private getChartFont(size = 12, weight = "normal"): ChartFontConfig {
+    private getChartFont(
+        size = 12,
+        weight: FontSpec["weight"] = "normal"
+    ): ChartFontConfig {
         return {
             family: this.theme.typography.fontFamily.sans.join(", "),
             size,

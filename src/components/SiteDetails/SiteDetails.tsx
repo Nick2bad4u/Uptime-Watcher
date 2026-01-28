@@ -37,7 +37,6 @@
  */
 
 import type { Site } from "@shared/types";
-import type { MouseEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import {
@@ -203,37 +202,9 @@ export const SiteDetails = ({
         void handleSaveInterval();
     }, [handleSaveInterval]);
 
-    /**
-     * Handles overlay click interactions to support closing the dialog when the
-     * user clicks outside the modal surface.
-     */
-    const handleOverlayClick = useCallback(
-        (event: MouseEvent<HTMLDivElement>): void => {
-            if (event.target === event.currentTarget) {
-                handleClose();
-            }
-        },
-        [handleClose]
-    );
-
-    const handleOverlayKeyDown = useCallback(
-        (event: ReactKeyboardEvent<HTMLDivElement>): void => {
-            if (event.target !== event.currentTarget) {
-                return;
-            }
-
-            const shouldClose =
-                event.key === "Escape" ||
-                event.key === "Enter" ||
-                event.key === " ";
-
-            if (shouldClose) {
-                event.preventDefault();
-                handleClose();
-            }
-        },
-        [handleClose]
-    );
+    const handleOverlayDismissClick = useCallback((): void => {
+        handleClose();
+    }, [handleClose]);
 
     const activeTabId = useMemo(
         () => `site-details-tab-${activeSiteDetailsTab}`,
@@ -246,17 +217,18 @@ export const SiteDetails = ({
     }
 
     return (
-        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal backdrop uses button role to provide keyboard-equivalent dismissal without invalid nested button markup
         <div
-            aria-label="Close site details"
             className={`modal-overlay modal-overlay--immersive site-details-modal-overlay ${
                 isDark ? "dark" : ""
             } ${isClosing ? "modal-overlay--closing" : ""}`}
-            onClick={handleOverlayClick}
-            onKeyDown={handleOverlayKeyDown}
-            role="button"
-            tabIndex={0}
         >
+            <button
+                aria-label="Close site details"
+                className="modal-overlay__dismiss"
+                onClick={handleOverlayDismissClick}
+                tabIndex={-1}
+                type="button"
+            />
             <ThemedBox
                 aria-label="Site details"
                 as="dialog"

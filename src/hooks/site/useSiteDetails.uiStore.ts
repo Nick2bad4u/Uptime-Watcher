@@ -23,10 +23,7 @@ type SiteDetailsUiStoreSlice = Pick<
     | "syncActiveSiteDetailsTab"
 >;
 
-const noopSyncActiveSiteDetailsTab: UIStore["syncActiveSiteDetailsTab"] = (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- no-op fallback for tests/mocks
-    _siteIdentifier
-) => {
+const noopSyncActiveSiteDetailsTab: UIStore["syncActiveSiteDetailsTab"] = () => {
     // no-op
 };
 

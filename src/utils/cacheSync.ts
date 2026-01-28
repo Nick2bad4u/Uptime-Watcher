@@ -139,13 +139,13 @@ export function setupCacheSync(): () => void {
     }
 
     let cleanupHandler: (() => void) | null = null;
-    let disposed = false;
+    const disposed: { current: boolean } = { current: false };
     let lastSiteUpdateResyncAt = 0;
 
     const handleInvalidation = (data: CacheInvalidatedEventData): void => {
         try {
             // Avoid processing events after teardown.
-            if (disposed) {
+            if (disposed.current) {
                 return;
             }
 
@@ -243,8 +243,7 @@ export function setupCacheSync(): () => void {
             const serviceCleanup =
                 await EventsService.onCacheInvalidated(handleInvalidation);
 
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Disposed flag can flip while awaiting subscription.
-            if (disposed) {
+            if (disposed.current) {
                 serviceCleanup();
                 return;
             }
@@ -260,7 +259,7 @@ export function setupCacheSync(): () => void {
 
     logger.debug("[CacheSync] Cache synchronization enabled");
     return (): void => {
-        disposed = true;
+        disposed.current = true;
         if (cleanupHandler) {
             cleanupHandler();
             cleanupHandler = null;

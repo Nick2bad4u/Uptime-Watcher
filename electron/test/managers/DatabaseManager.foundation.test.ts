@@ -4,6 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
 import {
@@ -85,10 +86,9 @@ describe("DatabaseManager Foundation Tests", () => {
                 timeout: 5000,
                 interval: 60_000,
             }),
-            getHistoryRetentionRules: vi.fn().mockReturnValue({
-                maxEntries: 500,
-                retentionDays: 30,
-            }),
+            getHistoryRetentionRules: vi
+                .fn()
+                .mockReturnValue({ ...DEFAULT_HISTORY_LIMIT_RULES }),
             // Add missing required properties
             configCache: new Map(),
             monitorValidator: {},

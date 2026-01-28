@@ -2,7 +2,7 @@
  * Behavioral tests for the global {@link ConfirmDialog} component.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -103,7 +103,10 @@ describe(ConfirmDialog, () => {
             screen.getByText("This action cannot be undone.")
         ).toBeInTheDocument();
 
-        fireEvent.click(screen.getByTestId("confirm-dialog-overlay"));
+        const overlay = screen.getByTestId("confirm-dialog-overlay");
+        fireEvent.click(
+            within(overlay).getByRole("button", { name: /close modal/i })
+        );
         expect(cancel).toHaveBeenCalledTimes(1);
 
         fireEvent.click(screen.getByTestId("confirm-dialog-confirm"));

@@ -3,8 +3,8 @@
  * theming, and form integration logic are covered.
  */
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { createElement, type ReactNode } from "react";
 import { describe, expect, it, beforeEach, vi } from "vitest";
 
 import { AddSiteModal } from "../../../components/AddSiteForm/AddSiteModal";
@@ -47,9 +47,17 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
 }));
 
 vi.mock("../../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children, ...props }: { readonly children: ReactNode }) => (
-        <span {...props}>{children}</span>
-    ),
+    ThemedText: ({
+        as,
+        children,
+        ...props
+    }: {
+        readonly as?: string;
+        readonly children: ReactNode;
+    } & Record<string, unknown>) => {
+        const tagName = typeof as === "string" ? as : "span";
+        return createElement(tagName, props, children);
+    },
 }));
 
 vi.mock("../../../utils/icons", () => ({
@@ -118,7 +126,12 @@ describe(AddSiteModal, () => {
 
         render(<AddSiteModal onClose={handleClose} />);
 
-        fireEvent.click(screen.getByTestId("add-site-modal-overlay"));
+        const overlay = screen.getByTestId("add-site-modal-overlay");
+        fireEvent.click(
+            within(overlay).getByRole("button", {
+                name: /close add site modal/i,
+            })
+        );
         await waitFor(() => {
             expect(handleClose).toHaveBeenCalledTimes(1);
         });

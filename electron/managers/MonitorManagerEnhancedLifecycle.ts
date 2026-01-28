@@ -231,7 +231,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
         const monitors = (
             Array.isArray(site.monitors) ? site.monitors : []
         ) as Array<Site["monitors"][0] | undefined>;
-        let siteStarted: boolean = false;
+            const siteStarted: { current: boolean } = { current: false };
 
         await runSequentially(monitors, async (candidate) => {
             if (!candidate) {
@@ -296,7 +296,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
                 }
 
                 succeeded += 1;
-                siteStarted = true;
+                    siteStarted.current = true;
                 await applyMonitorState(
                     site,
                     candidate,
@@ -316,8 +316,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
             }
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Guard ensures scheduler is only triggered when a monitor actually transitioned to active.
-        if (siteStarted) {
+            if (siteStarted.current) {
             config.monitorScheduler.startSite(site);
         }
     });

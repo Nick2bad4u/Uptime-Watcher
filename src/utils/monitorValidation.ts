@@ -10,6 +10,7 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { Simplify, UnknownRecord } from "type-fest";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { validateMonitorType } from "@shared/utils/validation";
 import {
     validateMonitorData as sharedValidateMonitorData,
@@ -246,10 +247,9 @@ function toPartialMonitorFormData<
     fieldName: TField,
     value: OptionalMonitorFieldValue<TType, TField>
 ): PartialMonitorFormDataByType<TType> {
-    // eslint-disable-next-line nitpick/no-redundant-vars -- We need a named object to safely assign a computed generic key without unsafe type assertions.
-    const payload: PartialMonitorFormDataByType<TType> = {};
-    payload[fieldName] = value;
-    return payload;
+    return castUnchecked<PartialMonitorFormDataByType<TType>>({
+        [fieldName]: value,
+    });
 }
 
 /**

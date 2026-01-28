@@ -5,12 +5,10 @@ import { AppIcons } from "../../utils/icons";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { Modal } from "../common/Modal/Modal";
 import { CloudSettingsSection } from "./CloudSettingsSection";
-import {
-    ApplicationSection,
-    MaintenanceSection,
-    MonitoringSection,
-    NotificationSection,
-} from "./SettingsSections";
+import { ApplicationSection } from "./sections/ApplicationSection";
+import { MaintenanceSection } from "./sections/MaintenanceSection";
+import { MonitoringSection } from "./sections/MonitoringSection";
+import { NotificationSection } from "./sections/NotificationSection";
 import { useSettingsController } from "./useSettingsController";
 import "./Settings.css";
 

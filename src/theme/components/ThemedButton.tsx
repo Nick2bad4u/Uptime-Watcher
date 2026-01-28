@@ -59,6 +59,7 @@ import type {
 
 import {
     type CSSProperties,
+    isValidElement,
     type JSX,
     memo,
     type MouseEvent,
@@ -170,8 +171,7 @@ const ThemedButtonComponent = ({
         [onClick]
     );
 
-    // eslint-disable-next-line sonarjs/function-return-type -- React rendering helper legitimately returns different ReactNode shapes (string, fragment, elements).
-    const renderContent = (): ReactNode => {
+    const renderContent = (): JSX.Element | null => {
         if (loading) {
             return (
                 <div className="themed-button__loading">
@@ -180,13 +180,20 @@ const ThemedButtonComponent = ({
                 </div>
             );
         }
+
         if (icon) {
             const iconElement: ReactNode = iconColor
                 ? renderColoredIcon(icon, iconColor)
                 : icon;
+
             if (!children) {
-                return iconElement;
+                return isValidElement(iconElement) ? (
+                    iconElement
+                ) : (
+                    <span>{iconElement}</span>
+                );
             }
+
             return iconPosition === "left" ? (
                 <>
                     {iconElement}
@@ -199,7 +206,12 @@ const ThemedButtonComponent = ({
                 </>
             );
         }
-        return children;
+
+        if (children === null || children === undefined || children === false) {
+            return null;
+        }
+
+        return isValidElement(children) ? children : <span>{children}</span>;
     };
 
     return (

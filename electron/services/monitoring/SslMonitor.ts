@@ -11,6 +11,7 @@
 import type { MonitorType, Site } from "@shared/types";
 import type { PeerCertificate } from "node:tls";
 
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
 
@@ -237,8 +238,8 @@ export class SslMonitor implements IMonitorService {
                 }
 
                 const peerCertificate = socket.getPeerCertificate(true);
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Node returns null when the peer omits a certificate.
-                if (!peerCertificate) {
+                // Node returns an empty object when the peer omits a certificate.
+                if (Object.keys(peerCertificate).length === 0) {
                     handleFailure(
                         new Error(
                             "TLS connection succeeded but no certificate was provided"
@@ -347,19 +348,19 @@ export class SslMonitor implements IMonitorService {
 
     private extractSubject(certificate: PeerCertificate): string {
         const { subject } = certificate;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Defensive guard for malformed certificates lacking subject details.
-        if (!subject) {
+
+        if (!isRecord(subject)) {
             return "unknown subject";
         }
 
-        const { CN, O, OU } = subject;
-        const candidates = [
-            CN,
-            O,
-            OU,
+        const candidates: unknown[] = [
+            subject["CN"],
+            subject["O"],
+            subject["OU"],
         ];
         const name = candidates.find(
-            (value) => typeof value === "string" && value.trim().length > 0
+            (value): value is string =>
+                typeof value === "string" && value.trim().length > 0
         );
 
         return name ?? "unknown subject";

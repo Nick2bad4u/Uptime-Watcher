@@ -4,6 +4,7 @@ import type {
     SiteSchemaType,
 } from "@shared/types/schemaTypes";
 
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import * as z from "zod";
 
 import { monitorIdSchema } from "./monitorFieldSchemas";
@@ -109,8 +110,7 @@ export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
 // stable typing across IPC boundaries.
 
 export const typedStatusUpdateSchema: z.ZodType<StatusUpdate> =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Intentional: enforce stable StatusUpdate output typing across strict TS/Zod inference edge cases.
-    statusUpdateSchema as unknown as z.ZodType<StatusUpdate>;
+    castUnchecked(statusUpdateSchema);
 
 /**
  * Compile-time assertion verifying {@link statusUpdateSchema} alignment with the

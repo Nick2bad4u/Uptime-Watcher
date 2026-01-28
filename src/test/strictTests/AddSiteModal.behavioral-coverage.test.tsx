@@ -4,7 +4,7 @@
 
 import type { ReactNode } from "react";
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const themeState = vi.hoisted(() => ({
@@ -72,7 +72,11 @@ describe("AddSiteModal coverage", () => {
         fireEvent.click(dialog);
         expect(onClose).not.toHaveBeenCalled();
 
-        fireEvent.click(overlay);
+        fireEvent.click(
+            within(overlay).getByRole("button", {
+                name: /close add site modal/i,
+            })
+        );
         await waitFor(() => {
             expect(onClose).toHaveBeenCalledTimes(1);
         });

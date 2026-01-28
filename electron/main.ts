@@ -482,27 +482,29 @@ if (isDev()) {
 class Main {
     private static readonly FATAL_SHUTDOWN_TIMEOUT_MS = 5000;
 
+    private static instance: Main | undefined = undefined;
+
     /** Application service instance for managing app lifecycle and features */
-    private readonly applicationService: null | {
+private readonly applicationService: null | {
         cleanup: () => Promise<void>;
     };
 
-    /** Flag to ensure cleanup is only called once */
-    private cleanedUp = false;
+/** Flag to ensure cleanup is only called once */
+private cleanedUp = false;
 
-    private readonly handleUnhandledRejection = (reason: unknown): void => {
+private readonly handleUnhandledRejection = (reason: unknown): void => {
         const normalizedError = ensureError(reason);
         logger.error("[Main] Unhandled promise rejection", normalizedError);
         void this.performFatalShutdown("unhandledRejection", normalizedError);
     };
 
-    private readonly handleUncaughtException = (error: unknown): void => {
+private readonly handleUncaughtException = (error: unknown): void => {
         const normalizedError = ensureError(error);
         logger.error("[Main] Uncaught exception", normalizedError);
         void this.performFatalShutdown("uncaughtException", normalizedError);
     };
 
-    private readonly handleRenderProcessGone = (
+private readonly handleRenderProcessGone = (
         _event: Event,
         webContents: WebContents,
         details: RenderProcessGoneDetails
@@ -517,7 +519,7 @@ class Main {
         });
     };
 
-    private readonly handleChildProcessGone = (
+private readonly handleChildProcessGone = (
         _event: Event,
         details: unknown
     ): void => {
@@ -532,7 +534,7 @@ class Main {
         });
     };
 
-    private readonly handleBrowserWindowCreated = (
+private readonly handleBrowserWindowCreated = (
         _event: Event,
         window: BrowserWindow
     ): void => {
@@ -560,10 +562,10 @@ class Main {
         window.once("closed", cleanup);
     };
 
-    /**
+/**
      * Named event handler for safe cleanup on process exit.
      */
-    private readonly handleProcessExit = (): void => {
+private readonly handleProcessExit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously without blocking process exit
@@ -587,10 +589,10 @@ class Main {
         }
     };
 
-    /**
+/**
      * Named event handler for safe cleanup on app quit.
      */
-    private readonly handleAppQuit = (): void => {
+private readonly handleAppQuit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously during app quit
@@ -613,6 +615,40 @@ class Main {
             });
         }
     };
+
+/**
+     * Starts the main application lifecycle.
+     *
+     * @remarks
+     * The returned instance is stored on the class to ensure it remains
+     * reachable for the lifetime of the process.
+     */
+    public static start(): Main {
+        Main.instance ??= new Main();
+        return Main.instance;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Runtime check for a cleanup-capable ApplicationService.
@@ -759,8 +795,7 @@ class Main {
  * garbage collection and maintaining lifecycle handlers.
  */
 if (process.versions.electron) {
-    // eslint-disable-next-line sonarjs/constructor-for-side-effects, no-new -- Main instance needed for lifecycle management
-    new Main();
+    Main.start();
 
     /**
      * Installs React and Redux DevTools extensions after the Electron app is
