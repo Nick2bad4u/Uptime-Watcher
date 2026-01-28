@@ -37,6 +37,7 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 import { isObject } from "@shared/utils/typeGuards";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { EventEmitter } from "node:events";
 
 import { logger as baseLogger } from "../utils/logger";
@@ -93,8 +94,7 @@ const cloneArrayPayload = <TPayload extends ArrayPayload>(
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Fallback cloning preserves tuple structures when structuredClone is unavailable.
-    return Array.from(payload) as TPayload;
+    return castUnchecked<TPayload>(Array.from(payload));
 };
 
 const cloneObjectPayload = <TPayload extends NonArrayObjectPayload>(
@@ -111,8 +111,7 @@ const cloneObjectPayload = <TPayload extends NonArrayObjectPayload>(
     const prototype = Reflect.getPrototypeOf(payload) ?? Object.prototype;
     const clone: NonArrayObjectPayload = { ...payload };
     Reflect.setPrototypeOf(clone, prototype);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Manual cloning retains the payload shape when structuredClone is unavailable.
-    return clone as TPayload;
+    return castUnchecked<TPayload>(clone);
 };
 
 const getHiddenProperty = (
@@ -860,8 +859,7 @@ export class TypedEventBus<
         if (this.isArrayPayload(data)) {
             const clonedArray = cloneArrayPayload(data);
             attachMetadata(clonedArray, metadata, { enumerable: false });
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Metadata attachment guarantees payload satisfies EnhancedEventPayload.
-            return clonedArray as EnhancedEventPayload<Payload>;
+            return castUnchecked<EnhancedEventPayload<Payload>>(clonedArray);
         }
 
         if (!this.isObjectPayload(data)) {
@@ -924,8 +922,7 @@ export class TypedEventBus<
             );
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Metadata attachment guarantees payload satisfies EnhancedEventPayload.
-        return clonedPayload as EnhancedEventPayload<Payload>;
+        return castUnchecked<EnhancedEventPayload<Payload>>(clonedPayload);
     }
 
     private wrapPrimitivePayload<Payload extends PrimitivePayload>(
@@ -934,8 +931,7 @@ export class TypedEventBus<
     ): EnhancedEventPayload<Payload> {
         const wrapper = { value };
         attachMetadata(wrapper, metadata);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Wrapper structure matches PrimitiveEventPayload after metadata attachment.
-        return wrapper as EnhancedEventPayload<Payload>;
+        return castUnchecked<EnhancedEventPayload<Payload>>(wrapper);
     }
 
     private isPrimitivePayload(

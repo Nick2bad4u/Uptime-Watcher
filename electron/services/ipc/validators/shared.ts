@@ -187,8 +187,13 @@ const validateCloudFilesystemProviderConfig: IpcParameterValidator =
                 return toValidationResult(baseDirectoryError);
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
-            const baseDirectoryRaw = record["baseDirectory"] as string;
+            const baseDirectoryCandidate = record["baseDirectory"];
+            if (typeof baseDirectoryCandidate !== "string") {
+                // Defensive: requiredString already enforces this.
+                return toValidationResult("baseDirectory must be a string");
+            }
+
+            const baseDirectoryRaw = baseDirectoryCandidate;
             const issues = validateFilesystemBaseDirectoryCandidate(
                 baseDirectoryRaw,
                 { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
@@ -497,8 +502,12 @@ function validateRestoreFileNameCandidate(candidate: unknown): string[] {
         return [requiredError];
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as non-empty string above
-    const rawFileName = candidate as string;
+    if (typeof candidate !== "string") {
+        // Defensive: requiredString already enforces this.
+        return ["fileName must be a string"];
+    }
+
+    const rawFileName = candidate;
     const fileName = rawFileName.trim();
     if (fileName.length === 0) {
         return ["fileName must not be blank"];
@@ -565,8 +574,12 @@ const validateImportDataPayload: IpcParameterValidator = createParamValidator(
                 return toValidationResult(stringError);
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
-            const data = candidate as string;
+            if (typeof candidate !== "string") {
+                // Defensive: requiredString already enforces this.
+                return toValidationResult("data must be a string");
+            }
+
+            const data = candidate;
             if (getUtfByteLength(data) > MAX_IMPORT_DATA_PAYLOAD_BYTES) {
                 errors.push(
                     `data exceeds ${MAX_IMPORT_DATA_PAYLOAD_BYTES} bytes; use SQLite backup/restore for large snapshots`
@@ -591,8 +604,12 @@ const validateEncryptionPassphrasePayload: IpcParameterValidator =
                 return toValidationResult(stringError);
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated as string above
-            const passphrase = candidate as string;
+            if (typeof candidate !== "string") {
+                // Defensive: requiredString already enforces this.
+                return toValidationResult("passphrase must be a string");
+            }
+
+            const passphrase = candidate;
             if (
                 getUtfByteLength(passphrase) > MAX_ENCRYPTION_PASSPHRASE_BYTES
             ) {
@@ -623,8 +640,12 @@ function createBackupKeyValidator(paramName: string): IpcParameterValidator {
                 return toValidationResult(error);
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
-            const key = normalizePathSeparatorsToPosix(value as string).trim();
+            if (typeof value !== "string") {
+                // Defensive: requiredString already enforces this.
+                return toValidationResult(`${paramName} must be a string`);
+            }
+
+            const key = normalizePathSeparatorsToPosix(value).trim();
 
             if (getUtfByteLength(key) > MAX_BACKUP_KEY_BYTES) {
                 return toValidationResult(

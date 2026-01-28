@@ -165,48 +165,43 @@ export const AnalyticsTab = ({
     const uptimeValue = parseUptimeValue(uptime);
 
     // Error-safe wrapper functions to handle formatter errors gracefully
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error type casting in catch blocks for logging */
     const safeDurationFormat = useCallback(
         (ms: number): string => {
-        try {
-            return formatDuration(ms);
-        } catch (error) {
-            logger.error("Error formatting duration", error as Error);
-            return `${Math.round(ms / 1000)}s`; // Fallback format
-        }
+            try {
+                return formatDuration(ms);
+            } catch (error) {
+                logger.error("Error formatting duration", error);
+                return `${Math.round(ms / 1000)}s`; // Fallback format
+            }
         },
         [formatDuration]
     );
 
     const safeResponseTimeFormat = useCallback(
         (time: number): string => {
-        try {
-            return formatResponseTime(time);
-        } catch (error) {
-            logger.error("Error formatting response time", error as Error);
-            return `${time}ms`; // Fallback format
-        }
+            try {
+                return formatResponseTime(time);
+            } catch (error) {
+                logger.error("Error formatting response time", error);
+                return `${time}ms`; // Fallback format
+            }
         },
         [formatResponseTime]
     );
 
     const safeAvailabilityDescription = useCallback(
         (percentage: number): string => {
-        try {
-            return getAvailabilityDescription(percentage);
-        } catch (error) {
-            logger.error(
-                "Error getting availability description",
-                error as Error
-            );
-            if (percentage >= 99) return "Good";
-            if (percentage >= 95) return "Fair";
-            return "Poor"; // Fallback descriptions
-        }
+            try {
+                return getAvailabilityDescription(percentage);
+            } catch (error) {
+                logger.error("Error getting availability description", error);
+                if (percentage >= 99) return "Good";
+                if (percentage >= 95) return "Fair";
+                return "Poor"; // Fallback descriptions
+            }
         },
         [getAvailabilityDescription]
     );
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe performance score type conversion */
 
     const iconColors = useMemo<AnalyticsIconColors>(() => {
         const availabilityColor = getColor(uptimeValue);

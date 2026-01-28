@@ -16,7 +16,7 @@ import type {
 } from "type-fest";
 
 import { isObject } from "../utils/typeGuards";
-import { ensureRecordLike } from "../utils/typeHelpers";
+import { castUnchecked, ensureRecordLike } from "../utils/typeHelpers";
 
 /**
  * Animation configuration interface.
@@ -507,8 +507,7 @@ function deepMergeSection<TTarget>(
     }
 
     if (!isMergeableObject(source)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Primitive overrides retain the section's original shape.
-        return source as TTarget;
+        return castUnchecked<TTarget>(source);
     }
 
     const targetRecord = isMergeableObject(target)
@@ -532,8 +531,7 @@ function deepMergeSection<TTarget>(
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Deep merge produces the same structural shape as the target section.
-    return result as TTarget;
+    return castUnchecked<TTarget>(result);
 }
 
 const mergeSection = <TSection>(

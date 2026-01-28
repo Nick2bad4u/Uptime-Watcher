@@ -5,6 +5,8 @@
  */
 import type { UnknownRecord } from "type-fest";
 
+import { isRecord } from "@shared/utils/typeHelpers";
+
 export const STATUS_KIND = {
     DEGRADED: "degraded",
     DOWN: "down",
@@ -569,26 +571,24 @@ export function isSiteStatus(status: string): status is SiteStatus {
  *
  * @public
  */
-export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
-    // Runtime validation requires null/undefined checks despite type signature
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Runtime validation must check for null/undefined despite TypeScript types
-    if (!monitor || typeof monitor !== "object") {
+export function validateMonitor(monitor: unknown): monitor is Monitor {
+    if (!isRecord(monitor)) {
         return false;
     }
 
     return (
-        typeof monitor.id === "string" &&
-        typeof monitor.type === "string" &&
-        (BASE_MONITOR_TYPES as readonly string[]).includes(monitor.type) &&
-        typeof monitor.status === "string" &&
-        isMonitorStatus(monitor.status) &&
-        typeof monitor.monitoring === "boolean" &&
-        typeof monitor.responseTime === "number" &&
-        typeof monitor.checkInterval === "number" &&
-        typeof monitor.timeout === "number" &&
-        typeof monitor.retryAttempts === "number" &&
-        Array.isArray(monitor.history) &&
-        (monitor.activeOperations === undefined ||
-            isValidActiveOperations(monitor.activeOperations))
+        typeof monitor["id"] === "string" &&
+        typeof monitor["type"] === "string" &&
+        (BASE_MONITOR_TYPES as readonly string[]).includes(monitor["type"]) &&
+        typeof monitor["status"] === "string" &&
+        isMonitorStatus(monitor["status"]) &&
+        typeof monitor["monitoring"] === "boolean" &&
+        typeof monitor["responseTime"] === "number" &&
+        typeof monitor["checkInterval"] === "number" &&
+        typeof monitor["timeout"] === "number" &&
+        typeof monitor["retryAttempts"] === "number" &&
+        Array.isArray(monitor["history"]) &&
+        (monitor["activeOperations"] === undefined ||
+            isValidActiveOperations(monitor["activeOperations"]))
     );
 }

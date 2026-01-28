@@ -155,8 +155,12 @@ export function createClipboardTextValidator(): IpcParameterValidator {
                 return toValidationResult(error);
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- validated above
-            const text = value as string;
+            if (typeof value !== "string") {
+                // Defensive: requiredString already enforces this.
+                return toValidationResult("text must be a string");
+            }
+
+            const text = value;
             if (getUtfByteLength(text) > MAX_CLIPBOARD_TEXT_BYTES) {
                 return toValidationResult(
                     `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`

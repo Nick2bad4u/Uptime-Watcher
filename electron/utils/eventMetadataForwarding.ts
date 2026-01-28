@@ -6,6 +6,8 @@
 import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
+import { castUnchecked } from "@shared/utils/typeHelpers";
+
 import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
 import { ORIGINAL_METADATA_SYMBOL } from "../events/TypedEventBus";
 
@@ -155,8 +157,9 @@ export function stripForwardedEventMetadata<
         Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_PROPERTY_KEY);
         Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_SYMBOL);
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Preserves runtime array structure; strips non-enumerable metadata properties.
-        return clonedArray as unknown as StrippedForwardedEventMetadata<TPayload>;
+        return castUnchecked<StrippedForwardedEventMetadata<TPayload>>(
+            clonedArray
+        );
     }
 
     const candidate: unknown = payload;
@@ -186,6 +189,5 @@ export function stripForwardedEventMetadata<
         Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Preserves runtime object shape; strips non-enumerable metadata properties.
-    return clonedPayload as unknown as StrippedForwardedEventMetadata<TPayload>;
+    return castUnchecked<StrippedForwardedEventMetadata<TPayload>>(clonedPayload);
 }

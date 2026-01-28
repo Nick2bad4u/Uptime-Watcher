@@ -22,7 +22,7 @@ import {
     type SettingsRow,
     type SiteRow,
 } from "@shared/types/database";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+import { castUnchecked, isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { DbValue } from "../converters/valueConverters";
 
@@ -94,8 +94,7 @@ function ensureValidRow<TRow extends object>(
         );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- SQLite returns unknown row shapes that are validated above
-    return row as TRow;
+    return castUnchecked<TRow>(row);
 }
 
 function ensureValidRows<TRow extends object>(

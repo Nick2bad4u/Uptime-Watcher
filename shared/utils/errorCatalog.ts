@@ -30,6 +30,8 @@
  * @packageDocumentation
  */
 
+import { castUnchecked } from "@shared/utils/typeHelpers";
+
 /**
  * Site-related error messages.
  *
@@ -431,13 +433,10 @@ export function formatErrorMessage(
  */
 export function isKnownErrorMessage(message: string): message is ErrorMessage {
     const allMessages = Object.values(ERROR_CATALOG).flatMap((category) =>
-        // This assertion is safe as we're extracting known error messages from the catalog
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe type assertion extracting known error messages from validated ERROR_CATALOG
-        Object.values(category as Record<string, string>)
+        Object.values(castUnchecked<Record<string, string>>(category))
     );
-    // This assertion is safe as we're checking against the known catalog
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe type assertion checking against known catalog messages
-    return allMessages.includes(message as ErrorMessage);
+
+    return allMessages.includes(castUnchecked<ErrorMessage>(message));
 }
 
 /**

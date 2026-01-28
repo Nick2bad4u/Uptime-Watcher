@@ -94,7 +94,14 @@ export interface RetryWithAbortOptions {
 export function createCombinedAbortSignal(
     options: CombineSignalsOptions = {}
 ): AbortSignal {
-    const { additionalSignals = [], reason, timeoutMs } = options;
+    const {
+        additionalSignals: additionalSignalsOption,
+        reason,
+        timeoutMs,
+    } = options;
+    const additionalSignals = Array.isArray(additionalSignalsOption)
+        ? additionalSignalsOption
+        : [];
 
     const signals: AbortSignal[] = [];
 
@@ -129,11 +136,8 @@ export function createCombinedAbortSignal(
         signals.push(createTimeoutSignal(timeoutMs, reason));
     }
 
-    // Add additional signals (handle null/undefined additionalSignals)
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- additionalSignals may be undefined from function parameter
-    if (additionalSignals) {
-        signals.push(...additionalSignals.filter(Boolean));
-    }
+    // Add additional signals.
+    signals.push(...additionalSignals.filter(Boolean));
 
     // If no signals to combine, create a signal that never aborts
     if (signals.length === 0) {

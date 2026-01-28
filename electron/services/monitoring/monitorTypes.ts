@@ -17,6 +17,8 @@ import type { MonitorType } from "@shared/types";
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
 
+const baseMonitorTypeSet: ReadonlySet<string> = new Set(BASE_MONITOR_TYPES);
+
 // MonitorType is available via import from ../../types - no re-export needed
 
 /**
@@ -64,6 +66,5 @@ export function getBaseMonitorTypes(): MonitorType[] {
  * @see {@link MonitorTypeRegistry.isValidType} for complete type checking
  */
 export function isBaseMonitorType(type: string): type is MonitorType {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard validation against known base monitor types
-    return BASE_MONITOR_TYPES.includes(type as MonitorType);
+    return baseMonitorTypeSet.has(type);
 }

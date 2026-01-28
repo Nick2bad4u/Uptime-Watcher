@@ -63,6 +63,7 @@ import type { Tagged, UnknownRecord } from "type-fest";
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { sleepUnref } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import * as z from "zod";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -476,8 +477,7 @@ async function handleFailure<T>(
         throw error;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Generic fallback value when operation fails and exceptions are disabled
-    return null as T;
+        return castUnchecked<T>(null);
 }
 
 /**

@@ -381,6 +381,13 @@ export class MonitorUnknownFieldError extends Error {
     }
 }
 
+function hasOwnKey<TObject extends object>(
+    obj: TObject,
+    key: string
+): key is Extract<keyof TObject, string> {
+    return Object.hasOwn(obj, key);
+}
+
 function validateFieldWithSchema(
     type: string,
     fieldName: string,
@@ -392,12 +399,9 @@ function validateFieldWithSchema(
 
     // Get the schema for the monitor type
     const schema = getMonitorSchema(type);
-    if (schema && Object.hasOwn(schema.shape, fieldName)) {
+    if (schema && hasOwnKey(schema.shape, fieldName)) {
         // Use the specific schema's field definition
-        // Type assertion is safe since we check field existence above
-        const fieldSchema =
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion for schema field lookup
-            schema.shape[fieldName as keyof typeof schema.shape];
+        const fieldSchema = schema.shape[fieldName];
         return z
             .object({ [fieldName]: fieldSchema })
             .strict()
@@ -406,12 +410,10 @@ function validateFieldWithSchema(
 
     // Fallback to base schema for common fields
     const commonFields = baseMonitorSchema.shape;
-    if (Object.hasOwn(commonFields, fieldName)) {
+    if (hasOwnKey(commonFields, fieldName)) {
         return z
             .object({
-                [fieldName]:
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- safe assertion for common field lookup
-                    commonFields[fieldName as keyof typeof commonFields],
+                [fieldName]: commonFields[fieldName],
             })
             .strict()
             .parse(testData);

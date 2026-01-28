@@ -15,6 +15,7 @@ import type { IconType } from "react-icons";
 import type { CamelCase, Tagged } from "type-fest";
 
 import { isSiteStatus, STATUS_KIND } from "@shared/types";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 
 import { AppIcons } from "./icons";
 
@@ -190,6 +191,5 @@ export function createStatusIdentifier<T extends string>(
         )
         .join("");
 
-    /* eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type-fest CamelCase utility ensures correct transformation */
-    return camelCased as StatusIdentifier<T>;
+    return castUnchecked<StatusIdentifier<T>>(camelCased);
 }

@@ -302,8 +302,7 @@ export class WindowService {
                 );
 
                 // Delay opening DevTools to ensure renderer is ready
-                // eslint-disable-next-line clean-timer/assign-timer-id -- One-time dev tools initialization
-                setTimeout(() => {
+                const devToolsTimer = setTimeout(() => {
                     if (!targetWindow.isDestroyed()) {
                         try {
                             targetWindow.webContents.openDevTools();
@@ -320,6 +319,7 @@ export class WindowService {
                         }
                     }
                 }, 1000);
+                devToolsTimer.unref();
             },
             {
                 logger,

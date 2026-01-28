@@ -9,6 +9,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { isObject } from "./typeGuards";
+import { castUnchecked } from "./typeHelpers";
 
 /**
  * Creates a null-prototype object with a specific compile-time shape.
@@ -16,8 +17,10 @@ import { isObject } from "./typeGuards";
  * @remarks
  * This centralizes the only “unsafe” assertion needed for prototype-pollution
  * hardening so callers do not need their own eslint-disable comments.
+ *
+ * @public
  */
-function createNullPrototypeObject<T extends object>(shape?: T): T {
+export function createNullPrototypeObject<T extends object>(shape?: T): T {
     if (shape) {
         // Touch the phantom parameter in a side-effect-free way so lints do not
         // treat it as unused.
@@ -74,9 +77,7 @@ export function safeObjectAccess<T>(
 
     // If no validator provided, check if value matches fallback type
     if (typeof value === typeof fallback) {
-        // Type assertion is safe as we've checked the type matches
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe cast after typeof comparison ensures matching types
-        return value as T;
+        return castUnchecked<T>(value);
     }
 
     return fallback;

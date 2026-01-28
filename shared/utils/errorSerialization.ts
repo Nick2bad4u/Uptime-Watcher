@@ -2,6 +2,7 @@ import type { SerializedError } from "@shared/utils/logger/common";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { serializeError } from "@shared/utils/logger/common";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 
 type ExtendedError = Error & SerializedError;
 
@@ -24,8 +25,9 @@ const copyAdditionalProperties = (
 };
 
 const cloneSerializedError = (payload: SerializedError): ExtendedError => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Error instances satisfy the SerializedError contract once enhanced below.
-    const errorInstance = new Error(payload.message) as ExtendedError;
+    const errorInstance = castUnchecked<ExtendedError>(
+        new Error(payload.message)
+    );
 
     if (payload.name) {
         Object.defineProperty(errorInstance, "name", {
@@ -58,8 +60,7 @@ const cloneSerializedError = (payload: SerializedError): ExtendedError => {
 };
 
 const buildFallbackError = (error: Error): ExtendedError => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Error instances satisfy the SerializedError contract once enhanced below.
-    const fallback = new Error(error.message) as ExtendedError;
+    const fallback = castUnchecked<ExtendedError>(new Error(error.message));
     Object.defineProperty(fallback, "name", {
         configurable: true,
         enumerable: false,

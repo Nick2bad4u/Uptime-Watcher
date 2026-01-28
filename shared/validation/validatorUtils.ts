@@ -568,11 +568,15 @@ export function safeInteger(
     min?: number,
     max?: number
 ): number {
-    // eslint-disable-next-line @typescript-eslint/init-declarations -- assigned in try/catch
-    let str: string;
-    try {
-        str = String(value);
-    } catch {
+    const str = ((): string | undefined => {
+        try {
+            return String(value);
+        } catch {
+            return undefined;
+        }
+    })();
+
+    if (str === undefined) {
         return defaultValue;
     }
 

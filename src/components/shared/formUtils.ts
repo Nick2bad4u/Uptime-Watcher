@@ -39,6 +39,8 @@
 
 import type React from "react";
 
+import { castUnchecked } from "@shared/utils/typeHelpers";
+
 // ============================================================================
 // Form Utility Functions
 // ============================================================================
@@ -132,8 +134,9 @@ export function createSelectChangeHandler<T = string>(
         const rawValue = event.target.value;
 
         // If no converter provided, assume T is string and use identity
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- generic type assertion when no converter provided
-        const finalValue = converter ? converter(rawValue) : (rawValue as T);
+        const finalValue = converter
+            ? converter(rawValue)
+            : castUnchecked<T>(rawValue);
         setValue(finalValue);
     };
 }

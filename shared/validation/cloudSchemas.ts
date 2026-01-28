@@ -51,10 +51,10 @@ const cloudStatusSummaryInternalSchema = z
         connected: z.boolean(),
         encryptionLocked: z.boolean(),
         encryptionMode: cloudEncryptionModeSchema,
-        lastBackupAt: z.union([z.number(), z.null()]),
+        lastBackupAt: z.number().nullable(),
         lastError: z.string().min(1).optional(),
-        lastSyncAt: z.union([z.number(), z.null()]),
-        provider: z.union([cloudProviderKindSchema, z.null()]),
+        lastSyncAt: z.number().nullable(),
+        provider: cloudProviderKindSchema.nullable(),
         providerDetails: cloudProviderDetailsSchema.optional(),
         syncEnabled: z.boolean(),
     })
@@ -71,8 +71,18 @@ const cloudStatusSummaryInternalSchema = z
     });
 
 export const cloudStatusSummarySchema: z.ZodType<CloudStatusSummary> =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Runtime schema enforces the interface; cast works around Zod typing noise.
-    cloudStatusSummaryInternalSchema as unknown as z.ZodType<CloudStatusSummary>;
+    cloudStatusSummaryInternalSchema.transform((value) => {
+        const provider = value.provider ?? null;
+
+        return {
+            ...value,
+            lastBackupAt: value.lastBackupAt ?? null,
+            lastSyncAt: value.lastSyncAt ?? null,
+            provider,
+            providerDetails:
+                provider === null ? undefined : value.providerDetails,
+        };
+    });
 
 const cloudSyncResetPreviewDeviceSchema: z.ZodType<CloudSyncResetPreviewDevice> =
     z
@@ -101,8 +111,18 @@ const cloudSyncResetPreviewInternalSchema = z
     .strict();
 
 export const cloudSyncResetPreviewSchema: z.ZodType<CloudSyncResetPreview> =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Runtime schema enforces the interface; cast works around Zod typing noise.
-    cloudSyncResetPreviewInternalSchema as unknown as z.ZodType<CloudSyncResetPreview>;
+    cloudSyncResetPreviewInternalSchema.transform((value) => ({
+        deviceIds: value.deviceIds,
+        fetchedAt: value.fetchedAt,
+        latestSnapshotKey: value.latestSnapshotKey,
+        operationDeviceIds: value.operationDeviceIds,
+        operationObjectCount: value.operationObjectCount,
+        otherObjectCount: value.otherObjectCount,
+        perDevice: value.perDevice,
+        resetAt: value.resetAt,
+        snapshotObjectCount: value.snapshotObjectCount,
+        syncObjectCount: value.syncObjectCount,
+    }));
 
 const cloudSyncResetDeletionFailureSchema: z.ZodType<
     CloudSyncResetResult["failedDeletions"][number]
@@ -126,8 +146,14 @@ const cloudSyncResetResultInternalSchema = z
     .strict();
 
 export const cloudSyncResetResultSchema: z.ZodType<CloudSyncResetResult> =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Runtime schema enforces the interface; cast works around Zod typing noise.
-    cloudSyncResetResultInternalSchema as unknown as z.ZodType<CloudSyncResetResult>;
+    cloudSyncResetResultInternalSchema.transform((value) => ({
+        completedAt: value.completedAt,
+        deletedObjects: value.deletedObjects,
+        failedDeletions: value.failedDeletions,
+        resetAt: value.resetAt,
+        seededSnapshotKey: value.seededSnapshotKey,
+        startedAt: value.startedAt,
+    }));
 
 export const validateCloudStatusSummary = (
     value: unknown

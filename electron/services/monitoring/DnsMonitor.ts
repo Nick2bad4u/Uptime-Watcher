@@ -44,6 +44,8 @@
 
 import type { MonitorType, Site } from "@shared/types";
 
+import { sleepUnref } from "@shared/utils/abortUtils";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     resolve4,
@@ -248,16 +250,7 @@ export class DnsMonitor implements IMonitorService {
             } catch (error) {
                 // If we have retries left, wait and try again
                 if (attemptNumber < retryAttempts) {
-                    await new Promise<void>((resolve) => {
-                        // Timer will complete when Promise resolves, cleanup not needed
-                        // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
-                        setTimeout(
-                            () => {
-                                resolve();
-                            },
-                            2 ** attemptNumber * 1000
-                        );
-                    });
+                    await sleepUnref(2 ** attemptNumber * 1000);
                     return attemptDnsCheck(attemptNumber + 1);
                 }
 
@@ -503,12 +496,29 @@ export class DnsMonitor implements IMonitorService {
             let details = "";
             let actualValues: string[] = [];
 
+            const isString = (value: unknown): value is string =>
+                typeof value === "string";
+
+            const pickNumber = (
+                primary: unknown,
+                fallback: unknown
+            ): number | undefined => {
+                if (typeof primary === "number") {
+                    return primary;
+                }
+
+                if (typeof fallback === "number") {
+                    return fallback;
+                }
+
+                return undefined;
+            };
+
             switch (recordType.toUpperCase()) {
                 case "A":
                 case "AAAA": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js DNS resolution for A/AAAA records returns string arrays as documented
-                        actualValues = result as string[];
+                        actualValues = result.filter(isString);
                         details = `${recordType} records: ${actualValues.join(", ")}`;
                     } else {
                         details = `No ${recordType} records found`;
@@ -518,10 +528,11 @@ export class DnsMonitor implements IMonitorService {
 
                 case "ANY": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js DNS ANY resolution returns objects with type field as documented
-                        const anyRecords = result as Array<{ type: string }>;
+                        const anyRecords = result.filter(isRecord);
                         details = `ANY records (${anyRecords.length} items)`;
-                        actualValues = anyRecords.map((r) => JSON.stringify(r));
+                        actualValues = anyRecords.map((record) =>
+                            JSON.stringify(record)
+                        );
                     } else {
                         details = "No ANY records found";
                     }
@@ -530,19 +541,18 @@ export class DnsMonitor implements IMonitorService {
 
                 case "CAA": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js CAA resolution returns objects with critical/iodef/issue fields as documented
-                        const caa = result as Array<{
-                            critical: number;
-                            iodef?: string;
-                            issue?: string;
-                        }>;
-                        details = `CAA records: ${caa.length}`;
-                        actualValues = caa
-                            .map((r) => r.issue ?? r.iodef)
-                            .filter(
-                                (value): value is string =>
-                                    typeof value === "string"
-                            );
+                        const caaRecords = result.filter(isRecord);
+                        details = `CAA records: ${caaRecords.length}`;
+                        actualValues = caaRecords.flatMap((record) => {
+                            const { iodef, issue } = record;
+                            if (typeof issue === "string") {
+                                return [issue];
+                            }
+                            if (typeof iodef === "string") {
+                                return [iodef];
+                            }
+                            return [];
+                        });
                     } else {
                         details = "No CAA records found";
                     }
@@ -551,9 +561,11 @@ export class DnsMonitor implements IMonitorService {
 
                 case "CNAME": {
                     if (Array.isArray(result) && result.length > 0) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js CNAME resolution returns string arrays as documented
-                        actualValues = result as string[];
-                        details = `CNAME record: ${actualValues[0]}`;
+                        actualValues = result.filter(isString);
+                        details =
+                            actualValues.length > 0
+                                ? `CNAME record: ${actualValues[0]}`
+                                : "No CNAME records found";
                     } else {
                         details = "No CNAME records found";
                     }
@@ -562,11 +574,19 @@ export class DnsMonitor implements IMonitorService {
 
                 case "MX": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js MX resolution returns objects with exchange/priority fields as documented
-                        const mxRecords = result as Array<{
-                            exchange: string;
-                            priority: number;
-                        }>;
+                        const mxRecords = result
+                            .filter(isRecord)
+                            .flatMap((record) => {
+                                const { exchange, priority } = record;
+                                if (
+                                    typeof exchange === "string" &&
+                                    typeof priority === "number" &&
+                                    Number.isFinite(priority)
+                                ) {
+                                    return [{ exchange, priority }];
+                                }
+                                return [];
+                            });
                         const formattedRecords = mxRecords
                             .map(
                                 (record) =>
@@ -585,13 +605,28 @@ export class DnsMonitor implements IMonitorService {
 
                 case "NAPTR": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js NAPTR resolution returns objects with flags/regexp/replacement/service fields as documented
-                        const naptr = result as Array<{
-                            flags: string;
-                            regexp: string;
-                            replacement: string;
-                            service: string;
-                        }>;
+                        const naptr = result
+                            .filter(isRecord)
+                            .flatMap((record) => {
+                                const { flags, regexp, replacement, service } =
+                                    record;
+                                if (
+                                    typeof flags === "string" &&
+                                    typeof regexp === "string" &&
+                                    typeof replacement === "string" &&
+                                    typeof service === "string"
+                                ) {
+                                    return [
+                                        {
+                                            flags,
+                                            regexp,
+                                            replacement,
+                                            service,
+                                        },
+                                    ];
+                                }
+                                return [];
+                            });
                         details = `NAPTR records: ${naptr
                             .map(
                                 (r) =>
@@ -607,8 +642,7 @@ export class DnsMonitor implements IMonitorService {
 
                 case "NS": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js NS resolution returns string arrays as documented
-                        actualValues = result as string[];
+                        actualValues = result.filter(isString);
                         details = `NS records: ${actualValues.join(", ")}`;
                     } else {
                         details = "No NS records found";
@@ -618,8 +652,7 @@ export class DnsMonitor implements IMonitorService {
 
                 case "PTR": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js PTR resolution returns string arrays as documented
-                        actualValues = result as string[];
+                        actualValues = result.filter(isString);
                         details = `PTR records: ${actualValues.join(", ")}`;
                     } else {
                         details = "No PTR records found";
@@ -628,15 +661,19 @@ export class DnsMonitor implements IMonitorService {
                 }
 
                 case "SOA": {
-                    if (result && typeof result === "object") {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js SOA resolution returns object with hostmaster/nsname/serial fields as documented
-                        const soa = result as {
-                            hostmaster: string;
-                            nsname: string;
-                            serial: number;
-                        };
-                        details = `SOA: ${soa.nsname} ${soa.hostmaster} (serial ${soa.serial})`;
-                        actualValues = [soa.nsname, soa.hostmaster];
+                    if (isRecord(result)) {
+                        const { hostmaster, nsname, serial } = result;
+                        if (
+                            typeof hostmaster === "string" &&
+                            typeof nsname === "string" &&
+                            typeof serial === "number" &&
+                            Number.isFinite(serial)
+                        ) {
+                            details = `SOA: ${nsname} ${hostmaster} (serial ${serial})`;
+                            actualValues = [nsname, hostmaster];
+                        } else {
+                            details = "No SOA record found";
+                        }
                     } else {
                         details = "No SOA record found";
                     }
@@ -645,13 +682,30 @@ export class DnsMonitor implements IMonitorService {
 
                 case "SRV": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js SRV resolution returns objects with name/port/priority/weight fields as documented
-                        const srvRecords = result as Array<{
-                            name: string;
-                            port: number;
-                            priority: number;
-                            weight: number;
-                        }>;
+                        const srvRecords = result
+                            .filter(isRecord)
+                            .flatMap((record) => {
+                                const { name, port, priority, weight } = record;
+                                if (
+                                    typeof name === "string" &&
+                                    typeof port === "number" &&
+                                    Number.isFinite(port) &&
+                                    typeof priority === "number" &&
+                                    Number.isFinite(priority) &&
+                                    typeof weight === "number" &&
+                                    Number.isFinite(weight)
+                                ) {
+                                    return [
+                                        {
+                                            name,
+                                            port,
+                                            priority,
+                                            weight,
+                                        },
+                                    ];
+                                }
+                                return [];
+                            });
                         const formattedRecords = srvRecords
                             .map(
                                 (record) =>
@@ -668,12 +722,41 @@ export class DnsMonitor implements IMonitorService {
 
                 case "TLSA": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js TLSA resolution returns objects with certUsage/match/selector fields as documented
-                        const tlsa = result as Array<{
-                            certUsage: number;
-                            match: number;
-                            selector: number;
-                        }>;
+                        const tlsa = result
+                            .filter(isRecord)
+                            .flatMap((record) => {
+                                const {
+                                    certUsage,
+                                    match,
+                                    matchingType,
+                                    selector,
+                                    usage,
+                                } = record;
+
+                                const resolvedCertUsage = pickNumber(
+                                    certUsage,
+                                    usage
+                                );
+                                const resolvedMatch = pickNumber(
+                                    match,
+                                    matchingType
+                                );
+
+                                if (
+                                    typeof resolvedCertUsage === "number" &&
+                                    typeof resolvedMatch === "number" &&
+                                    typeof selector === "number"
+                                ) {
+                                    return [
+                                        {
+                                            certUsage: resolvedCertUsage,
+                                            match: resolvedMatch,
+                                            selector,
+                                        },
+                                    ];
+                                }
+                                return [];
+                            });
                         details = `TLSA records: ${tlsa.length}`;
                         actualValues = tlsa.map(
                             (r) => `${r.certUsage}:${r.selector}:${r.match}`
@@ -686,9 +769,12 @@ export class DnsMonitor implements IMonitorService {
 
                 case "TXT": {
                     if (Array.isArray(result)) {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Node.js TXT resolution returns array of string arrays as documented
-                        const txtRecords = result as string[][];
-                        const flatRecords = txtRecords.flat();
+                        const txtRecords = result.filter(
+                            (entry): entry is unknown[] => Array.isArray(entry)
+                        );
+                        const flatRecords = txtRecords.flatMap((entry) =>
+                            entry.filter(isString)
+                        );
                         details = `TXT records: ${flatRecords.join(", ")}`;
                         actualValues = flatRecords;
                     } else {

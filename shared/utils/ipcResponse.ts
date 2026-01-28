@@ -18,7 +18,7 @@
 
 import type { IpcResponse } from "@shared/types/ipc";
 
-import { isRecord } from "@shared/utils/typeHelpers";
+import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 
 /**
  * Runtime type guard for {@link IpcResponse} envelopes.
@@ -97,8 +97,7 @@ export function extractIpcResponseData<T>(
         throw new Error("IPC response missing data field");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- IPC envelope validation ensures structure but not the data payload.
-    return response.data as T;
+    return castUnchecked<T>(response.data);
 }
 
 /**

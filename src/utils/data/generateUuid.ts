@@ -8,6 +8,48 @@
  * @public
  */
 
+const fallbackSequence: { value: number } = {
+    value: 0,
+};
+
+function nextFallbackSequence(): number {
+    fallbackSequence.value = (fallbackSequence.value + 1) % 1_000_000;
+    return fallbackSequence.value;
+}
+
+function toBaseThirtySixSixChars(value: number): string {
+    return value.toString(36).padStart(6, "0").slice(-6);
+}
+
+function toUint32(value: number): number {
+    const modulus = 2 ** 32;
+    const remainder = value % modulus;
+    return remainder < 0 ? remainder + modulus : remainder;
+}
+
+function tryGenerateCryptoFallbackId(): string | undefined {
+    try {
+        const values = new Uint32Array(2);
+        globalThis.crypto.getRandomValues(values);
+        return (
+            toBaseThirtySixSixChars(values[0] ?? 0) +
+            toBaseThirtySixSixChars(values[1] ?? 0)
+        );
+    } catch {
+        return undefined;
+    }
+}
+
+function generateDeterministicFallbackId(
+    nowMs: number,
+    sequence: number
+): string {
+    const low = toUint32(nowMs + sequence);
+    // 2654435761 is the 32-bit golden ratio constant (0x9E3779B1).
+    const high = toUint32(Math.floor(nowMs / 1000) + sequence * 2_654_435_761);
+    return `${toBaseThirtySixSixChars(low)}${toBaseThirtySixSixChars(high)}`;
+}
+
 /**
  * Generate a unique identifier string using crypto.randomUUID.
  *
@@ -38,18 +80,16 @@ export function generateUuid(): string {
         // Crypto is not available, fall through to fallback
     }
 
-    // Fallback: Generate a custom ID using timestamp and random string
-    // Note: Math.random is acceptable for non-cryptographic IDs
-    /* eslint-disable sonarjs/pseudo-random -- Safe for non-security purposes (IDs, not cryptographic keys) */
+    // Fallback: preserve the historical ID shape (`site-{random}-{timestamp}`)
+    // without relying on Math.random.
+    const now = Date.now();
+    const sequence = nextFallbackSequence();
+    const timestampSuffix = (sequence % 1000).toString(10).padStart(3, "0");
+    const timestampPart = `${now}${timestampSuffix}`;
+
     const randomPart =
-        Math.random().toString(36).slice(2, 8) +
-        Math.random().toString(36).slice(2, 8);
-    const timestampPart =
-        Date.now().toString() +
-        Math.floor(Math.random() * 1000)
-            .toString()
-            .padStart(3, "0");
-    /* eslint-enable sonarjs/pseudo-random -- Re-enable check */
+        tryGenerateCryptoFallbackId() ??
+        generateDeterministicFallbackId(now, sequence);
 
     return `site-${randomPart}-${timestampPart}`;
 }

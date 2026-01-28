@@ -271,27 +271,28 @@ export function convertError(error: unknown): ErrorConversionResult {
         };
     }
 
-    // Safely convert to string with fallback for problematic objects
-    // eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in try-catch below
-    let errorMessage: string;
-    try {
-        errorMessage = String(error);
-    } catch {
-        // Fallback for objects that can't be converted to string
+    // Safely convert to string with fallback for problematic objects.
+    const errorMessage = ((): string => {
         try {
-            errorMessage = JSON.stringify(error);
+            return String(error);
         } catch {
-            errorMessage = "[object cannot be converted to string]";
+            // Fallback for objects that can't be converted to string
+            try {
+                return JSON.stringify(error);
+            } catch {
+                return "[object cannot be converted to string]";
+            }
         }
-    }
+    })();
 
     // Provide fallback for whitespace-only strings (but preserve truly empty strings)
-    if (errorMessage.trim().length === 0 && errorMessage.length > 0) {
-        errorMessage = `[whitespace-only ${typeof error}]`;
-    }
+    const normalizedMessage =
+        errorMessage.trim().length === 0 && errorMessage.length > 0
+            ? `[whitespace-only ${typeof error}]`
+            : errorMessage;
 
     return {
-        error: new Error(errorMessage, { cause: error }),
+        error: new Error(normalizedMessage, { cause: error }),
         originalType: typeof error,
         wasError: false,
     };

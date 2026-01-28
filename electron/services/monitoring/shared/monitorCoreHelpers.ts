@@ -17,6 +17,21 @@ export type MonitorByType<TType extends Site["monitors"][number]["type"]> =
     Site["monitors"][number] & { type: TType };
 
 /**
+ * Asserts that the supplied monitor matches the expected type literal.
+ */
+export function assertMonitorType<
+    TType extends Site["monitors"][number]["type"],
+>(
+    monitor: Site["monitors"][number],
+    expectedType: TType,
+    scope: string
+): asserts monitor is MonitorByType<TType> {
+    if (monitor.type !== expectedType) {
+        throw new Error(`${scope} cannot handle monitor type: ${monitor.type}`);
+    }
+}
+
+/**
  * Ensures the supplied monitor matches the expected type literal.
  *
  * @throws Error when the monitor type does not match the expected literal.
@@ -28,12 +43,8 @@ export function ensureMonitorType<
     expectedType: TType,
     scope: string
 ): MonitorByType<TType> {
-    if (monitor.type !== expectedType) {
-        throw new Error(`${scope} cannot handle monitor type: ${monitor.type}`);
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Monitor type is validated against the expected literal above.
-    return monitor as MonitorByType<TType>;
+    assertMonitorType(monitor, expectedType, scope);
+    return monitor;
 }
 
 /**

@@ -8,6 +8,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { castUnchecked } from "@shared/utils/typeHelpers";
+
 /**
  * Base interface for all database row types.
  *
@@ -375,21 +377,17 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  * @public
  */
 export function safeGetRowProperty<T>(
-    row: UnknownRecord,
+    row: null | undefined | UnknownRecord,
     property: string,
     defaultValue: T
 ): T {
-    // Handle null/undefined row objects - this check is needed despite the type
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Runtime safety check for database row objects that may be null/undefined despite types
     if (!row || typeof row !== "object") {
         return defaultValue;
     }
 
     // First check for exact property name match (including properties with dots)
     if (property in row && row[property] !== undefined) {
-        // We can't safely assert the type here, so we need to trust the caller
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion required for dynamic property access on generic database row objects
-        return row[property] as T;
+        return castUnchecked(row[property]);
     }
 
     // Handle nested property access with dot notation
@@ -412,9 +410,7 @@ export function safeGetRowProperty<T>(
             }
         }
 
-        // We can't safely assert the type here, so we need to trust the caller
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Type assertion required for nested property access on dynamic database row objects
-        return current as T;
+        return castUnchecked(current);
     }
 
     return defaultValue;

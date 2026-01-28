@@ -44,7 +44,6 @@ export interface DetailLabelProperties {
     readonly monitorType: MonitorType;
 }
 
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error type casting in catch blocks for logging */
 /**
  * Conditionally renders children based on monitor type's response time support.
  *
@@ -85,7 +84,7 @@ export function ConditionalResponseTime({
                     // non-critical feature degradation
                     logger.warn(
                         "Failed to check response time support",
-                        error as Error
+                        error
                     );
                     if (!isCancelled) {
                         setSupportsResponseTime(false);
@@ -152,7 +151,7 @@ export const DetailLabel = ({
                     // degradation
                     logger.warn(
                         "Failed to format detail label",
-                        error as Error
+                        error
                     );
                     if (!isCancelled) {
                         setFormattedLabel(fallback);
@@ -178,4 +177,3 @@ export const DetailLabel = ({
 
     return <span>{formattedLabel}</span>;
 };
-/* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe string manipulation for UI labels */

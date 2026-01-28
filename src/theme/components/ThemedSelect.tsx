@@ -52,9 +52,8 @@ import type {
 } from "@shared/types/componentProps";
 import type {
     ForwardedRef,
-    ForwardRefExoticComponent,
     JSX,
-    MemoExoticComponent,
+    NamedExoticComponent,
     RefAttributes,
 } from "react";
 
@@ -184,12 +183,14 @@ const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
     }
 );
 
-type ForwardedSelectComponent = ForwardRefExoticComponent<
+/**
+ * Memoized themed select component.
+ *
+ * @remarks
+ * React's `memo()` preserves the `forwardRef` signature in modern React types.
+ * Exporting this value directly avoids unnecessary type assertions.
+ */
+export const ThemedSelect: NamedExoticComponent<
     RefAttributes<HTMLSelectElement> & ThemedSelectProperties
->;
-type MemoizedSelectComponent = MemoExoticComponent<ForwardedSelectComponent>;
+> = memo(ForwardedSelect);
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- React.memo loses forwardRef signature fidelity without an explicit assertion.
-const themedSelectComponent = memo(ForwardedSelect) as MemoizedSelectComponent;
-
-export { themedSelectComponent as ThemedSelect };

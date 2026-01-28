@@ -144,7 +144,7 @@ export function getRegisteredMonitorTypes(): readonly string[] {
  *
  * @public
  */
-export function isValidMonitorType(type: string): boolean {
+export function isValidMonitorType(type: string): type is MonitorType {
     return monitorTypes.has(type);
 }
 
@@ -192,8 +192,7 @@ function validateMonitorTypeInternal(
 
     return {
         success: true,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type validated by isValidMonitorType check above
-        value: type as MonitorType,
+        value: type,
     };
 }
 
@@ -377,7 +376,7 @@ export function createMonitorWithTypeGuards(
  *
  * @returns `true` when the value is a registered monitor type string.
  */
-export function isValidMonitorTypeGuard(type: unknown): type is string {
+export function isValidMonitorTypeGuard(type: unknown): type is MonitorType {
     return typeof type === "string" && isValidMonitorType(type);
 }
 

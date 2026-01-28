@@ -7,6 +7,7 @@ import {
     cloudEncryptionConfigSchema,
 } from "@shared/types/cloudEncryption";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isValidPersistedDeviceId } from "@shared/validation/persistedDeviceIdValidation";
 import * as z from "zod";
 
@@ -105,9 +106,7 @@ export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
     // IMPORTANT: Avoid Object.fromEntries with untrusted keys. Even if keys are
     // validated, defense-in-depth matters and null-prototype records avoid
     // prototype pollution edge cases.
-    //
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Null-prototype record used as plain map.
-    const devices = Object.create(null) as CloudSyncManifest["devices"];
+    const devices = createNullPrototypeObject<CloudSyncManifest["devices"]>();
     for (const [deviceId, meta] of limited) {
         Object.defineProperty(devices, deviceId, {
             configurable: true,

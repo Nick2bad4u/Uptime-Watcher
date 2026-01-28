@@ -225,13 +225,29 @@ export class ThemeManager {
         return subscribePrefersDarkModeChange(callback);
     }
 
+    private forEachRecordEntry(
+        candidate: unknown,
+        visitor: (key: string, value: unknown) => void
+    ): void {
+        if (!isRecord(candidate)) {
+            return;
+        }
+
+        for (const [key, value] of Object.entries(candidate)) {
+            visitor(key, value);
+        }
+    }
+
     /**
      * Add border radius CSS variables from theme.
      */
     private addBorderRadiusVariables(theme: Theme, variables: string[]): void {
-        for (const [size, value] of Object.entries(theme.borderRadius)) {
-            variables.push(`  --radius-${size}: ${value};`);
-        }
+        const {borderRadius} = theme;
+        this.forEachRecordEntry(borderRadius, (size, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --radius-${size}: ${value};`);
+            }
+        });
     }
 
     /**
@@ -292,63 +308,80 @@ export class ThemeManager {
      * Add shadow CSS variables from theme.
      */
     private addShadowVariables(theme: Theme, variables: string[]): void {
-        for (const [size, value] of Object.entries(theme.shadows)) {
-            variables.push(`  --shadow-${size}: ${value};`);
-        }
+        const {shadows} = theme;
+        this.forEachRecordEntry(shadows, (size, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --shadow-${size}: ${value};`);
+            }
+        });
     }
 
     /**
      * Add spacing CSS variables from theme.
      */
     private addSpacingVariables(theme: Theme, variables: string[]): void {
-        for (const [size, value] of Object.entries(theme.spacing)) {
-            variables.push(`  --spacing-${size}: ${value};`);
-        }
+        const {spacing} = theme;
+        this.forEachRecordEntry(spacing, (size, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --spacing-${size}: ${value};`);
+            }
+        });
     }
 
     /**
      * Add typography CSS variables from theme.
      */
     private addTypographyVariables(theme: Theme, variables: string[]): void {
-        this.addFontSizeVariables(theme.typography, variables);
-        this.addFontWeightVariables(theme.typography, variables);
-        this.addLineHeightVariables(theme.typography, variables);
+        const {typography} = theme;
+        if (!isRecord(typography)) {
+            return;
+        }
+
+        this.addFontSizeVariables(typography.fontSize, variables);
+        this.addFontWeightVariables(typography.fontWeight, variables);
+        this.addLineHeightVariables(typography.lineHeight, variables);
     }
 
     /**
      * Add font size CSS variables from typography.
      */
     private addFontSizeVariables(
-        typography: Theme["typography"],
+        fontSize: unknown,
         variables: string[]
     ): void {
-        for (const [size, value] of Object.entries(typography.fontSize)) {
-            variables.push(`  --font-size-${size}: ${value};`);
-        }
+        this.forEachRecordEntry(fontSize, (size, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --font-size-${size}: ${value};`);
+            }
+        });
     }
 
     /**
      * Add font weight CSS variables from typography.
      */
     private addFontWeightVariables(
-        typography: Theme["typography"],
+        fontWeight: unknown,
         variables: string[]
     ): void {
-        for (const [weight, value] of Object.entries(typography.fontWeight)) {
-            variables.push(`  --font-weight-${weight}: ${value};`);
-        }
+        this.forEachRecordEntry(fontWeight, (weight, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --font-weight-${weight}: ${value};`);
+            }
+        });
     }
 
     /**
      * Add line height CSS variables from typography.
      */
     private addLineHeightVariables(
-        typography: Theme["typography"],
+        lineHeight: unknown,
         variables: string[]
     ): void {
-        for (const [height, value] of Object.entries(typography.lineHeight)) {
-            variables.push(`  --line-height-${height}: ${value};`);
-        }
+        this.forEachRecordEntry(lineHeight, (height, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --line-height-${height}: ${value};`);
+            }
+        });
     }
 
     /**
@@ -358,9 +391,11 @@ export class ThemeManager {
         root: HTMLElement,
         borderRadius: Theme["borderRadius"]
     ): void {
-        for (const [size, value] of Object.entries(borderRadius)) {
-            root.style.setProperty(`--radius-${size}`, String(value));
-        }
+        this.forEachRecordEntry(borderRadius, (size, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--radius-${size}`, value);
+            }
+        });
     }
 
     /**
@@ -383,18 +418,22 @@ export class ThemeManager {
      * Apply shadow CSS custom properties
      */
     private applyShadows(root: HTMLElement, shadows: Theme["shadows"]): void {
-        for (const [size, value] of Object.entries(shadows)) {
-            root.style.setProperty(`--shadow-${size}`, String(value));
-        }
+        this.forEachRecordEntry(shadows, (size, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--shadow-${size}`, value);
+            }
+        });
     }
 
     /**
      * Apply spacing CSS custom properties
      */
     private applySpacing(root: HTMLElement, spacing: Theme["spacing"]): void {
-        for (const [size, value] of Object.entries(spacing)) {
-            root.style.setProperty(`--spacing-${size}`, String(value));
-        }
+        this.forEachRecordEntry(spacing, (size, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--spacing-${size}`, value);
+            }
+        });
     }
 
     /**
@@ -444,13 +483,14 @@ export class ThemeManager {
     /**
      * Apply typography CSS custom properties
      */
-    private applyTypography(
-        root: HTMLElement,
-        typography: Theme["typography"]
-    ): void {
-        this.applyFontSizeProperties(root, typography);
-        this.applyFontWeightProperties(root, typography);
-        this.applyLineHeightProperties(root, typography);
+    private applyTypography(root: HTMLElement, typography: unknown): void {
+        if (!isRecord(typography)) {
+            return;
+        }
+
+        this.applyFontSizeProperties(root, typography["fontSize"]);
+        this.applyFontWeightProperties(root, typography["fontWeight"]);
+        this.applyLineHeightProperties(root, typography["lineHeight"]);
     }
 
     /**
@@ -458,11 +498,13 @@ export class ThemeManager {
      */
     private applyFontSizeProperties(
         root: HTMLElement,
-        typography: Theme["typography"]
+        fontSize: unknown
     ): void {
-        for (const [size, value] of Object.entries(typography.fontSize)) {
-            root.style.setProperty(`--font-size-${size}`, value);
-        }
+        this.forEachRecordEntry(fontSize, (size, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--font-size-${size}`, value);
+            }
+        });
     }
 
     /**
@@ -470,11 +512,13 @@ export class ThemeManager {
      */
     private applyFontWeightProperties(
         root: HTMLElement,
-        typography: Theme["typography"]
+        fontWeight: unknown
     ): void {
-        for (const [weight, value] of Object.entries(typography.fontWeight)) {
-            root.style.setProperty(`--font-weight-${weight}`, value);
-        }
+        this.forEachRecordEntry(fontWeight, (weight, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--font-weight-${weight}`, value);
+            }
+        });
     }
 
     /**
@@ -482,11 +526,13 @@ export class ThemeManager {
      */
     private applyLineHeightProperties(
         root: HTMLElement,
-        typography: Theme["typography"]
+        lineHeight: unknown
     ): void {
-        for (const [height, value] of Object.entries(typography.lineHeight)) {
-            root.style.setProperty(`--line-height-${height}`, value);
-        }
+        this.forEachRecordEntry(lineHeight, (height, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--line-height-${height}`, value);
+            }
+        });
     }
 }
 

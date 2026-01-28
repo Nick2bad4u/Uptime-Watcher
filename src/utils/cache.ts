@@ -36,6 +36,7 @@
 import type { CacheValue } from "@shared/types/configTypes";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 
 import { logger } from "../services/logger";
 
@@ -496,8 +497,7 @@ export async function getCachedOrFetch<T extends Exclude<unknown, undefined>>(
     const inFlight = ensureInFlightRegistry();
     const existingPromise = inFlight.get(key);
     if (existingPromise) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Promise is inserted by this helper for the same generic T.
-        return existingPromise as Promise<T>;
+        return castUnchecked<Promise<T>>(existingPromise);
     }
 
     const generationAtStart = cache.getGeneration();

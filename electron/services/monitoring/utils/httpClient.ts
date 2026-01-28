@@ -16,7 +16,7 @@
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
 import { readNumberEnv } from "@shared/utils/environment";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { ensureRecordLike, isRecord  } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";
@@ -101,15 +101,17 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
         },
         (error) => {
             // Also calculate timing for error responses
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Axios error object structure is stable and well-documented for metadata access
-            const err = error as {
-                config?: { metadata?: { startTime?: number } };
-                responseTime?: number;
-            };
-            if (err.config?.metadata?.startTime) {
-                const duration =
-                    performance.now() - err.config.metadata.startTime;
-                err.responseTime = Math.round(duration);
+            const errorRecord = ensureRecordLike(error);
+            const config = errorRecord ? ensureRecordLike(errorRecord["config"]) : undefined;
+            const metadata = config ? ensureRecordLike(config["metadata"]) : undefined;
+            const startTime =
+                metadata && typeof metadata["startTime"] === "number"
+                    ? metadata["startTime"]
+                    : undefined;
+
+            if (startTime !== undefined && errorRecord) {
+                const duration = performance.now() - startTime;
+                Reflect.set(errorRecord, "responseTime", Math.round(duration));
             }
             return Promise.reject(ensureErrorInstance(error));
         }

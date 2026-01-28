@@ -11,6 +11,7 @@
 
 import type { Event, RenderProcessGoneDetails, WebContents } from "electron";
 
+import { sleepUnref } from "@shared/utils/abortUtils";
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { app, BrowserWindow } from "electron";
@@ -784,11 +785,7 @@ if (process.versions.electron) {
         async () => {
             await app.whenReady();
             // Wait a bit for the main window to be created and ready
-            await new Promise<void>((resolve) => {
-                // Timer will complete immediately, cleanup not needed
-                // eslint-disable-next-line clean-timer/assign-timer-id -- Timer completes with Promise resolution
-                setTimeout(resolve, 1);
-            });
+            await sleepUnref(1);
 
             if (!isDev()) {
                 return;

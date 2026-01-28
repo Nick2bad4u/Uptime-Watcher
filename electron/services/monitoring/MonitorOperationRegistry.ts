@@ -208,16 +208,16 @@ export class MonitorOperationRegistry {
             timeoutMs?: number;
         }
     ): { operationId: string; signal: AbortSignal } {
-        // eslint-disable-next-line no-useless-assignment -- Variable initialized to satisfy init-declarations rule, even though immediately reassigned
-        let operationId = "";
-        let attempts = 0;
-        do {
-            operationId = crypto.randomUUID();
-            attempts++;
-            // Incredibly unlikely, but retry if collision
-        } while (this.activeOperations.has(operationId) && attempts < 5);
+        let operationId: string | undefined = undefined;
+        for (let attempt = 0; attempt < 5; attempt++) {
+            const candidate = crypto.randomUUID();
+            if (!this.activeOperations.has(candidate)) {
+                operationId = candidate;
+                break;
+            }
+        }
 
-        if (this.activeOperations.has(operationId)) {
+        if (!operationId) {
             throw new Error(
                 "Failed to generate a unique operation ID after multiple attempts."
             );
