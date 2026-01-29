@@ -2154,6 +2154,7 @@ export default defineConfig([
                         "all",
                         "supports",
                         "safe",
+                        "sanitize",
                         "timeout",
                         "with",
                         "cleanup",
@@ -3585,6 +3586,7 @@ export default defineConfig([
                         "all",
                         "supports",
                         "safe",
+                        "sanitize",
                         "timeout",
                         "with",
                         "cleanup",
@@ -3661,6 +3663,7 @@ export default defineConfig([
                     allow: [
                         "**/*.css",
                         "**/*.scss",
+                        "chartjs-adapter-date-fns",
                     ], // Allow CSS imports without assignment
                 },
             ],
@@ -4176,7 +4179,7 @@ export default defineConfig([
             "react/prefer-exact-props": "warn",
             "react/prefer-read-only-props": "warn",
             "react/prefer-stateless-function": "warn",
-            "react/prop-types": "warn",
+            "react/prop-types": "off", // TypeScript provides type checking
             "react/react-in-jsx-scope": "off",
             "react/require-default-props": "off",
             "react/require-optimization": "warn",
@@ -4184,7 +4187,10 @@ export default defineConfig([
             "react/sort-comp": "warn",
             "react/sort-default-props": "warn",
             "react/sort-prop-types": "warn",
-            "react/state-in-constructor": "warn",
+            "react/state-in-constructor": [
+                "warn",
+                "never", // Prefer modern class-field state initialization
+            ],
             "react/static-property-placement": "warn",
             "react/style-prop-object": "warn",
             "react/void-dom-elements-no-children": "warn",
@@ -5317,6 +5323,7 @@ export default defineConfig([
                         "all",
                         "supports",
                         "safe",
+                        "sanitize",
                         "timeout",
                         "with",
                         "cleanup",
@@ -6759,6 +6766,7 @@ export default defineConfig([
                         "all",
                         "supports",
                         "safe",
+                        "sanitize",
                         "timeout",
                         "with",
                         "cleanup",
@@ -6835,6 +6843,7 @@ export default defineConfig([
                     allow: [
                         "**/*.css",
                         "**/*.scss",
+                        "chartjs-adapter-date-fns",
                     ], // Allow CSS imports without assignment
                 },
             ],
@@ -7350,7 +7359,7 @@ export default defineConfig([
             "react/prefer-exact-props": "warn",
             "react/prefer-read-only-props": "warn",
             "react/prefer-stateless-function": "warn",
-            "react/prop-types": "warn",
+            "react/prop-types": "off", // TypeScript provides type checking
             "react/react-in-jsx-scope": "off",
             "react/require-default-props": "off",
             "react/require-optimization": "warn",
@@ -7358,7 +7367,10 @@ export default defineConfig([
             "react/sort-comp": "warn",
             "react/sort-default-props": "warn",
             "react/sort-prop-types": "warn",
-            "react/state-in-constructor": "warn",
+            "react/state-in-constructor": [
+                "warn",
+                "never", // Prefer modern class-field state initialization
+            ],
             "react/static-property-placement": "warn",
             "react/style-prop-object": "warn",
             "react/void-dom-elements-no-children": "warn",
@@ -9096,7 +9108,16 @@ export default defineConfig([
             "import-x/no-rename-default": "off",
             "import-x/no-restricted-paths": "warn",
             "import-x/no-self-import": "warn",
-            "import-x/no-unassigned-import": "warn",
+            "import-x/no-unassigned-import": [
+                "warn",
+                {
+                    allow: [
+                        "**/*.css",
+                        "**/*.scss",
+                        "chartjs-adapter-date-fns",
+                    ],
+                },
+            ],
             "import-x/no-unresolved": "warn",
             "import-x/no-unused-modules": "warn",
             "import-x/no-useless-path-segments": "warn",
@@ -10297,8 +10318,43 @@ export default defineConfig([
             "react-perf": reactPerfPlugin,
         },
         rules: {
+            "@metamask/design-tokens/color-no-hex": "off",
             // Theme components legitimately need inline styles for dynamic theming
             "react-perf/jsx-no-new-object-as-prop": "warn",
+        },
+    },
+    {
+        files: ["src/hooks/useThemeStyles.ts"],
+        name: "Theme Styles Override - src/hooks/useThemeStyles.ts",
+        rules: {
+            "@metamask/design-tokens/color-no-hex": "off",
+        },
+    },
+    {
+        files: ["src/theme/components/ThemedSelect.tsx"],
+        name: "Theme Component Override - ThemedSelect.tsx",
+        rules: {
+            // This component must expose the underlying <select> element ref.
+            "@eslint-react/no-forward-ref": "off",
+        },
+    },
+    {
+        files: ["src/stores/error/ErrorBoundary.tsx"],
+        name: "ErrorBoundary Override - src/stores/error/ErrorBoundary.tsx",
+        rules: {
+            // Error boundaries must be able to call setState during retry.
+            "react/no-set-state": "off",
+            // Conflicts with sort-class-members (enabled repo-wide) and provides
+            // mostly legacy guidance for class member ordering.
+            "react/sort-comp": "off",
+        },
+    },
+    {
+        files: ["src/components/AddSiteForm/fields/fieldFactories.tsx"],
+        name: "AddSite fieldFactories Override - fieldFactories.tsx",
+        rules: {
+            // This file intentionally defines component factories.
+            "react/no-multi-comp": "off",
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════

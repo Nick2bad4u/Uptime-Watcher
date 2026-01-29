@@ -81,7 +81,7 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Basic Functionality", () => {
-        it("should use getElementById for root element lookup", async ({
+        it("should use querySelector for root element lookup", async ({
             task,
             annotate,
         }) => {
@@ -90,30 +90,20 @@ describe("main.tsx - Application Entry Point", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Retrieval", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Retrieval", "type");
-
-            const getElementByIdSpy = vi.spyOn(document, "getElementById");
+            const querySelectorSpy = vi.spyOn(document, "querySelector");
 
             // Import main.tsx which triggers initialization
             await import("../main");
 
-            expect(getElementByIdSpy).toHaveBeenCalledWith("root");
+            expect(querySelectorSpy).toHaveBeenCalledWith("#root");
 
-            getElementByIdSpy.mockRestore();
+            querySelectorSpy.mockRestore();
         });
 
         it("should handle missing root element gracefully", async ({
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -143,11 +133,6 @@ describe("main.tsx - Application Entry Point", () => {
             annotate("Category: Core", "category");
             annotate("Type: Initialization", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Initialization", "type");
-
             // Remove root element to trigger error
             document.body.innerHTML = "";
 
@@ -166,15 +151,10 @@ describe("main.tsx - Application Entry Point", () => {
     });
 
     describe("Performance Optimizations", () => {
-        it("should use getElementById instead of querySelector for performance", async ({
+        it("should use querySelector instead of getElementById for performance", async ({
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: main", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Retrieval", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: main", "component");
             annotate("Category: Core", "category");
@@ -189,9 +169,7 @@ describe("main.tsx - Application Entry Point", () => {
             // Import main.tsx
             await import("../main");
 
-            // Verify getElementById was used for performance
-            expect(getElementByIdSpy).toHaveBeenCalledWith("root");
-            expect(querySelectorSpy).not.toHaveBeenCalled();
+            expect(querySelectorSpy).toHaveBeenCalledWith("#root");
 
             getElementByIdSpy.mockRestore();
             querySelectorSpy.mockRestore();

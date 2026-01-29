@@ -533,15 +533,23 @@ export function interpolateLogTemplate(
     };
 
     return template.replaceAll(
-        // eslint-disable-next-line regexp/strict, regexp/require-unicode-regexp -- Conflicting rules: strict wants escaped braces, require-unicode-sets wants v flag, require-unicode wants u flag
-        /{(?<variableName>[$_a-z][\w$]*)}/gi,
-        (match: string, key: string): string => {
-            const value = variables[key];
+        /\{(?<variableName>[$_a-z][\w$]*)\}/giu,
+        (
+            match: string,
+            key: string,
+            _offset: number,
+            _input: string,
+            groups?: Record<string, string>
+        ): string => {
+            const resolvedKey = groups?.["variableName"] ?? key;
+            const value = variables[resolvedKey];
+
             return value === undefined || value === null
                 ? match
                 : formatValue(value);
         }
     );
+
 }
 
 /**
@@ -551,7 +559,6 @@ export function interpolateLogTemplate(
  *
  * ```typescript
  * import { createTemplateLogger } from "@shared/utils/logTemplates";
- *
  * const logger = createTemplateLogger(baseLogger);
  *
  * // Use with templates

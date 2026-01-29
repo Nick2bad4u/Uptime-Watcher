@@ -406,6 +406,18 @@ async function handleFrontendOperation<T>(
     }
 }
 
+function isFrontendStoreContext(
+    candidate: unknown
+): candidate is ErrorHandlingFrontendStore {
+    return (
+        typeof candidate === "object" &&
+        candidate !== null &&
+        "setError" in candidate &&
+        "clearError" in candidate &&
+        "setLoading" in candidate
+    );
+}
+
 /**
  * Handle async operations with frontend store or backend context integration.
  *
@@ -432,37 +444,8 @@ async function handleFrontendOperation<T>(
 export async function withErrorHandling<T>(
     operation: () => Promise<T>,
     storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
-): Promise<T>;
-
-/**
- * Implementation of the overloaded withErrorHandling function.
- *
- * @typeParam T - The return type of the async operation
- *
- * @param operation - Async operation to execute
- * @param storeOrContext - Either frontend store or backend context
- *
- * @returns Promise resolving to operation result
- *
- * @throws Re-throws the original error after handling (logging or state
- *   management)
- *
- * @internal
- */
-// eslint-disable-next-line no-redeclare -- Function overload implementation is legitimate TypeScript pattern
-export async function withErrorHandling<T>(
-    operation: () => Promise<T>,
-    storeOrContext: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
 ): Promise<T> {
-    // Check if it's a frontend store (has setError, clearError, setLoading
-    // methods)
-    const isFrontendStore =
-        typeof storeOrContext === "object" &&
-        "setError" in storeOrContext &&
-        "clearError" in storeOrContext &&
-        "setLoading" in storeOrContext;
-
-    return isFrontendStore
+    return isFrontendStoreContext(storeOrContext)
         ? handleFrontendOperation(operation, storeOrContext)
         : handleBackendOperation(operation, storeOrContext);
 }

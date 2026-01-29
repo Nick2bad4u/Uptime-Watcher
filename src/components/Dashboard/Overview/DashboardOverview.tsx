@@ -8,8 +8,6 @@
  * to stay consistent with the application's visual language.
  */
 
-/* eslint-disable react/prop-types -- Component uses TypeScript for props validation. */
-
 import type { NamedExoticComponent } from "react";
 import type { IconType } from "react-icons";
 
@@ -179,5 +177,3 @@ export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties
             </section>
         );
     });
-
-/* eslint-enable react/prop-types -- Re-enable prop-types lint rule. */

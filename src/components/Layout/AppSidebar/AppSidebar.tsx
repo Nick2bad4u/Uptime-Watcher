@@ -1,8 +1,6 @@
 import type { Site, SiteStatus } from "@shared/types";
 import type { IconType } from "react-icons";
 
-// eslint-disable-next-line sonarjs/no-implicit-dependencies -- Uses configured Vite alias for shared asset resolution
-import MascotLogo from "@assets/UptimeWatcherMascot.avif";
 import {
     getSiteDisplayStatus,
     getSiteStatusDescription,
@@ -50,6 +48,11 @@ const STATUS_ICON_MAP: Record<SiteStatus, IconType> = {
     unknown: AppIcons.status.pendingFilled,
     up: AppIcons.status.upFilled,
 };
+
+const mascotLogoUrl = new URL(
+    "../../../../assets/UptimeWatcherMascot.avif",
+    import.meta.url
+).toString();
 
 /**
  * Maps a {@link SiteStatus} to a CSS modifier class.
@@ -211,7 +214,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                 <img
                     alt="Uptime Watcher mascot"
                     className="app-sidebar__logo-tooltip-image"
-                    src={MascotLogo}
+                    src={mascotLogoUrl}
                 />
             </div>
         ),
@@ -255,7 +258,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                                 <img
                                     alt="Uptime Watcher mascot"
                                     className="app-sidebar__brand-logo-image"
-                                    src={MascotLogo}
+                                    src={mascotLogoUrl}
                                 />
                             </div>
                         )}

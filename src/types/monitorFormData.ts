@@ -845,11 +845,10 @@ export function safeGetFormProperty<T>(
  *
  * @public
  */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Type parameter ensures type safety for value at call site
-export function safeSetFormProperty<T>(
+export function safeSetFormProperty(
     data: DynamicFormData,
     property: string,
-    value: T
+    value: unknown
 ): void {
     data[property] = value;
 }

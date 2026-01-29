@@ -40,8 +40,7 @@ import "./index.css";
  * @throws {@link Error} If the root element with ID "root" is not found.
  */
 function initializeApp(): void {
-    // eslint-disable-next-line unicorn/prefer-query-selector -- getElementById is measurably faster for single ID lookups and this is the critical app initialization path
-    const rootElement = document.getElementById("root");
+        const rootElement = document.querySelector<HTMLElement>("#root");
     if (!rootElement) {
         throw new Error("Root element not found");
     }

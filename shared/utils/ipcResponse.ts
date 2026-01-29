@@ -42,7 +42,17 @@ export function isIpcResponseEnvelope(value: unknown): value is IpcResponse {
 /**
  * Options for {@link extractIpcResponseData}.
  */
-export interface ExtractIpcResponseDataOptions {
+export interface ExtractIpcResponseDataOptions<T = unknown> {
+    /**
+     * Optional payload parser/validator.
+     *
+     * @remarks
+     * When provided, the parser is used to convert/validate the raw `data`
+     * payload. This makes the extractor genuinely type-safe and also allows
+     * TypeScript to infer `T` from the parser.
+     */
+    readonly parse?: (data: unknown) => T;
+
     /**
      * When true, `success: true` responses must include a defined `data`
      * payload.
@@ -79,10 +89,9 @@ const normalizeFailureMessage = (response: IpcResponse): string => {
  * - Does **not** require `data` to be present. A successful response may
  *   legitimately omit `data` (e.g. `T` includes `undefined`).
  */
-// eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- The caller provides the expected data type.
 export function extractIpcResponseData<T>(
     response: unknown,
-    options: ExtractIpcResponseDataOptions = {}
+    options: ExtractIpcResponseDataOptions<T> = {}
 ): T {
     if (!isIpcResponseEnvelope(response)) {
         throw new Error("Invalid IPC response format");
@@ -97,7 +106,9 @@ export function extractIpcResponseData<T>(
         throw new Error("IPC response missing data field");
     }
 
-    return castUnchecked<T>(response.data);
+    const rawData = response.data;
+    const { parse } = options;
+    return parse ? parse(rawData) : castUnchecked<T>(rawData);
 }
 
 /**
@@ -119,7 +130,7 @@ export function validateVoidIpcResponse(response: unknown): void {
 export function safeExtractIpcResponseData<T>(
     response: unknown,
     fallback: T,
-    options: ExtractIpcResponseDataOptions = {}
+    options: ExtractIpcResponseDataOptions<T> = {}
 ): T {
     try {
         return extractIpcResponseData<T>(response, {

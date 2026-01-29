@@ -64,12 +64,14 @@ import type {
     SerializedDatabaseRestorePayload as SharedSerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult as SharedSerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
+import type * as z from "zod";
 
 import {
     extractIpcResponseData,
     isIpcResponseEnvelope,
     safeExtractIpcResponseData,
 } from "@shared/utils/ipcResponse";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 
 /** Renderer-facing IPC diagnostics channels. */
 export type IpcDiagnosticsChannel = SharedIpcDiagnosticsChannel;
@@ -111,9 +113,30 @@ export type SerializedDatabaseRestoreResult =
  *
  * @public
  */
-// eslint-disable-next-line etc/no-misused-generics -- Type parameter must be explicitly provided for type guard
-export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
-    return isIpcResponseEnvelope(value);
+/**
+ * Runtime type guard for IPC response envelopes.
+ *
+ * @remarks
+ * If a `schema` is provided and the response indicates success, the schema is
+ * used to validate `data`.
+ */
+export function isIpcResponse<T>(
+    value: unknown,
+    schema?: z.ZodType<T>
+): value is IpcResponse<T> {
+    if (!isIpcResponseEnvelope(value)) {
+        return false;
+    }
+
+    if (!value.success) {
+        return true;
+    }
+
+    if (!schema) {
+        return true;
+    }
+
+    return schema.safeParse(value.data).success;
 }
 
 /**
@@ -127,9 +150,16 @@ export function isIpcResponse<T>(value: unknown): value is IpcResponse<T> {
  *
  * @public
  */
-// eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- Type parameter must be explicitly provided for type assertion
-export function extractIpcData<T>(response: unknown): T {
-    return extractIpcResponseData<T>(response, { requireData: false });
+export function extractIpcData<T>(response: unknown, schema?: z.ZodType<T>): T {
+    const extracted = extractIpcResponseData<unknown>(response, {
+        requireData: false,
+    });
+
+    if (!schema) {
+        return castUnchecked<T>(extracted);
+    }
+
+    return schema.parse(extracted);
 }
 
 /**
@@ -142,6 +172,18 @@ export function extractIpcData<T>(response: unknown): T {
  *
  * @public
  */
-export function safeExtractIpcData<T>(response: unknown, fallback: T): T {
-    return safeExtractIpcResponseData<T>(response, fallback);
+export function safeExtractIpcData<T>(
+    response: unknown,
+    fallback: T,
+    schema?: z.ZodType<T>
+): T {
+    if (!schema) {
+        return safeExtractIpcResponseData<T>(response, fallback);
+    }
+
+    try {
+        return extractIpcData(response, schema);
+    } catch {
+        return fallback;
+    }
 }

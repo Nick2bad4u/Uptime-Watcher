@@ -102,7 +102,6 @@ export interface ThemedSelectProperties
     readonly value?: number | string;
 }
 
-/* eslint-disable-next-line @eslint-react/no-forward-ref -- Required to expose the native select ref for focus and picker control. */
 const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
     function ForwardedSelect(
         {
@@ -193,4 +192,3 @@ const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
 export const ThemedSelect: NamedExoticComponent<
     RefAttributes<HTMLSelectElement> & ThemedSelectProperties
 > = memo(ForwardedSelect);
-

@@ -16,25 +16,10 @@
  * - Integration with application logging infrastructure
  * - TypeScript support with proper error type handling
  *
- * The error boundary follows React's best practices and provides a
- * user-friendly way to handle unexpected errors without crashing the entire
- * application. It's particularly useful around store-connected components where
- * state errors might occur.
- *
  * @example
- *
  * ```tsx
- * // Basic usage with default fallback
  * <ErrorBoundary>
- *   <StoreConnectedComponent />
- * </ErrorBoundary>
- *
- * // With custom fallback and error handler
- * <ErrorBoundary
- *   fallback={CustomErrorFallback}
- *   onError={(error, errorInfo) => reportToErrorService(error, errorInfo)}
- * >
- *   <CriticalComponent />
+ *     <StoreConnectedComponent />
  * </ErrorBoundary>
  * ```
  *
@@ -43,40 +28,39 @@
 
 import type { ComponentType, ErrorInfo, JSX, ReactNode } from "react";
 
-import { Component } from "react";
+import { PureComponent } from "react";
 
 import { DefaultErrorFallback } from "../../components/error/DefaultErrorFallback";
 import { logger } from "../../services/logger";
 
 /**
+ * Props for a custom error boundary fallback component.
+ */
+export interface ErrorBoundaryFallbackProps {
+    /** Error object that was caught by the boundary */
+    readonly error?: Error;
+    /** Function to retry rendering by resetting the error state */
+    readonly onRetry: () => void;
+}
+
+/**
  * Props for the {@link ErrorBoundary} component.
- *
- * @remarks
- * Accepts children to render, an optional fallback component for error display,
- * and an optional error handler callback.
  *
  * @public
  */
 export interface ErrorBoundaryProperties {
     /** React children to be rendered within the error boundary */
     readonly children: ReactNode;
+
     /** Optional custom fallback component to render when an error occurs */
-    readonly fallback?: ComponentType<{
-        /** Error object that was caught by the boundary */
-        error?: Error;
-        /** Function to retry rendering by resetting the error state */
-        onRetry: () => void;
-    }>;
+    readonly fallback?: ComponentType<ErrorBoundaryFallbackProps>;
+
     /** Optional callback function called when an error is caught */
     readonly onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 /**
  * State for the {@link ErrorBoundary} component.
- *
- * @remarks
- * Tracks error state for rendering fallback UI. The retryCount is used to force
- * re-mounting of children on retry.
  *
  * @public
  */
@@ -89,33 +73,16 @@ export interface ErrorBoundaryState {
     retryCount: number;
 }
 
-/**
- * Error boundary component for wrapping store-connected components.
- *
- * @remarks
- * Catches errors in child components, logs them, and displays a fallback UI.
- * Supports custom fallback components and error handling callbacks. Used to
- * wrap store-connected or critical UI components.
- *
- * @example
- *
- * ```tsx
- * <ErrorBoundary>
- *     <MyComponent />
- * </ErrorBoundary>;
- * ```
- *
- * @public
- */
-
-// eslint-disable-next-line react/require-optimization -- ErrorBoundary should always re-render on error state changes
-class ErrorBoundaryBase extends Component<
+class ErrorBoundaryBase extends PureComponent<
     ErrorBoundaryProperties,
     ErrorBoundaryState
 > {
-    // eslint-disable-next-line react/sort-comp -- handleRetry needs to be accessible before lifecycle methods for proper binding
+    public override state: ErrorBoundaryState = {
+        hasError: false,
+        retryCount: 0,
+    };
+
     public handleRetry = (): void => {
-        // eslint-disable-next-line react/no-set-state -- Required for error recovery functionality
         this.setState((prevState) => ({
             error: undefined,
             hasError: false,
@@ -131,17 +98,6 @@ class ErrorBoundaryBase extends Component<
         };
     }
 
-    public constructor(properties: ErrorBoundaryProperties) {
-        super(properties);
-        /* eslint-disable no-constructor-bind/no-constructor-state -- Required for React error boundary pattern */
-        this.state = {
-            hasError: false,
-            retryCount: 0,
-        };
-    }
-
-    /* eslint-enable no-constructor-bind/no-constructor-state -- Class component requires constructor state initialization */
-
     public override componentDidCatch(
         error: Error,
         errorInfo: ErrorInfo
@@ -151,12 +107,6 @@ class ErrorBoundaryBase extends Component<
             componentStack: errorInfo.componentStack,
         });
 
-        // eslint-disable-next-line react/no-set-state -- Required for error boundary functionality
-        this.setState({
-            error,
-        });
-
-        // Call the onError prop if provided
         const { onError } = this.props;
         onError?.(error, errorInfo);
     }
@@ -180,13 +130,7 @@ class ErrorBoundaryBase extends Component<
 }
 
 /**
- * Error boundary component with consistent export pattern.
- *
- * @remarks
- * Standardized export following the application's component export conventions.
- * This ensures consistent import patterns and proper TypeScript support
- * throughout the codebase.
- *
- * @public
+ * Error boundary component for wrapping store-connected components.
  */
-export { ErrorBoundaryBase as ErrorBoundary };
+export const ErrorBoundary: ComponentType<ErrorBoundaryProperties> =
+    ErrorBoundaryBase;

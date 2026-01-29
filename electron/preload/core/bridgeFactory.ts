@@ -762,10 +762,9 @@ export function createEventManager(channel: string): {
         (_event: IpcRendererEvent, ...args: unknown[]) => void
     >();
 
-    const invokeSafely = (callback: EventCallback, args: unknown[]): void => {
+    const invokeSafely = (handler: EventCallback, args: unknown[]): void => {
         try {
-            // eslint-disable-next-line n/callback-return -- Event handler callback, no return needed
-            callback(...args);
+            handler(...args);
         } catch (error) {
             // Log callback errors but don't propagate them to prevent event system crashes.
             const normalizedError = ensureError(error);

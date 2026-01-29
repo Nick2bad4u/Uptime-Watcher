@@ -1,4 +1,3 @@
-/* eslint-disable @metamask/design-tokens/color-no-hex -- Theme definitions require direct hex color values */
 /**
  * Theme definitions for the application.
  *
@@ -434,5 +433,3 @@ export const themes: Themes = {
     "high-contrast": highContrastTheme,
     light: lightTheme,
 } as const;
-
-/* eslint-enable @metamask/design-tokens/color-no-hex -- Restore default token lint after theme definitions. */

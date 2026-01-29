@@ -145,7 +145,6 @@ export function createFieldWrapper<
         parameters: FieldWrapperRenderParameters<TProps>
     ) => ReactElement;
 }): NamedExoticComponent<TProps> {
-    // eslint-disable-next-line react/no-multi-comp -- Factory creates a reusable component instance
     const FieldComponent = memo((props: TProps): ReactElement => {
         const { error, helpText, id, label, required = false } = props;
 

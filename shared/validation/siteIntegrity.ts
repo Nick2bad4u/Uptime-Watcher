@@ -116,7 +116,6 @@ export function ensureUniqueSiteIdentifiers(
  *
  * @returns Sanitized sites alongside duplicate identifier diagnostics.
  */
-// eslint-disable-next-line function-name/starts-with-verb -- "sanitize" is a valid verb for data cleansing operations.
 export function sanitizeSitesByIdentifier(
     sites: readonly Site[]
 ): SanitizedSitesByIdentifierResult {

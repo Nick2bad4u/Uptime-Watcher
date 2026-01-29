@@ -7,7 +7,6 @@
  */
 
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 import pc from "picocolors";
 import { normalizePath, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -17,7 +16,7 @@ import {
     defineConfig,
 } from "vitest/config";
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = import.meta.dirname;
 
 /**
  * Vitest configuration for Electron backend test suites.
