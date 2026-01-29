@@ -140,7 +140,7 @@ export class MonitorValidator {
      * @internal
      */
     private validateMonitorTypeSpecific(
-        monitor: Site["monitors"][0]
+        monitor: Omit<Site["monitors"][number], "type"> & { type: string }
     ): readonly string[] {
         // Validate monitor type using registry
         if (!isValidMonitorType(monitor.type)) {

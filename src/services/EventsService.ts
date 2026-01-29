@@ -22,33 +22,42 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 import { subscribeWithCleanupValidation } from "./utils/preloadSubscriptions";
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers("EventsService", {
-    bridgeContracts: [
-        {
-            domain: "events",
-            methods: [
-                "onCacheInvalidated",
-                "onHistoryLimitUpdated",
-                "onMonitorCheckCompleted",
-                "onMonitorDown",
-                "onMonitoringStarted",
-                "onMonitoringStopped",
-                "onMonitorStatusChanged",
-                "onMonitorUp",
-                "onSiteAdded",
-                "onSiteRemoved",
-                "onSiteUpdated",
-                "onTestEvent",
-                "onUpdateStatus",
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("EventsService", {
+            bridgeContracts: [
+                {
+                    domain: "events",
+                    methods: [
+                        "onCacheInvalidated",
+                        "onHistoryLimitUpdated",
+                        "onMonitorCheckCompleted",
+                        "onMonitorDown",
+                        "onMonitoringStarted",
+                        "onMonitoringStopped",
+                        "onMonitorStatusChanged",
+                        "onMonitorUp",
+                        "onSiteAdded",
+                        "onSiteRemoved",
+                        "onSiteUpdated",
+                        "onTestEvent",
+                        "onUpdateStatus",
+                    ],
+                },
             ],
-        },
-    ],
-});
+        });
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 type SiteAddedEventData = RendererEventPayloadMap["site:added"];
 type SiteRemovedEventData = RendererEventPayloadMap["site:removed"];

@@ -666,11 +666,10 @@ const createCustomStack = <EventMap extends TypedEventMap>(
     middlewares: Array<EventMiddleware<EventMap>>
 ): EventMiddleware<EventMap> => composeMiddleware<EventMap>(...middlewares);
 
-const createDevelopmentStack = <
+function createDevelopmentStack<
     EventMap extends TypedEventMap = TypedEventMap,
->(): EventMiddleware<EventMap> =>
-    composeMiddleware<EventMap>(
-        // eslint-disable-next-line ex/no-unhandled -- Error handling middleware already captures downstream failures
+>(): EventMiddleware<EventMap> {
+    return composeMiddleware<EventMap>(
         createErrorHandlingMiddleware<EventMap>({ continueOnError: true }),
         createDebugMiddleware<EventMap>({ enabled: true, verbose: true }),
         createLoggingMiddleware<EventMap>({
@@ -678,12 +677,12 @@ const createDevelopmentStack = <
             level: "debug",
         })
     );
+}
 
-const createProductionStack = <
+function createProductionStack<
     EventMap extends TypedEventMap = TypedEventMap,
->(): EventMiddleware<EventMap> =>
-    composeMiddleware<EventMap>(
-        // eslint-disable-next-line ex/no-unhandled -- Error handling middleware already captures downstream failures
+>(): EventMiddleware<EventMap> {
+    return composeMiddleware<EventMap>(
         createErrorHandlingMiddleware<EventMap>({ continueOnError: true }),
         createRateLimitMiddleware<EventMap>({
             burstLimit: 5,
@@ -698,18 +697,19 @@ const createProductionStack = <
             level: "info",
         })
     );
+}
 
-const createTestingStack = <
+function createTestingStack<
     EventMap extends TypedEventMap = TypedEventMap,
->(): EventMiddleware<EventMap> =>
-    composeMiddleware<EventMap>(
-        // eslint-disable-next-line ex/no-unhandled -- Error handling middleware already captures downstream failures
+>(): EventMiddleware<EventMap> {
+    return composeMiddleware<EventMap>(
         createErrorHandlingMiddleware<EventMap>({ continueOnError: false }),
         createLoggingMiddleware<EventMap>({
             includeData: false,
             level: "warn",
         })
     );
+}
 
 export const MIDDLEWARE_STACKS: MiddlewareStacks = {
     custom: createCustomStack,

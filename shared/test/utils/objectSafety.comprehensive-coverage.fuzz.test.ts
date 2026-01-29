@@ -302,7 +302,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
     describe(safeObjectOmit, () => {
         test.prop([fc.constantFrom(null, undefined), fc.array(fc.string())])(
             "returns empty object for null/undefined inputs",
-            (nullishInput, keys) => {
+            (nullishInput: null | undefined, keys: readonly string[]) => {
                 const result = safeObjectOmit(nullishInput, keys);
                 expect(result).toEqual({});
                 expect(typeof result).toBe("object");
@@ -312,7 +312,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
         test.prop([
             fc.record({ a: fc.string(), b: fc.integer(), c: fc.boolean() }),
         ])("omits specified keys correctly", (obj) => {
-            const result = safeObjectOmit(obj, ["a", "c"]);
+            const result = safeObjectOmit(obj, ["a", "c"] as const);
 
             expect(result).not.toHaveProperty("a");
             expect(result).not.toHaveProperty("c");
@@ -347,7 +347,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
                 [symbolKey]: "symbol-value",
             };
 
-            const result = safeObjectOmit(obj, ["stringKey"]);
+            const result = safeObjectOmit(obj, ["stringKey"] as const);
 
             expect(result).not.toHaveProperty("stringKey");
             expect(result).toHaveProperty("numberKey");
@@ -359,7 +359,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
 
         test("preserves all properties when omitting empty array", () => {
             const obj = { a: 1, b: "test", c: true };
-            const result = safeObjectOmit(obj, []);
+            const result = safeObjectOmit(obj, [] as const);
 
             expect(result).toEqual(obj);
             expect(result).not.toBe(obj); // Should be a new object
@@ -368,7 +368,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
         test.prop([
             fc.record({ a: fc.anything(), b: fc.anything(), c: fc.anything() }),
         ])("creates new object reference", (obj) => {
-            const result = safeObjectOmit(obj, ["a"]);
+            const result = safeObjectOmit(obj, ["a"] as const);
             expect(result).not.toBe(obj);
             expect(typeof result).toBe("object");
         });
@@ -385,7 +385,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
                 func: () => "function",
             };
 
-            const result = safeObjectOmit(obj, ["simple"]);
+            const result = safeObjectOmit(obj, ["simple"] as const);
 
             expect(result).toEqual({
                 nested: { deep: { value: "nested" } },
@@ -735,8 +735,8 @@ describe("objectSafety comprehensive fuzzing tests", () => {
         test.prop([
             fc.record({ a: fc.anything(), b: fc.anything(), c: fc.anything() }),
         ])("pick and omit are complementary operations", (obj) => {
-            const picked = safeObjectPick(obj, ["a", "b"]);
-            const omitted = safeObjectOmit(obj, ["c"]);
+            const picked = safeObjectPick(obj, ["a", "b"] as const);
+            const omitted = safeObjectOmit(obj, ["c"] as const);
 
             expect(picked).toEqual(omitted);
         });

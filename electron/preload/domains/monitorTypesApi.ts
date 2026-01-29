@@ -10,8 +10,6 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
-
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
@@ -21,6 +19,7 @@ import {
     type MonitorTypesDomainBridge,
 } from "@shared/types/preload";
 import { isValidationResult } from "@shared/types/validation";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import {
     createValidatedInvoker,
@@ -104,57 +103,63 @@ export interface MonitorTypesApiInterface extends MonitorTypesDomainBridge {
  *
  * @public
  */
-export const monitorTypesApi: MonitorTypesApiInterface = {
-    /**
-     * Formats monitor detail information for display.
-     */
-    formatMonitorDetail: createValidatedInvoker(
-        MONITOR_TYPES_CHANNELS.formatMonitorDetail,
-        safeParseStringResult,
-        {
-            domain: "monitorTypesApi",
-            guardName: "safeParseStringResult",
-        }
-    ),
+export const monitorTypesApi: MonitorTypesApiInterface = ((): MonitorTypesApiInterface => {
+    try {
+        return {
+            /**
+             * Formats monitor detail information for display.
+             */
+            formatMonitorDetail: createValidatedInvoker(
+                MONITOR_TYPES_CHANNELS.formatMonitorDetail,
+                safeParseStringResult,
+                {
+                    domain: "monitorTypesApi",
+                    guardName: "safeParseStringResult",
+                }
+            ),
 
-    /**
-     * Formats monitor title suffix for display.
-     */
-    formatMonitorTitleSuffix: createValidatedInvoker(
-        MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
-        safeParseStringResult,
-        {
-            domain: "monitorTypesApi",
-            guardName: "safeParseStringResult",
-        }
-    ),
+            /**
+             * Formats monitor title suffix for display.
+             */
+            formatMonitorTitleSuffix: createValidatedInvoker(
+                MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
+                safeParseStringResult,
+                {
+                    domain: "monitorTypesApi",
+                    guardName: "safeParseStringResult",
+                }
+            ),
 
-    /**
-     * Gets all available monitor types and their configurations
-     *
-     * @returns Promise resolving to monitor types registry
-     */
-    getMonitorTypes: createValidatedInvoker(
-        MONITOR_TYPES_CHANNELS.getMonitorTypes,
-        safeParseMonitorTypeConfigs,
-        {
-            domain: "monitorTypesApi",
-            guardName: "safeParseMonitorTypeConfigs",
-        }
-    ),
+            /**
+             * Gets all available monitor types and their configurations
+             *
+             * @returns Promise resolving to monitor types registry
+             */
+            getMonitorTypes: createValidatedInvoker(
+                MONITOR_TYPES_CHANNELS.getMonitorTypes,
+                safeParseMonitorTypeConfigs,
+                {
+                    domain: "monitorTypesApi",
+                    guardName: "safeParseMonitorTypeConfigs",
+                }
+            ),
 
-    /**
-     * Validates monitor configuration data.
-     */
-    validateMonitorData: createValidatedInvoker(
-        MONITOR_TYPES_CHANNELS.validateMonitorData,
-        safeParseValidationResult,
-        {
-            domain: "monitorTypesApi",
-            guardName: "safeParseValidationResult",
-        }
-    ),
-} as const;
+            /**
+             * Validates monitor configuration data.
+             */
+            validateMonitorData: createValidatedInvoker(
+                MONITOR_TYPES_CHANNELS.validateMonitorData,
+                safeParseValidationResult,
+                {
+                    domain: "monitorTypesApi",
+                    guardName: "safeParseValidationResult",
+                }
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Type alias for the monitor types domain preload bridge.
@@ -162,5 +167,3 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
  * @public
  */
 export type MonitorTypesApi = MonitorTypesDomainBridge;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

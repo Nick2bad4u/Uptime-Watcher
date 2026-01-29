@@ -189,7 +189,7 @@ export function getAvailableMonitorTypes(): readonly string[] {
  * @public
  */
 export function getMonitorWithResult(
-    type: MonitorType,
+    type: string,
     config?: MonitorServiceConfig,
     forceConfigUpdate = false
 ): MonitorServiceResult {

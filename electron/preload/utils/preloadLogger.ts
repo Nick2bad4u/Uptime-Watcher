@@ -97,9 +97,8 @@ const serializeValue = (value: unknown): unknown => {
     if (typeof value === "string") {
         try {
             // Accept any parseable URL (including mailto/file) for redaction.
-            // eslint-disable-next-line no-new -- parsing-only
-            new URL(value);
-            return getSafeUrlForLogging(value);
+            const parsedUrl = new URL(value);
+            return getSafeUrlForLogging(parsedUrl.toString());
         } catch {
             // not a URL
         }

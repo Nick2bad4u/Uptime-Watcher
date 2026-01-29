@@ -12,6 +12,7 @@ import type { SetOptional, Simplify, UnknownRecord } from "type-fest";
 
 import { safeObjectAccess } from "@shared/utils/objectSafety";
 import { isNonEmptyString } from "@shared/utils/typeGuards";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import {
     isValidFQDN,
     isValidHost,
@@ -333,16 +334,6 @@ type ServerHeartbeatOptionalKeys =
 type WebsocketKeepaliveOptionalKeys = "maxPongDelayMs" | "url";
 
 /**
- * Create default form data for a specific monitor type.
- *
- * @param type - Monitor type
- *
- * @returns Default form data for the specified type
- *
- * @public
- */
-/* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
-/**
  * Creates default monitor form data for the specified monitor type.
  *
  * @remarks
@@ -356,53 +347,27 @@ type WebsocketKeepaliveOptionalKeys = "maxPongDelayMs" | "url";
  * @returns A partially-populated form data object with required fields for the
  *   given monitor type.
  */
-/* eslint-disable tsdoc-require/require -- Overloaded signatures share the implementation TSDoc. */
-export function createDefaultFormData(
-    type: "cdn-edge-consistency"
-): SetOptional<CdnEdgeConsistencyFormData, CdnEdgeConsistencyOptionalKeys>;
-export function createDefaultFormData(
-    type: "dns"
-): SetOptional<DnsFormData, "host" | "recordType">;
-export function createDefaultFormData(
-    type: "http-header"
-): SetOptional<HttpHeaderFormData, HttpHeaderOptionalKeys>;
-export function createDefaultFormData(
-    type: "http-json"
-): SetOptional<HttpJsonFormData, HttpJsonOptionalKeys>;
-export function createDefaultFormData(
-    type: "http"
-): SetOptional<HttpFormData, "url">;
-export function createDefaultFormData(
-    type: "http-keyword"
-): SetOptional<HttpKeywordFormData, "bodyKeyword" | "url">;
-export function createDefaultFormData(
-    type: "http-latency"
-): SetOptional<HttpLatencyFormData, HttpLatencyOptionalKeys>;
-export function createDefaultFormData(
-    type: "http-status"
-): SetOptional<HttpStatusFormData, "expectedStatusCode" | "url">;
-export function createDefaultFormData(
-    type: "ping"
-): SetOptional<PingFormData, "host">;
-export function createDefaultFormData(
-    type: "port"
-): SetOptional<PortFormData, "host" | "port">;
-export function createDefaultFormData(
-    type: "replication"
-): SetOptional<ReplicationFormData, ReplicationOptionalKeys>;
-export function createDefaultFormData(
-    type: "server-heartbeat"
-): SetOptional<ServerHeartbeatFormData, ServerHeartbeatOptionalKeys>;
-export function createDefaultFormData(
-    type: "ssl"
-): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
-export function createDefaultFormData(
-    type: "websocket-keepalive"
-): SetOptional<WebsocketKeepaliveFormData, WebsocketKeepaliveOptionalKeys>;
-export function createDefaultFormData(
-    type: string
-): SetOptional<BaseFormData, never> {
-    /* eslint-enable no-redeclare -- Re-enable after necessary function overloading for type safety */
+export interface CreateDefaultFormData {
+    (
+        type: "cdn-edge-consistency"
+    ): SetOptional<CdnEdgeConsistencyFormData, CdnEdgeConsistencyOptionalKeys>;
+    (type: "dns"): SetOptional<DnsFormData, "host" | "recordType">;
+    (type: "http-header"): SetOptional<HttpHeaderFormData, HttpHeaderOptionalKeys>;
+    (type: "http-json"): SetOptional<HttpJsonFormData, HttpJsonOptionalKeys>;
+    (type: "http"): SetOptional<HttpFormData, "url">;
+    (type: "http-keyword"): SetOptional<HttpKeywordFormData, "bodyKeyword" | "url">;
+    (type: "http-latency"): SetOptional<HttpLatencyFormData, HttpLatencyOptionalKeys>;
+    (type: "http-status"): SetOptional<HttpStatusFormData, "expectedStatusCode" | "url">;
+    (type: "ping"): SetOptional<PingFormData, "host">;
+    (type: "port"): SetOptional<PortFormData, "host" | "port">;
+    (type: "replication"): SetOptional<ReplicationFormData, ReplicationOptionalKeys>;
+    (type: "server-heartbeat"): SetOptional<ServerHeartbeatFormData, ServerHeartbeatOptionalKeys>;
+    (type: "ssl"): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
+    (type: "websocket-keepalive"): SetOptional<WebsocketKeepaliveFormData, WebsocketKeepaliveOptionalKeys>;
+    (type: string): SetOptional<BaseFormData, never>;
+}
+
+function createDefaultFormDataImpl(type: string): SetOptional<BaseFormData, never> {
     return {
         checkInterval: 300_000, // 5 minutes
         monitoring: true,
@@ -412,7 +377,9 @@ export function createDefaultFormData(
     };
 }
 
-/* eslint-enable tsdoc-require/require -- re-enable after overloaded signatures */
+export const createDefaultFormData: CreateDefaultFormData = castUnchecked(
+    createDefaultFormDataImpl
+);
 
 /**
  * Type guard to check if form data is for HTTP monitor.

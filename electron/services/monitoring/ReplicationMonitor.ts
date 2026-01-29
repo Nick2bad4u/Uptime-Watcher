@@ -3,10 +3,9 @@
  * request orchestration and retry handling.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
 import type { Monitor } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
 
@@ -222,19 +221,26 @@ const behavior: RemoteMonitorBehavior<
     type: "replication",
 };
 
-const ReplicationMonitorBase: new (
+type ReplicationMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => IMonitorService = buildMonitorFactory(
-    () =>
-        createRemoteMonitorService<"replication", ReplicationMonitorContext>(
-            behavior
-        ),
-    "ReplicationMonitor"
-);
+) => IMonitorService;
+
+const ReplicationMonitorBase: ReplicationMonitorConstructor = ((): ReplicationMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () =>
+                createRemoteMonitorService<
+                    "replication",
+                    ReplicationMonitorContext
+                >(behavior),
+            "ReplicationMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Replication monitor service built atop the shared remote monitor core.
  */
 export class ReplicationMonitor extends ReplicationMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

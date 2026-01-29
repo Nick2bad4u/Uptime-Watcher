@@ -430,6 +430,38 @@ const MONITOR_TYPE_ACRONYMS = new Set([
     "http",
 ]);
 
+/**
+ * Inserts spaces between camelCase boundaries.
+ *
+ * @remarks
+ * Avoid regex lookarounds: the codebase forbids lookahead/lookbehind, and
+ * regexp auto-fixers may attempt to introduce them.
+ */
+function splitCamelCase(value: string): string {
+    if (value.length === 0) {
+        return value;
+    }
+
+    let result = "";
+    let previous = "";
+
+    for (const character of value) {
+        const previousIsLowerAscii =
+            previous >= "a" && previous <= "z";
+        const isUpperAscii =
+            character >= "A" && character <= "Z";
+
+        if (previousIsLowerAscii && isUpperAscii) {
+            result += " ";
+        }
+
+        result += character;
+        previous = character;
+    }
+
+    return result;
+}
+
 function formatMonitorTypeSegment(segment: string): string {
     if (!segment) {
         return "";
@@ -488,7 +520,10 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                 const titleCase = monitorType
 
                     .replaceAll(/[_-]/gu, " ") // Replace underscores and hyphens with spaces
-                    .replaceAll(/([a-z])([A-Z])/gu, "$1 $2") // Add space before capitals (no lookbehind)
+                    // Convert camelCase segments into spaced words without regex lookarounds.
+                    .split(" ")
+                    .map((segment) => splitCamelCase(segment))
+                    .join(" ")
                     .split(" ")
                     .map((word) => formatMonitorTypeSegment(word))
                     .join(" ");

@@ -53,19 +53,26 @@ const normalizeHistoryLimitError = (
     return primaryError;
 };
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers("SettingsService", {
-    bridgeContracts: [
-        {
-            domain: "settings",
-            methods: [
-                "getHistoryLimit",
-                "resetSettings",
-                "updateHistoryLimit",
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("SettingsService", {
+            bridgeContracts: [
+                {
+                    domain: "settings",
+                    methods: [
+                        "getHistoryLimit",
+                        "resetSettings",
+                        "updateHistoryLimit",
+                    ],
+                },
             ],
-        },
-    ],
-});
+        });
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Contract describing the renderer-facing settings service surface.

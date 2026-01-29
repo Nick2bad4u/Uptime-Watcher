@@ -10,6 +10,7 @@
  * @packageDocumentation
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     getSafeUrlForLogging,
     validateExternalOpenUrlCandidate,
@@ -20,19 +21,28 @@ import type { ElectronAPI } from "../types";
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers("SystemService", {
-    bridgeContracts: [
-        {
-            domain: "system",
-            methods: [
-                "openExternal",
-                "quitAndInstall",
-                "writeClipboardText",
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("SystemService", {
+            bridgeContracts: [
+                {
+                    domain: "system",
+                    methods: [
+                        "openExternal",
+                        "quitAndInstall",
+                        "writeClipboardText",
+                    ],
+                },
             ],
-        },
-    ],
-});
+        });
+    } catch (error) {
+        // Fail fast when preload wiring is invalid, but keep it explicitly
+        // handled for eslint-plugin-exception-handling.
+        throw ensureError(error);
+    }
+})();
 
 interface SystemServiceContract {
     initialize: () => Promise<void>;

@@ -3,8 +3,7 @@
  * shared HTTP monitor core.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
+import { ensureError } from "@shared/utils/errorHandling";
 import { determineMonitorStatus } from "@shared/utils/httpStatusUtils";
 
 import type { MonitorServiceConfig } from "./types";
@@ -36,16 +35,22 @@ const behavior: HttpMonitorBehavior<"http", undefined> = {
     }),
 };
 
-const HttpMonitorBase: new (
+type HttpMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance = buildMonitorFactory(
-    () => createHttpMonitorService<"http", undefined>(behavior),
-    "HttpMonitor"
-);
+) => HttpMonitorServiceInstance;
+
+const HttpMonitorBase: HttpMonitorConstructor = ((): HttpMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () => createHttpMonitorService<"http", undefined>(behavior),
+            "HttpMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * HTTP monitor service that performs health checks via the shared core.
  */
 export class HttpMonitor extends HttpMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

@@ -3,8 +3,6 @@
  * for request orchestration and retry handling.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -234,19 +232,26 @@ const behavior: RemoteMonitorBehavior<
     type: "server-heartbeat",
 };
 
-const ServerHeartbeatMonitorBase: new (
+type ServerHeartbeatMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => IMonitorService = buildMonitorFactory(
-    () =>
-        createRemoteMonitorService<"server-heartbeat", ServerHeartbeatContext>(
-            behavior
-        ),
-    "ServerHeartbeatMonitor"
-);
+) => IMonitorService;
+
+const ServerHeartbeatMonitorBase: ServerHeartbeatMonitorConstructor = ((): ServerHeartbeatMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () =>
+                createRemoteMonitorService<
+                    "server-heartbeat",
+                    ServerHeartbeatContext
+                >(behavior),
+            "ServerHeartbeatMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Server heartbeat monitor service built atop the shared remote monitor core.
  */
 export class ServerHeartbeatMonitor extends ServerHeartbeatMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

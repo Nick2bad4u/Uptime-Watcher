@@ -2,8 +2,6 @@
  * HTTP JSON monitor service built on the shared HTTP core.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -128,8 +126,7 @@ function parsePayload(
 function isParseError(
     result: ReturnType<typeof parsePayload>
 ): result is { error: Error; ok: false } {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison keeps type guard exhaustive
-    return result.ok === false;
+    return !result.ok;
 }
 
 /**
@@ -220,20 +217,26 @@ const behavior: HttpMonitorBehavior<
     },
 };
 
-const HttpJsonMonitorBase: new (
+type HttpJsonMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance = buildMonitorFactory(
-    () =>
-        createHttpMonitorService<
-            "http-json",
-            { expectedValue: string; jsonPath: string }
-        >(behavior),
-    "HttpJsonMonitor"
-);
+) => HttpMonitorServiceInstance;
+
+const HttpJsonMonitorBase: HttpJsonMonitorConstructor = ((): HttpJsonMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () =>
+                createHttpMonitorService<
+                    "http-json",
+                    { expectedValue: string; jsonPath: string }
+                >(behavior),
+            "HttpJsonMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * HTTP JSON monitor service driven by the shared HTTP core.
  */
 export class HttpJsonMonitor extends HttpJsonMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

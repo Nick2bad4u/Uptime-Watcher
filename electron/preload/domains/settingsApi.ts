@@ -9,12 +9,11 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
-
 import {
     SETTINGS_CHANNELS,
     type SettingsDomainBridge,
 } from "@shared/types/preload";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import {
     createValidatedInvoker,
@@ -55,44 +54,50 @@ export interface SettingsApiInterface extends SettingsDomainBridge {
  *
  * @public
  */
-export const settingsApi: SettingsApiInterface = {
-    /**
-     * Gets the current history retention limit
-     *
-     * @returns Promise resolving to the current history limit in days
-     */
-    getHistoryLimit: createValidatedInvoker(
-        SETTINGS_CHANNELS.getHistoryLimit,
-        safeParseNonNegativeIntResult,
-        {
-            domain: "settingsApi",
-            guardName: "safeParseNonNegativeIntResult",
-        }
-    ),
+export const settingsApi: SettingsApiInterface = ((): SettingsApiInterface => {
+    try {
+        return {
+            /**
+             * Gets the current history retention limit
+             *
+             * @returns Promise resolving to the current history limit in days
+             */
+            getHistoryLimit: createValidatedInvoker(
+                SETTINGS_CHANNELS.getHistoryLimit,
+                safeParseNonNegativeIntResult,
+                {
+                    domain: "settingsApi",
+                    guardName: "safeParseNonNegativeIntResult",
+                }
+            ),
 
-    /**
-     * Resets all persisted application settings to their defaults
-     *
-     * @returns Promise that resolves when the reset completes
-     */
-    resetSettings: createVoidInvoker(SETTINGS_CHANNELS.resetSettings),
+            /**
+             * Resets all persisted application settings to their defaults
+             *
+             * @returns Promise that resolves when the reset completes
+             */
+            resetSettings: createVoidInvoker(SETTINGS_CHANNELS.resetSettings),
 
-    /**
-     * Updates the history retention limit
-     *
-     * @param limitDays - New history limit in days
-     *
-     * @returns Promise resolving to the updated history limit value
-     */
-    updateHistoryLimit: createValidatedInvoker(
-        SETTINGS_CHANNELS.updateHistoryLimit,
-        safeParseNonNegativeIntResult,
-        {
-            domain: "settingsApi",
-            guardName: "safeParseNonNegativeIntResult",
-        }
-    ),
-} as const;
+            /**
+             * Updates the history retention limit
+             *
+             * @param limitDays - New history limit in days
+             *
+             * @returns Promise resolving to the updated history limit value
+             */
+            updateHistoryLimit: createValidatedInvoker(
+                SETTINGS_CHANNELS.updateHistoryLimit,
+                safeParseNonNegativeIntResult,
+                {
+                    domain: "settingsApi",
+                    guardName: "safeParseNonNegativeIntResult",
+                }
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Type alias for the settings domain preload bridge.
@@ -100,5 +105,3 @@ export const settingsApi: SettingsApiInterface = {
  * @public
  */
 export type SettingsApi = SettingsDomainBridge;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

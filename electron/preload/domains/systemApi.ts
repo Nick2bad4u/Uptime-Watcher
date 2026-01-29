@@ -10,12 +10,11 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
-
 import {
     SYSTEM_CHANNELS,
     type SystemDomainBridge,
 } from "@shared/types/preload";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import {
     createValidatedInvoker,
@@ -34,56 +33,62 @@ export type SystemApiInterface = SystemDomainBridge;
  *
  * @public
  */
-export const systemApi: SystemApiInterface = {
-    /**
-     * Opens an external URL in the default browser
-     *
-     * @param url - URL to open externally
-     *
-     * @returns Promise resolving to true if URL was opened successfully
-     */
-    openExternal: createValidatedInvoker(
-        SYSTEM_CHANNELS.openExternal,
-        safeParseBooleanResult,
-        {
-            domain: "systemApi",
-            guardName: "safeParseBooleanResult",
-        }
-    ),
+export const systemApi: SystemApiInterface = ((): SystemApiInterface => {
+    try {
+        return {
+            /**
+             * Opens an external URL in the default browser
+             *
+             * @param url - URL to open externally
+             *
+             * @returns Promise resolving to true if URL was opened successfully
+             */
+            openExternal: createValidatedInvoker(
+                SYSTEM_CHANNELS.openExternal,
+                safeParseBooleanResult,
+                {
+                    domain: "systemApi",
+                    guardName: "safeParseBooleanResult",
+                }
+            ),
 
-    /**
-     * Quits the application and installs a pending update
-     *
-     * @remarks
-     * This method triggers the app to quit and automatically install a
-     * downloaded update. This is typically called after the user confirms they
-     * want to install an available update.
-     */
-    quitAndInstall: createValidatedInvoker(
-        SYSTEM_CHANNELS.quitAndInstall,
-        safeParseBooleanResult,
-        {
-            domain: "systemApi",
-            guardName: "safeParseBooleanResult",
-        }
-    ),
+            /**
+             * Quits the application and installs a pending update
+             *
+             * @remarks
+             * This method triggers the app to quit and automatically install a
+             * downloaded update. This is typically called after the user confirms they
+             * want to install an available update.
+             */
+            quitAndInstall: createValidatedInvoker(
+                SYSTEM_CHANNELS.quitAndInstall,
+                safeParseBooleanResult,
+                {
+                    domain: "systemApi",
+                    guardName: "safeParseBooleanResult",
+                }
+            ),
 
-    /**
-     * Writes the provided string to the OS clipboard.
-     *
-     * @remarks
-     * Uses Electron's main-process clipboard API to avoid browser clipboard
-     * permission issues in hardened Electron contexts.
-     */
-    writeClipboardText: createValidatedInvoker(
-        SYSTEM_CHANNELS.writeClipboardText,
-        safeParseBooleanResult,
-        {
-            domain: "systemApi",
-            guardName: "safeParseBooleanResult",
-        }
-    ),
-} as const;
+            /**
+             * Writes the provided string to the OS clipboard.
+             *
+             * @remarks
+             * Uses Electron's main-process clipboard API to avoid browser clipboard
+             * permission issues in hardened Electron contexts.
+             */
+            writeClipboardText: createValidatedInvoker(
+                SYSTEM_CHANNELS.writeClipboardText,
+                safeParseBooleanResult,
+                {
+                    domain: "systemApi",
+                    guardName: "safeParseBooleanResult",
+                }
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Public system API surface exposed via the preload bridge.
@@ -91,5 +96,3 @@ export const systemApi: SystemApiInterface = {
  * @public
  */
 export type SystemApi = SystemDomainBridge;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

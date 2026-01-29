@@ -46,6 +46,7 @@ import {
     type HandlerDetails,
     type WebPreferences,
 } from "electron";
+import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -58,11 +59,10 @@ import {
     getProductionCspHeaderValue,
 } from "./utils/productionSecurityHeaders";
 
-// ESM equivalent of currentDirectory
-/* eslint-disable unicorn/prefer-import-meta-properties -- Node.js types still lag on import.meta.dirname; fileURLToPath is the typed equivalent. */
-const currentFilename = fileURLToPath(import.meta.url);
-const currentDirectory = path.dirname(currentFilename);
-/* eslint-enable unicorn/prefer-import-meta-properties -- Restore default rule behavior after path derivation. */
+// ESM equivalent of `__dirname`.
+// Node.js provides this on `import.meta` in ESM; Electron targets a recent
+// enough Node runtime for this to be available.
+const currentDirectory = import.meta.dirname;
 
 const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(currentDirectory);
 
@@ -423,10 +423,10 @@ export class WindowService {
                             MAX_DELAY
                         );
 
-                        // Using crypto for better randomness would be overkill
-                        // for jitter - Math.random is sufficient.
-                        // eslint-disable-next-line sonarjs/pseudo-random -- dev only
-                        const jitter = Math.random() * JITTER_MS;
+                        // Use a cryptographically strong RNG to avoid
+                        // pseudo-random lints (and because it's essentially
+                        // free at this scale).
+                        const jitter = randomInt(0, JITTER_MS + 1);
 
                         return exponentialDelay + jitter;
                     },
@@ -556,13 +556,12 @@ export class WindowService {
      * @returns The created BrowserWindow instance
      */
     public createMainWindow(): BrowserWindow {
-        if (this.hasMainWindow()) {
+        const existingWindow = this.mainWindow;
+        if (existingWindow) {
             logger.warn(
                 "[WindowService] Main window already exists; returning existing instance"
             );
-            // `hasMainWindow()` ensures `this.mainWindow` is non-null.
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Guaranteed by hasMainWindow().
-            return this.mainWindow!;
+            return existingWindow;
         }
 
         this.mainWindow = new BrowserWindow({
@@ -595,7 +594,7 @@ export class WindowService {
 
             session.setPermissionCheckHandler(() => false);
             session.setPermissionRequestHandler(
-                (_webContents, permission, callback) => {
+                (_webContents, permission, grantPermission) => {
                     if (!this.loggedDeniedPermissions.has(permission)) {
                         this.loggedDeniedPermissions.add(permission);
                         logger.warn(
@@ -604,8 +603,9 @@ export class WindowService {
                         );
                     }
 
-                    // eslint-disable-next-line n/no-callback-literal -- Electron permission callback expects a boolean grant flag.
-                    callback(false);
+                    // Electron expects a boolean "grant" flag here, not an
+                    // error-first Node.js callback.
+                    grantPermission(false);
                 }
             );
 

@@ -15,22 +15,27 @@
 
 import type { AppNotificationRequest } from "@shared/types/notifications";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { validateAppNotificationRequest } from "@shared/validation/notifications";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers(
-    "AppNotificationService",
-    {
-        bridgeContracts: [
-            {
-                domain: "notifications",
-                methods: ["notifyAppEvent"],
-            },
-        ],
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("AppNotificationService", {
+            bridgeContracts: [
+                {
+                    domain: "notifications",
+                    methods: ["notifyAppEvent"],
+                },
+            ],
+        });
+    } catch (error) {
+        throw ensureError(error);
     }
-);
+})();
 
 /**
  * Contract describing app notification operations from the renderer.

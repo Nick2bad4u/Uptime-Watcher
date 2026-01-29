@@ -37,19 +37,26 @@ import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 type RecoveryTrigger = "invalid-event" | "revision-gap" | "truncated-event";
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers("StateSyncService", {
-    bridgeContracts: [
-        {
-            domain: "stateSync",
-            methods: ["getSyncStatus", "requestFullSync"],
-        },
-        {
-            domain: "events",
-            methods: ["onStateSyncEvent"],
-        },
-    ],
-});
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("StateSyncService", {
+            bridgeContracts: [
+                {
+                    domain: "stateSync",
+                    methods: ["getSyncStatus", "requestFullSync"],
+                },
+                {
+                    domain: "events",
+                    methods: ["onStateSyncEvent"],
+                },
+            ],
+        });
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Contract for renderer-facing state synchronization operations.

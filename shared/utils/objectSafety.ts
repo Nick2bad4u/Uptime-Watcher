@@ -134,13 +134,28 @@ export function safeObjectIteration(
  *
  * @returns New object without the specified keys
  */
-export function safeObjectOmit<T extends object, K extends keyof T>(
+export interface SafeObjectOmit {
+    /**
+     * Omitting keys from a nullish input yields an empty object.
+     */
+    (obj: null | undefined, keys: readonly PropertyKey[]): Record<string, never>;
+
+    /**
+     * Omits the provided keys from the object.
+     */
+    <T extends object, K extends keyof T>(
+        obj: null | T | undefined,
+        keys: readonly K[]
+    ): Omit<T, K>;
+}
+
+function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
     obj: null | T | undefined,
     keys: readonly K[]
-): Omit<T, K> {
+): Omit<T, Extract<K, keyof T>> | Record<string, never> {
     // Handle null/undefined inputs by returning empty object
     if (obj === null || obj === undefined) {
-        return createNullPrototypeObject<Omit<T, K>>();
+        return createNullPrototypeObject<Record<string, never>>();
     }
 
     const stringKeysToOmit = new Set<string>();
@@ -162,7 +177,7 @@ export function safeObjectOmit<T extends object, K extends keyof T>(
     // - `Object.defineProperty` on a null-prototype object always defines an
     //   own property.
     //
-    const result = createNullPrototypeObject<Omit<T, K>>();
+    const result = createNullPrototypeObject<Omit<T, Extract<K, keyof T>>>();
     const record = castUnchecked<UnknownRecord>(obj);
 
     // Copy enumerable string/number properties
@@ -191,6 +206,8 @@ export function safeObjectOmit<T extends object, K extends keyof T>(
 
     return result;
 }
+
+export const safeObjectOmit: SafeObjectOmit = safeObjectOmitImpl as SafeObjectOmit;
 
 /**
  * Create a type-safe subset of an object with only specified keys.

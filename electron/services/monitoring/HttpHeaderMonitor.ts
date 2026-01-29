@@ -2,8 +2,6 @@
  * HTTP header monitor service built on the shared HTTP core.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -162,20 +160,26 @@ const behavior: HttpMonitorBehavior<
     },
 };
 
-const HttpHeaderMonitorBase: new (
+type HttpHeaderMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance = buildMonitorFactory(
-    () =>
-        createHttpMonitorService<
-            "http-header",
-            { expectedValue: string; headerName: string }
-        >(behavior),
-    "HttpHeaderMonitor"
-);
+) => HttpMonitorServiceInstance;
+
+const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor = ((): HttpHeaderMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () =>
+                createHttpMonitorService<
+                    "http-header",
+                    { expectedValue: string; headerName: string }
+                >(behavior),
+            "HttpHeaderMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * HTTP header monitor service powered by the shared HTTP core.
  */
 export class HttpHeaderMonitor extends HttpHeaderMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

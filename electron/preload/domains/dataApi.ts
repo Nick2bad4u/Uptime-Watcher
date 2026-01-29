@@ -12,9 +12,8 @@
  * @packageDocumentation
  */
 
-/* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
-
 import { DATA_CHANNELS, type DataDomainBridge } from "@shared/types/preload";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     validateSerializedDatabaseBackupResult,
     validateSerializedDatabaseBackupSaveResult,
@@ -74,71 +73,77 @@ export interface DataApiInterface extends DataDomainBridge {
  *
  * @public
  */
-export const dataApi: DataApiInterface = {
-    /**
-     * Downloads a SQLite database backup
-     *
-     * @returns Promise resolving to backup buffer data
-     */
-    downloadSqliteBackup: createValidatedInvoker(
-        DATA_CHANNELS.downloadSqliteBackup,
-        validateSerializedDatabaseBackupResult,
-        {
-            domain: "dataApi",
-            guardName: "validateSerializedDatabaseBackupResult",
-        }
-    ),
+export const dataApi: DataApiInterface = ((): DataApiInterface => {
+    try {
+        return {
+            /**
+             * Downloads a SQLite database backup
+             *
+             * @returns Promise resolving to backup buffer data
+             */
+            downloadSqliteBackup: createValidatedInvoker(
+                DATA_CHANNELS.downloadSqliteBackup,
+                validateSerializedDatabaseBackupResult,
+                {
+                    domain: "dataApi",
+                    guardName: "validateSerializedDatabaseBackupResult",
+                }
+            ),
 
-    /**
-     * Exports all application data to a JSON string
-     *
-     * @returns Promise resolving to exported data as JSON string
-     */
-    exportData: createValidatedInvoker(
-        DATA_CHANNELS.exportData,
-        safeParseStringResult,
-        {
-            domain: "dataApi",
-            guardName: "safeParseStringResult",
-        }
-    ),
+            /**
+             * Exports all application data to a JSON string
+             *
+             * @returns Promise resolving to exported data as JSON string
+             */
+            exportData: createValidatedInvoker(
+                DATA_CHANNELS.exportData,
+                safeParseStringResult,
+                {
+                    domain: "dataApi",
+                    guardName: "safeParseStringResult",
+                }
+            ),
 
-    /**
-     * Imports application data from a JSON string
-     *
-     * @param jsonData - JSON string containing application data to import
-     *
-     * @returns Promise resolving to a boolean success flag
-     */
-    importData: createValidatedInvoker(
-        DATA_CHANNELS.importData,
-        safeParseBooleanResult,
-        {
-            domain: "dataApi",
-            guardName: "safeParseBooleanResult",
-        }
-    ),
+            /**
+             * Imports application data from a JSON string
+             *
+             * @param jsonData - JSON string containing application data to import
+             *
+             * @returns Promise resolving to a boolean success flag
+             */
+            importData: createValidatedInvoker(
+                DATA_CHANNELS.importData,
+                safeParseBooleanResult,
+                {
+                    domain: "dataApi",
+                    guardName: "safeParseBooleanResult",
+                }
+            ),
 
-    /** Restores a SQLite backup from an uploaded file */
-    restoreSqliteBackup: createValidatedInvoker(
-        DATA_CHANNELS.restoreSqliteBackup,
-        validateSerializedDatabaseRestoreResult,
-        {
-            domain: "dataApi",
-            guardName: "validateSerializedDatabaseRestoreResult",
-        }
-    ),
+            /** Restores a SQLite backup from an uploaded file */
+            restoreSqliteBackup: createValidatedInvoker(
+                DATA_CHANNELS.restoreSqliteBackup,
+                validateSerializedDatabaseRestoreResult,
+                {
+                    domain: "dataApi",
+                    guardName: "validateSerializedDatabaseRestoreResult",
+                }
+            ),
 
-    /** Saves a SQLite backup to disk via the main process. */
-    saveSqliteBackup: createValidatedInvoker(
-        DATA_CHANNELS.saveSqliteBackup,
-        validateSerializedDatabaseBackupSaveResult,
-        {
-            domain: "dataApi",
-            guardName: "validateSerializedDatabaseBackupSaveResult",
-        }
-    ),
-} as const;
+            /** Saves a SQLite backup to disk via the main process. */
+            saveSqliteBackup: createValidatedInvoker(
+                DATA_CHANNELS.saveSqliteBackup,
+                validateSerializedDatabaseBackupSaveResult,
+                {
+                    domain: "dataApi",
+                    guardName: "validateSerializedDatabaseBackupSaveResult",
+                }
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Type alias for the data domain preload bridge.
@@ -146,5 +151,3 @@ export const dataApi: DataApiInterface = {
  * @public
  */
 export type DataApi = DataDomainBridge;
-
-/* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

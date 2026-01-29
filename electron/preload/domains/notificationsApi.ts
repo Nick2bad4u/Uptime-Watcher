@@ -6,14 +6,13 @@
  * preferences with the Electron main process.
  */
 
-/* eslint-disable ex/no-unhandled -- Preload bridges propagate errors to the caller */
-
 import type {
     AppNotificationRequest,
     NotificationPreferenceUpdate,
 } from "@shared/types/notifications";
 
 import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import { createVoidInvoker } from "../core/bridgeFactory";
 
@@ -47,11 +46,17 @@ export interface NotificationsApiInterface {
  *
  * @public
  */
-export const notificationsApi: NotificationsApiInterface = {
-    notifyAppEvent: createVoidInvoker(NOTIFICATION_CHANNELS.notifyAppEvent),
-    updatePreferences: createVoidInvoker(
-        NOTIFICATION_CHANNELS.updatePreferences
-    ),
-} as const;
-
-/* eslint-enable ex/no-unhandled -- Re-enable lint rule for other modules */
+export const notificationsApi: NotificationsApiInterface = ((): NotificationsApiInterface => {
+    try {
+        return {
+            notifyAppEvent: createVoidInvoker(
+                NOTIFICATION_CHANNELS.notifyAppEvent
+            ),
+            updatePreferences: createVoidInvoker(
+                NOTIFICATION_CHANNELS.updatePreferences
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();

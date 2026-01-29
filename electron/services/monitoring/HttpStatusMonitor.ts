@@ -2,9 +2,9 @@
  * HTTP status monitor service built on the shared HTTP core.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
 import type { Monitor } from "@shared/types";
+
+import { ensureError } from "@shared/utils/errorHandling";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -67,20 +67,26 @@ const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
         },
     };
 
-const HttpStatusMonitorBase: new (
+type HttpStatusMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance = buildMonitorFactory(
-    () =>
-        createHttpMonitorService<"http-status", { expectedStatus: number }>(
-            behavior
-        ),
-    "HttpStatusMonitor"
-);
+) => HttpMonitorServiceInstance;
+
+const HttpStatusMonitorBase: HttpStatusMonitorConstructor = ((): HttpStatusMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () =>
+                createHttpMonitorService<"http-status", { expectedStatus: number }>(
+                    behavior
+                ),
+            "HttpStatusMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * HTTP status monitor service that validates response codes via the shared
  * core.
  */
 export class HttpStatusMonitor extends HttpStatusMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

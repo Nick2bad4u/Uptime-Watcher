@@ -123,11 +123,15 @@ const downloadSqliteBackupAction = (
                 clearMetadataOnFailure: true,
                 deps,
                 errorLogMessage: "Failed to download SQLite backup:",
-                operation: () =>
-                    // eslint-disable-next-line ex/no-unhandled -- deps access is safe here; errors are handled by the surrounding operation wrapper.
-                    handleSQLiteBackupDownload(() =>
-                        deps.services.data.downloadSqliteBackup()
-                    ),
+                operation: () => (async (): Promise<SerializedDatabaseBackupResult> => {
+                        try {
+                            return await handleSQLiteBackupDownload(
+                                deps.services.data.downloadSqliteBackup
+                            );
+                        } catch (error) {
+                            throw ensureError(error);
+                        }
+                    })(),
             }),
         deps,
         {

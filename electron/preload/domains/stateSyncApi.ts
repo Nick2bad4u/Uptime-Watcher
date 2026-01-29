@@ -19,6 +19,7 @@ import {
     safeParseStateSyncFullSyncResult,
     safeParseStateSyncStatusSummary,
 } from "@shared/types/stateSync";
+import { ensureError } from "@shared/utils/errorHandling";
 
 import { createValidatedInvoker } from "../core/bridgeFactory";
 
@@ -48,37 +49,41 @@ export interface StateSyncApiInterface extends StateSyncDomainBridge {
  *
  * @public
  */
-export const stateSyncApi: StateSyncApiInterface = {
-    /**
-     * Gets the current synchronization status
-     *
-     * @returns Promise resolving to current sync status information
-     */
-    // eslint-disable-next-line ex/no-unhandled -- Accessing constant channel mapping.
-    getSyncStatus: createValidatedInvoker(
-        STATE_SYNC_CHANNELS.getSyncStatus,
-        safeParseStateSyncStatusSummary,
-        {
-            domain: "stateSyncApi",
-            guardName: "safeParseStateSyncStatusSummary",
-        }
-    ),
+export const stateSyncApi: StateSyncApiInterface = ((): StateSyncApiInterface => {
+    try {
+        return {
+            /**
+             * Gets the current synchronization status
+             *
+             * @returns Promise resolving to current sync status information
+             */
+            getSyncStatus: createValidatedInvoker(
+                STATE_SYNC_CHANNELS.getSyncStatus,
+                safeParseStateSyncStatusSummary,
+                {
+                    domain: "stateSyncApi",
+                    guardName: "safeParseStateSyncStatusSummary",
+                }
+            ),
 
-    /**
-     * Requests a full synchronization of all data
-     *
-     * @returns Promise resolving to synchronized site data
-     */
-    // eslint-disable-next-line ex/no-unhandled -- Accessing constant channel mapping.
-    requestFullSync: createValidatedInvoker(
-        STATE_SYNC_CHANNELS.requestFullSync,
-        safeParseStateSyncFullSyncResult,
-        {
-            domain: "stateSyncApi",
-            guardName: "safeParseStateSyncFullSyncResult",
-        }
-    ),
-} as const;
+            /**
+             * Requests a full synchronization of all data
+             *
+             * @returns Promise resolving to synchronized site data
+             */
+            requestFullSync: createValidatedInvoker(
+                STATE_SYNC_CHANNELS.requestFullSync,
+                safeParseStateSyncFullSyncResult,
+                {
+                    domain: "stateSyncApi",
+                    guardName: "safeParseStateSyncFullSyncResult",
+                }
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Type alias for the state sync domain preload surface.

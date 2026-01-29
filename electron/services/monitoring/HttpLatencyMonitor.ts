@@ -2,9 +2,9 @@
  * HTTP latency monitor service built on the shared HTTP core.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
 import type { Monitor } from "@shared/types";
+
+import { ensureError } from "@shared/utils/errorHandling";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -74,19 +74,25 @@ const behavior: HttpMonitorBehavior<"http-latency", { threshold: number }> = {
     },
 };
 
-const HttpLatencyMonitorBase: new (
+type HttpLatencyMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance = buildMonitorFactory(
-    () =>
-        createHttpMonitorService<"http-latency", { threshold: number }>(
-            behavior
-        ),
-    "HttpLatencyMonitor"
-);
+) => HttpMonitorServiceInstance;
+
+const HttpLatencyMonitorBase: HttpLatencyMonitorConstructor = ((): HttpLatencyMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () =>
+                createHttpMonitorService<"http-latency", { threshold: number }>(
+                    behavior
+                ),
+            "HttpLatencyMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * HTTP latency monitor service driven by the shared HTTP core.
  */
 export class HttpLatencyMonitor extends HttpLatencyMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

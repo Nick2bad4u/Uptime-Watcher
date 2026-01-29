@@ -1312,7 +1312,6 @@ describe(WindowService, () => {
             await annotate("Type: Business Logic", "type");
 
             const originalFetch = globalThis.fetch;
-            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
 
             let attempts = 0;
             const retryingFetch = async () => {
@@ -1333,11 +1332,12 @@ describe(WindowService, () => {
 
                 expect(attempts).toBe(2);
                 expect(logger.debug).toHaveBeenCalledWith(
-                    expect.stringContaining("Waiting 500ms before retry 2/20")
+                    expect.stringMatching(
+                        /Waiting \d+ms before retry 2\/20/u
+                    )
                 );
             } finally {
                 (globalThis as any).fetch = originalFetch;
-                randomSpy.mockRestore();
             }
         });
 

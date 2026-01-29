@@ -232,7 +232,7 @@ describe("objectSafety.ts fuzzing tests", () => {
     describe(safeObjectOmit, () => {
         test.prop([fc.constantFrom(null, undefined), fc.array(fc.string())])(
             "should return empty object for null/undefined input",
-            (nullishInput, keys) => {
+            (nullishInput: null | undefined, keys: readonly string[]) => {
                 const result = safeObjectOmit(nullishInput, keys);
                 expect(result).toEqual({});
             }

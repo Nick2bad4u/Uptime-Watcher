@@ -40,29 +40,36 @@ import type {
 import type { UnknownRecord } from "type-fest";
 import type * as z from "zod";
 
-import { ApplicationError } from "@shared/utils/errorHandling";
+import { ApplicationError, ensureError } from "@shared/utils/errorHandling";
 import { validateStatusUpdate } from "@shared/validation/guards";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers("MonitoringService", {
-    bridgeContracts: [
-        {
-            domain: "monitoring",
-            methods: [
-                "checkSiteNow",
-                "startMonitoring",
-                "startMonitoringForMonitor",
-                "startMonitoringForSite",
-                "stopMonitoring",
-                "stopMonitoringForMonitor",
-                "stopMonitoringForSite",
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("MonitoringService", {
+            bridgeContracts: [
+                {
+                    domain: "monitoring",
+                    methods: [
+                        "checkSiteNow",
+                        "startMonitoring",
+                        "startMonitoringForMonitor",
+                        "startMonitoringForSite",
+                        "stopMonitoring",
+                        "stopMonitoringForMonitor",
+                        "stopMonitoringForSite",
+                    ],
+                },
             ],
-        },
-    ],
-});
+        });
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Resolves a candidate value to a non-empty identifier string.

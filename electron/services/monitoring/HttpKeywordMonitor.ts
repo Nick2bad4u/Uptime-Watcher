@@ -2,9 +2,9 @@
  * HTTP keyword monitor service built on the shared HTTP core.
  */
 
-/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
-
 import type { Monitor } from "@shared/types";
+
+import { ensureError } from "@shared/utils/errorHandling";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -79,17 +79,25 @@ const behavior: HttpMonitorBehavior<"http-keyword", { keyword: string }> = {
     },
 };
 
-const HttpKeywordMonitorBase: new (
+type HttpKeywordMonitorConstructor = new (
     config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance = buildMonitorFactory(
-    () =>
-        createHttpMonitorService<"http-keyword", { keyword: string }>(behavior),
-    "HttpKeywordMonitor"
-);
+) => HttpMonitorServiceInstance;
+
+const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor = ((): HttpKeywordMonitorConstructor => {
+    try {
+        return buildMonitorFactory(
+            () =>
+                createHttpMonitorService<"http-keyword", { keyword: string }>(
+                    behavior
+                ),
+            "HttpKeywordMonitor"
+        );
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * HTTP keyword monitor service powered by the shared HTTP core.
  */
 export class HttpKeywordMonitor extends HttpKeywordMonitorBase {}
-
-/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

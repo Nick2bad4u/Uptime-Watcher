@@ -14,22 +14,27 @@
 
 import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { validateNotificationPreferenceUpdate } from "@shared/validation/notifications";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers(
-    "NotificationPreferenceService",
-    {
-        bridgeContracts: [
-            {
-                domain: "notifications",
-                methods: ["updatePreferences"],
-            },
-        ],
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("NotificationPreferenceService", {
+            bridgeContracts: [
+                {
+                    domain: "notifications",
+                    methods: ["updatePreferences"],
+                },
+            ],
+        });
+    } catch (error) {
+        throw ensureError(error);
     }
-);
+})();
 
 /**
  * Contract describing notification preference operations from the renderer.

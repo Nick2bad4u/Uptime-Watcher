@@ -33,6 +33,8 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
@@ -65,32 +67,39 @@ interface CloudServiceContract {
     uploadLatestBackup: () => Promise<CloudBackupEntry>;
 }
 
-// eslint-disable-next-line ex/no-unhandled -- Module-level initialization should fail fast when preload wiring is invalid.
-const { ensureInitialized, wrap } = getIpcServiceHelpers("CloudService", {
-    bridgeContracts: [
-        {
-            domain: "cloud",
-            methods: [
-                "clearEncryptionKey",
-                "connectDropbox",
-                "connectGoogleDrive",
-                "configureFilesystemProvider",
-                "deleteBackup",
-                "disconnect",
-                "enableSync",
-                "getStatus",
-                "listBackups",
-                "migrateBackups",
-                "previewResetRemoteSyncState",
-                "requestSyncNow",
-                "resetRemoteSyncState",
-                "restoreBackup",
-                "setEncryptionPassphrase",
-                "uploadLatestBackup",
+type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
+
+const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
+    try {
+        return getIpcServiceHelpers("CloudService", {
+            bridgeContracts: [
+                {
+                    domain: "cloud",
+                    methods: [
+                        "clearEncryptionKey",
+                        "connectDropbox",
+                        "connectGoogleDrive",
+                        "configureFilesystemProvider",
+                        "deleteBackup",
+                        "disconnect",
+                        "enableSync",
+                        "getStatus",
+                        "listBackups",
+                        "migrateBackups",
+                        "previewResetRemoteSyncState",
+                        "requestSyncNow",
+                        "resetRemoteSyncState",
+                        "restoreBackup",
+                        "setEncryptionPassphrase",
+                        "uploadLatestBackup",
+                    ],
+                },
             ],
-        },
-    ],
-});
+        });
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Service for interacting with cloud providers through Electron IPC.
