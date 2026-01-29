@@ -689,7 +689,6 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 try {
                     await withErrorHandling(
                         async () => {
-                            // eslint-disable-next-line n/no-sync -- Domain-level "enable sync" call, not a Node.js sync filesystem API.
                             const status = await CloudService.enableSync({
                                 enabled,
                             });

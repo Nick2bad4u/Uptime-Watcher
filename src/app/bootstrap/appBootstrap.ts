@@ -143,7 +143,6 @@ export async function runAppBootstrap(
         }
 
         logger.debug("[App:init] setting up cache synchronization");
-        // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
         const cacheSyncCleanup = setupCacheSync();
         logger.debug("[App:init] cache synchronization enabled");
         options.cleanupRefs.cacheSyncCleanupRef.current = cacheSyncCleanup;

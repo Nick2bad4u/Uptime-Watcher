@@ -411,7 +411,6 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // via the UpdatesStore to keep event ownership consistent.
 
     // Focus-based state synchronization (disabled by default for performance)
-    // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
 
     const handleSidebarBreakpointChange = useCallback(

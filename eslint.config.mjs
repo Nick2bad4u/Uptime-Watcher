@@ -2299,7 +2299,18 @@ export default defineConfig([
             ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
-            "n/no-sync": "warn",
+            "n/no-sync": [
+                "warn",
+                {
+                    ignores: [
+                        "enableSync",
+                        "requestFullSync",
+                        "stateSync",
+                        "setupCacheSync",
+                        "useBackendFocusSync",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "warn",
@@ -3726,7 +3737,18 @@ export default defineConfig([
             ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
-            "n/no-sync": "warn",
+            "n/no-sync": [
+                "warn",
+                {
+                    ignores: [
+                        "enableSync",
+                        "requestFullSync",
+                        "stateSync",
+                        "setupCacheSync",
+                        "useBackendFocusSync",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "off",
@@ -5445,7 +5467,18 @@ export default defineConfig([
             ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
-            "n/no-sync": "warn",
+            "n/no-sync": [
+                "warn",
+                {
+                    ignores: [
+                        "enableSync",
+                        "requestFullSync",
+                        "stateSync",
+                        "setupCacheSync",
+                        "useBackendFocusSync",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "warn",
@@ -6879,7 +6912,18 @@ export default defineConfig([
             ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
-            "n/no-sync": "warn",
+            "n/no-sync": [
+                "warn",
+                {
+                    ignores: [
+                        "enableSync",
+                        "requestFullSync",
+                        "stateSync",
+                        "setupCacheSync",
+                        "useBackendFocusSync",
+                    ],
+                },
+            ],
             "n/no-top-level-await": "warn",
             "n/no-unpublished-import": [
                 "warn",
@@ -9112,7 +9156,18 @@ export default defineConfig([
             ],
             "n/no-restricted-import": "warn",
             "n/no-restricted-require": "warn",
-            "n/no-sync": "warn",
+            "n/no-sync": [
+                "warn",
+                {
+                    ignores: [
+                        "enableSync",
+                        "requestFullSync",
+                        "stateSync",
+                        "setupCacheSync",
+                        "useBackendFocusSync",
+                    ],
+                },
+            ],
             "n/no-unpublished-import": [
                 "off",
                 {

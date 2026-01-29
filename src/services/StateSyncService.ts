@@ -76,7 +76,7 @@ interface StateSyncServiceContract {
      * cleanup callback.
      */
     readonly onStateSyncEvent: (
-        callback: (event: StateSyncEventData) => void
+        handler: (event: StateSyncEventData) => void
     ) => Promise<() => void>;
     /**
      * Requests a full synchronization cycle and returns the backend result
@@ -119,7 +119,6 @@ export const StateSyncService: StateSyncServiceContract = {
      *   {@link StateSyncStatusSummary}.
      */
     getSyncStatus: wrap("getSyncStatus", async (api) => {
-        // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
         const rawSummary = await api.stateSync.getSyncStatus();
         return parseStateSyncStatusSummary(rawSummary);
     }),
@@ -151,7 +150,7 @@ export const StateSyncService: StateSyncServiceContract = {
      * a matching broadcast from the backend before clearing its recovery
      * expectation.
      *
-     * @param callback - Handler invoked with validated
+    * @param handler - Handler invoked with validated
      *   {@link StateSyncEventData} instances describing bulk or incremental site
      *   snapshots.
      *
@@ -164,8 +163,7 @@ export const StateSyncService: StateSyncServiceContract = {
      */
     onStateSyncEvent: wrap(
         "onStateSyncEvent",
-        async (api, callback: (event: StateSyncEventData) => void) => {
-            /* eslint-disable n/no-sync, n/callback-return -- IPC bridge exposes asynchronous APIs with "Sync" suffix and forwards callbacks */
+        async (api, handler: (event: StateSyncEventData) => void) => {
             let pendingRecovery: null | Promise<void> = null;
             let subscriptionActive = true;
             let pendingRecoveryExpectation: null | {
@@ -227,10 +225,10 @@ export const StateSyncService: StateSyncServiceContract = {
 
                         logger.warn(recoveryMessage);
 
-                        const rawFullSync =
+                        const rawFullSyncResult =
                             await api.stateSync.requestFullSync();
                         const fullSync =
-                            parseStateSyncFullSyncResult(rawFullSync);
+                            parseStateSyncFullSyncResult(rawFullSyncResult);
 
                         logger.info(
                             "[StateSyncService] Full sync recovery snapshot retrieved",
@@ -255,7 +253,7 @@ export const StateSyncService: StateSyncServiceContract = {
                             timestamp: fullSync.completedAt,
                         };
 
-                        callback(synthesizedEvent);
+                        handler(synthesizedEvent);
 
                         lastSeenRevision = fullSync.revision;
 
@@ -372,7 +370,7 @@ export const StateSyncService: StateSyncServiceContract = {
                             pendingRecoveryExpectation.expectedRevision;
 
                     if (!shouldSkipCallback) {
-                        callback(parsedEvent.data);
+                        handler(parsedEvent.data);
                     }
 
                     if (isExpectedRecoveryBroadcast) {
@@ -393,8 +391,6 @@ export const StateSyncService: StateSyncServiceContract = {
                     }
                 })
             );
-            /* eslint-enable n/no-sync, n/callback-return -- Restore linting after state sync subscription block */
-
             const normalizedCleanup = resolveCleanupHandler(
                 unsubscribeCandidate,
                 {
@@ -451,7 +447,6 @@ export const StateSyncService: StateSyncServiceContract = {
      *   {@link StateSyncFullSyncResult}.
      */
     requestFullSync: wrap("requestFullSync", async (api) => {
-        // eslint-disable-next-line n/no-sync -- IPC bridge exposes async method with "Sync" suffix.
         const rawResult = await api.stateSync.requestFullSync();
         return parseStateSyncFullSyncResult(rawResult);
     }),

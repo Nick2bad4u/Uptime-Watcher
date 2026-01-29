@@ -51,7 +51,6 @@ export function registerCloudHandlers({
 
     register(
         CLOUD_CHANNELS.enableSync,
-        // eslint-disable-next-line n/no-sync -- "Sync" is part of the feature name, not a Node.js sync API.
         (config: CloudEnableSyncConfig) => cloudService.enableSync(config),
         CloudHandlerValidators.enableSync
     );

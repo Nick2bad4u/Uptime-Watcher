@@ -657,7 +657,6 @@ export const createSiteSyncActions = (
 
                     try {
                         const fullSyncResult =
-                            // eslint-disable-next-line n/no-sync -- Backend API name uses "Sync" suffix but returns a Promise
                             await StateSyncService.requestFullSync();
                         const {
                             completedAt,
