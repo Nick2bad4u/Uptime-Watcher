@@ -851,7 +851,7 @@
         "cssnano-preset-advanced": "^7.0.10",
         "depcheck": "^1.4.7",
         "docusaurus-plugin-typedoc": "^1.4.2",
-        "electron": "^40.0.0",
+        "electron": "^40.1.0",
         "electron-builder": "^26.4.0",
         "electron-builder-squirrel-windows": "^26.4.0",
         "electron-debug": "^4.1.0",
