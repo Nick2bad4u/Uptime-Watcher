@@ -379,7 +379,10 @@ export default defineConfig([
             "docs/**/*.{ts,tsx}",
             "scripts/**/*.{ts,tsx}",
         ],
-        ignores: ["shared/types/**/*", "**/*.d.ts"],
+        ignores: [
+            "shared/types/**/*",
+            "**/*.d.ts",
+        ],
         name: "Shared Contract Interface Guard",
         rules: {
             "uptime-watcher/no-redeclare-shared-contract-interfaces": "error",
@@ -4547,7 +4550,10 @@ export default defineConfig([
                 },
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
-                project: ["tsconfig.electron.json", "tsconfig.shared.json"],
+                project: [
+                    "tsconfig.electron.json",
+                    "tsconfig.shared.json",
+                ],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,

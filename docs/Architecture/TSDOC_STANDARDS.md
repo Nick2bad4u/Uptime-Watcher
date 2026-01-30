@@ -43,6 +43,7 @@ tags:
  * @example
  *  ```typescript
  *
+ *
  *  // Basic usage example
  *  const result = await functionName(requiredParam, optionalParam);
  *  console.log(result);
@@ -50,10 +51,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Advanced usage example with error handling
  *  try {
@@ -100,10 +97,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  // Basic repository usage
  *  const repository = new ExampleRepository({ databaseService });
  *
@@ -123,6 +116,7 @@ tags:
  *
  * @example
  *  ```typescript
+ *
  *
  *  // Transaction usage with multiple operations
  *  await databaseService.executeTransaction(async (db) => {
@@ -207,10 +201,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  // Define typed event map
  *  interface MyEvents {
  *   "user:login": { userId: string; timestamp: number };
@@ -229,10 +219,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Listen to events with type safety
  *  eventBus.onTyped("user:login", (data) => {
@@ -271,10 +257,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  // Object event (typical case)
  *  await bus.emitTyped("user:login", {
  *   userId: "123",
@@ -293,10 +275,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Event emission with error handling
  *  try {
@@ -344,10 +322,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  // Basic store usage
  *  import { useExampleStore } from "./stores/useExampleStore";
  *
@@ -376,10 +350,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Advanced usage with selectors
  *  // Efficient selector for derived state
@@ -426,10 +396,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  // Frontend usage with store integration
  *  const handleUserAction = async () => {
  *   await withErrorHandling(async () => {
@@ -442,10 +408,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Backend usage with logger integration
  *  async performBackendOperation() {
@@ -462,10 +424,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Error handling with specific error types
  *  try {
@@ -516,10 +474,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  import { SITES_CHANNELS } from "@shared/types/preload";
  *  import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
  *
@@ -538,10 +492,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  import { SITES_CHANNELS } from "@shared/types/preload";
  *  import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
  *
@@ -556,10 +506,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  import { SITES_CHANNELS } from "@shared/types/preload";
  *  import { registerStandardizedIpcHandler } from "@electron/services/ipc/utils";
@@ -595,10 +541,6 @@ tags:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  // Brief description of what this example shows
  *  const result = await functionName(param1, param2);
  *  console.log(result);
@@ -613,10 +555,6 @@ tags:
 /**
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Comprehensive example with error handling
  *  try {
@@ -643,10 +581,6 @@ tags:
 /**
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Basic usage pattern
  *  const store = useExampleStore();
@@ -676,10 +610,6 @@ Show the most common, straightforward usage:
  * @example
  *  ```typescript
  *
- *
- *
- *
- *
  *  // Basic repository usage
  *  const user = await userRepository.findById("user-123");
  *  if (user) {
@@ -698,10 +628,6 @@ Demonstrate proper error handling patterns:
 /**
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Proper error handling
  *  try {
@@ -725,10 +651,6 @@ Show complex scenarios and integration patterns:
 /**
  * @example
  *  ```typescript
- *
- *
- *
- *
  *
  *  // Advanced usage with transaction coordination
  *  await databaseService.executeTransaction(async (db) => {

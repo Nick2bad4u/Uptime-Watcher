@@ -183,7 +183,6 @@
                     "prettier-plugin-sort-json",
                     "prettier-plugin-jsdoc",
                     "prettier-plugin-jsdoc-type",
-                    "prettier-markdown-table",
                     "prettier-plugin-merge"
                 ],
                 "tabWidth": 1

@@ -83,24 +83,24 @@ import { setupCacheSync } from "@/utils/cacheSync";
  * Establish site + monitor subscriptions once during app bootstrap.
  *
  * @remarks
- * See `src/App.tsx` for the real integration.
+ *   See `src/App.tsx` for the real integration.
  */
 export function useSitesEventBootstrap(): void {
-  const sitesStore = useSitesStore();
+ const sitesStore = useSitesStore();
 
-  useEffect(() => {
-    const cacheSyncCleanup = setupCacheSync();
-    const syncEventsCleanup = sitesStore.subscribeToSyncEvents();
+ useEffect(() => {
+  const cacheSyncCleanup = setupCacheSync();
+  const syncEventsCleanup = sitesStore.subscribeToSyncEvents();
 
-    // Monitor updates (down/up/status-changed + manual checks)
-    void sitesStore.subscribeToStatusUpdates();
+  // Monitor updates (down/up/status-changed + manual checks)
+  void sitesStore.subscribeToStatusUpdates();
 
-    return () => {
-      cacheSyncCleanup();
-      syncEventsCleanup();
-      sitesStore.unsubscribeFromStatusUpdates();
-    };
-  }, [sitesStore]);
+  return () => {
+   cacheSyncCleanup();
+   syncEventsCleanup();
+   sitesStore.unsubscribeFromStatusUpdates();
+  };
+ }, [sitesStore]);
 }
 ```
 

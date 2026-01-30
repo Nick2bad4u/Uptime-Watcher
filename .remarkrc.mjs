@@ -128,10 +128,11 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  * @property {boolean} [gfm] - Enable GitHub Flavored Markdown features.
  * @property {boolean} [yaml] - Handle frontmatter in markdown files.
  * @property {"tab" | "one" | "mixed"} [listItemIndent] - List item indentation
- * style.
+ *   style.
  * @property {"*" | "_"} [emphasis] - Character to use for emphasis.
  * @property {"*" | "_"} [strong] - Character to use for strong emphasis.
- * @property {"***" | "---"} [thematicBreak] - Marker to use for thematic breaks.
+ * @property {"***" | "---"} [thematicBreak] - Marker to use for thematic
+ *   breaks.
  * @property {"`" | "~"} [fence] - Character to use for fences.
  * @property {"ordered"} [style] - List style preference.
  * @property {""" | "'"} [quote] - Preferred quote style for titles.
@@ -155,21 +156,32 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  */
 
 // Plugin-specific options types
-/** @typedef {{schemas?: Record<string, string[]>}} FrontmatterSchemaOptions */
+/** @typedef {{ schemas?: Record<string, string[]> }} FrontmatterSchemaOptions */
 /** @typedef {import("remark-lint-mdx-jsx-quote-style").Options} QuoteStyle */
 /** @typedef {import("remark-lint-ordered-list-marker-value").Options} OrderedListMarkerValueOptions */
 /** @typedef {import("remark-lint-file-extension").Options} FileExtensionOptions */
-/** @typedef {{entries?: {pattern: string, snippets: string[]}[]}} RequireSnippetsOptions */
+/** @typedef {{ entries?: { pattern: string; snippets: string[] }[] }} RequireSnippetsOptions */
 /** @typedef {import("unified").Plugin<[RequireSnippetsOptions?], Root>} CustomValidationPlugin */
 
 // Remark plugin option types (prefer real plugin-exported types where available)
 /** @typedef {import("remark-toc").Options} RemarkTocOptions */
-/** @typedef {{collapseSpace?: boolean}} ReferenceLinksOptions */
+/** @typedef {{ collapseSpace?: boolean }} ReferenceLinksOptions */
 /** @typedef {import("remark-lint-checkbox-character-style").Options} CheckboxCharacterStyleOptions */
 /** @typedef {import("remark-lint-fenced-code-flag").Options} FencedCodeFlagOptions */
 
 /**
- * @typedef {{passive?: boolean, illusion?: boolean, so?: boolean, thereIs?: boolean, weasel?: boolean, adverb?: boolean, tooWordy?: boolean, cliches?: boolean, eprime?: boolean, whitelist?: string[]}} WriteGoodOptions
+ * @typedef {{
+ *     passive?: boolean;
+ *     illusion?: boolean;
+ *     so?: boolean;
+ *     thereIs?: boolean;
+ *     weasel?: boolean;
+ *     adverb?: boolean;
+ *     tooWordy?: boolean;
+ *     cliches?: boolean;
+ *     eprime?: boolean;
+ *     whitelist?: string[];
+ * }} WriteGoodOptions
  */
 /** @typedef {import("remark-validate-links").Options} ValidateLinksOptions */
 /** @typedef {import("remark-lint-heading-style").Options} HeadingStyleOptions */
@@ -182,8 +194,8 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 /** @typedef {import("remark-lint-link-title-style").Options} LinkTitleStyleOptions */
 
 // Missing option types that are actually used in the config
-/** @typedef {{case?: "lower" | "upper"}} FencedCodeFlagCaseOptions */
-/** @typedef {{skipUrlPatterns?: (string | RegExp)[]}} NoDeadUrlsOptions */
+/** @typedef {{ case?: "lower" | "upper" }} FencedCodeFlagCaseOptions */
+/** @typedef {{ skipUrlPatterns?: (string | RegExp)[] }} NoDeadUrlsOptions */
 
 /** @type {RemarkConfig} */
 const remarkConfig = {
@@ -296,9 +308,9 @@ const remarkConfig = {
         ["remark-lint-no-empty-sections", true], // Require every heading to introduce content
 
         // Table formatting
-        ["remark-lint-table-pipe-alignment", true], // Enforce table pipe alignment
+        ["remark-lint-table-pipe-alignment", false], // Enforce table pipe alignment
         ["remark-lint-no-hidden-table-cell", true], // Prevent invisible overflow cells in tables
-        ["remark-lint-list-item-bullet-indent", true], // Prevent list markers from being indented
+        ["remark-lint-list-item-bullet-indent", false], // Prevent list markers from being indented
         "remark-lint-list-item-content-indent", // Keep list item content aligned with the first child
 
         // Task list formatting

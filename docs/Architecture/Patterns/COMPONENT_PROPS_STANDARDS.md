@@ -329,6 +329,7 @@ export interface ComponentProperties {
   *
   *
   *
+  *
   *  <Component onClick={() => console.log("Clicked!")} />;
   *  ```;
   */
@@ -367,8 +368,6 @@ export interface ComponentProperties {
  *  With
  *
  *
- *
- *
  *  loading state:
  *
  *  ```tsx
@@ -401,8 +400,6 @@ export interface ComponentProperties {
  *
  * @example
  *  ```tsx
- *
- *
  *
  *
  *
@@ -574,7 +571,7 @@ export default FormComponent;
    interface ButtonProps {
     onClick?: () => void;
    }
-
+   
    // After
    interface ButtonProperties {
     readonly onClick?: () => void;
@@ -586,7 +583,7 @@ export default FormComponent;
    ```typescript
    // Before
    readonly onClick?: (e?: React.MouseEvent) => void;
-
+   
    // After
    readonly onClick?: () => void;
    // OR (if event needed)
@@ -601,7 +598,7 @@ export default FormComponent;
     title: string;
     disabled?: boolean;
    }
-
+   
    // After
    interface ComponentProperties {
     readonly title: string;
