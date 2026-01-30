@@ -1,5 +1,6 @@
 /* eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Config file */
 /* eslint-disable n/no-unpublished-import -- Stylelint config file, dev dependency allowed */
+
 /**
  * Comprehensive Stylelint configuration for the Uptime Watcher project.
  *
@@ -85,7 +86,7 @@ import defineConfig from "stylelint-define-config";
  * ```
  *
  * @returns The complete Stylelint configuration object with all rules and
- *   plugins
+ * plugins.
  *
  * @public
  *
@@ -755,6 +756,7 @@ const config = defineConfig({
         "order/properties-alphabetical-order": null,
         // Plugin rules
         "plugin/declaration-block-no-ignored-properties": true,
+
         /**
          * Browser compatibility rules with specific browser support targets.
          *
@@ -781,6 +783,7 @@ const config = defineConfig({
                 ],
             },
         ],
+
         /**
          * Performance optimization rules for animations and high-impact
          * properties.
@@ -818,6 +821,7 @@ const config = defineConfig({
         ],
         "plugin/no-restricted-syntax": null,
         "plugin/no-unresolved-module": null,
+
         /**
          * Browser feature compatibility validation.
          *
@@ -842,6 +846,7 @@ const config = defineConfig({
                     "last 2 node major versions",
                     "not dead",
                 ],
+
                 /**
                  * Features to ignore despite browser support concerns.
                  *
@@ -850,6 +855,7 @@ const config = defineConfig({
                  * support but are acceptable for this project.
                  */
                 ignore: ["multicolumn"], // Allow modern CSS features
+
                 /**
                  * Severity level for unsupported feature detection.
                  *
@@ -860,6 +866,7 @@ const config = defineConfig({
                 severity: "warning",
             },
         ],
+
         /**
          * BEM (Block Element Modifier) pattern enforcement.
          *
@@ -885,6 +892,7 @@ const config = defineConfig({
                 String.raw`/^:/`, // Pseudo-classes
                 String.raw`/^\.` + String.raw`/[A-Z]/`, // CSS Modules (PascalCase)
             ],
+
             /**
              * BEM preset configuration.
              *
@@ -905,6 +913,7 @@ const config = defineConfig({
         },
         "plugin/stylelint-group-selectors": true,
         "plugin/use-baseline": null,
+
         /**
          * Defensive CSS practices enforcement.
          *
@@ -942,6 +951,7 @@ const config = defineConfig({
                 "vendor-prefix-grouping": true,
             },
         ],
+
         /**
          * Logical properties and values promotion.
          *
@@ -956,6 +966,7 @@ const config = defineConfig({
             true,
             { severity: "warning" },
         ],
+
         /**
          * Logical units enforcement.
          *
@@ -973,6 +984,7 @@ const config = defineConfig({
         "rule-empty-line-before": null,
         "rule-nesting-at-rule-required-list": null,
         "rule-selector-property-disallowed-list": null,
+
         /**
          * Scale-based design system rules.
          *
@@ -987,6 +999,7 @@ const config = defineConfig({
         "scale-unlimited/declaration-strict-value": null,
         "scales/alpha-values": null,
         "scales/border-widths": null,
+
         /**
          * Font size scale configuration.
          *
@@ -1053,6 +1066,7 @@ const config = defineConfig({
         ],
         "scales/font-weights": null,
         "scales/letter-spacings": null,
+
         /**
          * Line height scale configuration.
          *
@@ -1085,6 +1099,7 @@ const config = defineConfig({
         "scales/space": null,
         "scales/word-spacings": null,
         "scales/z-indices": null,
+
         /**
          * SCSS (Sass) specific linting rules.
          *
@@ -1140,6 +1155,7 @@ const config = defineConfig({
         "selector-attribute-operator-allowed-list": null,
         "selector-attribute-operator-disallowed-list": null,
         "selector-attribute-quotes": "always",
+
         /**
          * Rule to enforce consistent class selector patterns.
          *
@@ -1178,6 +1194,7 @@ const config = defineConfig({
         "string-no-newline": true,
         "syntax-string-no-invalid": true,
         // Time rules
+
         /**
          * Minimum animation/transition duration.
          *

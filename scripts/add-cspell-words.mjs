@@ -1,12 +1,12 @@
 /**
- * CSpell Custom Words Manager
+ * CSpell Custom Words Manager.
  *
  * Automatically appends new unknown words found by cspell to custom-words.txt.
  * Provides intelligent filtering, validation, and configuration options.
  *
  * @version 2.0.0
  *
- * @file Enhanced CSpell dictionary management tool with advanced features
+ * @file Enhanced CSpell dictionary management tool with advanced features.
  *
  * @author Nick2bad4u
  *
@@ -37,24 +37,24 @@ const __dirname = import.meta.dirname;
 const cspellConfigPath = "--config .cspell.json";
 
 /**
- * Configuration object for the script with validation and defaults
+ * Configuration object for the script with validation and defaults.
  *
- * @typedef {Object} Config
+ * @typedef {object} Config
  *
- * @property {string} customWordsFile - Path to custom words file
- * @property {string[]} filePatterns - File patterns to check
- * @property {boolean} dryRun - Whether to perform a dry run
- * @property {boolean} verbose - Whether to show verbose output
- * @property {boolean} interactive - Whether to prompt for confirmation
- * @property {number} minWordLength - Minimum word length to include
- * @property {number} maxWordLength - Maximum word length to include
- * @property {string[]} excludePatterns - Patterns to exclude from words
- * @property {boolean} sortWords - Whether to sort words alphabetically
- * @property {boolean} createBackup - Whether to create backup before changes
+ * @property {string} customWordsFile - Path to custom words file.
+ * @property {string[]} filePatterns - File patterns to check.
+ * @property {boolean} dryRun - Whether to perform a dry run.
+ * @property {boolean} verbose - Whether to show verbose output.
+ * @property {boolean} interactive - Whether to prompt for confirmation.
+ * @property {number} minWordLength - Minimum word length to include.
+ * @property {number} maxWordLength - Maximum word length to include.
+ * @property {string[]} excludePatterns - Patterns to exclude from words.
+ * @property {boolean} sortWords - Whether to sort words alphabetically.
+ * @property {boolean} createBackup - Whether to create backup before changes.
  */
 
 /**
- * Default configuration
+ * Default configuration.
  *
  * @type {Config}
  */
@@ -78,9 +78,9 @@ const DEFAULT_CONFIG = {
 };
 
 /**
- * Parse command line arguments and return configuration
+ * Parse command line arguments and return configuration.
  *
- * @returns {Config} Parsed configuration
+ * @returns {Config} Parsed configuration.
  */
 function parseArguments() {
     const args = process.argv.slice(2);
@@ -168,7 +168,7 @@ function parseArguments() {
 }
 
 /**
- * Display help information
+ * Display help information.
  */
 function showHelp() {
     console.log(`
@@ -201,7 +201,7 @@ EXAMPLES:
 }
 
 /**
- * Logger utility with different log levels
+ * Logger utility with different log levels.
  */
 class Logger {
     constructor(verbose = false) {
@@ -259,12 +259,12 @@ class Logger {
 }
 
 /**
- * Validate a word against exclusion patterns and length constraints
+ * Validate a word against exclusion patterns and length constraints.
  *
- * @param {string} word - Word to validate
- * @param {Config} config - Configuration object
+ * @param {string} word - Word to validate.
+ * @param {Config} config - Configuration object.
  *
- * @returns {boolean} Whether the word is valid
+ * @returns {boolean} Whether the word is valid.
  */
 function isValidWord(word, config) {
     // Check length constraints
@@ -292,12 +292,12 @@ function isValidWord(word, config) {
 }
 
 /**
- * Create a backup of the custom words file
+ * Create a backup of the custom words file.
  *
- * @param {string} filePath - Path to the file to backup
- * @param {Logger} logger - Logger instance
+ * @param {string} filePath - Path to the file to backup.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {Promise<string>} Path to the backup file
+ * @returns {Promise<string>} Path to the backup file.
  */
 async function createBackup(filePath, logger) {
     const timestamp = new Date().toISOString().replaceAll(/[.:]/g, "-");
@@ -316,13 +316,13 @@ async function createBackup(filePath, logger) {
 }
 
 /**
- * Read and parse current custom words from file
+ * Read and parse current custom words from file.
  *
- * @param {string} filePath - Path to custom words file
- * @param {Logger} logger - Logger instance
+ * @param {string} filePath - Path to custom words file.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {Promise<{ content: string; words: Set<string> }>} Current content
- *   and words
+ * @returns {Promise<{content: string, words: Set<string>}>} Current content
+ * and words.
  */
 async function readCurrentWords(filePath, logger) {
     let currentWordsContent = "";
@@ -356,12 +356,12 @@ async function readCurrentWords(filePath, logger) {
 }
 
 /**
- * Run cspell and get unknown words
+ * Run cspell and get unknown words.
  *
- * @param {Config} config - Configuration object
- * @param {Logger} logger - Logger instance
+ * @param {Config} config - Configuration object.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {Promise<string>} CSpell output
+ * @returns {Promise<string>} CSpell output.
  */
 async function runCSpell(config, logger) {
     const cspellCommand = [
@@ -414,14 +414,14 @@ async function runCSpell(config, logger) {
 }
 
 /**
- * Process and filter found words
+ * Process and filter found words.
  *
- * @param {string} cspellOutput - Raw output from cspell
- * @param {Set<string>} currentWords - Currently known words
- * @param {Config} config - Configuration object
- * @param {Logger} logger - Logger instance
+ * @param {string} cspellOutput - Raw output from cspell.
+ * @param {Set<string>} currentWords - Currently known words.
+ * @param {Config} config - Configuration object.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {Set<string>} Filtered new words
+ * @returns {Set<string>} Filtered new words.
  */
 function processFoundWords(cspellOutput, currentWords, config, logger) {
     const rawWords = cspellOutput
@@ -444,12 +444,12 @@ function processFoundWords(cspellOutput, currentWords, config, logger) {
 }
 
 /**
- * Prompt user for confirmation in interactive mode
+ * Prompt user for confirmation in interactive mode.
  *
- * @param {Set<string>} words - Words to be added
- * @param {Logger} logger - Logger instance
+ * @param {Set<string>} words - Words to be added.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {Promise<boolean>} Whether to proceed
+ * @returns {Promise<boolean>} Whether to proceed.
  */
 async function promptForConfirmation(words, logger) {
     return new Promise((resolve) => {
@@ -469,13 +469,13 @@ async function promptForConfirmation(words, logger) {
 }
 
 /**
- * Write updated words to file
+ * Write updated words to file.
  *
- * @param {string} filePath - Path to custom words file
- * @param {string} currentContent - Current file content
- * @param {Set<string>} newWords - New words to add
- * @param {Config} config - Configuration object
- * @param {Logger} logger - Logger instance
+ * @param {string} filePath - Path to custom words file.
+ * @param {string} currentContent - Current file content.
+ * @param {Set<string>} newWords - New words to add.
+ * @param {Config} config - Configuration object.
+ * @param {Logger} logger - Logger instance.
  *
  * @returns {Promise<void>}
  */
@@ -516,7 +516,7 @@ async function writeUpdatedWords(
 }
 
 /**
- * Main execution function
+ * Main execution function.
  *
  * @returns {Promise<void>}
  */

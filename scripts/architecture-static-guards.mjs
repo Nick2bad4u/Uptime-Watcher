@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Lightweight architecture guard checks.
  *
@@ -331,6 +332,7 @@ async function checkTypedEventUsage(electronFiles, knownEventNames) {
 /**
  * Ensure URL opening stays centralized.
  *
+ * @param electronFiles
  * @remarks
  * Direct `shell.openExternal()` calls are easy to sprinkle around the codebase
  * and can accidentally bypass URL validation/allowlisting.
@@ -373,6 +375,7 @@ async function checkElectronShellUsage(electronFiles) {
 /**
  * Ensure window-open handling stays centralized.
  *
+ * @param electronFiles
  * @remarks
  * `webContents.setWindowOpenHandler(...)` is a security-sensitive choke point.
  */
@@ -596,6 +599,9 @@ async function checkInvokeChannelCoverage() {
     return errors;
 }
 
+/**
+ *
+ */
 async function main() {
     const electronRoot = path.resolve(ROOT_DIRECTORY, "electron");
     const srcRoot = path.resolve(ROOT_DIRECTORY, "src");

@@ -452,12 +452,11 @@ export function toClonedArrayBuffer(view: ArrayBufferView): ArrayBuffer {
  *
  * @public
  */
-// eslint-disable-next-line etc/no-misused-generics -- Type parameter can be omitted for flexible usage
-export function createErrorResponse<T = void>(
+export function createErrorResponse(
     error: string,
     metadata?: UnknownRecord
-): IpcResponse<T> {
-    const response: IpcResponse<T> = {
+): IpcResponse<never> {
+    const response: IpcResponse<never> = {
         error,
         success: false,
     };
@@ -521,7 +520,7 @@ function createResponseFromExecution<T>(
         return createSuccessResponse(execution.value, responseMetadata);
     }
 
-    return createErrorResponse<T>(execution.errorMessage, responseMetadata);
+    return createErrorResponse(execution.errorMessage, responseMetadata);
 }
 
 /**
@@ -632,7 +631,7 @@ export async function withIpcHandlerValidation<
                 errors: validationErrors,
             }
         );
-        return createErrorResponse<T>(errorMessage, responseMetadata);
+        return createErrorResponse(errorMessage, responseMetadata);
     }
 
     const metadata: IpcHandlerMetadata = {

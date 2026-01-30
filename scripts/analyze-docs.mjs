@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+
 /**
- * Documentation analytics and health checking script
+ * Documentation analytics and health checking script.
  *
- * Provides insights into documentation quality, coverage, and maintenance needs
+ * Provides insights into documentation quality, coverage, and maintenance needs.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -13,19 +14,19 @@ const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.join(__dirname, "..");
 
 /**
- * @typedef {Object} DocumentationStats
+ * @typedef {object} DocumentationStats
  *
- * @property {number} totalFiles - Total markdown files analyzed
- * @property {number} totalWords - Total word count across all files
- * @property {number} averageReadingTime - Average reading time in minutes
- * @property {string[]} missingFrontmatter - Files without proper frontmatter
- * @property {string[]} outdatedDocs - Files not reviewed recently
+ * @property {number} totalFiles - Total markdown files analyzed.
+ * @property {number} totalWords - Total word count across all files.
+ * @property {number} averageReadingTime - Average reading time in minutes.
+ * @property {string[]} missingFrontmatter - Files without proper frontmatter.
+ * @property {string[]} outdatedDocs - Files not reviewed recently.
  * @property {Record<string, number>} complexityScore - Complexity metrics per
- *   file
- * @property {Record<string, number>} wordCounts - Word count per file
- * @property {string[]} missingTOC - Files that should have table of contents
+ * file.
+ * @property {Record<string, number>} wordCounts - Word count per file.
+ * @property {string[]} missingTOC - Files that should have table of contents.
  * @property {Record<string, string[]>} brokenLinks - Files with potential
- *   broken internal links
+ * broken internal links.
  */
 
 /**
@@ -35,11 +36,11 @@ const ROOT_DIRECTORY = path.join(__dirname, "..");
  */
 
 /**
- * Recursively collect all markdown files in documentation directories
+ * Recursively collect all markdown files in documentation directories.
  *
- * @param {string} dir - Directory to scan
+ * @param {string} dir - Directory to scan.
  *
- * @returns {Promise<string[]>} Array of file paths
+ * @returns {Promise<string[]>} Array of file paths.
  */
 async function collectMarkdownFiles(dir) {
     const files = [];
@@ -69,11 +70,11 @@ async function collectMarkdownFiles(dir) {
 }
 
 /**
- * Extract and parse YAML frontmatter from markdown content
+ * Extract and parse YAML frontmatter from markdown content.
  *
- * @param {string} content - Markdown file content
+ * @param {string} content - Markdown file content.
  *
- * @returns {Frontmatter | null} Parsed frontmatter or null if not found
+ * @returns {Frontmatter | null} Parsed frontmatter or null if not found.
  */
 function extractFrontmatter(content) {
     const frontmatterMatch = content.match(/^---\s*\n(?<yaml>[\S\s]*?)\n---/);
@@ -104,11 +105,11 @@ function extractFrontmatter(content) {
 }
 
 /**
- * Calculate complexity score based on various factors
+ * Calculate complexity score based on various factors.
  *
- * @param {string} content - Markdown content
+ * @param {string} content - Markdown content.
  *
- * @returns {number} Complexity score (1-10)
+ * @returns {number} Complexity score (1-10).
  */
 function calculateComplexity(content) {
     let score = 1;
@@ -149,13 +150,13 @@ function calculateComplexity(content) {
 }
 
 /**
- * Check for broken internal links
+ * Check for broken internal links.
  *
- * @param {string} content - Markdown content
- * @param {string} filePath - Current file path
- * @param {string[]} allFiles - All markdown files in the project
+ * @param {string} content - Markdown content.
+ * @param {string} filePath - Current file path.
+ * @param {string[]} allFiles - All markdown files in the project.
  *
- * @returns {string[]} Array of potentially broken links
+ * @returns {string[]} Array of potentially broken links.
  */
 function checkInternalLinks(content, filePath, allFiles) {
     const brokenLinks = [];
@@ -194,7 +195,7 @@ function checkInternalLinks(content, filePath, allFiles) {
 }
 
 /**
- * Main analysis function
+ * Main analysis function.
  *
  * @returns {Promise<DocumentationStats>}
  */
@@ -284,9 +285,9 @@ async function analyzeDocumentation() {
 }
 
 /**
- * Generate and display analysis report
+ * Generate and display analysis report.
  *
- * @param {DocumentationStats} stats - Analysis results
+ * @param {DocumentationStats} stats - Analysis results.
  */
 function displayReport(stats) {
     console.log("📊 DOCUMENTATION ANALYSIS REPORT");
@@ -393,9 +394,9 @@ function displayReport(stats) {
 /**
  * Determine whether the current module is executed directly through Node.
  *
- * @param {string} moduleUrl - The module's import.meta.url value
+ * @param {string} moduleUrl - The module's import.meta.url value.
  *
- * @returns {boolean} True when the module is the program entry point
+ * @returns {boolean} True when the module is the program entry point.
  */
 function isExecutedDirectly(moduleUrl) {
     const entryFilePath = process.argv[1];

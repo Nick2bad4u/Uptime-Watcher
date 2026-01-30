@@ -13,7 +13,7 @@ const typedocConfigFiles = [
 ];
 
 /**
- * @param {string} candidate Path to verify.
+ * @param {string} candidate - Path to verify.
  *
  * @returns {Promise<boolean>} Resolves to true when the path exists.
  */
@@ -69,9 +69,9 @@ const loadTypedocOutputPaths = async () => {
 };
 
 /**
- * @param {Map<string, string>} targets Paths mapped to logging reasons.
+ * @param {Map<string, string>} targets - Paths mapped to logging reasons.
  *
- * @returns {Promise<{ targetPath: string; reason: string }[]>}
+ * @returns {Promise<{targetPath: string, reason: string}[]>}
  */
 const removeGeneratedTargets = async (targets) => {
     const removed = [];
@@ -87,7 +87,7 @@ const removeGeneratedTargets = async (targets) => {
 };
 
 /**
- * @param {Set<string>} typedocOutputs Normalized TypeDoc output directories.
+ * @param {Set<string>} typedocOutputs - Normalized TypeDoc output directories.
  */
 const recreatePlaceholders = async (typedocOutputs) => {
     const typedocRoot = Array.from(typedocOutputs).find((outputPath) =>

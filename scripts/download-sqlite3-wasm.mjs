@@ -3,7 +3,7 @@
  * Downloads the required WASM file from the node-sqlite3-wasm repository and
  * places it in the dist directory for bundling.
  *
- * @global process
+ * @global
  */
 
 // @ts-check
@@ -41,7 +41,11 @@ if (!fs.existsSync(scriptsDir)) {
 const EXPECTED_SHA256 = process.env["SQLITE3_WASM_SHA256"]?.toLowerCase();
 
 const MAX_REDIRECTS = 3;
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB safety cap
+
+/**
+ * 5MB safety cap.
+ */
+const MAX_SIZE_BYTES = 5 * 1024 * 1024; 
 
 // Check for command line flags
 const forceDownload = process.argv.includes("--force");
@@ -52,7 +56,7 @@ const noUpdate = process.argv.includes("--no-update");
  * @property {boolean} hasUpdate - Indicates if an update is available.
  * @property {string} latestVersion - The latest version hash.
  * @property {string | null} currentVersion - The current version hash or null
- *   if unknown.
+ * if unknown.
  * @property {string} [error] - Optional error message if checking failed.
  *
  * @interface UpdateCheckResult
@@ -180,7 +184,7 @@ function saveVersion(version) {
 }
 
 /**
- * @returns Any
+ * @returns Any.
  */
 async function checkForUpdates() {
     try {
@@ -228,7 +232,7 @@ async function checkForUpdates() {
 /**
  * @param {string} urlToFetch
  * @param {string} destPath
- * @param {number} [redirectCount=0] Default is `0`
+ * @param {number} [redirectCount] - Default is `0`.
  */
 function download(urlToFetch, destPath, redirectCount = 0) {
     if (redirectCount > MAX_REDIRECTS) {
@@ -329,6 +333,9 @@ function download(urlToFetch, destPath, redirectCount = 0) {
     req.on("error", (err) => failAndExit(`Network error: ${err}`));
 }
 
+/**
+ *
+ */
 async function main() {
     // Handle check-update-only flag (just check, don't download)
     if (checkUpdateOnly) {
@@ -457,6 +464,9 @@ async function main() {
     startDownload();
 }
 
+/**
+ *
+ */
 function startDownload() {
     verifyNonPlaceholderHash();
     console.log(

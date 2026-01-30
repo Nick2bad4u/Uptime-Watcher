@@ -85,8 +85,10 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
             };
             return config;
         },
-        // eslint-disable-next-line promise/no-promise-in-callback -- Standard axios interceptor pattern
-        (error) => Promise.reject(ensureErrorInstance(error))
+        (error) => {
+            const normalizedError = ensureErrorInstance(error);
+            return Promise.reject(normalizedError);
+        }
     );
 
     // Add response interceptor to calculate duration
@@ -102,8 +104,12 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
         (error) => {
             // Also calculate timing for error responses
             const errorRecord = ensureRecordLike(error);
-            const config = errorRecord ? ensureRecordLike(errorRecord["config"]) : undefined;
-            const metadata = config ? ensureRecordLike(config["metadata"]) : undefined;
+            const config = errorRecord
+                ? ensureRecordLike(errorRecord["config"])
+                : undefined;
+            const metadata = config
+                ? ensureRecordLike(config["metadata"])
+                : undefined;
             const startTime =
                 metadata && typeof metadata["startTime"] === "number"
                     ? metadata["startTime"]
@@ -113,7 +119,9 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
                 const duration = performance.now() - startTime;
                 Reflect.set(errorRecord, "responseTime", Math.round(duration));
             }
-            return Promise.reject(ensureErrorInstance(error));
+
+            const normalizedError = ensureErrorInstance(error);
+            return Promise.reject(normalizedError);
         }
     );
 }

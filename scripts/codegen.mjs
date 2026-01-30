@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * Playwright Codegen Helper Script for Uptime-Watcher
+ * Playwright Codegen Helper Script for Uptime-Watcher.
  *
  * This script simplifies the process of generating Playwright tests for the
  * Uptime-Watcher Electron application using full codegen recording
  * capabilities.
  *
- * Usage: node scripts/codegen.mjs [options]
+ * Usage: node scripts/codegen.mjs [options].
  *
  * Options: --dev Use development server with browser codegen (default)
  * --electron Use Electron app with full recording capabilities --viewport Set
  * viewport size (e.g., 1280x720) --output Output file path --inspector Open
- * Playwright Inspector with full codegen features for Electron
+ * Playwright Inspector with full codegen features for Electron.
  */
 
 import { spawn } from "node:child_process";
@@ -37,6 +37,9 @@ const options = {
     help: args.includes("--help") || args.includes("-h"),
 };
 
+/**
+ *
+ */
 function showHelp() {
     console.log(`
 🎭 Playwright Codegen Helper for Uptime-Watcher
@@ -71,6 +74,9 @@ See docs/PLAYWRIGHT_CODEGEN_GUIDE.md for details.
     process.exit(0);
 }
 
+/**
+ *
+ */
 async function startDevServer() {
     console.log("🚀 Starting development server...");
 
@@ -101,7 +107,7 @@ async function startDevServer() {
 
 /**
  * Launch Electron app with Playwright Inspector for full codegen recording
- * Following the official Electron + Playwright documentation pattern
+ * Following the official Electron + Playwright documentation pattern.
  */
 async function startElectronWithInspector() {
     console.log("🎭 Starting Electron app with Playwright Inspector...");
@@ -159,13 +165,13 @@ async function startElectronWithInspector() {
 }
 
 /**
- * Build codegen command for standard web browser testing
+ * Build codegen command for standard web browser testing.
  *
- * @param {string} target - Target URL
- * @param {{ viewport?: string; output?: string }} options - Configuration
- *   options
+ * @param {string} target - Target URL.
+ * @param {{viewport?: string, output?: string}} options - Configuration
+ * options.
  *
- * @returns {string[]} Command array
+ * @returns {string[]} Command array.
  */
 function buildCodegenCommand(target, options) {
     const cmd = [
@@ -191,11 +197,11 @@ function buildCodegenCommand(target, options) {
 }
 
 /**
- * Run the codegen command
+ * Run the codegen command.
  *
- * @param {string[]} cmd - Command array to execute
+ * @param {string[]} cmd - Command array to execute.
  *
- * @returns {import("child_process").ChildProcess} The spawned process
+ * @returns {import("child_process").ChildProcess} The spawned process.
  */
 function runCodegen(cmd) {
     console.log(`🎬 Running: ${cmd.join(" ")}`);
@@ -228,6 +234,9 @@ function runCodegen(cmd) {
     return codegen;
 }
 
+/**
+ *
+ */
 async function main() {
     // Load custom transformations
     try {
@@ -303,7 +312,7 @@ async function main() {
         } else {
             console.log("🌐 Using development server mode...");
             const target = await startDevServer();
-            /** @type {{ viewport?: string; output?: string }} */
+            /** @type {{viewport?: string, output?: string}} */
             const cmdOptions = { viewport: options.viewport };
             if (options.output) {
                 cmdOptions.output = options.output;

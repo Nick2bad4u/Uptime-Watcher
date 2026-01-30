@@ -7,7 +7,7 @@
  * - All theme customization moved to CSS using @theme directive
  * - Dark mode handled via CSS @media queries
  * - Plugins configured in CSS using @layer and @utility directives
- * - Optimized content paths for Electron + React architecture
+ * - Optimized content paths for Electron + React architecture.
  *
  * This replaces the complex JavaScript configuration approach of v3 with a
  * clean, maintainable CSS-first approach for better performance.

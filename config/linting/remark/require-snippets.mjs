@@ -18,14 +18,14 @@ import * as path from "node:path";
 const normalizePath = (filePath) => filePath.replace(/\\/gu, "/");
 
 /**
- * @typedef {Object} RequiredSnippetEntry
+ * @typedef {object} RequiredSnippetEntry
  *
  * @property {string} pattern - File path suffix to match.
  * @property {readonly string[]} snippets - Snippets that must appear.
  */
 
 /**
- * @typedef {Object} RequireSnippetsOptions
+ * @typedef {object} RequireSnippetsOptions
  *
  * @property {readonly RequiredSnippetEntry[]} [entries]
  */

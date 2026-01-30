@@ -1,12 +1,12 @@
 /**
- * Commitlint configuration for Uptime Watcher
+ * Commitlint configuration for Uptime Watcher.
  *
  * Enforces conventional commit format with emoji and bracketed type, e.g., "✨
  * [feat] Add dark mode toggle". Each commit bullet point should start with one
  * of the following: 🔧 [build], 🧹 [chore], 👷 [ci], 📝 [docs], ✨ [feat], 🛠️
  * [fix], ⚡ [perf], 🚜 [refactor], ⏪ [revert], 🎨 [style], 🧪 [test] Example: "✨
  * [feat] Add dark mode toggle" Indent any lines that refer to the statement
- * above with a " - "
+ * above with a " - ".
  *
  * @type {import("@commitlint/types").UserConfig}
  *
@@ -20,36 +20,51 @@ export default /** @type {CommitlintConfig} */ {
     $schema: "https://www.schemastore.org/commitlintrc.json",
 
     /**
-     * Default ignore patterns
+     * Default ignore patterns.
      */
     defaultIgnores: true,
 
     /**
-     * Extends the conventional commit configuration with additional rules
+     * Extends the conventional commit configuration with additional rules.
      */
     extends: ["@commitlint/config-conventional"],
 
     /**
-     * Help URL for commit format guidance
+     * Help URL for commit format guidance.
      */
     helpUrl: "https://www.conventionalcommits.org/",
 
     /**
-     * Ignore certain commit patterns
+     * Ignore certain commit patterns.
      */
     ignores: [
-        // Ignore merge commits
+        /**
+         * Ignore merge commits.
+         * @param commit
+         */
         (commit) => commit.includes("Merge"),
-        // Ignore revert commits (handled by 'revert' type)
+
+        /**
+         * Ignore revert commits (handled by 'revert' type).
+         * @param commit
+         */
         (commit) => commit.includes("Revert"),
-        // Ignore automated release commits
+
+        /**
+         * Ignore automated release commits.
+         * @param commit
+         */
         (commit) => /^chore\(release\)/v.test(commit),
-        // Ignore dependency updates with automated format
+
+        /**
+         * Ignore dependency updates with automated format.
+         * @param commit
+         */
         (commit) => /^build\(deps.*\): bump/v.test(commit),
     ],
 
     /**
-     * Prompt configuration for interactive usage
+     * Prompt configuration for interactive usage.
      */
     prompt: {
         questions: {
@@ -157,7 +172,7 @@ export default /** @type {CommitlintConfig} */ {
     },
 
     /**
-     * Custom rules for enhanced commit message validation
+     * Custom rules for enhanced commit message validation.
      */
     rules: {
         "body-case": [

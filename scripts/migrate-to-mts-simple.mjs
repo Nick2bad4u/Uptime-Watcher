@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
 /**
- * Simplified TypeScript to .mts Migration Script
+ * Simplified TypeScript to .mts Migration Script.
  *
  * This script:
  *
  * 1. Renames a .ts file to .mts
- * 2. Updates all local imports to use .mjs extensions
+ * 2. Updates all local imports to use .mjs extensions.
  */
 
 import * as fs from "node:fs";
 import * as path from "node:path";
 
 /**
- * Configuration
+ * Configuration.
  */
 const CONFIG = {
     sourceExtensions: [".ts", ".tsx"],
@@ -23,7 +23,7 @@ const CONFIG = {
 };
 
 /**
- * Logger with colors
+ * Logger with colors.
  */
 const log = {
     info: (/** @type {any} */ msg) =>
@@ -37,7 +37,7 @@ const log = {
 };
 
 /**
- * Check if import path is local (should be updated)
+ * Check if import path is local (should be updated).
  *
  * @param {string} importPath
  */
@@ -49,7 +49,7 @@ function isLocalImport(importPath) {
 }
 
 /**
- * Update import path to use .mjs extension
+ * Update import path to use .mjs extension.
  *
  * @param {string} importPath
  */
@@ -68,7 +68,7 @@ function updateImportPath(importPath) {
 }
 
 /**
- * Process file content and update imports
+ * Process file content and update imports.
  *
  * @param {string} content
  */
@@ -113,9 +113,10 @@ function processImports(content) {
 }
 
 /**
- * Migrate a TypeScript file to .mts
+ * Migrate a TypeScript file to .mts.
  *
  * @param {string} filePath
+ * @param isDryRun
  */
 function migrateFile(filePath, isDryRun = false) {
     try {
@@ -179,7 +180,7 @@ function migrateFile(filePath, isDryRun = false) {
 }
 
 /**
- * Main function
+ * Main function.
  */
 function main() {
     const args = process.argv.slice(2);

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Quick script to validate our Vite performance configuration
+ * Quick script to validate our Vite performance configuration.
  */
 
 import { readFileSync } from "node:fs";

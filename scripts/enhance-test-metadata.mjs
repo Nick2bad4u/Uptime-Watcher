@@ -2,13 +2,13 @@
 
 /**
  * Enhanced Test Metadata Manager for Vitest Automatically adds comprehensive
- * metadata to test files using Vitest context features
+ * metadata to test files using Vitest context features.
  *
- * Usage: node scripts/enhance-test-metadata.mjs [options]
+ * Usage: node scripts/enhance-test-metadata.mjs [options].
  *
  * Options: --dry-run, -d Show what would be changed without making changes
  * --pattern, -p Glob pattern for test files --force, -f Force update files that
- * already have metadata --help, -h Show this help message
+ * already have metadata --help, -h Show this help message.
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
@@ -19,13 +19,14 @@ const __filename = import.meta.filename;
 const __dirname = import.meta.dirname;
 
 // ✨ ENHANCEMENT 2: Enhanced CLI argument parsing with validation (moved to top)
+
 /**
- * Get command line argument value
+ * Get command line argument value.
  *
- * @param {string} longName - Long form argument name
- * @param {string} [shortName] - Short form argument name
+ * @param {string} longName - Long form argument name.
+ * @param {string} [shortName] - Short form argument name.
  *
- * @returns {string | null} Argument value
+ * @returns {string | null} Argument value.
  */
 function getArgValue(longName, shortName) {
     const args = process.argv.slice(2);
@@ -142,11 +143,11 @@ const contentCache = new Map();
 const metadataCache = new Map();
 
 /**
- * Cached content reader with performance tracking
+ * Cached content reader with performance tracking.
  *
- * @param {string} filePath - Path to file
+ * @param {string} filePath - Path to file.
  *
- * @returns {string} File content
+ * @returns {string} File content.
  */
 function getCachedContent(filePath) {
     if (contentCache.has(filePath)) {
@@ -170,12 +171,12 @@ function getCachedContent(filePath) {
 }
 
 /**
- * Cached metadata generator
+ * Cached metadata generator.
  *
- * @param {string} filePath - Path to test file
- * @param {string} testName - Name of the test
+ * @param {string} filePath - Path to test file.
+ * @param {string} testName - Name of the test.
  *
- * @returns {string} Generated metadata
+ * @returns {string} Generated metadata.
  */
 function getCachedMetadata(filePath, testName) {
     const cacheKey = `${filePath}:${testName}`;
@@ -192,12 +193,12 @@ function getCachedMetadata(filePath, testName) {
 }
 
 /**
- * Performance utility to time operations and track metrics
+ * Performance utility to time operations and track metrics.
  *
- * @param {Function} operation - The operation to time
- * @param {string} operationName - Name for logging
+ * @param {Function} operation - The operation to time.
+ * @param {string} operationName - Name for logging.
  *
- * @returns {any} Operation result
+ * @returns {any} Operation result.
  */
 function timeOperation(operation, operationName) {
     const start = performance.now();
@@ -217,7 +218,7 @@ function timeOperation(operation, operationName) {
 // ✨ ENHANCEMENT 4: Enhanced error handling with retry logic
 
 /**
- * Enhanced logger with structured output
+ * Enhanced logger with structured output.
  */
 const logger = {
     info: (/** @type {any} */ message, /** @type {any} */ ...args) => {
@@ -232,7 +233,7 @@ const logger = {
     },
     error: (
         /** @type {any} */ message,
-        /** @type {{ message: any; name: any; stack: any }} */ error
+        /** @type {{message: any, name: any, stack: any}} */ error
     ) => {
         perfCounters.errors++;
         if (error instanceof Error) {
@@ -251,11 +252,11 @@ const logger = {
 };
 
 /**
- * Determines the component name from file path
+ * Determines the component name from file path.
  *
- * @param {string} filePath - The test file path
+ * @param {string} filePath - The test file path.
  *
- * @returns {string} Component name
+ * @returns {string} Component name.
  */
 function getComponentName(filePath) {
     const fileName = path.basename(filePath);
@@ -271,11 +272,11 @@ function getComponentName(filePath) {
 }
 
 /**
- * Determines the category from file path
+ * Determines the category from file path.
  *
- * @param {string} filePath - The test file path
+ * @param {string} filePath - The test file path.
  *
- * @returns {string} Category
+ * @returns {string} Category.
  */
 function getCategory(filePath) {
     const pathParts = filePath.split(path.sep);
@@ -295,11 +296,11 @@ function getCategory(filePath) {
 }
 
 /**
- * Determines test type from test name
+ * Determines test type from test name.
  *
- * @param {string} testName - The test function name
+ * @param {string} testName - The test function name.
  *
- * @returns {string} Test type
+ * @returns {string} Test type.
  */
 function getTestType(testName) {
     const lowerName = testName.toLowerCase();
@@ -337,12 +338,12 @@ function getTestType(testName) {
 }
 
 /**
- * Generates metadata annotations for a test function
+ * Generates metadata annotations for a test function.
  *
- * @param {string} filePath - The test file path
- * @param {string} testName - The test function name
+ * @param {string} filePath - The test file path.
+ * @param {string} testName - The test function name.
  *
- * @returns {string} Metadata annotation code
+ * @returns {string} Metadata annotation code.
  */
 function generateMetadata(filePath, testName) {
     const component = getComponentName(filePath);
@@ -356,11 +357,11 @@ function generateMetadata(filePath, testName) {
 }
 
 /**
- * Processes a test file to add metadata
+ * Processes a test file to add metadata.
  *
- * @param {string} filePath - Path to the test file
+ * @param {string} filePath - Path to the test file.
  *
- * @returns {boolean} Whether the file was modified
+ * @returns {boolean} Whether the file was modified.
  */
 function processTestFile(filePath) {
     return timeOperation(
@@ -485,13 +486,13 @@ function processTestFile(filePath) {
 }
 
 /**
- * Recursively find test files matching the pattern
+ * Recursively find test files matching the pattern.
  *
- * @param {string} dir - Directory to search
- * @param {string} pattern - File pattern to match
- * @param {string} projectRoot - Project root directory for relative paths
+ * @param {string} dir - Directory to search.
+ * @param {string} pattern - File pattern to match.
+ * @param {string} projectRoot - Project root directory for relative paths.
  *
- * @returns {string[]} Array of test file paths
+ * @returns {string[]} Array of test file paths.
  */
 function findTestFiles(dir, pattern, projectRoot) {
     const files = [];
@@ -553,7 +554,7 @@ function findTestFiles(dir, pattern, projectRoot) {
 }
 
 /**
- * ✨ Enhanced main execution function with performance reporting
+ * ✨ Enhanced main execution function with performance reporting.
  */
 function main() {
     console.log("🚀 Enhanced Test Metadata Manager v2.0.0");

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Universal Documentation Downloader & Processor v2.0.0
+ * Universal Documentation Downloader & Processor v2.0.0.
  *
  * Advanced documentation downloader with caching, parallel processing,
  * validation, and comprehensive error handling.
  *
  * @version 2.0.0
  *
- * @file Enhanced documentation downloader with enterprise-grade features
+ * @file Enhanced documentation downloader with enterprise-grade features.
  *
  * @author Nick2bad4u
  *
@@ -44,103 +44,103 @@ const execFileAsync = promisify(execFile);
 /* ==================== TYPE DEFINITIONS ==================== */
 
 /**
- * @typedef {Object} ExecFileResult
+ * @typedef {object} ExecFileResult
  *
- * @property {string} stdout - Standard output
- * @property {string} stderr - Standard error
+ * @property {string} stdout - Standard output.
+ * @property {string} stderr - Standard error.
  */
 
 /**
- * @typedef {Object} HttpModule
+ * @typedef {object} HttpModule
  *
- * @property {Function} get - HTTP GET method
+ * @property {Function} get - HTTP GET method.
  */
 
 /**
- * @typedef {Object} HttpResponse
+ * @typedef {object} HttpResponse
  *
- * @property {number} [statusCode] - HTTP status code
- * @property {Function} setEncoding - Set response encoding
- * @property {Function} on - Event listener
+ * @property {number} [statusCode] - HTTP status code.
+ * @property {Function} setEncoding - Set response encoding.
+ * @property {Function} on - Event listener.
  */
 
 /**
- * @typedef {Object} HttpRequest
+ * @typedef {object} HttpRequest
  *
- * @property {Function} on - Event listener
- * @property {Function} setTimeout - Set request timeout
- * @property {Function} destroy - Destroy request
+ * @property {Function} on - Event listener.
+ * @property {Function} setTimeout - Set request timeout.
+ * @property {Function} destroy - Destroy request.
  */
 
 /**
- * @typedef {Object} DownloadConfig
+ * @typedef {object} DownloadConfig
  *
- * @property {string} docName - Unique identifier for this documentation set
- * @property {string} baseUrl - Base URL for documentation source
- * @property {string[]} pages - Array of page paths to download
- * @property {string} inputFormat - Pandoc input format
- * @property {string} outputFormat - Pandoc output format
- * @property {string} outputExt - Output file extension
- * @property {string[]} subdirs - Output directory structure
- * @property {boolean} enableCache - Whether to use caching
- * @property {boolean} enableParallel - Whether to use parallel processing
- * @property {boolean} enableValidation - Whether to validate downloads
- * @property {number} maxRetries - Maximum retry attempts
- * @property {number} timeout - Request timeout in milliseconds
- * @property {number} concurrency - Maximum concurrent downloads
- * @property {string[]} removeFromMarkers - Markers to remove content from
- * @property {string[]} removeLineMarkers - Markers to remove lines containing
- * @property {string[]} removeAboveMarkers - Markers to remove content above
- * @property {number} minContentLength - Minimum content length for validation
- * @property {string[]} requiredPatterns - Required patterns for validation
- * @property {string[]} forbiddenPatterns - Forbidden patterns for validation
- * @property {boolean} verbose - Enable verbose logging
- * @property {boolean} [force] - Force re-download ignoring cache
+ * @property {string} docName - Unique identifier for this documentation set.
+ * @property {string} baseUrl - Base URL for documentation source.
+ * @property {string[]} pages - Array of page paths to download.
+ * @property {string} inputFormat - Pandoc input format.
+ * @property {string} outputFormat - Pandoc output format.
+ * @property {string} outputExt - Output file extension.
+ * @property {string[]} subdirs - Output directory structure.
+ * @property {boolean} enableCache - Whether to use caching.
+ * @property {boolean} enableParallel - Whether to use parallel processing.
+ * @property {boolean} enableValidation - Whether to validate downloads.
+ * @property {number} maxRetries - Maximum retry attempts.
+ * @property {number} timeout - Request timeout in milliseconds.
+ * @property {number} concurrency - Maximum concurrent downloads.
+ * @property {string[]} removeFromMarkers - Markers to remove content from.
+ * @property {string[]} removeLineMarkers - Markers to remove lines containing.
+ * @property {string[]} removeAboveMarkers - Markers to remove content above.
+ * @property {number} minContentLength - Minimum content length for validation.
+ * @property {string[]} requiredPatterns - Required patterns for validation.
+ * @property {string[]} forbiddenPatterns - Forbidden patterns for validation.
+ * @property {boolean} verbose - Enable verbose logging.
+ * @property {boolean} [force] - Force re-download ignoring cache.
  */
 
 /**
- * @typedef {Object} Paths
+ * @typedef {object} Paths
  *
- * @property {string} outputDir - Output directory path
- * @property {string} logFile - Log file path
- * @property {string} hashesFile - Hashes file path
- * @property {string} cacheDir - Cache directory path
+ * @property {string} outputDir - Output directory path.
+ * @property {string} logFile - Log file path.
+ * @property {string} hashesFile - Hashes file path.
+ * @property {string} cacheDir - Cache directory path.
  */
 
 /**
- * @typedef {Object} DownloadTask
+ * @typedef {object} DownloadTask
  *
- * @property {string} page - Page path
- * @property {string} url - Full URL to download
- * @property {string} outputPath - Output file path
- * @property {number} attempts - Number of attempts made
+ * @property {string} page - Page path.
+ * @property {string} url - Full URL to download.
+ * @property {string} outputPath - Output file path.
+ * @property {number} attempts - Number of attempts made.
  */
 
 /**
- * @typedef {Object} DownloadResult
+ * @typedef {object} DownloadResult
  *
- * @property {string} page - Page path
- * @property {string} outputPath - Output file path
- * @property {boolean} success - Whether download succeeded
- * @property {string} [hash] - Content hash (if successful)
- * @property {number} [size] - Content size in bytes (if successful)
- * @property {string} [error] - Error message (if failed)
- * @property {number} attempts - Number of attempts made
+ * @property {string} page - Page path.
+ * @property {string} outputPath - Output file path.
+ * @property {boolean} success - Whether download succeeded.
+ * @property {string} [hash] - Content hash (if successful).
+ * @property {number} [size] - Content size in bytes (if successful).
+ * @property {string} [error] - Error message (if failed).
+ * @property {number} attempts - Number of attempts made.
  */
 
 /**
- * @typedef {Object} InitializationResult
+ * @typedef {object} InitializationResult
  *
- * @property {DownloadConfig} config - Parsed configuration
- * @property {Logger} logger - Logger instance
- * @property {Paths} paths - Path configuration
+ * @property {DownloadConfig} config - Parsed configuration.
+ * @property {Logger} logger - Logger instance.
+ * @property {Paths} paths - Path configuration.
  */
 
 /**
- * @typedef {Object} ValidationResult
+ * @typedef {object} ValidationResult
  *
- * @property {boolean} isValid - Whether content is valid
- * @property {string[]} [errors] - Validation errors
+ * @property {boolean} isValid - Whether content is valid.
+ * @property {string[]} [errors] - Validation errors.
  */
 
 /**
@@ -150,7 +150,7 @@ const execFileAsync = promisify(execFile);
 /* ==================== ENHANCED CONFIGURATION ==================== */
 
 /**
- * Configuration object with comprehensive options
+ * Configuration object with comprehensive options.
  *
  * @type {DownloadConfig}
  */
@@ -199,9 +199,9 @@ const CONFIG = {
 };
 
 /**
- * Parse command line arguments and merge with config
+ * Parse command line arguments and merge with config.
  *
- * @returns {DownloadConfig} Enhanced configuration
+ * @returns {DownloadConfig} Enhanced configuration.
  */
 function parseArguments() {
     /** @type {string[]} */
@@ -278,7 +278,7 @@ function parseArguments() {
 }
 
 /**
- * Display comprehensive help information
+ * Display comprehensive help information.
  *
  * @returns {void}
  */
@@ -328,12 +328,12 @@ function showHelp() {
 /* ==================== ENHANCED UTILITIES ==================== */
 
 /**
- * Enhanced logger with multiple levels and formatting
+ * Enhanced logger with multiple levels and formatting.
  */
 class Logger {
     /**
-     * @param {boolean} [verbose=false] - Enable verbose logging. Default is
-     *   `false`
+     * @param {boolean} [verbose] - Enable verbose logging. Default is
+     * `false`.
      */
     constructor(verbose = false) {
         /** @type {boolean} */
@@ -398,7 +398,7 @@ class Logger {
     /**
      * @param {number} current
      * @param {number} total
-     * @param {string} [item=""] Default is `""`
+     * @param {string} [item] - Default is `""`.
      *
      * @returns {void}
      */
@@ -419,7 +419,7 @@ class Logger {
 }
 
 /**
- * Initialize application with configuration and setup
+ * Initialize application with configuration and setup.
  *
  * @returns {Promise<InitializationResult>}
  */
@@ -465,13 +465,13 @@ async function initialize() {
 }
 
 /**
- * Enhanced content validator with comprehensive checks
+ * Enhanced content validator with comprehensive checks.
  *
- * @param {string} content - Content to validate
- * @param {DownloadConfig} config - Configuration object
- * @param {Logger} logger - Logger instance
+ * @param {string} content - Content to validate.
+ * @param {DownloadConfig} config - Configuration object.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {boolean} Whether content is valid
+ * @returns {boolean} Whether content is valid.
  */
 function validateContent(content, config, logger) {
     if (!config.enableValidation) {
@@ -507,13 +507,13 @@ function validateContent(content, config, logger) {
 }
 
 /**
- * Enhanced link rewriter with better URL handling
+ * Enhanced link rewriter with better URL handling.
  *
- * @param {string} content - Content to process
- * @param {string} baseUrl - Base URL for resolving links
- * @param {Logger} logger - Logger instance
+ * @param {string} content - Content to process.
+ * @param {string} baseUrl - Base URL for resolving links.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {string} Processed content
+ * @returns {string} Processed content.
  */
 function rewriteLinks(content, baseUrl, logger) {
     /** @type {number} */
@@ -549,13 +549,13 @@ function rewriteLinks(content, baseUrl, logger) {
 }
 
 /**
- * Enhanced content cleaner with configurable rules
+ * Enhanced content cleaner with configurable rules.
  *
- * @param {string} content - Content to clean
- * @param {DownloadConfig} config - Configuration object
- * @param {Logger} logger - Logger instance
+ * @param {string} content - Content to clean.
+ * @param {DownloadConfig} config - Configuration object.
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {string} Cleaned content
+ * @returns {string} Cleaned content.
  */
 function cleanContent(content, config, logger) {
     /** @type {string} */
@@ -624,10 +624,10 @@ function cleanContent(content, config, logger) {
 }
 
 /**
- * Download content directly via HTTP/HTTPS
+ * Download content directly via HTTP/HTTPS.
  *
- * @param {string} url - URL to download
- * @param {number} timeoutMs - Timeout in milliseconds
+ * @param {string} url - URL to download.
+ * @param {number} timeoutMs - Timeout in milliseconds.
  *
  * @returns {Promise<string>}
  */
@@ -657,11 +657,11 @@ async function rawDownload(url, timeoutMs) {
 }
 
 /**
- * Check if Pandoc is available on the system
+ * Check if Pandoc is available on the system.
  *
- * @param {Logger} logger - Logger instance
+ * @param {Logger} logger - Logger instance.
  *
- * @returns {Promise<boolean>} Whether Pandoc is available
+ * @returns {Promise<boolean>} Whether Pandoc is available.
  */
 async function isPandocAvailable(logger) {
     try {
@@ -678,15 +678,15 @@ async function isPandocAvailable(logger) {
 }
 
 /**
- * Download a single file with retry logic
+ * Download a single file with retry logic.
  *
- * @param {DownloadTask} task - Download task
- * @param {DownloadConfig} config - Configuration
- * @param {Logger} logger - Logger instance
- * @param {Paths} _paths - Path configuration
- * @param {HashRecord} previousHashes - Previous file hashes
+ * @param {DownloadTask} task - Download task.
+ * @param {DownloadConfig} config - Configuration.
+ * @param {Logger} logger - Logger instance.
+ * @param {Paths} _paths - Path configuration.
+ * @param {HashRecord} previousHashes - Previous file hashes.
  *
- * @returns {Promise<DownloadResult>} Download result
+ * @returns {Promise<DownloadResult>} Download result.
  */
 async function downloadFile(task, config, logger, _paths, previousHashes) {
     const { page, url, outputPath } = task;
@@ -811,15 +811,15 @@ async function downloadFile(task, config, logger, _paths, previousHashes) {
 }
 
 /**
- * Download files sequentially
+ * Download files sequentially.
  *
- * @param {DownloadTask[]} tasks - Download tasks
- * @param {DownloadConfig} config - Configuration
- * @param {Logger} logger - Logger instance
- * @param {Paths} paths - Path configuration
- * @param {HashRecord} previousHashes - Previous file hashes
+ * @param {DownloadTask[]} tasks - Download tasks.
+ * @param {DownloadConfig} config - Configuration.
+ * @param {Logger} logger - Logger instance.
+ * @param {Paths} paths - Path configuration.
+ * @param {HashRecord} previousHashes - Previous file hashes.
  *
- * @returns {Promise<DownloadResult[]>} Download results
+ * @returns {Promise<DownloadResult[]>} Download results.
  */
 async function downloadSequential(
     tasks,
@@ -851,15 +851,15 @@ async function downloadSequential(
 }
 
 /**
- * Download files in parallel with concurrency control
+ * Download files in parallel with concurrency control.
  *
- * @param {DownloadTask[]} tasks - Download tasks
- * @param {DownloadConfig} config - Configuration
- * @param {Logger} logger - Logger instance
- * @param {Paths} paths - Path configuration
- * @param {HashRecord} previousHashes - Previous file hashes
+ * @param {DownloadTask[]} tasks - Download tasks.
+ * @param {DownloadConfig} config - Configuration.
+ * @param {Logger} logger - Logger instance.
+ * @param {Paths} paths - Path configuration.
+ * @param {HashRecord} previousHashes - Previous file hashes.
  *
- * @returns {Promise<DownloadResult[]>} Download results
+ * @returns {Promise<DownloadResult[]>} Download results.
  */
 async function downloadParallel(tasks, config, logger, paths, previousHashes) {
     /** @type {DownloadResult[]} */
@@ -902,13 +902,13 @@ async function downloadParallel(tasks, config, logger, paths, previousHashes) {
 }
 
 /**
- * Generate comprehensive report of download results
+ * Generate comprehensive report of download results.
  *
- * @param {DownloadResult[]} results - Download results
- * @param {DownloadConfig} config - Configuration
- * @param {Logger} logger - Logger instance
- * @param {Paths} paths - Path configuration
- * @param {HashRecord} previousHashes - Previous file hashes
+ * @param {DownloadResult[]} results - Download results.
+ * @param {DownloadConfig} config - Configuration.
+ * @param {Logger} logger - Logger instance.
+ * @param {Paths} paths - Path configuration.
+ * @param {HashRecord} previousHashes - Previous file hashes.
  *
  * @returns {Promise<void>}
  */
@@ -990,7 +990,7 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 /* ==================== MAIN APPLICATION ==================== */
 
 /**
- * Main application entry point
+ * Main application entry point.
  *
  * @returns {Promise<void>}
  */
@@ -1067,13 +1067,13 @@ async function main() {
 }
 
 /**
- * Get output file path for a page
+ * Get output file path for a page.
  *
- * @param {string} page - Page path
- * @param {DownloadConfig} config - Configuration
- * @param {Paths} paths - Path configuration
+ * @param {string} page - Page path.
+ * @param {DownloadConfig} config - Configuration.
+ * @param {Paths} paths - Path configuration.
  *
- * @returns {string} Output file path
+ * @returns {string} Output file path.
  */
 function getOutputPath(page, config, paths) {
     /** @type {path.ParsedPath} */

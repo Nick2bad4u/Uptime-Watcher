@@ -2,18 +2,18 @@
 
 /**
  * Script to extract and export all test names from the project Parses test
- * files to find describe() and it() blocks and exports test names
+ * files to find describe() and it() blocks and exports test names.
  */
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import * as path from "node:path";
 
 /**
- * Extract test names from a single test file
+ * Extract test names from a single test file.
  *
- * @param {string} filePath - Path to the test file
+ * @param {string} filePath - Path to the test file.
  *
- * @returns {Object} - Object containing test structure
+ * @returns {object} - Object containing test structure.
  */
 function extractTestNames(filePath) {
     try {
@@ -64,10 +64,10 @@ function extractTestNames(filePath) {
 }
 
 /**
- * Find all test files in the project
+ * Find all test files in the project.
  *
- * @param {string} dirPath - Directory to search
- * @param {string[]} testFiles - Array to collect test file paths
+ * @param {string} dirPath - Directory to search.
+ * @param {string[]} testFiles - Array to collect test file paths.
  */
 function findTestFiles(dirPath, testFiles = []) {
     try {
@@ -117,10 +117,10 @@ function findTestFiles(dirPath, testFiles = []) {
 }
 
 /**
- * Format test names for different output formats
+ * Format test names for different output formats.
  *
- * @param {Object[]} testStructures - Array of test structures
- * @param {string} format - Output format ('list', 'json', 'tree', 'flat')
+ * @param {object[]} testStructures - Array of test structures.
+ * @param {string} format - Output format ('list', 'json', 'tree', 'flat').
  */
 function formatTestNames(testStructures, format = "list") {
     switch (format) {
@@ -194,7 +194,7 @@ function formatTestNames(testStructures, format = "list") {
 }
 
 /**
- * Main function
+ * Main function.
  */
 function main() {
     const args = process.argv.slice(2);
@@ -220,7 +220,7 @@ function main() {
         console.log(`Found ${testFiles.length} test files\n`);
 
         // Extract test names from all files
-        /** @type {Object[]} */
+        /** @type {object[]} */
         const testStructures = [];
         testFiles.forEach((filePath) => {
             const structure = extractTestNames(filePath);
@@ -270,7 +270,13 @@ function main() {
     }
 }
 
-// Usage information
+/**
+ * Usage information.
+ */
+
+/**
+ *
+ */
 function showUsage() {
     console.log(`
 Usage: node extract-test-names.js [options]

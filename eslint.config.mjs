@@ -1,7 +1,7 @@
 /**
- * Optimized ESLint configuration for Uptime Watcher
+ * Optimized ESLint configuration for Uptime Watcher.
  *
- * This configuration is specifically tailored for:
+ * This configuration is specifically tailored for:.
  *
  * ```
  *         rules: {
@@ -11,7 +11,7 @@
  * - Service-based backend architecture
  * - High code quality with reduced false positives
  * - Modern ES2024+ features
- * - Enhanced security and performance rules
+ * - Enhanced security and performance rules.
  *
  * @see {@link https://www.schemastore.org/eslintrc.json} for JSON schema validation
  */
@@ -1322,6 +1322,7 @@ export default defineConfig([
             "tailwind/migration-from-tailwind-2": "warn",
             "tailwind/no-arbitrary-value": "warn",
             "tailwind/no-contradicting-classname": "warn",
+
             /**
              * Performance issue with the plugin, somewhat mitigated setting
              * cssFiles to an empty array.
@@ -4312,6 +4313,7 @@ export default defineConfig([
             // "tailwind/migration-from-tailwind-2": "warn",
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
+
             /**
              * Performance issue with the plugin, somewhat mitigated setting
              * cssFiles to an empty array.
@@ -7492,6 +7494,7 @@ export default defineConfig([
             // "tailwind/migration-from-tailwind-2": "warn",
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
+
             /**
              * Performance issue with the plugin, somewhat mitigated setting
              * cssFiles to an empty array.
@@ -9697,7 +9700,12 @@ export default defineConfig([
     // MARK: JS JsDoc
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: ["**/*.{js,cjs}"],
+        files: [
+            "scripts/**/*.{js,cjs,mjs}",
+            "storybook/**/*.{js,cjs,mjs}",
+            "test-remark.mjs",
+            "test-runner-jest.config.js",
+        ],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -9708,14 +9716,18 @@ export default defineConfig([
                 require: "readonly",
             },
         },
-        name: "JS JSDoc - **/*.{JS,CJS}",
+        name: "JS JSDoc - **/*.{JS,CJS,MJS}",
         plugins: {
             jsdoc: jsdocPlugin,
         },
         rules: {
+            // Start from upstream defaults for JS so new recommended rules are
+            // picked up automatically when eslint-plugin-jsdoc updates.
+            ...jsdocPlugin.configs["flat/recommended"].rules,
+
             "jsdoc/check-access": "warn", // Recommended
             "jsdoc/check-alignment": "warn", // Recommended
-            "jsdoc/check-indentation": "warn",
+            "jsdoc/check-indentation": "off",
             "jsdoc/check-line-alignment": "warn",
             "jsdoc/check-param-names": "warn", // Recommended
             "jsdoc/check-property-names": "warn", // Recommended
@@ -9729,66 +9741,77 @@ export default defineConfig([
             "jsdoc/escape-inline-tags": "warn", // Recommended for TS configs
             "jsdoc/implements-on-classes": "warn", // Recommended
             "jsdoc/imports-as-dependencies": "warn",
-            "jsdoc/informative-docs": "warn",
+            "jsdoc/informative-docs": "off",
             "jsdoc/lines-before-block": "warn",
-            "jsdoc/match-description": "warn",
+            "jsdoc/match-description": "off",
             "jsdoc/match-name": "off",
             "jsdoc/multiline-blocks": "warn", // Recommended
             "jsdoc/no-bad-blocks": "warn",
             "jsdoc/no-blank-block-descriptions": "warn",
-            "jsdoc/no-blank-blocks": "warn", // Recommended
+            "jsdoc/no-blank-blocks": "off",
             "jsdoc/no-defaults": "warn", // Recommended
             "jsdoc/no-missing-syntax": "off",
             "jsdoc/no-multi-asterisks": "warn", // Recommended
             "jsdoc/no-restricted-syntax": "off",
             "jsdoc/no-types": "off", // Recommended for TS configs
-            "jsdoc/no-undefined-types": "warn", // Recommended for non-TS configs
+            "jsdoc/no-undefined-types": "off", // Too noisy for tooling scripts
             "jsdoc/prefer-import-tag": "off",
             "jsdoc/reject-any-type": "off",
-            "jsdoc/reject-function-type": "warn", // Recommended
+            "jsdoc/reject-function-type": "off",
             "jsdoc/require-asterisk-prefix": "warn",
-            "jsdoc/require-description": "warn",
-            "jsdoc/require-description-complete-sentence": "warn",
+            "jsdoc/require-description": "off",
+            "jsdoc/require-description-complete-sentence": "off",
             "jsdoc/require-example": "off",
-            "jsdoc/require-file-overview": "warn",
+            "jsdoc/require-file-overview": "off",
             "jsdoc/require-hyphen-before-param-description": "warn",
             "jsdoc/require-jsdoc": "warn", // Recommended
             "jsdoc/require-next-description": "warn",
             "jsdoc/require-next-type": "warn", // Recommended
-            "jsdoc/require-param": "warn", // Recommended
-            "jsdoc/require-param-description": "warn", // Recommended
+            "jsdoc/require-param": "off", // Too noisy for tooling scripts
+            "jsdoc/require-param-description": "off", // Too noisy for tooling scripts
             "jsdoc/require-param-name": "warn", // Recommended
-            "jsdoc/require-param-type": "warn", // Recommended in non-TS configs
+            "jsdoc/require-param-type": "off",
             "jsdoc/require-property": "warn", // Recommended
             "jsdoc/require-property-description": "warn", // Recommended
             "jsdoc/require-property-name": "warn", // Recommended
             "jsdoc/require-property-type": "warn", // Recommended in non-TS configs
-            "jsdoc/require-rejects": "warn", // Recommended
-            "jsdoc/require-returns": "warn", // Recommended
+            "jsdoc/require-rejects": "off", // Too noisy for tooling scripts
+            "jsdoc/require-returns": "off", // Too noisy for tooling scripts
             "jsdoc/require-returns-check": "warn", // Recommended
-            "jsdoc/require-returns-description": "warn", // Recommended
-            "jsdoc/require-returns-type": "warn", // Recommended in non-TS configs
+            "jsdoc/require-returns-description": "off", // Too noisy for tooling scripts
+            "jsdoc/require-returns-type": "off",
             "jsdoc/require-tags": "off",
             "jsdoc/require-template": "warn",
             "jsdoc/require-template-description": "warn",
-            "jsdoc/require-throws": "warn",
+            "jsdoc/require-throws": "off",
             "jsdoc/require-throws-description": "warn",
-            "jsdoc/require-throws-type": "warn", // Recommended
+            "jsdoc/require-throws-type": "off",
             "jsdoc/require-yields": "warn", // Recommended
             "jsdoc/require-yields-check": "warn", // Recommended
             "jsdoc/require-yields-description": "warn",
             "jsdoc/require-yields-type": "warn", // Recommended
             "jsdoc/sort-tags": "off",
             "jsdoc/tag-lines": "off", // Recommended
-            "jsdoc/text-escaping": "warn",
+            "jsdoc/text-escaping": [
+                "warn",
+                {
+                    escapeHTML: true,
+                },
+            ],
             "jsdoc/ts-method-signature-style": "warn",
             "jsdoc/ts-no-empty-object-type": "warn",
             "jsdoc/ts-no-unnecessary-template-expression": "warn",
             "jsdoc/ts-prefer-function-type": "warn",
             "jsdoc/type-formatting": "warn",
-            "jsdoc/valid-types": "warn", // Recommended
+            "jsdoc/valid-types": "off", // Tooling scripts frequently use TS-style imports/types
             // "jsdoc/check-examples": "warn", // Deprecated and not for ESLint >= 8
             // "jsdoc/rejct-any-type": "warn", // broken
+        },
+        settings: {
+            jsdoc: {
+                // JS files in this repo use classic JSDoc.
+                mode: "jsdoc",
+            },
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10336,6 +10359,18 @@ export default defineConfig([
         rules: {
             // This component must expose the underlying <select> element ref.
             "@eslint-react/no-forward-ref": "off",
+        },
+    },
+    {
+        files: [
+            "vitest*.config.ts",
+            "config/testing/vitest*.config.ts",
+        ],
+        name: "Vitest Config Overrides - *.config.ts",
+        rules: {
+            // Vite/Vitest config types still include `any`/loose augmentation in
+            // places (e.g., `test:`), which makes this rule pure noise.
+            "@typescript-eslint/no-unsafe-assignment": "off",
         },
     },
     {

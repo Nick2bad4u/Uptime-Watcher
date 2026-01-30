@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Verifies that all ESLint inspector components are properly deployed
+ * Verifies that all ESLint inspector components are properly deployed.
  *
  * @version 1.0.0
  *
- * @file Verification script for ESLint Config Inspector deployment
+ * @file Verification script for ESLint Config Inspector deployment.
  *
  * @author Uptime-Watcher Team
  *
@@ -21,12 +21,12 @@ const staticDir = path.join(docusaurusDir, "static", "eslint-inspector");
 const buildDir = path.join(docusaurusDir, "build", "eslint-inspector");
 
 /**
- * Checks if a directory exists and contains expected files
+ * Checks if a directory exists and contains expected files.
  *
- * @param {string} dirPath - Directory path to check
- * @param {string[]} expectedFiles - Expected files in directory
+ * @param {string} dirPath - Directory path to check.
+ * @param {string[]} expectedFiles - Expected files in directory.
  *
- * @returns {Promise<{ exists: boolean; files: string[]; missing: string[] }>}
+ * @returns {Promise<{exists: boolean, files: string[], missing: string[]}>}
  */
 async function checkDirectory(dirPath, expectedFiles = []) {
     try {
@@ -49,11 +49,11 @@ async function checkDirectory(dirPath, expectedFiles = []) {
 }
 
 /**
- * Verifies configuration file contents
+ * Verifies configuration file contents.
  *
- * @param {string} filePath - Path to config file
+ * @param {string} filePath - Path to config file.
  *
- * @returns {Promise<{ valid: boolean; content?: string; error?: string }>}
+ * @returns {Promise<{valid: boolean, content?: string, error?: string}>}
  */
 async function verifyConfigFile(filePath) {
     try {
@@ -93,7 +93,7 @@ async function verifyConfigFile(filePath) {
 }
 
 /**
- * Main verification function
+ * Main verification function.
  */
 async function verifyESLintInspectorDeployment() {
     console.log("🔍 Verifying ESLint Config Inspector deployment...\n");

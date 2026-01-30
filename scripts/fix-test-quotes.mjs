@@ -2,12 +2,12 @@
 
 /**
  * Test Quote Fixer for TypeScript Test Files Automatically fixes quote issues
- * in test files that can occur after automated modifications
+ * in test files that can occur after automated modifications.
  *
- * Usage: node scripts/fix-test-quotes.mjs [options]
+ * Usage: node scripts/fix-test-quotes.mjs [options].
  *
  * Options: --dry-run, -d Show what would be changed without making changes
- * --pattern, -p Glob pattern for test files --help, -h Show this help message
+ * --pattern, -p Glob pattern for test files --help, -h Show this help message.
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
@@ -54,11 +54,11 @@ Examples:
 }
 
 /**
- * Fix quote issues in a single file
+ * Fix quote issues in a single file.
  *
- * @param {string} filePath - Path to the file to fix
+ * @param {string} filePath - Path to the file to fix.
  *
- * @returns {boolean} Whether the file was modified
+ * @returns {boolean} Whether the file was modified.
  */
 function fixFileQuotes(filePath) {
     try {
@@ -141,12 +141,12 @@ function fixFileQuotes(filePath) {
 }
 
 /**
- * Recursively find test files matching the pattern
+ * Recursively find test files matching the pattern.
  *
- * @param {string} dir - Directory to search
- * @param {string} pattern - File pattern to match
+ * @param {string} dir - Directory to search.
+ * @param {string} pattern - File pattern to match.
  *
- * @returns {string[]} Array of test file paths
+ * @returns {string[]} Array of test file paths.
  */
 function findTestFiles(dir, pattern) {
     const files = [];
@@ -183,7 +183,7 @@ function findTestFiles(dir, pattern) {
 }
 
 /**
- * Main execution function
+ * Main execution function.
  */
 function main() {
     console.log("🔧 Test Quote Fixer");

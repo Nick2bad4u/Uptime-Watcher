@@ -1,5 +1,5 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file overrides for config typings */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- vitest/config mergeConfig typing currently widens configs to any. */
+ 
 /**
  * Specialized Vitest configuration optimized for zero-coverage detection runs.
  *

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * @file Build script for ESLint Config Inspector
+ * @file Build script for ESLint Config Inspector.
  *
  *   This script builds a static version of the ESLint Config Inspector and copies
  *   it to the Docusaurus static directory for deployment.
@@ -96,7 +96,7 @@ async function buildESLintInspector() {
 }
 
 /**
- * Copy the built inspector to docusaurus static directory
+ * Copy the built inspector to docusaurus static directory.
  */
 async function copyToDocusaurus() {
     try {
@@ -142,7 +142,7 @@ async function copyToDocusaurus() {
 }
 
 /**
- * Fix absolute asset paths in HTML files to work with subdirectory deployment
+ * Fix absolute asset paths in HTML files to work with subdirectory deployment.
  */
 async function fixAssetPaths() {
     try {
@@ -222,7 +222,7 @@ async function fixAssetPaths() {
 }
 
 /**
- * Create a local testing version with relative paths for direct browser opening
+ * Create a local testing version with relative paths for direct browser opening.
  */
 async function createLocalTestingVersion() {
     try {
@@ -314,7 +314,7 @@ async function createLocalTestingVersion() {
 }
 
 /**
- * Create an index redirect page for better SEO and usability
+ * Create an index redirect page for better SEO and usability.
  */
 async function createIndexRedirect() {
     try {
@@ -396,7 +396,7 @@ async function createIndexRedirect() {
 }
 
 /**
- * @file Entrypoint for ESLint Config Inspector deployment
+ * @file Entrypoint for ESLint Config Inspector deployment.
  *
  *   This script orchestrates the build and deployment process for the ESLint
  *   Config Inspector. It performs the following steps:
@@ -444,7 +444,7 @@ export { buildESLintInspector };
  * deployment.
  *
  * @returns {Promise<void>} Resolves when the copy operation completes
- *   successfully.
+ * successfully.
  */
 export { copyToDocusaurus };
 

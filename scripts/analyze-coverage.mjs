@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Analyzes code coverage statistics from a coverage-final.json file.
  *
@@ -17,7 +18,7 @@
  * @param input - Coverage/coverage-final.json: Istanbul JSON coverage report.
  *
  * @returns Console output listing files with low function and branch coverage,
- *   and a summary.
+ * and a summary.
  */
 
 import * as fs from "node:fs";
@@ -143,11 +144,12 @@ for (const [filePath, data] of Object.entries(coverageData)) {
         totalFunctions > 0 ? (coveredFunctions / totalFunctions) * 100 : 100;
 
     // Helper to determine if a branch is covered
+
     /**
      * Determines if a branch is covered based on its coverage array or count.
      *
      * @param {number | number[]} branchArray - The branch coverage data, either
-     *   a number or an array of numbers.
+     * a number or an array of numbers.
      *
      * @returns {boolean} True if the branch is covered, false otherwise.
      */
@@ -169,22 +171,22 @@ for (const [filePath, data] of Object.entries(coverageData)) {
      * Represents coverage analysis for a single file.
      *
      * @property {string} file - Relative path to the file.
-     * @property {Object} statements - Statement coverage details.
+     * @property {object} statements - Statement coverage details.
      * @property {number} statements.total - Total number of statements.
      * @property {number} statements.covered - Number of covered statements.
      * @property {number} statements.percentage - Percentage of covered
-     *   statements.
-     * @property {Object} functions - Function coverage details.
+     * statements.
+     * @property {object} functions - Function coverage details.
      * @property {number} functions.total - Total number of functions.
      * @property {number} functions.covered - Number of covered functions.
      * @property {number} functions.percentage - Percentage of covered
-     *   functions.
-     * @property {Object} branches - Branch coverage details.
+     * functions.
+     * @property {object} branches - Branch coverage details.
      * @property {number} branches.total - Total number of branches.
      * @property {number} branches.covered - Number of covered branches.
      * @property {number} branches.percentage - Percentage of covered branches.
      *
-     *   The analysis object summarizes coverage statistics for each file.
+     * The analysis object summarizes coverage statistics for each file.
      */
     fileAnalysis.push({
         file: relativePath,
@@ -248,6 +250,7 @@ if (debugFile) {
 }
 
 // Helper: format a fixed-width table for coverage sections
+
 /**
  * @param {any[]} displayed
  */
@@ -257,7 +260,7 @@ function computeColWidths(displayed) {
     const fileCol = Math.max(
         minFileCol,
         ...displayed.map(
-            (/** @type {{ file: string | any[] }} */ f) => f.file.length
+            (/** @type {{file: string | any[]}} */ f) => f.file.length
         )
     );
     // Other columns get a reasonable width
@@ -272,6 +275,7 @@ function computeColWidths(displayed) {
 }
 
 // Shorten long paths by keeping head and tail with ellipsis in the middle
+
 /**
  * @param {any} s
  * @param {number} max
@@ -281,15 +285,19 @@ function ellipsize(s, max) {
     if (!max || str.length <= max) return str;
     if (max <= 4) return str.slice(-max);
     const head = Math.ceil(max * 0.4);
-    const tail = max - head - 3; // For '...'
+
+    /**
+     * For '...'.
+     */
+    const tail = max - head - 3; 
     return `${str.slice(0, head)}...${str.slice(-tail)}`;
 }
 
 /**
  * Print a table section with aligned headers and numeric columns.
  *
- * @param {string} header - The section title
- * @param {any[]} files - Array of file analysis objects
+ * @param {string} header - The section title.
+ * @param {any[]} files - Array of file analysis objects.
  */
 function printCoverageSection(header, files) {
     console.log(colors.bold(`=== ${header} ===`));
@@ -315,7 +323,7 @@ function printCoverageSection(header, files) {
 
         displayed.forEach((f) => {
             const fmt = (
-                /** @type {{ percentage: number; covered: any; total: any }} */ cov
+                /** @type {{percentage: number, covered: any, total: any}} */ cov
             ) => {
                 if (!cov) return "-";
                 const pct = cov.percentage ?? 0;
@@ -360,7 +368,7 @@ function printCoverageSection(header, files) {
             fileCol
         );
         const cell = (
-            /** @type {{ percentage: number; covered: any; total: any }} */ cov
+            /** @type {{percentage: number, covered: any, total: any}} */ cov
         ) => {
             if (!cov) return padLeft("-", 14);
             const pct = cov.percentage ?? 0;
@@ -384,6 +392,7 @@ function printCoverageSection(header, files) {
 }
 
 // Small helpers for padding
+
 /**
  * @param {string} s
  * @param {number} width

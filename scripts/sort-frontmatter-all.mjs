@@ -23,7 +23,7 @@ function collectMarkdownFilesFromDir(dir) {
  * Resolve one CLI argument into a list of .md files.
  *
  * - If it's a directory: recurse and collect all .md
- * - Otherwise: treat it as a glob (or single file) and let glob handle it
+ * - Otherwise: treat it as a glob (or single file) and let glob handle it.
  *
  * @param {string} rawArg
  *

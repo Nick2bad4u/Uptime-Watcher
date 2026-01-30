@@ -54,8 +54,8 @@ const NORMALIZED_ELECTRON_DIR = normalizePath(ELECTRON_DIR);
  * Lazily loads and caches canonical monitor type identifiers for rule
  * evaluations.
  * @remarks Parsed once from the shared TypeScript source to avoid repeated filesystem
-reads when multiple files trigger the rule. This avoids blocking the event
-loop at module initialization.
+ * reads when multiple files trigger the rule. This avoids blocking the event
+ * loop at module initialization.
  * @type {readonly string[] | null}
  */
 let BASE_MONITOR_TYPES_CACHE = null;
@@ -64,7 +64,7 @@ let BASE_MONITOR_TYPES_CACHE = null;
  * Returns the cached monitor types, loading them if necessary.
  *
  * @returns {readonly string[]} Monitor type identifiers defined in shared
- *   configuration.
+ * configuration.
  */
 function getBaseMonitorTypes() {
     if (!BASE_MONITOR_TYPES_CACHE) {
@@ -78,7 +78,7 @@ function getBaseMonitorTypes() {
  * source.
  *
  * @returns {readonly string[]} Monitor type identifiers defined in shared
- *   configuration.
+ * configuration.
  */
 function loadBaseMonitorTypes() {
     const source = fs.readFileSync(SHARED_TYPES_PATH, "utf8");
@@ -147,10 +147,10 @@ function loadBaseMonitorTypes() {
  * Extracts an array literal from a potential TypeScript assertion wrapper.
  *
  * @param {ts.Expression} expression - Expression that may represent an array
- *   literal or an assertion wrapping an array literal.
+ * literal or an assertion wrapping an array literal.
  *
  * @returns {ts.ArrayLiteralExpression | null} Unwrapped array literal if one is
- *   present.
+ * present.
  */
 function extractArrayLiteral(expression) {
     if (ts.isArrayLiteralExpression(expression)) {
@@ -180,12 +180,12 @@ function extractArrayLiteral(expression) {
  * TypeScript-specific wrappers like `as const`.
  *
  * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} initializer
- *   -
+ * -.
  *
- *   Initializer node from a variable declaration.
+ * Initializer node from a variable declaration.
  *
  * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression | null}
- *   Array expression when found.
+ * Array expression when found.
  */
 function getArrayExpression(initializer) {
     if (!initializer) {
@@ -210,8 +210,8 @@ function getArrayExpression(initializer) {
 /**
  * Extracts the string literal value from an object property.
  *
- * @param {import("@typescript-eslint/utils").TSESTree.Property} property -
- *   Object property node.
+ * @param {import("@typescript-eslint/utils").TSESTree.Property} property
+ * Object property node.
  *
  * @returns {string | null} String literal value when present.
  */
@@ -261,6 +261,7 @@ const monitorFallbackConsistencyRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { messageId: string; node: any; data?: { type: string; } | { type: string; } | { types: string; } | { type: string; }; }) => void; }} context
      */
@@ -402,6 +403,7 @@ const electronNoConsoleRule = {
         schema: [],
         type: "suggestion",
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { data: { method: string; }; messageId: string; node: any; }) => void; }} context
      */
@@ -418,7 +420,7 @@ const electronNoConsoleRule = {
 
         return {
             /**
-             * @param {{ callee: { type: string; object: { type: string; name: string; }; computed: any; property: { type: string; name: any; }; }; }} node
+             * @param {{callee: {type: string, object: {type: string, name: string}, computed: any, property: {type: string, name: any}}}} node
              */
             CallExpression(node) {
                 if (
@@ -457,6 +459,7 @@ const rendererNoElectronImportRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{
      *   getFilename: () => string;
@@ -488,7 +491,7 @@ const rendererNoElectronImportRule = {
          * @param {string} moduleName - Module specifier under evaluation.
          *
          * @returns {boolean} True when the specifier targets the Electron
-         *   runtime package.
+         * runtime package.
          */
         function isDirectElectronModule(moduleName) {
             if (moduleName === "electron" || moduleName === "node:electron") {
@@ -507,10 +510,10 @@ const rendererNoElectronImportRule = {
          * directory.
          *
          * @param {string} moduleName - Module specifier from an import or
-         *   require call.
+         * require call.
          *
          * @returns {boolean} True when the resolved path lives inside the
-         *   electron source tree.
+         * electron source tree.
          */
         function resolvesToElectronDirectory(moduleName) {
             if (!moduleName.startsWith(".")) {
@@ -530,7 +533,7 @@ const rendererNoElectronImportRule = {
          * Reports an invalid Electron dependency usage.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST
-         *   node to highlight.
+         * node to highlight.
          * @param {string} moduleName - Name of the offending module specifier.
          *
          * @returns {void}
@@ -548,7 +551,7 @@ const rendererNoElectronImportRule = {
          * it references Electron.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
-         *   owning the literal specifier.
+         * owning the literal specifier.
          * @param {string} moduleName - Literal module specifier value.
          *
          * @returns {void}
@@ -574,6 +577,7 @@ const rendererNoElectronImportRule = {
                     handleStaticSpecifier(node.source, node.source.value);
                 }
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportExpression} node
              */
@@ -585,8 +589,9 @@ const rendererNoElectronImportRule = {
                     handleStaticSpecifier(node.source, node.source.value);
                 }
             },
+
             /**
-             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; }} node
+             * @param {{callee: {type: string, name: string}, arguments: string | any[]}} node
              */
             CallExpression(node) {
                 if (
@@ -628,6 +633,7 @@ const sharedNoOutsideImportsRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{
      *   getFilename: () => string;
@@ -657,7 +663,7 @@ const sharedNoOutsideImportsRule = {
          * layer.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
-         *   to highlight.
+         * to highlight.
          * @param {string} moduleName - The offending module specifier.
          */
         function report(node, moduleName) {
@@ -672,7 +678,7 @@ const sharedNoOutsideImportsRule = {
          * Determines whether a module specifier refers to a disallowed target.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST
-         *   node to highlight if violation occurs.
+         * node to highlight if violation occurs.
          * @param {string} moduleName - Module specifier to inspect.
          */
         function handleModuleSpecifier(node, moduleName) {
@@ -722,6 +728,7 @@ const sharedNoOutsideImportsRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportExpression} node
              */
@@ -733,8 +740,9 @@ const sharedNoOutsideImportsRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+
             /**
-             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; }} node
+             * @param {{callee: {type: string, name: string}, arguments: string | any[]}} node
              */
             CallExpression(node) {
                 if (
@@ -775,6 +783,7 @@ const electronNoRendererImportRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { module: any; }; messageId: string; node: any; }) => void; }} context
      */
@@ -836,7 +845,7 @@ const electronNoRendererImportRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: any; }; }} node
+             * @param {{source: {type: string, value: any}}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -846,8 +855,9 @@ const electronNoRendererImportRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+
             /**
-             * @param {{ source: { type: string; value: any; }; }} node
+             * @param {{source: {type: string, value: any}}} node
              */
             ImportExpression(node) {
                 if (
@@ -857,8 +867,9 @@ const electronNoRendererImportRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
+
             /**
-             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; }} node
+             * @param {{callee: {type: string, name: string}, arguments: string | any[]}} node
              */
             CallExpression(node) {
                 if (
@@ -906,6 +917,7 @@ const electronNoDirectIpcHandleRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { method: any; }; messageId: string; node: any; }) => void; }} context
      */
@@ -932,7 +944,7 @@ const electronNoDirectIpcHandleRule = {
 
         return {
             /**
-             * @param {{ callee: { type?: any; computed?: any; object?: any; property?: any; }; }} node
+             * @param {{callee: {type?: any, computed?: any, object?: any, property?: any}}} node
              */
             CallExpression(node) {
                 if (node.callee.type !== "MemberExpression") {
@@ -986,6 +998,7 @@ const electronNoDirectIpcMainImportRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -1014,7 +1027,7 @@ const electronNoDirectIpcMainImportRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: string; }; specifiers: any; }} node
+             * @param {{source: {type: string, value: string}, specifiers: any}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -1046,8 +1059,9 @@ const electronNoDirectIpcMainImportRule = {
                     });
                 }
             },
+
             /**
-             * @param {{ callee: { type: string; name: string; }; arguments: string | any[]; parent: any; }} node
+             * @param {{callee: {type: string, name: string}, arguments: string | any[], parent: any}} node
              */
             CallExpression(node) {
                 // Guard against `const { ipcMain } = require("electron")`.
@@ -1079,7 +1093,7 @@ const electronNoDirectIpcMainImportRule = {
                     parent.id &&
                     parent.id.type === "ObjectPattern" &&
                     parent.id.properties.some(
-                        (/** @type {{ type: string; computed: any; key: { type: string; name: string; }; }} */ property) =>
+                        (/** @type {{type: string, computed: any, key: {type: string, name: string}}} */ property) =>
                             property.type === "Property" &&
                             !property.computed &&
                             property.key.type === "Identifier" &&
@@ -1120,6 +1134,7 @@ const electronNoInlineIpcChannelLiteralRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -1171,7 +1186,7 @@ const electronNoInlineIpcChannelLiteralRule = {
 
         return {
             /**
-             * @param {{ callee: { type: string; name: string; }; arguments: any[]; }} node
+             * @param {{callee: {type: string, name: string}, arguments: any[]}} node
              */
             CallExpression(node) {
                 if (node.callee.type !== "Identifier") {
@@ -1219,6 +1234,7 @@ const electronPreloadNoInlineIpcChannelConstantRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -1311,7 +1327,7 @@ const electronPreloadNoInlineIpcChannelConstantRule = {
  * handlers.
  *
  * @remarks
- * `registerStandardizedIpcHandler<"some-channel">(...)` duplicates the channel
+ * `registerStandardizedIpcHandler&lt;"some-channel">(...)` duplicates the channel
  * identifier in the type position and encourages drift. Prefer inference from
  * the channel constant passed as the first argument.
  */
@@ -1329,6 +1345,7 @@ const electronNoInlineIpcChannelTypeArgumentRule = {
         schema: [],
         type: "suggestion",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: object; }) => void; }} context
      */
@@ -1374,7 +1391,7 @@ const electronNoInlineIpcChannelTypeArgumentRule = {
 
         return {
             /**
-             * @param {{ callee: { type: string; name: string; }; typeArguments: any; typeParameters: any; }} node
+             * @param {{callee: {type: string, name: string}, typeArguments: any, typeParameters: any}} node
              */
             CallExpression(node) {
                 if (node.callee.type !== "Identifier") {
@@ -1445,7 +1462,7 @@ const electronNoInlineIpcChannelTypeArgumentRule = {
  * @remarks
  * Examples of banned patterns outside the canonical shared contract modules:
  *
- * - `Extract<IpcInvokeChannel, "add-site">`
+ * - `Extract&lt;IpcInvokeChannel, "add-site">`
  * - `const channel = "add-site" satisfies IpcInvokeChannel`
  * - `const channel = "add-site" as IpcInvokeChannel`
  *
@@ -1467,6 +1484,7 @@ const noInlineIpcChannelTypeLiteralsRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -1514,7 +1532,7 @@ const noInlineIpcChannelTypeLiteralsRule = {
                 return false;
             }
 
-            const literal = /** @type {{ literal?: unknown }} */ (node).literal;
+            const literal = /** @type {{literal?: unknown}} */ (node).literal;
 
             if (!literal || typeof literal !== "object") {
                 return false;
@@ -1578,7 +1596,7 @@ const noInlineIpcChannelTypeLiteralsRule = {
 
         return {
             /**
-             * @param {{ typeName: unknown; typeArguments: { params: any; }; }} node
+             * @param {{typeName: unknown, typeArguments: {params: any}}} node
              */
             TSTypeReference(node) {
                 // Extract<IpcInvokeChannel, "some-channel">
@@ -1615,6 +1633,7 @@ const noInlineIpcChannelTypeLiteralsRule = {
                     node: secondParam,
                 });
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.TSSatisfiesExpression} node
              */
@@ -1639,6 +1658,7 @@ const noInlineIpcChannelTypeLiteralsRule = {
                     });
                 }
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.TSAsExpression} node
              */
@@ -1691,6 +1711,7 @@ const electronPreloadNoDirectIpcRendererUsageRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -1721,7 +1742,7 @@ const electronPreloadNoDirectIpcRendererUsageRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: string; }; specifiers: any; }} node
+             * @param {{source: {type: string, value: string}, specifiers: any}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -1751,8 +1772,9 @@ const electronPreloadNoDirectIpcRendererUsageRule = {
                     }
                 }
             },
+
             /**
-             * @param {{ object: { type: string; name: string; }; }} node
+             * @param {{object: {type: string, name: string}}} node
              */
             MemberExpression(node) {
                 // Any usage of a free identifier `ipcRenderer` in preload domain
@@ -1795,6 +1817,7 @@ const rendererNoDirectPreloadBridgeRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { owner: string; }; messageId: string; node: any; }) => void; }} context
      */
@@ -1825,7 +1848,7 @@ const rendererNoDirectPreloadBridgeRule = {
          *
          * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} member
          *
-         * @returns {{ owner: string } | null}
+         * @returns {{owner: string} | null}
          */
         function matchElectronApiMember(member) {
             const property = member.property;
@@ -1917,6 +1940,7 @@ const rendererNoPreloadBridgeWritesRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -1976,6 +2000,7 @@ const rendererNoPreloadBridgeWritesRule = {
                     });
                 }
             },
+
             /**
              * @param {{ callee: { type: string; computed: any; object: { type: string; name: string; }; property: { type: string; name: string; }; }; arguments: [any, any]; }} node
              */
@@ -2046,6 +2071,7 @@ const rendererNoDirectElectronLogRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { module: any; }; messageId: string; node: any; }) => void; }} context
      */
@@ -2078,7 +2104,7 @@ const rendererNoDirectElectronLogRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: any; }; }} node
+             * @param {{source: {type: string, value: any}}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -2121,6 +2147,7 @@ const rendererNoImportInternalServiceUtilsRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -2143,7 +2170,7 @@ const rendererNoImportInternalServiceUtilsRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: any; }; }} node
+             * @param {{source: {type: string, value: any}}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -2196,6 +2223,7 @@ const rendererNoDirectNetworkingRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ sourceCode: any; getSourceCode: () => any; getFilename: () => any; report: (arg0: { data: { api: string; } | { api: string; } | { api: string; } | { api: string; }; messageId: string; node: any; }) => void; }} context
      */
@@ -2238,7 +2266,7 @@ const rendererNoDirectNetworkingRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: string; }; specifiers: any; }} node
+             * @param {{source: {type: string, value: string}, specifiers: any}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -2273,8 +2301,9 @@ const rendererNoDirectNetworkingRule = {
                     node: node.source,
                 });
             },
+
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 const callee = node.callee;
@@ -2344,6 +2373,7 @@ const rendererNoIpcRendererUsageRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{
      *   getFilename: () => string;
@@ -2432,7 +2462,7 @@ const rendererNoIpcRendererUsageRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: any; }; specifiers: any; }} node
+             * @param {{source: {type: string, value: any}, specifiers: any}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -2473,6 +2503,7 @@ const rendererNoIpcRendererUsageRule = {
                     }
                 }
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.VariableDeclarator} node
              */
@@ -2487,6 +2518,7 @@ const rendererNoIpcRendererUsageRule = {
 
                 electronModuleBindings.add(node.id.name);
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
@@ -2533,6 +2565,7 @@ const rendererNoIpcRendererUsageRule = {
                     report(node);
                 }
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} node
              */
@@ -2601,6 +2634,7 @@ const rendererNoBrowserDialogsRule = {
         schema: [],
         type: "suggestion",
     },
+
     /**
      * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { dialog: any; }; messageId: string; node: any; }) => void; }} context
      */
@@ -2710,7 +2744,7 @@ const rendererNoBrowserDialogsRule = {
 
         return {
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 const dialog = getForbiddenDialogFromCallee(node.callee, node);
@@ -2750,6 +2784,7 @@ const rendererNoWindowOpenRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -2850,7 +2885,7 @@ const rendererNoWindowOpenRule = {
 
         return {
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 if (!isForbiddenWindowOpenCallee(node.callee, node)) {
@@ -2890,6 +2925,7 @@ const electronNoDirectIpcHandlerWrappersRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{
      *   getFilename: () => string;
@@ -2943,7 +2979,7 @@ const electronNoDirectIpcHandlerWrappersRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; }; specifiers: any; }} node
+             * @param {{source: {type: string}, specifiers: any}} node
              */
             ImportDeclaration(node) {
                 if (!node.source || node.source.type !== "Literal") {
@@ -2973,8 +3009,9 @@ const electronNoDirectIpcHandlerWrappersRule = {
                     forbiddenLocalIdentifiers.add(specifier.local.name);
                 }
             },
+
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 const callee = node.callee;
@@ -3024,6 +3061,7 @@ const rendererNoDirectBridgeReadinessRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { callee: any; }; messageId: string; node: any; }) => void; }} context
      */
@@ -3068,7 +3106,7 @@ const rendererNoDirectBridgeReadinessRule = {
 
         return {
             /**
-             * @param {{ specifiers: any; }} node
+             * @param {{specifiers: any}} node
              */
             ImportDeclaration(node) {
                 for (const specifier of node.specifiers) {
@@ -3096,8 +3134,9 @@ const rendererNoDirectBridgeReadinessRule = {
                     }
                 }
             },
+
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 const callee = node.callee;
@@ -3121,8 +3160,9 @@ const rendererNoDirectBridgeReadinessRule = {
                     }
                 }
             },
+
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             NewExpression(node) {
                 const callee = node.callee;
@@ -3158,6 +3198,7 @@ const tsdocNoConsoleExampleRule = {
         schema: [],
         type: "suggestion",
     },
+
     /**
      * @param {{ getSourceCode: () => any; report: (arg0: { loc: { end: any; start: any; }; messageId: string; }) => void; }} context
      */
@@ -3222,8 +3263,9 @@ const preferSharedAliasRule = {
         schema: [],
         type: "suggestion",
     },
+
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { fix(fixer: any): any; messageId: string; node: any; }) => void; }} context
+     * @param {{getFilename: () => any; report: (arg0: {fix: (fixer: any) => any; messageId: string; node: any}) => void}} context
      */
     create(context) {
         const filename = context.getFilename();
@@ -3240,7 +3282,7 @@ const preferSharedAliasRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: any; raw: any; extra: { raw: any; }; }; }} node
+             * @param {{source: {type: string, value: any, raw: any, extra: {raw: any}}}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -3309,7 +3351,7 @@ const preferSharedAliasRule = {
 };
 
 /**
- * ESLint rule ensuring files outside of src reference renderer modules via the
+ * ESLint rule ensuring files outside of src reference renderer modules via the.
  *
  * @app alias.
  */
@@ -3328,8 +3370,9 @@ const preferAppAliasRule = {
         schema: [],
         type: "suggestion",
     },
+
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { fix(fixer: any): any; messageId: string; node: any; }) => void; }} context
+     * @param {{getFilename: () => any; report: (arg0: {fix: (fixer: any) => any; messageId: string; node: any}) => void}} context
      */
     create(context) {
         const filename = context.getFilename();
@@ -3346,7 +3389,7 @@ const preferAppAliasRule = {
 
         return {
             /**
-             * @param {{ source: { type: string; value: any; raw: any; extra: { raw: any; }; }; }} node
+             * @param {{source: {type: string, value: any, raw: any, extra: {raw: any}}}} node
              */
             ImportDeclaration(node) {
                 if (
@@ -3429,6 +3472,7 @@ const noDeprecatedExportsRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{
      *   sourceCode?: any;
@@ -3537,6 +3581,7 @@ const noDeprecatedExportsRule = {
 
                 reportIfDeprecated(node, node);
             },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ExportNamedDeclaration} node
              */
@@ -3566,6 +3611,7 @@ const noLocalRecordGuardsRule = {
         },
         schema: [],
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: import("estree").Identifier; messageId: string; data: { name: string; }; }) => void; }} context
      */
@@ -3626,6 +3672,7 @@ const noLocalRecordGuardsRule = {
                     reportIdentifier(node.id);
                 }
             },
+
             /**
              * @param {{ id: import("estree").Identifier; }} node
              */
@@ -3652,6 +3699,7 @@ const noLocalErrorNormalizersRule = {
         },
         schema: [],
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: import("estree").Identifier; messageId: string; data: { name: string; }; }) => void; }} context
      */
@@ -3704,6 +3752,7 @@ const noLocalErrorNormalizersRule = {
                     reportIdentifier(node.id);
                 }
             },
+
             /**
              * @param {{ id: import("estree").Identifier; }} node
              */
@@ -3737,13 +3786,14 @@ const noRegexpVFlagRule = {
                 "RegExp flag 'v' is not allowed. Use 'u'/'gu' or rewrite the regex.",
         },
     },
+
     /**
      * @param {{ report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
     create(context) {
         return {
             /**
-             * @param {{ regex: any; }} node
+             * @param {{regex: any}} node
              */
             Literal(node) {
                 const regex = node?.regex;
@@ -3807,6 +3857,7 @@ const noLocalIdentifiersRule = {
             banned: "Local definition of '{{name}}' is not allowed. {{details}}",
         },
     },
+
     /**
      * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; details: any; } | { name: any; details: any; }; }) => void; }} context
      */
@@ -3814,22 +3865,22 @@ const noLocalIdentifiersRule = {
         const option = context.options?.[0];
         const banned = Array.isArray(option?.banned) ? option.banned : [];
         const bannedByName = new Map(
-            banned.map((/** @type {{ name: any; }} */ entry) => [entry.name, entry])
+            banned.map((/** @type {{name: any}} */ entry) => [entry.name, entry])
         );
 
-        const shouldReport = (/** @type {{ kinds: any; }} */ entry, /** @type {string} */ kind) => {
+        const shouldReport = (/** @type {{kinds: any}} */ entry, /** @type {string} */ kind) => {
             const kinds = entry.kinds;
             return !Array.isArray(kinds) || kinds.includes(kind);
         };
 
-        const detailsFor = (/** @type {{ message: string | any[]; }} */ entry) =>
+        const detailsFor = (/** @type {{message: string | any[]}} */ entry) =>
             typeof entry.message === "string" && entry.message.length > 0
                 ? entry.message
                 : "Import and reuse the shared helper instead.";
 
         return {
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             FunctionDeclaration(node) {
                 const id = node?.id;
@@ -3851,8 +3902,9 @@ const noLocalIdentifiersRule = {
                     },
                 });
             },
+
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             VariableDeclarator(node) {
                 const id = node?.id;
@@ -3911,6 +3963,7 @@ const noRedeclareSharedContractInterfacesRule = {
                 'Do not redeclare the shared interface "{{name}}". Import it from @shared instead.',
         },
     },
+
     /**
      * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; }; }) => void; }} context
      */
@@ -3928,7 +3981,7 @@ const noRedeclareSharedContractInterfacesRule = {
 
         return {
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             TSInterfaceDeclaration(node) {
                 const id = node?.id;
@@ -3969,6 +4022,7 @@ const electronNoLocalStringSafetyHelpersRule = {
             banned: "Use hasAsciiControlCharacters from shared/utils/stringSafety.ts instead of defining local implementations.",
         },
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -3984,7 +4038,7 @@ const electronNoLocalStringSafetyHelpersRule = {
             return {};
         }
 
-        const reportIfNameMatches = (/** @type {{ type: string; name: string; }} */ id) => {
+        const reportIfNameMatches = (/** @type {{type: string, name: string}} */ id) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -3999,13 +4053,14 @@ const electronNoLocalStringSafetyHelpersRule = {
 
         return {
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             FunctionDeclaration(node) {
                 reportIfNameMatches(node?.id);
             },
+
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             VariableDeclarator(node) {
                 reportIfNameMatches(node?.id);
@@ -4034,6 +4089,7 @@ const electronNoAdHocErrorCodeSuffixRule = {
             banned: "Use getElectronErrorCodeSuffix from electron/services/shell/openExternalUtils.ts instead of ad-hoc error code suffix formatting.",
         },
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -4051,23 +4107,23 @@ const electronNoAdHocErrorCodeSuffixRule = {
             return {};
         }
 
-        const isEmptyStringLiteral = (/** @type {{ type: string; value: string; }} */ node) =>
+        const isEmptyStringLiteral = (/** @type {{type: string, value: string}} */ node) =>
             node?.type === "Literal" && node.value === "";
 
-        const isCodeSuffixTemplate = (/** @type {{ type: string; expressions: any; quasis: any; }} */ node) => {
+        const isCodeSuffixTemplate = (/** @type {{type: string, expressions: any, quasis: any}} */ node) => {
             if (!node || node.type !== "TemplateLiteral") {
                 return false;
             }
 
             const hasCodeIdentifier = (node.expressions ?? []).some(
-                (/** @type {{ type: string; name: string; }} */ expr) => expr?.type === "Identifier" && expr.name === "code"
+                (/** @type {{type: string, name: string}} */ expr) => expr?.type === "Identifier" && expr.name === "code"
             );
 
             if (!hasCodeIdentifier) {
                 return false;
             }
 
-            return (node.quasis ?? []).some((/** @type {{ value: { raw: any; }; }} */ quasi) => {
+            return (node.quasis ?? []).some((/** @type {{value: {raw: any}}} */ quasi) => {
                 const raw = quasi?.value?.raw;
                 return typeof raw === "string" && raw.includes(" (");
             });
@@ -4075,7 +4131,7 @@ const electronNoAdHocErrorCodeSuffixRule = {
 
         return {
             /**
-             * @param {{ consequent: any; alternate: any; }} node
+             * @param {{consequent: any, alternate: any}} node
              */
             ConditionalExpression(node) {
                 const consequent = node?.consequent;
@@ -4117,6 +4173,7 @@ const electronSyncNoLocalAsciiDigitsRule = {
             banned: "Use isAsciiDigits from electron/services/sync/syncEngineUtils.ts (avoid duplicated validation policies).",
         },
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -4132,7 +4189,7 @@ const electronSyncNoLocalAsciiDigitsRule = {
             return {};
         }
 
-        const reportIfNameMatches = (/** @type {{ type: string; name: string; }} */ id) => {
+        const reportIfNameMatches = (/** @type {{type: string, name: string}} */ id) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -4147,13 +4204,14 @@ const electronSyncNoLocalAsciiDigitsRule = {
 
         return {
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             FunctionDeclaration(node) {
                 reportIfNameMatches(node?.id);
             },
+
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             VariableDeclarator(node) {
                 reportIfNameMatches(node?.id);
@@ -4185,6 +4243,7 @@ const electronCloudProvidersDriftGuardsRule = {
                 "Local definition of '{{name}}' is not allowed. {{details}}",
         },
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; data?: { name: any; details: string; }; }) => void; }} context
      */
@@ -4210,7 +4269,7 @@ const electronCloudProvidersDriftGuardsRule = {
             ],
         ]);
 
-        const reportLocal = (/** @type {{ type: string; name: string; }} */ id) => {
+        const reportLocal = (/** @type {{type: string, name: string}} */ id) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -4232,7 +4291,7 @@ const electronCloudProvidersDriftGuardsRule = {
 
         return {
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 const callee = node?.callee;
@@ -4249,14 +4308,16 @@ const electronCloudProvidersDriftGuardsRule = {
                     messageId: "bannedCall",
                 });
             },
+
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             FunctionDeclaration(node) {
                 reportLocal(node?.id);
             },
+
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             VariableDeclarator(node) {
                 reportLocal(node?.id);
@@ -4282,6 +4343,7 @@ const sharedTypesNoLocalIsPlainObjectRule = {
             banned: "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
         },
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -4293,7 +4355,7 @@ const sharedTypesNoLocalIsPlainObjectRule = {
 
         return {
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             VariableDeclarator(node) {
                 const id = node?.id;
@@ -4331,6 +4393,7 @@ const preloadNoLocalIsPlainObjectRule = {
             banned: "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
         },
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -4342,7 +4405,7 @@ const preloadNoLocalIsPlainObjectRule = {
 
         return {
             /**
-             * @param {{ id: any; }} node
+             * @param {{id: any}} node
              */
             VariableDeclarator(node) {
                 const id = node?.id;
@@ -4389,6 +4452,7 @@ const testNoMockReturnValueConstructorsRule = {
             banned: "Avoid {{method}} on '{{name}}'. Vitest implements it with an arrow function, which cannot be used with `new`. Prefer {{replacement}} instead.",
         },
     },
+
     /**
      * @param {{ report: (arg0: { node: any; messageId: string; data: { method: any; name: any; replacement: string; }; }) => void; }} context
      */
@@ -4430,7 +4494,7 @@ const testNoMockReturnValueConstructorsRule = {
         const isPascalCase = (/** @type {string} */ name) =>
             typeof name === "string" && /^[A-Z][A-Za-z0-9]*$/.test(name);
 
-        const isViMockedCall = (/** @type {{ type: string; callee: any; }} */ node) => {
+        const isViMockedCall = (/** @type {{type: string, callee: any}} */ node) => {
             if (!node || node.type !== "CallExpression") {
                 return false;
             }
@@ -4480,7 +4544,7 @@ const testNoMockReturnValueConstructorsRule = {
 
         return {
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 const callee = unwrapExpression(node.callee);
@@ -4563,6 +4627,7 @@ const noCallIdentifiersRule = {
                 "Calling '{{name}}' directly is not allowed. {{details}}",
         },
     },
+
     /**
      * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; details: any; }; }) => void; }} context
      */
@@ -4570,12 +4635,12 @@ const noCallIdentifiersRule = {
         const option = context.options?.[0];
         const banned = Array.isArray(option?.banned) ? option.banned : [];
         const bannedByName = new Map(
-            banned.map((/** @type {{ name: any; }} */ entry) => [entry.name, entry])
+            banned.map((/** @type {{name: any}} */ entry) => [entry.name, entry])
         );
 
         return {
             /**
-             * @param {{ callee: any; }} node
+             * @param {{callee: any}} node
              */
             CallExpression(node) {
                 const callee = node?.callee;
@@ -4608,7 +4673,7 @@ const noCallIdentifiersRule = {
 };
 
 /**
- * @param {{ type: any; typeAnnotation: any; types: any; members: any; }} typeNode
+ * @param {{type: any, typeAnnotation: any, types: any, members: any}} typeNode
  */
 function typeContainsCodeProperty(typeNode) {
     if (!typeNode || typeof typeNode !== "object") {
@@ -4621,7 +4686,7 @@ function typeContainsCodeProperty(typeNode) {
         case "TSIntersectionType":
             return (typeNode.types ?? []).some(typeContainsCodeProperty);
         case "TSTypeLiteral":
-            return (typeNode.members ?? []).some((/** @type {{ type: string; key: { type: string; name: string; }; }} */ member) => {
+            return (typeNode.members ?? []).some((/** @type {{type: string, key: {type: string, name: string}}} */ member) => {
                 if (!member || member.type !== "TSPropertySignature") {
                     return false;
                 }
@@ -4652,6 +4717,7 @@ const preferTryGetErrorCodeRule = {
             prefer: "Use tryGetErrorCode() from shared/utils/errorCodes.ts instead of asserting a `{ code?: unknown }` type.",
         },
     },
+
     /**
      * @param {{ report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -4669,13 +4735,14 @@ const preferTryGetErrorCodeRule = {
 
         return {
             /**
-             * @param {{ typeAnnotation: any; }} node
+             * @param {{typeAnnotation: any}} node
              */
             TSAsExpression(node) {
                 check(node.typeAnnotation);
             },
+
             /**
-             * @param {{ typeAnnotation: any; }} node
+             * @param {{typeAnnotation: any}} node
              */
             TSTypeAssertion(node) {
                 check(node.typeAnnotation);
@@ -4687,11 +4754,11 @@ const preferTryGetErrorCodeRule = {
 /**
  * ESLint rule preventing a common logging footgun:
  *
- * `logger.error(message, { error: ensureError(error) })`
+ * `logger.error(message, { error: ensureError(error) })`.
  *
  * Should instead be:
  *
- * `logger.error(message, ensureError(error), { ...context })`
+ * `logger.error(message, ensureError(error), { ...context })`.
  *
  * @remarks
  * The shared logger supports a dedicated error argument so stack/cause are
@@ -4712,6 +4779,7 @@ const loggerNoErrorInContextRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -4741,7 +4809,7 @@ const loggerNoErrorInContextRule = {
         ]);
 
         /**
-         * @param {{ type: string; callee: { type: string; name: string; }; }} node
+         * @param {{type: string, callee: {type: string, name: string}}} node
          */
         function isEnsureErrorCall(node) {
             if (!node || node.type !== "CallExpression") {
@@ -4756,7 +4824,7 @@ const loggerNoErrorInContextRule = {
         }
 
         /**
-         * @param {{ type: string; callee: { type: string; name: string; }; name: string; }} node
+         * @param {{type: string, callee: {type: string, name: string}, name: string}} node
          */
         function isSuspiciousErrorValue(node) {
             if (!node) {
@@ -4783,7 +4851,7 @@ const loggerNoErrorInContextRule = {
         }
 
         /**
-         * @param {{ type: string; object: { type: string; name: string; }; property: { type: string; name: string; }; }} callee
+         * @param {{type: string, object: {type: string, name: string}, property: {type: string, name: string}}} callee
          */
         function isLoggerErrorOrWarnCall(callee) {
             if (!callee || callee.type !== "MemberExpression") {
@@ -4806,7 +4874,7 @@ const loggerNoErrorInContextRule = {
         }
 
         /**
-         * @param {{ properties: any; }} objectExpression
+         * @param {{properties: any}} objectExpression
          */
         function getErrorPropertyFromObjectExpression(objectExpression) {
             for (const property of objectExpression.properties) {
@@ -4834,7 +4902,7 @@ const loggerNoErrorInContextRule = {
 
         return {
             /**
-             * @param {{ callee: any; arguments: any; }} node
+             * @param {{callee: any, arguments: any}} node
              */
             CallExpression(node) {
                 if (!isLoggerErrorOrWarnCall(node.callee)) {
@@ -4893,6 +4961,7 @@ const storeActionsRequireFinallyResetRule = {
         schema: [],
         type: "problem",
     },
+
     /**
      * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { flag: any; }; messageId: string; node: any; }) => void; }} context
      */
@@ -4923,7 +4992,7 @@ const storeActionsRequireFinallyResetRule = {
          *
          * - set({ ... })
          * - set(() => ({ ... }))
-         * - set(() => { return { ... }; })
+         * - set(() => { return { ... }; }).
          *
          * @param {unknown} argument
          *
@@ -5051,7 +5120,7 @@ const storeActionsRequireFinallyResetRule = {
 
         /**
          * @param {unknown} node
-         * @param {{ flagsResetInFinally: Set<string>; flagsSet: Map<string, unknown>; inFinally: boolean; root: unknown; }} state
+         * @param {{flagsResetInFinally: Set<string>, flagsSet: Map<string, unknown>, inFinally: boolean, root: unknown}} state
          */
         function walk(node, state) {
             if (!node || typeof node !== "object" || !("type" in node)) {
@@ -5133,7 +5202,7 @@ const storeActionsRequireFinallyResetRule = {
         }
 
         /**
-         * @param {{ body: any; }} node
+         * @param {{body: any}} node
          */
         function analyzeFunction(node) {
             if (!node.body) {
@@ -5199,8 +5268,9 @@ const requireEnsureErrorInCatchRule = {
         schema: [],
         type: "problem",
     },
+
     /**
-        * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { name: any; }; messageId: string; node: import("@typescript-eslint/utils").TSESTree.Node; }) => void; }} context
+     * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { name: any; }; messageId: string; node: import("@typescript-eslint/utils").TSESTree.Node; }) => void; }} context
      */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
@@ -5345,7 +5415,7 @@ const requireEnsureErrorInCatchRule = {
 
         return {
             /**
-             * @param {{ param: any; body: any; }} node
+             * @param {{param: any, body: any}} node
              */
             CatchClause(node) {
                 const param = node.param;
@@ -5397,6 +5467,7 @@ const electronPreferReadProcessEnvRule = {
         },
         schema: [],
     },
+
     /**
      * @param {{ getFilename: () => string; getSourceCode: () => { (): any; new (): any; getText: { (): any; new (): any; }; }; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -5468,6 +5539,7 @@ const electronIpcHandlerRequireValidatorRule = {
         },
         schema: [],
     },
+
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -5516,7 +5588,7 @@ const electronIpcHandlerRequireValidatorRule = {
 
         return {
             /**
-             * @param {{ callee: { type: string; name: string; }; arguments: any[]; }} node
+             * @param {{callee: {type: string, name: string}, arguments: any[]}} node
              */
             CallExpression(node) {
                 if (node.callee?.type !== "Identifier") {
@@ -5553,6 +5625,7 @@ const noOneDriveRule = {
         },
         schema: [],
     },
+
     /**
      * @param {{ getFilename: () => string; getSourceCode: () => any; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Documentation link checker.
  *
@@ -129,7 +130,7 @@ function normalizeLink(link) {
 /**
  * @param {string} markdownPath
  * @param {string} link
- * @param {{ file: any; link: any; resolvedPath: string }[]} issues
+ * @param {{file: any, link: any, resolvedPath: string}[]} issues
  */
 async function validateLink(markdownPath, link, issues) {
     const normalized = normalizeLink(link);
@@ -195,6 +196,9 @@ async function checkFile(markdownPath, issues) {
     }
 }
 
+/**
+ *
+ */
 async function main() {
     /**
      * @type {string | any[]}

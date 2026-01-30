@@ -238,9 +238,9 @@ if (checkOnly) {
 /**
  * Helper to check if a directory should be excluded from search.
  *
- * @param {string} dirName - Directory name to check
+ * @param {string} dirName - Directory name to check.
  *
- * @returns {boolean} - True if directory should be excluded
+ * @returns {boolean} - True if directory should be excluded.
  */
 function shouldExcludeDir(dirName) {
     return excludeDirs.has(dirName);
@@ -302,10 +302,10 @@ async function safeReadDir(dir) {
  * array. Handles permission errors and inaccessible directories gracefully by
  * skipping them. Respects exclusion patterns for directory names.
  *
- * @param {string} dir - Directory to search
+ * @param {string} dir - Directory to search.
  *
  * @returns {Promise<string[]>} - Array of empty directory paths, each relative
- *   to ROOT_DIR.
+ * to ROOT_DIR.
  */
 async function findEmptyDirs(dir) {
     if (!(await isDirectory(dir))) return [];
@@ -357,9 +357,9 @@ async function findEmptyDirs(dir) {
  * Safely deletes an empty directory with error handling. Only deletes
  * directories that are empty; does not handle non-empty directories.
  *
- * @param {string} dirPath - Absolute path to the directory to delete
+ * @param {string} dirPath - Absolute path to the directory to delete.
  *
- * @returns {Promise<boolean>} - True if successfully deleted, false otherwise
+ * @returns {Promise<boolean>} - True if successfully deleted, false otherwise.
  */
 async function safeDeleteDir(dirPath) {
     try {
@@ -385,6 +385,9 @@ async function safeDeleteDir(dirPath) {
     }
 }
 
+/**
+ *
+ */
 async function main() {
     let totalFound = 0;
     let totalDeleted = 0;

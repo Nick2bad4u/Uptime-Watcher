@@ -1,8 +1,9 @@
 #!/usr/bin/env node
+
 /**
  * Script to find and report @shared imports that need to be converted to
  * relative imports This helps identify files causing Rollup parser issues in
- * coverage analysis
+ * coverage analysis.
  */
 
 import {
@@ -32,7 +33,7 @@ const CONFIG = {
 };
 
 /**
- * Get all files recursively from a directory
+ * Get all files recursively from a directory.
  *
  * @param {string} dir
  * @param {string | string[]} extensions
@@ -80,7 +81,7 @@ function getFilesRecursively(dir, extensions) {
 }
 
 /**
- * Calculate relative path from one file to another
+ * Calculate relative path from one file to another.
  *
  * @param {string} fromFile
  * @param {string} toPath
@@ -94,7 +95,7 @@ function calculateRelativePath(fromFile, toPath) {
 }
 
 /**
- * Suggest relative import path for
+ * Suggest relative import path for.
  *
  * @param {any} filePath
  * @param {string} sharedPath
@@ -120,7 +121,7 @@ function suggestRelativePath(filePath, sharedPath) {
 }
 
 /**
- * Find
+ * Find.
  *
  * @param {import("fs").PathOrFileDescriptor} filePath
  *
@@ -165,19 +166,9 @@ function findSharedImports(filePath) {
 }
 
 /**
- * Format output based on configuration
+ * Format output based on configuration.
  *
- * @param {{
- *     filePath: string;
- *     fullPath: any;
- *     imports: {
- *         line: number;
- *         content: string;
- *         originalImport: string;
- *         sharedPath: string;
- *         suggestedPath: string;
- *     }[];
- * }[]} results
+ * @param {{filePath: string, fullPath: any, imports: {line: number, content: string, originalImport: string, sharedPath: string, suggestedPath: string}[]}[]} results
  */
 function formatOutput(results) {
     switch (CONFIG.outputFormat) {
@@ -195,22 +186,22 @@ function formatOutput(results) {
 }
 
 /**
- * Format simple output (just file paths)
+ * Format simple output (just file paths).
  *
  * @param {any[]} results
  */
 function formatSimple(results) {
     const files = results
         .filter(
-            (/** @type {{ imports: string | any[] }} */ r) =>
+            (/** @type {{imports: string | any[]}} */ r) =>
                 r.imports.length > 0
         )
-        .map((/** @type {{ filePath: any }} */ r) => r.filePath);
+        .map((/** @type {{filePath: any}} */ r) => r.filePath);
     return files.join("\n");
 }
 
 /**
- * Format detailed output with import suggestions
+ * Format detailed output with import suggestions.
  *
  * @param {any[]} results
  */
@@ -224,7 +215,7 @@ function formatDetailed(results) {
     output += `${"=".repeat(80)}\n\n`;
 
     const filesWithImports = results.filter(
-        (/** @type {{ imports: string | any[] }} */ r) => r.imports.length > 0
+        (/** @type {{imports: string | any[]}} */ r) => r.imports.length > 0
     );
 
     if (filesWithImports.length === 0) {
@@ -264,7 +255,7 @@ function formatDetailed(results) {
 }
 
 /**
- * Main execution function
+ * Main execution function.
  */
 function main() {
     console.log("🔍 Scanning for @shared imports...\n");

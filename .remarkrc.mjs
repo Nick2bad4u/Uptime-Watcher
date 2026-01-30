@@ -1,12 +1,12 @@
 /**
- * @file Remark configuration for markdown and MDX linting and formatting
+ * @file Remark configuration for markdown and MDX linting and formatting.
  *
  *   This configuration provides comprehensive markdown quality checks including:
  *
  *   - Consistent formatting and style
  *   - Content structure validation
  *   - GitHub Flavored Markdown support
- *   - Integration with Prettier for formatting
+ *   - Integration with Prettier for formatting.
  *
  * @see {@link https://github.com/remarkjs/remark-lint} for available rules
  * @see {@link https://github.com/remarkjs/remark-gfm} for GitHub Flavored Markdown
@@ -26,6 +26,7 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 /** @typedef {import("unified").Plugin} Plugin */
 /** @typedef {import("mdast").Root} Root */
 /** @typedef {import("vfile").VFile} VFile */
+
 /**
  * @typedef {string | Plugin | Preset | [string | Plugin | Preset, ...unknown[]]} PluginEntry
  */
@@ -118,67 +119,57 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 // Additional missing plugin types for completeness
 
 /**
- * Remark settings for markdown processing
+ * Remark settings for markdown processing.
  *
- * @typedef {Object} RemarkSettings
+ * @typedef {object} RemarkSettings
  *
- * @property {"*" | "+" | "-"} [bullet] - Preferred unordered list marker
- * @property {boolean} [commonmark] - Enable commonmark compliance
- * @property {boolean} [gfm] - Enable GitHub Flavored Markdown features
- * @property {boolean} [yaml] - Handle frontmatter in markdown files
+ * @property {"*" | "+" | "-"} [bullet] - Preferred unordered list marker.
+ * @property {boolean} [commonmark] - Enable commonmark compliance.
+ * @property {boolean} [gfm] - Enable GitHub Flavored Markdown features.
+ * @property {boolean} [yaml] - Handle frontmatter in markdown files.
  * @property {"tab" | "one" | "mixed"} [listItemIndent] - List item indentation
- *   style
- * @property {"*" | "_"} [emphasis] - Character to use for emphasis
- * @property {"*" | "_"} [strong] - Character to use for strong emphasis
- * @property {"***" | "---"} [thematicBreak] - Marker to use for thematic breaks
- * @property {"`" | "~"} [fence] - Character to use for fences
- * @property {"ordered"} [style] - List style preference
- * @property {'"' | "'"} [quote] - Preferred quote style for titles
- * @property {boolean} [closeAtx] - Require closing hashes for ATX headings
- * @property {boolean} [fences] - Use fenced code blocks
- * @property {boolean} [incrementListMarker] - Increment ordered list markers
- * @property {boolean} [referenceLinks] - Use reference-style links
- * @property {boolean} [resourceLink] - Enable resource-style links
- * @property {boolean} [ruleSpaces] - Whether to include spaces in rules
- * @property {boolean} [setext] - Use Setext-style headings
- * @property {boolean} [tightDefinitions] - Use tight definitions
- * @property {number} [ruleRepetition] - Number of rule markers
- * @property {string} [rule] - Marker to use for rules
+ * style.
+ * @property {"*" | "_"} [emphasis] - Character to use for emphasis.
+ * @property {"*" | "_"} [strong] - Character to use for strong emphasis.
+ * @property {"***" | "---"} [thematicBreak] - Marker to use for thematic breaks.
+ * @property {"`" | "~"} [fence] - Character to use for fences.
+ * @property {"ordered"} [style] - List style preference.
+ * @property {""" | "'"} [quote] - Preferred quote style for titles.
+ * @property {boolean} [closeAtx] - Require closing hashes for ATX headings.
+ * @property {boolean} [fences] - Use fenced code blocks.
+ * @property {boolean} [incrementListMarker] - Increment ordered list markers.
+ * @property {boolean} [referenceLinks] - Use reference-style links.
+ * @property {boolean} [resourceLink] - Enable resource-style links.
+ * @property {boolean} [ruleSpaces] - Whether to include spaces in rules.
+ * @property {boolean} [setext] - Use Setext-style headings.
+ * @property {boolean} [tightDefinitions] - Use tight definitions.
+ * @property {number} [ruleRepetition] - Number of rule markers.
+ * @property {string} [rule] - Marker to use for rules.
  */
 
 /**
- * @typedef {Object} RemarkConfig
+ * @typedef {object} RemarkConfig
  *
- * @property {PluginEntry[]} plugins - Array of plugins and presets
- * @property {RemarkSettings} settings - Remark processing settings
+ * @property {PluginEntry[]} plugins - Array of plugins and presets.
+ * @property {RemarkSettings} settings - Remark processing settings.
  */
 
 // Plugin-specific options types
-/** @typedef {{ schemas?: Record<string, string[]> }} FrontmatterSchemaOptions */
+/** @typedef {{schemas?: Record<string, string[]>}} FrontmatterSchemaOptions */
 /** @typedef {import("remark-lint-mdx-jsx-quote-style").Options} QuoteStyle */
 /** @typedef {import("remark-lint-ordered-list-marker-value").Options} OrderedListMarkerValueOptions */
 /** @typedef {import("remark-lint-file-extension").Options} FileExtensionOptions */
-/** @typedef {{ entries?: { pattern: string; snippets: string[] }[] }} RequireSnippetsOptions */
+/** @typedef {{entries?: {pattern: string, snippets: string[]}[]}} RequireSnippetsOptions */
 /** @typedef {import("unified").Plugin<[RequireSnippetsOptions?], Root>} CustomValidationPlugin */
 
 // Remark plugin option types (prefer real plugin-exported types where available)
 /** @typedef {import("remark-toc").Options} RemarkTocOptions */
-/** @typedef {{ collapseSpace?: boolean }} ReferenceLinksOptions */
+/** @typedef {{collapseSpace?: boolean}} ReferenceLinksOptions */
 /** @typedef {import("remark-lint-checkbox-character-style").Options} CheckboxCharacterStyleOptions */
 /** @typedef {import("remark-lint-fenced-code-flag").Options} FencedCodeFlagOptions */
+
 /**
- * @typedef {{
- *     passive?: boolean;
- *     illusion?: boolean;
- *     so?: boolean;
- *     thereIs?: boolean;
- *     weasel?: boolean;
- *     adverb?: boolean;
- *     tooWordy?: boolean;
- *     cliches?: boolean;
- *     eprime?: boolean;
- *     whitelist?: string[];
- * }} WriteGoodOptions
+ * @typedef {{passive?: boolean, illusion?: boolean, so?: boolean, thereIs?: boolean, weasel?: boolean, adverb?: boolean, tooWordy?: boolean, cliches?: boolean, eprime?: boolean, whitelist?: string[]}} WriteGoodOptions
  */
 /** @typedef {import("remark-validate-links").Options} ValidateLinksOptions */
 /** @typedef {import("remark-lint-heading-style").Options} HeadingStyleOptions */
@@ -191,8 +182,8 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 /** @typedef {import("remark-lint-link-title-style").Options} LinkTitleStyleOptions */
 
 // Missing option types that are actually used in the config
-/** @typedef {{ case?: "lower" | "upper" }} FencedCodeFlagCaseOptions */
-/** @typedef {{ skipUrlPatterns?: (string | RegExp)[] }} NoDeadUrlsOptions */
+/** @typedef {{case?: "lower" | "upper"}} FencedCodeFlagCaseOptions */
+/** @typedef {{skipUrlPatterns?: (string | RegExp)[]}} NoDeadUrlsOptions */
 
 /** @type {RemarkConfig} */
 const remarkConfig = {

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+
 /**
- * Automated documentation maintenance script
+ * Automated documentation maintenance script.
  *
  * Performs routine maintenance tasks on documentation including:
  *
@@ -8,13 +9,13 @@
  * - Generating table of contents for files that need them
  * - Validating cross-references and internal links
  * - Checking for outdated API documentation
- * - Analyzing content quality metrics
+ * - Analyzing content quality metrics.
  *
  * Processes all documentation folders:
  *
  * - Docs/Architecture/ - Architecture decision records and patterns
  * - Docs/Testing/ - Testing guides and best practices
- * - Docs/Guides/ - User and developer guides
+ * - Docs/Guides/ - User and developer guides.
  */
 
 import { readFile, writeFile, readdir } from "node:fs/promises";
@@ -28,12 +29,12 @@ const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.join(__dirname, "..");
 
 /**
- * @typedef {Object} MaintenanceReport
+ * @typedef {object} MaintenanceReport
  *
- * @property {string[]} updatedFiles - Files that had their frontmatter updated
- * @property {string[]} tocGenerated - Files that had TOC generated
- * @property {string[]} linksFixed - Files that had broken links fixed
- * @property {string[]} warnings - Issues that need manual attention
+ * @property {string[]} updatedFiles - Files that had their frontmatter updated.
+ * @property {string[]} tocGenerated - Files that had TOC generated.
+ * @property {string[]} linksFixed - Files that had broken links fixed.
+ * @property {string[]} warnings - Issues that need manual attention.
  */
 
 /**
@@ -44,11 +45,11 @@ const ROOT_DIRECTORY = path.join(__dirname, "..");
  */
 
 /**
- * Get the last modified date of a file from git
+ * Get the last modified date of a file from git.
  *
- * @param {string} filePath - Path to the file
+ * @param {string} filePath - Path to the file.
  *
- * @returns {Promise<Date | null>} Last modification date or null if not in git
+ * @returns {Promise<Date | null>} Last modification date or null if not in git.
  */
 async function getGitLastModified(filePath) {
     try {
@@ -70,15 +71,11 @@ async function getGitLastModified(filePath) {
 }
 
 /**
- * Extract frontmatter from markdown content
+ * Extract frontmatter from markdown content.
  *
- * @param {string} content - Markdown content
+ * @param {string} content - Markdown content.
  *
- * @returns {{
- *     frontmatter: Frontmatter | null;
- *     content: string;
- *     yamlLines: number;
- * }}
+ * @returns {{frontmatter: Frontmatter | null, content: string, yamlLines: number}}
  */
 function parseFrontmatter(content) {
     const frontmatterMatch = content.match(
@@ -90,7 +87,11 @@ function parseFrontmatter(content) {
     }
 
     const yamlContent = frontmatterMatch.groups?.["yaml"] ?? "";
-    const yamlLineCount = yamlContent.split("\n").length + 2; // +2 for the --- delimiters
+
+    /**
+     * +2 for the --- delimiters.
+     */
+    const yamlLineCount = yamlContent.split("\n").length + 2; 
     const contentAfterFrontmatter = content.slice(frontmatterMatch[0].length);
     const yamlLines = yamlContent.split("\n");
 
@@ -170,11 +171,11 @@ function parseFrontmatter(content) {
 }
 
 /**
- * Remove surrounding single/double quotes from YAML values
+ * Remove surrounding single/double quotes from YAML values.
  *
- * @param {string} value - Raw YAML scalar
+ * @param {string} value - Raw YAML scalar.
  *
- * @returns {string} Unquoted value
+ * @returns {string} Unquoted value.
  */
 function stripYamlQuotes(value) {
     if (
@@ -188,11 +189,11 @@ function stripYamlQuotes(value) {
 }
 
 /**
- * Serialize frontmatter back to YAML
+ * Serialize frontmatter back to YAML.
  *
- * @param {Frontmatter} frontmatter - Frontmatter object
+ * @param {Frontmatter} frontmatter - Frontmatter object.
  *
- * @returns {string} YAML string
+ * @returns {string} YAML string.
  */
 function serializeFrontmatter(frontmatter) {
     const lines = ["---"];
@@ -244,11 +245,11 @@ function serializeFrontmatter(frontmatter) {
 }
 
 /**
- * Update last_reviewed date for files modified within the last 180 days
+ * Update last_reviewed date for files modified within the last 180 days.
  *
- * @param {string} filePath - Path to the markdown file
+ * @param {string} filePath - Path to the markdown file.
  *
- * @returns {Promise<boolean>} True if file was updated
+ * @returns {Promise<boolean>} True if file was updated.
  */
 async function updateLastReviewedDate(filePath) {
     try {
@@ -295,9 +296,9 @@ async function updateLastReviewedDate(filePath) {
 /**
  * Generate table of contents for files that need them using remark-toc.
  *
- * @param {string} filePath - Path to the markdown file
+ * @param {string} filePath - Path to the markdown file.
  *
- * @returns {Promise<boolean>} True if TOC was added
+ * @returns {Promise<boolean>} True if TOC was added.
  */
 async function generateTableOfContents(filePath) {
     try {
@@ -358,11 +359,11 @@ async function generateTableOfContents(filePath) {
 }
 
 /**
- * Fix common cross-reference issues
+ * Fix common cross-reference issues.
  *
- * @param {string} filePath - Path to the markdown file
+ * @param {string} filePath - Path to the markdown file.
  *
- * @returns {Promise<boolean>} True if links were fixed
+ * @returns {Promise<boolean>} True if links were fixed.
  */
 async function fixCrossReferences(filePath) {
     try {
@@ -380,8 +381,15 @@ async function fixCrossReferences(filePath) {
                 continue;
             }
 
-            const linkText = groups["text"]; // From named capture group
-            const linkUrl = groups["url"]; // From named capture group
+            /**
+             * From named capture group.
+             */
+            const linkText = groups["text"];
+ 
+            /**
+             * From named capture group.
+             */
+            const linkUrl = groups["url"]; 
 
             // Fix common path issues
             if (
@@ -417,7 +425,7 @@ async function fixCrossReferences(filePath) {
 }
 
 /**
- * Main maintenance function
+ * Main maintenance function.
  *
  * @returns {Promise<MaintenanceReport>}
  */
@@ -524,9 +532,9 @@ async function maintainDocs() {
 }
 
 /**
- * Display maintenance report
+ * Display maintenance report.
  *
- * @param {MaintenanceReport} report - Maintenance results
+ * @param {MaintenanceReport} report - Maintenance results.
  */
 function displayMaintenanceReport(report) {
     console.log("\n🎯 MAINTENANCE REPORT");
@@ -578,9 +586,9 @@ function displayMaintenanceReport(report) {
  * Determine whether the current ES module is the entry point.
  *
  * @param {string} moduleUrl - URL for the executing module (typically
- *   import.meta.url)
+ * import.meta.url).
  *
- * @returns {boolean} True when the module is being run directly via Node
+ * @returns {boolean} True when the module is being run directly via Node.
  */
 function isExecutedDirectly(moduleUrl) {
     const entryFilePath = process.argv[1];

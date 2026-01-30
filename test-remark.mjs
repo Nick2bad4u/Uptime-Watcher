@@ -7,6 +7,14 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-watcher-docs.mjs";
 
+/**
+ * Runs a lightweight smoke test against the repo's remark configuration.
+ *
+ * @remarks
+ * This is a developer utility script (not shipped with the app). It exists to
+ * validate that the custom remark preset can parse and report issues for a
+ * representative markdown document.
+ */
 async function testRemarkConfig() {
     console.log("🧪 Testing remark configuration...\n");
 

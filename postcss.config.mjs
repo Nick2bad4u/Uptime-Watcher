@@ -16,16 +16,17 @@
  * - Media query optimization and sorting
  * - Duplicate selector combining for smaller bundles
  * - Production minification with cssnano (advanced preset)
- * - Development reporting and debugging
+ * - Development reporting and debugging.
  *
  * Asset Directory Structure:
  *
  * - Place SVG icons in './icons' (project root).
  * - Place other assets in './src/assets' (project root).
- * - Ensure both directories exist for PostCSS plugins to resolve assets
+ * - Ensure both directories exist for PostCSS plugins to resolve assets.
  *
  * @see {@link https://www.schemastore.org/postcssrc.json} for JSON schema validation
  */
+
 /**
  * @typedef {import("postcss").Processor} Processor
  *

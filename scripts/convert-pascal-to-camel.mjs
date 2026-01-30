@@ -2,18 +2,18 @@
 
 /**
  * Script to convert all PascalCase filenames to camelCase Recursively searches
- * through the project and renames files
+ * through the project and renames files.
  */
 
 import { readdirSync, renameSync } from "node:fs";
 import * as path from "node:path";
 
 /**
- * Convert PascalCase string to camelCase
+ * Convert PascalCase string to camelCase.
  *
- * @param {string} str - The PascalCase string to convert
+ * @param {string} str - The PascalCase string to convert.
  *
- * @returns {string} - The camelCase string
+ * @returns {string} - The camelCase string.
  */
 function pascalToCamelCase(str) {
     // Check if the string starts with an uppercase letter (PascalCase)
@@ -26,11 +26,11 @@ function pascalToCamelCase(str) {
 }
 
 /**
- * Check if a filename is in PascalCase
+ * Check if a filename is in PascalCase.
  *
- * @param {string} filename - The filename to check
+ * @param {string} filename - The filename to check.
  *
- * @returns {boolean} - True if the filename is in PascalCase
+ * @returns {boolean} - True if the filename is in PascalCase.
  */
 function isPascalCase(filename) {
     // Get filename without extension
@@ -45,10 +45,10 @@ function isPascalCase(filename) {
 }
 
 /**
- * Recursively process directory to find and rename PascalCase files
+ * Recursively process directory to find and rename PascalCase files.
  *
- * @param {string} dirPath - Directory path to process
- * @param {boolean} dryRun - If true, only log what would be renamed
+ * @param {string} dirPath - Directory path to process.
+ * @param {boolean} dryRun - If true, only log what would be renamed.
  */
 function processDirectory(dirPath, dryRun = false) {
     const entries = readdirSync(dirPath, { withFileTypes: true });
@@ -97,7 +97,7 @@ function processDirectory(dirPath, dryRun = false) {
 }
 
 /**
- * Main function
+ * Main function.
  */
 function main() {
     const args = process.argv.slice(2);

@@ -69,7 +69,7 @@
         "@docusaurus/theme-mermaid": "^3.9.2",
         "@docusaurus/theme-search-algolia": "^3.9.2",
         "@docusaurus/types": "^3.9.2",
-        "@easyops-cn/docusaurus-search-local": "^0.52.2",
+        "@easyops-cn/docusaurus-search-local": "^0.52.3",
         "@eslint/config-inspector": "^1.4.2",
         "@grnet/docusaurus-glossary-view": "^2.0.0-rc.2",
         "@grnet/docusaurus-term-preview": "^2.0.0-rc.2",

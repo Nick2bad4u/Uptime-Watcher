@@ -1,5 +1,5 @@
 /**
- * Custom validation for Uptime Watcher documentation patterns
+ * Custom validation for Uptime Watcher documentation patterns.
  */
 import * as path from "node:path";
 import { statSync } from "node:fs";
@@ -45,9 +45,9 @@ const EMOJI_CODEPOINT_REGEX = /^(?:\p{Extended_Pictographic})$/u;
  * The input is expected to be a single Unicode symbol (which may span multiple
  * UTF-16 code units).
  *
- * @param {string} symbol - Single Unicode symbol to check
+ * @param {string} symbol - Single Unicode symbol to check.
  *
- * @returns {boolean} True if the symbol is classified as an emoji
+ * @returns {boolean} True if the symbol is classified as an emoji.
  */
 function isEmoji(symbol) {
     if (symbol.length === 0) return false;
@@ -55,11 +55,11 @@ function isEmoji(symbol) {
 }
 
 /**
- * Check if a string starts with a capital letter or emoji
+ * Check if a string starts with a capital letter or emoji.
  *
- * @param {string} text - Text to check
+ * @param {string} text - Text to check.
  *
- * @returns {boolean} True if starts with capital letter or emoji
+ * @returns {boolean} True if starts with capital letter or emoji.
  */
 function startsWithCapitalOrEmoji(text) {
     if (!text || text.length === 0) return false;
@@ -82,18 +82,18 @@ function startsWithCapitalOrEmoji(text) {
 }
 
 /**
- * Create a proper remark message with position information
+ * Create a proper remark message with position information.
  *
  * @typedef {Position | UnistNode | null | undefined} LintLocation
  */
 
 /**
- * Create a proper remark message with position information
+ * Create a proper remark message with position information.
  *
- * @param {VFile} file - Virtual file
- * @param {string} message - Error message
- * @param {LintLocation} location - Node or position
- * @param {string} ruleId - Rule identifier
+ * @param {VFile} file - Virtual file.
+ * @param {string} message - Error message.
+ * @param {LintLocation} location - Node or position.
+ * @param {string} ruleId - Rule identifier.
  */
 function createMessage(file, message, location, ruleId) {
     // vfile.message has multiple overloads; cast location to the broader
@@ -109,12 +109,12 @@ function createMessage(file, message, location, ruleId) {
 }
 
 /**
- * Check if file is in ignored patterns for certain rules
+ * Check if file is in ignored patterns for certain rules.
  *
- * @param {string} filePath - File path
- * @param {string[]} patterns - Patterns to check against
+ * @param {string} filePath - File path.
+ * @param {string[]} patterns - Patterns to check against.
  *
- * @returns {boolean} True if file matches any pattern
+ * @returns {boolean} True if file matches any pattern.
  */
 function isIgnoredFile(filePath, patterns) {
     if (!filePath) return false;
@@ -151,10 +151,10 @@ const INTERNAL_LINK_CODE_EXTENSIONS = new Set([
  * Determine if a relative link points at a directory instead of a markdown
  * file.
  *
- * @param {string} relativeUrl - Relative URL extracted from the markdown link
- * @param {string} sourceFilePath - Absolute path for the current markdown file
+ * @param {string} relativeUrl - Relative URL extracted from the markdown link.
+ * @param {string} sourceFilePath - Absolute path for the current markdown file.
  *
- * @returns {boolean} True when the link resolves to a directory
+ * @returns {boolean} True when the link resolves to a directory.
  */
 function isDirectoryReference(relativeUrl, sourceFilePath) {
     const sanitizedUrl = relativeUrl.split("#")[0];
@@ -184,11 +184,11 @@ function isDirectoryReference(relativeUrl, sourceFilePath) {
 /**
  * Check whether a relative URL resolves to an existing file on disk.
  *
- * @param {string} relativeUrl - Relative URL from the markdown file
+ * @param {string} relativeUrl - Relative URL from the markdown file.
  * @param {string} sourceFilePath - Absolute or relative path to the markdown
- *   file being linted
+ * file being linted.
  *
- * @returns {boolean} True when the URL resolves to a concrete file
+ * @returns {boolean} True when the URL resolves to a concrete file.
  */
 function resolvesToFileTarget(relativeUrl, sourceFilePath) {
     if (!sourceFilePath) {
@@ -213,10 +213,10 @@ function resolvesToFileTarget(relativeUrl, sourceFilePath) {
 /**
  * Determine if a relative link references an allowed non-markdown file.
  *
- * @param {string} relativeUrl - Relative URL without the hash segment
- * @param {string} sourceFilePath - Source markdown file path
+ * @param {string} relativeUrl - Relative URL without the hash segment.
+ * @param {string} sourceFilePath - Source markdown file path.
  *
- * @returns {boolean} True when the link targets an allowed file type
+ * @returns {boolean} True when the link targets an allowed file type.
  */
 function hasAllowedInternalLinkTarget(relativeUrl, sourceFilePath) {
     if (!relativeUrl) {
@@ -241,9 +241,9 @@ function hasAllowedInternalLinkTarget(relativeUrl, sourceFilePath) {
  * Only blob/tree/edit/raw paths within the repository are considered
  * convertible.
  *
- * @param {string} urlString - URL taken from the markdown link
+ * @param {string} urlString - URL taken from the markdown link.
  *
- * @returns {boolean} True when the link can be replaced with a relative path
+ * @returns {boolean} True when the link can be replaced with a relative path.
  */
 function shouldPreferRelativeGitHubLink(urlString) {
     try {

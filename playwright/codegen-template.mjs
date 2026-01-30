@@ -1,5 +1,5 @@
 /**
- * Custom Playwright codegen template for better lint compliance
+ * Custom Playwright codegen template for better lint compliance.
  *
  * This template automatically formats generated tests to match our lint
  * standards:
@@ -9,10 +9,11 @@
  * - Clean test titles
  * - TypeScript best practices
  * - No conditional logic in tests
- * - No raw locators
+ * - No raw locators.
  */
 
 // Template for generated test files
+
 /**
  * Template string for generating Playwright test files with lint-compliant
  * structure.
@@ -20,7 +21,7 @@
  * @param {string} testName - The name of the test suite.
  * @param {string} testTitle - The title of the individual test.
  * @param {string} testBody - The body of the test containing Playwright actions
- *   and assertions.
+ * and assertions.
  *
  * @usage Replace
  * {{testName}}, {{testTitle}}, and {{testBody}} with appropriate values when generating a test file.

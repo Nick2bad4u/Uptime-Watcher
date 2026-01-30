@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * Front-matter validator for Markdown documentation.
  *
@@ -15,7 +16,7 @@
  *   `tags`, `title`
  * - Allowed keys only (no deprecated/unknown fields)
  * - Basic type and format checks (arrays vs strings, date formats, enums)
- * - `schema` value points at the doc-frontmatter schema file
+ * - `schema` value points at the doc-frontmatter schema file.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -112,7 +113,7 @@ async function collectMarkdownFiles(startDirectory) {
  * @param {string} content
  * @param {string} filePath
  *
- * @returns {{ yamlText: string; bodyOffset: number }}
+ * @returns {{yamlText: string, bodyOffset: number}}
  */
 function extractFrontMatter(content, filePath) {
     const lines = content.split(/\r?\n/);
@@ -160,7 +161,7 @@ function extractFrontMatter(content, filePath) {
  *
  * - `key: value` string pairs (single line, with or without quotes)
  * - `key:` followed by `- item` array entries
- * - `key: >-` followed by indented lines as a folded multiline string
+ * - `key: >-` followed by indented lines as a folded multiline string.
  *
  * Nested objects, anchors, and advanced YAML features are intentionally not
  * supported.
@@ -321,7 +322,7 @@ function parseFrontMatterYaml(yamlText, filePath) {
  * @param {JsonObject} data
  * @param {string} filePath
  *
- * @returns {string[]} List of validation error messages for this file
+ * @returns {string[]} List of validation error messages for this file.
  */
 function validateAgainstSchema(schema, data, filePath) {
     /** @type {string[]} */
@@ -359,15 +360,8 @@ function validateAgainstSchema(schema, data, filePath) {
     // Per-property checks
     for (const [key, rawDefinition] of Object.entries(properties)) {
         const definition = /**
-         * @type {{
-         *     type?: string;
-         *     enum?: string[];
-         *     minLength?: number;
-         *     pattern?: string;
-         *     minItems?: number;
-         *     items?: { type?: string };
-         * }}
-         */ (rawDefinition);
+                            * @type {{type?: string, enum?: string[], minLength?: number, pattern?: string, minItems?: number, items?: {type?: string}}}
+                            */ (rawDefinition);
 
         const value = data[key];
         if (value === undefined || value === null) {
@@ -470,6 +464,9 @@ async function validateFile(markdownPath, schema) {
     return validateAgainstSchema(schema, frontMatter, markdownPath);
 }
 
+/**
+ *
+ */
 async function main() {
     const schemaRaw = await readFile(FRONTMATTER_SCHEMA_PATH, "utf8");
     const schema = /** @type {JsonObject} */ (JSON.parse(schemaRaw));

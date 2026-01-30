@@ -42,7 +42,7 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-describe(ErrorBoundary, () => {
+describe("ErrorBoundary", () => {
     describe("Normal Operation", () => {
         it("should render children when there are no errors", ({
             task,
