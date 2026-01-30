@@ -132,5 +132,4 @@ class ErrorBoundaryBase extends PureComponent<
 /**
  * Error boundary component for wrapping store-connected components.
  */
-export const ErrorBoundary: ComponentType<ErrorBoundaryProperties> =
-    ErrorBoundaryBase;
+export const ErrorBoundary: typeof ErrorBoundaryBase = ErrorBoundaryBase;
