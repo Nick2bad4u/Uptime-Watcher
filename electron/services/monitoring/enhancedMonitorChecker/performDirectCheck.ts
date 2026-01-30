@@ -1,7 +1,7 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import type { EnhancedMonitorCheckConfig } from "../EnhancedMonitorChecker";
+import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 import type { MonitorCheckResult } from "../types";
 
@@ -22,14 +22,14 @@ export async function performDirectCheck(args: {
         freshMonitorWithHistory: Site["monitors"][0],
         checkResult: StatusUpdateMonitorCheckResult
     ) => Promise<void>;
-    readonly eventEmitter: EnhancedMonitorCheckConfig["eventEmitter"];
+    readonly eventEmitter: EnhancedMonitoringDependencies["eventEmitter"];
     readonly fetchFreshMonitorWithHistory: (
         monitorId: string
     ) => Promise<Site["monitors"][0] | undefined>;
     readonly isManualCheck: boolean;
     readonly logger: Logger;
     readonly monitor: Monitor;
-    readonly monitorRepository: EnhancedMonitorCheckConfig["monitorRepository"];
+    readonly monitorRepository: EnhancedMonitoringDependencies["monitorRepository"];
     readonly runServiceCheck: (args: {
         readonly context: MonitorCheckContext;
         readonly operationId: string;

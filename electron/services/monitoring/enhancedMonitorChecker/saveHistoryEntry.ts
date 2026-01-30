@@ -1,7 +1,7 @@
 import type { Monitor } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import type { EnhancedMonitorCheckConfig } from "../EnhancedMonitorChecker";
+import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 import type { HistoryPruneState } from "./historyPruningState";
 
@@ -14,12 +14,16 @@ import type { HistoryPruneState } from "./historyPruningState";
  */
 export async function saveMonitorHistoryEntry(args: {
     readonly checkResult: StatusUpdateMonitorCheckResult;
-    readonly config: EnhancedMonitorCheckConfig;
+    readonly dependencies: Pick<
+        EnhancedMonitoringDependencies,
+        "getHistoryLimit" | "historyRepository"
+    >;
     readonly historyPruneState: Map<string, HistoryPruneState>;
     readonly logger: Logger;
     readonly monitor: Monitor;
 }): Promise<void> {
-    const { checkResult, config, historyPruneState, logger, monitor } = args;
+    const { checkResult, dependencies, historyPruneState, logger, monitor } =
+        args;
 
     if (!monitor.id) {
         logger.warn("Cannot save history entry: monitor missing ID");
@@ -34,7 +38,7 @@ export async function saveMonitorHistoryEntry(args: {
 
     try {
         // Pass the details field from the check result to the history repository.
-        await config.historyRepository.addEntry(
+        await dependencies.historyRepository.addEntry(
             monitor.id,
             historyEntry,
             checkResult.details
@@ -42,7 +46,7 @@ export async function saveMonitorHistoryEntry(args: {
 
         // Smart history pruning: Only prune when necessary to avoid
         // performance overhead
-        const historyLimit = config.getHistoryLimit();
+        const historyLimit = dependencies.getHistoryLimit();
         if (historyLimit > 0) {
             // Use a buffer strategy: only prune when we exceed limit + buffer.
             const bufferSize = Math.max(Math.floor(historyLimit * 0.2), 5);
@@ -74,12 +78,13 @@ export async function saveMonitorHistoryEntry(args: {
                 state.hasPerformedCountCheck = true;
                 historyPruneState.set(monitor.id, state);
 
-                const currentCount = await config.historyRepository.getHistoryCount(
+                const currentCount =
+                    await dependencies.historyRepository.getHistoryCount(
                     monitor.id
                 );
 
                 if (currentCount > pruneThreshold) {
-                    await config.historyRepository.pruneHistory(
+                    await dependencies.historyRepository.pruneHistory(
                         monitor.id,
                         historyLimit
                     );

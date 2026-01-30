@@ -4,74 +4,74 @@
 
 ## Invoke Channels
 
-| Channel | Description | Parameters | Result |
-| --- | --- | --- | --- |
-| `add-site` | Handles `add-site` invocations. | `[site: Site]` | `Site` |
-| `check-site-now` | Handles `check-site-now` invocations. | `[siteIdentifier: string, monitorId: string]` | `StatusUpdate \| undefined` |
-| `cloud-clear-encryption-key` | Handles `cloud-clear-encryption-key` invocations. | `[]` | `CloudStatusSummary` |
-| `cloud-configure-filesystem-provider` | Handles `cloud-configure-filesystem-provider` invocations. | `[config: CloudFilesystemProviderConfig]` | `CloudStatusSummary` |
-| `cloud-connect-dropbox` | Handles `cloud-connect-dropbox` invocations. | `[]` | `CloudStatusSummary` |
-| `cloud-connect-google-drive` | Handles `cloud-connect-google-drive` invocations. | `[]` | `CloudStatusSummary` |
-| `cloud-delete-backup` | Handles `cloud-delete-backup` invocations. | `[key: string]` | `CloudBackupEntry[]` |
-| `cloud-disconnect` | Handles `cloud-disconnect` invocations. | `[]` | `CloudStatusSummary` |
-| `cloud-enable-sync` | Handles `cloud-enable-sync` invocations. | `[config: CloudEnableSyncConfig]` | `CloudStatusSummary` |
-| `cloud-get-status` | Handles `cloud-get-status` invocations. | `[]` | `CloudStatusSummary` |
-| `cloud-list-backups` | Handles `cloud-list-backups` invocations. | `[]` | `CloudBackupEntry[]` |
-| `cloud-migrate-backups` | Handles `cloud-migrate-backups` invocations. | `[config: CloudBackupMigrationRequest]` | `CloudBackupMigrationResult` |
-| `cloud-preview-reset-remote-sync` | Handles `cloud-preview-reset-remote-sync` invocations. | `[]` | `CloudSyncResetPreview` |
-| `cloud-request-sync-now` | Handles `cloud-request-sync-now` invocations. | `[]` | `undefined` |
-| `cloud-reset-remote-sync` | Handles `cloud-reset-remote-sync` invocations. | `[]` | `CloudSyncResetResult` |
-| `cloud-restore-backup` | Handles `cloud-restore-backup` invocations. | `[key: string]` | `SerializedDatabaseRestoreResult` |
-| `cloud-set-encryption-passphrase` | Handles `cloud-set-encryption-passphrase` invocations. | `[passphrase: string]` | `CloudStatusSummary` |
-| `cloud-upload-latest-backup` | Handles `cloud-upload-latest-backup` invocations. | `[]` | `CloudBackupEntry` |
-| `delete-all-sites` | Handles `delete-all-sites` invocations. | `[]` | `number` |
-| `diagnostics-report-preload-guard` | Handles `diagnostics-report-preload-guard` invocations. | `[report: PreloadGuardDiagnosticsReport]` | `undefined` |
-| `diagnostics-verify-ipc-handler` | Handles `diagnostics-verify-ipc-handler` invocations. | `[channel: string]` | `IpcHandlerVerificationResult` |
-| `download-sqlite-backup` | Handles `download-sqlite-backup` invocations. | `[]` | `SerializedDatabaseBackupResult` |
-| `export-data` | Handles `export-data` invocations. | `[]` | `string` |
-| `format-monitor-detail` | Handles `format-monitor-detail` invocations. | `[monitorType: string, details: string]` | `string` |
-| `format-monitor-title-suffix` | Handles `format-monitor-title-suffix` invocations. | `[monitorType: string, monitor: Monitor]` | `string` |
-| `get-history-limit` | Handles `get-history-limit` invocations. | `[]` | `number` |
-| `get-monitor-types` | Handles `get-monitor-types` invocations. | `[]` | `MonitorTypeConfig[]` |
-| `get-sites` | Handles `get-sites` invocations. | `[]` | `Site[]` |
-| `get-sync-status` | Handles `get-sync-status` invocations. | `[]` | `StateSyncStatusSummary` |
-| `import-data` | Handles `import-data` invocations. | `[data: string]` | `boolean` |
-| `notify-app-event` | Handles `notify-app-event` invocations. | `[request: AppNotificationRequest]` | `undefined` |
-| `open-external` | Handles `open-external` invocations. | `[url: string]` | `boolean` |
-| `quit-and-install` | Handles `quit-and-install` invocations. | `[]` | `boolean` |
-| `remove-monitor` | Handles `remove-monitor` invocations. | `[siteIdentifier: string, monitorId: string]` | `Site` |
-| `remove-site` | Handles `remove-site` invocations. | `[identifier: string]` | `boolean` |
-| `request-full-sync` | Handles `request-full-sync` invocations. | `[]` | `StateSyncFullSyncResult` |
-| `reset-settings` | Handles `reset-settings` invocations. | `[]` | `undefined` |
-| `restore-sqlite-backup` | Handles `restore-sqlite-backup` invocations. | `[payload: SerializedDatabaseRestorePayload]` | `SerializedDatabaseRestoreResult` |
-| `save-sqlite-backup` | Handles `save-sqlite-backup` invocations. | `[]` | `SerializedDatabaseBackupSaveResult` |
-| `start-monitoring` | Handles `start-monitoring` invocations. | `[]` | `MonitoringStartSummary` |
-| `start-monitoring-for-monitor` | Handles `start-monitoring-for-monitor` invocations. | `[siteIdentifier: string, monitorId: string]` | `boolean` |
-| `start-monitoring-for-site` | Handles `start-monitoring-for-site` invocations. | `[siteIdentifier: string]` | `boolean` |
-| `stop-monitoring` | Handles `stop-monitoring` invocations. | `[]` | `MonitoringStopSummary` |
-| `stop-monitoring-for-monitor` | Handles `stop-monitoring-for-monitor` invocations. | `[siteIdentifier: string, monitorId: string]` | `boolean` |
-| `stop-monitoring-for-site` | Handles `stop-monitoring-for-site` invocations. | `[siteIdentifier: string]` | `boolean` |
-| `update-history-limit` | Handles `update-history-limit` invocations. | `[limitDays: number]` | `number` |
-| `update-notification-preferences` | Handles `update-notification-preferences` invocations. | `[preferences: NotificationPreferenceUpdate]` | `undefined` |
-| `update-site` | Handles `update-site` invocations. | `[identifier: string, updates: Partial<Site>]` | `Site` |
-| `validate-monitor-data` | Handles `validate-monitor-data` invocations. | `[monitorType: string, data: unknown]` | `ValidationResult` |
-| `write-clipboard-text` | Handles `write-clipboard-text` invocations. | `[text: string]` | `boolean` |
+| Channel                               | Description                                                | Parameters                                     | Result                               |
+| :------------------------------------ | :--------------------------------------------------------- | :--------------------------------------------- | :----------------------------------- |
+| `add-site`                            | Handles `add-site` invocations.                            | `[site: Site]`                                 | `Site`                               |
+| `check-site-now`                      | Handles `check-site-now` invocations.                      | `[siteIdentifier: string, monitorId: string]`  | `StatusUpdate \| undefined`          |
+| `cloud-clear-encryption-key`          | Handles `cloud-clear-encryption-key` invocations.          | `[]`                                           | `CloudStatusSummary`                 |
+| `cloud-configure-filesystem-provider` | Handles `cloud-configure-filesystem-provider` invocations. | `[config: CloudFilesystemProviderConfig]`      | `CloudStatusSummary`                 |
+| `cloud-connect-dropbox`               | Handles `cloud-connect-dropbox` invocations.               | `[]`                                           | `CloudStatusSummary`                 |
+| `cloud-connect-google-drive`          | Handles `cloud-connect-google-drive` invocations.          | `[]`                                           | `CloudStatusSummary`                 |
+| `cloud-delete-backup`                 | Handles `cloud-delete-backup` invocations.                 | `[key: string]`                                | `CloudBackupEntry[]`                 |
+| `cloud-disconnect`                    | Handles `cloud-disconnect` invocations.                    | `[]`                                           | `CloudStatusSummary`                 |
+| `cloud-enable-sync`                   | Handles `cloud-enable-sync` invocations.                   | `[config: CloudEnableSyncConfig]`              | `CloudStatusSummary`                 |
+| `cloud-get-status`                    | Handles `cloud-get-status` invocations.                    | `[]`                                           | `CloudStatusSummary`                 |
+| `cloud-list-backups`                  | Handles `cloud-list-backups` invocations.                  | `[]`                                           | `CloudBackupEntry[]`                 |
+| `cloud-migrate-backups`               | Handles `cloud-migrate-backups` invocations.               | `[config: CloudBackupMigrationRequest]`        | `CloudBackupMigrationResult`         |
+| `cloud-preview-reset-remote-sync`     | Handles `cloud-preview-reset-remote-sync` invocations.     | `[]`                                           | `CloudSyncResetPreview`              |
+| `cloud-request-sync-now`              | Handles `cloud-request-sync-now` invocations.              | `[]`                                           | `undefined`                          |
+| `cloud-reset-remote-sync`             | Handles `cloud-reset-remote-sync` invocations.             | `[]`                                           | `CloudSyncResetResult`               |
+| `cloud-restore-backup`                | Handles `cloud-restore-backup` invocations.                | `[key: string]`                                | `SerializedDatabaseRestoreResult`    |
+| `cloud-set-encryption-passphrase`     | Handles `cloud-set-encryption-passphrase` invocations.     | `[passphrase: string]`                         | `CloudStatusSummary`                 |
+| `cloud-upload-latest-backup`          | Handles `cloud-upload-latest-backup` invocations.          | `[]`                                           | `CloudBackupEntry`                   |
+| `delete-all-sites`                    | Handles `delete-all-sites` invocations.                    | `[]`                                           | `number`                             |
+| `diagnostics-report-preload-guard`    | Handles `diagnostics-report-preload-guard` invocations.    | `[report: PreloadGuardDiagnosticsReport]`      | `undefined`                          |
+| `diagnostics-verify-ipc-handler`      | Handles `diagnostics-verify-ipc-handler` invocations.      | `[channel: string]`                            | `IpcHandlerVerificationResult`       |
+| `download-sqlite-backup`              | Handles `download-sqlite-backup` invocations.              | `[]`                                           | `SerializedDatabaseBackupResult`     |
+| `export-data`                         | Handles `export-data` invocations.                         | `[]`                                           | `string`                             |
+| `format-monitor-detail`               | Handles `format-monitor-detail` invocations.               | `[monitorType: string, details: string]`       | `string`                             |
+| `format-monitor-title-suffix`         | Handles `format-monitor-title-suffix` invocations.         | `[monitorType: string, monitor: Monitor]`      | `string`                             |
+| `get-history-limit`                   | Handles `get-history-limit` invocations.                   | `[]`                                           | `number`                             |
+| `get-monitor-types`                   | Handles `get-monitor-types` invocations.                   | `[]`                                           | `MonitorTypeConfig[]`                |
+| `get-sites`                           | Handles `get-sites` invocations.                           | `[]`                                           | `Site[]`                             |
+| `get-sync-status`                     | Handles `get-sync-status` invocations.                     | `[]`                                           | `StateSyncStatusSummary`             |
+| `import-data`                         | Handles `import-data` invocations.                         | `[data: string]`                               | `boolean`                            |
+| `notify-app-event`                    | Handles `notify-app-event` invocations.                    | `[request: AppNotificationRequest]`            | `undefined`                          |
+| `open-external`                       | Handles `open-external` invocations.                       | `[url: string]`                                | `boolean`                            |
+| `quit-and-install`                    | Handles `quit-and-install` invocations.                    | `[]`                                           | `boolean`                            |
+| `remove-monitor`                      | Handles `remove-monitor` invocations.                      | `[siteIdentifier: string, monitorId: string]`  | `Site`                               |
+| `remove-site`                         | Handles `remove-site` invocations.                         | `[identifier: string]`                         | `boolean`                            |
+| `request-full-sync`                   | Handles `request-full-sync` invocations.                   | `[]`                                           | `StateSyncFullSyncResult`            |
+| `reset-settings`                      | Handles `reset-settings` invocations.                      | `[]`                                           | `undefined`                          |
+| `restore-sqlite-backup`               | Handles `restore-sqlite-backup` invocations.               | `[payload: SerializedDatabaseRestorePayload]`  | `SerializedDatabaseRestoreResult`    |
+| `save-sqlite-backup`                  | Handles `save-sqlite-backup` invocations.                  | `[]`                                           | `SerializedDatabaseBackupSaveResult` |
+| `start-monitoring`                    | Handles `start-monitoring` invocations.                    | `[]`                                           | `MonitoringStartSummary`             |
+| `start-monitoring-for-monitor`        | Handles `start-monitoring-for-monitor` invocations.        | `[siteIdentifier: string, monitorId: string]`  | `boolean`                            |
+| `start-monitoring-for-site`           | Handles `start-monitoring-for-site` invocations.           | `[siteIdentifier: string]`                     | `boolean`                            |
+| `stop-monitoring`                     | Handles `stop-monitoring` invocations.                     | `[]`                                           | `MonitoringStopSummary`              |
+| `stop-monitoring-for-monitor`         | Handles `stop-monitoring-for-monitor` invocations.         | `[siteIdentifier: string, monitorId: string]`  | `boolean`                            |
+| `stop-monitoring-for-site`            | Handles `stop-monitoring-for-site` invocations.            | `[siteIdentifier: string]`                     | `boolean`                            |
+| `update-history-limit`                | Handles `update-history-limit` invocations.                | `[limitDays: number]`                          | `number`                             |
+| `update-notification-preferences`     | Handles `update-notification-preferences` invocations.     | `[preferences: NotificationPreferenceUpdate]`  | `undefined`                          |
+| `update-site`                         | Handles `update-site` invocations.                         | `[identifier: string, updates: Partial<Site>]` | `Site`                               |
+| `validate-monitor-data`               | Handles `validate-monitor-data` invocations.               | `[monitorType: string, data: unknown]`         | `ValidationResult`                   |
+| `write-clipboard-text`                | Handles `write-clipboard-text` invocations.                | `[text: string]`                               | `boolean`                            |
 
 ## Renderer Event Channels
 
-| Channel | Description | Payload Type |
-| --- | --- | --- |
-| `cache:invalidated` | Events emitted on the `cache:invalidated` channel. | `RendererEventPayloadMap["cache:invalidated"]` |
+| Channel                          | Description                                                     | Payload Type                                                |
+| :------------------------------- | :-------------------------------------------------------------- | :---------------------------------------------------------- |
+| `cache:invalidated`              | Events emitted on the `cache:invalidated` channel.              | `RendererEventPayloadMap["cache:invalidated"]`              |
 | `settings:history-limit-updated` | Events emitted on the `settings:history-limit-updated` channel. | `RendererEventPayloadMap["settings:history-limit-updated"]` |
-| `monitor:check-completed` | Events emitted on the `monitor:check-completed` channel. | `RendererEventPayloadMap["monitor:check-completed"]` |
-| `monitor:down` | Events emitted on the `monitor:down` channel. | `RendererEventPayloadMap["monitor:down"]` |
-| `monitoring:started` | Events emitted on the `monitoring:started` channel. | `RendererEventPayloadMap["monitoring:started"]` |
-| `monitoring:stopped` | Events emitted on the `monitoring:stopped` channel. | `RendererEventPayloadMap["monitoring:stopped"]` |
-| `monitor:status-changed` | Events emitted on the `monitor:status-changed` channel. | `RendererEventPayloadMap["monitor:status-changed"]` |
-| `monitor:up` | Events emitted on the `monitor:up` channel. | `RendererEventPayloadMap["monitor:up"]` |
-| `site:added` | Events emitted on the `site:added` channel. | `RendererEventPayloadMap["site:added"]` |
-| `site:removed` | Events emitted on the `site:removed` channel. | `RendererEventPayloadMap["site:removed"]` |
-| `site:updated` | Events emitted on the `site:updated` channel. | `RendererEventPayloadMap["site:updated"]` |
-| `state-sync-event` | Events emitted on the `state-sync-event` channel. | `RendererEventPayloadMap["state-sync-event"]` |
-| `test-event` | Events emitted on the `test-event` channel. | `RendererEventPayloadMap["test-event"]` |
-| `update-status` | Events emitted on the `update-status` channel. | `RendererEventPayloadMap["update-status"]` |
+| `monitor:check-completed`        | Events emitted on the `monitor:check-completed` channel.        | `RendererEventPayloadMap["monitor:check-completed"]`        |
+| `monitor:down`                   | Events emitted on the `monitor:down` channel.                   | `RendererEventPayloadMap["monitor:down"]`                   |
+| `monitoring:started`             | Events emitted on the `monitoring:started` channel.             | `RendererEventPayloadMap["monitoring:started"]`             |
+| `monitoring:stopped`             | Events emitted on the `monitoring:stopped` channel.             | `RendererEventPayloadMap["monitoring:stopped"]`             |
+| `monitor:status-changed`         | Events emitted on the `monitor:status-changed` channel.         | `RendererEventPayloadMap["monitor:status-changed"]`         |
+| `monitor:up`                     | Events emitted on the `monitor:up` channel.                     | `RendererEventPayloadMap["monitor:up"]`                     |
+| `site:added`                     | Events emitted on the `site:added` channel.                     | `RendererEventPayloadMap["site:added"]`                     |
+| `site:removed`                   | Events emitted on the `site:removed` channel.                   | `RendererEventPayloadMap["site:removed"]`                   |
+| `site:updated`                   | Events emitted on the `site:updated` channel.                   | `RendererEventPayloadMap["site:updated"]`                   |
+| `state-sync-event`               | Events emitted on the `state-sync-event` channel.               | `RendererEventPayloadMap["state-sync-event"]`               |
+| `test-event`                     | Events emitted on the `test-event` channel.                     | `RendererEventPayloadMap["test-event"]`                     |
+| `update-status`                  | Events emitted on the `update-status` channel.                  | `RendererEventPayloadMap["update-status"]`                  |

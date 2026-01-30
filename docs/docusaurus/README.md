@@ -2,9 +2,9 @@
 
 <div align="center">
 
-[![Docusaurus badge.](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus\&logoColor=white)](https://docusaurus.io/)
-[![Node.js badge.](https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js\&logoColor=white)](https://nodejs.org/)
-[![Deployment badge.](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github\&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
+[![Docusaurus badge.](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus&logoColor=white)](https://docusaurus.io/)
+[![Node.js badge.](https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Deployment badge.](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
 
 ## 📖 Official documentation website for Uptime Watcher
 

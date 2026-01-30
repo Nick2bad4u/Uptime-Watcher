@@ -22,6 +22,7 @@ import fc from "fast-check";
 import { z } from "zod";
 import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 import type { IMonitorService } from "../../services/monitoring/types";
+import type { BaseMonitorConfig } from "../../services/monitoring/MonitorTypeRegistry.types";
 import {
     getMonitorTypeConfig,
     getRegisteredMonitorTypes,
@@ -31,7 +32,6 @@ import {
     registerMonitorType,
     createMonitorWithTypeGuards,
     isValidMonitorTypeGuard,
-    type BaseMonitorConfig,
 } from "../../services/monitoring/MonitorTypeRegistry";
 
 describe("MonitorTypeRegistry Fuzzing Tests", () => {

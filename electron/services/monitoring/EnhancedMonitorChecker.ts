@@ -566,7 +566,7 @@ export class EnhancedMonitorChecker {
     ): Promise<void> {
         await saveMonitorHistoryEntry({
             checkResult,
-            config: this.config,
+            dependencies: this.config,
             historyPruneState: this.historyPruneState,
             logger,
             monitor,

@@ -1,6 +1,6 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
-import type { EnhancedMonitorCheckConfig } from "../EnhancedMonitorChecker";
+import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 
 import { resolveStatusUpdateDetails } from "../utils/monitorCheckResultNormalization";
@@ -12,7 +12,7 @@ import { emitStatusChangeEvents } from "./emitStatusChangeEvents";
  */
 export async function handleSuccessfulCheck(args: {
     readonly checkResult: StatusUpdateMonitorCheckResult;
-    readonly eventEmitter: EnhancedMonitorCheckConfig["eventEmitter"];
+    readonly eventEmitter: EnhancedMonitoringDependencies["eventEmitter"];
     readonly fetchFreshMonitorWithHistory: (
         monitorId: string
     ) => Promise<Site["monitors"][0] | undefined>;

@@ -136,12 +136,12 @@ type HistoryLimitUpdatedEventData =
 
 | Task                                                            | Status | Notes                                                                   |
 | --------------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
-| Normalize all invoke channels and preload bridges               | ✅      | Run `npm run generate:ipc` after refactors.                             |
-| Update renderer services (`EventsService`, `MonitoringService`) | ✅      | Ensure new listeners return cleanup functions.                          |
-| Wire optimistic manual-check handling into stores               | ✅      | Verify `createSiteMonitoringActions` is in use.                         |
-| Handle `settings:history-limit-updated` in all settings views   | ✅      | Remember to invalidate cached retention copy in Zustand store/services. |
-| Add CI drift detection (`npm run check:ipc`)                    | ✅      | Integrate into lint/test workflows.                                     |
-| Update product docs & release notes                             | ✅      | Reference this guide and the changelog entry.                           |
+| Normalize all invoke channels and preload bridges               | ✅     | Run `npm run generate:ipc` after refactors.                             |
+| Update renderer services (`EventsService`, `MonitoringService`) | ✅     | Ensure new listeners return cleanup functions.                          |
+| Wire optimistic manual-check handling into stores               | ✅     | Verify `createSiteMonitoringActions` is in use.                         |
+| Handle `settings:history-limit-updated` in all settings views   | ✅     | Remember to invalidate cached retention copy in Zustand store/services. |
+| Add CI drift detection (`npm run check:ipc`)                    | ✅     | Integrate into lint/test workflows.                                     |
+| Update product docs & release notes                             | ✅     | Reference this guide and the changelog entry.                           |
 
 Mark each item off during integration reviews. Pull requests must demonstrate automation via CI logs and include targeted tests when modifying IPC contracts.
 

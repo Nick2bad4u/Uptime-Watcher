@@ -29,7 +29,7 @@
 }
 
 .modal-overlay dialog,
-.modal-overlay .modal-shell,
+.modal-overlay :where(.modal-shell),
 .modal-overlay .modal-overlay__content {
     position: relative;
     z-index: 2;

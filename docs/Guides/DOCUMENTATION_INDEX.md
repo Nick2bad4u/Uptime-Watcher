@@ -49,15 +49,15 @@ tags:
 
 Essential documentation for developers and contributors:
 
-| Document                                                 | Purpose                         | Audience                    |
-| -------------------------------------------------------- | ------------------------------- | --------------------------- |
-| [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) | Fast developer setup            | New Contributors            |
-| [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md)          | Complete environment guide      | Developers                  |
-| [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md)          | IPC and API reference           | Frontend/Backend Developers |
-| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)               | Debug and fix issues            | All Developers              |
-| [TECHNOLOGY\_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)    | Migration history and rationale | Architects, Contributors    |
-| [DOCUMENTATION\_INDEX.md](./DOCUMENTATION_INDEX.md)      | This index document             | All Users                   |
-| [ORGANIZATION\_SUMMARY.md](./ORGANIZATION_SUMMARY.md)    | Documentation cleanup summary   | Maintainers                 |
+| Document                                               | Purpose                         | Audience                    |
+| ------------------------------------------------------ | ------------------------------- | --------------------------- |
+| [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) | Fast developer setup            | New Contributors            |
+| [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)         | Complete environment guide      | Developers                  |
+| [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)         | IPC and API reference           | Frontend/Backend Developers |
+| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)             | Debug and fix issues            | All Developers              |
+| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)   | Migration history and rationale | Architects, Contributors    |
+| [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)     | This index document             | All Users                   |
+| [ORGANIZATION_SUMMARY.md](./ORGANIZATION_SUMMARY.md)   | Documentation cleanup summary   | Maintainers                 |
 
 ### 🏗️ Architecture (`/docs/Architecture/`)
 
@@ -65,49 +65,49 @@ System design, patterns, and architectural decisions:
 
 #### ADRs (Architecture Decision Records)
 
-| Document                                                                                                                                                 | Decision                                    | Status      |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------- |
-| [ADR\_001\_REPOSITORY\_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                                                                   | Database access pattern                     | ✅ Accepted  |
-| [ADR\_002\_EVENT\_DRIVEN\_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)                                                    | Event system design                         | ✅ Accepted  |
-| [ADR\_003\_ERROR\_HANDLING\_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)                                                        | Error handling approach                     | ✅ Accepted  |
-| [ADR\_004\_FRONTEND\_STATE\_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)                                                    | Zustand state management                    | ✅ Accepted  |
-| [ADR\_005\_IPC\_COMMUNICATION\_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md)                                                  | IPC communication design                    | ✅ Accepted  |
-| [ADR\_006\_STANDARDIZED\_CACHE\_CONFIGURATION.md](../Architecture/ADRs/ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md)                                      | Cache configuration standardization         | ✅ Accepted  |
-| [ADR\_007\_SERVICE\_CONTAINER\_DEPENDENCY\_INJECTION.md](../Architecture/ADRs/ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md)                         | Service container/DI                        | ✅ Accepted  |
-| [ADR\_008\_MONITOR\_TYPE\_REGISTRY.md](../Architecture/ADRs/ADR_008_MONITOR_TYPE_REGISTRY.md)                                                            | Monitor type registry + plugin architecture | ✅ Accepted  |
-| [ADR\_009\_VALIDATION\_STRATEGY.md](../Architecture/ADRs/ADR_009_VALIDATION_STRATEGY.md)                                                                 | Validation strategy                         | ✅ Accepted  |
-| [ADR\_010\_TESTING\_STRATEGY.md](../Architecture/ADRs/ADR_010_TESTING_STRATEGY.md)                                                                       | Testing strategy                            | ✅ Accepted  |
-| [ADR\_011\_SCHEDULER\_AND\_BACKOFF.md](../Architecture/ADRs/ADR_011_SCHEDULER_AND_BACKOFF.md)                                                            | Scheduler and backoff                       | ✅ Accepted  |
-| [ADR\_012\_NOTIFICATIONS\_AND\_ALERTING.md](../Architecture/ADRs/ADR_012_NOTIFICATIONS_AND_ALERTING.md)                                                  | Notifications policy                        | ✅ Accepted  |
-| [ADR\_013\_DATA\_PORTABILITY\_AND\_BACKUP.md](../Architecture/ADRs/ADR_013_DATA_PORTABILITY_AND_BACKUP.md)                                               | Data portability + backup/restore           | ✅ Accepted  |
-| [ADR\_014\_LOGGING\_TELEMETRY\_AND\_DIAGNOSTICS.md](../Architecture/ADRs/ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md)                                   | Logging + diagnostics                       | ✅ Accepted  |
-| [ADR\_015\_CLOUD\_SYNC\_AND\_REMOTE\_BACKUP.md](../Architecture/ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)                                            | Cloud sync + remote backups                 | ✅ Accepted  |
-| [ADR\_016\_MULTI\_DEVICE\_SYNC\_MODEL.md](../Architecture/ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)                                                       | True multi-device sync model                | ✅ Accepted  |
-| [ADR\_017\_EXTERNAL\_ALERT\_INTEGRATIONS.md](../Architecture/ADRs/ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md)                                                | Slack/Discord/webhook alerts                | 💡 Proposed |
-| [ADR\_018\_MAINTENANCE\_WINDOWS\_AND\_SILENCING.md](../Architecture/ADRs/ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md)                                   | Maintenance windows + silence rules         | 💡 Proposed |
-| [ADR\_019\_TEMPLATES\_AND\_BULK\_OPERATIONS.md](../Architecture/ADRs/ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md)                                           | Templates + bulk import/export              | 💡 Proposed |
-| [ADR\_020\_SUPPORT\_DIAGNOSTICS\_BUNDLE.md](../Architecture/ADRs/ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md)                                                  | Diagnostics bundle export                   | 💡 Proposed |
-| [ADR\_021\_CLOUD\_PROVIDER\_SELECTION\_AND\_SETTINGS\_UI.md](../Architecture/ADRs/ADR_021_CLOUD_PROVIDER_SELECTION_AND_SETTINGS_UI.md)                   | Cloud provider selection UI + roadmap       | ✅ Accepted  |
-| [ADR\_022\_OAUTH\_LOOPBACK\_REDIRECT\_AND\_CALLBACK\_ROUTING.md](../Architecture/ADRs/ADR_022_OAUTH_LOOPBACK_REDIRECT_AND_CALLBACK_ROUTING.md)           | OAuth loopback redirect + callback routing  | ✅ Accepted  |
-| [ADR\_023\_SECRET\_STORAGE\_AND\_ENCRYPTION\_POLICY.md](../Architecture/ADRs/ADR_023_SECRET_STORAGE_AND_ENCRYPTION_POLICY.md)                            | Secret storage + encryption policy          | ✅ Accepted  |
-| [ADR\_024\_CLOUD\_PROVIDER\_SWITCHING\_AND\_MIGRATION\_POLICY.md](../Architecture/ADRs/ADR_024_CLOUD_PROVIDER_SWITCHING_AND_MIGRATION_POLICY.md)         | Cloud provider switching policy             | ✅ Accepted  |
-| [ADR\_025\_RELEASE\_ASSET\_NAMING\_AND\_UPLOAD\_STRATEGY.md](../Architecture/ADRs/ADR_025_RELEASE_ASSET_NAMING_AND_UPLOAD_STRATEGY.md)                   | Release asset naming + upload strategy      | ✅ Accepted  |
-| [ADR\_026\_ELECTRON\_SECURITY\_MODEL\_AND\_RENDERER\_ISOLATION.md](../Architecture/ADRs/ADR_026_ELECTRON_SECURITY_MODEL_AND_RENDERER_ISOLATION.md)       | Electron security model + isolation         | ✅ Accepted  |
-| [ADR\_027\_AUTO\_UPDATE\_STRATEGY\_AND\_RELEASE\_CHANNELS.md](../Architecture/ADRs/ADR_027_AUTO_UPDATE_STRATEGY_AND_RELEASE_CHANNELS.md)                 | Auto-update strategy + release channels     | ✅ Accepted  |
-| [ADR\_028\_DATABASE\_SCHEMA\_VERSIONING\_AND\_MIGRATIONS.md](../Architecture/ADRs/ADR_028_DATABASE_SCHEMA_VERSIONING_AND_MIGRATIONS.md)                  | Database schema versioning + migrations     | ✅ Accepted  |
-| [ADR\_029\_BACKUP\_FORMAT\_ENCRYPTION\_AND\_COMPATIBILITY\_POLICY.md](../Architecture/ADRs/ADR_029_BACKUP_FORMAT_ENCRYPTION_AND_COMPATIBILITY_POLICY.md) | Backup format + encryption compatibility    | ✅ Accepted  |
-| [ADR\_030\_APP\_CONFIGURATION\_AND\_SETTINGS\_PERSISTENCE\_MODEL.md](../Architecture/ADRs/ADR_030_APP_CONFIGURATION_AND_SETTINGS_PERSISTENCE_MODEL.md)   | App configuration + settings persistence    | ✅ Accepted  |
-| [ADR\_031\_PACKAGING\_SIGNING\_AND\_NOTARIZATION\_POLICY.md](../Architecture/ADRs/ADR_031_PACKAGING_SIGNING_AND_NOTARIZATION_POLICY.md)                  | Packaging + signing/notarization policy     | ✅ Accepted  |
-| [ADR\_032\_SUPPORT\_AND\_DIAGNOSTICS\_DATA\_POLICY.md](../Architecture/ADRs/ADR_032_SUPPORT_AND_DIAGNOSTICS_DATA_POLICY.md)                              | Support/diagnostics data policy             | ✅ Accepted  |
+| Document                                                                                                                                          | Decision                                    | Status      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------- |
+| [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                                                               | Database access pattern                     | ✅ Accepted |
+| [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)                                                 | Event system design                         | ✅ Accepted |
+| [ADR_003_ERROR_HANDLING_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)                                                     | Error handling approach                     | ✅ Accepted |
+| [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)                                                 | Zustand state management                    | ✅ Accepted |
+| [ADR_005_IPC_COMMUNICATION_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md)                                               | IPC communication design                    | ✅ Accepted |
+| [ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md](../Architecture/ADRs/ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md)                                   | Cache configuration standardization         | ✅ Accepted |
+| [ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md](../Architecture/ADRs/ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md)                       | Service container/DI                        | ✅ Accepted |
+| [ADR_008_MONITOR_TYPE_REGISTRY.md](../Architecture/ADRs/ADR_008_MONITOR_TYPE_REGISTRY.md)                                                         | Monitor type registry + plugin architecture | ✅ Accepted |
+| [ADR_009_VALIDATION_STRATEGY.md](../Architecture/ADRs/ADR_009_VALIDATION_STRATEGY.md)                                                             | Validation strategy                         | ✅ Accepted |
+| [ADR_010_TESTING_STRATEGY.md](../Architecture/ADRs/ADR_010_TESTING_STRATEGY.md)                                                                   | Testing strategy                            | ✅ Accepted |
+| [ADR_011_SCHEDULER_AND_BACKOFF.md](../Architecture/ADRs/ADR_011_SCHEDULER_AND_BACKOFF.md)                                                         | Scheduler and backoff                       | ✅ Accepted |
+| [ADR_012_NOTIFICATIONS_AND_ALERTING.md](../Architecture/ADRs/ADR_012_NOTIFICATIONS_AND_ALERTING.md)                                               | Notifications policy                        | ✅ Accepted |
+| [ADR_013_DATA_PORTABILITY_AND_BACKUP.md](../Architecture/ADRs/ADR_013_DATA_PORTABILITY_AND_BACKUP.md)                                             | Data portability + backup/restore           | ✅ Accepted |
+| [ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md](../Architecture/ADRs/ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md)                                 | Logging + diagnostics                       | ✅ Accepted |
+| [ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md](../Architecture/ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)                                           | Cloud sync + remote backups                 | ✅ Accepted |
+| [ADR_016_MULTI_DEVICE_SYNC_MODEL.md](../Architecture/ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)                                                     | True multi-device sync model                | ✅ Accepted |
+| [ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md](../Architecture/ADRs/ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md)                                             | Slack/Discord/webhook alerts                | 💡 Proposed |
+| [ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md](../Architecture/ADRs/ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md)                                 | Maintenance windows + silence rules         | 💡 Proposed |
+| [ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md](../Architecture/ADRs/ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md)                                         | Templates + bulk import/export              | 💡 Proposed |
+| [ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md](../Architecture/ADRs/ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md)                                               | Diagnostics bundle export                   | 💡 Proposed |
+| [ADR_021_CLOUD_PROVIDER_SELECTION_AND_SETTINGS_UI.md](../Architecture/ADRs/ADR_021_CLOUD_PROVIDER_SELECTION_AND_SETTINGS_UI.md)                   | Cloud provider selection UI + roadmap       | ✅ Accepted |
+| [ADR_022_OAUTH_LOOPBACK_REDIRECT_AND_CALLBACK_ROUTING.md](../Architecture/ADRs/ADR_022_OAUTH_LOOPBACK_REDIRECT_AND_CALLBACK_ROUTING.md)           | OAuth loopback redirect + callback routing  | ✅ Accepted |
+| [ADR_023_SECRET_STORAGE_AND_ENCRYPTION_POLICY.md](../Architecture/ADRs/ADR_023_SECRET_STORAGE_AND_ENCRYPTION_POLICY.md)                           | Secret storage + encryption policy          | ✅ Accepted |
+| [ADR_024_CLOUD_PROVIDER_SWITCHING_AND_MIGRATION_POLICY.md](../Architecture/ADRs/ADR_024_CLOUD_PROVIDER_SWITCHING_AND_MIGRATION_POLICY.md)         | Cloud provider switching policy             | ✅ Accepted |
+| [ADR_025_RELEASE_ASSET_NAMING_AND_UPLOAD_STRATEGY.md](../Architecture/ADRs/ADR_025_RELEASE_ASSET_NAMING_AND_UPLOAD_STRATEGY.md)                   | Release asset naming + upload strategy      | ✅ Accepted |
+| [ADR_026_ELECTRON_SECURITY_MODEL_AND_RENDERER_ISOLATION.md](../Architecture/ADRs/ADR_026_ELECTRON_SECURITY_MODEL_AND_RENDERER_ISOLATION.md)       | Electron security model + isolation         | ✅ Accepted |
+| [ADR_027_AUTO_UPDATE_STRATEGY_AND_RELEASE_CHANNELS.md](../Architecture/ADRs/ADR_027_AUTO_UPDATE_STRATEGY_AND_RELEASE_CHANNELS.md)                 | Auto-update strategy + release channels     | ✅ Accepted |
+| [ADR_028_DATABASE_SCHEMA_VERSIONING_AND_MIGRATIONS.md](../Architecture/ADRs/ADR_028_DATABASE_SCHEMA_VERSIONING_AND_MIGRATIONS.md)                 | Database schema versioning + migrations     | ✅ Accepted |
+| [ADR_029_BACKUP_FORMAT_ENCRYPTION_AND_COMPATIBILITY_POLICY.md](../Architecture/ADRs/ADR_029_BACKUP_FORMAT_ENCRYPTION_AND_COMPATIBILITY_POLICY.md) | Backup format + encryption compatibility    | ✅ Accepted |
+| [ADR_030_APP_CONFIGURATION_AND_SETTINGS_PERSISTENCE_MODEL.md](../Architecture/ADRs/ADR_030_APP_CONFIGURATION_AND_SETTINGS_PERSISTENCE_MODEL.md)   | App configuration + settings persistence    | ✅ Accepted |
+| [ADR_031_PACKAGING_SIGNING_AND_NOTARIZATION_POLICY.md](../Architecture/ADRs/ADR_031_PACKAGING_SIGNING_AND_NOTARIZATION_POLICY.md)                 | Packaging + signing/notarization policy     | ✅ Accepted |
+| [ADR_032_SUPPORT_AND_DIAGNOSTICS_DATA_POLICY.md](../Architecture/ADRs/ADR_032_SUPPORT_AND_DIAGNOSTICS_DATA_POLICY.md)                             | Support/diagnostics data policy             | ✅ Accepted |
 
 #### Patterns & standards
 
-| Document                                                                                  | Purpose                  | Use When                               |
-| ----------------------------------------------------------------------------------------- | ------------------------ | -------------------------------------- |
-| [DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) | Coding patterns overview | Understanding system patterns          |
-| [TSDOC\_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)                                 | Documentation standards  | Writing code documentation             |
-| [LINT\_GUARDRAILS\_AND\_CUSTOM\_RULES.md](./LINT_GUARDRAILS_AND_CUSTOM_RULES.md)          | Custom lint guardrails   | Fixing architecture lint rule failures |
-| [ADR\_IMPLEMENTATION\_PUNCHLIST.md](./ADR_IMPLEMENTATION_PUNCHLIST.md)                    | ADR follow-up backlog    | Planning and tracking ADR work         |
+| Document                                                                                | Purpose                  | Use When                               |
+| --------------------------------------------------------------------------------------- | ------------------------ | -------------------------------------- |
+| [DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) | Coding patterns overview | Understanding system patterns          |
+| [TSDOC_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)                                | Documentation standards  | Writing code documentation             |
+| [LINT_GUARDRAILS_AND_CUSTOM_RULES.md](./LINT_GUARDRAILS_AND_CUSTOM_RULES.md)            | Custom lint guardrails   | Fixing architecture lint rule failures |
+| [ADR_IMPLEMENTATION_PUNCHLIST.md](./ADR_IMPLEMENTATION_PUNCHLIST.md)                    | ADR follow-up backlog    | Planning and tracking ADR work         |
 
 #### Store reference docs
 
@@ -124,37 +124,37 @@ System design, patterns, and architectural decisions:
 
 #### Templates
 
-| Template                                                                           | Purpose                     | Use When                     |
-| ---------------------------------------------------------------------------------- | --------------------------- | ---------------------------- |
-| [REPOSITORY\_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md)        | Database repository pattern | Adding new data repositories |
-| [IPC\_HANDLER\_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md)     | IPC communication pattern   | Adding new IPC endpoints     |
-| [ZUSTAND\_STORE\_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) | Frontend state management   | Creating new Zustand stores  |
+| Template                                                                         | Purpose                     | Use When                     |
+| -------------------------------------------------------------------------------- | --------------------------- | ---------------------------- |
+| [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md)       | Database repository pattern | Adding new data repositories |
+| [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md)     | IPC communication pattern   | Adding new IPC endpoints     |
+| [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) | Frontend state management   | Creating new Zustand stores  |
 
 ### 📖 Implementation Guides (`/docs/Guides/`)
 
 Step-by-step implementation instructions:
 
-| Guide                                                                                         | Purpose                     | Complexity      |
-| --------------------------------------------------------------------------------------------- | --------------------------- | --------------- |
-| [RENDERER\_INTEGRATION\_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md)                    | Renderer/IPC integration    | 🟡 Intermediate |
-| [NEW\_MONITOR\_TYPE\_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md)         | Adding monitor types        | 🟡 Intermediate |
-| [UI\_FEATURE\_DEVELOPMENT\_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md)               | Frontend development        | 🟡 Intermediate |
-| [CLOUD\_PROVIDER\_IMPLEMENTATION\_GUIDE.md](../Guides/CLOUD_PROVIDER_IMPLEMENTATION_GUIDE.md) | Adding cloud providers      | 🟡 Intermediate |
-| [TESTING.md](../Guides/TESTING.md)                                                            | Testing setup and practices | 🟢 Beginner     |
+| Guide                                                                                      | Purpose                     | Complexity      |
+| ------------------------------------------------------------------------------------------ | --------------------------- | --------------- |
+| [RENDERER_INTEGRATION_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md)                   | Renderer/IPC integration    | 🟡 Intermediate |
+| [NEW_MONITOR_TYPE_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md)         | Adding monitor types        | 🟡 Intermediate |
+| [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md)               | Frontend development        | 🟡 Intermediate |
+| [CLOUD_PROVIDER_IMPLEMENTATION_GUIDE.md](../Guides/CLOUD_PROVIDER_IMPLEMENTATION_GUIDE.md) | Adding cloud providers      | 🟡 Intermediate |
+| [TESTING.md](../Guides/TESTING.md)                                                         | Testing setup and practices | 🟢 Beginner     |
 
 ### 📝 Historical & Learning (`/docs/`)
 
 Relevant historical context and lessons learned:
 
-| Document                                              | Purpose                    | Relevance                          |
-| ----------------------------------------------------- | -------------------------- | ---------------------------------- |
-| [TECHNOLOGY\_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md) | Complete migration history | Understanding current architecture |
+| Document                                             | Purpose                    | Relevance                          |
+| ---------------------------------------------------- | -------------------------- | ---------------------------------- |
+| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md) | Complete migration history | Understanding current architecture |
 
 ## 🎯 Documentation by Role
 
 ### 🤖 AI Assistants
 
-**Start Here**: [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md)
+**Start Here**: [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md)
 
 - Complete project overview and patterns
 - Common development tasks
@@ -162,13 +162,13 @@ Relevant historical context and lessons learned:
 
 **Follow Up**:
 
-- [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interface reference
+- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interface reference
 - [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
 - [Architecture/Templates/](../Architecture/Templates/) - Code templates
 
 ### 👨‍💻 New Developers
 
-**Start Here**: [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md)
+**Start Here**: [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md)
 
 - Fast setup and orientation
 - Common development tasks
@@ -176,27 +176,27 @@ Relevant historical context and lessons learned:
 
 **Next Steps**:
 
-- [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md) - Complete environment
-- [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Coding patterns
+- [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Complete environment
+- [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Coding patterns
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - When things go wrong
 
 ### 🏗️ Backend Developers
 
 **Focus Areas**:
 
-- [ADR\_001\_REPOSITORY\_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md) - Database patterns
-- [ADR\_002\_EVENT\_DRIVEN\_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md) - Event system
-- [REPOSITORY\_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md) - Repository implementation
-- [IPC\_HANDLER\_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md) - IPC communication
+- [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md) - Database patterns
+- [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md) - Event system
+- [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md) - Repository implementation
+- [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md) - IPC communication
 
 ### 🎨 Frontend Developers
 
 **Focus Areas**:
 
-- [ADR\_004\_FRONTEND\_STATE\_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md) - State management
-- [UI\_FEATURE\_DEVELOPMENT\_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md) - Component development
-- [ZUSTAND\_STORE\_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) - Store creation
-- [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - IPC interfaces
+- [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md) - State management
+- [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md) - Component development
+- [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) - Store creation
+- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - IPC interfaces
 
 ### 🧪 QA/Testing
 
@@ -204,54 +204,54 @@ Relevant historical context and lessons learned:
 
 - [TESTING.md](../Guides/TESTING.md) - Testing setup and practices
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Common issues
-- [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment configuration
+- [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment configuration
 
 ### 📐 Architects/Tech Leads
 
 **Focus Areas**:
 
 - [Architecture/ADRs/](../Architecture/ADRs/) - All architectural decisions
-- [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - System patterns
+- [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - System patterns
 - Historical documents for evolution understanding
 
 ## 🔍 Documentation by Topic
 
 ### 🗃️ Database & Persistence
 
-- [ADR\_001\_REPOSITORY\_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md) - Repository pattern design
-- [REPOSITORY\_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md) - Implementation template
+- [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md) - Repository pattern design
+- [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md) - Implementation template
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md#database-issues) - Database troubleshooting
 
 ### 🔗 Communication & Events
 
-- [ADR\_002\_EVENT\_DRIVEN\_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md) - Event system
-- [ADR\_005\_IPC\_COMMUNICATION\_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md) - IPC design
-- [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Communication interfaces
-- [RENDERER\_INTEGRATION\_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md) - Renderer IPC integration
-- [IPC\_HANDLER\_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md) - IPC implementation
+- [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md) - Event system
+- [ADR_005_IPC_COMMUNICATION_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md) - IPC design
+- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Communication interfaces
+- [RENDERER_INTEGRATION_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md) - Renderer IPC integration
+- [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md) - IPC implementation
 
 ### 🎨 Frontend & UI
 
-- [ADR\_004\_FRONTEND\_STATE\_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md) - State management
-- [UI\_FEATURE\_DEVELOPMENT\_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md) - UI development
-- [ZUSTAND\_STORE\_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) - Store patterns
+- [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md) - State management
+- [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md) - UI development
+- [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) - Store patterns
 
 ### 🔍 Monitoring & Performance
 
-- [NEW\_MONITOR\_TYPE\_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) - Monitor types
+- [NEW_MONITOR_TYPE_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) - Monitor types
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Performance tips
 
 ### ⚠️ Error Handling & Debugging
 
-- [ADR\_003\_ERROR\_HANDLING\_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md) - Error strategy
+- [ADR_003_ERROR_HANDLING_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md) - Error strategy
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Debug guide
-- [ENVIRONMENT\_SETUP.md](../Guides/ENVIRONMENT_SETUP.md) - Debug tools
+- [ENVIRONMENT_SETUP.md](../Guides/ENVIRONMENT_SETUP.md) - Debug tools
 
 ## 📋 Documentation Maintenance
 
 ### 📝 Contributing to Documentation
 
-1. **Follow TSDoc Standards**: Use [TSDOC\_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)
+1. **Follow TSDoc Standards**: Use [TSDOC_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)
 2. **Update Index**: Add new documents to this index
 3. **Cross-Reference**: Link related documents
 4. **Keep Current**: Update outdated information
@@ -276,27 +276,27 @@ Track documentation health:
 
 ### 📚 Complete Onboarding (New Team Member)
 
-1. [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) - Setup
-2. [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment
+1. [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) - Setup
+2. [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment
 3. [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
-4. [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interfaces
+4. [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interfaces
 
 ### ⚡ Quick Start (Experienced Developer)
 
-1. [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) - Setup
-2. [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Patterns
+1. [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) - Setup
+2. [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Patterns
 
 ### 🐛 Debugging Focus
 
 1. [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Issues and solutions
-2. [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md) - Debug tools
-3. [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Error patterns
+2. [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Debug tools
+3. [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Error patterns
 
 ### 🏗️ Architecture Deep Dive
 
 1. [Architecture/ADRs/](../Architecture/ADRs/) - All decisions
 2. Historical documents for evolution context
-3. [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Implementation patterns
+3. [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Implementation patterns
 
 ---
 

@@ -68,59 +68,59 @@ For developers new to TSDoc:
 
 ### Core concepts
 
-| Document | Description | Purpose |
-| --- | --- | --- |
-| [TSDoc home](./TSDoc-Home.md) | Overview of TSDoc system | Understanding TSDoc fundamentals |
+| Document                                    | Description                           | Purpose                              |
+| ------------------------------------------- | ------------------------------------- | ------------------------------------ |
+| [TSDoc home](./TSDoc-Home.md)               | Overview of TSDoc system              | Understanding TSDoc fundamentals     |
 | [TSDoc approach](./TSDoc-Intro-Approach.md) | Documentation philosophy and approach | Establishing documentation standards |
-| [Using TSDoc](./TSDoc-Intro-UsingTsdoc.md) | Practical implementation guide | Day-to-day documentation practices |
+| [Using TSDoc](./TSDoc-Intro-UsingTsdoc.md)  | Practical implementation guide        | Day-to-day documentation practices   |
 
 ### Specification and standards
 
-| Document | Description | Purpose |
-| --- | --- | --- |
-| [Specification overview](./TSDoc-Spec-Overview.md) | TSDoc specification details | Understanding formal standards |
-| [Standardization groups](./TSDoc-Spec-StandardizationGroups.md) | Governance and standardization | Standards compliance |
-| [Tag kinds](./TSDoc-Spec-TagKinds.md) | Tag classification system | Proper tag usage |
+| Document                                                        | Description                    | Purpose                        |
+| --------------------------------------------------------------- | ------------------------------ | ------------------------------ |
+| [Specification overview](./TSDoc-Spec-Overview.md)              | TSDoc specification details    | Understanding formal standards |
+| [Standardization groups](./TSDoc-Spec-StandardizationGroups.md) | Governance and standardization | Standards compliance           |
+| [Tag kinds](./TSDoc-Spec-TagKinds.md)                           | Tag classification system      | Proper tag usage               |
 
 ### Package integration
 
-| Document | Description | Purpose |
-| --- | --- | --- |
-| [Core TSDoc package](./TSDoc-Package-Tsdoc.md) | Main TSDoc package documentation | Core functionality |
-| [ESLint plugin](./TSDoc-Package-EslintPluginTsdoc.md) | ESLint integration for TSDoc | Automated linting |
-| [Configuration](./TSDoc-Package-TsdocConfig.md) | TSDoc configuration options | Project setup |
+| Document                                              | Description                      | Purpose            |
+| ----------------------------------------------------- | -------------------------------- | ------------------ |
+| [Core TSDoc package](./TSDoc-Package-Tsdoc.md)        | Main TSDoc package documentation | Core functionality |
+| [ESLint plugin](./TSDoc-Package-EslintPluginTsdoc.md) | ESLint integration for TSDoc     | Automated linting  |
+| [Configuration](./TSDoc-Package-TsdocConfig.md)       | TSDoc configuration options      | Project setup      |
 
 ## 🏷️ Tag reference
 
 ### Essential tags
 
-| Tag | Purpose | Usage |
-| --- | --- | --- |
-| [`@param`](./TSDoc-Tag-Param.md) | Document function parameters | Required for all parameters |
-| [`@returns`](./TSDoc-Tag-Returns.md) | Document return values | Required for functions with return values |
-| [`@example`](./TSDoc-Tag-Example.md) | Provide usage examples | Recommended for public APIs |
-| [`@remarks`](./TSDoc-Tag-Remarks.md) | Additional implementation details | Detailed explanations |
-| [`@throws`](./TSDoc-Tag-Throws.md) | Document thrown exceptions | Error conditions |
+| Tag                                  | Purpose                           | Usage                                     |
+| ------------------------------------ | --------------------------------- | ----------------------------------------- |
+| [`@param`](./TSDoc-Tag-Param.md)     | Document function parameters      | Required for all parameters               |
+| [`@returns`](./TSDoc-Tag-Returns.md) | Document return values            | Required for functions with return values |
+| [`@example`](./TSDoc-Tag-Example.md) | Provide usage examples            | Recommended for public APIs               |
+| [`@remarks`](./TSDoc-Tag-Remarks.md) | Additional implementation details | Detailed explanations                     |
+| [`@throws`](./TSDoc-Tag-Throws.md)   | Document thrown exceptions        | Error conditions                          |
 
 ### Lifecycle and visibility tags
 
-| Tag | Purpose | Usage |
-| --- | --- | --- |
-| [`@public`](./TSDoc-Tag-Public.md) | Mark as public API | Public interfaces |
-| [`@internal`](./TSDoc-Tag-Internal.md) | Mark as internal implementation | Internal code |
-| [`@alpha`](./TSDoc-Tag-Alpha.md) | Mark as alpha/experimental | Early development |
-| [`@beta`](./TSDoc-Tag-Beta.md) | Mark as beta/preview | Pre-release features |
-| [`@deprecated`](./TSDoc-Tag-Deprecated.md) | Mark as deprecated | Deprecated code |
+| Tag                                        | Purpose                         | Usage                |
+| ------------------------------------------ | ------------------------------- | -------------------- |
+| [`@public`](./TSDoc-Tag-Public.md)         | Mark as public API              | Public interfaces    |
+| [`@internal`](./TSDoc-Tag-Internal.md)     | Mark as internal implementation | Internal code        |
+| [`@alpha`](./TSDoc-Tag-Alpha.md)           | Mark as alpha/experimental      | Early development    |
+| [`@beta`](./TSDoc-Tag-Beta.md)             | Mark as beta/preview            | Pre-release features |
+| [`@deprecated`](./TSDoc-Tag-Deprecated.md) | Mark as deprecated              | Deprecated code      |
 
 ### Advanced tags
 
-| Tag | Purpose | Usage |
-| --- | --- | --- |
+| Tag                                        | Purpose                           | Usage                     |
+| ------------------------------------------ | --------------------------------- | ------------------------- |
 | [`@inheritdoc`](./TSDoc-Tag-Inheritdoc.md) | Inherit documentation from parent | Interface implementations |
-| [`@override`](./TSDoc-Tag-Override.md) | Mark method overrides | Class inheritance |
-| [`@virtual`](./TSDoc-Tag-Virtual.md) | Mark as overridable | Base class methods |
-| [`@sealed`](./TSDoc-Tag-Sealed.md) | Mark as non-overridable | Final implementations |
-| [`@readonly`](./TSDoc-Tag-Readonly.md) | Mark as read-only | Immutable properties |
+| [`@override`](./TSDoc-Tag-Override.md)     | Mark method overrides             | Class inheritance         |
+| [`@virtual`](./TSDoc-Tag-Virtual.md)       | Mark as overridable               | Base class methods        |
+| [`@sealed`](./TSDoc-Tag-Sealed.md)         | Mark as non-overridable           | Final implementations     |
+| [`@readonly`](./TSDoc-Tag-Readonly.md)     | Mark as read-only                 | Immutable properties      |
 
 ## 🔧 Configuration
 

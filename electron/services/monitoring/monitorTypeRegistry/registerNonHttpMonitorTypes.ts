@@ -2,7 +2,7 @@ import type { Monitor } from "@shared/types";
 
 import { monitorSchemas } from "@shared/validation/monitorSchemas";
 
-import type { BaseMonitorConfig } from "../MonitorTypeRegistry";
+import type { BaseMonitorConfig } from "../MonitorTypeRegistry.types";
 
 import { CdnEdgeConsistencyMonitor } from "../CdnEdgeConsistencyMonitor";
 import { DnsMonitor } from "../DnsMonitor";

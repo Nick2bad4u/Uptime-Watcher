@@ -9,7 +9,7 @@ import {
     monitorSchemas,
 } from "@shared/validation/monitorSchemas";
 
-import type { HttpMonitorRegistration } from "../MonitorTypeRegistry";
+import type { HttpMonitorRegistration } from "../MonitorTypeRegistry.types";
 
 import { HttpHeaderMonitor } from "../HttpHeaderMonitor";
 import { HttpJsonMonitor } from "../HttpJsonMonitor";

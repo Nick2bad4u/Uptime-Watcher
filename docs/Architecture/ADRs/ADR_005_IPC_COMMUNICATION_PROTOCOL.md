@@ -256,7 +256,6 @@ To keep the IPC security boundary and layering guarantees enforceable over time,
 The script (`scripts/architecture-static-guards.mjs`) performs the following checks:
 
 1. **Centralized `ipcMain.handle` registration** – Direct `ipcMain.handle(...)` calls are only allowed in the centralized IPC registration layer:
-
    - `electron/services/ipc/IpcService.ts`
    - `electron/services/ipc/utils.ts` (shared helper for handler wiring)
 
@@ -267,7 +266,6 @@ The script (`scripts/architecture-static-guards.mjs`) performs the following che
    - All IPC calls benefit from the shared `IpcResponse` validation and error handling implemented in the preload layer.
 
 3. **Scoped `window.electronAPI` usage** – Direct references to `window.electronAPI` in `src/**` are limited to a small set of explicit helper/service modules and type definitions:
-
    - `src/types/ipc.ts` (documentation/example usage)
    - `src/services/DataService.ts`
    - `src/services/NotificationPreferenceService.ts`

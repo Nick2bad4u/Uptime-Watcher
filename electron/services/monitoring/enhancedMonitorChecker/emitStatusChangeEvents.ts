@@ -5,7 +5,7 @@ import type {
     MonitorUpEventData,
 } from "@shared/types/events";
 
-import type { EnhancedMonitorCheckConfig } from "../EnhancedMonitorChecker";
+import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 
 /**
@@ -13,7 +13,7 @@ import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateServi
  */
 export async function emitStatusChangeEvents(args: {
     readonly checkResult: StatusUpdateMonitorCheckResult;
-    readonly eventEmitter: EnhancedMonitorCheckConfig["eventEmitter"];
+    readonly eventEmitter: EnhancedMonitoringDependencies["eventEmitter"];
     readonly freshMonitor: Site["monitors"][0];
     readonly originalMonitor: Site["monitors"][0];
     readonly site: Site;

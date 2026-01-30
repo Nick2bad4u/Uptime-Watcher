@@ -9,16 +9,15 @@
 
 /* eslint max-lines: ["error", { "max": 2000 }] -- Registry aggregates monitor definitions in one module */
 
-import type {
-    MonitorFieldDefinition,
-    MonitorType,
-} from "@shared/types";
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { MonitorType } from "@shared/types";
 import type * as z from "zod";
 
 import { MONITOR_STATUS } from "@shared/types";
 
-import type { MonitorUIConfig } from "./monitorUiConfig";
+import type {
+    BaseMonitorConfig,
+    HttpMonitorRegistration,
+} from "./MonitorTypeRegistry.types";
 import type {
     IMonitorService,
     MonitorConfiguration,
@@ -28,59 +27,9 @@ import type {
 import { logger } from "../../utils/logger";
 import { registerHttpMonitorTypes } from "./monitorTypeRegistry/registerHttpMonitorTypes";
 import { registerNonHttpMonitorTypes } from "./monitorTypeRegistry/registerNonHttpMonitorTypes";
-import {
-    createHttpMonitorUiConfig,
-    type HttpMonitorUiOverrides,
-} from "./utils/httpMonitorUiConfig";
+import { createHttpMonitorUiConfig } from "./utils/httpMonitorUiConfig";
 
-// Base monitor type definition
-/**
- * Configuration contract for a monitor type in the monitoring system.
- *
- * @remarks
- * Each monitor type (e.g., HTTP, Port) must provide a configuration object
- * describing its metadata, validation schema, UI display options, and service
- * factory. This enables dynamic registration, validation, and UI rendering for
- * new monitor types.
- *
- * @param description - Description of what this monitor checks.
- * @param displayName - Human-readable display name for UI.
- * @param fields - Field definitions for dynamic form generation.
- * @param serviceFactory - Factory function to create monitor service instances.
- * @param type - Unique identifier for the monitor type.
- * @param uiConfig - Optional UI display configuration for analytics, history,
- *   and help texts.
- * @param validationSchema - Zod validation schema for this monitor type.
- * @param version - Version of the monitor implementation.
- *
- * @public
- */
 
-/**
- * Configuration contract required to register a monitor type in the system.
- *
- * @remarks
- * Mirrors {@link MonitorTypeConfig} but narrows the UI configuration to the
- * richer {@link MonitorUIConfig} type used by the Electron renderer.
- */
-export interface BaseMonitorConfig extends Omit<MonitorTypeConfig, "uiConfig"> {
-    /** Field definitions for dynamic form generation */
-    readonly fields: MonitorFieldDefinition[];
-    /** Factory function to create monitor service instances */
-    readonly serviceFactory: () => IMonitorService;
-    /** UI display configuration */
-    readonly uiConfig?: MonitorUIConfig;
-    /** Zod validation schema for this monitor type */
-    readonly validationSchema: z.ZodType;
-}
-
-/**
- * Registration contract for HTTP-based monitor definitions.
- */
-export interface HttpMonitorRegistration
-    extends Omit<BaseMonitorConfig, "uiConfig"> {
-    readonly uiOverrides?: HttpMonitorUiOverrides;
-}
 /**
  * Internal registry for all monitor types and their configurations.
  *
