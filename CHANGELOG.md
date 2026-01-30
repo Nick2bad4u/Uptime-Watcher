@@ -4,6 +4,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [21.1.0] - 2026-01-30
+
+
+[[d54009c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)...
+[e57614c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e57614c79cbf216215bb484d022b7507fcaee821)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d54009cf33b556e668453ee4a52883801035e42d...e57614c79cbf216215bb484d022b7507fcaee821))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group [`(4d4e856)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4d4e856e8b2b244dba4ff7341a47538d8e6f86d9)
+
+
+
+### 🧹 Chores
+
+- *(release)* V21.1.0 [skip ci] [`(e57614c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e57614c79cbf216215bb484d022b7507fcaee821)
+
+
+- Update changelogs for v21.0.0 [skip ci] [`(d54009c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)
+
+
+
+
+
+
 ## [21.0.0] - 2026-01-23
 
 
