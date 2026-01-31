@@ -153,10 +153,23 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                const monitorSummaryButton = sslCard.getByRole("button", {
-                    name: /SSL Certificate:\s*secure\.example\.com:443/i,
+                const monitorSelector = sslCard.getByRole("combobox", {
+                    name: "Select monitor",
                 });
-                await expect(monitorSummaryButton).toBeVisible({
+                const selectedOption = monitorSelector.getByRole("option", {
+                    selected: true,
+                });
+
+                await expect(selectedOption).toHaveText(
+                    /SSL Certificate:\s*secure\.example\.com:443/i,
+                    {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    }
+                );
+
+                // Also ensure the selector itself is visible so the identifier
+                // is actually surfaced in the site card UI.
+                await expect(monitorSelector).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
             }

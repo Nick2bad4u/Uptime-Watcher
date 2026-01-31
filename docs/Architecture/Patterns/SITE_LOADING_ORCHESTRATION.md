@@ -91,8 +91,8 @@ This targeted hydration removes unnecessary full-table reads and guarantees rend
 - [ ] Await `MonitoringConfig.setHistoryLimit` in any new loader or mutation.
 - [ ] Propagate monitoring start/stop rejections, logging before rethrowing.
 - [ ] When adding background hydration paths, emit internal
-      `sites:state-synchronized` (forwarded to renderers as `state-sync-event`) and
-      `internal:site:cache-updated`.
+  `sites:state-synchronized` (forwarded to renderers as `state-sync-event`) and
+  `internal:site:cache-updated`.
 - [ ] Update this document when the orchestration flow or event contracts change.
 
 ## Current Implementation Audit (2025-11-04)

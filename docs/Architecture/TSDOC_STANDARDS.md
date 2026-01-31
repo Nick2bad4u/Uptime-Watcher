@@ -28,6 +28,7 @@ tags:
 ### Enhanced Basic Format
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -77,6 +78,7 @@ tags:
 #### Repository Class
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -179,6 +181,7 @@ tags:
 #### Event Bus
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -239,6 +242,7 @@ tags:
 #### Event Emission
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -302,6 +306,7 @@ tags:
 #### Store Interface
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -374,6 +379,7 @@ tags:
 #### withErrorHandling Function
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -458,6 +464,7 @@ tags:
 #### Handler Registration
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -536,6 +543,7 @@ tags:
 #### Simple Examples
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -552,6 +560,7 @@ tags:
 #### Complex Examples
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -580,6 +589,7 @@ tags:
 #### Usage Pattern Examples
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -610,6 +620,7 @@ tags:
 Show the most common, straightforward usage:
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -631,6 +642,7 @@ Show the most common, straightforward usage:
 Demonstrate proper error handling patterns:
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -656,6 +668,7 @@ Demonstrate proper error handling patterns:
 Show complex scenarios and integration patterns:
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**

@@ -197,9 +197,14 @@ test.describe(
                         await fieldInput.fill("");
                     }
 
-                    await page
-                        .getByRole("button", { name: /Add Site/i })
-                        .click();
+                    await page.getByTestId("add-site-submit").click();
+
+                    // Invalid submissions should keep the modal open.
+                    await expect(page.getByTestId("add-site-modal")).toBeVisible(
+                        {
+                            timeout: WAIT_TIMEOUTS.MEDIUM,
+                        }
+                    );
 
                     await expect(page.getByTestId("add-site-form")).toBeVisible(
                         {

@@ -98,5 +98,5 @@ When adding new guides:
 
 1. Follow the [documentation style guide](./DOCUMENTATION_STYLE_GUIDE.md)
 2. Update this README to include your new guide
-3. Add appropriate cross-references in [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)
+3. Add appropriate cross-references in [DOCUMENTATION\_INDEX.md](./DOCUMENTATION_INDEX.md)
 4. Ensure your guide includes clear examples and practical guidance

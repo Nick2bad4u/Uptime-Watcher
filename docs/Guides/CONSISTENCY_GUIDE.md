@@ -236,6 +236,7 @@ export class HttpMonitor implements IMonitorService {
 Use comprehensive TSDoc comments following the project standards:
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -265,6 +266,7 @@ Use comprehensive TSDoc comments following the project standards:
 **Always use logger in JSDoc examples**, never console:
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 // ✅ Correct - JSDoc with logger

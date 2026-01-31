@@ -271,9 +271,9 @@ lifecycle change:
 - `monitoring:started` / `monitoring:stopped` telemetry events for dashboards.
 - A follow-up `cache:invalidated` event that carries the authoritative signal
   to refresh site data. The orchestrator emits `{ type: "site", reason:
-"update", timestamp: Date.now() }` for scoped changes (optionally including
+  "update", timestamp: Date.now() }` for scoped changes (optionally including
   an `identifier`), and `{ type: "all", reason: "update", timestamp:
-Date.now() }` when monitoring is toggled globally so the renderer can
+  Date.now() }` when monitoring is toggled globally so the renderer can
   short-circuit to a full resync.
 
 On the renderer side:

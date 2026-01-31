@@ -38,6 +38,7 @@ For stores with straightforward state that don't require modular composition:
 <!-- keep template code outside of the audit list -->
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**

@@ -27,7 +27,7 @@ This app uses **Dropbox OAuth 2.0 Authorization Code + PKCE** with a **loopback 
 ## What you need (as the app maintainer)
 
 - A Dropbox "Scoped app" (recommended)
-- The **App Key** (client_id)
+- The **App Key** (client\_id)
 
 > Important
 >
@@ -86,7 +86,7 @@ values:
 
 The app still uses the `localhost` redirect URI.
 
-### Troubleshooting: invalid_redirect_uri
+### Troubleshooting: invalid\_redirect\_uri
 
 If your browser shows an error like:
 

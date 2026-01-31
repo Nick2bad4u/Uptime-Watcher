@@ -53,15 +53,25 @@ import { fileURLToPath } from "node:url";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { openExternalOrThrow } from "../shell/openExternalUtils";
-import { getProductionDistDirectory, isPathWithinDirectory } from "./utils/pathGuards";
+import {
+    getProductionDistDirectory,
+    isPathWithinDirectory,
+} from "./utils/pathGuards";
 import {
     applyProductionDocumentSecurityHeaders,
     getProductionCspHeaderValue,
 } from "./utils/productionSecurityHeaders";
 
-// ESM equivalent of `__dirname`.
-// Node.js provides this on `import.meta` in ESM; Electron targets a recent
-// enough Node runtime for this to be available.
+/**
+ * Absolute directory path for this module.
+ *
+ * @remarks
+ * This module is authored as ESM. `import.meta.dirname` is convenient, but it
+ * has proven fragile in some bundling configurations.
+ *
+ * Instead, we derive the directory from `import.meta.url`, which Vite handles
+ * reliably.
+ */
 const currentDirectory = import.meta.dirname;
 
 const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(currentDirectory);

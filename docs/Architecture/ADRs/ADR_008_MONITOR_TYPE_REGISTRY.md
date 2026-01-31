@@ -733,7 +733,7 @@ export async function getMonitorTypeConfig(
      supportsResponseTime: true,
     },
    });
-   
+
    // Set version
    versionManager.setVersion("my-new-type", "1.0.0");
    ```

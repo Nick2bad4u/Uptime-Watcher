@@ -451,7 +451,7 @@ patterns are used when wiring store actions to `withErrorHandling()`:
    ```typescript
    import { withErrorHandling } from "@shared/utils/errorHandling";
    import { createStoreErrorHandler } from "src/stores/utils/storeErrorHandling";
-   
+
    // Inside a store module
    const initializeSettings = async (): Promise<void> => {
     await withErrorHandling(

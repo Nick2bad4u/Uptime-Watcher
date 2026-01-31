@@ -51,6 +51,7 @@ export const Settings = ({
 
     return (
         <Modal
+            accent="success"
             closeButtonAriaLabel="Close settings"
             headerBackground={headerBackground}
             headerIcon={headerIcon}

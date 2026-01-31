@@ -73,8 +73,8 @@ $env:FAST_CHECK_NUM_RUNS=250
 npm run fuzz
 ```
 
-- FAST_CHECK_SEED: fixed seed for deterministic runs
-- FAST_CHECK_NUM_RUNS: number of generated cases per property (default in our setup is usually 100)
+- FAST\_CHECK\_SEED: fixed seed for deterministic runs
+- FAST\_CHECK\_NUM\_RUNS: number of generated cases per property (default in our setup is usually 100)
 
 ## Tips for achieving “100% fast-check fuzzing coverage”
 
@@ -85,7 +85,7 @@ npm run fuzz
 
 ## Troubleshooting
 
-- If a suite gets flaky due to heavy generation, lower FAST_CHECK_NUM_RUNS or restrict arbitraries.
+- If a suite gets flaky due to heavy generation, lower FAST\_CHECK\_NUM\_RUNS or restrict arbitraries.
 - For long running suites, use the dot reporter (npm run fuzz:minimal) or target a subset with -t "fuzz|fuzzing" patterns.
 - If Electron-specific tests need the dev server, please start the Vite dev server in another terminal or use the dedicated Electron fuzz scripts.
 

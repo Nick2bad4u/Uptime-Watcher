@@ -85,6 +85,7 @@ stateDiagram-v2
 ### 3. Consistent Structure
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 import { Database } from "node-sqlite3-wasm";
