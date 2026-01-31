@@ -60,6 +60,7 @@ import pluginCompat from "eslint-plugin-compat";
 import * as pluginCssModules from "eslint-plugin-css-modules";
 import depend from "eslint-plugin-depend";
 import pluginDeprecation from "eslint-plugin-deprecation";
+import eslintPluginEslintPlugin from "eslint-plugin-eslint-plugin";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import etc from "eslint-plugin-etc";
 import { plugin as ex } from "eslint-plugin-exception-handling";
@@ -206,10 +207,10 @@ import { createRequire } from "node:module";
 import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
 import * as yamlEslintParser from "yaml-eslint-parser";
-// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import github from 'eslint-plugin-github'
 
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
+
+// import github from 'eslint-plugin-github' -- unused for now
 
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
@@ -665,6 +666,56 @@ export default defineConfig([
                 polymorphicPropName: "as", // Define the prop name used for polymorphic components (e.g., <Component as="div">)
                 version: "detect", // Specify the React version for semantic analysis (can be "detect" for auto-detection)
             },
+        },
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: ESLint Plugin config
+    // ═══════════════════════════════════════════════════════════════════════════════
+    {
+        files: [
+            "config/linting/plugins/**/*.{js,ts,mjs,cjs,mts,cts}",
+            "config/linting/rules/**/*.{js,ts,mjs,cjs,mts,cts}",
+        ],
+        ...eslintPluginEslintPlugin.configs["all-type-checked"],
+        ignores: [],
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                document: "readonly",
+                globalThis: "readonly",
+                window: "readonly",
+            },
+            parser: tseslintParser,
+            parserOptions: {
+                ecmaFeatures: {
+                    impliedStrict: true,
+                },
+                ecmaVersion: "latest",
+                jsDocParsingMode: "all",
+                project: "config/testing/tsconfig.js.json",
+                sourceType: "module",
+                tsconfigRootDir: path.resolve(import.meta.dirname),
+                warnOnUnsupportedTypeScriptVersion: true,
+            },
+        },
+        name: "ESLint Plugin Source Files - config/linting/plugins/**/*.*",
+        plugins: { "eslint-plugin": eslintPluginEslintPlugin },
+        rules: {
+            "eslint-plugin/consistent-output": "error",
+            "eslint-plugin/meta-property-ordering": "warn",
+            "eslint-plugin/no-matching-violation-suggest-message-ids": "error",
+            "eslint-plugin/no-property-in-node": "error",
+            "eslint-plugin/prefer-placeholders": "warn",
+            "eslint-plugin/prefer-replace-text": "error",
+            "eslint-plugin/report-message-format": "warn",
+            "eslint-plugin/require-meta-docs-description": "warn",
+            "eslint-plugin/require-meta-docs-recommended": "warn",
+            "eslint-plugin/require-meta-docs-url": "error",
+            "eslint-plugin/require-test-case-name": "warn",
+            "eslint-plugin/test-case-property-ordering": "warn",
+            "eslint-plugin/test-case-shorthand-strings": "error",
+            "eslint-plugin/unique-test-case-names": "error",
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════

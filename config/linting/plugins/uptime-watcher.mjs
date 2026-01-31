@@ -7,7 +7,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
+import * as ts from "typescript";
 
 /**
  * Normalizes a file path to POSIX separators for uniform rule matching.
@@ -168,8 +168,21 @@ function extractArrayLiteral(expression) {
         return extractArrayLiteral(expression.expression);
     }
 
-    if (ts.isTypeAssertionExpression?.(expression)) {
-        return extractArrayLiteral(expression.expression);
+    /**
+     * @type {unknown}
+     * @remarks
+     * Some TypeScript versions expose `isTypeAssertionExpression` at runtime but
+     * do not include it in the public type surface.
+     */
+    const maybeTypeAssertion = /** @type {any} */ (ts)
+        .isTypeAssertionExpression;
+
+    if (
+        typeof maybeTypeAssertion === "function" &&
+        maybeTypeAssertion(expression)
+    ) {
+        const assertedExpression = /** @type {any} */ (expression).expression;
+        return extractArrayLiteral(assertedExpression);
     }
 
     return null;
@@ -4824,27 +4837,30 @@ const loggerNoErrorInContextRule = {
         }
 
         /**
-         * @param {{type: string, callee: {type: string, name: string}, name: string}} node
+         * @param {unknown} node
          */
         function isSuspiciousErrorValue(node) {
-            if (!node) {
+            if (!node || typeof node !== "object") {
                 return false;
             }
 
-            if (isEnsureErrorCall(node)) {
+            /** @type {any} */
+            const typedNode = node;
+
+            if (isEnsureErrorCall(typedNode)) {
                 return true;
             }
 
             if (
-                node.type === "NewExpression" &&
-                node.callee.type === "Identifier" &&
-                node.callee.name === "Error"
+                typedNode.type === "NewExpression" &&
+                typedNode.callee.type === "Identifier" &&
+                typedNode.callee.name === "Error"
             ) {
                 return true;
             }
 
-            if (node.type === "Identifier") {
-                return suspiciousErrorIdentifiers.has(node.name);
+            if (typedNode.type === "Identifier") {
+                return suspiciousErrorIdentifiers.has(typedNode.name);
             }
 
             return false;
@@ -5736,5 +5752,41 @@ const uptimeWatcherPlugin = {
         "no-onedrive": noOneDriveRule,
     },
 };
+
+/**
+ * Default docs URL for rules in this internal plugin.
+ *
+ * @remarks
+ * This plugin lives inside the repository (not published as a standalone npm
+ * package). We still want each rule to expose a stable URL for tooling (e.g.
+ * eslint-plugin-eslint-plugin) and for developer ergonomics when inspecting
+ * rule docs.
+ */
+const DEFAULT_RULE_DOCS_URL =
+    "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs";
+
+/**
+ * Ensure every rule has `meta.docs.url`.
+ *
+ * @remarks
+ * Many ecosystem tools assume `meta.docs.url` exists. Because this plugin keeps
+ * many rules in a single file, we inject a default URL automatically so authors
+ * don't have to repeat themselves.
+ */
+for (const [ruleName, rule] of Object.entries(uptimeWatcherPlugin.rules)) {
+    /**
+     * @type {any}
+     * @remarks
+     * This file is type-checked via JSDoc + TypeScript. The inferred types for
+     * rule metadata are intentionally narrow (often only `description` and
+     * `recommended`). We still want to attach `docs.url` universally without
+     * rewriting every rule's docs type annotation.
+     */
+    const mutableRule = rule;
+
+    mutableRule.meta ??= {};
+    mutableRule.meta.docs ??= {};
+    mutableRule.meta.docs.url ??= `${DEFAULT_RULE_DOCS_URL}#${ruleName}`;
+}
 
 export default uptimeWatcherPlugin;
