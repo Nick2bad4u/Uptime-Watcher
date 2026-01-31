@@ -188,6 +188,7 @@ Always follow this order to minimize breaking changes:
 
 **Current Implementation Pattern:**
 
+<!-- prettier-ignore -->
 ````tsx
 
 // Import standardized prop types for consistency
@@ -209,10 +210,6 @@ import { useCallback, useEffect, useState } from "react";
  *
  * @example
  *  ```tsx
- *
- *
- *
- *
  *  <MyComponent
  *   siteName="Example Site"
  *   onAction={handleAction}

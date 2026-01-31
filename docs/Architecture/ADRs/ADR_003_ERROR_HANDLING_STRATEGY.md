@@ -136,7 +136,7 @@ There are two supported patterns for constructing this context:
     operationName: string
    ): ErrorHandlingFrontendStore {
     const errorStore = useErrorStore.getState();
-
+   
     return {
      clearError: () => errorStore.clearStoreError(storeKey),
      setError: (error) => errorStore.setStoreError(storeKey, error),
@@ -144,7 +144,7 @@ There are two supported patterns for constructing this context:
       errorStore.setOperationLoading(operationName, loading),
     };
    }
-
+   
    // Example: settings initialization
    const result = await withErrorHandling(
     async () => {

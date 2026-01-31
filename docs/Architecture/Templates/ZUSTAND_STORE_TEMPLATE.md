@@ -37,6 +37,7 @@ For stores with straightforward state that don't require modular composition:
 
 <!-- keep template code outside of the audit list -->
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -51,10 +52,6 @@ For stores with straightforward state that don't require modular composition:
  *
  * @example
  *  ```typescript
- *
- *
- *
- *
  *  import { useExampleStore } from "./stores/useExampleStore";
  *
  *  function MyComponent() {

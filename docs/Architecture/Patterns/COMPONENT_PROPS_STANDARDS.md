@@ -312,6 +312,8 @@ export interface IconComponentProperties {
 
 **Standard**: Use TSDoc comments with clear descriptions
 
+<!-- prettier-ignore -->
+
 ````typescript
 
 export interface ComponentProperties {
@@ -324,12 +326,6 @@ export interface ComponentProperties {
   *
   * @example
   *  ```tsx
-  *
-  *
-  *
-  *
-  *
-  *
   *  <Component onClick={() => console.log("Clicked!")} />;
   *  ```;
   */
@@ -347,6 +343,8 @@ export interface ComponentProperties {
 ### **Component Documentation**
 
 **Standard**: Include comprehensive examples and usage patterns
+
+<!-- prettier-ignore -->
 
 ````typescript
 
@@ -366,8 +364,6 @@ export interface ComponentProperties {
  *
  * @example
  *  With
- *
- *
  *  loading state:
  *
  *  ```tsx
@@ -390,6 +386,8 @@ export interface ComponentProperties {
 
 ### **Basic Component Template**
 
+<!-- prettier-ignore -->
+
 ````typescript
 
 /**
@@ -400,9 +398,6 @@ export interface ComponentProperties {
  *
  * @example
  *  ```tsx
- *
- *
- *
  *  <ComponentName prop="value" />;
  *  ```;
  */

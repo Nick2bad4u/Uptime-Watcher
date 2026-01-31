@@ -235,6 +235,7 @@ export class HttpMonitor implements IMonitorService {
 
 Use comprehensive TSDoc comments following the project standards:
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -246,7 +247,6 @@ Use comprehensive TSDoc comments following the project standards:
  *
  * @example
  *  ```typescript
- *
  *  const result = await httpMonitor.check(monitor);
  *  logger.info(`Check result: ${result.status}`);
  *  ```
@@ -264,12 +264,15 @@ Use comprehensive TSDoc comments following the project standards:
 
 **Always use logger in JSDoc examples**, never console:
 
+<!-- prettier-ignore -->
 ````typescript
 
 // ✅ Correct - JSDoc with logger
 /**
  * @example
  *  ```typescript
+ *
+ *
  *
  *  const result = await service.performOperation();
  *  logger.info(`Operation completed: ${result.status}`);
@@ -280,7 +283,6 @@ Use comprehensive TSDoc comments following the project standards:
 /**
  * @example
  *  ```typescript
- *
  *  const result = await service.performOperation();
  *  console.log(`Operation completed: ${result.status}`);
  *  ```

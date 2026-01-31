@@ -79,6 +79,7 @@ import {
  *
  * @example
  *  ```typescript
+ *
  *  registerExampleHandlers({
  *   exampleManager,
  *   registeredHandlers,
@@ -290,6 +291,7 @@ export interface ExampleImportData {
  *
  * @example
  *  ```typescript
+ *
  *
  *  if (isExampleIdParams(params)) {
  *   // params is now typed as ExampleIdParams

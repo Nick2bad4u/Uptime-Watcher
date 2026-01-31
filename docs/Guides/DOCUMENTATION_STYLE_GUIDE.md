@@ -210,11 +210,11 @@ circuit-breaker-implementation-plan.md
 
 </div>
 
-| Feature | Description | Status |
-| --- | --- | --- |
-| Monitoring | Real-time uptime tracking | ✅ |
-| Alerts | Desktop notifications | ✅ |
-| Analytics | Historical data visualization | 🚧 |
+| Feature    | Description                   | Status |
+| ---------- | ----------------------------- | ------ |
+| Monitoring | Real-time uptime tracking     | ✅     |
+| Alerts     | Desktop notifications         | ✅     |
+| Analytics  | Historical data visualization | 🚧     |
 ```
 
 ### Code Blocks
@@ -514,9 +514,9 @@ npm run dev
 
 ```markdown
 | Monitor Type | Port | Protocol | Timeout |
-| --- | --- | --- | --- |
-| HTTP | 80 | TCP | 30s |
-| HTTPS | 443 | TCP | 30s |
+| ------------ | ---- | -------- | ------- |
+| HTTP         | 80   | TCP      | 30s     |
+| HTTPS        | 443  | TCP      | 30s     |
 ```
 
 ### Poor Examples
@@ -538,8 +538,8 @@ npm install
 ❌ **Incomplete table:**
 
 ```markdown
-| Type | Info |
-| --- | --- |
+| Type | Info      |
+| ---- | --------- |
 | HTTP | web stuff |
 ```
 

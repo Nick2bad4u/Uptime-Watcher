@@ -64,15 +64,12 @@ extensions. This can lead to frustrating incompatibilities.
 
 Consider a hypothetical input:
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
  * @example
- *  Prints
- *
- *
- *
- *  "true" for `{@link}` but "false" for `@internal`:
+ *  Prints "true" for `{@link}` but "false" for `@internal`:
  *  ```ts
  *  console.log(isInlineTag('{@link}'));
  *  console.log(isInlineTag('@internal'));

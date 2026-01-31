@@ -302,7 +302,7 @@ Watch console for warmup effectiveness and transform times.
    ```typescript
    // Prefer direct imports
    import { Button } from "./components/Button";
-
+   
    // Over barrel imports
    import { Button } from "./components";
    ```
@@ -312,7 +312,7 @@ Watch console for warmup effectiveness and transform times.
    ```typescript
    // Good
    import { format } from "date-fns";
-
+   
    // Avoid
    import * as dateFns from "date-fns";
    ```

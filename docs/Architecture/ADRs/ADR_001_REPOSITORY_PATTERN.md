@@ -84,6 +84,7 @@ stateDiagram-v2
 
 ### 3. Consistent Structure
 
+<!-- prettier-ignore -->
 ````typescript
 
 import { Database } from "node-sqlite3-wasm";
@@ -103,8 +104,6 @@ import type { DatabaseService } from "@electron/services/database/DatabaseServic
  *
  * @example
  *  ```typescript
- *
- *
  *  const repository = new ExampleRepository({ databaseService });
  *
  *  // Public async method - creates its own transaction
@@ -137,6 +136,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  const repository = new ExampleRepository({
   *   databaseService: serviceContainer.getDatabaseService(),
   *  });
@@ -160,6 +160,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
@@ -207,6 +208,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  // Use within an existing transaction
   *  await databaseService.executeTransaction((db) => {
   *   repository.bulkInsertInternal(db, records);
@@ -250,6 +252,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  const allRecords = await repository.findAll();
   *  ```;
   *
@@ -276,6 +279,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *
@@ -318,6 +322,7 @@ export class ExampleRepository {
   *
   *
   *
+  *
   *  // Use within an existing transaction
   *  await databaseService.executeTransaction((db) => {
   *   repository.deleteAllInternal(db);
@@ -350,6 +355,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *

@@ -65,7 +65,7 @@ When adding a new monitor type:
    // shared/validation/monitorSchemas.ts
    import { z } from "zod";
    import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-
+   
    export const MonitorConfigSchema = z.object({
     id: z.string().min(1, "Monitor ID is required"),
     url: z.string().url(),
@@ -95,7 +95,7 @@ When adding a new monitor type:
    ```typescript
    // electron/managers/MonitorManager.ts
    import { ApplicationError } from "@shared/errors";
-
+   
    class MonitorManager {
     async createMonitor(config: MonitorConfig): Promise<Monitor> {
      // Business rule validation
@@ -107,7 +107,7 @@ When adding a new monitor type:
        details: { interval: config.interval, minimumInterval: 10000 },
       });
      }
-
+   
      return await this.repository.create(config);
     }
    }
@@ -126,7 +126,7 @@ When adding a new monitor type:
        url: config.url.trim().toLowerCase(),
        createdAt: Date.now(),
       };
-
+   
       return await tx.run(
        `INSERT INTO monitors (id, url, interval, type, enabled, createdAt)
                     VALUES (?, ?, ?, ?, ?, ?)`,
@@ -155,7 +155,7 @@ When adding a new monitor type:
       expect(() => MonitorConfigSchema.parse(invalid)).toThrow();
      });
     });
-
+   
     describe("Manager Business Rules", () => {
      it("should enforce TCP minimum interval", async () => {
       const config = { type: "tcp", interval: 5000 };
@@ -164,7 +164,7 @@ When adding a new monitor type:
       );
      });
     });
-
+   
     describe("Repository Persistence", () => {
      it("should normalize URLs before saving", async () => {
       const config = { url: " HTTPS://EXAMPLE.COM " };

@@ -930,22 +930,22 @@ For an IPC-backed validation entry point, use
 `MonitorTypesService.validateMonitorData(...)` (documented above) which mirrors
 the backend validation layer.
 
-| Monitor type (`Monitor.type`) | Primary fields on {@link Monitor} |
-| --- | --- |
-| `http` | `url`, `checkInterval`, optional `followRedirects` |
-| `http-status` | `url`, `expectedStatusCode` |
-| `http-header` | `url`, `headerName`, `expectedHeaderValue` |
-| `http-keyword` | `url`, `bodyKeyword` |
-| `http-json` | `url`, `expectedJsonValue` |
-| `http-latency` | `url` |
-| `ping` | `host` |
-| `port` | `host`, `port` |
-| `dns` | `host`, `expectedValue` |
-| `ssl` | `host`, `port`, `certificateWarningDays` |
-| `cdn-edge-consistency` | `baselineUrl`, `edgeLocations` |
-| `replication` | replication URLs + lag budget fields (see schema) |
-| `server-heartbeat` | heartbeat URLs + drift budget fields (see schema) |
-| `websocket-keepalive` | websocket URL + timeout fields (see schema) |
+| Monitor type (`Monitor.type`) | Primary fields on {@link Monitor}                  |
+| ----------------------------- | -------------------------------------------------- |
+| `http`                        | `url`, `checkInterval`, optional `followRedirects` |
+| `http-status`                 | `url`, `expectedStatusCode`                        |
+| `http-header`                 | `url`, `headerName`, `expectedHeaderValue`         |
+| `http-keyword`                | `url`, `bodyKeyword`                               |
+| `http-json`                   | `url`, `expectedJsonValue`                         |
+| `http-latency`                | `url`                                              |
+| `ping`                        | `host`                                             |
+| `port`                        | `host`, `port`                                     |
+| `dns`                         | `host`, `expectedValue`                            |
+| `ssl`                         | `host`, `port`, `certificateWarningDays`           |
+| `cdn-edge-consistency`        | `baselineUrl`, `edgeLocations`                     |
+| `replication`                 | replication URLs + lag budget fields (see schema)  |
+| `server-heartbeat`            | heartbeat URLs + drift budget fields (see schema)  |
+| `websocket-keepalive`         | websocket URL + timeout fields (see schema)        |
 
 > **Schema note:** The table above is intentionally high level. Refer to the
 > shared Zod schemas for the exact required fields and constraints per monitor

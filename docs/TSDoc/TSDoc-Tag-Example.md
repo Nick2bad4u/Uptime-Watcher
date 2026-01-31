@@ -21,28 +21,21 @@ as a title for the example. Otherwise, the documentation tool can index the exam
 
 For this code sample, the generated titles might be **"Example"** and **"Example 2"**:
 
+<!-- prettier-ignore -->
 ````ts
 
 /**
  * Adds two numbers together.
  *
  * @example
- *  Here's
- *
- *
- *
- *  a simple example:
+ *  Here's a simple example:
  *  ```
  *  // Prints "2":
  *  console.log(add(1,1));
  *  ```
  *
  * @example
- *  Here's
- *
- *
- *
- *  an example with negative numbers:
+ *  Here's an example with negative numbers:
  *  ```
  *  // Prints "0":
  *  console.log(add(1,-1));
@@ -55,17 +48,14 @@ export function add(x: number, y: number): number {}
 
 For this code sample, the generated title might be **"Example: Parsing a basic JSON file"**:
 
+<!-- prettier-ignore -->
 ````ts
 
 /**
  * Parses a JSON file.
  *
  * @example
- *  Parsing
- *
- *
- *
- *  a basic JSON file
+ *  Parsing a basic JSON file
  *
  *  # Contents of `file.json`
  *  ```json

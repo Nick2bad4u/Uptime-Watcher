@@ -135,7 +135,7 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  *   breaks.
  * @property {"`" | "~"} [fence] - Character to use for fences.
  * @property {"ordered"} [style] - List style preference.
- * @property {""" | "'"} [quote] - Preferred quote style for titles.
+ * @property {'"' | "'"} [quote] - Preferred quote style for titles.
  * @property {boolean} [closeAtx] - Require closing hashes for ATX headings.
  * @property {boolean} [fences] - Use fenced code blocks.
  * @property {boolean} [incrementListMarker] - Increment ordered list markers.

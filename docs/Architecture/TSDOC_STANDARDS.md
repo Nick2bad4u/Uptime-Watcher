@@ -27,6 +27,7 @@ tags:
 
 ### Enhanced Basic Format
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -42,8 +43,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
  *  // Basic usage example
  *  const result = await functionName(requiredParam, optionalParam);
  *  console.log(result);
@@ -51,7 +50,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
  *  // Advanced usage example with error handling
  *  try {
  *   const result = await functionName(param);
@@ -78,6 +76,7 @@ tags:
 
 #### Repository Class
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -96,7 +95,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
  *  // Basic repository usage
  *  const repository = new ExampleRepository({ databaseService });
  *
@@ -116,8 +114,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
- *
  *  // Transaction usage with multiple operations
  *  await databaseService.executeTransaction(async (db) => {
  *   repository.createInternal(db, entity1);
@@ -182,6 +178,7 @@ tags:
 
 #### Event Bus
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -200,7 +197,6 @@ tags:
  *
  * @example
  *  ```typescript
- *
  *  // Define typed event map
  *  interface MyEvents {
  *   "user:login": { userId: string; timestamp: number };
@@ -242,6 +238,7 @@ tags:
 
 #### Event Emission
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -304,6 +301,7 @@ tags:
 
 #### Store Interface
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -375,6 +373,7 @@ tags:
 
 #### withErrorHandling Function
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -458,6 +457,7 @@ tags:
 
 #### Handler Registration
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -535,6 +535,7 @@ tags:
 
 #### Simple Examples
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
@@ -550,11 +551,13 @@ tags:
 
 #### Complex Examples
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
  * @example
  *  ```typescript
+ *
  *
  *  // Comprehensive example with error handling
  *  try {
@@ -576,11 +579,13 @@ tags:
 
 #### Usage Pattern Examples
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
  * @example
  *  ```typescript
+ *
  *
  *  // Basic usage pattern
  *  const store = useExampleStore();
@@ -604,11 +609,13 @@ tags:
 
 Show the most common, straightforward usage:
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
  * @example
  *  ```typescript
+ *
  *
  *  // Basic repository usage
  *  const user = await userRepository.findById("user-123");
@@ -623,11 +630,13 @@ Show the most common, straightforward usage:
 
 Demonstrate proper error handling patterns:
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
  * @example
  *  ```typescript
+ *
  *
  *  // Proper error handling
  *  try {
@@ -646,11 +655,13 @@ Demonstrate proper error handling patterns:
 
 Show complex scenarios and integration patterns:
 
+<!-- prettier-ignore -->
 ````typescript
 
 /**
  * @example
  *  ```typescript
+ *
  *
  *  // Advanced usage with transaction coordination
  *  await databaseService.executeTransaction(async (db) => {
