@@ -8,11 +8,45 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[d54009c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...d54009cf33b556e668453ee4a52883801035e42d))
+[bca82d2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4))
 
 
 ### ✨ Features
+
+- ✨ [feat] Implement Settings Controller Hook for Enhanced Settings Management
+ - Introduced `useSettingsController` hook to manage application settings in a modular way.
+ - Added state management for application sections, maintenance, monitoring, and notifications.
+ - Implemented handlers for theme changes, history limits, in-app alerts, and system notifications.
+ - Integrated backup and restore functionality for SQLite databases with user feedback.
+ - Enhanced user experience with volume control for in-app alert sounds and notifications.
+
+🧪 [test] Add Comprehensive Tests for Settings Hooks and UI Store
+ - Created tests for `useInAppAlertTonePreview` to validate volume preview scheduling and sound playback.
+ - Developed tests for `useSettingsChangeHandlers` to ensure proper application of settings changes and logging.
+ - Implemented tests for `useSiteDetailsUiStore` to verify state management and tab synchronization functionality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3dbe1dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3dbe1dc4b1d3508a452c2624d5e1fc32cf3184f5)
+
+
+- ✨ [feat] Implement idempotent initialization utility
+ - 🆕 Add runIdempotentInitialization function to manage initialization promises
+ - 🔄 Refactor initialize methods in UptimeOrchestrator and ServiceContainer to use the new utility
+ - 📦 Ensure that multiple initialization calls are handled correctly, allowing retries after failures
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bc150ea)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bc150ea94647ceee95a88fad31ef806e33d21ea1)
+
+
+- ✨ [feat] Adds lint drift guards and mock helpers
+
+✨ [feat] Adds drift-guard lint rules to prevent duplicate contracts and helper redefinitions across layers 🧭
+🔧 [build] Aligns lint configuration with the new plugin guards and reduces conflicting style/test rules 🧹
+🚜 [refactor] Moves constructible mock utilities into shared helpers and adds constructible return-value helpers to avoid non-constructible mocks 🧰
+🧪 [test] Updates constructor-based mocks to use constructible helpers for instantiation safety ✅
+📝 [docs] Refreshes lint and testing guidance to reflect the new guardrails 📚
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5c66818)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c66818d27169a8fbb74ce9585ee797b3eb19413)
+
 
 - ✨ [feat] Enhances sync security and data integrity
 
@@ -416,6 +450,24 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2
 
 ### 🛠️ Bug Fixes
 
+- 🛠️ [fix] Adds success accent to settings modal
+
+🛠️ [fix] Improves settings visibility by adding a success accent for clearer status cues
+🔧 [build] Updates linting setup with refreshed rule configs and resolver tweaks to reduce noise
+ - routes markdown lint fixing through the shared script
+🧪 [test] Strengthens UI coverage by asserting invalid submissions keep modals open and selectors surface labels
+📝 [docs] Normalizes documentation formatting and escapes underscores for consistent rendering
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bca82d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4)
+
+
+- 🛠️ [fix] Harden snapshot creation against NUL bytes
+ - Added validation to `escapeSqlStringLiteral` to reject strings containing NUL bytes, preventing potential SQLite errors.
+ - Updated tests to ensure `createVacuumSnapshot` throws an error when provided with a snapshot path containing NUL bytes and verifies that the transient connection is closed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7a3163a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7a3163a32e471dc05891a72767384e4fdfe4585c)
+
+
 - 🛠️ [fix] Improves cancellation safety
 
 🛠️ [fix] Improves cancellation handling across monitoring and retries
@@ -753,6 +805,208 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5063
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Clarifies monitoring wiring
+
+🚜 [refactor] Extracts shared monitoring type contracts and narrows history persistence dependencies.
+ - Avoids registry import cycles and limits repository access to required APIs.
+🎨 [style] Broadens modal overlay selector matching for consistent stacking behavior.
+📝 [docs] Normalizes guide links, tables, and escapes to improve readability and navigation.
+🧹 [chore] Simplifies markdown formatting settings and disables embedded formatting for markdown.
+🧪 [test] Updates fuzz registry coverage to reference extracted type contracts.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(949e8c1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/949e8c1e8dbdb2040ee0ebf5581d08e5789ea80f)
+
+
+- 🚜 [refactor] Improves IPC safety and linting
+
+🚜 [refactor] Adds optional payload parsing and schema validation to improve IPC runtime safety and inference
+🚜 [refactor] Centralizes frontend store detection and refines error boundary typing and state for reliable recovery
+🛠️ [fix] Uses selector-based root lookup and URL-derived logo assets to avoid UI resolution issues
+🎨 [style] Updates template interpolation regex handling and trims redundant lint suppressions and type-parameter noise
+🧹 [chore] Expands lint rules and targeted overrides for themes, factories, and unassigned imports to match TypeScript usage
+🧪 [test] Aligns entry-point expectations and test config directory resolution with the selector lookup and module metadata
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5293c12)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5293c12998b2a76f77d26012bc4f27202e071dfa)
+
+
+- 🚜 [refactor] Improves IPC setup safety
+
+🚜 [refactor] Wraps preload bridges, monitor factories, and renderer IPC services in explicit error handling to keep initialization fail-fast and remove blanket exception-handling disables
+🚜 [refactor] Strengthens type safety for monitor defaults and object omission, loosens monitor lookup inputs, and adjusts monitor label formatting without regex lookarounds
+🛠️ [fix] Improves window setup with ESM directory metadata support, cryptographic retry jitter, and clearer permission denial handling
+🧪 [test] Aligns fuzzing and retry-delay assertions with stricter typings and variable jitter
+🔧 [build] Refreshes lint plugin wiring, tool/agent config, dependency versions, and the bundled SQLite WASM revision
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bff0dd2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bff0dd221f66afd06addd6e66211813c987cc758)
+
+
+- 🚜 [refactor] Simplifies sync, UI, and linting
+
+🚜 [refactor] Tightens object-safe omission to prevent routing-only data from leaking into validation
+ - 🚜 [refactor] Narrows object handling to avoid unsafe key access paths
+🚜 [refactor] Keeps sequential operations explicit while scoping lint disables for retries and migrations
+ - 🚜 [refactor] Streamlines import flow to avoid early-continue branching and preserve rollback safety
+🎨 [style] Relies on native select focus with cleaner wrapper semantics and updated layout positioning
+ - 🧪 [test] Updates selector interaction expectations to match the simplified focus behavior
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0cb3a44)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0cb3a44e613673f93be7498940d10212d96d621b)
+
+
+- 🚜 [refactor] Improves stability and overlays
+
+🛠️ [fix] Ensures the app lifecycle instance stays reachable to avoid premature teardown.
+🚜 [refactor] Centralizes DNS record parsing to reduce complexity and standardize success evaluation.
+🛠️ [fix] Hardens TLS certificate and subject handling to treat empty or malformed data as failures.
+🚜 [refactor] Splits settings sections into focused components to simplify maintenance and reuse.
+🛠️ [fix] Adds dedicated overlay dismiss buttons so modal closing is accessible without backdrop handlers.
+🚜 [refactor] Validates history retention rules and prevents settings sync subscription races.
+🚜 [refactor] Tightens type safety in charts, object helpers, and validation utilities to reduce unsafe casts.
+🛠️ [fix] Normalizes button and card rendering to avoid invalid child node output.
+🧪 [test] Updates modal interaction tests to use the new dismiss controls.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2bbb4f6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bbb4f65a48567c6bb53be786f15ee2c777444e1)
+
+
+- 🚜 [refactor] Improves runtime type safety
+
+🚜 [refactor] Centralizes unchecked casting and removes scattered assertions across payload cloning, error handling, IPC/database access, and UI helpers to clarify trusted boundaries
+🛠️ [fix] Strengthens runtime validation, schema normalization, and safe property access for inputs, monitor types, and null-prototype maps
+🛠️ [fix] Makes DNS monitoring parsing resilient by filtering record shapes, handling mixed result types, and improving record detail extraction
+🛠️ [fix] Switches retries and devtools delays to unref-friendly sleeps to avoid shutdown blocking
+🚜 [refactor] Hardens theme variable generation by iterating only record-like sections, skipping non-string values, and simplifying button/select rendering
+🛠️ [fix] Reworks UUID fallback generation to avoid Math.random, prefer crypto entropy, and add deterministic sequencing for uniqueness
+🧪 [test] Streamlines UUID tests to focus on observable behavior, crypto fallbacks, and uniqueness
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5b40954)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b409548a98d6db56da7db59b3ccbe1f04fc7f42)
+
+
+- 🚜 [refactor] Tightens type safety and guards
+
+🚜 [refactor] Strengthens object safety helpers and theme handling.
+ - 🧩 Uses record-like guards and null-prototype objects to reduce unsafe casts.
+ - 🎨 Simplifies theme variable application with stricter key checks.
+
+🛠️ [fix] Hardens cache validation and event handling.
+ - 🧹 Clears invalid cached monitor type data and falls back safely.
+ - 🧭 Adds platform-aware path normalization and uses generic submit events.
+
+🚜 [refactor] Moves type-only Electron surfaces to declarations.
+
+🧹 [chore] Aligns test runner configs and dependency versions.
+ - ⚙️ Normalizes silent flags and config dirname resolution.
+
+🧪 [test] Adds strict coverage suites for cloud, backup, fs, and path utilities.
+ - 🔍 Expands property-based checks for monitor type handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(74169d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74169d4cd54f26d1f967c78c0882e222042e99a5)
+
+
+- 🚜 [refactor] Extract MonitorManager operations and helpers for improved organization
+
+ - ✨ [feat] Move enhanced lifecycle configuration creation to createEnhancedLifecycle.ts
+ - ✨ [feat] Introduce createEnhancedLifecycleConfigOperation and createEnhancedLifecycleHostOperation for better encapsulation
+ - 🚜 [refactor] Centralize monitoring toggle operations in toggleMonitoringAllOperation.ts
+ - 🚜 [refactor] Create toggleMonitoringForSiteOperation.ts to handle per-site monitoring toggles
+ - 🚜 [refactor] Extract scheduled check handling logic into handleScheduledCheckOperation.ts
+ - 🚜 [refactor] Implement createMonitorActionDelegate in createMonitorActionDelegate.ts for recursion-safe actions
+ - 🛠️ [fix] Update EnhancedMonitorChecker to use bound cleanup operation for better context handling
+ - 📝 [docs] Add documentation comments to new utility files for clarity
+ - 🚜 [refactor] Simplify Settings component by extracting in-app alert tone preview logic into useInAppAlertTonePreview.ts
+ - 🚜 [refactor] Create useSettingsChangeHandlers.ts to manage settings change logic separately
+ - 🚜 [refactor] Refactor useSiteDetails to utilize a dedicated UI store slice in useSiteDetails.uiStore.ts
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(07df4e3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/07df4e3c745370d22a937e70cd6a57ce81fe85f1)
+
+
+- 🚜 [refactor] Extract SiteDetails tab content into separate component
+
+ - 🆕 [new] Create SiteDetailsTabContent component to encapsulate tab rendering logic
+ - 🔧 [build] Update SiteDetails component to utilize SiteDetailsTabContent for cleaner structure
+ - 🧹 [chore] Remove individual tab rendering logic from SiteDetails, simplifying its responsibilities
+ - 🔄 [refactor] Pass necessary props to SiteDetailsTabContent for rendering different tabs
+ - 📝 [docs] Add comments to clarify the purpose of the new SiteDetailsTabContent component
+ - 🧪 [test] Ensure comprehensive test coverage for the new SiteDetailsTabContent component
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(77c2986)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/77c29866897b448ffe9c6591df32414980925cd0)
+
+
+- 🚜 [refactor] Modularize monitoring flows
+
+🚜 [refactor] Extracts monitoring lifecycle operations into dedicated helpers to simplify orchestration and keep state, logging, and event emission consistent
+ - Reduces branching in core monitoring flows while preserving manual checks and auto-start behavior
+🚜 [refactor] Splits site details analytics and settings handling into focused hooks and components to lower complexity and improve chart reuse
+ - Centralizes chart configuration and metric rendering for clearer UI updates
+🧹 [chore] Adds a lint configuration script and refreshes core and tooling dependencies for consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f410b8c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f410b8c19f5e044803335500e5c2d2c35b489cda)
+
+
+- 🚜 [refactor] Improves retry orchestration
+
+🚜 [refactor] Centralizes retry behavior with dynamic delays, hooks, and unref timers to reduce scattered loops across services
+ - 🛠️ [fix] Keeps non-retryable errors surfaced while insulating retry callbacks from failure
+🛠️ [fix] Stabilizes readiness polling for dev server and bridge checks with clearer retry reasons and final failure context
+ - ⚡ [perf] Maintains exponential backoff with jitter while avoiding last-attempt waits
+🛠️ [fix] Improves theme equality checks with deep comparison to prevent false change detection
+⚡ [perf] Simplifies cumulative backoff math for settings retry messaging
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3875997)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3875997e04bdbe4f67795c3be25f81d9fe98d896)
+
+
+- 🚜 [refactor] Extract backup/history helpers
+
+🚜 [refactor] Moves backup orchestration steps into shared helpers
+ - ⚙️ Improves separation of concerns for snapshots, temp files, and safe swaps
+🚜 [refactor] Centralizes monitor history save and pruning flow
+ - 🧠 Keeps the checker focused on orchestration and state tracking
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(998087b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/998087b3c0681aa971876b1ddd3558f8d844180d)
+
+
+- 🚜 [refactor] Splits orchestration and settings UI
+
+🚜 [refactor] Centralizes orchestrator subscriptions and error context
+ - 🔌 Keeps event wiring and diagnostics logging consistent on teardown
+🚜 [refactor] Extracts site cache, background load, and monitoring helpers
+ - 🧹 Reuses duplicate checks and state sync emission paths
+🚜 [refactor] Modularizes monitor type registration catalogs
+ - 🧩 Separates HTTP and non-HTTP definitions to shrink registry size
+🚜 [refactor] Splits cloud provider and site settings UI panels
+ - 🧭 Uses shared models and focused cards to simplify view logic
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c63cb79)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c63cb79d9dc902f1cce554c8d71fa0838cb521f2)
+
+
+- 🚜 [refactor] Streamlines async handlers
+
+🚜 [refactor] Introduces reusable fire-and-forget utilities to standardize background task error handling across orchestration, caching, and app lifecycle flows.
+🛠️ [fix] Adds explicit error fallback for monitoring-active requests to keep responses predictable when scheduler checks fail.
+🚜 [refactor] Extracts monitoring result normalization, UI config, and title suffix helpers to centralize monitoring behaviors and reduce duplication.
+🚜 [refactor] Centralizes production window path guards and security header construction for tighter navigation and response hardening.
+🚜 [refactor] Moves add-site guidance bullet logic into a dedicated builder for consistent de-duplication and clarity.
+🧹 [chore] Updates documentation plugins and lint/style tooling dependencies.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c54baf0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c54baf03609a36ae3caeee30df03e61465f12003)
+
+
+- 🚜 [refactor] Improves shared sync logic
+
+🚜 [refactor] Centralizes IPC validation helpers and record checks for consistent parameter rules
+ - Moves common validators and parameter/record validation utilities into shared helpers
+
+🚜 [refactor] Extracts preload cleanup validation and sync event handling to simplify diagnostics
+ - Adds reusable subscription cleanup validation, sync event handler, and status summary utilities
+
+🚜 [refactor] Replaces custom update status wiring with a ref-counted async subscription helper for safer async setup and cleanup
+ - Adds reusable subscription utility with focused coverage
+
+🧪 [test] Simplifies mocks and adds coverage for ref-counted subscriptions
+
+🧹 [chore] Updates dependencies and minor lint config cleanup
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1c7cf4a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c7cf4a945a016639eab31d8756e1f92ba381e00)
+
 
 - 🚜 [refactor] Streamlines validation and UI
 
@@ -1160,6 +1414,17 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Enhance documentation across multiple scripts
+ - ✨ Improved JSDoc comments for clarity and consistency in `enhance-test-metadata.mjs`, `extract-test-names.mjs`, `find-empty-dirs.mjs`, `find-shared-imports.mjs`, `fix-test-quotes.mjs`, `maintain-docs.mjs`, `migrate-to-mts-simple.mjs`, `sort-frontmatter-all.mjs`, `sort-frontmatter.mjs`, `transform-test.mjs`, `validate-doc-frontmatter.mjs`, `validate-performance-config.mjs`, `verify-eslint-inspector.mjs`, and `test-remark.mjs`.
+ - 🛠️ Fixed quote issues in test descriptions in `ErrorBoundary.comprehensive.test.tsx`.
+ - 🎨 Updated comments in `test-runner-jest.config.js` for better understanding of configuration purpose.
+ - ⚡ Added usage information and remarks in various scripts to enhance usability and understanding.
+ - 🧹 Removed unnecessary eslint disable comments in `test-runner-jest.config.js`.
+ - ✨ Improved overall readability and structure of comments to facilitate easier maintenance and onboarding for new developers.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f94618c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f94618cba62126ce8d2ba4dcef989b0e36e0bf75)
+
+
 - 📝 [docs] Update architecture docs and linting
 
 🚜 [refactor] Standardize internal Zod schema naming and validation
@@ -1372,6 +1637,19 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
+
+
+- 🧹 [chore] Streamlines sync linting rules
+
+🧹 [chore] Allows async APIs with sync naming in lint rules
+ - 🧹 [chore] Reduces noise so warnings focus on real sync I/O
+🚜 [refactor] Cleans up sync-related handler naming and notes
+ - 🚜 [refactor] Improves readability by removing scattered suppressions
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8cad793)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8cad79315da4592d5da04bc34fb5d65224187026)
+
 
 - Update changelogs for v21.0.0 [skip ci] [`(d54009c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)
 

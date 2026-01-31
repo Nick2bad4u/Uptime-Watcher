@@ -8,11 +8,22 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[d54009c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...d54009cf33b556e668453ee4a52883801035e42d))
+[3cfabc7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cfabc7a19de0c7c8785ef1781c97be701cf81fc)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...3cfabc7a19de0c7c8785ef1781c97be701cf81fc))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds lint drift guards and mock helpers
+
+✨ [feat] Adds drift-guard lint rules to prevent duplicate contracts and helper redefinitions across layers 🧭
+🔧 [build] Aligns lint configuration with the new plugin guards and reduces conflicting style/test rules 🧹
+🚜 [refactor] Moves constructible mock utilities into shared helpers and adds constructible return-value helpers to avoid non-constructible mocks 🧰
+🧪 [test] Updates constructor-based mocks to use constructible helpers for instantiation safety ✅
+📝 [docs] Refreshes lint and testing guidance to reflect the new guardrails 📚
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5c66818)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c66818d27169a8fbb74ce9585ee797b3eb19413)
+
 
 - ✨ [feat] Enhances sync security and data integrity
 
@@ -631,6 +642,102 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a29e
 
 ### 🚜 Refactor
 
+- 🚜 [refactor] Improves IPC safety and linting
+
+🚜 [refactor] Adds optional payload parsing and schema validation to improve IPC runtime safety and inference
+🚜 [refactor] Centralizes frontend store detection and refines error boundary typing and state for reliable recovery
+🛠️ [fix] Uses selector-based root lookup and URL-derived logo assets to avoid UI resolution issues
+🎨 [style] Updates template interpolation regex handling and trims redundant lint suppressions and type-parameter noise
+🧹 [chore] Expands lint rules and targeted overrides for themes, factories, and unassigned imports to match TypeScript usage
+🧪 [test] Aligns entry-point expectations and test config directory resolution with the selector lookup and module metadata
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5293c12)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5293c12998b2a76f77d26012bc4f27202e071dfa)
+
+
+- 🚜 [refactor] Improves IPC setup safety
+
+🚜 [refactor] Wraps preload bridges, monitor factories, and renderer IPC services in explicit error handling to keep initialization fail-fast and remove blanket exception-handling disables
+🚜 [refactor] Strengthens type safety for monitor defaults and object omission, loosens monitor lookup inputs, and adjusts monitor label formatting without regex lookarounds
+🛠️ [fix] Improves window setup with ESM directory metadata support, cryptographic retry jitter, and clearer permission denial handling
+🧪 [test] Aligns fuzzing and retry-delay assertions with stricter typings and variable jitter
+🔧 [build] Refreshes lint plugin wiring, tool/agent config, dependency versions, and the bundled SQLite WASM revision
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bff0dd2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bff0dd221f66afd06addd6e66211813c987cc758)
+
+
+- 🚜 [refactor] Simplifies sync, UI, and linting
+
+🚜 [refactor] Tightens object-safe omission to prevent routing-only data from leaking into validation
+ - 🚜 [refactor] Narrows object handling to avoid unsafe key access paths
+🚜 [refactor] Keeps sequential operations explicit while scoping lint disables for retries and migrations
+ - 🚜 [refactor] Streamlines import flow to avoid early-continue branching and preserve rollback safety
+🎨 [style] Relies on native select focus with cleaner wrapper semantics and updated layout positioning
+ - 🧪 [test] Updates selector interaction expectations to match the simplified focus behavior
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0cb3a44)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0cb3a44e613673f93be7498940d10212d96d621b)
+
+
+- 🚜 [refactor] Improves stability and overlays
+
+🛠️ [fix] Ensures the app lifecycle instance stays reachable to avoid premature teardown.
+🚜 [refactor] Centralizes DNS record parsing to reduce complexity and standardize success evaluation.
+🛠️ [fix] Hardens TLS certificate and subject handling to treat empty or malformed data as failures.
+🚜 [refactor] Splits settings sections into focused components to simplify maintenance and reuse.
+🛠️ [fix] Adds dedicated overlay dismiss buttons so modal closing is accessible without backdrop handlers.
+🚜 [refactor] Validates history retention rules and prevents settings sync subscription races.
+🚜 [refactor] Tightens type safety in charts, object helpers, and validation utilities to reduce unsafe casts.
+🛠️ [fix] Normalizes button and card rendering to avoid invalid child node output.
+🧪 [test] Updates modal interaction tests to use the new dismiss controls.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2bbb4f6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bbb4f65a48567c6bb53be786f15ee2c777444e1)
+
+
+- 🚜 [refactor] Improves runtime type safety
+
+🚜 [refactor] Centralizes unchecked casting and removes scattered assertions across payload cloning, error handling, IPC/database access, and UI helpers to clarify trusted boundaries
+🛠️ [fix] Strengthens runtime validation, schema normalization, and safe property access for inputs, monitor types, and null-prototype maps
+🛠️ [fix] Makes DNS monitoring parsing resilient by filtering record shapes, handling mixed result types, and improving record detail extraction
+🛠️ [fix] Switches retries and devtools delays to unref-friendly sleeps to avoid shutdown blocking
+🚜 [refactor] Hardens theme variable generation by iterating only record-like sections, skipping non-string values, and simplifying button/select rendering
+🛠️ [fix] Reworks UUID fallback generation to avoid Math.random, prefer crypto entropy, and add deterministic sequencing for uniqueness
+🧪 [test] Streamlines UUID tests to focus on observable behavior, crypto fallbacks, and uniqueness
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5b40954)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b409548a98d6db56da7db59b3ccbe1f04fc7f42)
+
+
+- 🚜 [refactor] Tightens type safety and guards
+
+🚜 [refactor] Strengthens object safety helpers and theme handling.
+ - 🧩 Uses record-like guards and null-prototype objects to reduce unsafe casts.
+ - 🎨 Simplifies theme variable application with stricter key checks.
+
+🛠️ [fix] Hardens cache validation and event handling.
+ - 🧹 Clears invalid cached monitor type data and falls back safely.
+ - 🧭 Adds platform-aware path normalization and uses generic submit events.
+
+🚜 [refactor] Moves type-only Electron surfaces to declarations.
+
+🧹 [chore] Aligns test runner configs and dependency versions.
+ - ⚙️ Normalizes silent flags and config dirname resolution.
+
+🧪 [test] Adds strict coverage suites for cloud, backup, fs, and path utilities.
+ - 🔍 Expands property-based checks for monitor type handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(74169d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74169d4cd54f26d1f967c78c0882e222042e99a5)
+
+
+- 🚜 [refactor] Improves retry orchestration
+
+🚜 [refactor] Centralizes retry behavior with dynamic delays, hooks, and unref timers to reduce scattered loops across services
+ - 🛠️ [fix] Keeps non-retryable errors surfaced while insulating retry callbacks from failure
+🛠️ [fix] Stabilizes readiness polling for dev server and bridge checks with clearer retry reasons and final failure context
+ - ⚡ [perf] Maintains exponential backoff with jitter while avoiding last-attempt waits
+🛠️ [fix] Improves theme equality checks with deep comparison to prevent false change detection
+⚡ [perf] Simplifies cumulative backoff math for settings retry messaging
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3875997)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3875997e04bdbe4f67795c3be25f81d9fe98d896)
+
+
 - 🚜 [refactor] Streamlines validation and UI
 
 🚜 [refactor] 🧩 Tightens cloud and data parsing with explicit loose schemas, safer generic metadata, and binary/blob validation.
@@ -1151,6 +1258,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
+
 
 - Update changelogs for v21.0.0 [skip ci] [`(d54009c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)
 

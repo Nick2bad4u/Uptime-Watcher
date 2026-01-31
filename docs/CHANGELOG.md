@@ -8,11 +8,22 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[d54009c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...d54009cf33b556e668453ee4a52883801035e42d))
+[bca82d2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds lint drift guards and mock helpers
+
+✨ [feat] Adds drift-guard lint rules to prevent duplicate contracts and helper redefinitions across layers 🧭
+🔧 [build] Aligns lint configuration with the new plugin guards and reduces conflicting style/test rules 🧹
+🚜 [refactor] Moves constructible mock utilities into shared helpers and adds constructible return-value helpers to avoid non-constructible mocks 🧰
+🧪 [test] Updates constructor-based mocks to use constructible helpers for instantiation safety ✅
+📝 [docs] Refreshes lint and testing guidance to reflect the new guardrails 📚
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5c66818)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c66818d27169a8fbb74ce9585ee797b3eb19413)
+
 
 - ✨ [feat] Add sqlite backup IPC and update tooling
 
@@ -200,6 +211,17 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2
 
 ### 🛠️ Bug Fixes
 
+- 🛠️ [fix] Adds success accent to settings modal
+
+🛠️ [fix] Improves settings visibility by adding a success accent for clearer status cues
+🔧 [build] Updates linting setup with refreshed rule configs and resolver tweaks to reduce noise
+ - routes markdown lint fixing through the shared script
+🧪 [test] Strengthens UI coverage by asserting invalid submissions keep modals open and selectors surface labels
+📝 [docs] Normalizes documentation formatting and escapes underscores for consistent rendering
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bca82d2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4)
+
+
 - 🛠️ [fix] Improves shutdown and DNS checks ⚡
 
 🛠️ [fix] Adds runtime cleanup checks 🧹 so shutdown only calls valid handlers
@@ -323,6 +345,74 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(16d9
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Clarifies monitoring wiring
+
+🚜 [refactor] Extracts shared monitoring type contracts and narrows history persistence dependencies.
+ - Avoids registry import cycles and limits repository access to required APIs.
+🎨 [style] Broadens modal overlay selector matching for consistent stacking behavior.
+📝 [docs] Normalizes guide links, tables, and escapes to improve readability and navigation.
+🧹 [chore] Simplifies markdown formatting settings and disables embedded formatting for markdown.
+🧪 [test] Updates fuzz registry coverage to reference extracted type contracts.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(949e8c1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/949e8c1e8dbdb2040ee0ebf5581d08e5789ea80f)
+
+
+- 🚜 [refactor] Tightens type safety and guards
+
+🚜 [refactor] Strengthens object safety helpers and theme handling.
+ - 🧩 Uses record-like guards and null-prototype objects to reduce unsafe casts.
+ - 🎨 Simplifies theme variable application with stricter key checks.
+
+🛠️ [fix] Hardens cache validation and event handling.
+ - 🧹 Clears invalid cached monitor type data and falls back safely.
+ - 🧭 Adds platform-aware path normalization and uses generic submit events.
+
+🚜 [refactor] Moves type-only Electron surfaces to declarations.
+
+🧹 [chore] Aligns test runner configs and dependency versions.
+ - ⚙️ Normalizes silent flags and config dirname resolution.
+
+🧪 [test] Adds strict coverage suites for cloud, backup, fs, and path utilities.
+ - 🔍 Expands property-based checks for monitor type handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(74169d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74169d4cd54f26d1f967c78c0882e222042e99a5)
+
+
+- 🚜 [refactor] Extract SiteDetails tab content into separate component
+
+ - 🆕 [new] Create SiteDetailsTabContent component to encapsulate tab rendering logic
+ - 🔧 [build] Update SiteDetails component to utilize SiteDetailsTabContent for cleaner structure
+ - 🧹 [chore] Remove individual tab rendering logic from SiteDetails, simplifying its responsibilities
+ - 🔄 [refactor] Pass necessary props to SiteDetailsTabContent for rendering different tabs
+ - 📝 [docs] Add comments to clarify the purpose of the new SiteDetailsTabContent component
+ - 🧪 [test] Ensure comprehensive test coverage for the new SiteDetailsTabContent component
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(77c2986)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/77c29866897b448ffe9c6591df32414980925cd0)
+
+
+- 🚜 [refactor] Modularize monitoring flows
+
+🚜 [refactor] Extracts monitoring lifecycle operations into dedicated helpers to simplify orchestration and keep state, logging, and event emission consistent
+ - Reduces branching in core monitoring flows while preserving manual checks and auto-start behavior
+🚜 [refactor] Splits site details analytics and settings handling into focused hooks and components to lower complexity and improve chart reuse
+ - Centralizes chart configuration and metric rendering for clearer UI updates
+🧹 [chore] Adds a lint configuration script and refreshes core and tooling dependencies for consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f410b8c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f410b8c19f5e044803335500e5c2d2c35b489cda)
+
+
+- 🚜 [refactor] Streamlines async handlers
+
+🚜 [refactor] Introduces reusable fire-and-forget utilities to standardize background task error handling across orchestration, caching, and app lifecycle flows.
+🛠️ [fix] Adds explicit error fallback for monitoring-active requests to keep responses predictable when scheduler checks fail.
+🚜 [refactor] Extracts monitoring result normalization, UI config, and title suffix helpers to centralize monitoring behaviors and reduce duplication.
+🚜 [refactor] Centralizes production window path guards and security header construction for tighter navigation and response hardening.
+🚜 [refactor] Moves add-site guidance bullet logic into a dedicated builder for consistent de-duplication and clarity.
+🧹 [chore] Updates documentation plugins and lint/style tooling dependencies.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c54baf0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c54baf03609a36ae3caeee30df03e61465f12003)
+
 
 - 🚜 [refactor] Refactors monitoring lifecycle and optimizes history pruning
 
@@ -536,6 +626,26 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Improve documentation formatting consistency
+
+📝 [docs] Improves table alignment, example spacing, and quote style to keep rendered docs consistent and readable
+ - 📝 [docs] Adds ignore directives to preserve intended formatting in examples
+📝 [docs] Normalizes link escaping and example titles to reduce formatter noise across guides
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eb37136)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eb37136489b972e6959a2b027cd8c1d760273487)
+
+
+- 📝 [docs] Enhance documentation across multiple scripts
+ - ✨ Improved JSDoc comments for clarity and consistency in `enhance-test-metadata.mjs`, `extract-test-names.mjs`, `find-empty-dirs.mjs`, `find-shared-imports.mjs`, `fix-test-quotes.mjs`, `maintain-docs.mjs`, `migrate-to-mts-simple.mjs`, `sort-frontmatter-all.mjs`, `sort-frontmatter.mjs`, `transform-test.mjs`, `validate-doc-frontmatter.mjs`, `validate-performance-config.mjs`, `verify-eslint-inspector.mjs`, and `test-remark.mjs`.
+ - 🛠️ Fixed quote issues in test descriptions in `ErrorBoundary.comprehensive.test.tsx`.
+ - 🎨 Updated comments in `test-runner-jest.config.js` for better understanding of configuration purpose.
+ - ⚡ Added usage information and remarks in various scripts to enhance usability and understanding.
+ - 🧹 Removed unnecessary eslint disable comments in `test-runner-jest.config.js`.
+ - ✨ Improved overall readability and structure of comments to facilitate easier maintenance and onboarding for new developers.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f94618c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f94618cba62126ce8d2ba4dcef989b0e36e0bf75)
+
+
 - 📝 [docs] Update architecture docs and linting
 
 🚜 [refactor] Standardize internal Zod schema naming and validation
@@ -583,6 +693,17 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aa7f
 
 
 ### 🎨 Styling
+
+- 🎨 [style] Refactor code formatting and documentation
+
+ - 📝 Remove unnecessary blank lines in multiple Markdown files for improved readability
+ - 🎨 Update Prettier configuration to enhance code style consistency
+ - 📝 Adjust JSDoc comments for better clarity and formatting
+ - 🧹 Clean up example code snippets in documentation to remove excess whitespace
+ - 🔧 Modify ESLint configuration for better ignore patterns and project settings
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(964e0f3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/964e0f348f62a26d806470abc24002d8e679df3e)
+
 
 - 🎨 [style] Standardize codebase formatting and structure
 
@@ -654,6 +775,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
+
 
 - Update changelogs for v21.0.0 [skip ci] [`(d54009c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)
 
