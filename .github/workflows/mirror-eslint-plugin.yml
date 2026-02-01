@@ -1,0 +1,172 @@
+# Mirror the internal uptime-watcher ESLint plugin folder to a separate GitHub repo
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+name: Mirror ESLint Plugin Repo
+
+on:
+    push:
+        branches: ["main"]
+        paths:
+            - "config/linting/plugins/uptime-watcher/**"
+            - "config/linting/plugins/uptime-watcher.mjs"
+            - ".github/workflows/mirror-eslint-plugin.yml"
+
+    workflow_dispatch:
+        inputs:
+            target_repository:
+                description: "Target repo in owner/name form (overrides vars.ESLINT_PLUGIN_MIRROR_REPO)."
+                required: false
+                type: string
+            target_branch:
+                description: "Target branch to push to."
+                required: false
+                default: "main"
+                type: string
+            run_validation:
+                description: "Run plugin lint/tests before mirroring (slower)."
+                required: false
+                default: false
+                type: boolean
+            force_sync:
+                description: "DANGEROUS: Force-push to target branch (rewrites history). Only applies to workflow_dispatch runs."
+                required: false
+                default: false
+                type: boolean
+
+permissions:
+    contents: read
+
+concurrency:
+    group: "eslint-plugin-mirror"
+    cancel-in-progress: true
+
+env:
+    SOURCE_DIR: "config/linting/plugins/uptime-watcher"
+
+jobs:
+    mirror:
+        name: Mirror plugin folder
+        runs-on: ubuntu-latest
+        if: github.repository == 'Nick2bad4u/Uptime-Watcher'
+        steps:
+            - name: Harden the runner (Audit all outbound calls)
+              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+              with:
+                  egress-policy: audit
+
+            - name: Checkout
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                  fetch-depth: 1
+
+            - name: Resolve target repository
+              id: target
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  TARGET_REPO="${{ github.event.inputs.target_repository }}"
+
+                  if [[ -z "${TARGET_REPO}" ]]; then
+                      TARGET_REPO="${{ vars['ESLINT_PLUGIN_MIRROR_REPO'] }}"
+                  fi
+
+                  if [[ -z "${TARGET_REPO}" ]]; then
+                      echo "Missing target repository. Provide workflow_dispatch input 'target_repository'" \
+                          "or define a repo variable 'ESLINT_PLUGIN_MIRROR_REPO'." >&2
+                      exit 1
+                  fi
+
+                  echo "repo=${TARGET_REPO}" >> "${GITHUB_OUTPUT}"
+
+            - name: Validate required token
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  if [[ -z "${{ secrets['ESLINT_PLUGIN_MIRROR_TOKEN'] }}" ]]; then
+                      echo "Missing secret ESLINT_PLUGIN_MIRROR_TOKEN." >&2
+                      echo "Create a fine-grained PAT with contents:read/write on the target repo." >&2
+                      exit 1
+                  fi
+
+            - name: Setup Node.js (optional validation)
+              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
+              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+              with:
+                  node-version: "latest"
+                  cache: "npm"
+
+            - name: Install dependencies (optional)
+              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
+              run: npm install --force
+
+            - name: Run lint checks (optional)
+              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
+              run: npm run lint:fix
+
+            - name: Run linting-rule tests (optional)
+              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
+              run: npx vitest run --config vitest.linting.config.ts
+
+            - name: Prepare mirror working directory
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  rm -rf ./temp/eslint-plugin-mirror
+                  mkdir -p ./temp/eslint-plugin-mirror
+
+                  # Copy the plugin folder contents into the mirror repo root.
+                  cp -R "${SOURCE_DIR}/." ./temp/eslint-plugin-mirror/
+
+                  # Also include the stable wrapper file (handy for internal consumers).
+                  cp "config/linting/plugins/uptime-watcher.mjs" ./temp/eslint-plugin-mirror/uptime-watcher.mjs
+
+            - name: Push to target repository
+              shell: bash
+              working-directory: ./temp/eslint-plugin-mirror
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  TARGET_REPO: ${{ steps.target.outputs.repo }}
+                  TARGET_BRANCH: ${{ github.event.inputs.target_branch }}
+                  FORCE_SYNC: ${{ github.event.inputs.force_sync }}
+                  MIRROR_TOKEN: ${{ secrets['ESLINT_PLUGIN_MIRROR_TOKEN'] }}
+              run: |
+                  set -euo pipefail
+
+                  TARGET_BRANCH="${TARGET_BRANCH:-main}"
+
+                  git init
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+                  # NOTE: Do not echo the remote URL; it contains credentials.
+                  git remote add origin "https://x-access-token:${MIRROR_TOKEN}@github.com/${TARGET_REPO}.git"
+
+                  # If the branch exists, fetch it so we can append a commit normally.
+                  if git ls-remote --exit-code --heads origin "${TARGET_BRANCH}" >/dev/null 2>&1; then
+                      git fetch origin "${TARGET_BRANCH}" --depth=1
+                      git checkout -B "${TARGET_BRANCH}" "origin/${TARGET_BRANCH}"
+                  else
+                      git checkout -B "${TARGET_BRANCH}"
+                  fi
+
+                  git add -A
+
+                  if git diff --cached --quiet; then
+                      echo "No changes to mirror."
+                      exit 0
+                  fi
+
+                  git commit -m "Mirror from ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
+
+                  if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${FORCE_SYNC}" == "true" ]]; then
+                      echo "WARNING: force_sync enabled; force-pushing to ${TARGET_REPO}@${TARGET_BRANCH}" >&2
+                      git push origin "HEAD:${TARGET_BRANCH}" --force-with-lease
+                  else
+                      # IMPORTANT: normal push only (no force). This will NOT rewrite the
+                      # target repo history; it only appends commits. If the target branch
+                      # diverges due to manual edits, the push will fail instead of
+                      # overwriting history.
+                      git push origin "HEAD:${TARGET_BRANCH}"
+                  fi

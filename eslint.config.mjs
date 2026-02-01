@@ -15,7 +15,7 @@
 /* eslint-disable import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
 /* eslint-disable n/no-unpublished-import -- ESLint config file, dev dependencies are fine */
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
+import { flatConfig } from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
 import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import eslintReact from "@eslint-react/eslint-plugin";
@@ -807,6 +807,8 @@ export default defineConfig([
         files: ["config/linting/plugins/uptime-watcher/**/*.{mjs,ts,tsx}"],
         name: "ESLint Plugin (uptime-watcher) - internal rule authoring overrides",
         rules: {
+            "@typescript-eslint/no-unsafe-assignment": "off",
+            "@typescript-eslint/no-unsafe-member-access": "off",
             // AST-walking rules frequently need null sentinels, early-continue loops,
             // and helper functions scoped to a specific rule.
             "canonical/id-match": "off",
@@ -815,6 +817,9 @@ export default defineConfig([
             "etc/no-deprecated": "off",
             "func-style": "off",
             "init-declarations": "off",
+            "jsdoc/require-description": "off",
+            "jsdoc/require-param-description": "off",
+            "jsdoc/require-returns-description": "off",
             "max-lines": "off",
             "max-lines-per-function": "off",
             "max-statements": "off",
@@ -3091,7 +3096,7 @@ export default defineConfig([
         },
         name: "TypeScript Frontend - src/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            "@arthurgeron/react-usememo": pluginUseMemo2,
+            "@arthurgeron/react-usememo": flatConfig,
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
@@ -6251,7 +6256,7 @@ export default defineConfig([
         },
         name: "TypeScript Shared - shared/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            "@arthurgeron/react-usememo": pluginUseMemo2,
+            "@arthurgeron/react-usememo": flatConfig,
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
