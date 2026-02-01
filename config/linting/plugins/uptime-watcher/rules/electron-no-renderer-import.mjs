@@ -2,44 +2,33 @@
  * @file Rule: electron-no-renderer-import
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import * as path from "node:path";
-import { normalizePath } from "../_internal/path-utils.mjs";
-import { NORMALIZED_ELECTRON_DIR, NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+import { normalizePath } from "../_internal/path-utils.mjs";
+import { NORMALIZED_ELECTRON_DIR,
+NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
+
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
- * ESLint rule ensuring Electron runtime code never depends on renderer bundles.
+ * ESLint rule ensuring Electron runtime code never depends on renderer
+ * bundles.
  */
 export const electronNoRendererImportRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow Electron runtime modules from importing renderer bundles",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-no-renderer-import",
-        },
-        schema: [],
-        messages: {
-            noRendererImport:
-                'Electron runtime code must not import from "{{module}}". Use shared contracts or preload bridges instead.',
-        },
-    },
-
     /**
      * @param {{
      *   getFilename: () => any;
-     *   report: (arg0: { data: { module: any }; messageId: string; node: any }) => void;
+     *   report: (arg0: { data: { module: any }; messageId: string; node: any
+     *   }) => void;
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -97,6 +86,25 @@ export const electronNoRendererImportRule = {
 
         return {
             /**
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
+             */
+            CallExpression(node) {
+                if (
+                    node.callee.type === "Identifier" &&
+                    node.callee.name === "require" &&
+                    node.arguments.length > 0
+                ) {
+                    const [firstArgument] = node.arguments;
+                    if (
+                        firstArgument?.type === "Literal" &&
+                        typeof firstArgument.value === "string"
+                    ) {
+                        handleModuleSpecifier(firstArgument, firstArgument.value);
+                    }
+                }
+            },
+
+            /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
             ImportDeclaration(node) {
@@ -119,25 +127,21 @@ export const electronNoRendererImportRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
-
-            /**
-             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
-             */
-            CallExpression(node) {
-                if (
-                    node.callee.type === "Identifier" &&
-                    node.callee.name === "require" &&
-                    node.arguments.length > 0
-                ) {
-                    const [firstArgument] = node.arguments;
-                    if (
-                        firstArgument?.type === "Literal" &&
-                        typeof firstArgument.value === "string"
-                    ) {
-                        handleModuleSpecifier(firstArgument, firstArgument.value);
-                    }
-                }
-            },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow Electron runtime modules from importing renderer bundles",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-renderer-import.md",
+        },
+        schema: [],
+        messages: {
+            noRendererImport:
+                'Electron runtime code must not import from "{{module}}". Use shared contracts or preload bridges instead.',
+        },
     },
 };

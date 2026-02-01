@@ -61,15 +61,15 @@ The following `uptime-watcher/*` rules currently exist and are enabled in
 - IPC + boundary guardrails
   - `uptime-watcher/electron-no-direct-ipc-handle`
   - `uptime-watcher/electron-no-direct-ipc-handler-wrappers`
-  - `uptime-watcher/electron-no-direct-ipcMain-import`
+  - `uptime-watcher/electron-no-direct-ipc-main-import`
   - `uptime-watcher/electron-no-inline-ipc-channel-literal`
   - `uptime-watcher/electron-no-inline-ipc-channel-type-argument`
-  - `uptime-watcher/electron-preload-no-direct-ipcRenderer-usage`
+  - `uptime-watcher/electron-preload-no-direct-ipc-renderer-usage`
   - `uptime-watcher/electron-preload-no-inline-ipc-channel-constant`
   - `uptime-watcher/no-inline-ipc-channel-type-literals`
   - `uptime-watcher/electron-ipc-handler-require-validator`
   - `uptime-watcher/renderer-no-electron-import`
-  - `uptime-watcher/renderer-no-ipcRenderer-usage`
+  - `uptime-watcher/renderer-no-ipc-renderer-usage`
   - `uptime-watcher/renderer-no-direct-preload-bridge`
   - `uptime-watcher/renderer-no-preload-bridge-writes`
   - `uptime-watcher/renderer-no-direct-networking`
@@ -93,8 +93,8 @@ The following `uptime-watcher/*` rules currently exist and are enabled in
   - `uptime-watcher/electron-no-ad-hoc-error-code-suffix`
   - `uptime-watcher/electron-sync-no-local-ascii-digits`
   - `uptime-watcher/electron-cloud-providers-drift-guards`
-  - `uptime-watcher/shared-types-no-local-isPlainObject`
-  - `uptime-watcher/preload-no-local-isPlainObject`
+  - `uptime-watcher/shared-types-no-local-is-plain-object`
+  - `uptime-watcher/preload-no-local-is-plain-object`
 
 - Test stability helpers
   - `uptime-watcher/test-no-mock-return-value-constructors`
@@ -118,7 +118,7 @@ Prefer the shared helper:
   - `uptime-watcher/logger-no-error-in-context`
 
 - Project-specific safety
-  - `uptime-watcher/electron-prefer-readProcessEnv`
+  - `uptime-watcher/electron-prefer-read-process-env`
   - `uptime-watcher/no-onedrive`
 
 - Monitor config consistency
@@ -267,7 +267,7 @@ Below are candidates that have historically prevented real AI-agent drift.
 
 ### Candidate `uptime-watcher/*` custom rules
 
-1. **`uptime-watcher/require-ensureError-in-catch`**
+1. **`uptime-watcher/require-ensure-error-in-catch`**
    - **Goal:** stop `catch (error) { logger.error(error.message) }` when `error`
      is `unknown`.
    - **Fix:** require `ensureError(error)` before accessing `.message` or

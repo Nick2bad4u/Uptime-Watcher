@@ -9,9 +9,9 @@
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
-const FORBIDDEN_WINDOW_OPEN_OBJECTS = new Set(["window", "globalThis", "global"]);
+const FORBIDDEN_WINDOW_OPEN_OBJECTS = new Set(["global", "globalThis", "window"]);
 
 /**
  * ESLint rule forbidding `window.open` usage in renderer code.
@@ -22,28 +22,13 @@ const FORBIDDEN_WINDOW_OPEN_OBJECTS = new Set(["window", "globalThis", "global"]
  * integration remain centralized.
  */
 export const rendererNoWindowOpenRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow window.open in renderer code so external navigation stays behind the main-process boundary",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-window-open",
-        },
-        schema: [],
-        messages: {
-            avoidWindowOpen:
-                "Do not use window.open in renderer code. Use SystemService.openExternal() instead.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
-        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename),
+         sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -109,10 +94,7 @@ export const rendererNoWindowOpenRule = {
             const unwrapped = unwrapChain(callee);
 
             if (unwrapped.type === "Identifier") {
-                if (unwrapped.name === "open" && !hasLocalBinding("open", node)) {
-                    return true;
-                }
-                return false;
+                return unwrapped.name === "open" && !hasLocalBinding("open", node);
             }
 
             if (unwrapped.type !== "MemberExpression") {
@@ -147,5 +129,20 @@ export const rendererNoWindowOpenRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow window.open in renderer code so external navigation stays behind the main-process boundary",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-window-open.md",
+        },
+        schema: [],
+        messages: {
+            avoidWindowOpen:
+                "Do not use window.open in renderer code. Use SystemService.openExternal() instead.",
+        },
     },
 };

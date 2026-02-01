@@ -2,36 +2,22 @@
  * @file Rule: shared-no-outside-imports
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import * as path from "node:path";
+
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SHARED_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule preventing shared layer modules from depending on renderer or
  * Electron runtime code.
  */
 export const sharedNoOutsideImportsRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow shared layer modules from importing renderer or Electron runtime code",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#shared-no-outside-imports",
-        },
-        schema: [],
-        messages: {
-            noExternalImports:
-                'Shared modules must not import from "{{module}}". Shared code should remain platform agnostic.',
-        },
-    },
-
     /**
      * @param {{
      *   getFilename: () => string;
@@ -43,8 +29,8 @@ export const sharedNoOutsideImportsRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -86,7 +72,7 @@ export const sharedNoOutsideImportsRule = {
             }
 
             // Disallow importing renderer/electron layers via aliases or bare
-            // top-level folder imports.
+            // Top-level folder imports.
             if (
                 moduleName === "@app" ||
                 moduleName.startsWith("@app/") ||
@@ -99,7 +85,8 @@ export const sharedNoOutsideImportsRule = {
                 return;
             }
 
-            // For non-relative (package) imports we don't enforce anything here.
+            // For non-relative (package) imports we don't enforce anything
+            // Here.
             if (!moduleName.startsWith(".")) {
                 return;
             }
@@ -120,6 +107,25 @@ export const sharedNoOutsideImportsRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
+             */
+            CallExpression(node) {
+                if (
+                    node.callee.type === "Identifier" &&
+                    node.callee.name === "require" &&
+                    node.arguments.length > 0
+                ) {
+                    const [firstArgument] = node.arguments;
+                    if (
+                        firstArgument?.type === "Literal" &&
+                        typeof firstArgument.value === "string"
+                    ) {
+                        handleModuleSpecifier(firstArgument, firstArgument.value);
+                    }
+                }
+            },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
@@ -143,25 +149,21 @@ export const sharedNoOutsideImportsRule = {
                     handleModuleSpecifier(node.source, node.source.value);
                 }
             },
-
-            /**
-             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
-             */
-            CallExpression(node) {
-                if (
-                    node.callee.type === "Identifier" &&
-                    node.callee.name === "require" &&
-                    node.arguments.length > 0
-                ) {
-                    const [firstArgument] = node.arguments;
-                    if (
-                        firstArgument?.type === "Literal" &&
-                        typeof firstArgument.value === "string"
-                    ) {
-                        handleModuleSpecifier(firstArgument, firstArgument.value);
-                    }
-                }
-            },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow shared layer modules from importing renderer or Electron runtime code",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/shared-no-outside-imports.md",
+        },
+        schema: [],
+        messages: {
+            noExternalImports:
+                'Shared modules must not import from "{{module}}". Shared code should remain platform agnostic.',
+        },
     },
 };

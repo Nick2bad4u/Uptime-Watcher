@@ -8,7 +8,7 @@
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule ensuring Zustand store busy flags are not left stuck `true`.
@@ -17,26 +17,12 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  * This rule is intentionally narrow:
  *
  * - It only targets `src/stores/**` (non-test) files.
- * - It only triggers on direct `set({ isX: true })` calls inside store actions.
- * - It requires a corresponding `set({ isX: false })` to appear inside a
+ * - It only triggers on direct `set({ isX: true })` calls inside store
+ * actions. - It requires a corresponding `set({ isX: false })` to appear
+ * inside a
  *   `finally` block in the same function.
  */
 export const storeActionsRequireFinallyResetRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "require store busy flags (isX) set to true to be reset to false in a finally block",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#store-actions-require-finally-reset",
-        },
-        schema: [],
-        messages: {
-            missingFinallyReset:
-                "Busy flag '{{flag}}' is set to true but is not reset to false inside a finally block in this action.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { flag: any; }; messageId: string; node: any; }) => void; }} context
      */
@@ -57,8 +43,8 @@ export const storeActionsRequireFinallyResetRule = {
             return {};
         }
 
-        const sourceCode = context.sourceCode ?? context.getSourceCode();
-        const visitorKeys = sourceCode.visitorKeys;
+        const sourceCode = context.sourceCode ?? context.getSourceCode(),
+         {visitorKeys} = sourceCode;
 
         /**
          * Extracts an object literal from a set() argument.
@@ -89,7 +75,7 @@ export const storeActionsRequireFinallyResetRule = {
                 return null;
             }
 
-            const body = node.body;
+            const {body} = node;
             if (body.type === "ObjectExpression") {
                 return body;
             }
@@ -147,7 +133,7 @@ export const storeActionsRequireFinallyResetRule = {
                 return null;
             }
 
-            const key = property.key;
+            const {key} = property;
             if (!key || typeof key !== "object" || !("type" in key)) {
                 return null;
             }
@@ -177,7 +163,7 @@ export const storeActionsRequireFinallyResetRule = {
                 return false;
             }
 
-            const callee = node.callee;
+            const {callee} = node;
             return Boolean(
                 callee &&
                     typeof callee === "object" &&
@@ -202,7 +188,7 @@ export const storeActionsRequireFinallyResetRule = {
             );
 
             // Do not traverse into nested functions; each action function is
-            // analyzed independently.
+            // Analyzed independently.
             if (
                 state.root !== node &&
                 (typedNode.type === "FunctionDeclaration" ||
@@ -240,11 +226,9 @@ export const storeActionsRequireFinallyResetRule = {
                         }
 
                         const value = getBooleanLiteralValue(property.value);
-                        if (value === true) {
-                            if (!state.flagsSet.has(name)) {
+                        if (value === true && !state.flagsSet.has(name)) {
                                 state.flagsSet.set(name, typedNode);
                             }
-                        }
 
                         if (state.inFinally && value === false) {
                             state.flagsResetInFinally.add(name);
@@ -300,9 +284,24 @@ export const storeActionsRequireFinallyResetRule = {
         }
 
         return {
+            ArrowFunctionExpression: analyzeFunction,
             FunctionDeclaration: analyzeFunction,
             FunctionExpression: analyzeFunction,
-            ArrowFunctionExpression: analyzeFunction,
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "require store busy flags (isX) set to true to be reset to false in a finally block",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/store-actions-require-finally-reset.md",
+        },
+        schema: [],
+        messages: {
+            missingFinallyReset:
+                "Busy flag '{{flag}}' is set to true but is not reset to false inside a finally block in this action.",
+        },
     },
 };

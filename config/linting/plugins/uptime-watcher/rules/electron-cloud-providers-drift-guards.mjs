@@ -8,29 +8,12 @@
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * Drift guard: prevent ad-hoc cloud provider behavior from drifting.
  */
 export const electronCloudProvidersDriftGuardsRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow ad-hoc cloud provider drift helpers and calls in electron/services/cloud/providers",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-cloud-providers-drift-guards",
-        },
-        schema: [],
-        messages: {
-            bannedLocal:
-                "Do not define local helper '{{name}}' here. Use the centralized allowlist/utility implementation.",
-            bannedCall:
-                "Do not call isAllowedExternalOpenUrl here. Use the centralized provider allowlist utilities.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; data?: any; }) => void; }} context
      */
@@ -54,11 +37,11 @@ export const electronCloudProvidersDriftGuardsRule = {
         }
 
         const bannedLocals = new Set([
-            "isAllowedExternalOpenUrl",
             "buildAllowedExternalOpenUrlRegexes",
-        ]);
+            "isAllowedExternalOpenUrl",
+        ]),
 
-        const reportLocal = (/** @type {{type: string, name: string}} */ id) => {
+         reportLocal = (/** @type {{type: string, name: string}} */ id) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -68,9 +51,9 @@ export const electronCloudProvidersDriftGuardsRule = {
             }
 
             context.report({
-                node: id,
-                messageId: "bannedLocal",
                 data: { name: id.name },
+                messageId: "bannedLocal",
+                node: id,
             });
         };
 
@@ -89,8 +72,8 @@ export const electronCloudProvidersDriftGuardsRule = {
                 }
 
                 context.report({
-                    node: callee,
                     messageId: "bannedCall",
+                    node: callee,
                 });
             },
 
@@ -108,5 +91,22 @@ export const electronCloudProvidersDriftGuardsRule = {
                 reportLocal(node?.id);
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow ad-hoc cloud provider drift helpers and calls in electron/services/cloud/providers",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-cloud-providers-drift-guards.md",
+        },
+        schema: [],
+        messages: {
+            bannedLocal:
+                "Do not define local helper '{{name}}' here. Use the centralized allowlist/utility implementation.",
+            bannedCall:
+                "Do not call isAllowedExternalOpenUrl here. Use the centralized provider allowlist utilities.",
+        },
     },
 };

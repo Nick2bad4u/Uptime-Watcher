@@ -2,31 +2,16 @@
  * @file Rule: no-deprecated-exports
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
-const DEPRECATED_TAG_PATTERN = /@deprecated\b/iu;
+const DEPRECATED_TAG_PATTERN = /@deprecated\b/iv;
 
 /**
  * ESLint rule disallowing exports of declarations annotated with @deprecated.
  */
 export const noDeprecatedExportsRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow exporting declarations that are annotated with @deprecated",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#no-deprecated-exports",
-        },
-        schema: [],
-        messages: {
-            noDeprecatedExports:
-                "Exported declarations must not be marked @deprecated. Remove the tag or explicitly disable this rule if the export must remain deprecated.",
-        },
-    },
-
     /**
      * @param {{
      *   sourceCode?: any;
@@ -38,8 +23,8 @@ export const noDeprecatedExportsRule = {
      * }} context
      */
     create(context) {
-        const sourceCode = context.sourceCode ?? context.getSourceCode?.();
-        const inspectedNodes = new WeakSet();
+        const inspectedNodes = new WeakSet(),
+         sourceCode = context.sourceCode ?? context.getSourceCode?.();
 
         if (!sourceCode) {
             return {};
@@ -53,7 +38,7 @@ export const noDeprecatedExportsRule = {
          *
          * @returns {import("@typescript-eslint/utils").TSESTree.BlockComment | null}
          */
-        function getJSDoc(node) {
+        function getJSDocument(node) {
             if (!node) {
                 return null;
             }
@@ -70,7 +55,7 @@ export const noDeprecatedExportsRule = {
                 return null;
             }
 
-            const lastComment = comments[comments.length - 1];
+            const lastComment = comments.at(-1);
             if (!lastComment || lastComment.type !== "Block") {
                 return null;
             }
@@ -105,7 +90,7 @@ export const noDeprecatedExportsRule = {
 
             inspectedNodes.add(targetNode);
 
-            const comment = getJSDoc(targetNode);
+            const comment = getJSDocument(targetNode);
             if (!comment) {
                 return;
             }
@@ -145,5 +130,20 @@ export const noDeprecatedExportsRule = {
                 reportIfDeprecated(node, node);
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow exporting declarations that are annotated with @deprecated",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-deprecated-exports.md",
+        },
+        schema: [],
+        messages: {
+            noDeprecatedExports:
+                "Exported declarations must not be marked @deprecated. Remove the tag or explicitly disable this rule if the export must remain deprecated.",
+        },
     },
 };

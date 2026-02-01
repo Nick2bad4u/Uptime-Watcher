@@ -1,15 +1,15 @@
 /**
- * @file Rule: renderer-no-ipcRenderer-usage
+ * @file Rule: renderer-no-ipc-renderer-usage
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule forbidding ipcRenderer usage in renderer application code.
@@ -21,21 +21,6 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  * normalization.
  */
 export const rendererNoIpcRendererUsageRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow ipcRenderer usage in src/*; use the preload bridge and services instead.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-ipcRenderer-usage",
-        },
-        schema: [],
-        messages: {
-            noIpcRenderer:
-                "Do not use ipcRenderer in renderer code. Use window.electronAPI via src/services/* instead.",
-        },
-    },
-
     /**
      * @param {{
      *   getFilename: () => string;
@@ -49,9 +34,9 @@ export const rendererNoIpcRendererUsageRule = {
      * }} context
      */
     create(context) {
-        const sourceCode = context.sourceCode ?? context.getSourceCode();
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename),
+         sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -124,6 +109,50 @@ export const rendererNoIpcRendererUsageRule = {
 
         return {
             /**
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
+             */
+            CallExpression(node) {
+                // Detect destructuring `require("electron")` that pulls
+                // `ipcRenderer`.
+                if (
+                    node.callee.type !== "Identifier" ||
+                    node.callee.name !== "require" ||
+                    node.arguments.length !== 1
+                ) {
+                    return;
+                }
+
+                const [first] = node.arguments;
+                if (!first || first.type !== "Literal" || first.value !== "electron") {
+                    return;
+                }
+
+                const {parent} = node;
+                if (
+                    parent &&
+                    parent.type === "VariableDeclarator" &&
+                    parent.id &&
+                    parent.id.type === "ObjectPattern" &&
+                    parent.id.properties.some((property) => {
+                        if (property.type !== "Property") {
+                            return false;
+                        }
+
+                        if (property.computed) {
+                            return false;
+                        }
+
+                        return (
+                            property.key.type === "Identifier" &&
+                            property.key.name === "ipcRenderer"
+                        );
+                    })
+                ) {
+                    report(node);
+                }
+            },
+
+            /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
             ImportDeclaration(node) {
@@ -155,13 +184,48 @@ export const rendererNoIpcRendererUsageRule = {
                     }
 
                     // Track default/namespace imports for later member checks
-                    // like `electron.ipcRenderer`.
+                    // Like `electron.ipcRenderer`.
                     if (
                         specifier.type === "ImportDefaultSpecifier" ||
                         specifier.type === "ImportNamespaceSpecifier"
                     ) {
                         electronModuleBindings.add(specifier.local.name);
                     }
+                }
+            },
+
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} node
+             */
+            MemberExpression(node) {
+                // IpcRenderer.invoke(...)
+                if (node.object.type === "Identifier") {
+                    if (
+                        node.object.name === "ipcRenderer" &&
+                        !hasLocalBinding("ipcRenderer", node)
+                    ) {
+                        report(node.object);
+                        return;
+                    }
+
+                    // Electron.ipcRenderer (where `electron` came from
+                    // Require/import)
+                    if (
+                        electronModuleBindings.has(node.object.name) &&
+                        isPropertyNamed(node, "ipcRenderer")
+                    ) {
+                        report(node.property);
+                        return;
+                    }
+                }
+
+                // Require("electron").ipcRenderer
+                if (
+                    isPropertyNamed(node, "ipcRenderer") &&
+                    node.object.type === "CallExpression" &&
+                    isRequireElectronCall(node.object)
+                ) {
+                    report(node.property);
                 }
             },
 
@@ -179,83 +243,21 @@ export const rendererNoIpcRendererUsageRule = {
 
                 electronModuleBindings.add(node.id.name);
             },
-
-            /**
-             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
-             */
-            CallExpression(node) {
-                // Detect destructuring `require("electron")` that pulls `ipcRenderer`.
-                if (
-                    node.callee.type !== "Identifier" ||
-                    node.callee.name !== "require" ||
-                    node.arguments.length !== 1
-                ) {
-                    return;
-                }
-
-                const [first] = node.arguments;
-                if (!first || first.type !== "Literal" || first.value !== "electron") {
-                    return;
-                }
-
-                const parent = node.parent;
-                if (
-                    parent &&
-                    parent.type === "VariableDeclarator" &&
-                    parent.id &&
-                    parent.id.type === "ObjectPattern" &&
-                    parent.id.properties.some((property) => {
-                        if (property.type !== "Property") {
-                            return false;
-                        }
-
-                        if (property.computed) {
-                            return false;
-                        }
-
-                        return (
-                            property.key.type === "Identifier" &&
-                            property.key.name === "ipcRenderer"
-                        );
-                    })
-                ) {
-                    report(node);
-                }
-            },
-
-            /**
-             * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} node
-             */
-            MemberExpression(node) {
-                // ipcRenderer.invoke(...)
-                if (node.object.type === "Identifier") {
-                    if (
-                        node.object.name === "ipcRenderer" &&
-                        !hasLocalBinding("ipcRenderer", node)
-                    ) {
-                        report(node.object);
-                        return;
-                    }
-
-                    // electron.ipcRenderer (where `electron` came from require/import)
-                    if (
-                        electronModuleBindings.has(node.object.name) &&
-                        isPropertyNamed(node, "ipcRenderer")
-                    ) {
-                        report(node.property);
-                        return;
-                    }
-                }
-
-                // require("electron").ipcRenderer
-                if (
-                    isPropertyNamed(node, "ipcRenderer") &&
-                    node.object.type === "CallExpression" &&
-                    isRequireElectronCall(node.object)
-                ) {
-                    report(node.property);
-                }
-            },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow ipcRenderer usage in src/*; use the preload bridge and services instead.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-ipc-renderer-usage.md",
+        },
+        schema: [],
+        messages: {
+            noIpcRenderer:
+                "Do not use ipcRenderer in renderer code. Use window.electronAPI via src/services/* instead.",
+        },
     },
 };

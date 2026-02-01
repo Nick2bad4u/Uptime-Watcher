@@ -2,14 +2,14 @@
  * @file Rule: renderer-no-preload-bridge-writes
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule preventing assignments/mutations of `window.electronAPI` in
@@ -19,27 +19,12 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  * Only tests/mocks should ever define or overwrite the preload bridge.
  */
 export const rendererNoPreloadBridgeWritesRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow mutating window.electronAPI in renderer code (non-test).",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-preload-bridge-writes",
-        },
-        schema: [],
-        messages: {
-            noBridgeWrites:
-                "Do not assign/define window.electronAPI in application code. Preload owns the bridge; renderer should only read it via services.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -80,7 +65,7 @@ export const rendererNoPreloadBridgeWritesRule = {
                 }
 
                 // Only flag obvious roots: window / globalThis / global.
-                const object = node.left.object;
+                const {object} = node.left;
                 if (
                     object.type === "Identifier" &&
                     (object.name === "window" ||
@@ -136,5 +121,20 @@ export const rendererNoPreloadBridgeWritesRule = {
                 }
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow mutating window.electronAPI in renderer code (non-test).",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-preload-bridge-writes.md",
+        },
+        schema: [],
+        messages: {
+            noBridgeWrites:
+                "Do not assign/define window.electronAPI in application code. Preload owns the bridge; renderer should only read it via services.",
+        },
     },
 };

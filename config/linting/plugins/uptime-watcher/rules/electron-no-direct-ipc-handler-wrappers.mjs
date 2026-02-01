@@ -2,14 +2,14 @@
  * @file Rule: electron-no-direct-ipc-handler-wrappers
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule enforcing that Electron IPC handlers are wrapped via
@@ -17,26 +17,11 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  * `withIpcHandler`/`withIpcHandlerValidation`.
  *
  * @remarks
- * This is an explicit "no new codepaths" rule: the only module that should deal
- * with response formatting, timing, and validation plumbing is
+ * This is an explicit "no new codepaths" rule: the only module that should
+ * deal with response formatting, timing, and validation plumbing is
  * `electron/services/ipc/utils.ts`.
  */
 export const electronNoDirectIpcHandlerWrappersRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow calling withIpcHandler/withIpcHandlerValidation outside the IPC utilities module.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-no-direct-ipc-handler-wrappers",
-        },
-        schema: [],
-        messages: {
-            preferStandardRegistration:
-                "Do not call {{wrapper}} directly. Use registerStandardizedIpcHandler so IPC handling stays centralized and consistent.",
-        },
-    },
-
     /**
      * @param {{
      *   getFilename: () => string;
@@ -48,8 +33,8 @@ export const electronNoDirectIpcHandlerWrappersRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -69,10 +54,10 @@ export const electronNoDirectIpcHandlerWrappersRule = {
         const forbiddenImportedNames = new Set([
             "withIpcHandler",
             "withIpcHandlerValidation",
-        ]);
+        ]),
 
         /** @type {Set<string>} */
-        const forbiddenLocalIdentifiers = new Set();
+         forbiddenLocalIdentifiers = new Set();
 
         /**
          * Reports a direct wrapper call.
@@ -89,6 +74,30 @@ export const electronNoDirectIpcHandlerWrappersRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
+             */
+            CallExpression(node) {
+                const {callee} = node;
+
+                if (callee.type === "Identifier") {
+                    if (
+                        forbiddenImportedNames.has(callee.name) ||
+                        forbiddenLocalIdentifiers.has(callee.name)
+                    ) {
+                        report(callee, callee.name);
+                    }
+                    return;
+                }
+
+                if (callee.type === "MemberExpression" && !callee.computed &&
+                        callee.property.type === "Identifier" &&
+                        forbiddenImportedNames.has(callee.property.name)
+                    ) {
+                        report(callee.property, callee.property.name);
+                    }
+            },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
@@ -120,32 +129,21 @@ export const electronNoDirectIpcHandlerWrappersRule = {
                     forbiddenLocalIdentifiers.add(specifier.local.name);
                 }
             },
-
-            /**
-             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
-             */
-            CallExpression(node) {
-                const callee = node.callee;
-
-                if (callee.type === "Identifier") {
-                    if (
-                        forbiddenImportedNames.has(callee.name) ||
-                        forbiddenLocalIdentifiers.has(callee.name)
-                    ) {
-                        report(callee, callee.name);
-                    }
-                    return;
-                }
-
-                if (callee.type === "MemberExpression" && !callee.computed) {
-                    if (
-                        callee.property.type === "Identifier" &&
-                        forbiddenImportedNames.has(callee.property.name)
-                    ) {
-                        report(callee.property, callee.property.name);
-                    }
-                }
-            },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow calling withIpcHandler/withIpcHandlerValidation outside the IPC utilities module.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-direct-ipc-handler-wrappers.md",
+        },
+        schema: [],
+        messages: {
+            preferStandardRegistration:
+                "Do not call {{wrapper}} directly. Use registerStandardizedIpcHandler so IPC handling stays centralized and consistent.",
+        },
     },
 };

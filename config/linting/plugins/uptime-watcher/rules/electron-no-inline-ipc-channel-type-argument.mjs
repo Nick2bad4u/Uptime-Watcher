@@ -2,14 +2,14 @@
  * @file Rule: electron-no-inline-ipc-channel-type-argument
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule discouraging string-literal type arguments when registering IPC
@@ -21,27 +21,12 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  * the channel constant passed as the first argument.
  */
 export const electronNoInlineIpcChannelTypeArgumentRule = {
-    meta: {
-        type: "suggestion",
-        docs: {
-            description:
-                "disallow string-literal type arguments on registerStandardizedIpcHandler; rely on inference from shared channel constants.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-no-inline-ipc-channel-type-argument",
-        },
-        schema: [],
-        messages: {
-            noInlineTypeChannel:
-                "Do not use a string-literal type argument for registerStandardizedIpcHandler. Use a shared channel constant and let TypeScript infer the channel type.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: object; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -54,26 +39,26 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
         }
 
         /**
-         * @param {unknown} typeParams
+         * @param {unknown} typeParameters
          *
          * @returns {readonly unknown[]}
          */
-        function getTypeArguments(typeParams) {
-            if (!typeParams || typeof typeParams !== "object") {
+        function getTypeArguments(typeParameters) {
+            if (!typeParameters || typeof typeParameters !== "object") {
                 return [];
             }
 
-            // @typescript-eslint uses `typeArguments` (newer) but older nodes may
-            // expose `params`.
+            // @typescript-eslint uses `typeArguments` (newer) but older nodes
+            // May expose `params`.
             if (
-                "typeArguments" in typeParams &&
-                Array.isArray(typeParams.typeArguments)
+                "typeArguments" in typeParameters &&
+                Array.isArray(typeParameters.typeArguments)
             ) {
-                return typeParams.typeArguments;
+                return typeParameters.typeArguments;
             }
 
-            if ("params" in typeParams && Array.isArray(typeParams.params)) {
-                return typeParams.params;
+            if ("params" in typeParameters && Array.isArray(typeParameters.params)) {
+                return typeParameters.params;
             }
 
             return [];
@@ -92,32 +77,32 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
                     return;
                 }
 
-                const typeParams = /** @type {unknown} */ (
+                const typeParameters = /** @type {unknown} */ (
                     node.typeArguments ?? node.typeParameters
-                );
-                const args = getTypeArguments(typeParams);
-                if (args.length === 0) {
+                ),
+                 arguments_ = getTypeArguments(typeParameters);
+                if (arguments_.length === 0) {
                     return;
                 }
 
-                const firstTypeArg = args[0];
-                if (!firstTypeArg || typeof firstTypeArg !== "object") {
+                const firstTypeArgument = arguments_[0];
+                if (!firstTypeArgument || typeof firstTypeArgument !== "object") {
                     return;
                 }
 
-                if (!("type" in firstTypeArg)) {
+                if (!("type" in firstTypeArgument)) {
                     return;
                 }
 
-                if (firstTypeArg.type !== "TSLiteralType") {
+                if (firstTypeArgument.type !== "TSLiteralType") {
                     return;
                 }
 
-                if (!("literal" in firstTypeArg)) {
+                if (!("literal" in firstTypeArgument)) {
                     return;
                 }
 
-                const literal = firstTypeArg.literal;
+                const {literal} = firstTypeArgument;
                 if (!literal || typeof literal !== "object") {
                     return;
                 }
@@ -137,10 +122,25 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
                 context.report({
                     messageId: "noInlineTypeChannel",
                     node: /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
-                        firstTypeArg
+                        firstTypeArgument
                     ),
                 });
             },
         };
+    },
+
+    meta: {
+        type: "suggestion",
+        docs: {
+            description:
+                "disallow string-literal type arguments on registerStandardizedIpcHandler; rely on inference from shared channel constants.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-inline-ipc-channel-type-argument.md",
+        },
+        schema: [],
+        messages: {
+            noInlineTypeChannel:
+                "Do not use a string-literal type argument for registerStandardizedIpcHandler. Use a shared channel constant and let TypeScript infer the channel type.",
+        },
     },
 };

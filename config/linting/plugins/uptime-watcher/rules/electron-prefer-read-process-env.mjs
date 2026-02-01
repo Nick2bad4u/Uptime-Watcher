@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-prefer-readProcessEnv
+ * @file Rule: electron-prefer-read-process-env
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -13,27 +13,12 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * `process.env.*` access.
  */
 export const electronPreferReadProcessEnvRule = {
-    meta: {
-        type: "suggestion",
-        docs: {
-            description:
-                "require using readProcessEnv() instead of direct process.env access",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-prefer-readProcessEnv",
-        },
-        schema: [],
-        messages: {
-            preferReadProcessEnv:
-                "Prefer readProcessEnv() instead of direct process.env access.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; getSourceCode: () => any; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -52,15 +37,30 @@ export const electronPreferReadProcessEnvRule = {
         return {
             /** @param {any} node */
             Program(node) {
-                const sourceCode = context.getSourceCode();
-                const text = sourceCode.getText();
+                const sourceCode = context.getSourceCode(),
+                 text = sourceCode.getText();
                 if (text.includes("process.env")) {
                     context.report({
-                        node,
                         messageId: "preferReadProcessEnv",
+                        node,
                     });
                 }
             },
         };
+    },
+
+    meta: {
+        type: "suggestion",
+        docs: {
+            description:
+                "require using readProcessEnv() instead of direct process.env access",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-prefer-read-process-env.md",
+        },
+        schema: [],
+        messages: {
+            preferReadProcessEnv:
+                "Prefer readProcessEnv() instead of direct process.env access.",
+        },
     },
 };

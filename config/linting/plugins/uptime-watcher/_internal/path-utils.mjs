@@ -10,5 +10,5 @@
  * @returns {string} Normalized POSIX-style path.
  */
 export function normalizePath(filename) {
-    return filename.replace(/\\/gu, "/");
+    return filename.replaceAll('\\', "/");
 }

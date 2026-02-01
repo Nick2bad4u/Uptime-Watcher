@@ -2,8 +2,8 @@
  * @file Rule: no-inline-ipc-channel-type-literals
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -19,39 +19,24 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * - `const channel = "add-site" satisfies IpcInvokeChannel`
  * - `const channel = "add-site" as IpcInvokeChannel`
  *
- * These are all forms of duplicating channel identifiers in places that are not
- * the shared contract registry. Prefer importing channel constants (e.g.
+ * These are all forms of duplicating channel identifiers in places that are
+ * not the shared contract registry. Prefer importing channel constants (e.g.
  * `SITES_CHANNELS.addSite`) or referencing the shared mappings.
  */
 export const noInlineIpcChannelTypeLiteralsRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow IPC channel string literals in TS type positions; rely on shared channel constants and inference.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#no-inline-ipc-channel-type-literals",
-        },
-        schema: [],
-        messages: {
-            noInlineChannelTypeLiteral:
-                "Do not encode IPC channel strings in TypeScript type positions. Use shared channel constants/mappings (from @shared/types/preload) and let types be inferred.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (normalizedFilename === "<input>") {
             return {};
         }
 
         // Allow the canonical registry modules where channel literals are
-        // expected and intentional.
+        // Expected and intentional.
         if (
             normalizedFilename.endsWith("/shared/types/preload.ts") ||
             normalizedFilename.endsWith("/shared/types/ipc.ts")
@@ -150,41 +135,29 @@ export const noInlineIpcChannelTypeLiteralsRule = {
 
         return {
             /**
-             * @param {import("@typescript-eslint/utils").TSESTree.TSTypeReference} node
+             * @param {import("@typescript-eslint/utils").TSESTree.TSAsExpression} node
              */
-            TSTypeReference(node) {
-                // Extract<IpcInvokeChannel, "some-channel">
-                if (
-                    !isIdentifier(node.typeName) ||
-                    node.typeName.name !== "Extract"
-                ) {
+            TSAsExpression(node) {
+                // "some-channel" as IpcInvokeChannel
+                if (!isInlineStringExpression(node.expression)) {
                     return;
                 }
 
-                const params = node.typeArguments?.params;
-                if (!params || params.length < 2) {
-                    return;
-                }
-
-                const [firstParam, secondParam] = params;
-                if (!isTypeReference(firstParam)) {
+                const annotation = node.typeAnnotation;
+                if (!annotation || !isTypeReference(annotation)) {
                     return;
                 }
 
                 if (
-                    !isIdentifier(firstParam.typeName) ||
-                    firstParam.typeName.name !== "IpcInvokeChannel"
+                    !isIdentifier(annotation.typeName) ||
+                    annotation.typeName.name !== "IpcInvokeChannel"
                 ) {
-                    return;
-                }
-
-                if (!isStringLiteralType(secondParam)) {
                     return;
                 }
 
                 context.report({
                     messageId: "noInlineChannelTypeLiteral",
-                    node: secondParam,
+                    node,
                 });
             },
 
@@ -214,31 +187,58 @@ export const noInlineIpcChannelTypeLiteralsRule = {
             },
 
             /**
-             * @param {import("@typescript-eslint/utils").TSESTree.TSAsExpression} node
+             * @param {import("@typescript-eslint/utils").TSESTree.TSTypeReference} node
              */
-            TSAsExpression(node) {
-                // "some-channel" as IpcInvokeChannel
-                if (!isInlineStringExpression(node.expression)) {
+            TSTypeReference(node) {
+                // Extract<IpcInvokeChannel, "some-channel">
+                if (
+                    !isIdentifier(node.typeName) ||
+                    node.typeName.name !== "Extract"
+                ) {
                     return;
                 }
 
-                const annotation = node.typeAnnotation;
-                if (!annotation || !isTypeReference(annotation)) {
+                const parameters = node.typeArguments?.params;
+                if (!parameters || parameters.length < 2) {
+                    return;
+                }
+
+                const [firstParameter, secondParameter] = parameters;
+                if (!isTypeReference(firstParameter)) {
                     return;
                 }
 
                 if (
-                    !isIdentifier(annotation.typeName) ||
-                    annotation.typeName.name !== "IpcInvokeChannel"
+                    !isIdentifier(firstParameter.typeName) ||
+                    firstParameter.typeName.name !== "IpcInvokeChannel"
                 ) {
+                    return;
+                }
+
+                if (!isStringLiteralType(secondParameter)) {
                     return;
                 }
 
                 context.report({
                     messageId: "noInlineChannelTypeLiteral",
-                    node,
+                    node: secondParameter,
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow IPC channel string literals in TS type positions; rely on shared channel constants and inference.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-inline-ipc-channel-type-literals.md",
+        },
+        schema: [],
+        messages: {
+            noInlineChannelTypeLiteral:
+                "Do not encode IPC channel strings in TypeScript type positions. Use shared channel constants/mappings (from @shared/types/preload) and let types be inferred.",
+        },
     },
 };

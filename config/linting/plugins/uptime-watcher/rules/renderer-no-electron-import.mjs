@@ -2,39 +2,25 @@
  * @file Rule: renderer-no-electron-import
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to make the internal ESLint
- * plugin easier to maintain and evolve.
+ * Extracted from the monolithic `uptime-watcher.mjs` to make the internal
+ * ESLint plugin easier to maintain and evolve.
  */
 
 import * as path from "node:path";
+
 import { normalizePath } from "../_internal/path-utils.mjs";
 import {
     NORMALIZED_ELECTRON_DIR,
     NORMALIZED_SRC_DIR,
 } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule preventing renderer bundles from importing the Electron runtime
  * directly.
  */
 export const rendererNoElectronImportRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow renderer code from importing Electron packages or backend modules directly.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-electron-import",
-        },
-        schema: [],
-        messages: {
-            forbiddenElectronImport:
-                'Renderer modules must not import from "{{module}}". Use preload bridges or shared contracts instead.',
-        },
-    },
-
     /**
      * @param {{
      *   getFilename: () => string;
@@ -46,8 +32,8 @@ export const rendererNoElectronImportRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -142,6 +128,25 @@ export const rendererNoElectronImportRule = {
 
         return {
             /**
+             * @param {{callee: {type: string, name: string}, arguments: string | any[]}} node
+             */
+            CallExpression(node) {
+                if (
+                    node.callee.type === "Identifier" &&
+                    node.callee.name === "require" &&
+                    node.arguments.length > 0
+                ) {
+                    const [firstArgument] = node.arguments;
+                    if (
+                        firstArgument?.type === "Literal" &&
+                        typeof firstArgument.value === "string"
+                    ) {
+                        handleStaticSpecifier(firstArgument, firstArgument.value);
+                    }
+                }
+            },
+
+            /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
             ImportDeclaration(node) {
@@ -164,25 +169,21 @@ export const rendererNoElectronImportRule = {
                     handleStaticSpecifier(node.source, node.source.value);
                 }
             },
-
-            /**
-             * @param {{callee: {type: string, name: string}, arguments: string | any[]}} node
-             */
-            CallExpression(node) {
-                if (
-                    node.callee.type === "Identifier" &&
-                    node.callee.name === "require" &&
-                    node.arguments.length > 0
-                ) {
-                    const [firstArgument] = node.arguments;
-                    if (
-                        firstArgument?.type === "Literal" &&
-                        typeof firstArgument.value === "string"
-                    ) {
-                        handleStaticSpecifier(firstArgument, firstArgument.value);
-                    }
-                }
-            },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow renderer code from importing Electron packages or backend modules directly.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-electron-import.md",
+        },
+        schema: [],
+        messages: {
+            forbiddenElectronImport:
+                'Renderer modules must not import from "{{module}}". Use preload bridges or shared contracts instead.',
+        },
     },
 };

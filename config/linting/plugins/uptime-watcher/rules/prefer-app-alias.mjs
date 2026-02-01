@@ -2,43 +2,29 @@
  * @file Rule: prefer-app-alias
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import * as path from "node:path";
-import { normalizePath } from "../_internal/path-utils.mjs";
-import { NORMALIZED_SRC_DIR, SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+import { normalizePath } from "../_internal/path-utils.mjs";
+import { NORMALIZED_SRC_DIR,
+SRC_DIR } from "../_internal/repo-paths.mjs";
+
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule ensuring files outside of src reference renderer modules via the
  * @app alias.
  */
 export const preferAppAliasRule = {
-    meta: {
-        type: "suggestion",
-        docs: {
-            description:
-                "require using the @app alias instead of relative paths into src from external packages.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#prefer-app-alias",
-        },
-        fixable: "code",
-        schema: [],
-        messages: {
-            useAlias:
-                "Import from src via the @app alias instead of relative paths.",
-        },
-    },
-
     /**
      * @param {{getFilename: () => any; report: (arg0: {fix: (fixer: any) => any; messageId: string; node: any}) => void}} context
      */
     create(context) {
-        const filename = context.getFilename();
-        const normalizedFilename = normalizePath(filename);
+        const filename = context.getFilename(),
+         normalizedFilename = normalizePath(filename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -66,8 +52,8 @@ export const preferAppAliasRule = {
                     return;
                 }
 
-                const importAbsolutePath = path.resolve(importerDirectory, importPath);
-                const normalizedImportAbsolute = normalizePath(importAbsolutePath);
+                const importAbsolutePath = path.resolve(importerDirectory, importPath),
+                 normalizedImportAbsolute = normalizePath(importAbsolutePath);
 
                 if (
                     normalizedImportAbsolute !== NORMALIZED_SRC_DIR &&
@@ -76,23 +62,24 @@ export const preferAppAliasRule = {
                     return;
                 }
 
-                const relativeToSrc = normalizePath(
+                const relativeToSource = normalizePath(
                     path.relative(SRC_DIR, importAbsolutePath)
                 );
 
-                if (!relativeToSrc || relativeToSrc.startsWith("..")) {
+                if (!relativeToSource || relativeToSource.startsWith("..")) {
                     return;
                 }
 
-                const aliasSuffix = relativeToSrc.replace(
-                    /\.(?:[cm]?[jt]sx?|d\.ts)$/u,
+                const aliasSuffix = relativeToSource.replace(
+                    /\.(?:[cm]?[jt]sx?|d\.ts)$/v,
                     ""
-                );
-                const cleanedSuffix = aliasSuffix.replace(/^\.\/?/u, "");
-                const aliasPath =
-                    cleanedSuffix.length > 0 ? `@app/${cleanedSuffix}` : "@app";
-                const rawSource = node.source.raw ?? node.source.extra?.raw;
-                const quote = rawSource?.startsWith("'") ? "'" : '"';
+                ),
+                 cleanedSuffix = aliasSuffix.replace(/^\.\/?/v, ""),
+                      aliasPath =
+                          cleanedSuffix.length > 0 ? `@app/${cleanedSuffix}` : "@app",
+                      rawSource =
+                          typeof node.source.raw === "string" ? node.source.raw : null,
+                      quote = rawSource?.startsWith("'") ? "'" : '"';
 
                 context.report({
                     /**
@@ -109,5 +96,21 @@ export const preferAppAliasRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "suggestion",
+        docs: {
+            description:
+                "require using the @app alias instead of relative paths into src from external packages.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-app-alias.md",
+        },
+        fixable: "code",
+        schema: [],
+        messages: {
+            useAlias:
+                "Import from src via the @app alias instead of relative paths.",
+        },
     },
 };

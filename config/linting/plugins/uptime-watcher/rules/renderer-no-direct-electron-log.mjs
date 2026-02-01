@@ -2,14 +2,14 @@
  * @file Rule: renderer-no-direct-electron-log
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule restricting direct usage of electron-log/renderer.
@@ -19,27 +19,12 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  * the IPC helper fallback) to avoid a proliferation of custom logging setups.
  */
 export const rendererNoDirectElectronLogRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow importing electron-log/renderer outside the renderer logger modules.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-direct-electron-log",
-        },
-        schema: [],
-        messages: {
-            useRendererLogger:
-                "Do not import {{module}} here. Use src/services/logger.ts (or inject a logger) to keep logging centralized.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { module: any; }; messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -59,7 +44,7 @@ export const rendererNoDirectElectronLogRule = {
             return {};
         }
 
-        const forbiddenModules = new Set(["electron-log/renderer", "electron-log"]);
+        const forbiddenModules = new Set(["electron-log", "electron-log/renderer"]);
 
         return {
             /**
@@ -85,5 +70,20 @@ export const rendererNoDirectElectronLogRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow importing electron-log/renderer outside the renderer logger modules.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-direct-electron-log.md",
+        },
+        schema: [],
+        messages: {
+            useRendererLogger:
+                "Do not import {{module}} here. Use src/services/logger.ts (or inject a logger) to keep logging centralized.",
+        },
     },
 };

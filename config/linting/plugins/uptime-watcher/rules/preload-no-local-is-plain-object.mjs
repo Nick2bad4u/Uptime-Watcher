@@ -1,5 +1,5 @@
 /**
- * @file Rule: preload-no-local-isPlainObject
+ * @file Rule: preload-no-local-is-plain-object
  *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
@@ -8,27 +8,13 @@
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * Drift guard: disallow local `isPlainObject` variable definitions inside
  * electron/preload.
  */
 export const preloadNoLocalIsPlainObjectRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow local isPlainObject definitions in electron/preload",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#preload-no-local-isPlainObject",
-        },
-        schema: [],
-        messages: {
-            banned: "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -53,10 +39,24 @@ export const preloadNoLocalIsPlainObjectRule = {
                 }
 
                 context.report({
-                    node: id,
                     messageId: "banned",
+                    node: id,
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow local isPlainObject definitions in electron/preload",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/preload-no-local-is-plain-object.md",
+        },
+        schema: [],
+        messages: {
+            banned: "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
+        },
     },
 };

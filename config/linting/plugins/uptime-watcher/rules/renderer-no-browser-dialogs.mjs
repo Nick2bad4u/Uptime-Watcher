@@ -2,14 +2,14 @@
  * @file Rule: renderer-no-browser-dialogs
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to make the internal ESLint
- * plugin easier to maintain and evolve.
+ * Extracted from the monolithic `uptime-watcher.mjs` to make the internal
+ * ESLint plugin easier to maintain and evolve.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set(["alert", "confirm", "prompt"]);
 
@@ -18,28 +18,13 @@ const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set(["alert", "confirm", "prompt"]);
  * dedicated confirmation dialog infrastructure.
  */
 export const rendererNoBrowserDialogsRule = {
-    meta: {
-        type: "suggestion",
-        docs: {
-            description:
-                "disallow alert/confirm/prompt in renderer code so UX flows use the shared dialog system",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-browser-dialogs",
-        },
-        schema: [],
-        messages: {
-            avoidBrowserDialog:
-                'Replace browser dialog "{{dialog}}" with the shared confirmation dialog utilities.',
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { dialog: any; }; messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
-        const sourceCode = context.sourceCode ?? context.getSourceCode();
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename),
+         sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -124,15 +109,13 @@ export const rendererNoBrowserDialogsRule = {
             }
 
             const object = unwrapChain(unwrapped.object);
-            if (object.type === "Identifier") {
-                if (
+            if (object.type === "Identifier" && (
                     object.name === "window" ||
                     object.name === "globalThis" ||
                     object.name === "global"
-                ) {
+                )) {
                     return propertyName;
                 }
-            }
 
             return null;
         }
@@ -154,5 +137,20 @@ export const rendererNoBrowserDialogsRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "suggestion",
+        docs: {
+            description:
+                "disallow alert/confirm/prompt in renderer code so UX flows use the shared dialog system",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-browser-dialogs.md",
+        },
+        schema: [],
+        messages: {
+            avoidBrowserDialog:
+                'Replace browser dialog "{{dialog}}" with the shared confirmation dialog utilities.',
+        },
     },
 };

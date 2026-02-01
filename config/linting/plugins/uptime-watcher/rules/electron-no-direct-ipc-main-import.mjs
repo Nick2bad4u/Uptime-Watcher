@@ -1,15 +1,15 @@
 /**
- * @file Rule: electron-no-direct-ipcMain-import
+ * @file Rule: electron-no-direct-ipc-main-import
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule enforcing that `ipcMain` is only imported in the centralized IPC
@@ -20,27 +20,12 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  * up elsewhere in the Electron runtime.
  */
 export const electronNoDirectIpcMainImportRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow importing ipcMain outside electron/services/ipc/*.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-no-direct-ipcMain-import",
-        },
-        schema: [],
-        messages: {
-            avoidIpcMain:
-                "Do not import ipcMain here. Use the centralized IpcService / registerStandardizedIpcHandler utilities under electron/services/ipc/.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -62,6 +47,54 @@ export const electronNoDirectIpcMainImportRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
+             */
+            CallExpression(node) {
+                // Guard against `const { ipcMain } = require("electron")`.
+                if (
+                    node.callee.type !== "Identifier" ||
+                    node.callee.name !== "require" ||
+                    node.arguments.length !== 1
+                ) {
+                    return;
+                }
+
+                const [first] = node.arguments;
+                if (!first || first.type !== "Literal" || first.value !== "electron") {
+                    return;
+                }
+
+                // We only flag the require call when we see it being
+                // Destructured to ipcMain.
+                const {parent} = node;
+                if (
+                    parent &&
+                    parent.type === "VariableDeclarator" &&
+                    parent.id &&
+                    parent.id.type === "ObjectPattern" &&
+                    parent.id.properties.some((property) => {
+                        if (property.type !== "Property") {
+                            return false;
+                        }
+
+                        if (property.computed) {
+                            return false;
+                        }
+
+                        return (
+                            property.key.type === "Identifier" &&
+                            property.key.name === "ipcMain"
+                        );
+                    })
+                ) {
+                    context.report({
+                        messageId: "avoidIpcMain",
+                        node,
+                    });
+                }
+            },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
@@ -95,54 +128,21 @@ export const electronNoDirectIpcMainImportRule = {
                     });
                 }
             },
-
-            /**
-             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
-             */
-            CallExpression(node) {
-                // Guard against `const { ipcMain } = require("electron")`.
-                if (
-                    node.callee.type !== "Identifier" ||
-                    node.callee.name !== "require" ||
-                    node.arguments.length !== 1
-                ) {
-                    return;
-                }
-
-                const [first] = node.arguments;
-                if (!first || first.type !== "Literal" || first.value !== "electron") {
-                    return;
-                }
-
-                // We only flag the require call when we see it being destructured
-                // to ipcMain.
-                const parent = node.parent;
-                if (
-                    parent &&
-                    parent.type === "VariableDeclarator" &&
-                    parent.id &&
-                    parent.id.type === "ObjectPattern" &&
-                    parent.id.properties.some((property) => {
-                        if (property.type !== "Property") {
-                            return false;
-                        }
-
-                        if (property.computed) {
-                            return false;
-                        }
-
-                        return (
-                            property.key.type === "Identifier" &&
-                            property.key.name === "ipcMain"
-                        );
-                    })
-                ) {
-                    context.report({
-                        messageId: "avoidIpcMain",
-                        node,
-                    });
-                }
-            },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow importing ipcMain outside electron/services/ipc/*.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-direct-ipc-main-import.md",
+        },
+        schema: [],
+        messages: {
+            avoidIpcMain:
+                "Do not import ipcMain here. Use the centralized IpcService / registerStandardizedIpcHandler utilities under electron/services/ipc/.",
+        },
     },
 };

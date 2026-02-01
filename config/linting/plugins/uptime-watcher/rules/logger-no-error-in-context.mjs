@@ -12,27 +12,12 @@ import {
     NORMALIZED_SRC_DIR,
 } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule preventing passing Error objects via `{ error: ... }` context.
  */
 export const loggerNoErrorInContextRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow passing Error objects via { error: ... } context to logger.error/warn; pass as the dedicated error argument instead",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#logger-no-error-in-context",
-        },
-        schema: [],
-        messages: {
-            avoidErrorContext:
-                "Do not pass Error objects via { error: ... } when calling logger. Pass the Error as the dedicated error argument instead.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -101,7 +86,7 @@ export const loggerNoErrorInContextRule = {
             }
 
             if (value.type === "CallExpression") {
-                // ensureError(...) or normalizeError(...)
+                // EnsureError(...) or normalizeError(...)
                 return (
                     value.callee?.type === "Identifier" &&
                     (value.callee.name === "ensureError" ||
@@ -151,9 +136,9 @@ export const loggerNoErrorInContextRule = {
                     return;
                 }
 
-                const args = node.arguments ?? [];
-                const lastArg = args[args.length - 1];
-                const errorProperty = getErrorProperty(lastArg);
+                const arguments_ = node.arguments ?? [],
+                 lastArgument = arguments_.at(-1),
+                 errorProperty = getErrorProperty(lastArgument);
 
                 if (!errorProperty) {
                     return;
@@ -169,5 +154,20 @@ export const loggerNoErrorInContextRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow passing Error objects via { error: ... } context to logger.error/warn; pass as the dedicated error argument instead",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/logger-no-error-in-context.md",
+        },
+        schema: [],
+        messages: {
+            avoidErrorContext:
+                "Do not pass Error objects via { error: ... } when calling logger. Pass the Error as the dedicated error argument instead.",
+        },
     },
 };

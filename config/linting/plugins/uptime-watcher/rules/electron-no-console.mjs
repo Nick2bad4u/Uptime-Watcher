@@ -2,8 +2,8 @@
  * @file Rule: electron-no-console
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin maintainable.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin maintainable.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -12,21 +12,6 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * ESLint rule disallowing console usage in Electron runtime code.
  */
 export const electronNoConsoleRule = {
-    meta: {
-        type: "suggestion",
-        docs: {
-            description:
-                "require structured logger usage instead of console in electron runtime code",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-no-console",
-        },
-        schema: [],
-        messages: {
-            preferLogger:
-                "Use the shared logger utilities instead of console.{{method}} in Electron runtime code.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; report: (arg0: { data: { method: string; }; messageId: string; node: any; }) => void; }} context
      */
@@ -61,5 +46,20 @@ export const electronNoConsoleRule = {
                 }
             },
         };
+    },
+
+    meta: {
+        type: "suggestion",
+        docs: {
+            description:
+                "require structured logger usage instead of console in electron runtime code",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-console.md",
+        },
+        schema: [],
+        messages: {
+            preferLogger:
+                "Use the shared logger utilities instead of console.{{method}} in Electron runtime code.",
+        },
     },
 };

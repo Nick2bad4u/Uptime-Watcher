@@ -26,12 +26,19 @@
             ],
             "@shared/*": [
                 "shared/*"
+            ],
+            "eslint-plugin-comment-length": [
+                "config/testing/types/eslint-plugin-comment-length.d.ts"
+            ],
+            "eslint-plugin-total-functions": [
+                "config/testing/types/eslint-plugin-total-functions.d.ts"
             ]
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.js.tsbuildinfo"
     },
     "exclude": [
+        "../../storybook/test-runner-jest.config.js",
         "../../electron/**/*.test.ts",
         "../../electron/**/*.test.tsx",
         "../../**/docs/docusaurus",

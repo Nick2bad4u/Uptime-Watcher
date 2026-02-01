@@ -1,0 +1,44 @@
+{
+    "$schema": "https://www.schemastore.org/tsconfig.json",
+    "compilerOptions": {
+        "allowJs": true,
+        "baseUrl": "../../../..",
+        "checkJs": true,
+        "composite": true,
+        "declaration": false,
+        "incremental": true,
+        "noEmit": true,
+        "paths": {
+            "@app/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "rootDir": "../../../..",
+        "tsBuildInfoFile": "../../../../.cache/tsbuildinfo/tsconfig.uptime-watcher-eslint.tsbuildinfo"
+    },
+    "exclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/.cache/**"
+    ],
+    "extends": "../../../../tsconfig.json",
+    "include": [
+        "./**/*.ts",
+        "./**/*.tsx",
+        "./**/*.mts",
+        "./**/*.cts",
+        "./**/*.js",
+        "./**/*.jsx",
+        "./**/*.mjs",
+        "./**/*.cjs"
+    ]
+}

@@ -2,14 +2,14 @@
  * @file Rule: electron-no-direct-ipc-handle
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule ensuring Electron runtime code never registers IPC handlers via
@@ -22,27 +22,12 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  * duplicate-registration protection.
  */
 export const electronNoDirectIpcHandleRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow ipcMain.handle/handleOnce outside the centralized IPC registration helper.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-no-direct-ipc-handle",
-        },
-        schema: [],
-        messages: {
-            useStandardizedRegistration:
-                "Do not call ipcMain.{{method}} directly. Register IPC handlers via registerStandardizedIpcHandler in electron/services/ipc/utils.ts.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { method: any; }; messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -92,5 +77,20 @@ export const electronNoDirectIpcHandleRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow ipcMain.handle/handleOnce outside the centralized IPC registration helper.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-direct-ipc-handle.md",
+        },
+        schema: [],
+        messages: {
+            useStandardizedRegistration:
+                "Do not call ipcMain.{{method}} directly. Register IPC handlers via registerStandardizedIpcHandler in electron/services/ipc/utils.ts.",
+        },
     },
 };

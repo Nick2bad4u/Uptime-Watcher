@@ -8,9 +8,10 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as ts from "typescript";
+
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { SHARED_DIR } from "../_internal/repo-paths.mjs";
-import * as ts from "typescript";
 
 const SHARED_TYPES_PATH = path.resolve(SHARED_DIR, "types.ts");
 
@@ -27,6 +28,36 @@ const SHARED_TYPES_PATH = path.resolve(SHARED_DIR, "types.ts");
 let BASE_MONITOR_TYPES_CACHE = null;
 
 /**
+ * Retrieves an ArrayExpression node from an ESTree initializer, unwrapping
+ * TypeScript-specific wrappers like `as const`.
+ *
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} initializer
+ * Initializer node from a variable declaration.
+ *
+ * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression | null}
+ * Array expression when found.
+ */
+function getArrayExpression(initializer) {
+    if (!initializer) {
+        return null;
+    }
+
+    if (initializer.type === "ArrayExpression") {
+        return initializer;
+    }
+
+    if (
+        initializer.type === "TSAsExpression" ||
+        initializer.type === "TSSatisfiesExpression" ||
+        initializer.type === "TSTypeAssertion"
+    ) {
+        return getArrayExpression(initializer.expression);
+    }
+
+    return null;
+}
+
+/**
  * Returns the cached monitor types, loading them if necessary.
  *
  * @returns {readonly string[]} Monitor type identifiers defined in shared
@@ -40,6 +71,33 @@ function getBaseMonitorTypes() {
 }
 
 /**
+ * Extracts the string literal value from an object property.
+ *
+ * @param {import("@typescript-eslint/utils").TSESTree.Property} property
+ * Object property node.
+ *
+ * @returns {string | null} String literal value when present.
+ */
+function getPropertyStringValue(property) {
+    if (
+        property.value.type === "Literal" &&
+        typeof property.value.value === "string"
+    ) {
+        return property.value.value;
+    }
+
+    if (
+        property.value.type === "TemplateLiteral" &&
+        property.value.expressions.length === 0 &&
+        property.value.quasis.length === 1
+    ) {
+        return property.value.quasis[0]?.value?.cooked ?? null;
+    }
+
+    return null;
+}
+
+/**
  * Extracts the canonical monitor type identifiers from the shared TypeScript
  * source.
  *
@@ -47,8 +105,8 @@ function getBaseMonitorTypes() {
  * configuration.
  */
 function loadBaseMonitorTypes() {
-    const source = fs.readFileSync(SHARED_TYPES_PATH, "utf8");
-    const sourceFile = ts.createSourceFile(
+    const source = fs.readFileSync(SHARED_TYPES_PATH, "utf8"),
+     sourceFile = ts.createSourceFile(
         SHARED_TYPES_PATH,
         source,
         ts.ScriptTarget.Latest,
@@ -84,8 +142,8 @@ function loadBaseMonitorTypes() {
         /**
          * @type {unknown}
          * @remarks
-         * Some TypeScript versions expose `isTypeAssertionExpression` at runtime
-         * but do not include it in the public type surface.
+         * Some TypeScript versions expose `isTypeAssertionExpression` at
+         * runtime but do not include it in the public type surface.
          */
         const maybeTypeAssertion = /** @type {any} */ (ts)
             .isTypeAssertionExpression;
@@ -133,7 +191,7 @@ function loadBaseMonitorTypes() {
         }
 
         // Avoid callback-based traversal so static analysis doesn't treat the
-        // result as constant.
+        // Result as constant.
         for (const child of node.getChildren(sourceFile)) {
             const found = findValues(child);
             if (found) {
@@ -154,91 +212,9 @@ function loadBaseMonitorTypes() {
 }
 
 /**
- * Retrieves an ArrayExpression node from an ESTree initializer, unwrapping
- * TypeScript-specific wrappers like `as const`.
- *
- * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} initializer
- * Initializer node from a variable declaration.
- *
- * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression | null}
- * Array expression when found.
- */
-function getArrayExpression(initializer) {
-    if (!initializer) {
-        return null;
-    }
-
-    if (initializer.type === "ArrayExpression") {
-        return initializer;
-    }
-
-    if (
-        initializer.type === "TSAsExpression" ||
-        initializer.type === "TSSatisfiesExpression" ||
-        initializer.type === "TSTypeAssertion"
-    ) {
-        return getArrayExpression(initializer.expression);
-    }
-
-    return null;
-}
-
-/**
- * Extracts the string literal value from an object property.
- *
- * @param {import("@typescript-eslint/utils").TSESTree.Property} property
- * Object property node.
- *
- * @returns {string | null} String literal value when present.
- */
-function getPropertyStringValue(property) {
-    if (
-        property.value.type === "Literal" &&
-        typeof property.value.value === "string"
-    ) {
-        return property.value.value;
-    }
-
-    if (
-        property.value.type === "TemplateLiteral" &&
-        property.value.expressions.length === 0 &&
-        property.value.quasis.length === 1
-    ) {
-        return property.value.quasis[0]?.value?.cooked ?? null;
-    }
-
-    return null;
-}
-
-/**
  * ESLint rule ensuring fallback monitor options mirror shared type contracts.
  */
 export const monitorFallbackConsistencyRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "require FALLBACK_MONITOR_TYPE_OPTIONS to stay aligned with shared BASE_MONITOR_TYPES",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#monitor-fallback-consistency",
-        },
-        schema: [],
-        messages: {
-            duplicateMonitorType:
-                'Monitor type "{{type}}" appears multiple times in FALLBACK_MONITOR_TYPE_OPTIONS.',
-            missingMonitorType:
-                "Monitor type(s) missing from FALLBACK_MONITOR_TYPE_OPTIONS: {{types}}.",
-            missingValueProperty:
-                'Each fallback monitor option must declare a literal "value" property.',
-            unknownMonitorType:
-                'Monitor type "{{type}}" is not defined in shared BASE_MONITOR_TYPES.',
-            unsortedMonitorType:
-                'Monitor type "{{type}}" is out of order. Align fallback options with BASE_MONITOR_TYPES order.',
-            valueShouldBeLiteral:
-                'Fallback monitor option "value" must be a string literal for static analysis.',
-        },
-    },
-
     /**
      * @param {{
      *   getFilename: () => string;
@@ -255,8 +231,8 @@ export const monitorFallbackConsistencyRule = {
             return {};
         }
 
-        const baseMonitorTypes = getBaseMonitorTypes();
-        const baseMonitorTypeSet = new Set(baseMonitorTypes);
+        const baseMonitorTypes = getBaseMonitorTypes(),
+         baseMonitorTypeSet = new Set(baseMonitorTypes);
 
         return {
             /**
@@ -278,12 +254,12 @@ export const monitorFallbackConsistencyRule = {
                 /**
                  * @type {Map<string, import("@typescript-eslint/utils").TSESTree.ObjectExpression>}
                  */
-                const optionMap = new Map();
-                const reportedNodes = new Set();
+                const optionMap = new Map(),
+                 reportedNodes = new Set();
 
-                arrayExpression.elements.forEach((element) => {
+                for (const element of arrayExpression.elements) {
                     if (!element || element.type !== "ObjectExpression") {
-                        return;
+                        continue;
                     }
 
                     const valueProperty = element.properties.find(
@@ -304,7 +280,7 @@ export const monitorFallbackConsistencyRule = {
                                 node: element,
                             });
                         }
-                        return;
+                        continue;
                     }
 
                     const monitorTypeValue =
@@ -317,7 +293,7 @@ export const monitorFallbackConsistencyRule = {
                                 node: valueProperty,
                             });
                         }
-                        return;
+                        continue;
                     }
 
                     if (optionMap.has(monitorTypeValue)) {
@@ -337,12 +313,12 @@ export const monitorFallbackConsistencyRule = {
                             node: valueProperty,
                         });
                     }
-                });
+                }
 
-                const optionValues = Array.from(optionMap.keys());
                 const missingTypes = baseMonitorTypes.filter(
                     (type) => !optionMap.has(type)
-                );
+                ),
+                 optionValues = [...optionMap.keys()];
 
                 if (missingTypes.length > 0) {
                     context.report({
@@ -352,7 +328,7 @@ export const monitorFallbackConsistencyRule = {
                     });
                 }
 
-                baseMonitorTypes.forEach((expectedType, index) => {
+                for (const [index, expectedType] of baseMonitorTypes.entries()) {
                     const actualType = optionValues[index];
                     if (actualType && actualType !== expectedType) {
                         const optionNode = optionMap.get(actualType);
@@ -364,8 +340,33 @@ export const monitorFallbackConsistencyRule = {
                             });
                         }
                     }
-                });
+                }
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "require FALLBACK_MONITOR_TYPE_OPTIONS to stay aligned with shared BASE_MONITOR_TYPES",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/monitor-fallback-consistency.md",
+        },
+        schema: [],
+        messages: {
+            duplicateMonitorType:
+                'Monitor type "{{type}}" appears multiple times in FALLBACK_MONITOR_TYPE_OPTIONS.',
+            missingMonitorType:
+                "Monitor type(s) missing from FALLBACK_MONITOR_TYPE_OPTIONS: {{types}}.",
+            missingValueProperty:
+                'Each fallback monitor option must declare a literal "value" property.',
+            unknownMonitorType:
+                'Monitor type "{{type}}" is not defined in shared BASE_MONITOR_TYPES.',
+            unsortedMonitorType:
+                'Monitor type "{{type}}" is out of order. Align fallback options with BASE_MONITOR_TYPES order.',
+            valueShouldBeLiteral:
+                'Fallback monitor option "value" must be a string literal for static analysis.',
+        },
     },
 };

@@ -8,26 +8,12 @@
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * Drift guard: disallow local string-safety helpers in electron/services.
  */
 export const electronNoLocalStringSafetyHelpersRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow local hasAsciiControlCharacters helpers in electron/services; use the shared implementation instead",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-no-local-string-safety-helpers",
-        },
-        schema: [],
-        messages: {
-            banned: "Use the shared hasAsciiControlCharacters implementation instead of re-declaring it locally.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -51,8 +37,8 @@ export const electronNoLocalStringSafetyHelpersRule = {
                 return;
             }
             context.report({
-                node: id,
                 messageId: "banned",
+                node: id,
             });
         };
 
@@ -71,5 +57,19 @@ export const electronNoLocalStringSafetyHelpersRule = {
                 reportIfNameMatches(node?.id);
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow local hasAsciiControlCharacters helpers in electron/services; use the shared implementation instead",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-local-string-safety-helpers.md",
+        },
+        schema: [],
+        messages: {
+            banned: "Use the shared hasAsciiControlCharacters implementation instead of re-declaring it locally.",
+        },
     },
 };

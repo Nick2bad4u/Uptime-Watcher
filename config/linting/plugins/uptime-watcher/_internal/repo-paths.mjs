@@ -3,7 +3,6 @@
  */
 
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { normalizePath } from "./path-utils.mjs";
 
@@ -11,11 +10,11 @@ import { normalizePath } from "./path-utils.mjs";
  * Absolute path to the repository root.
  *
  * @remarks
- * Derived relative to this module so the rules stay portable when the workspace
- * is relocated.
+ * Derived relative to this module so the rules stay portable when the
+ * workspace is relocated.
  */
 export const REPO_ROOT = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
+    import.meta.dirname,
     "..",
     "..",
     "..",

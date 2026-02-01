@@ -8,26 +8,13 @@
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
- * Drift guard: disallow local `isAsciiDigits` implementations in electron/services/sync.
+ * Drift guard: disallow local `isAsciiDigits` implementations in
+ * electron/services/sync.
  */
 export const electronSyncNoLocalAsciiDigitsRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow local isAsciiDigits implementations in electron/services/sync; import the shared helper instead",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-sync-no-local-ascii-digits",
-        },
-        schema: [],
-        messages: {
-            banned: "Import isAsciiDigits from the shared helper instead of defining it locally.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
      */
@@ -51,8 +38,8 @@ export const electronSyncNoLocalAsciiDigitsRule = {
                 return;
             }
             context.report({
-                node: id,
                 messageId: "banned",
+                node: id,
             });
         };
 
@@ -71,5 +58,19 @@ export const electronSyncNoLocalAsciiDigitsRule = {
                 reportIfNameMatches(node?.id);
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow local isAsciiDigits implementations in electron/services/sync; import the shared helper instead",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-sync-no-local-ascii-digits.md",
+        },
+        schema: [],
+        messages: {
+            banned: "Import isAsciiDigits from the shared helper instead of defining it locally.",
+        },
     },
 };

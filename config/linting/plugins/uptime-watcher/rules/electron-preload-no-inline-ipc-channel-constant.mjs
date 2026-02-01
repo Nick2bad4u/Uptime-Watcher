@@ -2,8 +2,8 @@
  * @file Rule: electron-preload-no-inline-ipc-channel-constant
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -13,32 +13,18 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * constants.
  *
  * @remarks
- * The preload layer should import canonical channel constants from shared types
- * (e.g. `@shared/types/preload`) instead of redefining channel strings. This
- * prevents drift and keeps AI changes on the established contract codepath.
+ * The preload layer should import canonical channel constants from shared
+ * types (e.g. `@shared/types/preload`) instead of redefining channel strings.
+ * This prevents drift and keeps AI changes on the established contract
+ * codepath.
  */
 export const electronPreloadNoInlineIpcChannelConstantRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow defining inline *_CHANNEL string constants in electron/preload; use shared channel constants instead.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-preload-no-inline-ipc-channel-constant",
-        },
-        schema: [],
-        messages: {
-            noInlineChannelConstant:
-                "Do not define IPC channel string constants here. Import canonical channel constants from @shared/types/preload (or another shared registry).",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -101,8 +87,9 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
                     return;
                 }
 
-                // Heuristic: most channel constants are ALL_CAPS with CHANNEL in the name.
-                if (!/CHANNEL/u.test(node.id.name)) {
+                // Heuristic: most channel constants are ALL_CAPS with CHANNEL
+                // In the name.
+                if (!/CHANNEL/v.test(node.id.name)) {
                     return;
                 }
 
@@ -116,5 +103,20 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow defining inline *_CHANNEL string constants in electron/preload; use shared channel constants instead.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-preload-no-inline-ipc-channel-constant.md",
+        },
+        schema: [],
+        messages: {
+            noInlineChannelConstant:
+                "Do not define IPC channel string constants here. Import canonical channel constants from @shared/types/preload (or another shared registry).",
+        },
     },
 };

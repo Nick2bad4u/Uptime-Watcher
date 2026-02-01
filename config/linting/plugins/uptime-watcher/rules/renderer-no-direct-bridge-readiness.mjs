@@ -2,14 +2,14 @@
  * @file Rule: renderer-no-direct-bridge-readiness
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule enforcing a single renderer bridge-readiness codepath.
@@ -20,27 +20,12 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  * so initialization, retry/backoff, and diagnostics stay consistent.
  */
 export const rendererNoDirectBridgeReadinessRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow calling waitForElectronBridge outside the renderer IPC helper utilities.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-direct-bridge-readiness",
-        },
-        schema: [],
-        messages: {
-            preferServiceHelpers:
-                "Do not call {{callee}} directly. Use getIpcServiceHelpers / createIpcServiceHelpers so bridge readiness stays centralized.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { callee: any; }; messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -61,9 +46,9 @@ export const rendererNoDirectBridgeReadinessRule = {
         }
 
         /** @type {Set<string>} */
-        const waitForElectronBridgeLocals = new Set();
-        /** @type {Set<string>} */
-        const notReadyErrorLocals = new Set();
+        const /** @type {Set<string>} */
+         notReadyErrorLocals = new Set(),
+        waitForElectronBridgeLocals = new Set();
 
         /**
          * @param {any} node
@@ -78,6 +63,30 @@ export const rendererNoDirectBridgeReadinessRule = {
         }
 
         return {
+            /**
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
+             */
+            CallExpression(node) {
+                const {callee} = node;
+                if (callee.type === "Identifier") {
+                    if (callee.name === "waitForElectronBridge") {
+                        report(callee, "waitForElectronBridge");
+                        return;
+                    }
+
+                    if (waitForElectronBridgeLocals.has(callee.name)) {
+                        report(callee, callee.name);
+                    }
+                }
+
+                if (callee.type === "MemberExpression" && !callee.computed &&
+                        callee.property.type === "Identifier" &&
+                        callee.property.name === "waitForElectronBridge"
+                    ) {
+                        report(callee.property, "waitForElectronBridge");
+                    }
+            },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
@@ -109,36 +118,10 @@ export const rendererNoDirectBridgeReadinessRule = {
             },
 
             /**
-             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
-             */
-            CallExpression(node) {
-                const callee = node.callee;
-                if (callee.type === "Identifier") {
-                    if (callee.name === "waitForElectronBridge") {
-                        report(callee, "waitForElectronBridge");
-                        return;
-                    }
-
-                    if (waitForElectronBridgeLocals.has(callee.name)) {
-                        report(callee, callee.name);
-                    }
-                }
-
-                if (callee.type === "MemberExpression" && !callee.computed) {
-                    if (
-                        callee.property.type === "Identifier" &&
-                        callee.property.name === "waitForElectronBridge"
-                    ) {
-                        report(callee.property, "waitForElectronBridge");
-                    }
-                }
-            },
-
-            /**
              * @param {import("@typescript-eslint/utils").TSESTree.NewExpression} node
              */
             NewExpression(node) {
-                const callee = node.callee;
+                const {callee} = node;
                 if (callee.type === "Identifier") {
                     if (callee.name === "ElectronBridgeNotReadyError") {
                         report(callee, "ElectronBridgeNotReadyError");
@@ -151,5 +134,20 @@ export const rendererNoDirectBridgeReadinessRule = {
                 }
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow calling waitForElectronBridge outside the renderer IPC helper utilities.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-direct-bridge-readiness.md",
+        },
+        schema: [],
+        messages: {
+            preferServiceHelpers:
+                "Do not call {{callee}} directly. Use getIpcServiceHelpers / createIpcServiceHelpers so bridge readiness stays centralized.",
+        },
     },
 };

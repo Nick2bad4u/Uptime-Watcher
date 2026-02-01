@@ -2,8 +2,8 @@
  * @file Rule: no-local-record-guards
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -12,21 +12,6 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * ESLint rule disallowing local record-guard helper declarations.
  */
 export const noLocalRecordGuardsRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow local record-guard helper declarations (use shared type helpers instead)",
-            recommended: true,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#no-local-record-guards",
-        },
-        schema: [],
-        messages: {
-            noLocalRecordGuards:
-                "Do not declare a local '{{name}}' helper. Import 'isRecord' and/or 'ensureRecordLike' from '@shared/utils/typeHelpers' instead.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => string; report: (arg0: { node: import("estree").Identifier; messageId: string; data: { name: string; }; }) => void; }} context
      */
@@ -57,24 +42,24 @@ export const noLocalRecordGuardsRule = {
         }
 
         const bannedNames = new Set([
-            "isObjectRecord",
-            "toRecord",
             "asRecord",
+            "isObjectRecord",
             "isRecordLike",
-        ]);
+            "toRecord",
+        ]),
 
         /** @param {import("estree").Identifier} identifier */
-        const reportIdentifier = (identifier) => {
+         reportIdentifier = (identifier) => {
             if (!bannedNames.has(identifier.name)) {
                 return;
             }
 
             context.report({
-                node: identifier,
-                messageId: "noLocalRecordGuards",
                 data: {
                     name: identifier.name,
                 },
+                messageId: "noLocalRecordGuards",
+                node: identifier,
             });
         };
 
@@ -97,5 +82,20 @@ export const noLocalRecordGuardsRule = {
                 }
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow local record-guard helper declarations (use shared type helpers instead)",
+            recommended: true,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-local-record-guards.md",
+        },
+        schema: [],
+        messages: {
+            noLocalRecordGuards:
+                "Do not declare a local '{{name}}' helper. Import 'isRecord' and/or 'ensureRecordLike' from '@shared/utils/typeHelpers' instead.",
+        },
     },
 };

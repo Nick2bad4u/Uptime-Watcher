@@ -2,41 +2,26 @@
  * @file Rule: renderer-no-import-internal-service-utils
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule preventing non-service modules from importing internal
  * `src/services/utils/*` helpers.
  */
 export const rendererNoImportInternalServiceUtilsRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow importing src/services/utils/* outside src/services/*.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-import-internal-service-utils",
-        },
-        schema: [],
-        messages: {
-            noInternalUtils:
-                "Do not import internal service utilities (src/services/utils/*) outside the service layer. Use the public service APIs instead.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -80,5 +65,20 @@ export const rendererNoImportInternalServiceUtilsRule = {
                 }
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow importing src/services/utils/* outside src/services/*.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-import-internal-service-utils.md",
+        },
+        schema: [],
+        messages: {
+            noInternalUtils:
+                "Do not import internal service utilities (src/services/utils/*) outside the service layer. Use the public service APIs instead.",
+        },
     },
 };

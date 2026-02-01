@@ -34,24 +34,10 @@ function typeContainsCodeProperty(typeNode) {
 }
 
 /**
- * ESLint rule encouraging use of tryGetErrorCode over asserting `{ code?: ... }`.
+ * ESLint rule encouraging use of tryGetErrorCode over asserting `{ code?: ...
+ * }`.
  */
 export const preferTryGetErrorCodeRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "require tryGetErrorCode over asserting unknown errors as { code?: ... }",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#prefer-try-get-error-code",
-        },
-        schema: [],
-        messages: {
-            prefer:
-                "Use tryGetErrorCode(error) instead of asserting error as { code?: ... }.",
-        },
-    },
-
     /**
      * @param {{ report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
@@ -83,5 +69,20 @@ export const preferTryGetErrorCodeRule = {
                 checkTypeAssertion(node);
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "require tryGetErrorCode over asserting unknown errors as { code?: ... }",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-try-get-error-code.md",
+        },
+        schema: [],
+        messages: {
+            prefer:
+                "Use tryGetErrorCode(error) instead of asserting error as { code?: ... }.",
+        },
     },
 };

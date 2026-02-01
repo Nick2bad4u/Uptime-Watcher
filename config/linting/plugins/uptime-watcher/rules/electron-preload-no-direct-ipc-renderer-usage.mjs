@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-preload-no-direct-ipcRenderer-usage
+ * @file Rule: electron-preload-no-direct-ipc-renderer-usage
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -17,27 +17,12 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * modules must compose bridges via the core factory utilities.
  */
 export const electronPreloadNoDirectIpcRendererUsageRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow ipcRenderer usage in preload modules outside core bridge infrastructure.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#electron-preload-no-direct-ipcRenderer-usage",
-        },
-        schema: [],
-        messages: {
-            noDirectIpcRenderer:
-                "Do not use ipcRenderer directly in preload domain modules. Use the core bridgeFactory helpers instead.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -97,8 +82,8 @@ export const electronPreloadNoDirectIpcRendererUsageRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} node
              */
             MemberExpression(node) {
-                // Any usage of a free identifier `ipcRenderer` in preload domain
-                // code is banned.
+                // Any usage of a free identifier `ipcRenderer` in preload
+                // Domain code is banned.
                 if (
                     node.object.type === "Identifier" &&
                     node.object.name === "ipcRenderer"
@@ -110,5 +95,20 @@ export const electronPreloadNoDirectIpcRendererUsageRule = {
                 }
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow ipcRenderer usage in preload modules outside core bridge infrastructure.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-preload-no-direct-ipc-renderer-usage.md",
+        },
+        schema: [],
+        messages: {
+            noDirectIpcRenderer:
+                "Do not use ipcRenderer directly in preload domain modules. Use the core bridgeFactory helpers instead.",
+        },
     },
 };

@@ -2,14 +2,14 @@
  * @file Rule: renderer-no-direct-preload-bridge
  *
  * @remarks
- * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal ESLint
- * plugin modular and easier to maintain.
+ * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
+ * ESLint plugin modular and easier to maintain.
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
-// repo path constants live in ../_internal/repo-paths.mjs
+// Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
  * ESLint rule preventing renderer application code from accessing
@@ -22,27 +22,12 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  * readiness checks and error handling.
  */
 export const rendererNoDirectPreloadBridgeRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow direct window.electronAPI usage outside the IPC service helper utilities.",
-            recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#renderer-no-direct-preload-bridge",
-        },
-        schema: [],
-        messages: {
-            avoidDirectBridge:
-                "Do not access {{owner}}.electronAPI directly. Use the established src/services/*Service wrappers (via getIpcServiceHelpers) instead.",
-        },
-    },
-
     /**
      * @param {{ getFilename: () => any; report: (arg0: { data: { owner: string; }; messageId: string; node: any; }) => void; }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
-        const normalizedFilename = normalizePath(rawFilename);
+        const rawFilename = context.getFilename(),
+         normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -70,7 +55,7 @@ export const rendererNoDirectPreloadBridgeRule = {
          * @returns {{owner: string} | null}
          */
         function matchElectronApiMember(member) {
-            const property = member.property;
+            const {property} = member;
             if (member.computed) {
                 if (property.type === "Literal" && property.value === "electronAPI") {
                     // Computed access like window["electronAPI"].
@@ -84,7 +69,7 @@ export const rendererNoDirectPreloadBridgeRule = {
                 return null;
             }
 
-            const object = member.object;
+            const {object} = member;
             if (object.type === "Identifier") {
                 if (
                     object.name === "window" ||
@@ -99,8 +84,8 @@ export const rendererNoDirectPreloadBridgeRule = {
 
             if (object.type === "MemberExpression" && !object.computed) {
                 // Match globalThis.window.electronAPI
-                const innerObject = object.object;
-                const innerProperty = object.property;
+                const innerObject = object.object,
+                 innerProperty = object.property;
                 if (
                     innerObject.type === "Identifier" &&
                     (innerObject.name === "globalThis" ||
@@ -132,5 +117,20 @@ export const rendererNoDirectPreloadBridgeRule = {
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow direct window.electronAPI usage outside the IPC service helper utilities.",
+            recommended: false,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-direct-preload-bridge.md",
+        },
+        schema: [],
+        messages: {
+            avoidDirectBridge:
+                "Do not access {{owner}}.electronAPI directly. Use the established src/services/*Service wrappers (via getIpcServiceHelpers) instead.",
+        },
     },
 };

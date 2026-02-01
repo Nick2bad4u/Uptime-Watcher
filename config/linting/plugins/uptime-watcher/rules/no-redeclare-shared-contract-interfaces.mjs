@@ -6,28 +6,14 @@
  */
 
 /**
- * ESLint rule preventing redeclaration of canonical shared contract interfaces.
+ * ESLint rule preventing redeclaration of canonical shared contract
+ * interfaces.
  *
  * @remarks
  * This helps ensure Electron and renderer layers import the shared contracts
  * rather than drifting out of sync.
  */
 export const noRedeclareSharedContractInterfacesRule = {
-    meta: {
-        type: "problem",
-        docs: {
-            description:
-                "disallow redeclaring canonical shared contract interfaces; import them from @shared instead",
-            recommended: true,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher.mjs#no-redeclare-shared-contract-interfaces",
-        },
-        schema: [],
-        messages: {
-            noRedeclare:
-                "Do not redeclare '{{name}}'. Import it from @shared instead.",
-        },
-    },
-
     /**
      * @param {{ report: (arg0: { node: any; messageId: string; data: { name: any; }; }) => void; }} context
      */
@@ -51,11 +37,26 @@ export const noRedeclareSharedContractInterfacesRule = {
                 }
 
                 context.report({
-                    node: id,
-                    messageId: "noRedeclare",
                     data: { name: id.name },
+                    messageId: "noRedeclare",
+                    node: id,
                 });
             },
         };
+    },
+
+    meta: {
+        type: "problem",
+        docs: {
+            description:
+                "disallow redeclaring canonical shared contract interfaces; import them from @shared instead",
+            recommended: true,
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-redeclare-shared-contract-interfaces.md",
+        },
+        schema: [],
+        messages: {
+            noRedeclare:
+                "Do not redeclare '{{name}}'. Import it from @shared instead.",
+        },
     },
 };
