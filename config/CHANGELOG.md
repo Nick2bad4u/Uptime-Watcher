@@ -8,11 +8,22 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[d54009c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...d54009cf33b556e668453ee4a52883801035e42d))
+[206552b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/206552b1756a5216597d9a88bf30895081886eaf)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...206552b1756a5216597d9a88bf30895081886eaf))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds lint drift guards and mock helpers
+
+✨ [feat] Adds drift-guard lint rules to prevent duplicate contracts and helper redefinitions across layers 🧭
+🔧 [build] Aligns lint configuration with the new plugin guards and reduces conflicting style/test rules 🧹
+🚜 [refactor] Moves constructible mock utilities into shared helpers and adds constructible return-value helpers to avoid non-constructible mocks 🧰
+🧪 [test] Updates constructor-based mocks to use constructible helpers for instantiation safety ✅
+📝 [docs] Refreshes lint and testing guidance to reflect the new guardrails 📚
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5c66818)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c66818d27169a8fbb74ce9585ee797b3eb19413)
+
 
 - ✨ [feat] Refactor icon usage across components to utilize AppIcons
 
@@ -163,6 +174,57 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85d4
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Tightens type safety and guards
+
+🚜 [refactor] Strengthens object safety helpers and theme handling.
+ - 🧩 Uses record-like guards and null-prototype objects to reduce unsafe casts.
+ - 🎨 Simplifies theme variable application with stricter key checks.
+
+🛠️ [fix] Hardens cache validation and event handling.
+ - 🧹 Clears invalid cached monitor type data and falls back safely.
+ - 🧭 Adds platform-aware path normalization and uses generic submit events.
+
+🚜 [refactor] Moves type-only Electron surfaces to declarations.
+
+🧹 [chore] Aligns test runner configs and dependency versions.
+ - ⚙️ Normalizes silent flags and config dirname resolution.
+
+🧪 [test] Adds strict coverage suites for cloud, backup, fs, and path utilities.
+ - 🔍 Expands property-based checks for monitor type handling.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(74169d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74169d4cd54f26d1f967c78c0882e222042e99a5)
+
+
+- 🚜 [refactor] Extract SiteDetails tab content into separate component
+
+ - 🆕 [new] Create SiteDetailsTabContent component to encapsulate tab rendering logic
+ - 🔧 [build] Update SiteDetails component to utilize SiteDetailsTabContent for cleaner structure
+ - 🧹 [chore] Remove individual tab rendering logic from SiteDetails, simplifying its responsibilities
+ - 🔄 [refactor] Pass necessary props to SiteDetailsTabContent for rendering different tabs
+ - 📝 [docs] Add comments to clarify the purpose of the new SiteDetailsTabContent component
+ - 🧪 [test] Ensure comprehensive test coverage for the new SiteDetailsTabContent component
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(77c2986)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/77c29866897b448ffe9c6591df32414980925cd0)
+
+
+- 🚜 [refactor] Improves shared sync logic
+
+🚜 [refactor] Centralizes IPC validation helpers and record checks for consistent parameter rules
+ - Moves common validators and parameter/record validation utilities into shared helpers
+
+🚜 [refactor] Extracts preload cleanup validation and sync event handling to simplify diagnostics
+ - Adds reusable subscription cleanup validation, sync event handler, and status summary utilities
+
+🚜 [refactor] Replaces custom update status wiring with a ref-counted async subscription helper for safer async setup and cleanup
+ - Adds reusable subscription utility with focused coverage
+
+🧪 [test] Simplifies mocks and adds coverage for ref-counted subscriptions
+
+🧹 [chore] Updates dependencies and minor lint config cleanup
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1c7cf4a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c7cf4a945a016639eab31d8756e1f92ba381e00)
+
 
 - 🚜 [refactor] Streamlines validation and UI
 
@@ -369,6 +431,17 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Enhance documentation across multiple scripts
+ - ✨ Improved JSDoc comments for clarity and consistency in `enhance-test-metadata.mjs`, `extract-test-names.mjs`, `find-empty-dirs.mjs`, `find-shared-imports.mjs`, `fix-test-quotes.mjs`, `maintain-docs.mjs`, `migrate-to-mts-simple.mjs`, `sort-frontmatter-all.mjs`, `sort-frontmatter.mjs`, `transform-test.mjs`, `validate-doc-frontmatter.mjs`, `validate-performance-config.mjs`, `verify-eslint-inspector.mjs`, and `test-remark.mjs`.
+ - 🛠️ Fixed quote issues in test descriptions in `ErrorBoundary.comprehensive.test.tsx`.
+ - 🎨 Updated comments in `test-runner-jest.config.js` for better understanding of configuration purpose.
+ - ⚡ Added usage information and remarks in various scripts to enhance usability and understanding.
+ - 🧹 Removed unnecessary eslint disable comments in `test-runner-jest.config.js`.
+ - ✨ Improved overall readability and structure of comments to facilitate easier maintenance and onboarding for new developers.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f94618c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f94618cba62126ce8d2ba4dcef989b0e36e0bf75)
+
+
 - 📝 [docs] Update architecture docs and linting
 
 🚜 [refactor] Standardize internal Zod schema naming and validation
@@ -496,6 +569,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 ### 🧹 Chores
 
+- Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
+
+
 - Update changelogs for v21.0.0 [skip ci] [`(d54009c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d54009cf33b556e668453ee4a52883801035e42d)
 
 
@@ -514,6 +590,14 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update ESLint configuration and dependencies
+ - 🆕 Add `eslint-plugin-eslint-plugin` to enhance linting capabilities
+ - 🛠️ Modify ESLint config to include new plugin settings for improved rule management
+ - 🔄 Remove unused `eslint-plugin-github` import for cleaner code
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(206552b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/206552b1756a5216597d9a88bf30895081886eaf)
+
 
 - 🔧 [build] Update TypeScript configuration files for improved build info management
  - 🛠️ Update `tsBuildInfoFile` paths in multiple TypeScript configuration files to ensure consistency
