@@ -16,9 +16,9 @@ import type { Simplify } from "type-fest";
  * @public
  */
 export interface MonitorTypesActions {
-    formatMonitorDetail: (type: string, details: string) => Promise<string>;
+    formatMonitorDetail: (type: MonitorType, details: string) => Promise<string>;
     formatMonitorTitleSuffix: (
-        type: string,
+        type: MonitorType,
         monitor: Monitor
     ) => Promise<string>;
     getFieldConfig: (
@@ -27,7 +27,7 @@ export interface MonitorTypesActions {
     loadMonitorTypes: () => Promise<void>;
     refreshMonitorTypes: () => Promise<void>;
     validateMonitorData: (
-        type: string,
+        type: MonitorType,
         data: unknown
     ) => Promise<ValidationResult>;
 }
@@ -38,7 +38,7 @@ export interface MonitorTypesActions {
  * @public
  */
 export interface MonitorTypesState {
-    fieldConfigs: Record<string, MonitorTypeConfig["fields"]>;
+    fieldConfigs: Partial<Record<MonitorType, MonitorTypeConfig["fields"]>>;
     isLoaded: boolean;
     monitorTypes: MonitorTypeConfig[];
 }

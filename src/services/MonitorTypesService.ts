@@ -11,7 +11,7 @@
  * @packageDocumentation
  */
 
-import type { Monitor } from "@shared/types";
+import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
@@ -47,15 +47,15 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
 })();
 
 interface MonitorTypesServiceContract {
-    formatMonitorDetail: (type: string, details: string) => Promise<string>;
+    formatMonitorDetail: (type: MonitorType, details: string) => Promise<string>;
     formatMonitorTitleSuffix: (
-        type: string,
+        type: MonitorType,
         monitor: Monitor
     ) => Promise<string>;
     getMonitorTypes: () => Promise<MonitorTypeConfig[]>;
     initialize: () => Promise<void>;
     validateMonitorData: (
-        type: string,
+        type: MonitorType,
         data: unknown
     ) => Promise<ValidationResult>;
 }
@@ -94,7 +94,7 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     formatMonitorDetail: wrap(
         "formatMonitorDetail",
-        async (api, type: string, details: string) => {
+        async (api, type: MonitorType, details: string) => {
             const result = await api.monitorTypes.formatMonitorDetail(
                 type,
                 details
@@ -130,7 +130,7 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     formatMonitorTitleSuffix: wrap(
         "formatMonitorTitleSuffix",
-        async (api, type: string, monitor: Monitor) => {
+        async (api, type: MonitorType, monitor: Monitor) => {
             const result = await api.monitorTypes.formatMonitorTitleSuffix(
                 type,
                 monitor
@@ -211,7 +211,11 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     validateMonitorData: wrap(
         "validateMonitorData",
-        async (api, type: string, data: unknown): Promise<ValidationResult> => {
+        async (
+            api,
+            type: MonitorType,
+            data: unknown
+        ): Promise<ValidationResult> => {
             try {
                 const parsed = validateServicePayload(
                     validateValidationResult,

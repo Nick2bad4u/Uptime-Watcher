@@ -40,6 +40,8 @@
  * @public
  */
 
+import type { MonitorType } from "@shared/types";
+
 import { convertError } from "@shared/utils/errorHandling";
 import { useCallback, useState } from "react";
 
@@ -63,7 +65,7 @@ export interface UseMonitorTypesResult {
         /** Human-readable display text for the monitor type */
         label: string;
         /** Unique identifier value for the monitor type */
-        value: string;
+        value: MonitorType;
     }>;
     /** Refresh monitor types from backend */
     refresh: () => Promise<void>;
@@ -80,7 +82,7 @@ export interface UseMonitorTypesResult {
  */
 export function useMonitorTypes(): UseMonitorTypesResult {
     const [options, setOptions] = useState<
-        Array<{ label: string; value: string }>
+        Array<{ label: string; value: MonitorType }>
     >([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | undefined>();

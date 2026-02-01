@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "New Monitor Type Implementation Guide"
 summary: "End-to-end guide for implementing a new monitor type in the Uptime Monitoring System."
 created: "2025-08-01"
-last_reviewed: "2025-11-17"
+last_reviewed: "2026-02-01"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -216,8 +216,8 @@ Goal: a user can add the monitor through the UI, validation responds correctly, 
 
 Run these commands after finishing code changes:
 
-1. `npm run lint`
-2. `npm run type-check`
+1. `npm run lint:fix`
+2. `npm run type-check:all`
 3. `npm run test:shared`
 4. `npm run test:electron`
 5. `npm run test:frontend`

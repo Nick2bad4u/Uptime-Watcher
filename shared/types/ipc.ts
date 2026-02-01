@@ -12,6 +12,7 @@ import type {
     Monitor,
     MonitoringStartSummary,
     MonitoringStopSummary,
+    MonitorType,
     Site,
     StatusUpdate,
 } from "@shared/types";
@@ -362,11 +363,11 @@ export interface IpcInvokeChannelMap {
         result: string;
     };
     "format-monitor-detail": {
-        params: readonly [monitorType: string, details: string];
+        params: readonly [monitorType: MonitorType, details: string];
         result: string;
     };
     "format-monitor-title-suffix": {
-        params: readonly [monitorType: string, monitor: Monitor];
+        params: readonly [monitorType: MonitorType, monitor: Monitor];
         result: string;
     };
     "get-history-limit": {
@@ -462,7 +463,7 @@ export interface IpcInvokeChannelMap {
         result: Site;
     };
     "validate-monitor-data": {
-        params: readonly [monitorType: string, data: unknown];
+        params: readonly [monitorType: MonitorType, data: unknown];
         result: ValidationResult;
     };
     "write-clipboard-text": {

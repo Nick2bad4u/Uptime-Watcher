@@ -61,7 +61,7 @@ describe("Monitor Form Data Types", () => {
                 monitoring: true,
                 retryAttempts: 3,
                 timeout: 10_000,
-                type: "custom",
+                type: "http",
             };
 
             expect(dynamicForm.checkInterval).toBe(300_000);

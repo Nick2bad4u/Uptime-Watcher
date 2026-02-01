@@ -6,9 +6,10 @@
  * types, ensuring consistency between frontend and backend implementations.
  */
 
-import type { MonitorFieldDefinition } from "@shared/types";
+import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 
 import { isObject } from "@shared/utils/typeGuards";
+import { validateMonitorType } from "@shared/utils/validation";
 
 /**
  * Shared representation of a monitor type configuration used by frontend and
@@ -29,7 +30,7 @@ export interface MonitorTypeConfig {
     /** Field definitions for dynamic form generation */
     fields: MonitorFieldDefinition[];
     /** Unique identifier for the monitor type */
-    type: string;
+    type: MonitorType;
     /** UI display configuration */
     uiConfig?: {
         /** Detail label formatter for different contexts */
@@ -71,7 +72,7 @@ export interface MonitorTypeOption {
     /** Human-readable display label presented to users. */
     label: string;
     /** Stable monitor type identifier used across IPC boundaries. */
-    value: string;
+    value: MonitorType;
 }
 
 /**
@@ -434,7 +435,7 @@ export function isMonitorTypeConfig(
         candidate;
 
     if (
-        !isNonEmptyString(type) ||
+        !validateMonitorType(type) ||
         !isNonEmptyString(displayName) ||
         !isNonEmptyString(description) ||
         !isNonEmptyString(version)

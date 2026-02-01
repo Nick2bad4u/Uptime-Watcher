@@ -1,3 +1,4 @@
+import type { DnsRecordType } from "@shared/types/schemaTypes";
 /**
  * Canonical status kinds shared across monitors, sites, and history records.
  *
@@ -289,7 +290,7 @@ export interface Monitor {
     /** Primary node status endpoint used for replication comparisons */
     primaryStatusUrl?: string | undefined;
     /** DNS record type to query (A, AAAA, CNAME, etc.) */
-    recordType?: string | undefined; // Added for DNS monitoring
+    recordType?: DnsRecordType | undefined; // Added for DNS monitoring
     /** Replica node status endpoint used for replication comparisons */
     replicaStatusUrl?: string | undefined;
     /** JSON field (dot notation supported) containing replication timestamps */

@@ -6,6 +6,7 @@ import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { validateMonitorType } from "@shared/utils/validation";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 
 import { logger } from "../../../utils/logger";
@@ -211,11 +212,20 @@ const serializeMonitorTypeConfig = (
         baseProperties.uiConfig
     );
 
+    const monitorTypeCandidate = baseProperties.type;
+    if (!validateMonitorType(monitorTypeCandidate)) {
+        throw new TypeError(
+            `[IpcService] Invalid monitor type identifier '${monitorTypeCandidate}' while serializing monitor type config`
+        );
+    }
+
+    const monitorType = monitorTypeCandidate;
+
     const sanitizedConfig: MonitorTypeConfig = {
         description: baseProperties.description,
         displayName: baseProperties.displayName,
         fields: baseProperties.fields,
-        type: baseProperties.type,
+        type: monitorType,
         version: baseProperties.version,
         ...(serializedUiConfig ? { uiConfig: serializedUiConfig } : {}),
     };
@@ -267,7 +277,7 @@ export function registerMonitorTypeHandlers({
     register(
         MONITOR_TYPES_CHANNELS.formatMonitorDetail,
         (monitorType, details) => {
-            const config = getMonitorTypeConfig(monitorType.trim());
+            const config = getMonitorTypeConfig(monitorType);
             if (!config) {
                 logger.warn(
                     LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL,
@@ -288,7 +298,7 @@ export function registerMonitorTypeHandlers({
     register(
         MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
         (monitorType, monitor) => {
-            const config = getMonitorTypeConfig(monitorType.trim());
+            const config = getMonitorTypeConfig(monitorType);
             if (!config) {
                 logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE, {
                     monitorType,
@@ -307,7 +317,7 @@ export function registerMonitorTypeHandlers({
 
     register(
         MONITOR_TYPES_CHANNELS.validateMonitorData,
-        (monitorType, data) => validateMonitorData(monitorType.trim(), data),
+        (monitorType, data) => validateMonitorData(monitorType, data),
         MonitorTypeHandlerValidators.validateMonitorData
     );
 }

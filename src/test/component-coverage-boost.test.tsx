@@ -602,11 +602,12 @@ describe("Component Coverage Boost", () => {
                 "Port History - localhost:8080"
             );
 
-            // Test unknown monitor type (fallback to type)
-            const unknownMonitor: Monitor = { id: "1", type: "unknown" };
+            // Test missing monitor type option (fallback to type)
+            // (dns is intentionally not present in the options list)
+            const unknownMonitor: Monitor = { id: "1", type: "dns" };
             expect(
                 historyTitleLogic.generateTitle(unknownMonitor, options)
-            ).toBe("unknown History");
+            ).toBe("dns History");
 
             // Test monitor with no URL, host, or port
             const basicMonitor: Monitor = { id: "1", type: "ping" };
@@ -615,10 +616,10 @@ describe("Component Coverage Boost", () => {
             );
 
             // Test monitor type option not found (fallback to monitor.type)
-            const missingTypeMonitor: Monitor = { id: "1", type: "custom" };
+            const missingTypeMonitor: Monitor = { id: "1", type: "dns" };
             expect(
                 historyTitleLogic.generateTitle(missingTypeMonitor, options)
-            ).toBe("custom History");
+            ).toBe("dns History");
         });
     });
 

@@ -1712,7 +1712,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
             const specialMonitorTypes = [
                 {
-                    type: "custom",
+                    type: "http",
                     displayName: "Custom Monitor",
                     description: "Custom monitoring",
                     version: "1.0.0",
@@ -1732,7 +1732,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                     ],
                 },
                 {
-                    type: "advanced",
+                    type: "dns",
                     displayName: "Advanced Monitor",
                     description: "Advanced monitoring",
                     version: "1.0.0",
