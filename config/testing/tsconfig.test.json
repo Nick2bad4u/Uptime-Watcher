@@ -68,6 +68,8 @@
         "../../tests/strictTests/**/*.mts",
         "../../tests/strictTests/**/*.cts",
         "../../tests/strictTests/**/*.tsx",
+        "../../tests/linting/**/*.ts",
+        "../../tests/linting/**/*.tsx",
         "../../tailwind.config.mjs",
         "vitest.config.ts",
         "vitest.shared.config.ts",
