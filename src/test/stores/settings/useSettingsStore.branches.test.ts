@@ -28,12 +28,6 @@ vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-// Mock extractIpcData
-vi.mock("../../../types/ipc", () => ({
-    extractIpcData: vi.fn(),
-    safeExtractIpcData: vi.fn(),
-}));
-
 // Mock logger
 vi.mock("../../../services/logger", () => ({
     logger: {
@@ -84,11 +78,8 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
 });
 
 // Import mocked modules to get references
-import { safeExtractIpcData } from "../../../types/ipc";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { installElectronApiMock } from "../../utils/electronApiMock";
-
-const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
 // Mock the entire electronAPI
@@ -118,16 +109,6 @@ describe("useSettingsStore Branch Coverage Tests", () => {
         // Setup default mock returns
         mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(1000);
         mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(1000);
-
-        mockSafeExtractIpcData.mockImplementation(
-            (response: any, fallback: any) => {
-                try {
-                    return response?.data ?? fallback;
-                } catch {
-                    return fallback;
-                }
-            }
-        );
 
         // Setup withErrorHandling to execute function properly
         mockWithErrorHandling.mockImplementation(

@@ -155,18 +155,26 @@ helpers and their shared counterparts.
 
 1. `src/types/monitorFormData.ts` redefines every monitor form interface,
    accepts `type: string`, and leaves dependent fields partially constrained.
-2. `src/types/monitor-forms.ts` duplicates monitor field descriptions and still
-   relies on `UnknownRecord` change handlers.
+2. `src/types/monitor-forms.ts` duplicated monitor field descriptions and still
+   relied on `UnknownRecord` change handlers.
 3. `src/types/ipc.ts` reimplements the IPC envelope instead of re-exporting the
    shared helpers and lacks excess-property checks.
 
+> Note (2026-02-01): `src/types/ipc.ts` has since been removed in favour of the
+> canonical shared helpers in `shared/utils/ipcResponse.ts` and the channel
+> contracts in `shared/types/ipc.ts`.
+
+> Note (2026-02-01): `src/types/monitor-forms.ts` has since been removed to
+> eliminate duplication; renderer form typing is now centralized in
+> `src/types/monitorFormData.ts` + `src/utils/monitorValidation.ts`.
+
 #### Recommended Follow-ups (Renderer Types Audit)
 
-| Roadmap Item | Scope                    | Action                                                                                                                   |
-| ------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| 34           | `monitorFormData.ts`     | Import shared monitor configuration inputs, enforce `RequireAllOrNone`, and align `type` fields with `MonitorType`.      |
-| 35           | `src/types/ipc.ts`       | Re-export shared IPC helpers and wrap guards with `Exact<>` to forbid excess properties.                                 |
-| 38           | Renderer monitor helpers | Update `monitorUiHelpers.ts` / `monitorTitleFormatters.ts` to depend on the shared unions once the form types are fixed. |
+| Roadmap Item | Scope                    | Action                                                                                                                     |
+| ------------ | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| 34           | `monitorFormData.ts`     | Import shared monitor configuration inputs, enforce `RequireAllOrNone`, and align `type` fields with `MonitorType`.        |
+| 35           | `src/types/ipc.ts`       | ✅ Completed (2026-02-01): remove renderer-local IPC helpers and use `shared/utils/ipcResponse.ts` + `shared/types/ipc.ts`. |
+| 38           | Renderer monitor helpers | Update `monitorUiHelpers.ts` / `monitorTitleFormatters.ts` to depend on the shared unions once the form types are fixed.   |
 
 ## 3. Zustand Store Typing Audit (2025-11-28)
 
@@ -323,7 +331,7 @@ the rationale for its modifications.
 | src/components/SiteDetails/SiteDetails.tsx                                 | Reviewed | Component now reads percentile metrics via nested analytics.percentileMetrics structure.                                                      |
 | src/hooks/site/useSiteAnalytics.ts                                         | Reviewed | Hook now exposes percentileMetrics object and uses readonly arrays for filtered history calculations.                                         |
 | src/services/EventsService.ts                                              | Reviewed | Monitoring start/stop guards now validate unknown payloads and log errors before invoking callbacks.                                          |
-| src/services/SiteService.ts                                                | Reviewed | Snapshot validation now checks status === "success" per new guard return shape.                                                               |
+| src/services/SiteService.ts                                                | Reviewed | Snapshot validation now consumes Zod `safeParse` results from `validateSiteSnapshots`, logging issues + derived invalid indices on failure.   |
 | src/stores/sites/types.ts                                                  | Reviewed | SitesState now re-exports canonical shape from useSitesState to avoid divergence.                                                             |
 | src/stores/sites/useSiteMonitoring.ts                                      | Reviewed | Dependency contract now reflects optional optimistic lock maps via Partial\<Record<...>>.                                                     |
 | src/stores/sites/useSitesState.ts                                          | Reviewed | State now uses typed Site/Monitor identifiers, partial lock maps, key validators, and helper collectors for cleanup.                          |
@@ -352,8 +360,8 @@ the rationale for its modifications.
 | src/test/working-utility-coverage.test.ts                                  | Reviewed | Coverage harness now passes serializable object to safeJsonStringifyWithFallback per new guard behavior.                                      |
 | src/theme/ThemeManager.ts                                                  | Reviewed | Color variable handling now uses typed helpers for emitting CSS properties and avoids unsafe type assertions.                                 |
 | src/theme/useTheme.ts                                                      | Reviewed | Added resolveThemeColorPath helper using shared isRecord guard for safer color lookup.                                                        |
-| src/types/ipc.ts                                                           | Reviewed | Renderer IPC types now alias shared diagnostics/response contracts and guard checks only allow known response keys.                           |
-| src/types/monitor-forms.ts                                                 | Reviewed | Introduced RequireAllOrNone helpers, non-empty string guards, and stricter replication/heartbeat field typing.                                |
+| src/types/ipc.ts                                                           | Reviewed | ✅ Removed (2026-02-01) in favour of `shared/utils/ipcResponse.ts` + `shared/types/ipc.ts` to eliminate duplicate IPC envelope helpers.        |
+| src/types/monitor-forms.ts                                                 | Reviewed | ✅ Removed (2026-02-01) to eliminate duplication with `monitorFormData.ts`; renderer form typing now lives in `src/types/monitorFormData.ts`.  |
 | src/types/monitorFormData.ts                                               | Reviewed | Monitor form types now reuse RequireAllOrNone helpers, non-empty string guards, and refined type guards for replication/heartbeat.            |
 | src/types/typeUtils.ts                                                     | Reviewed | Added RequireAllOrNoneFields helper ensuring grouped form fields stay in sync.                                                                |
 | src/utils/monitorTitleFormatters.ts                                        | Reviewed | Formatter registry now uses typed monitor keys, supports custom maps, and exposes reset helper.                                               |

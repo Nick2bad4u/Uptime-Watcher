@@ -107,31 +107,6 @@ describe("Comprehensive Coverage Boost Tests", () => {
     });
 
     describe("Monitor Form Types Coverage", () => {
-        it("should test monitor-forms types", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: comprehensive-coverage-boost",
-                "component"
-            );
-            await annotate("Category: Core", "category");
-            await annotate("Type: Monitoring", "type");
-
-            // Test monitor-forms.ts (lines 127-207)
-            const mockMonitorForm = {
-                name: "Test Monitor",
-                type: "http",
-                url: "https://example.com",
-                enabled: true,
-                configuration: {},
-            };
-
-            expect(mockMonitorForm).toBeDefined();
-            expect(mockMonitorForm.name).toBe("Test Monitor");
-            expect(mockMonitorForm.type).toBe("http");
-            expect(mockMonitorForm.url).toBe("https://example.com");
-            expect(mockMonitorForm.enabled).toBeTruthy();
-        });
-
         it("should test monitorFormData types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(

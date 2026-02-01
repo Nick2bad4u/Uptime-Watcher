@@ -10,13 +10,6 @@ import { AppCaches } from "../../utils/cache";
 import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 import { installElectronApiMock } from "./electronApiMock";
 
-// Mock dependencies
-vi.mock("../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn(
-        (response, fallback) => response.data || fallback
-    ),
-}));
-
 vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(async (fn, _description, fallback) => {
         try {

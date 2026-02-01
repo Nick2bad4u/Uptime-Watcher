@@ -534,11 +534,17 @@ describe("monitorFormData functions - Additional Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = (createDefaultFormData as any)("DNS");
-            expect(result1.type).toBe("DNS");
+            expect(() => {
+                (createDefaultFormData as unknown as (type: string) => unknown)(
+                    "DNS"
+                );
+            }).toThrowError(/invalid monitor type/i);
 
-            const result2 = (createDefaultFormData as any)("HTTP");
-            expect(result2.type).toBe("HTTP");
+            expect(() => {
+                (createDefaultFormData as unknown as (type: string) => unknown)(
+                    "HTTP"
+                );
+            }).toThrowError(/invalid monitor type/i);
         });
 
         it("should handle empty string type", async ({ task, annotate }) => {
@@ -550,8 +556,11 @@ describe("monitorFormData functions - Additional Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = (createDefaultFormData as any)("");
-            expect(result.type).toBe("");
+            expect(() => {
+                (createDefaultFormData as unknown as (type: string) => unknown)(
+                    ""
+                );
+            }).toThrowError(/invalid monitor type/i);
         });
 
         it("should handle very long type names", async ({ task, annotate }) => {
@@ -565,8 +574,12 @@ describe("monitorFormData functions - Additional Coverage", () => {
 
             const longType =
                 "very-long-custom-monitor-type-that-is-not-recognized";
-            const result = (createDefaultFormData as any)(longType);
-            expect(result.type).toBe(longType);
+
+            expect(() => {
+                (createDefaultFormData as unknown as (type: string) => unknown)(
+                    longType
+                );
+            }).toThrowError(/invalid monitor type/i);
         });
 
         it("should create consistent base properties for all types", async ({
@@ -581,16 +594,10 @@ describe("monitorFormData functions - Additional Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const types = [
-                "dns",
-                "http",
-                "ping",
-                "port",
-                "custom",
-            ];
+            const types = ["dns", "http", "ping", "port"] as const;
 
             for (const type of types) {
-                const result = (createDefaultFormData as any)(type);
+                const result = createDefaultFormData(type);
                 expect(result).toHaveProperty("checkInterval");
                 expect(result).toHaveProperty("timeout");
                 expect(result).toHaveProperty("retryAttempts");

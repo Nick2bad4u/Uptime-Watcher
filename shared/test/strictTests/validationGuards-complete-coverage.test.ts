@@ -51,8 +51,11 @@ describe(validateSiteSnapshots, () => {
         ];
         const result = validateSiteSnapshots(snapshots);
 
-        expect(result.status).toBe("success");
-        expect(result.errors).toHaveLength(0);
+        expect(result.success).toBeTruthy();
+        if (!result.success) {
+            throw new Error("Expected validation to succeed");
+        }
+
         expect(result.data).toStrictEqual(snapshots);
     });
 
@@ -76,41 +79,38 @@ describe(validateSiteSnapshots, () => {
             invalidSnapshots[1],
         ]);
 
-        expect(result.status).toBe("failure");
-        expect(result.data).toStrictEqual([validSnapshot]);
-        expect(result.errors).toHaveLength(2);
-        expect(result.errors[0]).toMatchObject({
-            index: 1,
-            value: invalidSnapshots[0],
-        });
-        expect(result.errors[1]).toMatchObject({
-            index: 2,
-            value: invalidSnapshots[1],
-        });
-        const [firstError] = result.errors;
-
-        if (!firstError) {
-            throw new Error(
-                "Expected diagnostics for the first invalid snapshot"
-            );
+        expect(result.success).toBeFalsy();
+        if (result.success) {
+            throw new Error("Expected validation to fail");
         }
 
-        const [firstIssue] = firstError.error.issues;
+        const {issues} = result.error;
+        expect(issues.length).toBeGreaterThan(0);
 
-        if (!firstIssue) {
-            throw new Error(
-                "Expected validation issues for the first invalid snapshot"
-            );
-        }
+        const hasIssueForIndex1 = issues.some(
+            (issue) => issue.path[0] === 1
+        );
+        const hasIssueForIndex2 = issues.some(
+            (issue) => issue.path[0] === 2
+        );
 
-        expect(firstIssue.path).toContain("monitors");
+        expect(hasIssueForIndex1).toBeTruthy();
+        expect(hasIssueForIndex2).toBeTruthy();
+
+        const mentionsMonitors = issues.some((issue) =>
+            issue.path.includes("monitors")
+        );
+        expect(mentionsMonitors).toBeTruthy();
     });
 
     it("gracefully handles empty collections", () => {
         const result = validateSiteSnapshots([]);
 
-        expect(result.status).toBe("success");
+        expect(result.success).toBeTruthy();
+        if (!result.success) {
+            throw new Error("Expected validation to succeed");
+        }
+
         expect(result.data).toHaveLength(0);
-        expect(result.errors).toHaveLength(0);
     });
 });

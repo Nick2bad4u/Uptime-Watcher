@@ -66,10 +66,6 @@ vi.mock("../../../stores/utils", async (importOriginal) => {
     };
 });
 
-vi.mock("../../../types/ipc", () => ({
-    safeExtractIpcData: originalSafeExtractIpcData,
-}));
-
 // Mock ElectronAPI
 const mockElectronAPI = {
     monitorTypes: {

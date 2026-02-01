@@ -3,20 +3,12 @@
  * application updates using electron-updater.
  */
 
-import { UPDATE_STATUS, type UpdateStatus } from "@shared/types/events";
+import { UPDATE_STATUS, type UpdateStatusEventData } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { autoUpdater } from "electron-updater";
 
 import { logger } from "../../utils/logger";
-
-/**
- * Data structure for update status information.
- */
-export interface UpdateStatusData {
-    error?: string;
-    status: UpdateStatus;
-}
 
 /**
  * Service responsible for handling application auto-updates. Manages update
@@ -56,7 +48,7 @@ export class AutoUpdaterService {
      * The callback should handle all status types gracefully and avoid throwing
      * exceptions as this could interfere with the update process.
      */
-    private onStatusChange?: (statusData: UpdateStatusData) => void;
+    private onStatusChange?: (statusData: UpdateStatusEventData) => void;
 
     /**
      * Named event handler for checking-for-update event
@@ -323,7 +315,7 @@ export class AutoUpdaterService {
      * @returns Void
      */
     public setStatusCallback(
-        callback: (statusData: UpdateStatusData) => void
+        callback: (statusData: UpdateStatusEventData) => void
     ): void {
         this.onStatusChange = callback;
     }
@@ -350,7 +342,7 @@ export class AutoUpdaterService {
      *
      * @internal
      */
-    private notifyStatusChange(statusData: UpdateStatusData): void {
+    private notifyStatusChange(statusData: UpdateStatusEventData): void {
         if (!this.onStatusChange) {
             return;
         }

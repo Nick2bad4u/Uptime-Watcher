@@ -24,9 +24,10 @@ import {
 import {
     createIpcCorrelationEnvelope,
     IPC_INVOKE_CHANNEL_PARAM_COUNTS,
+    type IpcInvokeChannel,
+    type IpcInvokeChannelMap,
 } from "@shared/types/ipc";
 import { generateCorrelationId } from "@shared/utils/correlation";
-import type { IpcInvokeChannel, IpcInvokeChannelMap } from "../../types/ipc";
 
 // Define all mocks using vi.hoisted so they're available before vi.mock is hoisted
 const { mockIpcMain, mockBrowserWindow, mockContextBridge, mockIpcRenderer } =

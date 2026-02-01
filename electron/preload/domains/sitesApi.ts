@@ -43,20 +43,22 @@ function safeParseSiteArray(
     }
 
     const parsed = validateSiteSnapshots(candidate);
-    if (parsed.status === "success") {
+    if (parsed.success) {
         return { data: parsed.data, success: true };
     }
 
-    const exampleIssue = parsed.errors.at(0);
-    const message =
-        exampleIssue === undefined
-            ? "Invalid site snapshots returned from main process"
-            : `Invalid site snapshots returned from main process (first failure at index ${exampleIssue.index})`;
+    const firstIssue = parsed.error.issues.at(0);
+    const firstIndex = firstIssue?.path[0];
+    const indexSuffix =
+        typeof firstIndex === "number" ? ` (first failure at index ${firstIndex})` : "";
 
     return {
-        error: new Error(message, {
-            cause: exampleIssue?.error,
-        }),
+        error: new Error(
+            `Invalid site snapshots returned from main process${indexSuffix}`,
+            {
+                cause: parsed.error,
+            }
+        ),
         success: false,
     };
 }

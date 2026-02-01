@@ -6,7 +6,6 @@
  * runtime checks remain in sync with the shared type definitions.
  */
 
-import type { ExclusifyUnion } from "type-fest";
 import type * as z from "zod";
 
 import type { Site } from "../types";
@@ -65,35 +64,19 @@ export type StatusUpdateParseResult = ReturnType<
 export const validateStatusUpdate = (value: unknown): StatusUpdateParseResult =>
     statusUpdateSchema.safeParse(value);
 
-/**
- * Describes a validation failure for an individual site snapshot.
- */
-export interface SiteSnapshotValidationIssue {
-    /** Detailed Zod error information for diagnostics. */
-    readonly error: z.ZodError<Site>;
-    /** Index of the invalid snapshot within the original collection. */
-    readonly index: number;
-    /** The original value that failed validation. */
-    readonly value: unknown;
-}
-
-type SiteSnapshotCollectionParseVariant =
-    | {
-          readonly data: Site[];
-          readonly errors: [];
-          readonly status: "success";
-      }
-    | {
-          readonly data: Site[];
-          readonly errors: SiteSnapshotValidationIssue[];
-          readonly status: "failure";
-      };
+const siteSnapshotsSchema: z.ZodType<Site[]> = siteSchema.array();
 
 /**
- * Result shape returned when validating a collection of site snapshots.
+ * Validates an unknown payload against the canonical `Site[]` schema.
+ *
+ * @remarks
+ * This mirrors the return shape of other guards in this module by returning the
+ * Zod {@link SafeParseReturnType}. Consumers that need per-index diagnostics can
+ * derive indices from `result.error.issues[*].path[0]`.
  */
-export type SiteSnapshotCollectionParseResult =
-    ExclusifyUnion<SiteSnapshotCollectionParseVariant>;
+export type SiteSnapshotsParseResult = ReturnType<
+    typeof siteSnapshotsSchema.safeParse
+>;
 
 /**
  * @remarks
@@ -106,37 +89,5 @@ export type SiteSnapshotCollectionParseResult =
  *   validation issues.
  */
 export const validateSiteSnapshots = (
-    values: readonly unknown[]
-): SiteSnapshotCollectionParseResult => {
-    const errors: SiteSnapshotValidationIssue[] = [];
-    const data: Site[] = [];
-
-    values.forEach((value, index) => {
-        const result = siteSchema.safeParse(value);
-
-        if (result.success) {
-            data.push(result.data);
-            return;
-        }
-
-        errors.push({
-            error: result.error,
-            index,
-            value,
-        });
-    });
-
-    if (errors.length === 0) {
-        return {
-            data,
-            errors: [],
-            status: "success",
-        } satisfies SiteSnapshotCollectionParseResult;
-    }
-
-    return {
-        data,
-        errors,
-        status: "failure",
-    } satisfies SiteSnapshotCollectionParseResult;
-};
+    values: unknown
+): SiteSnapshotsParseResult => siteSnapshotsSchema.safeParse(values);

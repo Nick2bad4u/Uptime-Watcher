@@ -18,12 +18,12 @@
  * import { useUpdatesStore } from './stores/updates/useUpdatesStore';
  *
  * function UpdateNotification() {
- *   const { updateStatus, updateInfo, applyUpdate } = useUpdatesStore();
+ *   const { updateStatus, applyUpdate } = useUpdatesStore();
  *
- *   if (updateStatus === 'downloaded' && updateInfo) {
+ *   if (updateStatus === 'downloaded') {
  *     return (
  *       <div>
- *         Update {updateInfo.version} ready!
+ *         Update ready!
  *         <button onClick={applyUpdate}>Install & Restart</button>
  *       </div>
  *     );
@@ -44,7 +44,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { UpdateStatus } from "../types";
-import type { UpdateInfo, UpdatesStore } from "./types";
+import type { UpdatesStore } from "./types";
 
 import { EventsService } from "../../services/EventsService";
 import { logger } from "../../services/logger";
@@ -65,7 +65,6 @@ type UpdatesStoreWithPersist = UseBoundStore<
                     PersistOptions<
                         UpdatesStore,
                         {
-                            updateInfo: undefined | UpdateInfo;
                             updateStatus: UpdateStatus;
                         }
                     >
@@ -81,7 +80,6 @@ type UpdatesStoreWithPersist = UseBoundStore<
                         PersistOptions<
                             UpdatesStore,
                             {
-                                updateInfo: undefined | UpdateInfo;
                                 updateStatus: UpdateStatus;
                             }
                         >
@@ -95,11 +93,9 @@ type UpdatesStoreWithPersist = UseBoundStore<
 const UPDATES_PERSIST_CONFIG = createPersistConfig<
     UpdatesStore,
     {
-        updateInfo: undefined | UpdateInfo;
         updateStatus: UpdateStatus;
     }
 >("updates", (state) => ({
-    updateInfo: state.updateInfo,
     updateStatus: state.updateStatus,
 }));
 
@@ -145,65 +141,65 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                 });
 
             return {
-            // Actions
-            applyUpdate: async (): Promise<void> => {
-                set({ updateError: undefined });
-                logStoreAction("UpdatesStore", "applyUpdate", {
-                    message: "Attempting to apply downloaded update",
-                    success: true,
-                });
-
-                try {
-                    await SystemService.quitAndInstall();
-
+                // Actions
+                applyUpdate: async (): Promise<void> => {
+                    set({ updateError: undefined });
                     logStoreAction("UpdatesStore", "applyUpdate", {
-                        message: "Quit and install triggered successfully",
+                        message: "Attempting to apply downloaded update",
                         success: true,
                     });
-                } catch (error: unknown) {
-                    const normalizedError = ensureError(error);
 
-                    set({ updateError: normalizedError.message });
-                    logStoreAction("UpdatesStore", "applyUpdate", {
-                        error: normalizedError.message,
-                        message: "Failed to trigger quit-and-install operation",
-                        success: false,
+                    try {
+                        await SystemService.quitAndInstall();
+
+                        logStoreAction("UpdatesStore", "applyUpdate", {
+                            message: "Quit and install triggered successfully",
+                            success: true,
+                        });
+                    } catch (error: unknown) {
+                        const normalizedError = ensureError(error);
+
+                        set({ updateError: normalizedError.message });
+                        logStoreAction("UpdatesStore", "applyUpdate", {
+                            error: normalizedError.message,
+                            message:
+                                "Failed to trigger quit-and-install operation",
+                            success: false,
+                        });
+                    }
+                },
+                applyUpdateStatus: (status: UpdateStatus): void => {
+                    logStoreAction("UpdatesStore", "applyUpdateStatus", {
+                        status,
                     });
-                }
-            },
-            applyUpdateStatus: (status: UpdateStatus): void => {
-                logStoreAction("UpdatesStore", "applyUpdateStatus", { status });
-                set({ updateStatus: status });
-            },
-            clearUpdateError: (): void => {
-                set({ updateError: undefined });
-                logStoreAction("UpdatesStore", "clearUpdateError", {
-                    message: "Update error cleared",
-                    success: true,
-                });
-            },
-            setUpdateError: (error: string | undefined): void => {
-                logStoreAction("UpdatesStore", "setUpdateError", { error });
-                set({ updateError: error });
-            },
-            setUpdateInfo: (info): void => {
-                logStoreAction("UpdatesStore", "setUpdateInfo", { info });
-                set({ updateInfo: info });
-            },
+                    set({ updateStatus: status });
+                },
+                clearUpdateError: (): void => {
+                    set({ updateError: undefined });
+                    logStoreAction("UpdatesStore", "clearUpdateError", {
+                        message: "Update error cleared",
+                        success: true,
+                    });
+                },
+                setUpdateError: (error: string | undefined): void => {
+                    logStoreAction("UpdatesStore", "setUpdateError", {
+                        error,
+                    });
+                    set({ updateError: error });
+                },
+                setUpdateProgress: (progress: number): void => {
+                    logStoreAction("UpdatesStore", "setUpdateProgress", {
+                        progress,
+                    });
+                    set({ updateProgress: progress });
+                },
+                subscribeToUpdateStatusEvents: (): (() => void) =>
+                    updateStatusEventsSubscription.subscribe(),
 
-            setUpdateProgress: (progress: number): void => {
-                logStoreAction("UpdatesStore", "setUpdateProgress", {
-                    progress,
-                });
-                set({ updateProgress: progress });
-            },
-
-            subscribeToUpdateStatusEvents: (): (() => void) => updateStatusEventsSubscription.subscribe(),
-            updateError: undefined,
-            updateInfo: undefined,
-            updateProgress: 0,
-            // State
-            updateStatus: "idle",
+                // State
+                updateError: undefined,
+                updateProgress: 0,
+                updateStatus: "idle",
             };
         },
         {

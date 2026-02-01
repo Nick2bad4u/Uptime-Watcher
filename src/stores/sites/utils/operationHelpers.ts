@@ -5,7 +5,6 @@
  */
 
 import type { Site } from "@shared/types";
-import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
@@ -31,25 +30,71 @@ const SITE_NOT_FOUND_MESSAGE = ERROR_CATALOG.sites.NOT_FOUND as string;
  */
 export interface OperationTelemetryConfig {
     /** Metadata merged into every log entry regardless of stage. */
-    base?: UnknownRecord;
+    base?: SitesTelemetryPayload;
     /** Additional metadata for failure log entries only. */
-    failure?: UnknownRecord;
+    failure?: SitesTelemetryPayload;
     /** Additional metadata for pending log entries only. */
-    pending?: UnknownRecord;
+    pending?: SitesTelemetryPayload;
     /** Additional metadata for success log entries only. */
-    success?: UnknownRecord;
+    success?: SitesTelemetryPayload;
 }
+
+/**
+ * Typed telemetry payload for the sites store.
+ *
+ * @remarks
+ * This is intentionally *flexible* (values are `unknown`) because telemetry
+ * often includes domain objects (e.g. `Partial<Site>`, monitors, sync deltas)
+ * whose types may contain unions/optionals that are awkward to model as strict
+ * JSON values.
+ *
+ * The consistency win here is centralizing the payload type and standardizing
+ * stage keys (`status`, `success`, `error`) via {@link SitesTelemetryStagePayload}.
+ */
+export type SitesTelemetryPayload = Readonly<Record<string, unknown>>;
+
+/**
+ * Telemetry stage discriminator used by the sites store.
+ *
+ * @public
+ */
+export type SitesTelemetryStage = "failure" | "pending" | "success";
+
+/**
+ * Discriminated union describing the canonical keys emitted by the sites store
+ * operation telemetry pipeline.
+ *
+ * @remarks
+ * The stage-specific keys (`status`, `success`, `error`) are standardized to
+ * make logs easy to query, while still allowing additional metadata via
+ * {@link SitesTelemetryPayload}.
+ *
+ * @public
+ */
+export type SitesTelemetryStagePayload =
+    | (SitesTelemetryPayload & {
+          readonly error: string;
+          readonly status: "failure";
+          readonly success: false;
+      })
+    | (SitesTelemetryPayload & { readonly status: "pending" })
+    | (SitesTelemetryPayload & {
+          readonly status: "success";
+          readonly success: true;
+      });
+
+type MutableSitesTelemetryPayload = Record<string, unknown>;
 
 type OperationTelemetryInput =
     | OperationTelemetryConfig
-    | undefined
-    | UnknownRecord;
+    | SitesTelemetryPayload
+    | undefined;
 
 interface NormalizedTelemetry {
-    readonly base: UnknownRecord;
-    readonly failure: UnknownRecord;
-    readonly pending: UnknownRecord;
-    readonly success: UnknownRecord;
+    readonly base: MutableSitesTelemetryPayload;
+    readonly failure: MutableSitesTelemetryPayload;
+    readonly pending: MutableSitesTelemetryPayload;
+    readonly success: MutableSitesTelemetryPayload;
 }
 
 /**
@@ -66,7 +111,7 @@ const TELEMETRY_CONFIG_KEYS = [
     "success",
 ] as const;
 
-const isPlainRecord = (value: unknown): value is UnknownRecord =>
+const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
     isSharedRecord(value);
 
 const isTelemetryConfig = (
@@ -111,7 +156,7 @@ const normalizeTelemetry = (
 const selectStageMetadata = (
     stage: OperationStage,
     telemetry: NormalizedTelemetry
-): UnknownRecord => {
+): MutableSitesTelemetryPayload => {
     if (stage === "failure") {
         return telemetry.failure;
     }
@@ -125,8 +170,8 @@ const selectStageMetadata = (
 
 const createTelemetryEmitter =
     (operationName: string, telemetry: NormalizedTelemetry) =>
-    (stage: OperationStage, additional: UnknownRecord): void => {
-        const payload: UnknownRecord = {
+    (stage: OperationStage, additional: SitesTelemetryPayload): void => {
+        const payload: MutableSitesTelemetryPayload = {
             ...telemetry.base,
             ...selectStageMetadata(stage, telemetry),
             ...additional,

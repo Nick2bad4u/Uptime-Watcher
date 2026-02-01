@@ -22,10 +22,20 @@ import { describe, expect, it } from "vitest";
 import fc from "fast-check";
 
 import {
-    isIpcResponse,
-    extractIpcData,
-    safeExtractIpcData,
-} from "../../types/ipc";
+    extractIpcResponseData,
+    isIpcResponseEnvelope,
+    safeExtractIpcResponseData,
+} from "@shared/utils/ipcResponse";
+
+// Preserve the historical helper names used by this suite while delegating to
+// the canonical shared implementation.
+const isIpcResponse = isIpcResponseEnvelope;
+
+const extractIpcData = (response: unknown): unknown =>
+    extractIpcResponseData(response, { requireData: false });
+
+const safeExtractIpcData = <T>(response: unknown, fallback: T): T =>
+    safeExtractIpcResponseData(response, fallback);
 
 describe("IPC Communication Fuzzing Tests", () => {
     describe("IPC Response Type Guard Fuzzing", () => {

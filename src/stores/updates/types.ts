@@ -8,22 +8,6 @@
 import type { UpdateStatus } from "../types";
 
 /**
- * Update information interface.
- *
- * @public
- */
-export interface UpdateInfo {
-    /** Release date */
-    releaseDate: string;
-    /** Release name */
-    releaseName: string;
-    /** Release notes */
-    releaseNotes: string;
-    /** Version number */
-    version: string;
-}
-
-/**
  * Updates store interface. Manages application update status and operations.
  *
  * @public
@@ -46,8 +30,6 @@ export interface UpdatesStore {
     clearUpdateError: () => void;
     /** Set update error */
     setUpdateError: (error: string | undefined) => void;
-    /** Set update info */
-    setUpdateInfo: (info: undefined | UpdateInfo) => void;
 
     /** Set update progress */
     setUpdateProgress: (progress: number) => void;
@@ -68,7 +50,6 @@ export interface UpdatesStore {
     /** Update error message if any */
     updateError: string | undefined;
     /** Update information */
-    updateInfo: undefined | UpdateInfo;
     /** Update progress (0-100) */
     updateProgress: number;
     // State

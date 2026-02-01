@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Updates store"
 summary: "Reference for the renderer store managing app update availability and user-triggered update actions."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
+last_reviewed: "2026-02-01"
 category: "guide"
 author: "Uptime Watcher Team"
 tags:
@@ -18,9 +18,9 @@ tags:
 
 `useUpdatesStore` models update state for:
 
-- update availability (`updateAvailable`, `updateInfo`)
-- update workflows (`isCheckingForUpdates`, `isApplyingUpdate`)
-- user actions (`checkForUpdates`, `installUpdate`)
+- update lifecycle status (`updateStatus`) and errors (`updateError`)
+- update progress (`updateProgress`) for UI affordances
+- user action for applying a downloaded update (`applyUpdate`)
 
 ## Source
 

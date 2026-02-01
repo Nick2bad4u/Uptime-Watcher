@@ -8,11 +8,14 @@
  * @public
  */
 
+import type { MonitorType } from "@shared/types";
+import type { DnsRecordType } from "@shared/types/schemaTypes";
 import type { SetOptional, Simplify, UnknownRecord } from "type-fest";
 
 import { safeObjectAccess } from "@shared/utils/objectSafety";
 import { isNonEmptyString } from "@shared/utils/typeGuards";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { validateMonitorType } from "@shared/utils/validation";
 import {
     isValidFQDN,
     isValidHost,
@@ -82,15 +85,15 @@ export interface BaseFormData {
     retryAttempts?: number;
     /** Request timeout in milliseconds */
     timeout?: number;
-    /** Monitor type identifier with autocomplete for known types */
-    type?: string;
+    /** Monitor type identifier */
+    type?: MonitorType;
 }
 
 /**
  * Dynamic form data for extensible monitor types.
  *
  * @remarks
- * Used when the monitor type is not known at compile time but the renderer
+ * Used when the monitor fields are not known at compile time but the renderer
  * still wants autocomplete for shared primitives.
  *
  * @public
@@ -104,8 +107,8 @@ export interface DynamicFormData extends UnknownRecord {
     retryAttempts?: number;
     /** Request timeout in milliseconds */
     timeout?: number;
-    /** Monitor type identifier with autocomplete for known types */
-    type?: string;
+    /** Monitor type identifier */
+    type?: MonitorType;
 }
 
 /**
@@ -223,7 +226,7 @@ export interface DnsFormData extends BaseFormData {
     /** Target host to resolve */
     host: string;
     /** DNS record type to query */
-    recordType: string;
+    recordType: DnsRecordType;
     type: "dns";
 }
 
@@ -364,10 +367,19 @@ export interface CreateDefaultFormData {
     (type: "server-heartbeat"): SetOptional<ServerHeartbeatFormData, ServerHeartbeatOptionalKeys>;
     (type: "ssl"): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
     (type: "websocket-keepalive"): SetOptional<WebsocketKeepaliveFormData, WebsocketKeepaliveOptionalKeys>;
-    (type: string): SetOptional<BaseFormData, never>;
+    (type: MonitorType): SetOptional<BaseFormData, never>;
 }
 
-function createDefaultFormDataImpl(type: string): SetOptional<BaseFormData, never> {
+function createDefaultFormDataImpl(
+    type: MonitorType
+): SetOptional<BaseFormData, never> {
+    // Defensive runtime validation in case callers circumvent TypeScript.
+    if (!validateMonitorType(type)) {
+        throw new Error(
+            "[createDefaultFormData] Invalid monitor type provided"
+        );
+    }
+
     return {
         checkInterval: 300_000, // 5 minutes
         monitoring: true,
@@ -797,19 +809,21 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
 
     const formData = data as Partial<MonitorFormData>;
 
-    if (!formData.type || typeof formData.type !== "string") {
+    if (!validateMonitorType(formData.type)) {
         return false;
     }
 
+    const monitorType = formData.type;
+
     // Use type-safe access with proper typing
     const validator = (
-        FORM_DATA_VALIDATORS as Simplify<
+        FORM_DATA_VALIDATORS as Partial<
             Record<
-                string,
+                MonitorType,
                 ((data: Partial<MonitorFormData>) => boolean) | undefined
             >
         >
-    )[formData.type];
+    )[monitorType];
     if (!validator) {
         return false;
     }

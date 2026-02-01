@@ -47,13 +47,6 @@ vi.mock("../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 
-// Mock IPC functions that are used by the store operations
-vi.mock("../../types/ipc", () => ({
-    extractIpcData: vi.fn((data) => data),
-    safeExtractIpcData: vi.fn((data) => data),
-    isIpcResponse: vi.fn(() => true),
-}));
-
 // Mock SiteService that the store operations use
 vi.mock("../../services/SiteService", () => ({
     SiteService: {

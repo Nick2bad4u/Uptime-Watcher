@@ -9,11 +9,11 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
-import type { UnknownRecord } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { SiteMonitoringActions } from "./types";
+import type { SitesTelemetryPayload } from "./utils/operationHelpers";
 import type { OptimisticMonitoringLock } from "./utils/optimisticMonitoringLock";
 import type { StatusUpdateSnapshotPayload } from "./utils/statusUpdateSnapshot";
 
@@ -124,20 +124,20 @@ type MonitoringActionName =
 const buildMonitoringLogPayload = (
     siteIdentifier: string,
     monitorId: string | undefined,
-    base: UnknownRecord
-): UnknownRecord => {
+    base: SitesTelemetryPayload
+): SitesTelemetryPayload => {
     if (monitorId === undefined) {
         return {
             siteIdentifier,
             ...base,
-        } satisfies UnknownRecord;
+        } satisfies SitesTelemetryPayload;
     }
 
     return {
         monitorId,
         siteIdentifier,
         ...base,
-    } satisfies UnknownRecord;
+    } satisfies SitesTelemetryPayload;
 };
 
 /**

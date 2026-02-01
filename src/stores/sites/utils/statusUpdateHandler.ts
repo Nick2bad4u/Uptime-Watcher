@@ -11,13 +11,13 @@
  */
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Site, StatusUpdate } from "@shared/types";
-import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isEnrichedMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
 
 import type { ListenerAttachmentState } from "../baseTypes";
+import type { SitesTelemetryPayload } from "./operationHelpers";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
 
 import { logger } from "../../../services/logger";
@@ -541,25 +541,29 @@ export class StatusUpdateManager {
             | RendererEventPayloadMap["monitoring:started"]
             | RendererEventPayloadMap["monitoring:stopped"]
     ): void {
-        const logPayload: UnknownRecord = { phase };
+        const monitorCountValue = event.monitorCount;
+        const siteCountValue = event.siteCount;
+        const timestampValue = event["timestamp"];
+        const {activeMonitors} = event;
+        const {reason} = event;
 
-        if (event.monitorCount !== undefined) {
-            logPayload["monitorCount"] = event.monitorCount;
-        }
+        const monitorCount =
+            typeof monitorCountValue === "number" ? monitorCountValue : undefined;
+        const siteCount =
+            typeof siteCountValue === "number" ? siteCountValue : undefined;
+        const timestamp =
+            typeof timestampValue === "number" ? timestampValue : undefined;
 
-        if (event.siteCount !== undefined) {
-            logPayload["siteCount"] = event.siteCount;
-        }
-
-        logPayload["timestamp"] = event["timestamp"];
-
-        if (typeof event.activeMonitors === "number") {
-            logPayload["activeMonitors"] = event.activeMonitors;
-        }
-
-        if (typeof event.reason === "string") {
-            logPayload["reason"] = event.reason;
-        }
+        const logPayload = {
+            phase,
+            ...(timestamp === undefined ? {} : { timestamp }),
+            ...(monitorCount === undefined ? {} : { monitorCount }),
+            ...(siteCount === undefined ? {} : { siteCount }),
+            ...(typeof activeMonitors === "number"
+                ? { activeMonitors }
+                : {}),
+            ...(typeof reason === "string" ? { reason } : {}),
+        } satisfies SitesTelemetryPayload;
 
         logger.debug("Received monitoring lifecycle event", logPayload);
     }

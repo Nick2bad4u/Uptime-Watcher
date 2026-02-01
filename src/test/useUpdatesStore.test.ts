@@ -50,7 +50,6 @@ describe(useUpdatesStore, () => {
         // Reset the store before each test
         useUpdatesStore.setState({
             updateError: undefined,
-            updateInfo: undefined,
             updateProgress: 0,
             updateStatus: "idle",
         });
@@ -83,7 +82,6 @@ describe(useUpdatesStore, () => {
             expect(result.current.updateStatus).toBe("idle");
             expect(result.current.updateProgress).toBe(0);
             expect(result.current.updateError).toBeUndefined();
-            expect(result.current.updateInfo).toBeUndefined();
         });
 
         it("should set update status", async ({ task, annotate }) => {
@@ -262,58 +260,6 @@ describe(useUpdatesStore, () => {
         });
     });
 
-    describe("update info management", () => {
-        it("should set update info", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUpdatesStore", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
-
-            const updateInfo = {
-                releaseDate: "2023-01-01",
-                releaseName: "v1.0.0",
-                releaseNotes: "Bug fixes and improvements",
-                version: "1.0.0",
-            };
-
-            const { result } = renderHook(() => useUpdatesStore());
-
-            act(() => {
-                result.current.setUpdateInfo(updateInfo);
-            });
-
-            expect(result.current.updateInfo).toEqual(updateInfo);
-        });
-
-        it("should clear update info", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUpdatesStore", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
-
-            const updateInfo = {
-                releaseDate: "2023-01-01",
-                releaseName: "v1.0.0",
-                releaseNotes: "Bug fixes and improvements",
-                version: "1.0.0",
-            };
-
-            const { result } = renderHook(() => useUpdatesStore());
-
-            act(() => {
-                result.current.setUpdateInfo(updateInfo);
-            });
-
-            expect(result.current.updateInfo).toEqual(updateInfo);
-
-            act(() => {
-                result.current.setUpdateInfo(undefined);
-            });
-
-            expect(result.current.updateInfo).toBeUndefined();
-        });
-    });
-
     describe("complex scenarios", () => {
         it("should handle complete update lifecycle", async ({
             task,
@@ -336,16 +282,9 @@ describe(useUpdatesStore, () => {
             // Update available
             act(() => {
                 result.current.applyUpdateStatus("available");
-                result.current.setUpdateInfo({
-                    releaseDate: "2023-01-01",
-                    releaseName: "v1.0.0",
-                    releaseNotes: "New features",
-                    version: "1.0.0",
-                });
             });
 
             expect(result.current.updateStatus).toBe("available");
-            expect(result.current.updateInfo?.version).toBe("1.0.0");
 
             // Start downloading
             act(() => {
@@ -419,23 +358,14 @@ describe(useUpdatesStore, () => {
 
             const { result } = renderHook(() => useUpdatesStore());
 
-            const updateInfo = {
-                releaseDate: "2023-02-01",
-                releaseName: "v2.0.0",
-                releaseNotes: "Major update",
-                version: "2.0.0",
-            };
-
             act(() => {
                 result.current.applyUpdateStatus("downloading");
                 result.current.setUpdateProgress(75);
-                result.current.setUpdateInfo(updateInfo);
                 result.current.setUpdateError("Connection timeout");
             });
 
             expect(result.current.updateStatus).toBe("downloading");
             expect(result.current.updateProgress).toBe(75);
-            expect(result.current.updateInfo).toEqual(updateInfo);
             expect(result.current.updateError).toBe("Connection timeout");
 
             // Change only status
@@ -445,7 +375,6 @@ describe(useUpdatesStore, () => {
 
             expect(result.current.updateStatus).toBe("error");
             expect(result.current.updateProgress).toBe(75); // Should remain unchanged
-            expect(result.current.updateInfo).toEqual(updateInfo); // Should remain unchanged
             expect(result.current.updateError).toBe("Connection timeout"); // Should remain unchanged
         });
     });
@@ -531,19 +460,11 @@ describe(useUpdatesStore, () => {
             const { logStoreAction } = await import("../stores/utils");
             const { result } = renderHook(() => useUpdatesStore());
 
-            const updateInfo = {
-                releaseDate: "2023-01-01",
-                releaseName: "v1.0.0",
-                releaseNotes: "Test update",
-                version: "1.0.0",
-            };
-
             // Test all actions that should log
             await act(async () => {
                 result.current.applyUpdateStatus("checking");
                 result.current.setUpdateProgress(50);
                 result.current.setUpdateError("Test error");
-                result.current.setUpdateInfo(updateInfo);
                 result.current.clearUpdateError();
                 await result.current.applyUpdate();
             });
@@ -562,11 +483,6 @@ describe(useUpdatesStore, () => {
                 "UpdatesStore",
                 "setUpdateError",
                 { error: "Test error" }
-            );
-            expect(logStoreAction).toHaveBeenCalledWith(
-                "UpdatesStore",
-                "setUpdateInfo",
-                { info: updateInfo }
             );
             expect(logStoreAction).toHaveBeenCalledWith(
                 "UpdatesStore",

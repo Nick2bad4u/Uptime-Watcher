@@ -292,7 +292,7 @@ This sequence illustrates how a scheduled monitor run traverses the enhanced mon
     AppSvc->>Notify: notifyMonitorDown/Up(site, monitorId)
     AppSvc->>RendererBridge: sendToRenderers(channel, payload)
     RendererBridge->>Preload: webContents.send(channel, payload)
-    Preload->>Renderer: window.electronAPI.events.dispatch(channel, payload)
+    Preload->>Renderer: ipcRenderer.on(channel) listener forwards to registered callbacks
     Renderer->>Stores: apply typed update & append history
     Stores->>UI: Re-render dashboards
 

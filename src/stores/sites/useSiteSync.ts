@@ -19,7 +19,6 @@ import type {
     SiteSyncDelta,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
-import type { UnknownRecord } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import {
@@ -30,6 +29,7 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
+import type { SitesTelemetryPayload } from "./utils/operationHelpers";
 
 import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
@@ -695,7 +695,7 @@ export const createSiteSyncActions = (
                             );
                         }
 
-                        const telemetryPayload: UnknownRecord = {
+                        const telemetryPayload = {
                             completedAt,
                             message: synchronized
                                 ? "Sites synchronized from backend"
@@ -705,12 +705,13 @@ export const createSiteSyncActions = (
                             source,
                             status: synchronized ? "success" : "failure",
                             success: synchronized,
-                        };
-
-                        if (!synchronized) {
-                            telemetryPayload["failureReason"] =
-                                "backend-not-synchronized";
-                        }
+                            ...(synchronized
+                                ? {}
+                                : {
+                                      failureReason:
+                                          "backend-not-synchronized",
+                                  }),
+                        } satisfies SitesTelemetryPayload;
 
                         logStoreAction(
                             "SitesStore",

@@ -8,7 +8,6 @@ import * as fc from "fast-check";
 
 import { AppCaches } from "../../utils/cache";
 import * as errorHandling from "@shared/utils/errorHandling";
-import * as ipcTypes from "../../types/ipc";
 import type { MonitorFieldDefinition } from "@shared/types";
 import {
     clearMonitorTypeCache,
@@ -51,10 +50,6 @@ vi.mock("../../utils/cache", () => ({
         cache.set(key, value);
         return value;
     }),
-}));
-
-vi.mock("../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn(),
 }));
 
 vi.mock("@shared/utils/errorHandling", () => ({
@@ -323,16 +318,12 @@ describe("monitorTypeHelper", () => {
             vi.mocked(
                 errorHandling.withUtilityErrorHandling
             ).mockImplementation(async (fn) => await fn());
-            vi.mocked(ipcTypes.safeExtractIpcData).mockReturnValue([]);
 
             // Configure the mock store to return empty data
             mockMonitorTypesStore.monitorTypes = [];
             mockMonitorTypesStore.isLoaded = true;
 
-            getMonitorTypesMock.mockResolvedValue({
-                success: true,
-                data: [],
-            });
+            getMonitorTypesMock.mockResolvedValue([]);
 
             const result = await getAvailableMonitorTypes();
 

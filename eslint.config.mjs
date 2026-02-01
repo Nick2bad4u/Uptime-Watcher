@@ -3257,6 +3257,12 @@ export default defineConfig([
             // Note: plugin typings used to be incomplete; if this regresses, prefer fixing types upstream.
             ...pluginBetterTailwindcss.configs["correctness"].rules,
             ...zod.configs.recommended.rules,
+            // React performance linting:
+            // We intentionally do NOT enforce blanket memoization.
+            // - React 19 + modern patterns (and the React Compiler) generally reduce
+            //   the need for manual useMemo/React.memo.
+            // - Blanket enforcement tends to create noisy diffs and can even hurt
+            //   performance or correctness if it drives unsafe refactors.
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "off",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
@@ -6413,9 +6419,10 @@ export default defineConfig([
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
-            "@arthurgeron/react-usememo/require-memo": "warn",
+            // React performance linting: keep these off (see note above).
+            "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "off",
-            "@arthurgeron/react-usememo/require-usememo-children": "warn",
+            "@arthurgeron/react-usememo/require-usememo-children": "off",
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",

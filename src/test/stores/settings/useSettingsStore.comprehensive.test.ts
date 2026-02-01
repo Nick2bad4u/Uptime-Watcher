@@ -41,12 +41,6 @@ vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-// Mock extractIpcData
-vi.mock("../../../types/ipc", () => ({
-    extractIpcData: vi.fn(),
-    safeExtractIpcData: vi.fn(),
-}));
-
 // Mock error store
 const mockErrorStore = {
     clearStoreError: vi.fn(),
@@ -87,14 +81,10 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
 });
 
 // Import mocked modules to get references
-import { extractIpcData, safeExtractIpcData } from "../../../types/ipc";
 import { logStoreAction } from "../../../stores/utils";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { resetHistoryLimitSubscriptionForTesting } from "../../../stores/settings/operations";
-
-const mockExtractIpcData = vi.mocked(extractIpcData);
-const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
 const mockLogStoreAction = vi.mocked(logStoreAction);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
@@ -183,17 +173,6 @@ describe(useSettingsStore, () => {
             name: "Settings Site",
         });
         mockElectronAPI.events.onStateSyncEvent.mockReturnValue(() => {});
-
-        mockExtractIpcData.mockImplementation((response: any) => response.data);
-        mockSafeExtractIpcData.mockImplementation(
-            (response: any, fallback: any) => {
-                try {
-                    return response?.data ?? fallback;
-                } catch {
-                    return fallback;
-                }
-            }
-        );
 
         // Setup withErrorHandling to execute function properly
         mockWithErrorHandling.mockImplementation(async (fn, handlers) => {

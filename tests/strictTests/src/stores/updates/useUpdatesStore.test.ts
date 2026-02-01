@@ -4,8 +4,6 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { UpdateStatus } from "@app/stores/types";
-import type { UpdateInfo } from "@app/stores/updates/types";
 import type { UpdateStatusEventData } from "@shared/types/events";
 
 type Cleanup = () => void;
@@ -54,31 +52,6 @@ describe("useUpdatesStore (strict coverage)", () => {
         onUpdateStatusMock.mockReset();
         loggerErrorMock.mockReset();
         logStoreActionMock.mockClear();
-    });
-
-    it("sets update info without mutating unrelated state", async () => {
-        const { useUpdatesStore } =
-            await import("@app/stores/updates/useUpdatesStore");
-
-        useUpdatesStore.setState({
-            updateError: "boom",
-            updateInfo: undefined,
-            updateProgress: 5,
-            updateStatus: "checking" as UpdateStatus,
-        });
-
-        const info: UpdateInfo = {
-            releaseDate: "2025-01-01",
-            releaseName: "Uptime Watcher",
-            releaseNotes: "notes",
-            version: "1.1.0",
-        };
-
-        useUpdatesStore.getState().setUpdateInfo(info);
-
-        expect(useUpdatesStore.getState().updateInfo).toEqual(info);
-        expect(useUpdatesStore.getState().updateError).toBe("boom");
-        expect(useUpdatesStore.getState().updateProgress).toBe(5);
     });
 
     it("sets progress without mutating update error", async () => {

@@ -165,47 +165,50 @@ export const SiteService: SiteServiceContract = {
         const rawSites = await api.sites.getSites();
         const validationResult = validateSiteSnapshots(rawSites);
 
-        if (validationResult.status === "success") {
+        if (validationResult.success) {
             return validationResult.data;
         }
 
-        const [firstIssue] = validationResult.errors;
+        const { issues } = validationResult.error;
+        const invalidIndices = Array.from(
+            new Set(
+                issues
+                    .map((issue) => issue.path[0])
+                    .filter((value): value is number =>
+                        typeof value === "number"
+                    )
+            )
+        ).toSorted((a, b) => a - b);
 
-        if (!firstIssue) {
+        if (issues.length === 0) {
             throw new ApplicationError({
+                cause: validationResult.error,
                 code: "RENDERER_SERVICE_INVALID_PAYLOAD",
                 message:
-                    "[SiteService] getSites returned invalid site snapshot data (validation errors were empty)",
+                    "[SiteService] getSites returned invalid site snapshot data (Zod issues were empty)",
             });
         }
 
-        const invalidIndices = validationResult.errors.map(
-            ({ index }) => index
-        );
-
         logger.error(
             "[SiteService] Invalid site snapshot(s) returned during getSites",
-            firstIssue.error,
+            validationResult.error,
             {
                 invalidIndices,
-                issues: validationResult.errors.map(({ error, index }) => ({
-                    index,
-                    issues: error.issues,
-                })),
+                issues,
             }
         );
 
         throw new ApplicationError({
-            cause: firstIssue.error,
+            cause: validationResult.error,
             code: "RENDERER_SERVICE_INVALID_PAYLOAD",
             details: {
                 invalidIndices,
-                issues: validationResult.errors.map(({ error, index }) => ({
-                    index,
-                    issues: error.issues,
-                })),
+                issues,
             },
-            message: `[SiteService] getSites returned invalid site snapshot data (indices: ${invalidIndices.join(", ")})`,
+            message:
+                invalidIndices.length === 0
+                    ? "[SiteService] getSites returned invalid site snapshot data"
+                    : `[SiteService] getSites returned invalid site snapshot data (indices: ${invalidIndices.join(", ")})`,
         });
     }),
 

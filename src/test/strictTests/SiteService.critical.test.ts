@@ -34,13 +34,6 @@ vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-// Mock the IPC utilities
-vi.mock("../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn(
-        (response, fallback) => response?.data || fallback
-    ),
-}));
-
 // Mock the logger
 vi.mock("../../services/logger", () => ({
     logger: {

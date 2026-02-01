@@ -119,10 +119,6 @@ vi.mock("../../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 
-vi.mock("../../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
-}));
-
 const { restore: restoreElectronApi } = installElectronApiMock(
     {},
     { ensureWindow: true }

@@ -268,12 +268,12 @@ The script (`scripts/architecture-static-guards.mjs`) performs the following che
 
 3. **Scoped `window.electronAPI` usage** – Direct references to `window.electronAPI` in `src/**` are limited to a small set of explicit helper/service modules and type definitions:
 
-   - `src/types/ipc.ts` (documentation/example usage)
    - `src/services/DataService.ts`
    - `src/services/NotificationPreferenceService.ts`
    - `src/services/StateSyncService.ts`
    - `src/services/utils/createIpcServiceHelpers.ts`
    - `src/services/utils/electronBridgeReadiness.ts`
+     - Note: historical renderer-local IPC envelope helpers formerly lived in `src/types/ipc.ts`, but this module has been removed in favour of the canonical shared helpers in `shared/utils/ipcResponse.ts` and the channel contracts in `shared/types/ipc.ts`.
 
    All other renderer code, including Zustand stores and React components, must depend on the typed renderer service facades instead of touching `window.electronAPI` directly. Unit tests under `src/test/**` are exempt so they can freely mock the bridge.
 

@@ -247,15 +247,11 @@ describe("Monitor Form Data Types", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const defaultCustom = (
-                createDefaultFormData as (type: string) => Partial<BaseFormData>
-            )("custom");
-
-            expect(defaultCustom.type).toBe("custom");
-            expect(defaultCustom.checkInterval).toBe(300_000);
-            expect(defaultCustom.monitoring).toBeTruthy();
-            expect(defaultCustom.retryAttempts).toBe(3);
-            expect(defaultCustom.timeout).toBe(10_000);
+            expect(() => {
+                (createDefaultFormData as unknown as (type: string) => unknown)(
+                    "custom"
+                );
+            }).toThrowError(/invalid monitor type/i);
         });
     });
 

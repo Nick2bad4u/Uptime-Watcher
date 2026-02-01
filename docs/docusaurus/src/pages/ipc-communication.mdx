@@ -181,8 +181,8 @@ This sequence diagram illustrates a typical IPC request-response cycle:
 
     UI->>Service: addSite(siteData)
     Service->>API: addSite(siteData)
-    API->>Preload: ipcRenderer.invoke("add-site", siteData)
-    Preload->>IPC: forward invoke
+    API->>Preload: createValidatedInvoker(SITES_CHANNELS.addSite)(siteData)
+    Preload->>IPC: ipcRenderer.invoke(SITES_CHANNELS.addSite, ...)
     IPC->>Handler: execute handler
     Handler->>Orchestrator: orchestrator.addSite(siteData)
     Orchestrator->>Manager: siteManager.addSite(siteData)
@@ -201,7 +201,8 @@ This sequence diagram illustrates a typical IPC request-response cycle:
     Service-->>UI: update complete
 
     Note over Events: Parallel broadcast
-    Events->>Preload: webContents.send("site:added")
+    Events->>IPC: RendererEventBridge.sendToRenderers("site:added")
+    IPC->>Preload: ipcRenderer.on("site:added")
     Preload->>API: dispatch event
     API->>Service: event listener
     Service->>UI: reactive update`} />

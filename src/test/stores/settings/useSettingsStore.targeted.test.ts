@@ -10,16 +10,10 @@
  * - Concurrency behavior
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { act } from "@testing-library/react";
 
 // Mock the entire constants module
 vi.mock("../../../constants", () => ({
     DEFAULT_HISTORY_LIMIT: 100,
-}));
-
-// Mock safeExtractIpcData
-vi.mock("../../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn(),
 }));
 
 // Mock error store
@@ -69,7 +63,6 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
 });
 
 // Import mocked modules
-import { safeExtractIpcData } from "../../../types/ipc";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import type { AppSettings } from "../../../stores/types";
@@ -94,7 +87,6 @@ vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
 // Mock window.electronAPI
@@ -152,105 +144,6 @@ describe("useSettingsStore - Targeted Coverage", () => {
         restoreElectronApi?.();
         restoreElectronApi = undefined;
         vi.restoreAllMocks();
-    });
-
-    describe("Rehydration Error Handling (Line 75)", () => {
-        it("should handle errors during settings sync after rehydration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSettingsStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const consoleWarnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
-
-            // Mock getHistoryLimit to throw an error
-            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
-                new Error("Backend connection failed")
-            );
-
-            // Create a spy to track the actual sync operation
-            vi.fn();
-
-            // Test the error path by calling the sync function directly
-            await act(async () => {
-                try {
-                    const response =
-                        await mockElectronAPI.settings.getHistoryLimit();
-                    const historyLimit = mockSafeExtractIpcData(
-                        response,
-                        100
-                    ) as number;
-                    useSettingsStore
-                        .getState()
-                        .updateSettings({ historyLimit });
-                } catch (error) {
-                    console.warn(
-                        "Failed to sync settings after rehydration:",
-                        error
-                    );
-                }
-            });
-
-            // Verify console.warn was called with the error
-            expect(consoleWarnSpy).toHaveBeenCalledWith(
-                "Failed to sync settings after rehydration:",
-                expect.any(Error)
-            );
-
-            consoleWarnSpy.mockRestore();
-        });
-
-        it("should handle safeExtractIpcData errors during rehydration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSettingsStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const consoleWarnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
-
-            // Mock successful API call but safeExtractIpcData throws
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(200);
-
-            mockSafeExtractIpcData.mockImplementation(() => {
-                throw new Error("Data extraction failed");
-            });
-
-            await act(async () => {
-                try {
-                    const response =
-                        await mockElectronAPI.settings.getHistoryLimit();
-                    const historyLimit = mockSafeExtractIpcData(
-                        response,
-                        100
-                    ) as number;
-                    useSettingsStore
-                        .getState()
-                        .updateSettings({ historyLimit });
-                } catch (error) {
-                    console.warn(
-                        "Failed to sync settings after rehydration:",
-                        error
-                    );
-                }
-            });
-
-            expect(consoleWarnSpy).toHaveBeenCalledWith(
-                "Failed to sync settings after rehydration:",
-                expect.any(Error)
-            );
-
-            consoleWarnSpy.mockRestore();
-        });
     });
 
     describe("syncFromBackend Implementation (Lines 207-228)", () => {
@@ -354,7 +247,6 @@ describe("useSettingsStore - Targeted Coverage", () => {
             useSettingsStore.setState({ settings: customSettings });
 
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(300);
-            mockSafeExtractIpcData.mockReturnValue(300);
 
             mockWithErrorHandling.mockImplementation(
                 async (asyncFn) => await asyncFn()

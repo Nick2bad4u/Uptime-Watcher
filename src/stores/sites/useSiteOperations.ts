@@ -15,7 +15,6 @@ import type {
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
-import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -30,6 +29,7 @@ import { normalizeMonitor } from "./utils/monitorOperations";
 import {
     applySavedSiteToStore,
     getSiteByIdentifier,
+    type SitesTelemetryPayload,
     updateMonitorAndSave,
     withSiteOperation,
     withSiteOperationReturning,
@@ -47,7 +47,7 @@ const updateMonitorNumericField = async (args: {
     monitorId: string;
     operationName: MonitorNumericUpdateOperationName;
     siteIdentifier: string;
-    telemetry: UnknownRecord;
+    telemetry: SitesTelemetryPayload;
     value: number | undefined;
 }): Promise<void> => {
     const {
@@ -118,21 +118,21 @@ const downloadSqliteBackupAction = (
 ): Promise<SerializedDatabaseBackupResult> =>
     withSiteOperationReturning(
         "downloadSqliteBackup",
-        () =>
-            runSqliteBackupOperationReturning({
-                clearMetadataOnFailure: true,
-                deps,
-                errorLogMessage: "Failed to download SQLite backup:",
-                operation: () => (async (): Promise<SerializedDatabaseBackupResult> => {
-                        try {
-                            return await handleSQLiteBackupDownload(
-                                deps.services.data.downloadSqliteBackup
-                            );
-                        } catch (error) {
-                            throw ensureError(error);
-                        }
-                    })(),
-            }),
+        async () => {
+            try {
+                return await runSqliteBackupOperationReturning({
+                    clearMetadataOnFailure: true,
+                    deps,
+                    errorLogMessage: "Failed to download SQLite backup:",
+                    operation: () =>
+                        handleSQLiteBackupDownload(
+                            deps.services.data.downloadSqliteBackup
+                        ),
+                });
+            } catch (error: unknown) {
+                throw ensureError(error);
+            }
+        },
         deps,
         {
             syncAfter: false,
@@ -430,7 +430,13 @@ export const createSiteOperationsActions = (
             monitorId,
             operationName: "updateMonitorRetryAttempts",
             siteIdentifier,
-            telemetry: { monitorId, retryAttempts, siteIdentifier },
+            telemetry: {
+                monitorId,
+                siteIdentifier,
+                ...(retryAttempts === undefined
+                    ? {}
+                    : { retryAttempts }),
+            },
             value: retryAttempts,
         });
     },
@@ -445,7 +451,11 @@ export const createSiteOperationsActions = (
             monitorId,
             operationName: "updateMonitorTimeout",
             siteIdentifier,
-            telemetry: { monitorId, siteIdentifier, timeout },
+            telemetry: {
+                monitorId,
+                siteIdentifier,
+                ...(timeout === undefined ? {} : { timeout }),
+            },
             value: timeout,
         });
     },

@@ -79,10 +79,6 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     }),
 }));
 
-vi.mock("../../../types/ipc", () => ({
-    safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
-}));
-
 vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),

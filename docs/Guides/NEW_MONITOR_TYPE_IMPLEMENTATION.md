@@ -84,7 +84,7 @@ Renderer (React + Zustand)
   - Notes: Confirm dynamic columns map to snake\_case SQL fields, round-trip correctly, and keep TypeScript facades/mappers in sync.
 - **Renderer** (Collect config, validate, display)
   - Responsibility: Collect config, validate, display
-  - Touch These Files: `src/types/monitorFormData.ts`<br>`src/types/monitor-forms.ts`<br>`src/utils/monitorValidation.ts`<br>`src/stores/sites/utils/monitorOperations.ts`<br>`src/stores/monitor/useMonitorTypesStore.ts`<br>`src/components/SiteDetails/useAddSiteForm.ts`<br>`src/components/AddSiteForm/AddSiteForm.tsx`<br>`src/components/AddSiteForm/DynamicMonitorFields.tsx`<br>`src/components/AddSiteForm/Submit.tsx`<br>`src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`<br>`src/components/SiteDetails/MonitoringStatusDisplay.tsx`<br>`src/utils/monitorTitleFormatters.ts`<br>`src/test/branch-coverage-optimization.test.tsx`<br>`src/constants.ts`<br>`src/utils/fallbacks.ts`<br>`src/test/constants.test.ts`<br>`src/test/constants-theme-100-coverage.test.ts`<br>`src/test/*` (renderer suites and fuzzers)
+  - Touch These Files: `src/types/monitorFormData.ts`<br>`src/utils/monitorValidation.ts`<br>`src/stores/sites/utils/monitorOperations.ts`<br>`src/stores/monitor/useMonitorTypesStore.ts`<br>`src/components/SiteDetails/useAddSiteForm.ts`<br>`src/components/AddSiteForm/AddSiteForm.tsx`<br>`src/components/AddSiteForm/DynamicMonitorFields.tsx`<br>`src/components/AddSiteForm/Submit.tsx`<br>`src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`<br>`src/components/SiteDetails/MonitoringStatusDisplay.tsx`<br>`src/utils/monitorTitleFormatters.ts`<br>`src/test/branch-coverage-optimization.test.tsx`<br>`src/constants.ts`<br>`src/utils/fallbacks.ts`<br>`src/test/constants.test.ts`<br>`src/test/constants-theme-100-coverage.test.ts`<br>`src/test/*` (renderer suites and fuzzers)
   - Notes: Keep client defaults, validation, and UI fallbacks aligned with shared schemas and registry metadata.
 
 Use this list as a printable checklist before opening a pull request.
@@ -184,7 +184,7 @@ Verification tip: start the Electron app after registering the monitor. The data
    - `useMonitorTypesStore` in `src/stores/monitor/useMonitorTypesStore.ts` consumes backend metadata. Update tests if they assert the list of known types.
 
 2. Form data shapes
-   - Extend `src/types/monitorFormData.ts` and `src/types/monitor-forms.ts` with interfaces, type guards, and default factories for the new type.
+   - Extend `src/types/monitorFormData.ts` with interfaces, type guards, and default factories for the new type.
    - Ensure `createDefaultFormData` returns sensible defaults that match the shared defaults.
 
 3. Client-side validation
@@ -206,7 +206,7 @@ Verification tip: start the Electron app after registering the monitor. The data
    - Expand `src/test/hooks/useAddSiteForm.comprehensive.test.ts` to cover state transitions, resetting, and submission success.
    - Update regression and fuzz suites: `src/test/comprehensive-100-percent-coverage.test.tsx`, `src/test/fuzzing/monitor-operations.fuzz.test.ts`, and `src/test/stores/sites/utils/monitorOperations.fast-check-comprehensive.test.ts`.
    - Extend constants-focused suites (`src/test/constants.test.ts`, `src/test/constants-theme-100-coverage.test.ts`) and any AddSiteForm test doubles that hard-code `FALLBACK_MONITOR_TYPE_OPTIONS` so they include the new label/value pair.
-   - Update shared and renderer form-data suites (`shared/test/types/formData.comprehensive.test.ts`, `src/test/types/monitorFormData.comprehensive.test.ts`, `src/test/types/monitor-forms.comprehensive.test.ts`, and their 100% coverage variants) so the new type participates in every assertion.
+   - Update shared and renderer form-data suites (`shared/test/types/formData.comprehensive.test.ts`, `src/test/types/monitorFormData.comprehensive.test.ts`, and their 100% coverage variants) so the new type participates in every assertion.
 
 Goal: a user can add the monitor through the UI, validation responds correctly, and labels render without custom components.
 

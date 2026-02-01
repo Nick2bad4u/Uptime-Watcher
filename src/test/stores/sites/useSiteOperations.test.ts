@@ -69,12 +69,6 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
     })),
 }));
 
-// Mock IPC extraction
-vi.mock("../../types/ipc", () => ({
-    extractIpcData: vi.fn((response) => response),
-    safeExtractIpcData: vi.fn((response, fallback) => response ?? fallback),
-}));
-
 // Access the global electronAPI mock
 const mockElectronAPI = (
     globalThis as typeof globalThis & { electronAPI: unknown }
