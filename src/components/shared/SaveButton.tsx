@@ -84,6 +84,11 @@ export const SaveButton: FC<SaveButtonProperties> = ({
         [iconSize, SaveIcon]
     );
 
+        const buttonVariant = useMemo(
+            () => (disabled ? "secondary" : "primary"),
+            [disabled]
+        );
+
     return (
         <ThemedButton
             {...props}
@@ -93,7 +98,7 @@ export const SaveButton: FC<SaveButtonProperties> = ({
             icon={saveIcon}
             onClick={onClick}
             size={size}
-            variant={disabled ? "secondary" : "primary"}
+                variant={buttonVariant}
         >
             Save
         </ThemedButton>

@@ -10,5 +10,12 @@
  * @returns {string} Normalized POSIX-style path.
  */
 export function normalizePath(filename) {
-    return filename.replaceAll('\\', "/");
+    const withForwardSlashes = filename.replaceAll("\\", "/");
+
+    // Normalize Windows drive letter casing so absolute-path prefix checks
+    // (`startsWith`) behave consistently across Node APIs.
+    return withForwardSlashes.replace(
+        /^(?<drive>[A-Za-z]):\//v,
+        (_match, drive) => `${String(drive).toLowerCase()}:/`
+    );
 }

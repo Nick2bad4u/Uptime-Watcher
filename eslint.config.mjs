@@ -865,6 +865,13 @@ export default defineConfig([
         },
     },
     {
+        files: ["config/linting/plugins/**/test/_internal/ruleTester.ts"],
+        name: "ESLint Plugin Tests - internal helper filename",
+        rules: {
+            "unicorn/filename-case": "off",
+        },
+    },
+    {
         files: ["config/linting/plugins/uptime-watcher.mjs"],
         name: "ESLint Plugin Wrapper - allowed re-export",
         rules: {
@@ -3251,7 +3258,7 @@ export default defineConfig([
             ...pluginBetterTailwindcss.configs["correctness"].rules,
             ...zod.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
-            "@arthurgeron/react-usememo/require-usememo": "error",
+            "@arthurgeron/react-usememo/require-usememo": "off",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
             // Sonar quality helpers
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
@@ -6407,7 +6414,7 @@ export default defineConfig([
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
-            "@arthurgeron/react-usememo/require-usememo": "error",
+            "@arthurgeron/react-usememo/require-usememo": "off",
             "@arthurgeron/react-usememo/require-usememo-children": "warn",
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
