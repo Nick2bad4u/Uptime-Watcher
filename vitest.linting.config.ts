@@ -34,7 +34,7 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
             "config/linting/plugins/**/test/**/*.{test,spec}.{ts,tsx,js,mjs,cjs,mts,cts}",
         ],
         name: {
-            color: "cyan",
+            color: "green",
             label: "Linting",
         },
         reporters: [

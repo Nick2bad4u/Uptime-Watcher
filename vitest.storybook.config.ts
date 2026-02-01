@@ -184,7 +184,10 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
             include: ["storybook/stories/**/*.stories.tsx"],
             isolate: true,
             maxWorkers: 1,
-            name: "storybook",
+            name: {
+                color: "blue",
+                label: "Storybook",
+            }, // Custom project name and color for Vitest
             outputFile: {
                 json: vitestJsonOutputPath,
             },

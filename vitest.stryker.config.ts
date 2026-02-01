@@ -12,6 +12,10 @@ const config = defineConfig((configEnv) => {
 
     const overrides = {
         cacheDir: "./.cache/vitest/.vitest-stryker",
+        name: {
+            color: "red",
+            label: "Stryker",
+        }, // Custom project name and color for Vitest
         test: {
             attachmentsDir: "./.cache/vitest/.vitest-attachments-stryker",
             cacheDir: "./.cache/vitest/.vitest-stryker",
