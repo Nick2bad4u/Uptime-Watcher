@@ -1661,7 +1661,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 },
             });
             expect(result.success).toBeFalsy();
-            expect(result.errors[0]).toContain("Invalid input");
+            expect(result.errors[0]).toContain("URL is required");
         });
 
         it("should throw error for unknown field in validateFieldWithSchema", async ({

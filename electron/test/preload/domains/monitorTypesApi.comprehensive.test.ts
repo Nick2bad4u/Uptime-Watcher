@@ -34,6 +34,7 @@ import {
     monitorTypesApi,
     type MonitorTypesApiInterface,
 } from "../../../preload/domains/monitorTypesApi";
+import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 
 const createIpcResponse = <T>(data: T) => ({ success: true, data });
 
@@ -48,7 +49,7 @@ const monitorTypeConfigArb: fc.Arbitrary<MonitorTypeConfig> = fc.record({
     description: fc.string({ minLength: 1, maxLength: 120 }),
     displayName: fc.string({ minLength: 1, maxLength: 64 }),
     fields: fc.array(fieldDefinitionArb, { minLength: 1, maxLength: 10 }),
-    type: fc.string({ minLength: 1, maxLength: 32 }),
+    type: fc.constantFrom(...(BASE_MONITOR_TYPES as readonly MonitorType[])),
     version: fc.string({ minLength: 1, maxLength: 16 }),
 });
 

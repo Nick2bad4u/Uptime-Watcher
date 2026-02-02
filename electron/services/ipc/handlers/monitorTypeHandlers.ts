@@ -27,6 +27,37 @@ const pickOptionalString = (value: unknown): string | undefined =>
 const pickBooleanWithFallback = (value: unknown, fallback: boolean): boolean =>
     typeof value === "boolean" ? value : fallback;
 
+const buildMonitorValidationCandidate = (
+    monitorType: string,
+    data: unknown
+): unknown => {
+    if (!isRecord(data)) {
+        return data;
+    }
+
+    const checkInterval =
+        typeof data["checkInterval"] === "number" ? data["checkInterval"] : 300_000;
+    const monitoring =
+        typeof data["monitoring"] === "boolean" ? data["monitoring"] : true;
+    const retryAttempts =
+        typeof data["retryAttempts"] === "number" ? data["retryAttempts"] : 3;
+    const timeout = typeof data["timeout"] === "number" ? data["timeout"] : 10_000;
+
+    return {
+        ...data,
+        activeOperations: [],
+        checkInterval,
+        history: [],
+        id: "temp-monitor",
+        monitoring,
+        responseTime: -1,
+        retryAttempts,
+        status: "pending",
+        timeout,
+        type: monitorType,
+    };
+};
+
 const ConfigPropertyValidator = {
     assertNoUnexpectedProperties(
         unexpectedProperties: UnknownRecord,
@@ -277,11 +308,20 @@ export function registerMonitorTypeHandlers({
     register(
         MONITOR_TYPES_CHANNELS.formatMonitorDetail,
         (monitorType, details) => {
-            const config = getMonitorTypeConfig(monitorType);
+            const normalizedMonitorType = monitorType.trim();
+            if (normalizedMonitorType.length === 0) {
+                logger.warn(
+                    LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL,
+                    { monitorType: normalizedMonitorType }
+                );
+                return details;
+            }
+
+            const config = getMonitorTypeConfig(normalizedMonitorType);
             if (!config) {
                 logger.warn(
                     LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_DETAIL,
-                    { monitorType }
+                    { monitorType: normalizedMonitorType }
                 );
                 return details;
             }
@@ -298,10 +338,18 @@ export function registerMonitorTypeHandlers({
     register(
         MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
         (monitorType, monitor) => {
-            const config = getMonitorTypeConfig(monitorType);
+            const normalizedMonitorType = monitorType.trim();
+            if (normalizedMonitorType.length === 0) {
+                logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE, {
+                    monitorType: normalizedMonitorType,
+                });
+                return "";
+            }
+
+            const config = getMonitorTypeConfig(normalizedMonitorType);
             if (!config) {
                 logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE, {
-                    monitorType,
+                    monitorType: normalizedMonitorType,
                 });
                 return "";
             }
@@ -317,7 +365,13 @@ export function registerMonitorTypeHandlers({
 
     register(
         MONITOR_TYPES_CHANNELS.validateMonitorData,
-        (monitorType, data) => validateMonitorData(monitorType, data),
+        (monitorType, data) => {
+            const normalizedMonitorType = monitorType.trim();
+            return validateMonitorData(
+                normalizedMonitorType,
+                buildMonitorValidationCandidate(normalizedMonitorType, data)
+            );
+        },
         MonitorTypeHandlerValidators.validateMonitorData
     );
 }

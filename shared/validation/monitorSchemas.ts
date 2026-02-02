@@ -56,6 +56,52 @@ import {
     createSslMonitorSchema,
 } from "./monitorSchemas.network";
 
+type ZodIssue = z.core.$ZodIssue;
+
+function normalizeMissingRequiredFieldIssues(
+    issues: readonly ZodIssue[]
+): ZodIssue[] {
+    const overrideByField: Readonly<Record<string, string>> = {
+        host: "Host is required",
+        port: "Port is required",
+        recordType: "Record type is required",
+        url: "URL is required",
+    };
+
+    return issues.map((issue) => {
+        const lastPathSegment = issue.path.at(-1);
+        if (typeof lastPathSegment !== "string") {
+            return issue;
+        }
+
+        if (
+            lastPathSegment === "recordType" &&
+            issue.message.startsWith("Invalid option:")
+        ) {
+            return {
+                ...issue,
+                message: "Record type is required",
+            };
+        }
+
+        if (issue.code !== "invalid_type") {
+            return issue;
+        }
+
+        const overrideMessage = overrideByField[lastPathSegment];
+        if (!overrideMessage) {
+            return issue;
+        }
+
+        return overrideMessage === issue.message
+            ? issue
+            : {
+                  ...issue,
+                  message: overrideMessage,
+              };
+    });
+}
+
 const hostValidationSchema = createHostValidationSchema();
 const httpHeaderNameSchema = createHttpHeaderNameSchema();
 const httpHeaderValueSchema = createHttpHeaderValueSchema();
@@ -465,30 +511,14 @@ export function validateMonitorData(
         };
     } catch (error) {
         if (error instanceof z.ZodError) {
-            type Issue = (typeof error.issues)[number];
-            const errorIssues: Issue[] = [];
-            const warningIssues: Issue[] = [];
-
-            for (const issue of error.issues) {
-                // Use Zod's structured error codes for robust warning detection
-                const isOptionalField =
-                    issue.code === "invalid_type" &&
-                    "received" in issue &&
-                    issue.received === "undefined" &&
-                    issue.path.length > 0;
-
-                if (isOptionalField) {
-                    warningIssues.push(issue);
-                } else {
-                    errorIssues.push(issue);
-                }
-            }
-
+            const normalizedIssues = normalizeMissingRequiredFieldIssues(
+                error.issues
+            );
             return {
-                errors: formatZodIssues(errorIssues),
+                errors: formatZodIssues(normalizedIssues),
                 metadata: { monitorType: type },
                 success: false,
-                warnings: formatZodIssues(warningIssues),
+                warnings: [],
             };
         }
 

@@ -31,7 +31,9 @@ export function createPortMonitorSchema(
         .extend({
             host: args.hostValidationSchema,
             port: z
-                .number()
+                .number({
+                    error: "Port is required",
+                })
                 .refine(isValidPort, "Must be a valid port number (1-65535)"),
             type: z.literal("port"),
         })
@@ -58,7 +60,8 @@ export function createDnsMonitorSchema(
         .extend({
             expectedValue: z.string().optional(),
             host: args.hostValidationSchema,
-            recordType: z.enum([
+            recordType: z.enum(
+                [
                 "A",
                 "AAAA",
                 "ANY",
@@ -72,7 +75,11 @@ export function createDnsMonitorSchema(
                 "SRV",
                 "TLSA",
                 "TXT",
-            ]),
+                ],
+                {
+                    error: "Record type is required",
+                }
+            ),
             type: z.literal("dns"),
         })
         .strict();
@@ -93,7 +100,9 @@ export function createSslMonitorSchema(
                 ),
             host: args.hostValidationSchema,
             port: z
-                .number()
+                .number({
+                    error: "Port is required",
+                })
                 .refine(isValidPort, "Must be a valid port number (1-65535)"),
             type: z.literal("ssl"),
         })

@@ -272,7 +272,11 @@ export default defineConfig(({ command, mode }) => {
                   ],
         },
         plugins: [
-            tsconfigPaths(),
+            tsconfigPaths({
+                // Avoid crawling generated folders like storybook-static/.
+                // Explicitly point to the canonical tsconfig(s).
+                projects: ["./tsconfig.json"],
+            }),
             // CSS Modules patch to fix Vite's CSS Modules handling
             patchCssModules({
                 generateSourceTypes: true, // Generate .d.ts files for TypeScript support

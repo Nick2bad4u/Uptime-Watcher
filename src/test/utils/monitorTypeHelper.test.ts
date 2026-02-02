@@ -8,7 +8,11 @@ import * as fc from "fast-check";
 
 import { AppCaches } from "../../utils/cache";
 import * as errorHandling from "@shared/utils/errorHandling";
-import type { MonitorFieldDefinition } from "@shared/types";
+import {
+    BASE_MONITOR_TYPES,
+    type MonitorFieldDefinition,
+    type MonitorType,
+} from "@shared/types";
 import {
     clearMonitorTypeCache,
     getAvailableMonitorTypes,
@@ -136,7 +140,7 @@ describe("monitorTypeHelper", () => {
             },
         },
         {
-            type: "tcp",
+            type: "port",
             displayName: "TCP Monitor",
             description: "Monitors TCP port connectivity",
             version: "1.0.0",
@@ -391,7 +395,7 @@ describe("monitorTypeHelper", () => {
             await annotate("Type: Monitoring", "type");
 
             const pingResult = await getMonitorTypeConfig("ping");
-            const tcpResult = await getMonitorTypeConfig("tcp");
+                const tcpResult = await getMonitorTypeConfig("port");
 
             expect(pingResult).toEqual(mockMonitorTypes[1]);
             expect(tcpResult).toEqual(mockMonitorTypes[2]);
@@ -506,7 +510,7 @@ describe("monitorTypeHelper", () => {
             expect(result).toEqual([
                 { label: "HTTP Monitor", value: "http" },
                 { label: "Ping Monitor", value: "ping" },
-                { label: "TCP Monitor", value: "tcp" },
+                    { label: "TCP Monitor", value: "port" },
             ]);
         });
 
@@ -537,18 +541,18 @@ describe("monitorTypeHelper", () => {
 
             const complexTypes: MonitorTypeConfig[] = [
                 {
-                    type: "special-http",
+                    type: "http",
                     displayName: "HTTP Monitor (Advanced)",
                     description: "Advanced HTTP monitoring",
                     version: "2.0.0",
                     fields: mockMonitorTypes[0]!.fields,
                 },
                 {
-                    type: "custom_ping",
+                    type: "ping",
                     displayName: "Custom Ping Service",
                     description: "Custom ping implementation",
                     version: "1.1.0",
-                    fields: mockMonitorTypes[0]!.fields,
+                    fields: mockMonitorTypes[1]!.fields,
                 },
             ];
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(complexTypes);
@@ -556,8 +560,8 @@ describe("monitorTypeHelper", () => {
             const result = await getMonitorTypeOptions();
 
             expect(result).toEqual([
-                { label: "HTTP Monitor (Advanced)", value: "special-http" },
-                { label: "Custom Ping Service", value: "custom_ping" },
+                { label: "HTTP Monitor (Advanced)", value: "http" },
+                { label: "Custom Ping Service", value: "ping" },
             ]);
 
             expect(getMonitorTypesMock).not.toHaveBeenCalled();
@@ -580,7 +584,7 @@ describe("monitorTypeHelper", () => {
             const result = await getMonitorTypeOptions();
 
             expect(result).toEqual([
-                { label: "TCP Monitor", value: "tcp" },
+                { label: "TCP Monitor", value: "port" },
                 { label: "Ping Monitor", value: "ping" },
                 { label: "HTTP Monitor", value: "http" },
             ]);
@@ -601,14 +605,14 @@ describe("monitorTypeHelper", () => {
             // fall back to the monitor types store.
             const invalidCachedTypes: MonitorTypeConfig[] = [
                 {
-                    type: "empty-name",
+                    type: "http",
                     displayName: "",
                     description: "Monitor with empty display name",
                     version: "1.0.0",
                     fields: mockMonitorTypes[0]!.fields,
                 },
                 {
-                    type: "normal",
+                    type: "ping",
                     displayName: "Normal Monitor",
                     description: "Normal monitor",
                     version: "1.0.0",
@@ -633,7 +637,7 @@ describe("monitorTypeHelper", () => {
             expect(result).toEqual([
                 { label: "HTTP Monitor", value: "http" },
                 { label: "Ping Monitor", value: "ping" },
-                { label: "TCP Monitor", value: "tcp" },
+                { label: "TCP Monitor", value: "port" },
             ]);
         });
 
@@ -648,7 +652,7 @@ describe("monitorTypeHelper", () => {
 
             const specialTypes: MonitorTypeConfig[] = [
                 {
-                    type: "special",
+                    type: "http",
                     displayName: "Monitor (v2.0) - Advanced & Fast",
                     description: "Special monitor",
                     version: "2.0.0",
@@ -660,7 +664,7 @@ describe("monitorTypeHelper", () => {
             const result = await getMonitorTypeOptions();
 
             expect(result).toEqual([
-                { label: "Monitor (v2.0) - Advanced & Fast", value: "special" },
+                { label: "Monitor (v2.0) - Advanced & Fast", value: "http" },
             ]);
         });
     });
@@ -746,16 +750,9 @@ describe("monitorTypeHelper", () => {
 
     // Property-based Tests
     describe("Property-based Tests", () => {
-        const safeMonitorTypeKey = fc
-            .string({ minLength: 1, maxLength: 20 })
-            .filter(
-                (value) =>
-                    ![
-                        "__proto__",
-                        "constructor",
-                        "prototype",
-                    ].includes(value)
-            );
+        const monitorTypeKeyArb = fc.constantFrom(
+            ...(BASE_MONITOR_TYPES as readonly MonitorType[])
+        );
 
         const monitorFieldOptionArb = fc.record({
             label: fc.string({ minLength: 1, maxLength: 20 }),
@@ -822,7 +819,7 @@ describe("monitorTypeHelper", () => {
                 minLength: 1,
                 maxLength: 5,
             }),
-            type: safeMonitorTypeKey,
+            type: monitorTypeKeyArb,
             version: fc.string({ minLength: 1, maxLength: 20 }),
         });
 
@@ -926,7 +923,7 @@ describe("monitorTypeHelper", () => {
 
             test.prop([
                 fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
-                fc.string({ minLength: 1, maxLength: 30 }),
+                fc.constantFrom(...(BASE_MONITOR_TYPES as readonly MonitorType[])),
             ])(
                 "should return undefined when monitor type not found",
                 async (mockTypes, searchType) => {

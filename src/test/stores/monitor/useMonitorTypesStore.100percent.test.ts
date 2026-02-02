@@ -20,7 +20,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import type { Monitor, MonitorType } from "@shared/types";
+import { BASE_MONITOR_TYPES, type Monitor } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
@@ -171,14 +171,10 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useMonitorTypesStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: IPC Response Handling", "type");
 
-            // Mock safeExtractIpcData to return empty array (simulating failed extraction for loadMonitorTypes)
-            originalSafeExtractIpcData.mockReturnValueOnce([]);
-
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue([]);
+            // Mock safeExtractIpcData to return null
+            originalSafeExtractIpcData.mockReturnValueOnce(null);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce([]);
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -367,7 +363,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             const complexConfigs: MonitorTypeConfig[] = [
                 {
-                    type: "complex-monitor",
+                    type: "http",
                     displayName: "Complex Monitor",
                     description: "A complex monitor type",
                     version: "1.0",
@@ -401,7 +397,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     ],
                 },
                 createMonitorTypeConfig({
-                    type: "minimal-monitor",
+                    type: "dns",
                     displayName: "Minimal",
                     description: "Minimal config",
                 }),
@@ -590,20 +586,20 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     isLoaded: true,
                     monitorTypes: [
                         createMonitorTypeConfig({
-                            type: "direct",
+                            type: "http",
                             displayName: "Direct",
                             description: "Direct mutation",
                         }),
                     ],
                     fieldConfigs: {
-                        direct: [],
+                        http: [],
                     },
                 });
             });
 
             expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.monitorTypes).toHaveLength(1);
-            expect(result.current.fieldConfigs).toHaveProperty("direct");
+            expect(result.current.fieldConfigs).toHaveProperty("http");
         });
 
         it("should handle getState() access patterns", async ({
@@ -619,7 +615,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             useMonitorTypesStore.setState({
                 isLoaded: true,
                 fieldConfigs: {
-                    test: [
+                    http: [
                         {
                             name: "testField",
                             type: "text",
@@ -634,7 +630,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Test getFieldConfig method which uses get() internally
             const fieldConfig = result.current.getFieldConfig(
-                "test" as MonitorType
+                "http"
             );
             expect(fieldConfig).toEqual([
                 {
@@ -646,7 +642,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             ]);
 
             const nonExistentConfig = result.current.getFieldConfig(
-                "nonexistent" as MonitorType
+                "ping"
             );
             expect(nonExistentConfig).toBeUndefined();
         });
@@ -843,7 +839,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             let result1: ValidationResult;
             await act(async () => {
                 result1 = await result.current.validateMonitorData(
-                    "complex",
+                    "http",
                     complexValidationResult.data
                 );
             });
@@ -1008,34 +1004,41 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            // Test logging with special characters and edge case strings
-            const edgeCaseTypes = [
-                "",
-                "   ",
-                "special-chars-!@#$%^&*()",
-                "unicode-测试-🚀",
-                "very-long-type-name-that-exceeds-normal-length-expectations-and-continues-for-a-very-long-time",
+            // With the stricter MonitorTypesStore contract, `type` is a
+            // MonitorType (not an arbitrary string). Exercise logging with
+            // edge-case payload shapes instead.
+            const edgeCasePayloads: readonly unknown[] = [
+                {},
+                { text: "" },
+                { whitespace: "   " },
+                { special: "special-chars-!@#$%^&*()" },
+                { unicode: "unicode-测试" },
+                {
+                    nested: {
+                        deep: {
+                            values: [1, 2, 3],
+                        },
+                    },
+                },
             ];
 
-            for (const edgeType of edgeCaseTypes) {
-                mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
-                    {
-                        success: false,
-                        data: null,
-                        errors: ["Type validation failed"],
-                        warnings: [],
-                        metadata: {},
-                    }
-                );
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
+                success: false,
+                data: null,
+                errors: ["Type validation failed"],
+                warnings: [],
+                metadata: {},
+            });
 
+            for (const payload of edgeCasePayloads) {
                 await act(async () => {
-                    await result.current.validateMonitorData(edgeType, {});
+                    await result.current.validateMonitorData("http", payload);
                 });
 
                 expect(originalLogStoreAction).toHaveBeenCalledWith(
                     "MonitorTypesStore",
                     "validateMonitorData",
-                    { type: edgeType }
+                    { type: "http" }
                 );
             }
         });
@@ -1055,19 +1058,25 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Set up mock to resolve after a delay
             let resolveCount = 0;
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValue(
-                new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve([
-                            createMonitorTypeConfig({
-                                type: `type-${++resolveCount}`,
-                                displayName: `Type ${resolveCount}`,
-                                description: "Test type",
-                            }),
-                        ]);
-                    }, 10);
-                })
-            );
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(() => {
+                const index = resolveCount++;
+                const monitorTypeCandidate =
+                    BASE_MONITOR_TYPES[index % BASE_MONITOR_TYPES.length];
+                if (monitorTypeCandidate === undefined) {
+                    throw new Error(
+                        "Unexpected missing monitor type from BASE_MONITOR_TYPES"
+                    );
+                }
+                const monitorType = monitorTypeCandidate;
+
+                return Promise.resolve([
+                    createMonitorTypeConfig({
+                        type: monitorType,
+                        displayName: `Type ${index + 1}`,
+                        description: "Test type",
+                    }),
+                ]);
+            });
 
             // Make rapid successive calls sequentially to avoid overlapping acts
             for (let i = 0; i < 5; i++) {
@@ -1137,7 +1146,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             const largeDataset: MonitorTypeConfig[] = Array.from(
                 { length: 1000 },
                 (_, index) => ({
-                    type: `type-${index}`,
+                    type:
+                        BASE_MONITOR_TYPES[index % BASE_MONITOR_TYPES.length] ??
+                        "http",
                     displayName: `Type ${index}`,
                     description: `Description for type ${index}`.repeat(100), // Large description
                     version: "1.0",
@@ -1167,7 +1178,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             expect(result.current.monitorTypes).toHaveLength(1000);
-            expect(Object.keys(result.current.fieldConfigs)).toHaveLength(1000);
+            expect(Object.keys(result.current.fieldConfigs)).toHaveLength(
+                BASE_MONITOR_TYPES.length
+            );
 
             // Test cleanup
             unmount();
@@ -1374,12 +1387,12 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             const testState = {
                 monitorTypes: [
                     createMonitorTypeConfig({
-                        type: "test",
+                        type: "http",
                         displayName: "Test",
                         description: "Test type",
                     }),
                 ],
-                fieldConfigs: { test: [] },
+                fieldConfigs: { http: [] },
                 isLoaded: true,
             };
 

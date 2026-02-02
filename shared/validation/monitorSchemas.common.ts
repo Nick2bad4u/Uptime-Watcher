@@ -82,8 +82,12 @@ export const VALIDATION_CONSTRAINTS: MonitorValidationConstraints = {
  * `localhost` are all accepted consistently across monitor types.
  */
 const hostValidationSchema = z
-    .string()
-    .refine(isValidHost, "Must be a valid hostname, IP address, or localhost");
+    .string({
+        error: "Host is required",
+    })
+    .trim()
+    .min(1, "Host is required")
+    .refine(isValidHost, "Must be a valid hostname");
 
 /**
  * Zod schema for base monitor fields shared by all monitor types.
@@ -201,7 +205,10 @@ const createProtocolUrlSchema = (
     message: string
 ): z.ZodString =>
     z
-        .string()
+        .string({
+            error: "URL is required",
+        })
+        .min(1, "URL is required")
         .refine(
             (value): boolean => isUrlWithAllowedProtocols(value, protocols),
             message

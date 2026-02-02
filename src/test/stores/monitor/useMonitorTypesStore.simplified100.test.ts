@@ -8,10 +8,11 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import type {
-    Monitor,
-    MonitorFieldDefinition,
-    MonitorType,
+import {
+    BASE_MONITOR_TYPES,
+    type Monitor,
+    type MonitorFieldDefinition,
+    type MonitorType,
 } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
@@ -618,26 +619,26 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
     describe("Complex Data Scenarios", () => {
         it("should handle large datasets", async () => {
-            const largeConfigs: MonitorTypeConfig[] = Array.from(
-                { length: 100 },
-                (_, index) => ({
-                    type: `type-${index}`,
-                    displayName: `Type ${index}`,
-                    description: `Description ${index}`,
-                    version: "1.0",
-                    fields: Array.from({ length: 10 }, (_, fieldIndex) => ({
-                        name: `field-${fieldIndex}`,
-                        type: "text",
-                        required: fieldIndex % 2 === 0,
-                        label: `Field ${fieldIndex}`,
-                    })),
-                })
-            );
+                const largeDataset: MonitorTypeConfig[] = Array.from(
+                    { length: 100 },
+                    (_, i) => ({
+                        type: BASE_MONITOR_TYPES[i % BASE_MONITOR_TYPES.length] ?? "http",
+                        displayName: `Type ${i}`,
+                        description: `Description ${i}`,
+                        version: "1.0",
+                        fields: Array.from({ length: 10 }, (_, fieldIndex) => ({
+                            name: `field-${fieldIndex}`,
+                            type: "text",
+                            required: fieldIndex % 2 === 0,
+                            label: `Field ${fieldIndex}`,
+                        })),
+                    })
+                );
 
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
-                largeConfigs
-            );
-            mockSafeExtractIpcData.mockReturnValue(largeConfigs);
+                mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                    largeDataset
+                );
+                mockSafeExtractIpcData.mockReturnValue(largeDataset);
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -645,17 +646,18 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 await result.current.loadMonitorTypes();
             });
 
-            expect(result.current.monitorTypes).toHaveLength(100);
-            expect(Object.keys(result.current.fieldConfigs)).toHaveLength(100);
+            expect(Object.keys(result.current.fieldConfigs)).toHaveLength(
+                BASE_MONITOR_TYPES.length
+            );
             expect(result.current.isLoaded).toBeTruthy();
         });
 
         it("should handle special character types and fields", async () => {
             const specialConfigs: MonitorTypeConfig[] = [
                 {
-                    type: "special-chars-!@#$%",
+                    type: "http",
                     displayName: "Special Characters",
-                    description: "Testing special characters",
+                    description: "Testing special characters in field definitions",
                     version: "1.0",
                     fields: [
                         {
@@ -680,8 +682,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toHaveLength(1);
-            expect(result.current.monitorTypes[0]!.type).toBe(
-                "special-chars-!@#$%"
+            expect(result.current.monitorTypes[0]!.type).toBe("http");
+            expect(result.current.monitorTypes[0]!.fields[0]!.name).toBe(
+                "field-with-unicode-测试"
             );
         });
     });

@@ -40,7 +40,7 @@
  * @public
  */
 
-import type { MonitorFieldDefinition } from "@shared/types";
+import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 
 import { useCallback, useEffect } from "react";
 
@@ -61,11 +61,14 @@ export interface UseMonitorFieldsResult {
     /** Error message if loading failed */
     error?: string | undefined;
     /** Get field definitions for a specific monitor type */
-    getFields: (monitorType: string) => MonitorFieldDefinition[];
+    getFields: (monitorType: MonitorType) => MonitorFieldDefinition[];
     /** Get required fields for a specific monitor type */
-    getRequiredFields: (monitorType: string) => string[];
+    getRequiredFields: (monitorType: MonitorType) => string[];
     /** Check if a field is required for a monitor type */
-    isFieldRequired: (monitorType: string, fieldName: string) => boolean;
+    isFieldRequired: (
+        monitorType: MonitorType,
+        fieldName: string
+    ) => boolean;
     /** Whether field definitions are loaded */
     isLoaded: boolean;
 }
@@ -104,13 +107,13 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     );
 
     const getFields = useCallback(
-        (monitorType: string): MonitorFieldDefinition[] =>
+        (monitorType: MonitorType): MonitorFieldDefinition[] =>
             fieldConfigs[monitorType] ?? [],
         [fieldConfigs]
     );
 
     const getRequiredFields = useCallback(
-        (monitorType: string): string[] => {
+        (monitorType: MonitorType): string[] => {
             const fields = getFields(monitorType);
             return fields
                 .filter((field) => field.required)
@@ -120,7 +123,7 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     );
 
     const isFieldRequired = useCallback(
-        (monitorType: string, fieldName: string): boolean => {
+        (monitorType: MonitorType, fieldName: string): boolean => {
             const fields = getFields(monitorType);
             const field = fields.find((f) => f.name === fieldName);
             return field?.required ?? false;

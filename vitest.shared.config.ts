@@ -35,7 +35,11 @@ const vitestConfig = defineConfig({
         namedExports: true,
         stringify: true,
     },
-    plugins: [tsconfigPaths()],
+    plugins: [
+        tsconfigPaths({
+            projects: ["./tsconfig.json"],
+        }),
+    ],
     resolve: {
         alias: {
             "@app": normalizePath(path.resolve(dirname, "src")),
