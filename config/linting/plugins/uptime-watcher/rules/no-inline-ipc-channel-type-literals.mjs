@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-inline-ipc-channel-type-literals
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-inline-ipc-channel-type-literals
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -25,11 +25,14 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const noInlineIpcChannelTypeLiteralsRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (normalizedFilename === "<input>") {
             return {};
@@ -71,7 +74,7 @@ export const noInlineIpcChannelTypeLiteralsRule = {
                 return false;
             }
 
-            const literal = /** @type {{literal?: unknown}} */ (node).literal;
+            const literal = /** @type {{ literal?: unknown }} */ (node).literal;
 
             if (!literal || typeof literal !== "object") {
                 return false;
@@ -96,9 +99,9 @@ export const noInlineIpcChannelTypeLiteralsRule = {
         function isTypeReference(node) {
             return Boolean(
                 node &&
-                    typeof node === "object" &&
-                    "type" in node &&
-                    node.type === "TSTypeReference"
+                typeof node === "object" &&
+                "type" in node &&
+                node.type === "TSTypeReference"
             );
         }
 
@@ -110,9 +113,9 @@ export const noInlineIpcChannelTypeLiteralsRule = {
         function isIdentifier(node) {
             return Boolean(
                 node &&
-                    typeof node === "object" &&
-                    "type" in node &&
-                    node.type === "Identifier"
+                typeof node === "object" &&
+                "type" in node &&
+                node.type === "Identifier"
             );
         }
 

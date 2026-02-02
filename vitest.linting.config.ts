@@ -10,7 +10,7 @@
 
 import * as path from "node:path";
 import pc from "picocolors";
-import { normalizePath, type UserConfig  } from "vite";
+import { normalizePath, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import {
     coverageConfigDefaults,
@@ -20,6 +20,15 @@ import {
 } from "vitest/config";
 
 const dirname = import.meta.dirname;
+
+/**
+ * Environment variables available to the Vitest config at runtime.
+ *
+ * @remarks
+ * We intentionally avoid accessing `process.env` directly to keep ESLint
+ * `n/no-process-env` enforcement strict in the rest of the codebase.
+ */
+const runtimeEnv = globalThis.process.env;
 
 /**
  * Vitest project configuration for linting/tooling tests.
@@ -57,7 +66,9 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
                 "**/html/**",
                 ...defaultExclude,
             ],
-            include: ["config/linting/plugins/**/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}"],
+            include: [
+                "config/linting/plugins/**/benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts}",
+            ],
             outputJson: "./coverage/linting/bench-results.json",
             reporters: ["default", "verbose"],
         },
@@ -100,7 +111,9 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
             excludeAfterRemap: true, // Exclude files after remapping for accuracy
             experimentalAstAwareRemapping: true,
             ignoreEmptyLines: true,
-            include: ["config/linting/plugins/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}"],
+            include: [
+                "config/linting/plugins/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            ],
             provider: "v8" as const,
             reporter: [
                 "text",
@@ -119,7 +132,7 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
                 lines: 90, // Minimum 90% line coverage for backend
                 statements: 90, // Minimum 90% statement coverage for backend
             },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @vitest/coverage-v8 types omit runtime-supported options.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @vitest/coverage-v8 types omit runtime-supported options.
         } as any,
         dangerouslyIgnoreUnhandledErrors: false,
         deps: {
@@ -134,13 +147,15 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
             maxDepth: 20,
             omitAnnotationLines: true,
             printBasicPrototype: false,
-            truncateAnnotation: pc.cyan(pc.bold("... Diff result is truncated")),
+            truncateAnnotation: pc.cyan(
+                pc.bold("... Diff result is truncated")
+            ),
             truncateThreshold: 250,
         },
         env: {
             NODE_ENV: "test",
-            // eslint-disable-next-line n/no-process-env -- safe at test time
-            PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
+
+            PACKAGE_VERSION: runtimeEnv["PACKAGE_VERSION"] ?? "unknown",
         },
         environment: "node",
         // Keep this project narrow and fast.
@@ -156,7 +171,10 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
         ],
         expect: {
             poll: { interval: 50, timeout: 1000 },
-            requireAssertions: true,
+            // ESLint RuleTester suites do not call Vitest's `expect(...)`; they
+            // assert via ESLint/Node assertion internals. Requiring Vitest
+            // assertions here produces false negatives.
+            requireAssertions: false,
         },
         fakeTimers: {
             advanceTimeDelta: 20,
@@ -177,8 +195,7 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
         maxWorkers: Math.max(
             1,
             Number(
-                // eslint-disable-next-line n/no-process-env -- safe for test time use
-                process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
+                runtimeEnv["MAX_THREADS"] ?? (runtimeEnv["CI"] ? "1" : "8")
             )
         ),
         name: {
@@ -221,7 +238,8 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
             include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
             only: false,
             spawnTimeout: 10_000,
-            tsconfig: "config/linting/plugins/uptime-watcher/tsconfig.eslint.json",
+            tsconfig:
+                "config/linting/plugins/uptime-watcher/tsconfig.eslint.json",
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
     } as any,

@@ -1,8 +1,8 @@
 /**
- * @file Rule: electron-cloud-providers-drift-guards
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: electron-cloud-providers-drift-guards
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -15,7 +15,11 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  */
 export const electronCloudProvidersDriftGuardsRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; data?: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: { node: any; messageId: string; data?: any }) =>
+     *     void;
+     * }} context
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
@@ -37,29 +41,30 @@ export const electronCloudProvidersDriftGuardsRule = {
         }
 
         const bannedLocals = new Set([
-            "buildAllowedExternalOpenUrlRegexes",
-            "isAllowedExternalOpenUrl",
-        ]),
+                "buildAllowedExternalOpenUrlRegexes",
+                "isAllowedExternalOpenUrl",
+            ]),
+            reportLocal = (
+                /** @type {{ type: string; name: string }} */ id
+            ) => {
+                if (!id || id.type !== "Identifier") {
+                    return;
+                }
 
-         reportLocal = (/** @type {{type: string, name: string}} */ id) => {
-            if (!id || id.type !== "Identifier") {
-                return;
-            }
+                if (!bannedLocals.has(id.name)) {
+                    return;
+                }
 
-            if (!bannedLocals.has(id.name)) {
-                return;
-            }
-
-            context.report({
-                data: { name: id.name },
-                messageId: "bannedLocal",
-                node: id,
-            });
-        };
+                context.report({
+                    data: { name: id.name },
+                    messageId: "bannedLocal",
+                    node: id,
+                });
+            };
 
         return {
             /**
-             * @param {{callee: any}} node
+             * @param {{ callee: any }} node
              */
             CallExpression(node) {
                 const callee = node?.callee;
@@ -78,14 +83,14 @@ export const electronCloudProvidersDriftGuardsRule = {
             },
 
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             FunctionDeclaration(node) {
                 reportLocal(node?.id);
             },
 
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             VariableDeclarator(node) {
                 reportLocal(node?.id);

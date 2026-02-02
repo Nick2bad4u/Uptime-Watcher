@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-no-direct-ipc-main-import
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-no-direct-ipc-main-import
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -21,11 +21,14 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  */
 export const electronNoDirectIpcMainImportRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -61,13 +64,17 @@ export const electronNoDirectIpcMainImportRule = {
                 }
 
                 const [first] = node.arguments;
-                if (!first || first.type !== "Literal" || first.value !== "electron") {
+                if (
+                    !first ||
+                    first.type !== "Literal" ||
+                    first.value !== "electron"
+                ) {
                     return;
                 }
 
                 // We only flag the require call when we see it being
                 // Destructured to ipcMain.
-                const {parent} = node;
+                const { parent } = node;
                 if (
                     parent &&
                     parent.type === "VariableDeclarator" &&

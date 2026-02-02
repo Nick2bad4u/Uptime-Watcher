@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-ipc-handler-require-validator
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-ipc-handler-require-validator
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -14,11 +14,14 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const electronIpcHandlerRequireValidatorRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { node: any; messageId: string }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||

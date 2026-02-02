@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-prefer-read-process-env
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-prefer-read-process-env
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -14,11 +14,15 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const electronPreferReadProcessEnvRule = {
     /**
-     * @param {{ getFilename: () => any; getSourceCode: () => any; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     getSourceCode: () => any;
+     *     report: (arg0: { node: any; messageId: string }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -38,7 +42,7 @@ export const electronPreferReadProcessEnvRule = {
             /** @param {any} node */
             Program(node) {
                 const sourceCode = context.getSourceCode(),
-                 text = sourceCode.getText();
+                    text = sourceCode.getText();
                 if (text.includes("process.env")) {
                     context.report({
                         messageId: "preferReadProcessEnv",

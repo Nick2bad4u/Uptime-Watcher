@@ -1,8 +1,8 @@
 /**
- * @file Rule: logger-no-error-in-context
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: logger-no-error-in-context
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -19,7 +19,10 @@ import {
  */
 export const loggerNoErrorInContextRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
@@ -82,7 +85,10 @@ export const loggerNoErrorInContextRule = {
             }
 
             if (value.type === "NewExpression") {
-                return value.callee?.type === "Identifier" && value.callee.name === "Error";
+                return (
+                    value.callee?.type === "Identifier" &&
+                    value.callee.name === "Error"
+                );
             }
 
             if (value.type === "CallExpression") {
@@ -137,8 +143,8 @@ export const loggerNoErrorInContextRule = {
                 }
 
                 const arguments_ = node.arguments ?? [],
-                 lastArgument = arguments_.at(-1),
-                 errorProperty = getErrorProperty(lastArgument);
+                    lastArgument = arguments_.at(-1),
+                    errorProperty = getErrorProperty(lastArgument);
 
                 if (!errorProperty) {
                     return;

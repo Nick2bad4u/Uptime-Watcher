@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-import-internal-service-utils
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: renderer-no-import-internal-service-utils
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -17,11 +17,14 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  */
 export const rendererNoImportInternalServiceUtilsRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||

@@ -38,7 +38,9 @@ export const getPluginRule = (ruleId: string): Linter.RuleModule => {
 
     const rule = rules[ruleId as keyof typeof rules];
     if (!rule) {
-        throw new Error(`Rule '${ruleId}' is not registered in uptimeWatcherPlugin`);
+        throw new Error(
+            `Rule '${ruleId}' is not registered in uptimeWatcherPlugin`
+        );
     }
 
     if (!isRuleModule(rule)) {

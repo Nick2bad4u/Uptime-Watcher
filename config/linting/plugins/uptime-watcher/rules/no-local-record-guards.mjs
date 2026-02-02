@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-local-record-guards
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-local-record-guards
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -13,7 +13,14 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const noLocalRecordGuardsRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { node: import("estree").Identifier; messageId: string; data: { name: string; }; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: {
+     *         node: import("estree").Identifier;
+     *         messageId: string;
+     *         data: { name: string };
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
@@ -42,30 +49,29 @@ export const noLocalRecordGuardsRule = {
         }
 
         const bannedNames = new Set([
-            "asRecord",
-            "isObjectRecord",
-            "isRecordLike",
-            "toRecord",
-        ]),
+                "asRecord",
+                "isObjectRecord",
+                "isRecordLike",
+                "toRecord",
+            ]),
+            /** @param {import("estree").Identifier} identifier */
+            reportIdentifier = (identifier) => {
+                if (!bannedNames.has(identifier.name)) {
+                    return;
+                }
 
-        /** @param {import("estree").Identifier} identifier */
-         reportIdentifier = (identifier) => {
-            if (!bannedNames.has(identifier.name)) {
-                return;
-            }
-
-            context.report({
-                data: {
-                    name: identifier.name,
-                },
-                messageId: "noLocalRecordGuards",
-                node: identifier,
-            });
-        };
+                context.report({
+                    data: {
+                        name: identifier.name,
+                    },
+                    messageId: "noLocalRecordGuards",
+                    node: identifier,
+                });
+            };
 
         return {
             /**
-             * @param {{ id: import("estree").Identifier; }} node
+             * @param {{ id: import("estree").Identifier }} node
              */
             FunctionDeclaration(node) {
                 if (node.id?.type === "Identifier") {
@@ -74,7 +80,7 @@ export const noLocalRecordGuardsRule = {
             },
 
             /**
-             * @param {{ id: import("estree").Identifier; }} node
+             * @param {{ id: import("estree").Identifier }} node
              */
             VariableDeclarator(node) {
                 if (node.id?.type === "Identifier") {

@@ -1,8 +1,8 @@
 /**
- * @file Rule: shared-types-no-local-is-plain-object
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: shared-types-no-local-is-plain-object
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -16,7 +16,10 @@ import { NORMALIZED_SHARED_DIR } from "../_internal/repo-paths.mjs";
  */
 export const sharedTypesNoLocalIsPlainObjectRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: { node: any; messageId: string }) => void;
+     * }} context
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
@@ -32,7 +35,7 @@ export const sharedTypesNoLocalIsPlainObjectRule = {
 
         return {
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             VariableDeclarator(node) {
                 if (

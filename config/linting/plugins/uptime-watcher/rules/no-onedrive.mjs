@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-onedrive
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-onedrive
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -16,7 +16,11 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const noOneDriveRule = {
     /**
-     * @param {{ getFilename: () => string; getSourceCode: () => any; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     getSourceCode: () => any;
+     *     report: (arg0: { node: any; messageId: string }) => void;
+     * }} context
      */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
@@ -45,7 +49,7 @@ export const noOneDriveRule = {
              */
             Program(node) {
                 const sourceCode = context.getSourceCode(),
-                 text = sourceCode.getText();
+                    text = sourceCode.getText();
                 if (!bannedPattern.test(text)) {
                     return;
                 }

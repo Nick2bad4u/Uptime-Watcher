@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-direct-bridge-readiness
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: renderer-no-direct-bridge-readiness
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -21,11 +21,15 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  */
 export const rendererNoDirectBridgeReadinessRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { data: { callee: any; }; messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { data: { callee: any }; messageId: string; node: any
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -47,8 +51,8 @@ export const rendererNoDirectBridgeReadinessRule = {
 
         /** @type {Set<string>} */
         const /** @type {Set<string>} */
-         notReadyErrorLocals = new Set(),
-        waitForElectronBridgeLocals = new Set();
+            notReadyErrorLocals = new Set(),
+            waitForElectronBridgeLocals = new Set();
 
         /**
          * @param {any} node
@@ -67,7 +71,7 @@ export const rendererNoDirectBridgeReadinessRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                const {callee} = node;
+                const { callee } = node;
                 if (callee.type === "Identifier") {
                     if (callee.name === "waitForElectronBridge") {
                         report(callee, "waitForElectronBridge");
@@ -79,12 +83,14 @@ export const rendererNoDirectBridgeReadinessRule = {
                     }
                 }
 
-                if (callee.type === "MemberExpression" && !callee.computed &&
-                        callee.property.type === "Identifier" &&
-                        callee.property.name === "waitForElectronBridge"
-                    ) {
-                        report(callee.property, "waitForElectronBridge");
-                    }
+                if (
+                    callee.type === "MemberExpression" &&
+                    !callee.computed &&
+                    callee.property.type === "Identifier" &&
+                    callee.property.name === "waitForElectronBridge"
+                ) {
+                    report(callee.property, "waitForElectronBridge");
+                }
             },
 
             /**
@@ -121,7 +127,7 @@ export const rendererNoDirectBridgeReadinessRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.NewExpression} node
              */
             NewExpression(node) {
-                const {callee} = node;
+                const { callee } = node;
                 if (callee.type === "Identifier") {
                     if (callee.name === "ElectronBridgeNotReadyError") {
                         report(callee, "ElectronBridgeNotReadyError");

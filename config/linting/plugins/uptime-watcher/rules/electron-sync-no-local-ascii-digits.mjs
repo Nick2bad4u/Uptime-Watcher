@@ -1,8 +1,8 @@
 /**
- * @file Rule: electron-sync-no-local-ascii-digits
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: electron-sync-no-local-ascii-digits
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -16,7 +16,10 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  */
 export const electronSyncNoLocalAsciiDigitsRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: { node: any; messageId: string }) => void;
+     * }} context
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
@@ -30,7 +33,9 @@ export const electronSyncNoLocalAsciiDigitsRule = {
             return {};
         }
 
-        const reportIfNameMatches = (/** @type {{type: string, name: string}} */ id) => {
+        const reportIfNameMatches = (
+            /** @type {{ type: string; name: string }} */ id
+        ) => {
             if (!id || id.type !== "Identifier") {
                 return;
             }
@@ -45,14 +50,14 @@ export const electronSyncNoLocalAsciiDigitsRule = {
 
         return {
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             FunctionDeclaration(node) {
                 reportIfNameMatches(node?.id);
             },
 
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             VariableDeclarator(node) {
                 reportIfNameMatches(node?.id);

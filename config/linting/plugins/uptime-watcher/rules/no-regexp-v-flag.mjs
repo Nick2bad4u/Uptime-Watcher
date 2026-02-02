@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-regexp-v-flag
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-regexp-v-flag
  */
 
 /**
@@ -15,12 +15,12 @@
  */
 export const noRegexpVFlagRule = {
     /**
-     * @param {{ report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{ report: (arg0: { node: any; messageId: string }) => void }} context
      */
     create(context) {
         return {
             /**
-             * @param {{regex: any}} node
+             * @param {{ regex: any }} node
              */
             Literal(node) {
                 const regex = node?.regex;

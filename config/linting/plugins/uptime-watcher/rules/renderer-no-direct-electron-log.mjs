@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-direct-electron-log
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: renderer-no-direct-electron-log
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -20,11 +20,15 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  */
 export const rendererNoDirectElectronLogRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { data: { module: any; }; messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { data: { module: any }; messageId: string; node: any
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -44,7 +48,10 @@ export const rendererNoDirectElectronLogRule = {
             return {};
         }
 
-        const forbiddenModules = new Set(["electron-log", "electron-log/renderer"]);
+        const forbiddenModules = new Set([
+            "electron-log",
+            "electron-log/renderer",
+        ]);
 
         return {
             /**

@@ -1,8 +1,8 @@
 /**
- * @file Rule: no-redeclare-shared-contract-interfaces
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: no-redeclare-shared-contract-interfaces
  */
 
 /**
@@ -15,16 +15,17 @@
  */
 export const noRedeclareSharedContractInterfacesRule = {
     /**
-     * @param {{ report: (arg0: { node: any; messageId: string; data: { name: any; }; }) => void; }} context
+     * @param {{
+     *     report: (arg0: { node: any; messageId: string; data: { name: any }
+     *     }) => void;
+     * }} context
      */
     create(context) {
-        const interfaceNames = new Set([
-            "MonitorTypeOption",
-        ]);
+        const interfaceNames = new Set(["MonitorTypeOption"]);
 
         return {
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             TSInterfaceDeclaration(node) {
                 const id = node?.id;

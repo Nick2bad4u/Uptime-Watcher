@@ -1,8 +1,8 @@
 /**
- * @file Rule: store-actions-require-finally-reset
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: store-actions-require-finally-reset
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -18,13 +18,19 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  *
  * - It only targets `src/stores/**` (non-test) files.
  * - It only triggers on direct `set({ isX: true })` calls inside store
- * actions. - It requires a corresponding `set({ isX: false })` to appear
- * inside a
+ * actions. -
+ *   It requires a corresponding `set({ isX: false })` to appear inside a
  *   `finally` block in the same function.
  */
 export const storeActionsRequireFinallyResetRule = {
     /**
-     * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { flag: any; }; messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     sourceCode: any;
+     *     getSourceCode: () => any;
+     *     report: (arg0: { data: { flag: any }; messageId: string; node: any
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
@@ -44,28 +50,34 @@ export const storeActionsRequireFinallyResetRule = {
         }
 
         const sourceCode = context.sourceCode ?? context.getSourceCode(),
-         {visitorKeys} = sourceCode;
+            { visitorKeys } = sourceCode;
 
         /**
          * Extracts an object literal from a set() argument.
          *
          * Supports:
-         * - set({ ... })
-         * - set(() => ({ ... }))
-         * - set(() => { return { ... }; })
+         *
+         * - Set({ ... })
+         * - Set(() => ({ ... }))
+         * - Set(() => { return { ... }; })
          *
          * @param {unknown} argument
          *
          * @returns {import("@typescript-eslint/utils").TSESTree.ObjectExpression | null}
          */
         function getSetObjectExpression(argument) {
-            if (!argument || typeof argument !== "object" || !("type" in argument)) {
+            if (
+                !argument ||
+                typeof argument !== "object" ||
+                !("type" in argument)
+            ) {
                 return null;
             }
 
-            const node = /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
-                argument
-            );
+            const node =
+                /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
+                    argument
+                );
 
             if (node.type === "ObjectExpression") {
                 return node;
@@ -75,7 +87,7 @@ export const storeActionsRequireFinallyResetRule = {
                 return null;
             }
 
-            const {body} = node;
+            const { body } = node;
             if (body.type === "ObjectExpression") {
                 return body;
             }
@@ -133,7 +145,7 @@ export const storeActionsRequireFinallyResetRule = {
                 return null;
             }
 
-            const {key} = property;
+            const { key } = property;
             if (!key || typeof key !== "object" || !("type" in key)) {
                 return null;
             }
@@ -142,7 +154,11 @@ export const storeActionsRequireFinallyResetRule = {
                 return typeof key.name === "string" ? key.name : null;
             }
 
-            if (key.type === "Literal" && "value" in key && typeof key.value === "string") {
+            if (
+                key.type === "Literal" &&
+                "value" in key &&
+                typeof key.value === "string"
+            ) {
                 return key.value;
             }
 
@@ -163,29 +179,35 @@ export const storeActionsRequireFinallyResetRule = {
                 return false;
             }
 
-            const {callee} = node;
+            const { callee } = node;
             return Boolean(
                 callee &&
-                    typeof callee === "object" &&
-                    "type" in callee &&
-                    callee.type === "Identifier" &&
-                    "name" in callee &&
-                    callee.name === "set"
+                typeof callee === "object" &&
+                "type" in callee &&
+                callee.type === "Identifier" &&
+                "name" in callee &&
+                callee.name === "set"
             );
         }
 
         /**
          * @param {unknown} node
-         * @param {{flagsResetInFinally: Set<string>, flagsSet: Map<string, unknown>, inFinally: boolean, root: unknown}} state
+         * @param {{
+         *     flagsResetInFinally: Set<string>;
+         *     flagsSet: Map<string, unknown>;
+         *     inFinally: boolean;
+         *     root: unknown;
+         * }} state
          */
         function walk(node, state) {
             if (!node || typeof node !== "object" || !("type" in node)) {
                 return;
             }
 
-            const typedNode = /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
-                node
-            );
+            const typedNode =
+                /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
+                    node
+                );
 
             // Do not traverse into nested functions; each action function is
             // Analyzed independently.
@@ -227,8 +249,8 @@ export const storeActionsRequireFinallyResetRule = {
 
                         const value = getBooleanLiteralValue(property.value);
                         if (value === true && !state.flagsSet.has(name)) {
-                                state.flagsSet.set(name, typedNode);
-                            }
+                            state.flagsSet.set(name, typedNode);
+                        }
 
                         if (state.inFinally && value === false) {
                             state.flagsResetInFinally.add(name);
@@ -256,7 +278,7 @@ export const storeActionsRequireFinallyResetRule = {
         }
 
         /**
-         * @param {{body: any}} node
+         * @param {{ body: any }} node
          */
         function analyzeFunction(node) {
             if (!node.body) {

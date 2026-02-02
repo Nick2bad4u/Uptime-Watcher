@@ -1,9 +1,9 @@
 /**
- * @file Rule: prefer-shared-alias
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: prefer-shared-alias
  */
 
 import * as path from "node:path";
@@ -19,13 +19,20 @@ SHARED_DIR } from "../_internal/repo-paths.mjs";
  */
 export const preferSharedAliasRule = {
     /**
-     * @param {{getFilename: () => any; report: (arg0: {fix: (fixer: any) => any; messageId: string; node: any}) => void}} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { fix: (fixer: any) => any; messageId: string; node:
+     *     any }) => void;
+     * }} context
      */
     create(context) {
         const filename = context.getFilename(),
-         normalizedFilename = normalizePath(filename);
+            normalizedFilename = normalizePath(filename);
 
-        if (normalizedFilename === "<input>" || normalizedFilename.includes("/shared/")) {
+        if (
+            normalizedFilename === "<input>" ||
+            normalizedFilename.includes("/shared/")
+        ) {
             return {};
         }
 
@@ -48,14 +55,22 @@ export const preferSharedAliasRule = {
                     return;
                 }
 
-                const importAbsolutePath = path.resolve(importerDirectory, importPath),
-                 normalizedImportAbsolute = normalizePath(importAbsolutePath);
+                const importAbsolutePath = path.resolve(
+                        importerDirectory,
+                        importPath
+                    ),
+                    normalizedImportAbsolute =
+                        normalizePath(importAbsolutePath);
 
                 if (normalizedImportAbsolute === NORMALIZED_SHARED_DIR) {
                     return;
                 }
 
-                if (!normalizedImportAbsolute.startsWith(`${NORMALIZED_SHARED_DIR}/`)) {
+                if (
+                    !normalizedImportAbsolute.startsWith(
+                        `${NORMALIZED_SHARED_DIR}/`
+                    )
+                ) {
                     return;
                 }
 
@@ -68,17 +83,21 @@ export const preferSharedAliasRule = {
                 }
 
                 const aliasSuffix = relativeToShared.replace(
-                    /\.(?:[cm]?[jt]sx?|d\.ts)$/v,
-                    ""
-                ),
-                      aliasPath = `@shared/${aliasSuffix}`,
-                      rawSource =
-                          typeof node.source.raw === "string" ? node.source.raw : null,
-                      quote = rawSource?.startsWith("'") ? "'" : '"';
+                        /\.(?:[cm]?[jt]sx?|d\.ts)$/v,
+                        ""
+                    ),
+                    aliasPath = `@shared/${aliasSuffix}`,
+                    rawSource =
+                        typeof node.source.raw === "string"
+                            ? node.source.raw
+                            : null,
+                    quote = rawSource?.startsWith("'") ? "'" : '"';
 
                 context.report({
                     /**
-                     * @param {{ replaceText: (arg0: any, arg1: string) => any; }} fixer
+                     * @param {{
+                     *     replaceText: (arg0: any, arg1: string) => any;
+                     * }} fixer
                      */
                     fix(fixer) {
                         return fixer.replaceText(

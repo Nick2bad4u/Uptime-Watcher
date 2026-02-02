@@ -1,9 +1,9 @@
 /**
- * @file Rule: shared-no-outside-imports
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: shared-no-outside-imports
  */
 
 import * as path from "node:path";
@@ -20,17 +20,17 @@ import { NORMALIZED_SHARED_DIR } from "../_internal/repo-paths.mjs";
 export const sharedNoOutsideImportsRule = {
     /**
      * @param {{
-     *   getFilename: () => string;
-     *   report: (descriptor: {
-     *     messageId: string;
-     *     node: import("@typescript-eslint/utils").TSESTree.Node;
-     *     data?: Record<string, unknown>;
-     *   }) => void;
+     *     getFilename: () => string;
+     *     report: (descriptor: {
+     *         messageId: string;
+     *         node: import("@typescript-eslint/utils").TSESTree.Node;
+     *         data?: Record<string, unknown>;
+     *     }) => void;
      * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -47,7 +47,7 @@ export const sharedNoOutsideImportsRule = {
          * layer.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
-         * to highlight.
+         *   to highlight.
          * @param {string} moduleName - The offending module specifier.
          */
         function report(node, moduleName) {
@@ -62,7 +62,7 @@ export const sharedNoOutsideImportsRule = {
          * Determines whether a module specifier refers to a disallowed target.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST
-         * node to highlight if violation occurs.
+         *   node to highlight if violation occurs.
          * @param {string} moduleName - Module specifier to inspect.
          */
         function handleModuleSpecifier(node, moduleName) {
@@ -121,7 +121,10 @@ export const sharedNoOutsideImportsRule = {
                         firstArgument?.type === "Literal" &&
                         typeof firstArgument.value === "string"
                     ) {
-                        handleModuleSpecifier(firstArgument, firstArgument.value);
+                        handleModuleSpecifier(
+                            firstArgument,
+                            firstArgument.value
+                        );
                     }
                 }
             },

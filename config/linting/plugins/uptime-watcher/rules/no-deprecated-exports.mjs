@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-deprecated-exports
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-deprecated-exports
  */
 
 const DEPRECATED_TAG_PATTERN = /@deprecated\b/iv;
@@ -14,17 +14,17 @@ const DEPRECATED_TAG_PATTERN = /@deprecated\b/iv;
 export const noDeprecatedExportsRule = {
     /**
      * @param {{
-     *   sourceCode?: any;
-     *   getSourceCode?: () => any;
-     *   report: (descriptor: {
-     *     messageId: string;
-     *     node: import("@typescript-eslint/utils").TSESTree.Node;
-     *   }) => void;
+     *     sourceCode?: any;
+     *     getSourceCode?: () => any;
+     *     report: (descriptor: {
+     *         messageId: string;
+     *         node: import("@typescript-eslint/utils").TSESTree.Node;
+     *     }) => void;
      * }} context
      */
     create(context) {
         const inspectedNodes = new WeakSet(),
-         sourceCode = context.sourceCode ?? context.getSourceCode?.();
+            sourceCode = context.sourceCode ?? context.getSourceCode?.();
 
         if (!sourceCode) {
             return {};
@@ -110,7 +110,10 @@ export const noDeprecatedExportsRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.ExportDefaultDeclaration} node
              */
             ExportDefaultDeclaration(node) {
-                if (node.declaration && node.declaration.type !== "Identifier") {
+                if (
+                    node.declaration &&
+                    node.declaration.type !== "Identifier"
+                ) {
                     reportIfDeprecated(node.declaration, node);
                     return;
                 }

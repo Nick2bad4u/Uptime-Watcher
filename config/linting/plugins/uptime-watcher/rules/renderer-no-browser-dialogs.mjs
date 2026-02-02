@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-browser-dialogs
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to make the internal
  * ESLint plugin easier to maintain and evolve.
+ *
+ * @file Rule: renderer-no-browser-dialogs
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -11,7 +11,11 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
 // Repo path constants live in ../_internal/repo-paths.mjs
 
-const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set(["alert", "confirm", "prompt"]);
+const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set([
+    "alert",
+    "confirm",
+    "prompt",
+]);
 
 /**
  * ESLint rule discouraging usage of native browser dialogs in favour of the
@@ -19,12 +23,18 @@ const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set(["alert", "confirm", "prompt"]);
  */
 export const rendererNoBrowserDialogsRule = {
     /**
-     * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { dialog: any; }; messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     sourceCode: any;
+     *     getSourceCode: () => any;
+     *     report: (arg0: { data: { dialog: any }; messageId: string; node: any
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename),
-         sourceCode = context.sourceCode ?? context.getSourceCode();
+            normalizedFilename = normalizePath(rawFilename),
+            sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -104,25 +114,29 @@ export const rendererNoBrowserDialogsRule = {
             }
 
             const propertyName = getMemberPropertyName(unwrapped);
-            if (!propertyName || !FORBIDDEN_BROWSER_DIALOG_NAMES.has(propertyName)) {
+            if (
+                !propertyName ||
+                !FORBIDDEN_BROWSER_DIALOG_NAMES.has(propertyName)
+            ) {
                 return null;
             }
 
             const object = unwrapChain(unwrapped.object);
-            if (object.type === "Identifier" && (
-                    object.name === "window" ||
+            if (
+                object.type === "Identifier" &&
+                (object.name === "window" ||
                     object.name === "globalThis" ||
-                    object.name === "global"
-                )) {
-                    return propertyName;
-                }
+                    object.name === "global")
+            ) {
+                return propertyName;
+            }
 
             return null;
         }
 
         return {
             /**
-             * @param {{callee: any}} node
+             * @param {{ callee: any }} node
              */
             CallExpression(node) {
                 const dialog = getForbiddenDialogFromCallee(node.callee, node);

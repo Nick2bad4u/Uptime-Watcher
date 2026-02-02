@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-electron-import
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to make the internal
  * ESLint plugin easier to maintain and evolve.
+ *
+ * @file Rule: renderer-no-electron-import
  */
 
 import * as path from "node:path";
@@ -23,17 +23,17 @@ import {
 export const rendererNoElectronImportRule = {
     /**
      * @param {{
-     *   getFilename: () => string;
-     *   report: (descriptor: {
-     *     messageId: string;
-     *     node: import("@typescript-eslint/utils").TSESTree.Node;
-     *     data?: Record<string, unknown>;
-     *   }) => void;
+     *     getFilename: () => string;
+     *     report: (descriptor: {
+     *         messageId: string;
+     *         node: import("@typescript-eslint/utils").TSESTree.Node;
+     *         data?: Record<string, unknown>;
+     *     }) => void;
      * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -52,7 +52,7 @@ export const rendererNoElectronImportRule = {
          * @param {string} moduleName - Module specifier under evaluation.
          *
          * @returns {boolean} True when the specifier targets the Electron
-         * runtime package.
+         *   runtime package.
          */
         function isDirectElectronModule(moduleName) {
             if (moduleName === "electron" || moduleName === "node:electron") {
@@ -71,10 +71,10 @@ export const rendererNoElectronImportRule = {
          * directory.
          *
          * @param {string} moduleName - Module specifier from an import or
-         * require call.
+         *   require call.
          *
          * @returns {boolean} True when the resolved path lives inside the
-         * electron source tree.
+         *   electron source tree.
          */
         function resolvesToElectronDirectory(moduleName) {
             if (!moduleName.startsWith(".")) {
@@ -94,7 +94,7 @@ export const rendererNoElectronImportRule = {
          * Reports an invalid Electron dependency usage.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST
-         * node to highlight.
+         *   node to highlight.
          * @param {string} moduleName - Name of the offending module specifier.
          *
          * @returns {void}
@@ -112,7 +112,7 @@ export const rendererNoElectronImportRule = {
          * it references Electron.
          *
          * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
-         * owning the literal specifier.
+         *   owning the literal specifier.
          * @param {string} moduleName - Literal module specifier value.
          *
          * @returns {void}
@@ -128,7 +128,10 @@ export const rendererNoElectronImportRule = {
 
         return {
             /**
-             * @param {{callee: {type: string, name: string}, arguments: string | any[]}} node
+             * @param {{
+             *     callee: { type: string; name: string };
+             *     arguments: string | any[];
+             * }} node
              */
             CallExpression(node) {
                 if (
@@ -141,7 +144,10 @@ export const rendererNoElectronImportRule = {
                         firstArgument?.type === "Literal" &&
                         typeof firstArgument.value === "string"
                     ) {
-                        handleStaticSpecifier(firstArgument, firstArgument.value);
+                        handleStaticSpecifier(
+                            firstArgument,
+                            firstArgument.value
+                        );
                     }
                 }
             },

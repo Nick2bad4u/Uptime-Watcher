@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-no-console
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin maintainable.
+ *
+ * @file Rule: electron-no-console
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -13,7 +13,11 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const electronNoConsoleRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { data: { method: string; }; messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: { data: { method: string }; messageId: string; node:
+     *     any }) => void;
+     * }} context
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
@@ -28,7 +32,14 @@ export const electronNoConsoleRule = {
 
         return {
             /**
-             * @param {{callee: {type: string, object: {type: string, name: string}, computed: any, property: {type: string, name: any}}}} node
+             * @param {{
+             *     callee: {
+             *         type: string;
+             *         object: { type: string; name: string };
+             *         computed: any;
+             *         property: { type: string; name: any };
+             *     };
+             * }} node
              */
             CallExpression(node) {
                 if (

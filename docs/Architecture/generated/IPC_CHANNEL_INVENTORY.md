@@ -29,8 +29,8 @@
 | `diagnostics-verify-ipc-handler`      | Handles `diagnostics-verify-ipc-handler` invocations.      | `[channel: string]`                            | `IpcHandlerVerificationResult`       |
 | `download-sqlite-backup`              | Handles `download-sqlite-backup` invocations.              | `[]`                                           | `SerializedDatabaseBackupResult`     |
 | `export-data`                         | Handles `export-data` invocations.                         | `[]`                                           | `string`                             |
-| `format-monitor-detail`               | Handles `format-monitor-detail` invocations.               | `[monitorType: string, details: string]`       | `string`                             |
-| `format-monitor-title-suffix`         | Handles `format-monitor-title-suffix` invocations.         | `[monitorType: string, monitor: Monitor]`      | `string`                             |
+| `format-monitor-detail`               | Handles `format-monitor-detail` invocations.               | `[monitorType: MonitorType, details: string]`  | `string`                             |
+| `format-monitor-title-suffix`         | Handles `format-monitor-title-suffix` invocations.         | `[monitorType: MonitorType, monitor: Monitor]` | `string`                             |
 | `get-history-limit`                   | Handles `get-history-limit` invocations.                   | `[]`                                           | `number`                             |
 | `get-monitor-types`                   | Handles `get-monitor-types` invocations.                   | `[]`                                           | `MonitorTypeConfig[]`                |
 | `get-sites`                           | Handles `get-sites` invocations.                           | `[]`                                           | `Site[]`                             |
@@ -54,7 +54,7 @@
 | `update-history-limit`                | Handles `update-history-limit` invocations.                | `[limitDays: number]`                          | `number`                             |
 | `update-notification-preferences`     | Handles `update-notification-preferences` invocations.     | `[preferences: NotificationPreferenceUpdate]`  | `undefined`                          |
 | `update-site`                         | Handles `update-site` invocations.                         | `[identifier: string, updates: Partial<Site>]` | `Site`                               |
-| `validate-monitor-data`               | Handles `validate-monitor-data` invocations.               | `[monitorType: string, data: unknown]`         | `ValidationResult`                   |
+| `validate-monitor-data`               | Handles `validate-monitor-data` invocations.               | `[monitorType: MonitorType, data: unknown]`    | `ValidationResult`                   |
 | `write-clipboard-text`                | Handles `write-clipboard-text` invocations.                | `[text: string]`                               | `boolean`                            |
 
 ## Renderer Event Channels

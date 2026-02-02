@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-call-identifiers
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-call-identifiers
  */
 
 /**
@@ -11,19 +11,28 @@
  */
 export const noCallIdentifiersRule = {
     /**
-     * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; details: any; }; }) => void; }} context
+     * @param {{
+     *     options: any[];
+     *     report: (arg0: {
+     *         node: any;
+     *         messageId: string;
+     *         data: { name: any; details: any };
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const option = context.options?.[0],
-         banned = Array.isArray(option?.banned) ? option.banned : [],
-         bannedByName = new Map(
-            banned.map((/** @type {{name: any}} */ entry) => [entry.name, entry])
-        ),
-
-         detailsFor = (/** @type {{message: string | any[]}} */ entry) =>
-            typeof entry.message === "string" && entry.message.length > 0
-                ? entry.message
-                : "Call the shared helper instead.";
+            banned = Array.isArray(option?.banned) ? option.banned : [],
+            bannedByName = new Map(
+                banned.map((/** @type {{ name: any }} */ entry) => [
+                    entry.name,
+                    entry,
+                ])
+            ),
+            detailsFor = (/** @type {{ message: string | any[] }} */ entry) =>
+                typeof entry.message === "string" && entry.message.length > 0
+                    ? entry.message
+                    : "Call the shared helper instead.";
 
         return {
             /**

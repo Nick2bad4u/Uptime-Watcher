@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-no-inline-ipc-channel-type-argument
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-no-inline-ipc-channel-type-argument
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -22,11 +22,14 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  */
 export const electronNoInlineIpcChannelTypeArgumentRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: object; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { messageId: string; node: object }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -57,7 +60,10 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
                 return typeParameters.typeArguments;
             }
 
-            if ("params" in typeParameters && Array.isArray(typeParameters.params)) {
+            if (
+                "params" in typeParameters &&
+                Array.isArray(typeParameters.params)
+            ) {
                 return typeParameters.params;
             }
 
@@ -66,7 +72,9 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
 
         return {
             /**
-             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression & { typeParameters?: unknown }} node
+             * @param {import("@typescript-eslint/utils").TSESTree.CallExpression & {
+             *     typeParameters?: unknown;
+             * }} node
              */
             CallExpression(node) {
                 if (node.callee.type !== "Identifier") {
@@ -78,15 +86,18 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
                 }
 
                 const typeParameters = /** @type {unknown} */ (
-                    node.typeArguments ?? node.typeParameters
-                ),
-                 arguments_ = getTypeArguments(typeParameters);
+                        node.typeArguments ?? node.typeParameters
+                    ),
+                    arguments_ = getTypeArguments(typeParameters);
                 if (arguments_.length === 0) {
                     return;
                 }
 
                 const firstTypeArgument = arguments_[0];
-                if (!firstTypeArgument || typeof firstTypeArgument !== "object") {
+                if (
+                    !firstTypeArgument ||
+                    typeof firstTypeArgument !== "object"
+                ) {
                     return;
                 }
 
@@ -102,7 +113,7 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
                     return;
                 }
 
-                const {literal} = firstTypeArgument;
+                const { literal } = firstTypeArgument;
                 if (!literal || typeof literal !== "object") {
                     return;
                 }
@@ -115,7 +126,10 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
                     return;
                 }
 
-                if (!("value" in literal) || typeof literal.value !== "string") {
+                if (
+                    !("value" in literal) ||
+                    typeof literal.value !== "string"
+                ) {
                     return;
                 }
 

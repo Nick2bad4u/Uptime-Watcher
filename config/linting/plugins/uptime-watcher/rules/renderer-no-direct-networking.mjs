@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-direct-networking
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: renderer-no-direct-networking
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -22,12 +22,21 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  */
 export const rendererNoDirectNetworkingRule = {
     /**
-     * @param {{ sourceCode: any; getSourceCode: () => any; getFilename: () => any; report: (arg0: { data: { api: string; } | { api: string; } | { api: string; } | { api: string; }; messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     sourceCode: any;
+     *     getSourceCode: () => any;
+     *     getFilename: () => any;
+     *     report: (arg0: {
+     *         data: { api: string } | { api: string } | { api: string } | {
+     *         api: string }; messageId: string;
+     *         node: any;
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename),
-         sourceCode = context.sourceCode ?? context.getSourceCode();
+            normalizedFilename = normalizePath(rawFilename),
+            sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -66,7 +75,7 @@ export const rendererNoDirectNetworkingRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                const {callee} = node;
+                const { callee } = node;
 
                 // Fetch(...)
                 if (callee.type === "Identifier" && callee.name === "fetch") {
@@ -93,23 +102,28 @@ export const rendererNoDirectNetworkingRule = {
                 }
 
                 // Axios.get(...)
-                if (callee.type === "MemberExpression" && !callee.computed &&
-                        callee.object.type === "Identifier" &&
-                        axiosLocalNames.has(callee.object.name)
-                    ) {
-                        context.report({
-                            data: { api: "axios" },
-                            messageId: "noDirectNetworking",
-                            node: callee,
-                        });
-                    }
+                if (
+                    callee.type === "MemberExpression" &&
+                    !callee.computed &&
+                    callee.object.type === "Identifier" &&
+                    axiosLocalNames.has(callee.object.name)
+                ) {
+                    context.report({
+                        data: { api: "axios" },
+                        messageId: "noDirectNetworking",
+                        node: callee,
+                    });
+                }
             },
 
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.ImportDeclaration} node
              */
             ImportDeclaration(node) {
-                if (node.source.type !== "Literal" || node.source.value !== "axios") {
+                if (
+                    node.source.type !== "Literal" ||
+                    node.source.value !== "axios"
+                ) {
                     return;
                 }
 

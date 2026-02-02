@@ -1,8 +1,8 @@
 /**
- * @file Rule: test-no-mock-return-value-constructors
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: test-no-mock-return-value-constructors
  */
 
 /**
@@ -20,99 +20,101 @@
  */
 export const testNoMockReturnValueConstructorsRule = {
     /**
-     * @param {{ report: (arg0: { node: any; messageId: string; data: { method: any; name: any; replacement: string; }; }) => void; }} context
+     * @param {{
+     *     report: (arg0: {
+     *         node: any;
+     *         messageId: string;
+     *         data: { method: any; name: any; replacement: string };
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const extractMockTargetName = (/** @type {any} */ node) => {
-            const unwrapped = unwrapExpression(node);
-            if (!unwrapped) {
-                return;
-            }
-
-            if (unwrapped.type === "Identifier") {
-                return unwrapped.name;
-            }
-
-            if (unwrapped.type === "MemberExpression") {
-                // Prefer the property name (e.g. BrowserWindow.getAllWindows)
-                if (unwrapped.property?.type === "Identifier") {
-                    return unwrapped.property.name;
+                const unwrapped = unwrapExpression(node);
+                if (!unwrapped) {
+                    return;
                 }
 
-                return;
-            }
+                if (unwrapped.type === "Identifier") {
+                    return unwrapped.name;
+                }
 
-            if (isViMockedCall(unwrapped)) {
-                const argument = unwrapped.arguments?.[0];
-                return extractMockTargetName(argument);
-            }
+                if (unwrapped.type === "MemberExpression") {
+                    // Prefer the property name (e.g.
+                    // BrowserWindow.getAllWindows)
+                    if (unwrapped.property?.type === "Identifier") {
+                        return unwrapped.property.name;
+                    }
 
+                    return;
+                }
 
-        },
+                if (isViMockedCall(unwrapped)) {
+                    const argument = unwrapped.arguments?.[0];
+                    return extractMockTargetName(argument);
+                }
+            },
+            isPascalCase = (/** @type {string} */ name) =>
+                typeof name === "string" && /^[A-Z][\dA-Za-z]*$/v.test(name),
+            isViMockedCall = (
+                /** @type {{ type: string; callee: any }} */ node
+            ) => {
+                if (!node || node.type !== "CallExpression") {
+                    return false;
+                }
 
-         isPascalCase = (/** @type {string} */ name) =>
-            typeof name === "string" && /^[A-Z][\dA-Za-z]*$/v.test(name),
+                const callee = unwrapExpression(node.callee);
 
-         isViMockedCall = (
-            /** @type {{type: string, callee: any}} */ node
-        ) => {
-            if (!node || node.type !== "CallExpression") {
+                // Vi.mocked(...)
+                if (
+                    callee?.type === "MemberExpression" &&
+                    callee.object?.type === "Identifier" &&
+                    callee.object.name === "vi" &&
+                    callee.property?.type === "Identifier" &&
+                    callee.property.name === "mocked"
+                ) {
+                    return true;
+                }
+
                 return false;
-            }
+            },
+            unwrapExpression = (/** @type {any} */ node) => {
+                let current = node;
+                // Unwrap TS wrappers commonly produced by @typescript-eslint
+                // Parser And optional chaining wrappers.
 
-            const callee = unwrapExpression(node.callee);
+                while (true) {
+                    if (!current) {
+                        return current;
+                    }
 
-            // Vi.mocked(...)
-            if (
-                callee?.type === "MemberExpression" &&
-                callee.object?.type === "Identifier" &&
-                callee.object.name === "vi" &&
-                callee.property?.type === "Identifier" &&
-                callee.property.name === "mocked"
-            ) {
-                return true;
-            }
+                    if (current.type === "ChainExpression") {
+                        current = current.expression;
+                        continue;
+                    }
 
-            return false;
-        },
+                    if (current.type === "TSAsExpression") {
+                        current = current.expression;
+                        continue;
+                    }
 
-         unwrapExpression = (/** @type {any} */ node) => {
-            let current = node;
-            // Unwrap TS wrappers commonly produced by @typescript-eslint parser
-            // And optional chaining wrappers.
+                    if (current.type === "TSTypeAssertion") {
+                        current = current.expression;
+                        continue;
+                    }
 
-            while (true) {
-                if (!current) {
+                    if (current.type === "TSNonNullExpression") {
+                        current = current.expression;
+                        continue;
+                    }
+
                     return current;
                 }
-
-                if (current.type === "ChainExpression") {
-                    current = current.expression;
-                    continue;
-                }
-
-                if (current.type === "TSAsExpression") {
-                    current = current.expression;
-                    continue;
-                }
-
-                if (current.type === "TSTypeAssertion") {
-                    current = current.expression;
-                    continue;
-                }
-
-                if (current.type === "TSNonNullExpression") {
-                    current = current.expression;
-                    continue;
-                }
-
-                return current;
-            }
-        };
+            };
 
         return {
             /**
-             * @param {{callee: any}} node
+             * @param {{ callee: any }} node
              */
             CallExpression(node) {
                 const callee = unwrapExpression(node.callee);
@@ -124,7 +126,7 @@ export const testNoMockReturnValueConstructorsRule = {
                     return;
                 }
 
-                const {property} = callee;
+                const { property } = callee;
                 if (!property || property.type !== "Identifier") {
                     return;
                 }

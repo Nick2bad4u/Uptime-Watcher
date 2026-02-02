@@ -1,9 +1,9 @@
 /**
- * @file Internal uptime-watcher ESLint plugin entrypoint.
- *
  * @remarks
  * This module is intentionally colocated with the rule implementations so the
  * plugin can be extracted/published later with minimal repo-specific glue.
+ *
+ * @file Internal uptime-watcher ESLint plugin entrypoint.
  */
 
 import { electronCloudProvidersDriftGuardsRule } from "./rules/electron-cloud-providers-drift-guards.mjs";
@@ -92,17 +92,20 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "electron-no-local-string-safety-helpers":
             electronNoLocalStringSafetyHelpersRule,
         "electron-no-renderer-import": electronNoRendererImportRule,
-        "electron-prefer-read-process-env": electronPreferReadProcessEnvironmentRule,
+        "electron-prefer-read-process-env":
+            electronPreferReadProcessEnvironmentRule,
         "electron-preload-no-direct-ipc-renderer-usage":
             electronPreloadNoDirectIpcRendererUsageRule,
         "electron-preload-no-inline-ipc-channel-constant":
             electronPreloadNoInlineIpcChannelConstantRule,
-        "electron-sync-no-local-ascii-digits": electronSyncNoLocalAsciiDigitsRule,
+        "electron-sync-no-local-ascii-digits":
+            electronSyncNoLocalAsciiDigitsRule,
         "logger-no-error-in-context": loggerNoErrorInContextRule,
         "monitor-fallback-consistency": monitorFallbackConsistencyRule,
         "no-call-identifiers": noCallIdentifiersRule,
         "no-deprecated-exports": noDeprecatedExportsRule,
-        "no-inline-ipc-channel-type-literals": noInlineIpcChannelTypeLiteralsRule,
+        "no-inline-ipc-channel-type-literals":
+            noInlineIpcChannelTypeLiteralsRule,
         "no-local-error-normalizers": noLocalErrorNormalizersRule,
         "no-local-identifiers": noLocalIdentifiersRule,
         "no-local-record-guards": noLocalRecordGuardsRule,
@@ -115,7 +118,8 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "prefer-try-get-error-code": preferTryGetErrorCodeRule,
         "preload-no-local-is-plain-object": preloadNoLocalIsPlainObjectRule,
         "renderer-no-browser-dialogs": rendererNoBrowserDialogsRule,
-        "renderer-no-direct-bridge-readiness": rendererNoDirectBridgeReadinessRule,
+        "renderer-no-direct-bridge-readiness":
+            rendererNoDirectBridgeReadinessRule,
         "renderer-no-direct-electron-log": rendererNoDirectElectronLogRule,
         "renderer-no-direct-networking": rendererNoDirectNetworkingRule,
         "renderer-no-direct-preload-bridge": rendererNoDirectPreloadBridgeRule,
@@ -127,8 +131,10 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "renderer-no-window-open": rendererNoWindowOpenRule,
         "require-ensure-error-in-catch": requireEnsureErrorInCatchRule,
         "shared-no-outside-imports": sharedNoOutsideImportsRule,
-        "shared-types-no-local-is-plain-object": sharedTypesNoLocalIsPlainObjectRule,
-        "store-actions-require-finally-reset": storeActionsRequireFinallyResetRule,
+        "shared-types-no-local-is-plain-object":
+            sharedTypesNoLocalIsPlainObjectRule,
+        "store-actions-require-finally-reset":
+            storeActionsRequireFinallyResetRule,
         "test-no-mock-return-value-constructors":
             testNoMockReturnValueConstructorsRule,
         "tsdoc-no-console-example": tsdocNoConsoleExampleRule,
@@ -163,6 +169,7 @@ const allRules = Object.fromEntries(
 
 /**
  * @param {readonly string[]} ruleNames
+ *
  * @returns {Record<string, "error">}
  */
 function errorRulesFor(ruleNames) {
@@ -175,6 +182,7 @@ function errorRulesFor(ruleNames) {
  * Ensures the uptime-watcher plugin is registered on a flat-config item.
  *
  * @param {FlatConfig} config
+ *
  * @returns {FlatConfig}
  */
 function withUptimeWatcherPlugin(config) {
@@ -203,10 +211,7 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "docs/**/*.{ts,tsx}",
             "scripts/**/*.{ts,tsx}",
         ],
-        ignores: [
-            "shared/types/**/*",
-            "**/*.d.ts",
-        ],
+        ignores: ["shared/types/**/*", "**/*.d.ts"],
         name: "uptime-watcher:shared-contract-interface-guard",
         rules: errorRulesFor(["no-redeclare-shared-contract-interfaces"]),
     }),
@@ -359,31 +364,47 @@ const repoConfigs = /** @type {readonly FlatConfig[]} */ ([
     ...repoDriftGuardConfigs,
 ]);
 
+const unscopedAllConfig = withUptimeWatcherPlugin({
+    name: "uptime-watcher:all",
+    rules: allRules,
+});
+
+const unscopedRecommendedConfig = withUptimeWatcherPlugin({
+    name: "uptime-watcher:recommended",
+    rules: allRules,
+});
+
+const unscopedDefaultConfig = withUptimeWatcherPlugin({
+    name: "uptime-watcher:default",
+    rules: allRules,
+});
+
+const flatAllConfig = withUptimeWatcherPlugin({
+    name: "uptime-watcher:flat/all",
+    rules: allRules,
+});
+
+const flatRecommendedConfig = withUptimeWatcherPlugin({
+    name: "uptime-watcher:flat/recommended",
+    rules: allRules,
+});
+
+const flatDefaultConfig = withUptimeWatcherPlugin({
+    name: "uptime-watcher:flat/default",
+    rules: allRules,
+});
+
 /** @type {any} */ (uptimeWatcherPlugin).configs = {
     // Generic (unscoped) configs. These intentionally rely on rules being
     // Internally defensive (path checks, etc.).
-    all: {
-        name: "uptime-watcher:all",
-        plugins: { "uptime-watcher": uptimeWatcherPlugin },
-        rules: allRules,
-    },
-    recommended: {
-        name: "uptime-watcher:recommended",
-        plugins: { "uptime-watcher": uptimeWatcherPlugin },
-        rules: allRules,
-    },
+    all: unscopedAllConfig,
+    recommended: unscopedRecommendedConfig,
+    default: unscopedDefaultConfig,
 
     // Common convention used by other plugins (helps muscle memory).
-    "flat/all": {
-        name: "uptime-watcher:flat/all",
-        plugins: { "uptime-watcher": uptimeWatcherPlugin },
-        rules: allRules,
-    },
-    "flat/recommended": {
-        name: "uptime-watcher:flat/recommended",
-        plugins: { "uptime-watcher": uptimeWatcherPlugin },
-        rules: allRules,
-    },
+    "flat/all": flatAllConfig,
+    "flat/recommended": flatRecommendedConfig,
+    "flat/default": flatDefaultConfig,
 
     // Repo-scoped convenience configs.
     // NOTE: arrays must be spread into the top-level config list.

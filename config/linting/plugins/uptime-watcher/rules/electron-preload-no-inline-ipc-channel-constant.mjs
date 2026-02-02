@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-preload-no-inline-ipc-channel-constant
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-preload-no-inline-ipc-channel-constant
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -20,11 +20,14 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const electronPreloadNoInlineIpcChannelConstantRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||

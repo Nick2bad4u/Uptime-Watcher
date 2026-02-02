@@ -1,16 +1,18 @@
 /**
- * @file Rule: electron-no-renderer-import
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-no-renderer-import
  */
 
 import * as path from "node:path";
 
 import { normalizePath } from "../_internal/path-utils.mjs";
-import { NORMALIZED_ELECTRON_DIR,
-NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
+import {
+    NORMALIZED_ELECTRON_DIR,
+    NORMALIZED_SRC_DIR,
+} from "../_internal/repo-paths.mjs";
 
 // Repo path constants live in ../_internal/repo-paths.mjs
 
@@ -21,14 +23,14 @@ NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 export const electronNoRendererImportRule = {
     /**
      * @param {{
-     *   getFilename: () => any;
-     *   report: (arg0: { data: { module: any }; messageId: string; node: any
-     *   }) => void;
+     *     getFilename: () => any;
+     *     report: (arg0: { data: { module: any }; messageId: string; node: any
+     *     }) => void;
      * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -99,7 +101,10 @@ export const electronNoRendererImportRule = {
                         firstArgument?.type === "Literal" &&
                         typeof firstArgument.value === "string"
                     ) {
-                        handleModuleSpecifier(firstArgument, firstArgument.value);
+                        handleModuleSpecifier(
+                            firstArgument,
+                            firstArgument.value
+                        );
                     }
                 }
             },

@@ -1,8 +1,8 @@
 /**
- * @file Rule: require-ensure-error-in-catch
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: require-ensure-error-in-catch
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -13,7 +13,16 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const requireEnsureErrorInCatchRule = {
     /**
-     * @param {{ getFilename: () => string; sourceCode: any; getSourceCode: () => any; report: (arg0: { data: { name: any; }; messageId: string; node: import("@typescript-eslint/utils").TSESTree.Node; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     sourceCode: any;
+     *     getSourceCode: () => any;
+     *     report: (arg0: {
+     *         data: { name: any };
+     *         messageId: string;
+     *         node: import("@typescript-eslint/utils").TSESTree.Node;
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
@@ -39,7 +48,7 @@ export const requireEnsureErrorInCatchRule = {
         }
 
         const sourceCode = context.sourceCode ?? context.getSourceCode(),
-         {visitorKeys} = sourceCode;
+            { visitorKeys } = sourceCode;
 
         /**
          * @param {unknown} node
@@ -54,9 +63,10 @@ export const requireEnsureErrorInCatchRule = {
                 return false;
             }
 
-            const call = /** @type {import("@typescript-eslint/utils").TSESTree.CallExpression} */ (
-                node
-            );
+            const call =
+                /** @type {import("@typescript-eslint/utils").TSESTree.CallExpression} */ (
+                    node
+                );
 
             if (call.callee.type !== "Identifier") {
                 return false;
@@ -68,7 +78,8 @@ export const requireEnsureErrorInCatchRule = {
 
             const firstArgument = call.arguments?.[0];
             return Boolean(
-                firstArgument?.type === "Identifier" && firstArgument.name === caughtName
+                firstArgument?.type === "Identifier" &&
+                firstArgument.name === caughtName
             );
         }
 
@@ -87,9 +98,10 @@ export const requireEnsureErrorInCatchRule = {
                 return false;
             }
 
-            const member = /** @type {import("@typescript-eslint/utils").TSESTree.MemberExpression} */ (
-                node
-            );
+            const member =
+                /** @type {import("@typescript-eslint/utils").TSESTree.MemberExpression} */ (
+                    node
+                );
 
             if (member.object.type !== "Identifier") {
                 return false;
@@ -105,10 +117,10 @@ export const requireEnsureErrorInCatchRule = {
 
         /**
          * @typedef {{
-         *   ensureErrorCall: boolean;
-         *   firstPropertyAccess:
-         *   import("@typescript-eslint/utils").TSESTree.MemberExpression |
-         *   null; name: string;
+         *     ensureErrorCall: boolean;
+         *     firstPropertyAccess:
+         *     import("@typescript-eslint/utils").TSESTree.MemberExpression |
+         *     null; name: string;
          * }} EnsureErrorState
          */
 
@@ -121,15 +133,22 @@ export const requireEnsureErrorInCatchRule = {
                 return;
             }
 
-            const typedNode = /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
-                node
-            );
+            const typedNode =
+                /** @type {import("@typescript-eslint/utils").TSESTree.Node} */ (
+                    node
+                );
 
-            if (!state.ensureErrorCall && isEnsureErrorCall(typedNode, state.name)) {
+            if (
+                !state.ensureErrorCall &&
+                isEnsureErrorCall(typedNode, state.name)
+            ) {
                 state.ensureErrorCall = true;
             }
 
-            if (!state.firstPropertyAccess && isDirectPropertyAccess(typedNode, state.name)) {
+            if (
+                !state.firstPropertyAccess &&
+                isDirectPropertyAccess(typedNode, state.name)
+            ) {
                 state.firstPropertyAccess = typedNode;
             }
 
@@ -153,20 +172,20 @@ export const requireEnsureErrorInCatchRule = {
 
         return {
             /**
-             * @param {{param: any, body: any}} node
+             * @param {{ param: any; body: any }} node
              */
             CatchClause(node) {
-                const {param} = node;
+                const { param } = node;
                 if (!param || param.type !== "Identifier") {
                     return;
                 }
 
                 const caughtName = param.name,
-                 state = /** @type {EnsureErrorState} */ ({
-                    ensureErrorCall: false,
-                    firstPropertyAccess: null,
-                    name: caughtName,
-                });
+                    state = /** @type {EnsureErrorState} */ ({
+                        ensureErrorCall: false,
+                        firstPropertyAccess: null,
+                        name: caughtName,
+                    });
 
                 walk(node.body, state);
 

@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-local-error-normalizers
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-local-error-normalizers
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -13,7 +13,14 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  */
 export const noLocalErrorNormalizersRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { node: import("estree").Identifier; messageId: string; data: { name: string; }; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: {
+     *         node: import("estree").Identifier;
+     *         messageId: string;
+     *         data: { name: string };
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
@@ -39,25 +46,24 @@ export const noLocalErrorNormalizersRule = {
         }
 
         const bannedNames = new Set(["ensureError", "normalizeError"]),
+            /** @param {import("estree").Identifier} identifier */
+            reportIdentifier = (identifier) => {
+                if (!bannedNames.has(identifier.name)) {
+                    return;
+                }
 
-        /** @param {import("estree").Identifier} identifier */
-         reportIdentifier = (identifier) => {
-            if (!bannedNames.has(identifier.name)) {
-                return;
-            }
-
-            context.report({
-                data: {
-                    name: identifier.name,
-                },
-                messageId: "noLocalErrorNormalizers",
-                node: identifier,
-            });
-        };
+                context.report({
+                    data: {
+                        name: identifier.name,
+                    },
+                    messageId: "noLocalErrorNormalizers",
+                    node: identifier,
+                });
+            };
 
         return {
             /**
-             * @param {{ id: import("estree").Identifier; }} node
+             * @param {{ id: import("estree").Identifier }} node
              */
             FunctionDeclaration(node) {
                 if (node.id?.type === "Identifier") {
@@ -66,7 +72,7 @@ export const noLocalErrorNormalizersRule = {
             },
 
             /**
-             * @param {{ id: import("estree").Identifier; }} node
+             * @param {{ id: import("estree").Identifier }} node
              */
             VariableDeclarator(node) {
                 if (node.id?.type === "Identifier") {

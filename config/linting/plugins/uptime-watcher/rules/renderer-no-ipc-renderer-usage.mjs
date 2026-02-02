@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-ipc-renderer-usage
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: renderer-no-ipc-renderer-usage
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -23,20 +23,20 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 export const rendererNoIpcRendererUsageRule = {
     /**
      * @param {{
-     *   getFilename: () => string;
-     *   getSourceCode: () => any;
-     *   sourceCode?: any;
-     *   report: (descriptor: {
-     *     messageId: string;
-     *     node: import("@typescript-eslint/utils").TSESTree.Node;
-     *     data?: Record<string, unknown>;
-     *   }) => void;
+     *     getFilename: () => string;
+     *     getSourceCode: () => any;
+     *     sourceCode?: any;
+     *     report: (descriptor: {
+     *         messageId: string;
+     *         node: import("@typescript-eslint/utils").TSESTree.Node;
+     *         data?: Record<string, unknown>;
+     *     }) => void;
      * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename),
-         sourceCode = context.sourceCode ?? context.getSourceCode();
+            normalizedFilename = normalizePath(rawFilename),
+            sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -123,11 +123,15 @@ export const rendererNoIpcRendererUsageRule = {
                 }
 
                 const [first] = node.arguments;
-                if (!first || first.type !== "Literal" || first.value !== "electron") {
+                if (
+                    !first ||
+                    first.type !== "Literal" ||
+                    first.value !== "electron"
+                ) {
                     return;
                 }
 
-                const {parent} = node;
+                const { parent } = node;
                 if (
                     parent &&
                     parent.type === "VariableDeclarator" &&

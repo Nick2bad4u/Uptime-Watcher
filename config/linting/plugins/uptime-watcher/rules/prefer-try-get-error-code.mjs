@@ -1,8 +1,8 @@
 /**
- * @file Rule: prefer-try-get-error-code
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: prefer-try-get-error-code
  */
 
 /**
@@ -23,7 +23,7 @@ function typeContainsCodeProperty(typeNode) {
 
     if (typeNode.type === "TSTypeLiteral") {
         return typeNode.members.some(
-            (/** @type {{type: string, key: any}} */ member) =>
+            (/** @type {{ type: string; key: any }} */ member) =>
                 member.type === "TSPropertySignature" &&
                 member.key?.type === "Identifier" &&
                 member.key.name === "code"
@@ -39,7 +39,7 @@ function typeContainsCodeProperty(typeNode) {
  */
 export const preferTryGetErrorCodeRule = {
     /**
-     * @param {{ report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{ report: (arg0: { messageId: string; node: any }) => void }} context
      */
     create(context) {
         /** @param {any} node */
@@ -81,8 +81,7 @@ export const preferTryGetErrorCodeRule = {
         },
         schema: [],
         messages: {
-            prefer:
-                "Use tryGetErrorCode(error) instead of asserting error as { code?: ... }.",
+            prefer: "Use tryGetErrorCode(error) instead of asserting error as { code?: ... }.",
         },
     },
 };

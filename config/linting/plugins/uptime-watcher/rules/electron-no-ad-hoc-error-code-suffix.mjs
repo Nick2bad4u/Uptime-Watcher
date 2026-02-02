@@ -1,8 +1,8 @@
 /**
- * @file Rule: electron-no-ad-hoc-error-code-suffix
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: electron-no-ad-hoc-error-code-suffix
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -19,7 +19,10 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  */
 export const electronNoAdHocErrorCodeSuffixRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: { node: any; messageId: string }) => void;
+     * }} context
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
@@ -29,48 +32,51 @@ export const electronNoAdHocErrorCodeSuffixRule = {
         }
 
         // Allowed source of truth.
-        if (filename.endsWith("/electron/services/shell/openExternalUtils.ts")) {
+        if (
+            filename.endsWith("/electron/services/shell/openExternalUtils.ts")
+        ) {
             return {};
         }
 
-        const isCodeSuffixTemplate = (/** @type {{type: string, expressions: any, quasis: any}} */ node) => {
-            if (!node || node.type !== "TemplateLiteral") {
-                return false;
-            }
-
-            const hasCodeIdentifier = (node.expressions ?? []).some(
-                (/** @type {{type: string, name: string}} */ expr) =>
-                    expr?.type === "Identifier" && expr.name === "code"
-            );
-
-            if (!hasCodeIdentifier) {
-                return false;
-            }
-
-            return (node.quasis ?? []).some(
-                (/** @type {{value: {raw: any}}} */ quasi) => {
-                    const raw = quasi?.value?.raw;
-                    return typeof raw === "string" && raw.includes(" (");
+        const isCodeSuffixTemplate = (
+                /** @type {{ type: string; expressions: any; quasis: any }} */ node
+            ) => {
+                if (!node || node.type !== "TemplateLiteral") {
+                    return false;
                 }
-            );
-        },
 
-         isEmptyStringLiteral = (/** @type {{type: string, value: string}} */ node) =>
-            node?.type === "Literal" && node.value === "";
+                const hasCodeIdentifier = (node.expressions ?? []).some(
+                    (/** @type {{ type: string; name: string }} */ expr) =>
+                        expr?.type === "Identifier" && expr.name === "code"
+                );
+
+                if (!hasCodeIdentifier) {
+                    return false;
+                }
+
+                return (node.quasis ?? []).some(
+                    (/** @type {{ value: { raw: any } }} */ quasi) => {
+                        const raw = quasi?.value?.raw;
+                        return typeof raw === "string" && raw.includes(" (");
+                    }
+                );
+            },
+            isEmptyStringLiteral = (
+                /** @type {{ type: string; value: string }} */ node
+            ) => node?.type === "Literal" && node.value === "";
 
         return {
             /**
-             * @param {{consequent: any, alternate: any}} node
+             * @param {{ consequent: any; alternate: any }} node
              */
             ConditionalExpression(node) {
                 const alternate = node?.alternate,
-                 consequent = node?.consequent,
-
-                 matches =
-                    (isCodeSuffixTemplate(consequent) &&
-                        isEmptyStringLiteral(alternate)) ||
-                    (isCodeSuffixTemplate(alternate) &&
-                        isEmptyStringLiteral(consequent));
+                    consequent = node?.consequent,
+                    matches =
+                        (isCodeSuffixTemplate(consequent) &&
+                            isEmptyStringLiteral(alternate)) ||
+                        (isCodeSuffixTemplate(alternate) &&
+                            isEmptyStringLiteral(consequent));
 
                 if (!matches) {
                     return;

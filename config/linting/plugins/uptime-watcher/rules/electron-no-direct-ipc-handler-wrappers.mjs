@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-no-direct-ipc-handler-wrappers
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-no-direct-ipc-handler-wrappers
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -24,17 +24,17 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 export const electronNoDirectIpcHandlerWrappersRule = {
     /**
      * @param {{
-     *   getFilename: () => string;
-     *   report: (descriptor: {
-     *     messageId: string;
-     *     node: import("@typescript-eslint/utils").TSESTree.Node;
-     *     data?: Record<string, unknown>;
-     *   }) => void;
+     *     getFilename: () => string;
+     *     report: (descriptor: {
+     *         messageId: string;
+     *         node: import("@typescript-eslint/utils").TSESTree.Node;
+     *         data?: Record<string, unknown>;
+     *     }) => void;
      * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -52,12 +52,11 @@ export const electronNoDirectIpcHandlerWrappersRule = {
         }
 
         const forbiddenImportedNames = new Set([
-            "withIpcHandler",
-            "withIpcHandlerValidation",
-        ]),
-
-        /** @type {Set<string>} */
-         forbiddenLocalIdentifiers = new Set();
+                "withIpcHandler",
+                "withIpcHandlerValidation",
+            ]),
+            /** @type {Set<string>} */
+            forbiddenLocalIdentifiers = new Set();
 
         /**
          * Reports a direct wrapper call.
@@ -78,7 +77,7 @@ export const electronNoDirectIpcHandlerWrappersRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                const {callee} = node;
+                const { callee } = node;
 
                 if (callee.type === "Identifier") {
                     if (
@@ -90,12 +89,14 @@ export const electronNoDirectIpcHandlerWrappersRule = {
                     return;
                 }
 
-                if (callee.type === "MemberExpression" && !callee.computed &&
-                        callee.property.type === "Identifier" &&
-                        forbiddenImportedNames.has(callee.property.name)
-                    ) {
-                        report(callee.property, callee.property.name);
-                    }
+                if (
+                    callee.type === "MemberExpression" &&
+                    !callee.computed &&
+                    callee.property.type === "Identifier" &&
+                    forbiddenImportedNames.has(callee.property.name)
+                ) {
+                    report(callee.property, callee.property.name);
+                }
             },
 
             /**

@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-direct-preload-bridge
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: renderer-no-direct-preload-bridge
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -23,11 +23,15 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  */
 export const rendererNoDirectPreloadBridgeRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { data: { owner: string; }; messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { data: { owner: string }; messageId: string; node:
+     *     any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -52,12 +56,15 @@ export const rendererNoDirectPreloadBridgeRule = {
          *
          * @param {import("@typescript-eslint/utils").TSESTree.MemberExpression} member
          *
-         * @returns {{owner: string} | null}
+         * @returns {{ owner: string } | null}
          */
         function matchElectronApiMember(member) {
-            const {property} = member;
+            const { property } = member;
             if (member.computed) {
-                if (property.type === "Literal" && property.value === "electronAPI") {
+                if (
+                    property.type === "Literal" &&
+                    property.value === "electronAPI"
+                ) {
                     // Computed access like window["electronAPI"].
                 } else {
                     return null;
@@ -69,7 +76,7 @@ export const rendererNoDirectPreloadBridgeRule = {
                 return null;
             }
 
-            const {object} = member;
+            const { object } = member;
             if (object.type === "Identifier") {
                 if (
                     object.name === "window" ||
@@ -85,7 +92,7 @@ export const rendererNoDirectPreloadBridgeRule = {
             if (object.type === "MemberExpression" && !object.computed) {
                 // Match globalThis.window.electronAPI
                 const innerObject = object.object,
-                 innerProperty = object.property;
+                    innerProperty = object.property;
                 if (
                     innerObject.type === "Identifier" &&
                     (innerObject.name === "globalThis" ||

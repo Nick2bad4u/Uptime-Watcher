@@ -1,9 +1,9 @@
 /**
- * @file Rule: no-local-identifiers
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: no-local-identifiers
  */
 
 /**
@@ -15,31 +15,39 @@
  */
 export const noLocalIdentifiersRule = {
     /**
-     * @param {{ options: any[]; report: (arg0: { node: any; messageId: string; data: { name: any; details: any; } | { name: any; details: any; }; }) => void; }} context
+     * @param {{
+     *     options: any[];
+     *     report: (arg0: {
+     *         node: any;
+     *         messageId: string;
+     *         data: { name: any; details: any } | { name: any; details: any };
+     *     }) => void;
+     * }} context
      */
     create(context) {
         const option = context.options?.[0],
-         banned = Array.isArray(option?.banned) ? option.banned : [],
-         bannedByName = new Map(
-            banned.map((/** @type {{name: any}} */ entry) => [entry.name, entry])
-        ),
-
-         detailsFor = (/** @type {{message: string | any[]}} */ entry) =>
-            typeof entry.message === "string" && entry.message.length > 0
-                ? entry.message
-                : "Import and reuse the shared helper instead.",
-
-         shouldReport = (
-            /** @type {{kinds: any}} */ entry,
-            /** @type {string} */ kind
-        ) => {
-            const {kinds} = entry;
-            return !Array.isArray(kinds) || kinds.includes(kind);
-        };
+            banned = Array.isArray(option?.banned) ? option.banned : [],
+            bannedByName = new Map(
+                banned.map((/** @type {{ name: any }} */ entry) => [
+                    entry.name,
+                    entry,
+                ])
+            ),
+            detailsFor = (/** @type {{ message: string | any[] }} */ entry) =>
+                typeof entry.message === "string" && entry.message.length > 0
+                    ? entry.message
+                    : "Import and reuse the shared helper instead.",
+            shouldReport = (
+                /** @type {{ kinds: any }} */ entry,
+                /** @type {string} */ kind
+            ) => {
+                const { kinds } = entry;
+                return !Array.isArray(kinds) || kinds.includes(kind);
+            };
 
         return {
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             FunctionDeclaration(node) {
                 const id = node?.id;
@@ -63,7 +71,7 @@ export const noLocalIdentifiersRule = {
             },
 
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             VariableDeclarator(node) {
                 const id = node?.id;

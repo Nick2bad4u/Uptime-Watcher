@@ -1,9 +1,9 @@
 /**
- * @file Rule: monitor-fallback-consistency
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to make the custom plugin
  * easier to maintain and test.
+ *
+ * @file Rule: monitor-fallback-consistency
  */
 
 import * as fs from "node:fs";
@@ -32,10 +32,10 @@ let BASE_MONITOR_TYPES_CACHE = null;
  * TypeScript-specific wrappers like `as const`.
  *
  * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} initializer
- * Initializer node from a variable declaration.
+ *   Initializer node from a variable declaration.
  *
  * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression | null}
- * Array expression when found.
+ *   Array expression when found.
  */
 function getArrayExpression(initializer) {
     if (!initializer) {
@@ -61,7 +61,7 @@ function getArrayExpression(initializer) {
  * Returns the cached monitor types, loading them if necessary.
  *
  * @returns {readonly string[]} Monitor type identifiers defined in shared
- * configuration.
+ *   configuration.
  */
 function getBaseMonitorTypes() {
     if (!BASE_MONITOR_TYPES_CACHE) {
@@ -74,7 +74,7 @@ function getBaseMonitorTypes() {
  * Extracts the string literal value from an object property.
  *
  * @param {import("@typescript-eslint/utils").TSESTree.Property} property
- * Object property node.
+ *   Object property node.
  *
  * @returns {string | null} String literal value when present.
  */
@@ -102,26 +102,26 @@ function getPropertyStringValue(property) {
  * source.
  *
  * @returns {readonly string[]} Monitor type identifiers defined in shared
- * configuration.
+ *   configuration.
  */
 function loadBaseMonitorTypes() {
     const source = fs.readFileSync(SHARED_TYPES_PATH, "utf8"),
-     sourceFile = ts.createSourceFile(
-        SHARED_TYPES_PATH,
-        source,
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS
-    );
+        sourceFile = ts.createSourceFile(
+            SHARED_TYPES_PATH,
+            source,
+            ts.ScriptTarget.Latest,
+            true,
+            ts.ScriptKind.TS
+        );
 
     /**
      * Extracts an array literal from a potential TypeScript assertion wrapper.
      *
-     * @param {ts.Expression} expression - Expression that may represent an array
-     * literal or an assertion wrapping an array literal.
+     * @param {ts.Expression} expression - Expression that may represent an
+     *   array literal or an assertion wrapping an array literal.
      *
-     * @returns {ts.ArrayLiteralExpression | null} Unwrapped array literal if one
-     * is present.
+     * @returns {ts.ArrayLiteralExpression | null} Unwrapped array literal if
+     *   one is present.
      */
     function extractArrayLiteral(expression) {
         if (ts.isArrayLiteralExpression(expression)) {
@@ -140,10 +140,11 @@ function loadBaseMonitorTypes() {
         }
 
         /**
-         * @type {unknown}
          * @remarks
          * Some TypeScript versions expose `isTypeAssertionExpression` at
          * runtime but do not include it in the public type surface.
+         *
+         * @type {unknown}
          */
         const maybeTypeAssertion = /** @type {any} */ (ts)
             .isTypeAssertionExpression;
@@ -205,7 +206,9 @@ function loadBaseMonitorTypes() {
     const values = findValues(sourceFile);
 
     if (!values) {
-        throw new Error("Failed to load BASE_MONITOR_TYPES from shared/types.ts");
+        throw new Error(
+            "Failed to load BASE_MONITOR_TYPES from shared/types.ts"
+        );
     }
 
     return values;
@@ -217,12 +220,12 @@ function loadBaseMonitorTypes() {
 export const monitorFallbackConsistencyRule = {
     /**
      * @param {{
-     *   getFilename: () => string;
-     *   report: (arg0: {
-     *     messageId: string;
-     *     node: any;
-     *     data?: { type: string } | { types: string };
-     *   }) => void;
+     *     getFilename: () => string;
+     *     report: (arg0: {
+     *         messageId: string;
+     *         node: any;
+     *         data?: { type: string } | { types: string };
+     *     }) => void;
      * }} context
      */
     create(context) {
@@ -232,7 +235,7 @@ export const monitorFallbackConsistencyRule = {
         }
 
         const baseMonitorTypes = getBaseMonitorTypes(),
-         baseMonitorTypeSet = new Set(baseMonitorTypes);
+            baseMonitorTypeSet = new Set(baseMonitorTypes);
 
         return {
             /**
@@ -255,7 +258,7 @@ export const monitorFallbackConsistencyRule = {
                  * @type {Map<string, import("@typescript-eslint/utils").TSESTree.ObjectExpression>}
                  */
                 const optionMap = new Map(),
-                 reportedNodes = new Set();
+                    reportedNodes = new Set();
 
                 for (const element of arrayExpression.elements) {
                     if (!element || element.type !== "ObjectExpression") {
@@ -316,9 +319,9 @@ export const monitorFallbackConsistencyRule = {
                 }
 
                 const missingTypes = baseMonitorTypes.filter(
-                    (type) => !optionMap.has(type)
-                ),
-                 optionValues = [...optionMap.keys()];
+                        (type) => !optionMap.has(type)
+                    ),
+                    optionValues = [...optionMap.keys()];
 
                 if (missingTypes.length > 0) {
                     context.report({
@@ -328,7 +331,10 @@ export const monitorFallbackConsistencyRule = {
                     });
                 }
 
-                for (const [index, expectedType] of baseMonitorTypes.entries()) {
+                for (const [
+                    index,
+                    expectedType,
+                ] of baseMonitorTypes.entries()) {
                     const actualType = optionValues[index];
                     if (actualType && actualType !== expectedType) {
                         const optionNode = optionMap.get(actualType);

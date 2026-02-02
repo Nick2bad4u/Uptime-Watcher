@@ -1,8 +1,6 @@
-import {
-    describe,
-    expect,
-    it,
-} from "vitest";
+import { describe,
+expect,
+it } from "vitest";
 
 import uptimeWatcherPlugin from "../../uptime-watcher.mjs";
 
@@ -53,8 +51,10 @@ describe("uptime-watcher plugin configs", () => {
         expect(keys).toEqual(
             expect.arrayContaining([
                 "all",
+                "default",
                 "recommended",
                 "flat/all",
+                "flat/default",
                 "flat/recommended",
                 "repo",
                 "repo/core",

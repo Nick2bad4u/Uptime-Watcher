@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-preload-bridge-writes
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: renderer-no-preload-bridge-writes
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -20,11 +20,14 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  */
 export const rendererNoPreloadBridgeWritesRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -65,7 +68,7 @@ export const rendererNoPreloadBridgeWritesRule = {
                 }
 
                 // Only flag obvious roots: window / globalThis / global.
-                const {object} = node.left;
+                const { object } = node.left;
                 if (
                     object.type === "Identifier" &&
                     (object.name === "window" ||
@@ -84,7 +87,10 @@ export const rendererNoPreloadBridgeWritesRule = {
              */
             CallExpression(node) {
                 // Object.defineProperty(window, "electronAPI", ...)
-                if (node.callee.type !== "MemberExpression" || node.callee.computed) {
+                if (
+                    node.callee.type !== "MemberExpression" ||
+                    node.callee.computed
+                ) {
                     return;
                 }
 
@@ -112,7 +118,8 @@ export const rendererNoPreloadBridgeWritesRule = {
                         (propertyName.type === "TemplateLiteral" &&
                             propertyName.expressions.length === 0 &&
                             propertyName.quasis.length === 1 &&
-                            propertyName.quasis[0]?.value?.cooked === "electronAPI"))
+                            propertyName.quasis[0]?.value?.cooked ===
+                                "electronAPI"))
                 ) {
                     context.report({
                         messageId: "noBridgeWrites",

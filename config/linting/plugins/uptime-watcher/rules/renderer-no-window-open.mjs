@@ -1,9 +1,9 @@
 /**
- * @file Rule: renderer-no-window-open
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to make the custom plugin
  * easier to maintain and incrementally modularize.
+ *
+ * @file Rule: renderer-no-window-open
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -11,7 +11,11 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
 // Repo path constants live in ../_internal/repo-paths.mjs
 
-const FORBIDDEN_WINDOW_OPEN_OBJECTS = new Set(["global", "globalThis", "window"]);
+const FORBIDDEN_WINDOW_OPEN_OBJECTS = new Set([
+    "global",
+    "globalThis",
+    "window",
+]);
 
 /**
  * ESLint rule forbidding `window.open` usage in renderer code.
@@ -23,12 +27,17 @@ const FORBIDDEN_WINDOW_OPEN_OBJECTS = new Set(["global", "globalThis", "window"]
  */
 export const rendererNoWindowOpenRule = {
     /**
-     * @param {{ getFilename: () => any; sourceCode: any; getSourceCode: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     sourceCode: any;
+     *     getSourceCode: () => any;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename),
-         sourceCode = context.sourceCode ?? context.getSourceCode();
+            normalizedFilename = normalizePath(rawFilename),
+            sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -94,7 +103,9 @@ export const rendererNoWindowOpenRule = {
             const unwrapped = unwrapChain(callee);
 
             if (unwrapped.type === "Identifier") {
-                return unwrapped.name === "open" && !hasLocalBinding("open", node);
+                return (
+                    unwrapped.name === "open" && !hasLocalBinding("open", node)
+                );
             }
 
             if (unwrapped.type !== "MemberExpression") {
@@ -116,7 +127,7 @@ export const rendererNoWindowOpenRule = {
 
         return {
             /**
-             * @param {{callee: any}} node
+             * @param {{ callee: any }} node
              */
             CallExpression(node) {
                 if (!isForbiddenWindowOpenCallee(node.callee, node)) {

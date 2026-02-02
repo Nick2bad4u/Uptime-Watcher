@@ -1,9 +1,9 @@
 /**
- * @file Rule: electron-no-inline-ipc-channel-literal
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: electron-no-inline-ipc-channel-literal
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -23,11 +23,14 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  */
 export const electronNoInlineIpcChannelLiteralRule = {
     /**
-     * @param {{ getFilename: () => any; report: (arg0: { messageId: string; node: any; }) => void; }} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { messageId: string; node: any }) => void;
+     * }} context
      */
     create(context) {
         const rawFilename = context.getFilename(),
-         normalizedFilename = normalizePath(rawFilename);
+            normalizedFilename = normalizePath(rawFilename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -57,11 +60,17 @@ export const electronNoInlineIpcChannelLiteralRule = {
                 return false;
             }
 
-            if (argument.type === "Literal" && typeof argument.value === "string") {
+            if (
+                argument.type === "Literal" &&
+                typeof argument.value === "string"
+            ) {
                 return true;
             }
 
-            if (argument.type === "TemplateLiteral" && argument.expressions.length === 0) {
+            if (
+                argument.type === "TemplateLiteral" &&
+                argument.expressions.length === 0
+            ) {
                 return true;
             }
 

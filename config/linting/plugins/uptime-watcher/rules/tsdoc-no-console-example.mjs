@@ -1,9 +1,9 @@
 /**
- * @file Rule: tsdoc-no-console-example
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: tsdoc-no-console-example
  */
 
 /**
@@ -11,7 +11,11 @@
  */
 export const tsdocNoConsoleExampleRule = {
     /**
-     * @param {{ getSourceCode: () => any; report: (arg0: { loc: { end: any; start: any; }; messageId: string; }) => void; }} context
+     * @param {{
+     *     getSourceCode: () => any;
+     *     report: (arg0: { loc: { end: any; start: any }; messageId: string })
+     *     => void;
+     * }} context
      */
     create(context) {
         const sourceCode = context.getSourceCode();
@@ -28,16 +32,18 @@ export const tsdocNoConsoleExampleRule = {
                     }
 
                     const consolePattern = /console\.[A-Za-z]+/v,
-                     examplePattern = /```[\s\S]*?```/gv;
+                        examplePattern = /```[\s\S]*?```/gv;
                     let match;
 
-                    while ((match = examplePattern.exec(comment.value)) !== null) {
+                    while (
+                        (match = examplePattern.exec(comment.value)) !== null
+                    ) {
                         if (!consolePattern.test(match[0])) {
                             continue;
                         }
 
                         const reportIndex = comment.range[0] + 2 + match.index,
-                         loc = sourceCode.getLocFromIndex(reportIndex);
+                            loc = sourceCode.getLocFromIndex(reportIndex);
                         context.report({
                             loc: {
                                 end: sourceCode.getLocFromIndex(

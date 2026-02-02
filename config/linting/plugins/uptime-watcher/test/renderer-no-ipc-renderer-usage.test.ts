@@ -1,6 +1,8 @@
-import { createRuleTester,
-getPluginRule,
-repoPath } from "./_internal/ruleTester.js";
+import {
+    createRuleTester,
+    getPluginRule,
+    repoPath,
+} from "./_internal/ruleTester.js";
 
 const ruleTester = createRuleTester();
 

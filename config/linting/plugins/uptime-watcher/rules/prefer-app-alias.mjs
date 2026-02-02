@@ -1,9 +1,9 @@
 /**
- * @file Rule: prefer-app-alias
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs` to keep the internal
  * ESLint plugin modular and easier to maintain.
+ *
+ * @file Rule: prefer-app-alias
  */
 
 import * as path from "node:path";
@@ -16,15 +16,20 @@ SRC_DIR } from "../_internal/repo-paths.mjs";
 
 /**
  * ESLint rule ensuring files outside of src reference renderer modules via the
+ *
  * @app alias.
  */
 export const preferAppAliasRule = {
     /**
-     * @param {{getFilename: () => any; report: (arg0: {fix: (fixer: any) => any; messageId: string; node: any}) => void}} context
+     * @param {{
+     *     getFilename: () => any;
+     *     report: (arg0: { fix: (fixer: any) => any; messageId: string; node:
+     *     any }) => void;
+     * }} context
      */
     create(context) {
         const filename = context.getFilename(),
-         normalizedFilename = normalizePath(filename);
+            normalizedFilename = normalizePath(filename);
 
         if (
             normalizedFilename === "<input>" ||
@@ -52,12 +57,18 @@ export const preferAppAliasRule = {
                     return;
                 }
 
-                const importAbsolutePath = path.resolve(importerDirectory, importPath),
-                 normalizedImportAbsolute = normalizePath(importAbsolutePath);
+                const importAbsolutePath = path.resolve(
+                        importerDirectory,
+                        importPath
+                    ),
+                    normalizedImportAbsolute =
+                        normalizePath(importAbsolutePath);
 
                 if (
                     normalizedImportAbsolute !== NORMALIZED_SRC_DIR &&
-                    !normalizedImportAbsolute.startsWith(`${NORMALIZED_SRC_DIR}/`)
+                    !normalizedImportAbsolute.startsWith(
+                        `${NORMALIZED_SRC_DIR}/`
+                    )
                 ) {
                     return;
                 }
@@ -71,19 +82,25 @@ export const preferAppAliasRule = {
                 }
 
                 const aliasSuffix = relativeToSource.replace(
-                    /\.(?:[cm]?[jt]sx?|d\.ts)$/v,
-                    ""
-                ),
-                 cleanedSuffix = aliasSuffix.replace(/^\.\/?/v, ""),
-                      aliasPath =
-                          cleanedSuffix.length > 0 ? `@app/${cleanedSuffix}` : "@app",
-                      rawSource =
-                          typeof node.source.raw === "string" ? node.source.raw : null,
-                      quote = rawSource?.startsWith("'") ? "'" : '"';
+                        /\.(?:[cm]?[jt]sx?|d\.ts)$/v,
+                        ""
+                    ),
+                    cleanedSuffix = aliasSuffix.replace(/^\.\/?/v, ""),
+                    aliasPath =
+                        cleanedSuffix.length > 0
+                            ? `@app/${cleanedSuffix}`
+                            : "@app",
+                    rawSource =
+                        typeof node.source.raw === "string"
+                            ? node.source.raw
+                            : null,
+                    quote = rawSource?.startsWith("'") ? "'" : '"';
 
                 context.report({
                     /**
-                     * @param {{ replaceText: (arg0: any, arg1: string) => any; }} fixer
+                     * @param {{
+                     *     replaceText: (arg0: any, arg1: string) => any;
+                     * }} fixer
                      */
                     fix(fixer) {
                         return fixer.replaceText(

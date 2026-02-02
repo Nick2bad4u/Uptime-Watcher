@@ -1,8 +1,8 @@
 /**
- * @file Rule: preload-no-local-is-plain-object
- *
  * @remarks
  * Extracted from the monolithic `uptime-watcher.mjs`.
+ *
+ * @file Rule: preload-no-local-is-plain-object
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
@@ -16,7 +16,10 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  */
 export const preloadNoLocalIsPlainObjectRule = {
     /**
-     * @param {{ getFilename: () => string; report: (arg0: { node: any; messageId: string; }) => void; }} context
+     * @param {{
+     *     getFilename: () => string;
+     *     report: (arg0: { node: any; messageId: string }) => void;
+     * }} context
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
@@ -26,7 +29,7 @@ export const preloadNoLocalIsPlainObjectRule = {
 
         return {
             /**
-             * @param {{id: any}} node
+             * @param {{ id: any }} node
              */
             VariableDeclarator(node) {
                 const id = node?.id;
