@@ -36,4 +36,4 @@ const config = defineConfig((configEnv) => {
     return mergeConfig(resolvedBase, overrides);
 }) as ReturnType<typeof defineConfig>;
 
-export default config;
+export default config as UserConfig;

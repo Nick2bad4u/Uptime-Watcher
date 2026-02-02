@@ -15,6 +15,7 @@ import {
     coverageConfigDefaults,
     defaultExclude,
     defineConfig,
+    type ViteUserConfigExport,
 } from "vitest/config";
 
 const dirname = import.meta.dirname;
@@ -22,7 +23,7 @@ const dirname = import.meta.dirname;
 /**
  * Vitest configuration for shared utility and cross-process test suites.
  */
-const vitestConfig = defineConfig({
+const vitestSharedConfig: ViteUserConfigExport = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-shared",
     esbuild: {
         // Combine JS/TS and module variants into a single glob for brevity.
@@ -244,4 +245,4 @@ const vitestConfig = defineConfig({
     } as any,
 }) satisfies UserConfig as UserConfig;
 
-export default vitestConfig as UserConfig;
+export default vitestSharedConfig as UserConfig;

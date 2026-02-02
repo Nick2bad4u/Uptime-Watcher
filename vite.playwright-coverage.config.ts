@@ -70,4 +70,4 @@ const playwrightCoverageConfig: UserConfigExport = defineConfig(async (env) => {
     } satisfies UserConfig;
 });
 
-export default playwrightCoverageConfig;
+export default playwrightCoverageConfig as UserConfig;

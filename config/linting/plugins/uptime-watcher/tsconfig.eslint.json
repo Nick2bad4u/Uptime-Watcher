@@ -6,8 +6,10 @@
         "checkJs": true,
         "composite": true,
         "declaration": false,
+        "declarationDir": "../../../../.cache/builds/test/linting/uptime-watcher-eslint/types",
         "incremental": true,
         "noEmit": true,
+        "outDir": "../../../../.cache/builds/test/linting/uptime-watcher-eslint",
         "paths": {
             "@app/*": [
                 "src/*"

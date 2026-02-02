@@ -14,6 +14,7 @@ import {
     coverageConfigDefaults,
     defaultExclude,
     defineConfig,
+    type ViteUserConfigExport,
 } from "vitest/config";
 
 const dirname = import.meta.dirname;
@@ -21,7 +22,7 @@ const dirname = import.meta.dirname;
 /**
  * Vitest configuration for Electron backend test suites.
  */
-const vitestConfig = defineConfig({
+const vitestElectronConfig: ViteUserConfigExport = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-backend",
     esbuild: {
         include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
@@ -227,4 +228,4 @@ const vitestConfig = defineConfig({
     } as any,
 }) satisfies UserConfig as UserConfig;
 
-export default vitestConfig as UserConfig;
+export default vitestElectronConfig as UserConfig;

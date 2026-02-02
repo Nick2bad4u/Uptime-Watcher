@@ -11,7 +11,7 @@
  * `vitestTransform` ourselves for story files under `storybook/stories/**`.
  */
 
-import type { Plugin } from "vite";
+import type { Plugin, UserConfig } from "vite";
 
 import { playwright } from "@vitest/browser-playwright";
 import * as path from "node:path";
@@ -214,4 +214,4 @@ const storybookVitestConfig: ViteUserConfigExport = defineConfig(
     createStorybookVitestConfig
 );
 
-export default storybookVitestConfig;
+export default storybookVitestConfig as UserConfig;

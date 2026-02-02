@@ -157,15 +157,239 @@ const allRules = Object.fromEntries(
     ])
 );
 
+/**
+ * @typedef {import("eslint").Linter.FlatConfig} FlatConfig
+ */
+
+/**
+ * @param {readonly string[]} ruleNames
+ * @returns {Record<string, "error">}
+ */
+function errorRulesFor(ruleNames) {
+    return Object.fromEntries(
+        ruleNames.map((ruleName) => [`uptime-watcher/${ruleName}`, "error"])
+    );
+}
+
+/**
+ * Ensures the uptime-watcher plugin is registered on a flat-config item.
+ *
+ * @param {FlatConfig} config
+ * @returns {FlatConfig}
+ */
+function withUptimeWatcherPlugin(config) {
+    return {
+        ...config,
+        plugins: {
+            ...config.plugins,
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+    };
+}
+
+/**
+ * Repo-scoped configs (the ones actually used by this monorepo).
+ *
+ * @remarks
+ * These config entries intentionally include `files`/`ignores` so consumers
+ * can `...uptimeWatcherPlugin.configs.repo` without re-declaring all the
+ * scoping in `eslint.config.mjs`.
+ */
+const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
+    withUptimeWatcherPlugin({
+        files: [
+            "src/**/*.{ts,tsx}",
+            "electron/**/*.{ts,tsx}",
+            "docs/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx}",
+        ],
+        ignores: [
+            "shared/types/**/*",
+            "**/*.d.ts",
+        ],
+        name: "uptime-watcher:shared-contract-interface-guard",
+        rules: errorRulesFor(["no-redeclare-shared-contract-interfaces"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["src/constants.ts"],
+        name: "uptime-watcher:monitor-fallback-consistency",
+        rules: errorRulesFor(["monitor-fallback-consistency"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["electron/services/ipc/handlers/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
+        name: "uptime-watcher:electron-ipc-handler-validation-guardrails",
+        rules: errorRulesFor(["electron-ipc-handler-require-validator"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["electron/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
+        name: "uptime-watcher:electron-logger-enforcement",
+        rules: errorRulesFor([
+            "electron-no-console",
+            "electron-no-direct-ipc-handle",
+            "electron-no-direct-ipc-handler-wrappers",
+            "electron-no-direct-ipc-main-import",
+            "electron-no-inline-ipc-channel-literal",
+            "electron-no-inline-ipc-channel-type-argument",
+            "electron-no-renderer-import",
+            "electron-prefer-read-process-env",
+            "electron-preload-no-direct-ipc-renderer-usage",
+            "electron-preload-no-inline-ipc-channel-constant",
+            "no-inline-ipc-channel-type-literals",
+        ]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["**/*.{ts,tsx}"],
+        name: "uptime-watcher:tsdoc-logger-examples",
+        rules: errorRulesFor(["tsdoc-no-console-example"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: [
+            "docs/**/*.{ts,tsx}",
+            "electron/**/*.{ts,tsx}",
+            "src/**/*.{ts,tsx}",
+            "storybook/**/*.{ts,tsx}",
+        ],
+        ignores: ["shared/**/*"],
+        name: "uptime-watcher:prefer-shared-alias",
+        rules: errorRulesFor(["prefer-shared-alias"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["shared/**/*.{ts,tsx,cts,mts}"],
+        name: "uptime-watcher:shared-layer-isolation",
+        rules: errorRulesFor(["shared-no-outside-imports"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
+        ignores: ["src/test/**/*"],
+        name: "uptime-watcher:renderer-electron-isolation",
+        rules: errorRulesFor([
+            "no-inline-ipc-channel-type-literals",
+            "renderer-no-browser-dialogs",
+            "renderer-no-direct-bridge-readiness",
+            "renderer-no-direct-electron-log",
+            "renderer-no-direct-networking",
+            "renderer-no-direct-preload-bridge",
+            "renderer-no-electron-import",
+            "renderer-no-import-internal-service-utils",
+            "renderer-no-ipc-renderer-usage",
+            "renderer-no-preload-bridge-writes",
+            "renderer-no-window-open",
+        ]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["src/stores/**/*.{ts,tsx}"],
+        ignores: ["src/test/**/*"],
+        name: "uptime-watcher:zustand-stores-busy-flags-reset",
+        rules: errorRulesFor(["store-actions-require-finally-reset"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: [
+            "electron/**/*.{ts,tsx}",
+            "shared/**/*.{ts,tsx}",
+            "src/**/*.{ts,tsx}",
+            "storybook/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx,js,jsx,mts,mjs,cjs,cts}",
+        ],
+        ignores: [
+            "electron/test/**/*",
+            "src/test/**/*",
+            "shared/test/**/*",
+        ],
+        name: "uptime-watcher:global-no-deprecated-exports",
+        rules: errorRulesFor([
+            "logger-no-error-in-context",
+            "no-deprecated-exports",
+            "no-local-error-normalizers",
+            "no-local-record-guards",
+            "no-onedrive",
+            "prefer-app-alias",
+            "require-ensure-error-in-catch",
+        ]),
+    }),
+]);
+
+const repoDriftGuardConfigs = /** @type {readonly FlatConfig[]} */ ([
+    withUptimeWatcherPlugin({
+        files: ["electron/services/sync/**/*.{ts,tsx}"],
+        ignores: ["electron/services/sync/syncEngineUtils.ts"],
+        name: "uptime-watcher:electron-cloud-sync-drift-guards",
+        rules: errorRulesFor(["electron-sync-no-local-ascii-digits"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["electron/services/cloud/providers/**/*.{ts,tsx}"],
+        name: "uptime-watcher:electron-cloud-providers-drift-guards",
+        rules: errorRulesFor(["electron-cloud-providers-drift-guards"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["shared/types/**/*.{ts,tsx}"],
+        name: "uptime-watcher:shared-types-drift-guards",
+        rules: errorRulesFor(["shared-types-no-local-is-plain-object"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["electron/preload/**/*.{ts,tsx}"],
+        name: "uptime-watcher:preload-drift-guards",
+        rules: errorRulesFor(["preload-no-local-is-plain-object"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["electron/services/**/*.{ts,tsx}"],
+        ignores: ["electron/services/sync/syncEngineUtils.ts"],
+        name: "uptime-watcher:electron-string-safety-drift-guards",
+        rules: errorRulesFor(["electron-no-local-string-safety-helpers"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["electron/services/**/*.{ts,tsx}"],
+        ignores: ["electron/services/shell/openExternalUtils.ts"],
+        name: "uptime-watcher:electron-error-formatting-drift-guards",
+        rules: errorRulesFor([
+            "electron-no-ad-hoc-error-code-suffix",
+            "prefer-try-get-error-code",
+        ]),
+    }),
+    withUptimeWatcherPlugin({
+        files: ["**/*.{ts,tsx}"],
+        name: "uptime-watcher:global-regex-drift-guards",
+        rules: errorRulesFor(["no-regexp-v-flag"]),
+    }),
+]);
+
+const repoConfigs = /** @type {readonly FlatConfig[]} */ ([
+    ...repoCoreConfigs,
+    ...repoDriftGuardConfigs,
+]);
+
 /** @type {any} */ (uptimeWatcherPlugin).configs = {
+    // Generic (unscoped) configs. These intentionally rely on rules being
+    // Internally defensive (path checks, etc.).
     all: {
+        name: "uptime-watcher:all",
         plugins: { "uptime-watcher": uptimeWatcherPlugin },
         rules: allRules,
     },
     recommended: {
+        name: "uptime-watcher:recommended",
         plugins: { "uptime-watcher": uptimeWatcherPlugin },
         rules: allRules,
     },
+
+    // Common convention used by other plugins (helps muscle memory).
+    "flat/all": {
+        name: "uptime-watcher:flat/all",
+        plugins: { "uptime-watcher": uptimeWatcherPlugin },
+        rules: allRules,
+    },
+    "flat/recommended": {
+        name: "uptime-watcher:flat/recommended",
+        plugins: { "uptime-watcher": uptimeWatcherPlugin },
+        rules: allRules,
+    },
+
+    // Repo-scoped convenience configs.
+    // NOTE: arrays must be spread into the top-level config list.
+    repo: repoConfigs,
+    "repo/core": repoCoreConfigs,
+    "repo/drift-guards": repoDriftGuardConfigs,
 };
 
 export default uptimeWatcherPlugin;
