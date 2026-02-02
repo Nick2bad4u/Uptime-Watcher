@@ -114,7 +114,7 @@ jobs:
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+              uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
               with:
                   egress-policy: audit
 
@@ -126,7 +126,7 @@ jobs:
 
             # Initializes the CodeQL tools for scanning.
             - name: Initialize CodeQL
-              uses: github/codeql-action/init@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v3.29.5
+              uses: github/codeql-action/init@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v3.29.5
               with:
                   languages: ${{ matrix.language }}
                   source-root: .
@@ -140,7 +140,7 @@ jobs:
                   cache: "npm"
 
             - name: Cache node modules
-              uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+              uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
               with:
                   path: ./node_modules
                   key: ${{ runner.os }}-.-node-modules-${{ hashFiles('./package-lock.json') }}
@@ -182,6 +182,6 @@ jobs:
             # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
 
             - name: Perform CodeQL Analysis
-              uses: github/codeql-action/analyze@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v3.29.5
+              uses: github/codeql-action/analyze@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v3.29.5
               with:
                   category: "/language:${{matrix.language}}"

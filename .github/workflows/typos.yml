@@ -18,14 +18,14 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+              uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
               with:
                   egress-policy: audit
 
             - name: Checkout code
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
             - name: Run typos (spell checker)
-              uses: crate-ci/typos@65120634e79d8374d1aa2f27e54baa0c364fff5a # v1.42.1
+              uses: crate-ci/typos@06d010dfe4c84fdab1a25ea02b57b3585018ba80 # v1.42.3
               with:
                   files: |
                       .
