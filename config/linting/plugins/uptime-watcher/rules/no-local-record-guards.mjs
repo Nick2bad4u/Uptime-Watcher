@@ -49,25 +49,28 @@ export const noLocalRecordGuardsRule = {
         }
 
         const bannedNames = new Set([
-                "asRecord",
-                "isObjectRecord",
-                "isRecordLike",
-                "toRecord",
-            ]),
-            /** @param {import("estree").Identifier} identifier */
-            reportIdentifier = (identifier) => {
-                if (!bannedNames.has(identifier.name)) {
-                    return;
-                }
+            "asRecord",
+            "isObjectRecord",
+            "isRecordLike",
+            "toRecord",
+        ]);
 
-                context.report({
-                    data: {
-                        name: identifier.name,
-                    },
-                    messageId: "noLocalRecordGuards",
-                    node: identifier,
-                });
-            };
+        /**
+         * @param {import("estree").Identifier} identifier
+         */
+        const reportIdentifier = (identifier) => {
+            if (!bannedNames.has(identifier.name)) {
+                return;
+            }
+
+            context.report({
+                data: {
+                    name: identifier.name,
+                },
+                messageId: "noLocalRecordGuards",
+                node: identifier,
+            });
+        };
 
         return {
             /**

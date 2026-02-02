@@ -5,9 +5,10 @@
         "baseUrl": "../../../..",
         "checkJs": true,
         "composite": true,
-        "declaration": false,
+        "declaration": true,
         "declarationDir": "../../../../.cache/builds/test/linting/uptime-watcher-eslint/types",
         "incremental": true,
+        "isolatedDeclarations": false,
         "noEmit": true,
         "outDir": "../../../../.cache/builds/test/linting/uptime-watcher-eslint",
         "paths": {
@@ -34,6 +35,7 @@
     ],
     "extends": "../../../../tsconfig.json",
     "include": [
+        "../uptime-watcher.mjs",
         "./**/*.ts",
         "./**/*.tsx",
         "./**/*.mts",

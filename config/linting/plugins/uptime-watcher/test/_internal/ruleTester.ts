@@ -1,5 +1,5 @@
 import tsParser from "@typescript-eslint/parser";
-import { type Linter,
+import { type Rule,
 RuleTester } from "eslint";
 import * as path from "node:path";
 
@@ -22,15 +22,17 @@ export const createRuleTester = (): RuleTester =>
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;
 
-const isRuleModule = (value: unknown): value is Linter.RuleModule => {
+const isRuleModule = (value: unknown): value is Rule.RuleModule => {
     if (!isRecord(value)) {
         return false;
     }
 
-    return typeof value.create === "function";
+    const maybeCreate = (value as { create?: unknown }).create;
+
+    return typeof maybeCreate === "function";
 };
 
-export const getPluginRule = (ruleId: string): Linter.RuleModule => {
+export const getPluginRule = (ruleId: string): Rule.RuleModule => {
     const rules = uptimeWatcherPlugin.rules;
     if (!rules) {
         throw new Error("uptimeWatcherPlugin.rules must be defined");

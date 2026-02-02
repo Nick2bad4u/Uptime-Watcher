@@ -156,12 +156,27 @@ for (const [ruleName, rule] of Object.entries(pluginRules)) {
  * This is a pragmatic internal default: the rules are generally self-scoped by
  * filename checks, so enabling them globally is safe for most consumers.
  */
-const allRules = Object.fromEntries(
-    Object.keys(pluginRules).map((ruleName) => [
-        `uptime-watcher/${ruleName}`,
-        "error",
-    ])
-);
+/**
+ * ESLint rule severity used by uptime-watcher presets.
+ *
+ * @remarks
+ * Must remain a literal type (not widened to `string`) so it is assignable to
+ * `@eslint/core`'s `SeverityName` union.
+ */
+const ERROR_SEVERITY = /** @type {const} */ ("error");
+
+/** @typedef {import("@eslint/core").RulesConfig} RulesConfig */
+
+/**
+ * All uptime-watcher rules enabled at error severity.
+ *
+ * @type {RulesConfig}
+ */
+const allRules = {};
+
+for (const ruleName of Object.keys(pluginRules)) {
+    allRules[`uptime-watcher/${ruleName}`] = ERROR_SEVERITY;
+}
 
 /**
  * @typedef {import("eslint").Linter.FlatConfig} FlatConfig
@@ -170,12 +185,17 @@ const allRules = Object.fromEntries(
 /**
  * @param {readonly string[]} ruleNames
  *
- * @returns {Record<string, "error">}
+ * @returns {RulesConfig}
  */
 function errorRulesFor(ruleNames) {
-    return Object.fromEntries(
-        ruleNames.map((ruleName) => [`uptime-watcher/${ruleName}`, "error"])
-    );
+    /** @type {RulesConfig} */
+    const rules = {};
+
+    for (const ruleName of ruleNames) {
+        rules[`uptime-watcher/${ruleName}`] = ERROR_SEVERITY;
+    }
+
+    return rules;
 }
 
 /**

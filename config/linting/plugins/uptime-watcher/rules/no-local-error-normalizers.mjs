@@ -45,21 +45,24 @@ export const noLocalErrorNormalizersRule = {
             return {};
         }
 
-        const bannedNames = new Set(["ensureError", "normalizeError"]),
-            /** @param {import("estree").Identifier} identifier */
-            reportIdentifier = (identifier) => {
-                if (!bannedNames.has(identifier.name)) {
-                    return;
-                }
+        const bannedNames = new Set(["ensureError", "normalizeError"]);
 
-                context.report({
-                    data: {
-                        name: identifier.name,
-                    },
-                    messageId: "noLocalErrorNormalizers",
-                    node: identifier,
-                });
-            };
+        /**
+         * @param {import("estree").Identifier} identifier
+         */
+        const reportIdentifier = (identifier) => {
+            if (!bannedNames.has(identifier.name)) {
+                return;
+            }
+
+            context.report({
+                data: {
+                    name: identifier.name,
+                },
+                messageId: "noLocalErrorNormalizers",
+                node: identifier,
+            });
+        };
 
         return {
             /**
