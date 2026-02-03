@@ -6,11 +6,16 @@
  * @file Internal uptime-watcher ESLint plugin entrypoint.
  */
 
+import { electronBrowserwindowRequirePreloadRule } from "./rules/electron-browserwindow-require-preload.mjs";
+import { electronBrowserwindowRequireSecureWebpreferencesRule } from "./rules/electron-browserwindow-require-secure-webpreferences.mjs";
 import { electronCloudProvidersDriftGuardsRule } from "./rules/electron-cloud-providers-drift-guards.mjs";
 import { electronDialogRequireAutomationBypassRule } from "./rules/electron-dialog-require-automation-bypass.mjs";
 import { electronIpcHandlerRequireValidatorRule } from "./rules/electron-ipc-handler-require-validator.mjs";
 import { electronNoAdHocErrorCodeSuffixRule } from "./rules/electron-no-ad-hoc-error-code-suffix.mjs";
+import { electronNoAppGetpathAtModuleScopeRule } from "./rules/electron-no-app-getpath-at-module-scope.mjs";
+import { electronNoBrowserwindowOutsideWindowserviceRule } from "./rules/electron-no-browserwindow-outside-windowservice.mjs";
 import { electronNoConsoleRule } from "./rules/electron-no-console.mjs";
+import { electronNoDialogSyncRule } from "./rules/electron-no-dialog-sync.mjs";
 import { electronNoDirectIpcHandleRule } from "./rules/electron-no-direct-ipc-handle.mjs";
 import { electronNoDirectIpcHandlerWrappersRule } from "./rules/electron-no-direct-ipc-handler-wrappers.mjs";
 import { electronNoDirectIpcMainImportRule } from "./rules/electron-no-direct-ipc-main-import.mjs";
@@ -19,6 +24,9 @@ import { electronNoInlineIpcChannelLiteralRule } from "./rules/electron-no-inlin
 import { electronNoInlineIpcChannelTypeArgumentRule } from "./rules/electron-no-inline-ipc-channel-type-argument.mjs";
 import { electronNoLocalStringSafetyHelpersRule } from "./rules/electron-no-local-string-safety-helpers.mjs";
 import { electronNoRendererImportRule } from "./rules/electron-no-renderer-import.mjs";
+import { electronNoShellOpenExternalRule } from "./rules/electron-no-shell-open-external.mjs";
+import { electronNoWebcontentsExecuteJavascriptRule } from "./rules/electron-no-webcontents-execute-javascript.mjs";
+import { electronOpenDevtoolsRequireDevOnlyRule } from "./rules/electron-open-devtools-require-dev-only.mjs";
 import { electronPreferReadProcessEnvRule as electronPreferReadProcessEnvironmentRule } from "./rules/electron-prefer-read-process-env.mjs";
 import { electronPreloadNoDirectIpcRendererUsageRule } from "./rules/electron-preload-no-direct-ipc-renderer-usage.mjs";
 import { electronPreloadNoInlineIpcChannelConstantRule } from "./rules/electron-preload-no-inline-ipc-channel-constant.mjs";
@@ -47,8 +55,10 @@ import { rendererNoElectronImportRule } from "./rules/renderer-no-electron-impor
 import { rendererNoImportInternalServiceUtilsRule as rendererNoImportInternalServiceUtilitiesRule } from "./rules/renderer-no-import-internal-service-utils.mjs";
 import { rendererNoIpcRendererUsageRule } from "./rules/renderer-no-ipc-renderer-usage.mjs";
 import { rendererNoPreloadBridgeWritesRule } from "./rules/renderer-no-preload-bridge-writes.mjs";
+import { rendererNoProcessEnvRule } from "./rules/renderer-no-process-env.mjs";
 import { rendererNoWindowOpenRule } from "./rules/renderer-no-window-open.mjs";
 import { requireEnsureErrorInCatchRule } from "./rules/require-ensure-error-in-catch.mjs";
+import { requireErrorCauseInCatchRule } from "./rules/require-error-cause-in-catch.mjs";
 import { sharedNoOutsideImportsRule } from "./rules/shared-no-outside-imports.mjs";
 import { sharedTypesNoLocalIsPlainObjectRule } from "./rules/shared-types-no-local-is-plain-object.mjs";
 import { storeActionsRequireFinallyResetRule } from "./rules/store-actions-require-finally-reset.mjs";
@@ -76,8 +86,14 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         version: "0.0.0",
     },
     rules: {
+        "electron-browserwindow-require-secure-webpreferences":
+            electronBrowserwindowRequireSecureWebpreferencesRule,
+        "electron-browserwindow-require-preload":
+            electronBrowserwindowRequirePreloadRule,
         "electron-dialog-require-automation-bypass":
             electronDialogRequireAutomationBypassRule,
+        "electron-no-app-getpath-at-module-scope":
+            electronNoAppGetpathAtModuleScopeRule,
         "electron-cloud-providers-drift-guards":
             electronCloudProvidersDriftGuardsRule,
         "electron-ipc-handler-require-validator":
@@ -85,6 +101,9 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "electron-no-ad-hoc-error-code-suffix":
             electronNoAdHocErrorCodeSuffixRule,
         "electron-no-console": electronNoConsoleRule,
+        "electron-no-dialog-sync": electronNoDialogSyncRule,
+        "electron-no-browserwindow-outside-windowservice":
+            electronNoBrowserwindowOutsideWindowserviceRule,
         "electron-no-direct-ipc-handle": electronNoDirectIpcHandleRule,
         "electron-no-direct-ipc-handler-wrappers":
             electronNoDirectIpcHandlerWrappersRule,
@@ -103,6 +122,11 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
             electronPreloadNoDirectIpcRendererUsageRule,
         "electron-preload-no-inline-ipc-channel-constant":
             electronPreloadNoInlineIpcChannelConstantRule,
+        "electron-no-shell-open-external": electronNoShellOpenExternalRule,
+        "electron-no-webcontents-execute-javascript":
+            electronNoWebcontentsExecuteJavascriptRule,
+        "electron-open-devtools-require-dev-only":
+            electronOpenDevtoolsRequireDevOnlyRule,
         "electron-sync-no-local-ascii-digits":
             electronSyncNoLocalAsciiDigitsRule,
         "logger-no-error-in-context": loggerNoErrorInContextRule,
@@ -132,8 +156,10 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "renderer-no-import-internal-service-utils":
             rendererNoImportInternalServiceUtilitiesRule,
         "renderer-no-ipc-renderer-usage": rendererNoIpcRendererUsageRule,
+        "renderer-no-process-env": rendererNoProcessEnvRule,
         "renderer-no-preload-bridge-writes": rendererNoPreloadBridgeWritesRule,
         "renderer-no-window-open": rendererNoWindowOpenRule,
+        "require-error-cause-in-catch": requireErrorCauseInCatchRule,
         "require-ensure-error-in-catch": requireEnsureErrorInCatchRule,
         "shared-no-outside-imports": sharedNoOutsideImportsRule,
         "shared-types-no-local-is-plain-object":
@@ -264,6 +290,11 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
         rules: errorRulesFor([
             "electron-no-console",
             "electron-dialog-require-automation-bypass",
+            "electron-browserwindow-require-secure-webpreferences",
+            "electron-browserwindow-require-preload",
+            "electron-no-browserwindow-outside-windowservice",
+            "electron-no-dialog-sync",
+            "electron-no-app-getpath-at-module-scope",
             "electron-no-direct-ipc-handle",
             "electron-no-direct-ipc-handler-wrappers",
             "electron-no-direct-ipc-main-import",
@@ -271,6 +302,9 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "electron-no-inline-ipc-channel-literal",
             "electron-no-inline-ipc-channel-type-argument",
             "electron-no-renderer-import",
+            "electron-no-shell-open-external",
+            "electron-no-webcontents-execute-javascript",
+            "electron-open-devtools-require-dev-only",
             "electron-prefer-read-process-env",
             "electron-preload-no-direct-ipc-renderer-usage",
             "electron-preload-no-inline-ipc-channel-constant",
@@ -312,6 +346,7 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "renderer-no-electron-import",
             "renderer-no-import-internal-service-utils",
             "renderer-no-ipc-renderer-usage",
+            "renderer-no-process-env",
             "renderer-no-preload-bridge-writes",
             "renderer-no-window-open",
         ]),
@@ -343,6 +378,7 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "no-local-record-guards",
             "no-onedrive",
             "prefer-app-alias",
+            "require-error-cause-in-catch",
             "require-ensure-error-in-catch",
         ]),
     }),

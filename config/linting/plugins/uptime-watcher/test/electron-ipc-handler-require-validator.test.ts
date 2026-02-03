@@ -22,10 +22,41 @@ ruleTester.run(
                     "foo.ts"
                 ),
             },
+            {
+                code: "const channel = 'x'; const register = createStandardizedIpcRegistrar({}); register(channel, async () => 123);",
+                errors: [{ messageId: "missingValidator" }],
+                filename: repoPath(
+                    "electron",
+                    "services",
+                    "ipc",
+                    "handlers",
+                    "foo.ts"
+                ),
+            },
         ],
         valid: [
             {
                 code: "const channel = 'x'; registerStandardizedIpcHandler(channel, () => true, async () => 123);",
+                filename: repoPath(
+                    "electron",
+                    "services",
+                    "ipc",
+                    "handlers",
+                    "foo.ts"
+                ),
+            },
+            {
+                code: "const channel = 'x'; const register = createStandardizedIpcRegistrar({}); register(channel, async () => 123, () => true);",
+                filename: repoPath(
+                    "electron",
+                    "services",
+                    "ipc",
+                    "handlers",
+                    "foo.ts"
+                ),
+            },
+            {
+                code: "const channel = 'x'; const registry = {}; registry.register(channel, async () => 123);",
                 filename: repoPath(
                     "electron",
                     "services",

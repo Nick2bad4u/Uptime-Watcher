@@ -32,24 +32,65 @@ export const electronIpcHandlerRequireValidatorRule = {
             return {};
         }
 
+        /** @type {Set<string>} */
+        const registrarFunctionNames = new Set();
+
         return {
+            /**
+             * Track registrar functions created via:
+             *   const register = createStandardizedIpcRegistrar(...)
+             *
+             * @param {import("@typescript-eslint/utils").TSESTree.VariableDeclarator} node
+             */
+            VariableDeclarator(node) {
+                const id = node.id;
+                const init = node.init;
+
+                if (id?.type !== "Identifier") {
+                    return;
+                }
+
+                if (init?.type !== "CallExpression") {
+                    return;
+                }
+
+                const callee = init.callee;
+                if (callee?.type !== "Identifier") {
+                    return;
+                }
+
+                if (callee.name !== "createStandardizedIpcRegistrar") {
+                    return;
+                }
+
+                registrarFunctionNames.add(id.name);
+            },
+
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                if (node.callee?.type !== "Identifier") {
-                    return;
-                }
+                if (node.callee?.type === "Identifier") {
+                    if (node.callee.name !== "registerStandardizedIpcHandler") {
+                        // Also enforce registrar usage in handler modules.
+                        if (registrarFunctionNames.has(node.callee.name) && (node.arguments ?? []).length < 3) {
+                                context.report({
+                                    messageId: "missingValidator",
+                                    node: node.callee,
+                                });
+                            }
 
-                if (node.callee.name !== "registerStandardizedIpcHandler") {
-                    return;
-                }
+                        return;
+                    }
 
-                if ((node.arguments ?? []).length < 3) {
-                    context.report({
-                        messageId: "missingValidator",
-                        node: node.callee,
-                    });
+                    if ((node.arguments ?? []).length < 3) {
+                        context.report({
+                            messageId: "missingValidator",
+                            node: node.callee,
+                        });
+                    }
+
+
                 }
             },
         };
@@ -66,7 +107,7 @@ export const electronIpcHandlerRequireValidatorRule = {
         schema: [],
         messages: {
             missingValidator:
-                "registerStandardizedIpcHandler must include a validator argument (or explicit null) to keep runtime validation consistent.",
+                "IPC handlers must include a request validator to validate payloads at the boundary.",
         },
     },
 };

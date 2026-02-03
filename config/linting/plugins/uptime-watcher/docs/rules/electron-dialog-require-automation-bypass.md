@@ -10,7 +10,7 @@ Native dialogs are **blocking UI**. In Playwright/E2E runs they:
 - cause flakes,
 - or fail the test because the runner cannot interact with OS-level dialogs.
 
-This rule enforces a simple convention: if a module calls `dialog.showSaveDialog`, `dialog.showOpenDialog`, etc., it must also contain a guard for automation mode (currently detected via `PLAYWRIGHT_TEST` or `HEADLESS`).
+This rule enforces a simple convention: if a module calls `dialog.showSaveDialog`, `dialog.showOpenDialog`, etc., it must also contain an explicit automation guard using `readProcessEnv("PLAYWRIGHT_TEST"|"HEADLESS")`.
 
 ## Options
 

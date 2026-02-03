@@ -23,12 +23,13 @@ const DIALOG_METHOD_NAMES = new Set([
  * escape hatch.
  *
  * @remarks
- * Native dialogs are a common source of test flakiness/hangs in E2E automation.
- * We require any Electron main-process module that calls `dialog.*` to also
- * contain a guard that bypasses the dialog when running under automation.
+ * Native dialogs are a common source of test flakiness/hangs in E2E
+ * automation. We require any Electron main-process module that calls
+ * `dialog.*` to also contain a guard that bypasses the dialog when running
+ * under automation.
  *
- * The rule is intentionally heuristic: it checks for `PLAYWRIGHT_TEST` or
- * `HEADLESS` in the module source.
+ * The rule requires an explicit `readProcessEnv("PLAYWRIGHT_TEST"|"HEADLESS")`
+ * call in the module.
  */
 export const electronDialogRequireAutomationBypassRule = {
     /**
@@ -57,6 +58,8 @@ export const electronDialogRequireAutomationBypassRule = {
 
         /** @type {any[]} */
         const dialogCalls = [];
+
+        let hasAutomationGuard = false;
 
         /**
          * @param {any} node
@@ -114,6 +117,18 @@ export const electronDialogRequireAutomationBypassRule = {
         return {
             /** @param {any} node */
             CallExpression(node) {
+                // Track explicit automation guard usage (avoid false positives
+                // From comments/strings).
+                if (
+                    node.callee?.type === "Identifier" &&
+                    node.callee.name === "readProcessEnv" &&
+                    node.arguments?.[0]?.type === "Literal" &&
+                    (node.arguments[0].value === "PLAYWRIGHT_TEST" ||
+                        node.arguments[0].value === "HEADLESS")
+                ) {
+                    hasAutomationGuard = true;
+                }
+
                 const methodName = getDialogMethodName(node.callee);
                 if (!methodName) {
                     return;
@@ -125,18 +140,10 @@ export const electronDialogRequireAutomationBypassRule = {
                 });
             },
 
-            /** @param {any} node */
-            "Program:exit"(node) {
+            "Program:exit"() {
                 if (dialogCalls.length === 0) {
                     return;
                 }
-
-                const sourceCode = context.getSourceCode();
-                const text = sourceCode.getText(node);
-
-                const hasAutomationGuard =
-                    text.includes("PLAYWRIGHT_TEST") ||
-                    text.includes("HEADLESS");
 
                 if (hasAutomationGuard) {
                     return;
@@ -166,7 +173,7 @@ export const electronDialogRequireAutomationBypassRule = {
         schema: [],
         messages: {
             missingAutomationBypass:
-                "Electron dialog call (dialog.{{methodName}}) must be guarded for automation (PLAYWRIGHT_TEST/HEADLESS) to avoid blocking Playwright runs.",
+                "Electron dialog call (dialog.{{methodName}}) must be guarded for automation. Add a readProcessEnv('PLAYWRIGHT_TEST'|'HEADLESS') check to avoid blocking Playwright runs.",
         },
     },
 };

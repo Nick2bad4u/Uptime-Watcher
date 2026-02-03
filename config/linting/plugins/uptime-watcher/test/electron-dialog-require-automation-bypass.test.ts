@@ -56,15 +56,16 @@ async function save() {
             {
                 code: `
 import { dialog } from "electron";
+import { readProcessEnv } from "@shared/utils/environment";
 
-const isHeadless = true; // HEADLESS
+const isHeadless = readProcessEnv("HEADLESS")?.toLowerCase() === "true";
 
 async function save() {
     if (isHeadless) {
         return;
     }
 
-    dialog.showMessageBoxSync({ message: "Hello" });
+    await dialog.showMessageBox({ message: "Hello" });
 }
 `.trim(),
                 filename: repoPath(
