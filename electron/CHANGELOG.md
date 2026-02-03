@@ -8,11 +8,24 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[bca82d2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4))
+[4ecb590](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4ecb59095e65c929b9c4bfb46b6d5ea9ba847e4d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...4ecb59095e65c929b9c4bfb46b6d5ea9ba847e4d))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds Electron lint guardrails
+
+✨ [feat] Adds Electron lint guardrails for native dialogs and non-standard module metadata to reduce automation hangs and runtime crashes
+ - ✨ [feat] Registers the new guardrails in the core Electron lint profile
+🛠️ [fix] Adds automation-safe backup handling and standard directory resolution in the Electron main process to avoid blocked UI and bundler fragility
+🛠️ [fix] Sanitizes debugger-injected node options when launching Electron for automation to prevent startup stalls
+🧪 [test] Aligns monitor-type and lint rule tests with canonical types and new checks for consistent coverage
+ - 🧪 [test] Adds rule documentation integrity validation for lint metadata links
+📝 [docs] Adds rule guides and removes an outdated architecture note
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b687493)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b687493d3586c551c347ad037d9bffdc1b8768ec)
+
 
 - ✨ [feat] Implement Settings Controller Hook for Enhanced Settings Management
  - Introduced `useSettingsController` hook to manage application settings in a modular way.
@@ -450,6 +463,19 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2
 
 ### 🛠️ Bug Fixes
 
+- 🛠️ [fix] Adds IPC result checks
+
+🛠️ [fix] Improves IPC handling by validating success payloads and returning safe errors when checks fail ✅🧯
+ - 🛠️ [fix] Records result validation issues in handler metadata for diagnostics 🧾
+🚜 [refactor] Tightens handler argument typing to reduce mismatch risk 🧩
+✨ [feat] Adds schema-backed validators for backup and restore results 🗂️
+🧹 [chore] Updates agent configuration to allow user invocation 🤖
+🎨 [style] Cleans up minor lint-rule formatting 🧽
+🧪 [test] Extends IPC tests and fixtures for result validation and new metadata fields 🧪
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4ecb590)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4ecb59095e65c929b9c4bfb46b6d5ea9ba847e4d)
+
+
 - 🛠️ [fix] Adds success accent to settings modal
 
 🛠️ [fix] Improves settings visibility by adding a success accent for clearer status cues
@@ -805,6 +831,43 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5063
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Enhance monitor type handling and validation
+ - 🛠️ [fix] Introduce buildMonitorValidationCandidate to standardize monitor data structure
+ - 🔧 [build] Normalize monitor type strings to prevent empty values
+ - 🛠️ [fix] Update validateMonitorData to utilize the new validation candidate structure
+ - 📝 [docs] Improve error messages for required fields in validation schemas
+ - 🎨 [style] Refactor monitor schemas to ensure consistent error handling
+ - 🧪 [test] Update tests to reflect changes in monitor type handling and validation logic
+ - 🔧 [build] Adjust Vite and Vitest configurations to improve project structure and type resolution
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b19500a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b19500a06279ea270e2b1c76e618c6c06bf24f2c)
+
+
+- 🚜 [refactor] Standardizes monitor type typing
+
+🚜 [refactor] Aligns monitor type identifiers across shared models, IPC contracts, and renderer state to reduce drift and enforce consistent option values.
+ - Adds runtime validation when serializing monitor type metadata and avoids trimming inputs to preserve canonical identifiers.
+🚜 [refactor] Tightens monitor model fields by using shared DNS record type unions for record selection.
+📝 [docs] Updates audit notes and guide maintenance steps to reflect new validation and tooling commands.
+🧪 [test] Adjusts fixtures and expectations to use supported monitor types and new option fallbacks.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4e174c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e174c79e81ba39537a157057be37cff9a922461)
+
+
+- 🚜 [refactor] Centralizes IPC helpers
+
+🚜 [refactor] Removes duplicate renderer IPC and monitor-form helpers to rely on shared contracts and tighter runtime validation
+ - 🛠️ [fix] Adds stricter monitor type checks and DNS record typing for safer defaults
+🛠️ [fix] Aligns site snapshot parsing with safe-parse results for clearer error diagnostics and payload handling
+🚜 [refactor] Simplifies update lifecycle state to shared status events and drops stored release metadata
+🚜 [refactor] Standardizes sites telemetry payload typing for consistent logging
+🧪 [test] Updates coverage and fuzz suites to match shared helpers and stricter validation
+📝 [docs] Refreshes architecture and workflow docs to reflect removed helpers and updated IPC flows
+🎨 [style] Documents memoization lint rule rationale while keeping rules disabled
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eb93cd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eb93cde67ec61395ec8f83fef08a3f71d763e8e)
+
 
 - 🚜 [refactor] Clarifies monitoring wiring
 
@@ -1637,6 +1700,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.2.0 [skip ci] [`(761bd4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/761bd4c64c2e1a20215281a004f455d2cbfbca16)
+
 
 - Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
 

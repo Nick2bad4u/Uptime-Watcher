@@ -8,11 +8,42 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[bca82d2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4))
+[b687493](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b687493d3586c551c347ad037d9bffdc1b8768ec)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...b687493d3586c551c347ad037d9bffdc1b8768ec))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds Electron lint guardrails
+
+✨ [feat] Adds Electron lint guardrails for native dialogs and non-standard module metadata to reduce automation hangs and runtime crashes
+ - ✨ [feat] Registers the new guardrails in the core Electron lint profile
+🛠️ [fix] Adds automation-safe backup handling and standard directory resolution in the Electron main process to avoid blocked UI and bundler fragility
+🛠️ [fix] Sanitizes debugger-injected node options when launching Electron for automation to prevent startup stalls
+🧪 [test] Aligns monitor-type and lint rule tests with canonical types and new checks for consistent coverage
+ - 🧪 [test] Adds rule documentation integrity validation for lint metadata links
+📝 [docs] Adds rule guides and removes an outdated architecture note
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b687493)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b687493d3586c551c347ad037d9bffdc1b8768ec)
+
+
+- ✨ [feat] Modularize ESLint rules for uptime-watcher plugin
+ - 🆕 Add `renderer-no-preload-bridge-writes` rule to prevent mutations of `window.electronAPI` in renderer code.
+ - 🆕 Introduce `renderer-no-window-open` rule to disallow `window.open` usage in renderer code for external navigation.
+ - 🆕 Implement `require-ensureError-in-catch` rule to enforce normalization of caught `unknown` errors before property access.
+ - 🆕 Create `shared-no-outside-imports` rule to prevent shared modules from importing renderer or Electron runtime code.
+ - 🆕 Add `shared-types-no-local-isPlainObject` rule to disallow local declarations of `isPlainObject` in shared/types.
+ - 🆕 Introduce `store-actions-require-finally-reset` rule to ensure Zustand store busy flags are reset in `finally` blocks.
+ - 🆕 Add `test-no-mock-return-value-constructors` rule to prevent mocking constructors with `mockReturnValue`.
+ - 🆕 Implement `tsdoc-no-console-example` rule to disallow console usage in TSDoc example code blocks.
+🧪 [test] Add tests for new ESLint rules in uptime-watcher plugin
+ - 🆕 Create tests for `electron-no-console` rule to validate console usage in Electron context.
+ - 🆕 Add tests for `renderer-no-window-open` rule to ensure proper handling of `window.open`.
+ - 🆕 Implement tests for `require-ensureError-in-catch` rule to check for normalization of caught errors.
+ - 🆕 Include tests for other newly added rules to ensure compliance and functionality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9bab9dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9bab9dc636f8759fc9be79c63971f35b5fc8c184)
+
 
 - ✨ [feat] Implement Settings Controller Hook for Enhanced Settings Management
  - Introduced `useSettingsController` hook to manage application settings in a modular way.
@@ -446,6 +477,47 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2
 
 ### 🛠️ Bug Fixes
 
+- 🛠️ [fix] Implement linting rules for uptime-watcher plugin
+
+ - ✨ [feat] Add tests for `electron-sync-no-local-ascii-digits` rule to prevent usage of local ASCII digits in specific files.
+ - ✨ [feat] Introduce `logger-no-error-in-context` rule to avoid logging errors with context in certain files.
+ - ✨ [feat] Create `monitor-fallback-consistency` rule to ensure fallback monitor types are consistent and valid.
+ - ✨ [feat] Add `no-call-identifiers` rule to restrict usage of banned function calls in specified files.
+ - ✨ [feat] Implement `no-deprecated-exports` rule to prevent exporting deprecated values.
+ - ✨ [feat] Add `no-inline-ipc-channel-type-literals` rule to avoid inline type literals for IPC channels.
+ - ✨ [feat] Introduce `no-local-error-normalizers` rule to restrict local error normalizers in specific files.
+ - ✨ [feat] Create `no-local-identifiers` rule to prevent usage of banned local identifiers.
+ - ✨ [feat] Implement `no-local-record-guards` rule to restrict local record guards in certain files.
+ - ✨ [feat] Add `no-onedrive` rule to prevent usage of OneDrive paths in specific files.
+ - ✨ [feat] Introduce `no-redeclare-shared-contract-interfaces` rule to avoid redeclaring shared interfaces.
+ - ✨ [feat] Create `no-regexp-v-flag` rule to prevent usage of the 'v' flag in regular expressions.
+ - ✨ [feat] Implement `prefer-app-alias` rule to encourage the use of application aliases in imports.
+ - ✨ [feat] Add `prefer-shared-alias` rule to enforce shared aliases in imports.
+ - ✨ [feat] Introduce `prefer-try-get-error-code` rule to encourage using a helper function for error codes.
+ - ✨ [feat] Create `preload-no-local-is-plain-object` rule to restrict local plain object checks in preload scripts.
+ - ✨ [feat] Implement `renderer-no-browser-dialogs` rule to prevent usage of browser dialogs in renderer processes.
+ - ✨ [feat] Add `renderer-no-direct-bridge-readiness` rule to enforce service helper usage for bridge readiness.
+ - ✨ [feat] Create `renderer-no-direct-electron-log` rule to prevent direct usage of electron-log in renderer.
+ - ✨ [feat] Implement `renderer-no-direct-networking` rule to restrict direct networking calls in renderer.
+ - ✨ [feat] Add `renderer-no-direct-preload-bridge` rule to prevent direct access to preload bridge.
+ - ✨ [feat] Create `renderer-no-electron-import` rule to restrict direct imports from electron in renderer.
+ - ✨ [feat] Implement `renderer-no-import-internal-service-utils` rule to prevent internal service utility imports in renderer.
+ - ✨ [feat] Add `renderer-no-ipc-renderer-usage` rule to restrict usage of ipcRenderer in renderer.
+ - ✨ [feat] Create `renderer-no-preload-bridge-writes` rule to prevent writing to preload bridge.
+ - ✨ [feat] Implement `renderer-no-window-open` rule to restrict usage of window.open in renderer.
+ - ✨ [feat] Add `require-ensure-error-in-catch` rule to enforce error handling in catch blocks.
+ - ✨ [feat] Create `shared-no-outside-imports` rule to prevent outside imports in shared modules.
+ - ✨ [feat] Implement `shared-types-no-local-is-plain-object` rule to restrict local plain object checks in shared types.
+ - ✨ [feat] Add `store-actions-require-finally-reset` rule to enforce finally blocks in store actions.
+ - ✨ [feat] Create `test-no-mock-return-value-constructors` rule to prevent mocking return value constructors in tests.
+ - ✨ [feat] Add `tsdoc-no-console-example` rule to prevent console usage in TSDoc examples.
+ - 🧹 [chore] Remove outdated `uptime-watcher-plugin.rules.test.ts` file as it is no longer needed.
+ - 🎨 [style] Update `eslint.config.mjs` to adjust rules for internal helper filenames and other configurations.
+ - 🚜 [refactor] Refactor `SaveButton.tsx` to use `useMemo` for button variant calculation based on disabled state.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2630c00)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2630c00e7b5a9a1b7795e6b59fde6eea90f41ff6)
+
+
 - 🛠️ [fix] Adds success accent to settings modal
 
 🛠️ [fix] Improves settings visibility by adding a success accent for clearer status cues
@@ -778,6 +850,43 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e251
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Enhance monitor type handling and validation
+ - 🛠️ [fix] Introduce buildMonitorValidationCandidate to standardize monitor data structure
+ - 🔧 [build] Normalize monitor type strings to prevent empty values
+ - 🛠️ [fix] Update validateMonitorData to utilize the new validation candidate structure
+ - 📝 [docs] Improve error messages for required fields in validation schemas
+ - 🎨 [style] Refactor monitor schemas to ensure consistent error handling
+ - 🧪 [test] Update tests to reflect changes in monitor type handling and validation logic
+ - 🔧 [build] Adjust Vite and Vitest configurations to improve project structure and type resolution
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b19500a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b19500a06279ea270e2b1c76e618c6c06bf24f2c)
+
+
+- 🚜 [refactor] Standardizes monitor type typing
+
+🚜 [refactor] Aligns monitor type identifiers across shared models, IPC contracts, and renderer state to reduce drift and enforce consistent option values.
+ - Adds runtime validation when serializing monitor type metadata and avoids trimming inputs to preserve canonical identifiers.
+🚜 [refactor] Tightens monitor model fields by using shared DNS record type unions for record selection.
+📝 [docs] Updates audit notes and guide maintenance steps to reflect new validation and tooling commands.
+🧪 [test] Adjusts fixtures and expectations to use supported monitor types and new option fallbacks.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4e174c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e174c79e81ba39537a157057be37cff9a922461)
+
+
+- 🚜 [refactor] Centralizes IPC helpers
+
+🚜 [refactor] Removes duplicate renderer IPC and monitor-form helpers to rely on shared contracts and tighter runtime validation
+ - 🛠️ [fix] Adds stricter monitor type checks and DNS record typing for safer defaults
+🛠️ [fix] Aligns site snapshot parsing with safe-parse results for clearer error diagnostics and payload handling
+🚜 [refactor] Simplifies update lifecycle state to shared status events and drops stored release metadata
+🚜 [refactor] Standardizes sites telemetry payload typing for consistent logging
+🧪 [test] Updates coverage and fuzz suites to match shared helpers and stricter validation
+📝 [docs] Refreshes architecture and workflow docs to reflect removed helpers and updated IPC flows
+🎨 [style] Documents memoization lint rule rationale while keeping rules disabled
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eb93cd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eb93cde67ec61395ec8f83fef08a3f71d763e8e)
+
 
 - 🚜 [refactor] Clarifies monitoring wiring
 
@@ -1577,6 +1686,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.2.0 [skip ci] [`(761bd4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/761bd4c64c2e1a20215281a004f455d2cbfbca16)
+
 
 - Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
 
