@@ -7,6 +7,12 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
+import {
+    BASE_MONITOR_TYPES,
+    type MonitorType,
+} from "@shared/types";
+import type { MonitorTypeOption } from "@shared/types/monitorTypes";
+
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../../constants";
 import { logger } from "../../services/logger";
 import { getMonitorTypeOptions } from "../../utils/monitorTypeHelper";
@@ -40,10 +46,10 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Loading", "type");
 
-            const mockOptions = [
+            const mockOptions: MonitorTypeOption[] = [
                 { label: "HTTP", value: "http" },
                 { label: "Port", value: "port" },
-                { label: "Custom", value: "custom" },
+                { label: "DNS", value: "dns" },
             ];
             mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
 
@@ -75,14 +81,14 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            const initialOptions = [
+            const initialOptions: MonitorTypeOption[] = [
                 { label: "HTTP", value: "http" },
                 { label: "Port", value: "port" },
             ];
-            const refreshedOptions = [
+            const refreshedOptions: MonitorTypeOption[] = [
                 { label: "HTTP", value: "http" },
                 { label: "Port", value: "port" },
-                { label: "WebSocket", value: "websocket" },
+                { label: "WebSocket", value: "websocket-keepalive" },
             ];
 
             mockGetMonitorTypeOptions
@@ -141,10 +147,10 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            const specialOptions = [
+            const specialOptions: MonitorTypeOption[] = [
                 { label: "HTTP/HTTPS Monitor", value: "http" },
                 { label: "TCP Port (Custom)", value: "port" },
-                { label: "API & WebSocket", value: "api" },
+                { label: "API & WebSocket", value: "websocket-keepalive" },
             ];
             mockGetMonitorTypeOptions.mockResolvedValue(specialOptions);
 
@@ -285,7 +291,9 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Type: Error Handling", "type");
 
             const testError = new Error("Initial error");
-            const successOptions = [{ label: "HTTP", value: "http" }];
+            const successOptions: MonitorTypeOption[] = [
+                { label: "HTTP", value: "http" },
+            ];
 
             mockGetMonitorTypeOptions
                 .mockRejectedValueOnce(testError)
@@ -321,7 +329,9 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
-            const initialOptions = [{ label: "HTTP", value: "http" }];
+            const initialOptions: MonitorTypeOption[] = [
+                { label: "HTTP", value: "http" },
+            ];
             const refreshError = new Error("Refresh failed");
 
             mockGetMonitorTypeOptions
@@ -366,13 +376,11 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Type: Initialization", "type");
 
             let resolvePromise: (
-                value: { label: string; value: string }[]
+                value: MonitorTypeOption[]
             ) => void;
-            const loadPromise = new Promise<{ label: string; value: string }[]>(
-                (resolve) => {
-                    resolvePromise = resolve;
-                }
-            );
+            const loadPromise = new Promise<MonitorTypeOption[]>((resolve) => {
+                resolvePromise = resolve;
+            });
             mockGetMonitorTypeOptions.mockReturnValue(loadPromise);
 
             const { result } = renderHook(() => useMonitorTypes());
@@ -400,7 +408,9 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Loading", "type");
 
-            const initialOptions = [{ label: "HTTP", value: "http" }];
+            const initialOptions: MonitorTypeOption[] = [
+                { label: "HTTP", value: "http" },
+            ];
             mockGetMonitorTypeOptions.mockResolvedValue(initialOptions);
 
             const { result } = renderHook(() => useMonitorTypes());
@@ -412,11 +422,9 @@ describe("useMonitorTypes Hook", () => {
 
             // Start refresh
             let resolveRefresh: (
-                value: { label: string; value: string }[]
+                value: MonitorTypeOption[]
             ) => void;
-            const refreshPromise = new Promise<
-                { label: string; value: string }[]
-            >((resolve) => {
+            const refreshPromise = new Promise<MonitorTypeOption[]>((resolve) => {
                 resolveRefresh = resolve;
             });
             mockGetMonitorTypeOptions.mockReturnValue(refreshPromise);
@@ -447,7 +455,9 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            const options = [{ label: "HTTP", value: "http" }];
+            const options: MonitorTypeOption[] = [
+                { label: "HTTP", value: "http" },
+            ];
             mockGetMonitorTypeOptions.mockResolvedValue(options);
 
             const { result } = renderHook(() => useMonitorTypes());
@@ -522,8 +532,8 @@ describe("useMonitorTypes Hook", () => {
 
             // Modify the returned options
             result.current.options.push({
-                label: "Modified",
-                value: "modified",
+                label: "Ping",
+                value: "ping",
             });
 
             // Original fallback should be unchanged
@@ -544,13 +554,11 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Type: Data Loading", "type");
 
             let resolvePromise: (
-                value: { label: string; value: string }[]
+                value: MonitorTypeOption[]
             ) => void;
-            const loadPromise = new Promise<{ label: string; value: string }[]>(
-                (resolve) => {
-                    resolvePromise = resolve;
-                }
-            );
+            const loadPromise = new Promise<MonitorTypeOption[]>((resolve) => {
+                resolvePromise = resolve;
+            });
             mockGetMonitorTypeOptions.mockReturnValue(loadPromise);
 
             const { result, unmount } = renderHook(() => useMonitorTypes());
@@ -578,11 +586,11 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
-            const realWorldOptions = [
+            const realWorldOptions: MonitorTypeOption[] = [
                 { label: "HTTP/HTTPS Website", value: "http" },
                 { label: "TCP Port Check", value: "port" },
-                { label: "Database Connection", value: "database" },
-                { label: "API Endpoint", value: "api" },
+                { label: "Database Replication", value: "replication" },
+                { label: "API Endpoint", value: "http-json" },
                 { label: "DNS Resolution", value: "dns" },
             ];
             mockGetMonitorTypeOptions.mockResolvedValue(realWorldOptions);
@@ -665,9 +673,7 @@ describe("useMonitorTypes Hook", () => {
                 fc.array(
                     fc.record({
                         label: fc.string({ minLength: 1, maxLength: 50 }),
-                        value: fc
-                            .string({ minLength: 1, maxLength: 20 })
-                            .filter((s) => /^[\w-]+$/.test(s)),
+                        value: fc.constantFrom<MonitorType>(...BASE_MONITOR_TYPES),
                     }),
                     { minLength: 0, maxLength: 10 }
                 ),
@@ -759,9 +765,9 @@ describe("useMonitorTypes Hook", () => {
             async (optionCount) => {
                 const monitorOptions = Array.from(
                     { length: optionCount },
-                    (_, i) => ({
+                    (_, i): MonitorTypeOption => ({
                         label: `Monitor Type ${i + 1}`,
-                        value: `type-${i + 1}`,
+                        value: BASE_MONITOR_TYPES[i % BASE_MONITOR_TYPES.length]!,
                     })
                 );
 
@@ -858,7 +864,9 @@ describe("useMonitorTypes Hook", () => {
                     // Clear mocks at start of each property test execution
                     vi.clearAllMocks();
 
-                    const mockOptions = [{ label: "Test", value: "test" }];
+                    const mockOptions: MonitorTypeOption[] = [
+                        { label: "Test", value: "http" },
+                    ];
                     mockGetMonitorTypeOptions.mockResolvedValue(mockOptions);
 
                     const { result } = renderHook(() => useMonitorTypes());
@@ -983,15 +991,31 @@ describe("useMonitorTypes Hook", () => {
             }
         );
 
-        test.prop([fc.constantFrom(null, undefined, [], {}, "invalid", 123)], {
-            timeout: 1500, // Increase fast-check timeout to 1.5s
-            numRuns: 5, // Reduce number of test runs
-        })(
-            "should handle invalid API responses gracefully",
-            async (invalidResponse) => {
-                mockGetMonitorTypeOptions.mockResolvedValue(
-                    invalidResponse as any
+        test.prop(
+            [
+                fc.array(
+                    fc.constantFrom<MonitorType>(...BASE_MONITOR_TYPES),
+                    {
+                        minLength: 0,
+                        maxLength: BASE_MONITOR_TYPES.length,
+                    }
+                ),
+            ],
+            {
+                timeout: 1500,
+                numRuns: 5,
+            }
+        )(
+            "should accept backend options as-is",
+            async (monitorTypes) => {
+                const monitorOptions: MonitorTypeOption[] = monitorTypes.map(
+                    (type): MonitorTypeOption => ({
+                        label: type.toUpperCase(),
+                        value: type,
+                    })
                 );
+
+                mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
 
                 const { result } = renderHook(() => useMonitorTypes());
 
@@ -999,8 +1023,7 @@ describe("useMonitorTypes Hook", () => {
                     expect(result.current.isLoading).toBeFalsy();
                 });
 
-                // Should accept the invalid response as-is (validation happens elsewhere)
-                expect(result.current.options).toEqual(invalidResponse);
+                expect(result.current.options).toEqual(monitorOptions);
                 expect(result.current.error).toBeUndefined();
             }
         );
@@ -1012,7 +1035,9 @@ describe("useMonitorTypes Hook", () => {
             // Clear mocks at start of each property test execution
             vi.clearAllMocks();
 
-            const mockOptions = [{ label: "Delayed", value: "delayed" }];
+            const mockOptions: MonitorTypeOption[] = [
+                { label: "Delayed", value: "http" },
+            ];
 
             mockGetMonitorTypeOptions.mockReturnValue(
                 new Promise((resolve) =>

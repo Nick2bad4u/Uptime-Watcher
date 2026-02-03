@@ -7,6 +7,7 @@ import type {
 
 import { MAX_IPC_SQLITE_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { DATA_CHANNELS } from "@shared/types/preload";
+import { readProcessEnv } from "@shared/utils/environment";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { app, dialog } from "electron";
 import * as path from "node:path";
@@ -67,6 +68,29 @@ export function registerDataHandlers({
             const downloadsDir = app.getPath("downloads");
             const suggestedFileName = `uptime-watcher-backup-${Date.now()}.sqlite`;
             const defaultPath = path.join(downloadsDir, suggestedFileName);
+
+            const isPlaywrightAutomation =
+                readProcessEnv("PLAYWRIGHT_TEST")?.toLowerCase() === "true";
+
+            if (isPlaywrightAutomation) {
+                const automationDir = path.join(
+                    app.getPath("userData"),
+                    "playwright-backups"
+                );
+                const automationPath = ensureSqliteFileExtension(
+                    path.join(automationDir, suggestedFileName)
+                );
+
+                const metadata =
+                    await uptimeOrchestrator.saveBackupToPath(automationPath);
+
+                return {
+                    canceled: false,
+                    fileName: path.basename(automationPath),
+                    filePath: automationPath,
+                    metadata,
+                } satisfies SerializedDatabaseBackupSaveResult;
+            }
 
             const dialogResult = await dialog.showSaveDialog({
                 defaultPath,

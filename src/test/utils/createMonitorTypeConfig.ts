@@ -23,7 +23,7 @@ export const createMonitorTypeConfig = (
         description: "Mock monitor type used for testing",
         displayName: "Mock Monitor",
         fields: overrides.fields ?? defaultFields,
-        type: overrides.type ?? "mock-monitor",
+        type: overrides.type ?? "http",
         version: overrides.version ?? "1.0.0",
         ...(uiConfig ? { uiConfig } : {}),
     } satisfies MonitorTypeConfig;

@@ -20,6 +20,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
 import { z } from "zod";
+import { BASE_MONITOR_TYPES } from "@shared/types";
 import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 import type { IMonitorService } from "../../services/monitoring/types";
 import type { BaseMonitorConfig } from "../../services/monitoring/MonitorTypeRegistry.types";
@@ -172,7 +173,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
     describe(registerMonitorType, () => {
         it("should handle valid monitor config registration", () => {
             const validConfig: BaseMonitorConfig = {
-                type: "test-fuzz-type",
+                type: "http",
                 displayName: "Test Fuzz Type",
                 description: "For fuzzing tests",
                 version: "1.0.0",
@@ -191,7 +192,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                             responseTime: 100,
                             timestamp: Date.now(),
                         }),
-                        getType: vi.fn().mockReturnValue("test-fuzz-type"),
+                        getType: vi.fn().mockReturnValue("http"),
                         updateConfig: vi.fn(),
                     }) as IMonitorService,
                 validationSchema: z.object({
@@ -265,7 +266,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                         }),
                     (field: MonitorFieldDefinition) => {
                         const config: BaseMonitorConfig = {
-                            type: `test-field-${Math.random()}`,
+                            type: "http",
                             displayName: "Test Field",
                             description: "For field testing",
                             version: "1.0.0",
@@ -275,7 +276,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                                     check: vi.fn().mockResolvedValue({
                                         status: "up" as const,
                                     }),
-                                    getType: vi.fn().mockReturnValue("test"),
+                                    getType: vi.fn().mockReturnValue("http"),
                                     updateConfig: vi.fn(),
                                 }) as IMonitorService,
                             validationSchema: z.object({ type: z.string() }),
@@ -312,7 +313,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
         it("should handle monitor creation with type guards", () => {
             // Register a test type first
             const testConfig: BaseMonitorConfig = {
-                type: "test-guard-type",
+                type: "http",
                 displayName: "Test Guard Type",
                 description: "For guard testing",
                 version: "1.0.0",
@@ -322,7 +323,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                         check: vi
                             .fn()
                             .mockResolvedValue({ status: "up" as const }),
-                        getType: vi.fn().mockReturnValue("test-guard-type"),
+                        getType: vi.fn().mockReturnValue("http"),
                         updateConfig: vi.fn(),
                     }) as IMonitorService,
                 validationSchema: z.object({ type: z.string() }),
@@ -333,7 +334,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             const testMonitor = {
                 id: "test-123",
                 name: "Test Monitor",
-                type: "test-guard-type" as MonitorType,
+                type: "http" as MonitorType,
                 enabled: true,
                 checkInterval: 60_000,
                 timeout: 5000,
@@ -343,7 +344,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             };
 
             expect(() =>
-                createMonitorWithTypeGuards("test-guard-type", testMonitor)
+                createMonitorWithTypeGuards("http", testMonitor)
             ).not.toThrowError();
         });
     });
@@ -451,10 +452,15 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
         it("should not leak memory with many registrations", () => {
             const initialTypes = getRegisteredMonitorTypes().length;
 
-            // Register many test types
-            for (let i = 0; i < 100; i++) {
+            // Re-register built-in types many times. This should not grow the
+            // registry (Map overwrite), but still exercises the hot path.
+            for (let i = 0; i < 1000; i++) {
+                const monitorType = BASE_MONITOR_TYPES[
+                    i % BASE_MONITOR_TYPES.length
+                ]!;
+
                 const config: BaseMonitorConfig = {
-                    type: `memory-test-${i}`,
+                    type: monitorType,
                     displayName: `Memory Test ${i}`,
                     description: "For memory testing",
                     version: "1.0.0",
@@ -466,7 +472,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                                 .mockResolvedValue({ status: "up" as const }),
                             getType: vi
                                 .fn()
-                                .mockReturnValue(`memory-test-${i}`),
+                                .mockReturnValue(monitorType),
                             updateConfig: vi.fn(),
                         }) as IMonitorService,
                     validationSchema: z.object({ type: z.string() }),
@@ -476,11 +482,11 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             }
 
             const finalTypes = getRegisteredMonitorTypes().length;
-            expect(finalTypes).toBeGreaterThan(initialTypes);
+            expect(finalTypes).toBe(initialTypes);
 
             // Registry should still function correctly
-            expect(isValidMonitorType("memory-test-50")).toBeTruthy();
-            expect(getMonitorTypeConfig("memory-test-75")).toBeDefined();
+            expect(isValidMonitorType("http")).toBeTruthy();
+            expect(getMonitorTypeConfig("http")).toBeDefined();
         });
     });
 });

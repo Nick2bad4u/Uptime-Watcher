@@ -120,7 +120,8 @@ describe(useMonitorFields, () => {
         expect(result.current.isLoaded).toBeFalsy();
         expect(result.current.error).toBeUndefined();
 
-        expect(result.current.getFields("missing")).toEqual([]);
+        // Use a valid monitor type that is not present in the mocked fieldConfigs.
+        expect(result.current.getFields("dns")).toEqual([]);
         expect(result.current.getFields("http")).toEqual(mockHttpFields);
 
         expect(result.current.getRequiredFields("http")).toEqual(["url"]);

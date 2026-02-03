@@ -18,6 +18,11 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { BASE_MONITOR_TYPES } from "@shared/types";
+import type {
+    MonitorTypeConfig,
+    MonitorTypeOption,
+} from "@shared/types/monitorTypes";
 
 // Component imports
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
@@ -41,7 +46,7 @@ const mockUseDynamicHelpText = vi.mocked(useDynamicHelpText);
 vi.mocked(useDelayedButtonLoading);
 
 // Mock data
-const mockMonitorTypes = vi.hoisted(() => [
+const mockMonitorTypes = vi.hoisted((): MonitorTypeConfig[] => [
     {
         type: "http",
         displayName: "HTTP",
@@ -98,8 +103,8 @@ const mockMonitorTypes = vi.hoisted(() => [
         ],
     },
     {
-        type: "tcp",
-        displayName: "TCP",
+        type: "port",
+        displayName: "Port",
         description: "Monitor TCP ports",
         version: "1.0.0",
         fields: [
@@ -372,10 +377,12 @@ vi.mock("@app/hooks/useMonitorFields", () => ({
 vi.mock("../../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: vi.fn(() => ({
         monitorTypes: mockMonitorTypes,
-        options: mockMonitorTypes.map((type) => ({
-            label: type.displayName,
-            value: type.type,
-        })),
+        options: mockMonitorTypes.map(
+            (type): MonitorTypeOption => ({
+                label: type.displayName,
+                value: type.type,
+            })
+        ),
         isLoading: false,
         error: undefined,
         refreshMonitorTypes: vi.fn(),
@@ -1738,13 +1745,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                     version: "1.0.0",
                     fields: [],
                 },
-            ];
+            ] satisfies MonitorTypeConfig[];
 
-            mockUseMonitorTypes.mockReturnValue({
-                options: specialMonitorTypes.map((type) => ({
+            const specialOptions = specialMonitorTypes.map(
+                (type): MonitorTypeOption => ({
                     label: type.displayName,
                     value: type.type,
-                })),
+                })
+            );
+
+            mockUseMonitorTypes.mockReturnValue({
+                options: specialOptions,
                 isLoading: false,
                 error: undefined,
                 refresh: vi.fn(),
@@ -1769,10 +1780,12 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             const refreshMonitorTypes = vi.fn();
 
             mockUseMonitorTypes.mockReturnValue({
-                options: mockMonitorTypes.map((type) => ({
-                    label: type.displayName,
-                    value: type.type,
-                })),
+                options: mockMonitorTypes.map(
+                    (type): MonitorTypeOption => ({
+                        label: type.displayName,
+                        value: type.type,
+                    })
+                ),
                 isLoading: false,
                 error: undefined,
                 refresh: refreshMonitorTypes,
@@ -2227,29 +2240,16 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            const largeMonitorTypesList = Array.from(
+            const largeMonitorOptions: MonitorTypeOption[] = Array.from(
                 { length: 100 },
-                (_, i) => ({
-                    type: `monitor${i}`,
-                    displayName: `Monitor Type ${i}`,
-                    description: `Monitor Type ${i} description`,
-                    version: "1.0.0",
-                    fields: [
-                        {
-                            name: `field${i}`,
-                            type: "text",
-                            required: false,
-                            label: `Field ${i}`,
-                        },
-                    ],
+                (_, i): MonitorTypeOption => ({
+                    label: `Monitor Type ${i}`,
+                    value: BASE_MONITOR_TYPES[i % BASE_MONITOR_TYPES.length]!,
                 })
             );
 
             mockUseMonitorTypes.mockReturnValue({
-                options: largeMonitorTypesList.map((type) => ({
-                    label: type.displayName,
-                    value: type.type,
-                })),
+                options: largeMonitorOptions,
                 isLoading: false,
                 error: undefined,
                 refresh: vi.fn(),

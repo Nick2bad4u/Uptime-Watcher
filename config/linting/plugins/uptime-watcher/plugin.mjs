@@ -7,12 +7,14 @@
  */
 
 import { electronCloudProvidersDriftGuardsRule } from "./rules/electron-cloud-providers-drift-guards.mjs";
+import { electronDialogRequireAutomationBypassRule } from "./rules/electron-dialog-require-automation-bypass.mjs";
 import { electronIpcHandlerRequireValidatorRule } from "./rules/electron-ipc-handler-require-validator.mjs";
 import { electronNoAdHocErrorCodeSuffixRule } from "./rules/electron-no-ad-hoc-error-code-suffix.mjs";
 import { electronNoConsoleRule } from "./rules/electron-no-console.mjs";
 import { electronNoDirectIpcHandleRule } from "./rules/electron-no-direct-ipc-handle.mjs";
 import { electronNoDirectIpcHandlerWrappersRule } from "./rules/electron-no-direct-ipc-handler-wrappers.mjs";
 import { electronNoDirectIpcMainImportRule } from "./rules/electron-no-direct-ipc-main-import.mjs";
+import { electronNoImportMetaDirnameRule } from "./rules/electron-no-import-meta-dirname.mjs";
 import { electronNoInlineIpcChannelLiteralRule } from "./rules/electron-no-inline-ipc-channel-literal.mjs";
 import { electronNoInlineIpcChannelTypeArgumentRule } from "./rules/electron-no-inline-ipc-channel-type-argument.mjs";
 import { electronNoLocalStringSafetyHelpersRule } from "./rules/electron-no-local-string-safety-helpers.mjs";
@@ -74,6 +76,8 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         version: "0.0.0",
     },
     rules: {
+        "electron-dialog-require-automation-bypass":
+            electronDialogRequireAutomationBypassRule,
         "electron-cloud-providers-drift-guards":
             electronCloudProvidersDriftGuardsRule,
         "electron-ipc-handler-require-validator":
@@ -85,6 +89,7 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "electron-no-direct-ipc-handler-wrappers":
             electronNoDirectIpcHandlerWrappersRule,
         "electron-no-direct-ipc-main-import": electronNoDirectIpcMainImportRule,
+        "electron-no-import-meta-dirname": electronNoImportMetaDirnameRule,
         "electron-no-inline-ipc-channel-literal":
             electronNoInlineIpcChannelLiteralRule,
         "electron-no-inline-ipc-channel-type-argument":
@@ -179,7 +184,13 @@ for (const ruleName of Object.keys(pluginRules)) {
 }
 
 /**
- * @typedef {import("eslint").Linter.FlatConfig} FlatConfig
+ * Flat config item type.
+ *
+ * @remarks
+ * ESLint deprecated the `Linter.FlatConfig` alias in favor of `Linter.Config`.
+ * We use `Config` to avoid editor TS6385 deprecation diagnostics.
+ *
+ * @typedef {import("eslint").Linter.Config} FlatConfig
  */
 
 /**
@@ -252,9 +263,11 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
         name: "uptime-watcher:electron-logger-enforcement",
         rules: errorRulesFor([
             "electron-no-console",
+            "electron-dialog-require-automation-bypass",
             "electron-no-direct-ipc-handle",
             "electron-no-direct-ipc-handler-wrappers",
             "electron-no-direct-ipc-main-import",
+            "electron-no-import-meta-dirname",
             "electron-no-inline-ipc-channel-literal",
             "electron-no-inline-ipc-channel-type-argument",
             "electron-no-renderer-import",

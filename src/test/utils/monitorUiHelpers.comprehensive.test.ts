@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Monitor } from "@shared/types";
+import type { MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { CacheKeys } from "@shared/utils/cacheKeys";
@@ -109,11 +110,11 @@ import { MonitorTypesService } from "../../services/MonitorTypesService";
 
 const configMap = new Map<string, MonitorTypeConfig>();
 
-const getCacheKeyForType = (type: string): string =>
+const getCacheKeyForType = (type: MonitorType): string =>
     CacheKeys.config.byName(`monitor-config-${type}`);
 
 const createConfig = (
-    type: string,
+    type: MonitorType,
     overrides: Partial<MonitorTypeConfig> = {}
 ): MonitorTypeConfig => {
     const baseConfig = {
@@ -175,7 +176,7 @@ const createConfig = (
 };
 
 const storeConfig = (
-    type: string,
+    type: MonitorType,
     overrides: Partial<MonitorTypeConfig> = {}
 ): MonitorTypeConfig => {
     const config = createConfig(type, overrides);
@@ -527,6 +528,8 @@ describe(getMonitorHelpTexts, () => {
 
 describe(getTypesWithFeature, () => {
     it("returns monitor types that support response time", async () => {
+        const invalidMonitorType = "invalid" as unknown as MonitorType;
+
         mockGetAvailableMonitorTypes.mockResolvedValueOnce([
             createConfig("http", {
                 uiConfig: {
@@ -538,7 +541,7 @@ describe(getTypesWithFeature, () => {
                     supportsResponseTime: false,
                 },
             }),
-            createConfig("invalid", {
+            createConfig(invalidMonitorType, {
                 uiConfig: {
                     supportsResponseTime: true,
                 },

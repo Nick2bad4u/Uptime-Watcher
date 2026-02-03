@@ -373,7 +373,7 @@ describe(useMonitorTypesStore, () => {
             // Set some initial state
             act(() => {
                 result.current.isLoaded = true;
-                result.current.fieldConfigs = { test: [] };
+                result.current.fieldConfigs = { http: [] };
                 result.current.monitorTypes = [];
             });
 

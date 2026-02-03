@@ -69,7 +69,48 @@ export async function launchElectronApp(
         { flags: "a" }
     );
 
-    const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
+    /**
+     * Sanitizes NODE_OPTIONS for Playwright-launched Electron.
+     *
+     * @remarks
+     * When running tasks from VS Code's "JavaScript Debug Terminal", VS Code
+     * injects a bootloader via NODE_OPTIONS (and sometimes inspector flags).
+     * That can pause the Electron main process (e.g. `--inspect-brk`) or
+     * otherwise interfere with window creation, causing Playwright to time out
+     * waiting for the first "window" event.
+     */
+    const sanitizeNodeOptions = (raw: string): string => {
+        const trimmed = raw.trim();
+        if (trimmed.length === 0) {
+            return "";
+        }
+
+        // Remove common inspector flags.
+        // Note: we intentionally keep unrelated flags such as
+        // `--max_old_space_size`.
+        const withoutInspector = trimmed
+            .replace(/\s--inspect-brk(=\S+)?/gu, "")
+            .replace(/\s--inspect(=\S+)?/gu, "")
+            .replace(/\s--inspect-publish-uid=\S+/gu, "");
+
+        // Remove VS Code js-debug bootloader injections.
+        // Handles both quoted and unquoted paths.
+        const withoutVsCodeBootloader = withoutInspector
+            .replace(
+                /\s--require\s+"?[^"]*?js-debug[^"]*?bootloader\.js"?/gu,
+                ""
+            )
+            .replace(
+                /\s--require\s+"?[^"]*?ms-vscode\.js-debug[^"]*?bootloader\.js"?/gu,
+                ""
+            );
+
+        return withoutVsCodeBootloader.replace(/\s{2,}/gu, " ").trim();
+    };
+
+    const existingNodeOptions = sanitizeNodeOptions(
+        process.env["NODE_OPTIONS"] ?? ""
+    );
     const disableWarningOption = "--disable-warning=DEP0190";
     const nodeOptions = existingNodeOptions.includes(disableWarningOption)
         ? existingNodeOptions

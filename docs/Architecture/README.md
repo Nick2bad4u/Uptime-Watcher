@@ -358,9 +358,6 @@ Canonical pattern for handling untrusted data at boundaries:
 The following areas were recently clarified and brought into closer alignment
 with the implemented architecture:
 
-- **2026-02-01 consistency audit**: See the full categorized report and
-  roadmap in [`CONSISTENCY_AUDIT_2026_02_01.md`](./CONSISTENCY_AUDIT_2026_02_01.md).
-
 - **Event naming**: ADR-002 and ADR-005 now include an explicit public-event
   summary table and terminology notes that match the canonical
   `UptimeEvents`/`OrchestratorEvents` definitions in code.

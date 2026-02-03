@@ -347,12 +347,7 @@ test.describe(
 
                 const actualTypes = Array.from(
                     new Set(
-                        typedConfigs
-                            .map((config) => config.type)
-                            .filter(
-                                (type): type is string =>
-                                    typeof type === "string" && type.length > 0
-                            )
+                        typedConfigs.map((config) => config.type)
                     )
                 ).sort((first, second) => first.localeCompare(second));
 
