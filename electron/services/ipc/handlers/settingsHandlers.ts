@@ -1,4 +1,4 @@
-import type { IpcInvokeChannel } from "@shared/types/ipc";
+import type { IpcInvokeChannel, IpcInvokeChannelParams } from "@shared/types/ipc";
 
 import { SETTINGS_CHANNELS } from "@shared/types/preload";
 
@@ -26,7 +26,11 @@ export function registerSettingsHandlers({
 
     register(
         SETTINGS_CHANNELS.updateHistoryLimit,
-        async (historyLimit) => {
+        async (
+            historyLimit: IpcInvokeChannelParams<
+                typeof SETTINGS_CHANNELS.updateHistoryLimit
+            >[0]
+        ) => {
             await uptimeOrchestrator.setHistoryLimit(historyLimit);
             return uptimeOrchestrator.getHistoryLimit();
         },

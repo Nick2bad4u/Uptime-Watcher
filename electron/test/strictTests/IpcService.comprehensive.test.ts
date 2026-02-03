@@ -28,9 +28,11 @@ import {
 
 const mockBackupBuffer = Buffer.from("mock backup data");
 const mockBackupMetadata = {
+    appVersion: "0.0.0-test",
     checksum: createHash("sha256").update(mockBackupBuffer).digest("hex"),
     createdAt: 1_700_000_000_000,
     originalPath: "/tmp/uptime-watcher.db",
+    retentionHintDays: 30,
     schemaVersion: 1,
     sizeBytes: mockBackupBuffer.byteLength,
 };
@@ -476,14 +478,13 @@ describe("IpcService - Comprehensive Coverage", () => {
                 success: true,
                 data: true,
                 metadata: expect.objectContaining({
-                    duration: expect.any(Number),
                     handler: "add-site",
                     paramCount: expect.any(Number),
                 }),
             });
-        });
+            });
 
-        it("should handle remove-site with site identifier", async ({
+            it("should handle remove-site with site identifier", async ({
             task,
             annotate,
         }) => {
@@ -1288,9 +1289,11 @@ describe("IpcService - Comprehensive Coverage", () => {
                     buffer: expect.any(ArrayBuffer),
                     fileName: "/path/to/backup.db",
                     metadata: expect.objectContaining({
+                        appVersion: mockBackupMetadata.appVersion,
                         checksum: mockBackupMetadata.checksum,
                         createdAt: mockBackupMetadata.createdAt,
                         originalPath: mockBackupMetadata.originalPath,
+                        retentionHintDays: mockBackupMetadata.retentionHintDays,
                         schemaVersion: mockBackupMetadata.schemaVersion,
                         sizeBytes: mockBackupMetadata.sizeBytes,
                     }),

@@ -1,4 +1,4 @@
-import type { IpcInvokeChannel } from "@shared/types/ipc";
+import type { IpcInvokeChannel, IpcInvokeChannelParams } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { UnknownRecord } from "type-fest";
 
@@ -307,7 +307,14 @@ export function registerMonitorTypeHandlers({
 
     register(
         MONITOR_TYPES_CHANNELS.formatMonitorDetail,
-        (monitorType, details) => {
+        (
+            monitorType: IpcInvokeChannelParams<
+                typeof MONITOR_TYPES_CHANNELS.formatMonitorDetail
+            >[0],
+            details: IpcInvokeChannelParams<
+                typeof MONITOR_TYPES_CHANNELS.formatMonitorDetail
+            >[1]
+        ) => {
             const normalizedMonitorType = monitorType.trim();
             if (normalizedMonitorType.length === 0) {
                 logger.warn(
@@ -337,7 +344,14 @@ export function registerMonitorTypeHandlers({
 
     register(
         MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
-        (monitorType, monitor) => {
+        (
+            monitorType: IpcInvokeChannelParams<
+                typeof MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix
+            >[0],
+            monitor: IpcInvokeChannelParams<
+                typeof MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix
+            >[1]
+        ) => {
             const normalizedMonitorType = monitorType.trim();
             if (normalizedMonitorType.length === 0) {
                 logger.warn(LOG_TEMPLATES.warnings.MONITOR_TYPE_UNKNOWN_TITLE, {
@@ -365,7 +379,14 @@ export function registerMonitorTypeHandlers({
 
     register(
         MONITOR_TYPES_CHANNELS.validateMonitorData,
-        (monitorType, data) => {
+        (
+            monitorType: IpcInvokeChannelParams<
+                typeof MONITOR_TYPES_CHANNELS.validateMonitorData
+            >[0],
+            data: IpcInvokeChannelParams<
+                typeof MONITOR_TYPES_CHANNELS.validateMonitorData
+            >[1]
+        ) => {
             const normalizedMonitorType = monitorType.trim();
             return validateMonitorData(
                 normalizedMonitorType,

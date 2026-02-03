@@ -1,6 +1,7 @@
 import type {
     IpcHandlerVerificationLogMetadata,
     IpcInvokeChannel,
+    IpcInvokeChannelParams,
     PreloadGuardDiagnosticsLogMetadata,
     PreloadGuardDiagnosticsReport,
 } from "@shared/types/ipc";
@@ -130,7 +131,11 @@ export function registerDiagnosticsHandlers({
 
     register(
         DIAGNOSTICS_CHANNELS.verifyIpcHandler,
-        (channelRaw) => {
+        (
+            channelRaw: IpcInvokeChannelParams<
+                typeof DIAGNOSTICS_CHANNELS.verifyIpcHandler
+            >[0]
+        ) => {
             if (typeof channelRaw !== "string") {
                 throw new TypeError("Channel name must be a non-empty string");
             }
@@ -178,7 +183,11 @@ export function registerDiagnosticsHandlers({
 
     register(
         DIAGNOSTICS_CHANNELS.reportPreloadGuard,
-        (reportCandidate): undefined => {
+        (
+            reportCandidate: IpcInvokeChannelParams<
+                typeof DIAGNOSTICS_CHANNELS.reportPreloadGuard
+            >[0]
+        ): undefined => {
             if (!isPreloadGuardDiagnosticsReport(reportCandidate)) {
                 throw new TypeError(
                     "Invalid preload guard diagnostics payload"

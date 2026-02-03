@@ -1,4 +1,4 @@
-import type { IpcInvokeChannel } from "@shared/types/ipc";
+import type { IpcInvokeChannel, IpcInvokeChannelParams  } from "@shared/types/ipc";
 
 import { MONITORING_CHANNELS } from "@shared/types/preload";
 
@@ -38,14 +38,25 @@ export function registerMonitoringHandlers({
 
     register(
         MONITORING_CHANNELS.startMonitoringForSite,
-        (siteIdentifier) =>
+        (
+            siteIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.startMonitoringForSite
+            >[0]
+        ) =>
             uptimeOrchestrator.startMonitoringForSite(siteIdentifier),
         MonitoringHandlerValidators.startMonitoringForSite
     );
 
     register(
         MONITORING_CHANNELS.startMonitoringForMonitor,
-        (siteIdentifier, monitorIdentifier) =>
+        (
+            siteIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.startMonitoringForMonitor
+            >[0],
+            monitorIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.startMonitoringForMonitor
+            >[1]
+        ) =>
             uptimeOrchestrator.startMonitoringForMonitor(
                 siteIdentifier,
                 monitorIdentifier
@@ -55,14 +66,25 @@ export function registerMonitoringHandlers({
 
     register(
         MONITORING_CHANNELS.stopMonitoringForSite,
-        (siteIdentifier) =>
+        (
+            siteIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.stopMonitoringForSite
+            >[0]
+        ) =>
             uptimeOrchestrator.stopMonitoringForSite(siteIdentifier),
         MonitoringHandlerValidators.stopMonitoringForSite
     );
 
     register(
         MONITORING_CHANNELS.stopMonitoringForMonitor,
-        (siteIdentifier, monitorIdentifier) =>
+        (
+            siteIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.stopMonitoringForMonitor
+            >[0],
+            monitorIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.stopMonitoringForMonitor
+            >[1]
+        ) =>
             uptimeOrchestrator.stopMonitoringForMonitor(
                 siteIdentifier,
                 monitorIdentifier
@@ -72,7 +94,14 @@ export function registerMonitoringHandlers({
 
     register(
         MONITORING_CHANNELS.checkSiteNow,
-        (siteIdentifier, monitorIdentifier) =>
+        (
+            siteIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.checkSiteNow
+            >[0],
+            monitorIdentifier: IpcInvokeChannelParams<
+                typeof MONITORING_CHANNELS.checkSiteNow
+            >[1]
+        ) =>
             uptimeOrchestrator.checkSiteManually(
                 siteIdentifier,
                 monitorIdentifier

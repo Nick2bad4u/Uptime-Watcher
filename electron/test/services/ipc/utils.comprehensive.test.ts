@@ -1551,6 +1551,79 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(result.data).toBe("execution test");
             });
 
+            it("should return an error response when the success payload validator fails", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                const mockHandler = vi.fn().mockResolvedValue({ ok: true });
+                const validateResult = vi.fn(() => ["bad result"]);
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.execution,
+                    mockHandler as never,
+                    null,
+                    registeredHandlers,
+                    validateResult as never
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) => call[0] === CHANNELS_FOR_TESTS.execution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
+                const result = await registeredFunction({} as any);
+
+                expect(result.success).toBeFalsy();
+                expect(result.metadata).toMatchObject({
+                    resultValidationErrors: ["bad result"],
+                });
+            });
+
+            it("should return an error response when the success payload validator throws", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                const mockHandler = vi.fn().mockResolvedValue({ ok: true });
+                const validateResult = vi.fn(() => {
+                    throw new Error("boom");
+                });
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.execution,
+                    mockHandler as never,
+                    null,
+                    registeredHandlers,
+                    validateResult as never
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) => call[0] === CHANNELS_FOR_TESTS.execution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
+                const result = await registeredFunction({} as any);
+
+                expect(result.success).toBeFalsy();
+            });
+
             it("should reject unexpected args when validateParams is null", async ({
                 task,
                 annotate,

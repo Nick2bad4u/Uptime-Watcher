@@ -8,7 +8,8 @@
 
 import { normalizePath } from "../_internal/path-utils.mjs";
 
-const ALLOWED_WINDOW_SERVICE_SUFFIX = "/electron/services/window/WindowService.ts";
+const ALLOWED_WINDOW_SERVICE_SUFFIX =
+    "/electron/services/window/WindowService.ts";
 
 /**
  * ESLint rule restricting BrowserWindow creation to the WindowService.
@@ -20,8 +21,8 @@ const ALLOWED_WINDOW_SERVICE_SUFFIX = "/electron/services/window/WindowService.t
 export const electronNoBrowserwindowOutsideWindowserviceRule = {
     /**
      * @param {{
-     *   getFilename: () => any;
-     *   report: (descriptor: { node: any; messageId: string }) => void;
+     *     getFilename: () => any;
+     *     report: (descriptor: { node: any; messageId: string }) => void;
      * }} context
      */
     create(context) {
@@ -41,7 +42,10 @@ export const electronNoBrowserwindowOutsideWindowserviceRule = {
             /** @param {any} node */
             NewExpression(node) {
                 const callee = node.callee;
-                if (callee?.type !== "Identifier" || callee.name !== "BrowserWindow") {
+                if (
+                    callee?.type !== "Identifier" ||
+                    callee.name !== "BrowserWindow"
+                ) {
                     return;
                 }
 

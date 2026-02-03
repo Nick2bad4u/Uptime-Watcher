@@ -25,9 +25,11 @@ import type {
 
 const mockBackupBuffer = Buffer.from("mock backup data");
 const mockBackupMetadata = {
+    appVersion: "0.0.0-test",
     checksum: createHash("sha256").update(mockBackupBuffer).digest("hex"),
     createdAt: 1_700_000_100_000,
     originalPath: "/tmp/uptime-watcher.db",
+    retentionHintDays: 30,
     schemaVersion: 1,
     sizeBytes: mockBackupBuffer.byteLength,
 };

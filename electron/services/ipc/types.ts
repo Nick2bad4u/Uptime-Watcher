@@ -46,3 +46,14 @@ export interface IpcHandlerConfig<
 export type IpcParameterValidator = (
     params: readonly unknown[]
 ) => null | string[];
+
+/**
+ * Validates an IPC handler's *success* payload.
+ *
+ * @remarks
+ * This follows the same convention as {@link IpcParameterValidator}:
+ * return `null` for success or an array of error strings for failure.
+ */
+export type IpcResultValidator<TResult> = (
+    result: TResult
+) => ReturnType<IpcParameterValidator>;

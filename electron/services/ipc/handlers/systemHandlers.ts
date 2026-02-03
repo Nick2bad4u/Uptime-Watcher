@@ -1,4 +1,4 @@
-import type { IpcInvokeChannel } from "@shared/types/ipc";
+import type { IpcInvokeChannel, IpcInvokeChannelParams  } from "@shared/types/ipc";
 
 import {
     getElectronErrorCodeSuffix,
@@ -32,7 +32,9 @@ export function registerSystemHandlers({
 
     register(
         SYSTEM_CHANNELS.openExternal,
-        async (url): Promise<boolean> => {
+        async (
+            url: IpcInvokeChannelParams<typeof SYSTEM_CHANNELS.openExternal>[0]
+        ): Promise<boolean> => {
             const validation = validateExternalOpenUrlCandidate(url);
 
             if ("reason" in validation) {
@@ -57,7 +59,11 @@ export function registerSystemHandlers({
 
     register(
         SYSTEM_CHANNELS.writeClipboardText,
-        (text): boolean => {
+        (
+            text: IpcInvokeChannelParams<
+                typeof SYSTEM_CHANNELS.writeClipboardText
+            >[0]
+        ): boolean => {
             try {
                 clipboard.writeText(text);
                 return true;

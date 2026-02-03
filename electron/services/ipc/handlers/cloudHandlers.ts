@@ -1,5 +1,5 @@
 import type { CloudEnableSyncConfig } from "@shared/types/cloud";
-import type { IpcInvokeChannel } from "@shared/types/ipc";
+import type { IpcInvokeChannel, IpcInvokeChannelParams } from "@shared/types/ipc";
 
 import { CLOUD_CHANNELS } from "@shared/types/preload";
 import { createSingleFlight } from "@shared/utils/singleFlight";
@@ -63,13 +63,21 @@ export function registerCloudHandlers({
 
     register(
         CLOUD_CHANNELS.configureFilesystemProvider,
-        (config) => cloudService.configureFilesystemProvider(config),
+        (
+            config: IpcInvokeChannelParams<
+                typeof CLOUD_CHANNELS.configureFilesystemProvider
+            >[0]
+        ) => cloudService.configureFilesystemProvider(config),
         CloudHandlerValidators.configureFilesystemProvider
     );
 
     register(
         CLOUD_CHANNELS.setEncryptionPassphrase,
-        (passphrase) => cloudService.setEncryptionPassphrase(passphrase),
+        (
+            passphrase: IpcInvokeChannelParams<
+                typeof CLOUD_CHANNELS.setEncryptionPassphrase
+            >[0]
+        ) => cloudService.setEncryptionPassphrase(passphrase),
         CloudHandlerValidators.setEncryptionPassphrase
     );
 
@@ -99,7 +107,8 @@ export function registerCloudHandlers({
 
     register(
         CLOUD_CHANNELS.migrateBackups,
-        (config) => cloudService.migrateBackups(config),
+        (config: IpcInvokeChannelParams<typeof CLOUD_CHANNELS.migrateBackups>[0]) =>
+            cloudService.migrateBackups(config),
         CloudHandlerValidators.migrateBackups
     );
 
@@ -123,7 +132,8 @@ export function registerCloudHandlers({
 
     register(
         CLOUD_CHANNELS.restoreBackup,
-        (key) => cloudService.restoreBackup(key),
+        (key: IpcInvokeChannelParams<typeof CLOUD_CHANNELS.restoreBackup>[0]) =>
+            cloudService.restoreBackup(key),
         CloudHandlerValidators.restoreBackup
     );
 

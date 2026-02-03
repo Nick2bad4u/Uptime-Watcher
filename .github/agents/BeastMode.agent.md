@@ -3,7 +3,8 @@ name: BeastMode
 description: Beast Mode 3.1 (Custom)
 argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
 target: vscode
-infer: true
+disable-model-invocation: false
+user-invokable: true
 agents: ["*"]
 handoffs:
  - label: Consistency

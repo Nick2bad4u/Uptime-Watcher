@@ -30,13 +30,41 @@ import {
     isNonEmptyString,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
-import { ipcMain } from "electron";
+import { ipcMain, type IpcMainInvokeEvent } from "electron";
 
-import type { IpcParameterValidator, IpcResponse } from "./types";
+import type {
+    IpcParameterValidator,
+    IpcResponse,
+    IpcResultValidator,
+} from "./types";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { truncateUtfString } from "./diagnosticsLimits";
+
+type ChannelParams<TChannel extends IpcInvokeChannel> = [
+    ...IpcInvokeChannelParams<TChannel>,
+];
+
+type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
+    ...args: ChannelParams<TChannel>
+) => IpcInvokeChannelResult<TChannel> | Promise<IpcInvokeChannelResult<TChannel>>;
+
+/**
+ * Registers an IPC invoke handler with standardized correlation handling,
+ * parameter validation, response formatting, and optional result validation.
+ */
+export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
+    channelName: TChannel,
+    handler: StrictIpcInvokeHandler<TChannel>,
+    validateParams: IpcParameterValidator,
+    validateResult?: IpcResultValidator<IpcInvokeChannelResult<TChannel>> | null
+) => void;
+
+function createSafeErrorMessage(error: unknown): string {
+    const ensured = ensureError(error);
+    return isNonEmptyString(ensured.message) ? ensured.message : "Unknown error";
+}
 
 const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
     MONITOR_TYPES_CHANNELS.formatMonitorDetail,
@@ -115,6 +143,9 @@ interface IpcHandlerMetadata extends UnknownRecord {
     handler?: string;
     /** Number of parameters supplied to the handler. */
     paramCount?: number;
+    /** Optional validation errors when the success payload validation fails. */
+    resultValidationErrors?: readonly string[];
+
     /** Optional validation errors when parameter validation fails. */
     validationErrors?: readonly string[];
 }
@@ -131,36 +162,16 @@ interface HandlerExecutionSuccess<T> {
     value: T;
 }
 
-type HandlerExecutionResult<T> =
-    | HandlerExecutionFailure
-    | HandlerExecutionSuccess<T>;
-
-interface WithIpcHandlerOptions {
-    readonly correlationId?: CorrelationId;
-    readonly metadata?: IpcHandlerMetadata;
-}
-
-type ChannelParams<TChannel extends IpcInvokeChannel> =
-    IpcInvokeChannelParams<TChannel> extends readonly unknown[]
-        ? IpcInvokeChannelParams<TChannel>
-        : never;
-
-type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
-    ...params: ChannelParams<TChannel>
-) =>
-    | IpcInvokeChannelResult<TChannel>
-    | Promise<IpcInvokeChannelResult<TChannel>>;
+type HandlerExecutionResult<T> = HandlerExecutionFailure | HandlerExecutionSuccess<T>;
 
 /**
- * Curried registrar type for standardized IPC handlers.
+ * Options for {@link withIpcHandler} / {@link withIpcHandlerValidation}.
  */
-export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
-    channelName: TChannel,
-    handler: StrictIpcInvokeHandler<TChannel>,
-    ...validatorArgs: ChannelParams<TChannel> extends readonly []
-        ? [validateParams?: IpcParameterValidator | null]
-        : [validateParams: IpcParameterValidator]
-) => void;
+export interface WithIpcHandlerOptions<TResult = unknown> {
+    correlationId?: CorrelationId;
+    metadata?: Partial<IpcHandlerMetadata>;
+    validateResult?: IpcResultValidator<TResult> | null;
+}
 
 function assertChannelParams<TChannel extends IpcInvokeChannel>(
     channelName: TChannel,
@@ -207,7 +218,7 @@ function shouldLogHandler(channelName: string): boolean {
 async function executeIpcHandler<T>(
     channelName: string,
     handler: () => Promise<T> | T,
-    options?: WithIpcHandlerOptions
+    options?: WithIpcHandlerOptions<T>
 ): Promise<HandlerExecutionResult<T>> {
     const startTime = Date.now();
     const logStart = shouldLogHandler(channelName);
@@ -285,8 +296,6 @@ async function executeIpcHandler<T>(
 
 /**
  * Standard parameter validation utilities for common IPC operations.
- *
- * @public
  */
 export const IpcValidators = {
     /**
@@ -506,8 +515,9 @@ export function createSuccessResponse<T>(
 function createResponseFromExecution<T>(
     channelName: string,
     execution: HandlerExecutionResult<T>,
-    correlationId?: CorrelationId,
-    metadata?: IpcHandlerMetadata
+    correlationId: CorrelationId | undefined,
+    metadata: IpcHandlerMetadata | undefined,
+    validateResult?: IpcResultValidator<T>
 ): IpcResponse<T> {
     const responseMetadata: IpcHandlerMetadata = {
         ...metadata,
@@ -517,6 +527,27 @@ function createResponseFromExecution<T>(
     };
 
     if (execution.outcome === "success") {
+        if (validateResult) {
+            try {
+                const resultValidationErrors = validateResult(execution.value);
+                if (
+                    resultValidationErrors &&
+                    resultValidationErrors.length > 0
+                ) {
+                    return createErrorResponse(
+                        "IPC handler returned an invalid response payload",
+                        {
+                            ...responseMetadata,
+                            resultValidationErrors,
+                        }
+                    );
+                }
+            } catch (error) {
+                const safeErrorMessage = createSafeErrorMessage(error);
+                return createErrorResponse(safeErrorMessage, responseMetadata);
+            }
+        }
+
         return createSuccessResponse(execution.value, responseMetadata);
     }
 
@@ -538,8 +569,13 @@ function createResponseFromExecution<T>(
  * ```typescript
  * import { SITES_CHANNELS } from "@shared/types/preload";
  *
- * const result = await withIpcHandler(SITES_CHANNELS.getSites, async () =>
- *     this.uptimeOrchestrator.getSites()
+ * const result = await withIpcHandler(
+ *     SITES_CHANNELS.getSites,
+ *     async () => this.uptimeOrchestrator.getSites(),
+ *     {
+ *         validateResult: (value) =>
+ *             Array.isArray(value) ? null : ["Expected an array"],
+ *     }
  * );
  * ```
  *
@@ -553,14 +589,15 @@ function createResponseFromExecution<T>(
 export async function withIpcHandler<T>(
     channelName: string,
     handler: () => Promise<T> | T,
-    options?: WithIpcHandlerOptions
+    options?: WithIpcHandlerOptions<T>
 ): Promise<IpcResponse<T>> {
     const execution = await executeIpcHandler(channelName, handler, options);
     return createResponseFromExecution(
         channelName,
         execution,
         options?.correlationId,
-        options?.metadata
+        options?.metadata,
+        options?.validateResult ?? undefined
     );
 }
 
@@ -603,60 +640,65 @@ export async function withIpcHandlerValidation<
     handler: (...validatedParams: TParams) => Promise<T> | T,
     validateParams: IpcParameterValidator,
     params: TParams,
-    options?: WithIpcHandlerOptions
+    options?: WithIpcHandlerOptions<T>
 ): Promise<IpcResponse<T>> {
     const validationErrors = validateParams(params) ?? [];
+
     const correlationId = options?.correlationId;
-    const correlationMetadata = correlationId ? { correlationId } : {};
+    const metadata: Partial<IpcHandlerMetadata> = {
+        ...options?.metadata,
+        paramCount: params.length,
+    };
+
     if (validationErrors.length > 0) {
-        const errorMessage = `Parameter validation failed: ${validationErrors.join(", ")}`;
+        if (shouldLogHandler(channelName)) {
+            logger.warn(
+                `[IpcHandler] Validation failed ${channelName}`,
+                withLogContext({
+                    channel: channelName,
+                    ...(correlationId ? { correlationId } : {}),
+                    event: "ipc:validation:failure",
+                    severity: "warn",
+                }),
+                {
+                    channelName,
+                    validationErrors,
+                }
+            );
+        }
 
-        const responseMetadata: IpcHandlerMetadata = {
-            ...options?.metadata,
+        const errorMessage = `Parameter validation failed: ${validationErrors.join(
+            ", "
+        )}`;
+
+        const responseMetadata = {
+            ...metadata,
             handler: channelName,
-            ...correlationMetadata,
-            paramCount: params.length,
+            ...(correlationId ? { correlationId } : {}),
             validationErrors,
-        };
+        } satisfies IpcHandlerMetadata;
 
-        logger.warn(
-            `[IpcHandler] Validation failed ${channelName}`,
-            withLogContext({
-                channel: channelName,
-                ...correlationMetadata,
-                event: "ipc:handler:validation-failed",
-                severity: "warn",
-            }),
-            {
-                errors: validationErrors,
-            }
-        );
         return createErrorResponse(errorMessage, responseMetadata);
     }
 
-    const metadata: IpcHandlerMetadata = {
-        paramCount: params.length,
-        ...options?.metadata,
+    const executionOptions: WithIpcHandlerOptions<T> = {
+        metadata,
+        validateResult: options?.validateResult ?? null,
+        ...(correlationId ? { correlationId } : {}),
     };
-
-    const executionOptions: WithIpcHandlerOptions =
-        correlationId === undefined
-            ? { metadata }
-            : {
-                  correlationId,
-                  metadata,
-              };
 
     const execution = await executeIpcHandler(
         channelName,
         () => handler(...params),
         executionOptions
     );
+
     return createResponseFromExecution(
         channelName,
         execution,
-        correlationId,
-        metadata
+        executionOptions.correlationId,
+        executionOptions.metadata,
+        executionOptions.validateResult ?? undefined
     );
 }
 
@@ -686,6 +728,7 @@ export async function withIpcHandlerValidation<
  * @param handler - The handler function
  * @param validateParams - Optional parameter validation function
  * @param registeredHandlers - Set to track registered handlers for cleanup
+ * @param validateResult - Optional validator for successful handler results
  *
  * @public
  */
@@ -695,7 +738,9 @@ export function registerStandardizedIpcHandler<
     channelName: TChannel,
     handler: StrictIpcInvokeHandler<TChannel>,
     validateParams: IpcParameterValidator | null,
-    registeredHandlers: Set<IpcInvokeChannel>
+    registeredHandlers: Set<IpcInvokeChannel>,
+    validateResult: IpcResultValidator<IpcInvokeChannelResult<TChannel>> | null =
+        null
 ): void {
     const expectedParamCount = getExpectedParamCount(channelName);
 
@@ -739,7 +784,9 @@ export function registerStandardizedIpcHandler<
     registeredHandlers.add(channelName);
 
     try {
-        ipcMain.handle(channelName, async (_event, ...rawArgs: unknown[]) => {
+            ipcMain.handle(
+                channelName,
+                async (_event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
             const { args, correlationId } =
                 extractIpcCorrelationContext(rawArgs);
 
@@ -805,15 +852,13 @@ export function registerStandardizedIpcHandler<
             const baseMetadata = {
                 paramCount: args.length,
             } satisfies IpcHandlerMetadata;
-            const handlerOptions: WithIpcHandlerOptions =
-                correlationId === undefined
-                    ? {
-                          metadata: baseMetadata,
-                      }
-                    : {
-                          correlationId,
-                          metadata: baseMetadata,
-                      };
+                const handlerOptions: WithIpcHandlerOptions<
+                    IpcInvokeChannelResult<TChannel>
+                > = {
+                ...(correlationId === undefined ? {} : { correlationId }),
+                metadata: baseMetadata,
+                ...(validateResult === null ? {} : { validateResult }),
+            };
 
             if (validateParams === null) {
                 return withIpcHandler(
@@ -864,20 +909,18 @@ export function registerStandardizedIpcHandler<
 export function createStandardizedIpcRegistrar(
     registeredHandlers: Set<IpcInvokeChannel>
 ): StandardizedIpcRegistrar {
-    return function register<TChannel extends IpcInvokeChannel>(
+    return (<TChannel extends IpcInvokeChannel>(
         channelName: TChannel,
         handler: StrictIpcInvokeHandler<TChannel>,
-        ...validatorArgs: ChannelParams<TChannel> extends readonly []
-            ? [validateParams?: IpcParameterValidator | null]
-            : [validateParams: IpcParameterValidator]
-    ): void {
-        const validateParams = validatorArgs[0] ?? null;
-
+        validateParams?: IpcParameterValidator | null,
+        validateResult?: IpcResultValidator<IpcInvokeChannelResult<TChannel>> | null
+    ) => {
         registerStandardizedIpcHandler(
             channelName,
             handler,
-            validateParams,
-            registeredHandlers
+            validateParams ?? null,
+            registeredHandlers,
+            validateResult ?? null
         );
-    };
+    }) as StandardizedIpcRegistrar;
 }
