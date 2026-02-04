@@ -58,7 +58,7 @@ jobs:
                   node-version: 18
             - name: Install dependencies and build
               run: |
-                  npm ci
+                  npm install --force --no-audit --no-fund
                   npm run build
             - name: Package application
               id: package_app

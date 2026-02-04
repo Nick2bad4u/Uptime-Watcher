@@ -92,14 +92,14 @@ Please follow these guidelines when seeking support:
 ### Common Issues
 
 1. **Application won't start**: Check Node.js version (>=24.8.0 required)
-2. **Build failures**: Try `npm ci --force` to refresh dependencies
+2. **Build failures**: Try `npm install --force --no-audit --no-fund --force` to refresh dependencies
 3. **Test failures**: Ensure you're using the correct Node.js version
 4. **Electron issues**: Check our [Electron troubleshooting guide](docs/Guides/TROUBLESHOOTING.md)
 
 ### Development Setup
 
 1. Clone the repository
-2. Run `npm ci --force` to install dependencies
+2. Run `npm install --force --no-audit --no-fund --force` to install dependencies
 3. Use `npm run build` to compile the project
 4. Run `npm run electron-dev` to launch the application (Vite + Electron)
 

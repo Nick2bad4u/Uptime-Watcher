@@ -63,7 +63,7 @@ jobs:
                   cache-dependency-path: package-lock.json
 
             - name: Install dependencies
-              run: npm ci --force --prefer-offline --no-audit
+              run: npm install --force --no-audit --no-fund
 
             - name: Run Stylelint (GitHub Reporter)
               run: npm run lint:stylelint:github

@@ -17,7 +17,7 @@
 #   - Initialize CodeQL for matrix languages.
 #   - Setup Node.js v24 (current LTS).
 #   - Cache node_modules for faster builds.
-#   - Install dependencies with npm ci --force (robust for CI).
+#   - Install dependencies with npm install --force --no-audit --no-fund --force (robust for CI).
 #   - Build Electron Vite project (matches architecture).
 #   - Package/upload CodeQL DBs for debugging (optional, non-fatal).
 #   - Perform CodeQL analysis.
@@ -39,7 +39,7 @@
 # - Notifications:
 #   - No notification step for failures (Slack/email). Add if needed.
 # - Dependency Installation:
-#   - continue-on-error: true for npm ci/build means analysis runs even if install/build fails (may be incomplete).
+#   - continue-on-error: true for npm install --force --no-audit --no-fund/build means analysis runs even if install/build fails (may be incomplete).
 # -----------------------------------------------
 
 # For most projects, this workflow file will not need changing; you simply need
@@ -149,7 +149,7 @@ jobs:
               continue-on-error: true # If this fails, the analysis will still run, but it may not be complete.
 
             - name: Install dependencies
-              run: npm ci --force
+              run: npm install --force --no-audit --no-fund --force
               continue-on-error: true # If this fails, the analysis will still run, but it may not be complete.
 
             # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).

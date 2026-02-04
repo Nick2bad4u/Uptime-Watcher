@@ -104,7 +104,7 @@ jobs:
                       stryker-incremental-
 
             - name: Install dependencies
-              run: npm ci --force
+              run: npm install --force --no-audit --no-fund --force
 
             # NEW STEP: Run full test suite to ensure baseline stability before mutation testing
             # This prevents Stryker from running on a failing test suite, which would produce unreliable results

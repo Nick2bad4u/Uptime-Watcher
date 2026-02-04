@@ -25,7 +25,7 @@ Style and tone
 
 Checklist to run for every PR (minimal)
 1. Build and typecheck
-   - Run: `npm ci` then `npm run type-check:all` and `npm run build` (or `npm run build` for combined build). Note failures.
+   - Run: `npm install --force --no-audit --no-fund` then `npm run type-check:all` and `npm run build` (or `npm run build` for combined build). Note failures.
 2. Lint
    - Run: `npm run lint` (or `npm run lint:all:fix`) and list errors/warnings. If lint passes, state so.
 3. Tests

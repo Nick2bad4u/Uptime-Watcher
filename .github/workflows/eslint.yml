@@ -60,7 +60,7 @@ jobs:
 
             - name: Install all required ESLint plugins
               run: |
-                  npm ci --force --no-audit --no-fund
+                  npm install --force --no-audit --no-fund
 
             - name: Check IPC artifacts
               run: npm run check:ipc
