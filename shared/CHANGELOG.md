@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[b19500a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b19500a06279ea270e2b1c76e618c6c06bf24f2c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...b19500a06279ea270e2b1c76e618c6c06bf24f2c))
+[665ed19](https://github.com/Nick2bad4u/Uptime-Watcher/commit/665ed19ef0524d3046f8eb0d655319490dd5a1e6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...665ed19ef0524d3046f8eb0d655319490dd5a1e6))
 
 
 ### ✨ Features
@@ -642,6 +642,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a29e
 
 ### 🚜 Refactor
 
+- 🚜 [refactor] Streamlines validation and linting
+
+🚜 [refactor] Streamlines monitor form validation by centralizing URL/FQDN options and reusing them across checks, including websocket protocols 🔗
+ - Removes stray type fields and uses safer host key access to keep guards consistent ✅
+🛠️ [fix] Prevents lint rules from running on stdin buffers and limits a mock-return-value rule to test files to avoid false positives 🧪
+🔧 [build] Expands lint enforcement with security, import, node, math, and comment-length rules while aligning plugin wiring to reduce noise 🧰
+🎨 [style] Improves docs site behavior with overscroll/scrollbar safeguards and broader lint ignore coverage, plus type declaration inclusion 🧭
+🧹 [chore] Clarifies scripts and docs comments with extra JSDoc context and usage text formatting for better guidance ✍️
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(665ed19)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/665ed19ef0524d3046f8eb0d655319490dd5a1e6)
+
+
 - 🚜 [refactor] Enhance monitor type handling and validation
  - 🛠️ [fix] Introduce buildMonitorValidationCandidate to standardize monitor data structure
  - 🔧 [build] Normalize monitor type strings to prevent empty values
@@ -1172,6 +1184,24 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(588c
 
 ### 🎨 Styling
 
+- 🎨 [style] Refactor import statements for consistency and readability
+ - Standardized import statements across multiple test files to a single line format for better readability.
+ - Adjusted spacing and indentation in various test files to enhance code clarity.
+
+🧪 [test] Improve test coverage and structure
+ - Updated tests in `cloudServiceFsUtils.test.ts` to ensure consistent import style and improved readability.
+ - Enhanced tests in `googleDriveHttpClient.test.ts` by refactoring mock function definitions for clarity.
+ - Refined tests in `snapshot.test.ts` to maintain consistent import statements and improve overall structure.
+ - Modified tests in `pathGuards.test.ts` to ensure uniformity in import statements and enhance readability.
+ - Streamlined tests in `fsSafeOps.test.ts` by consolidating mock function definitions and improving clarity.
+
+📝 [docs] Update comments for clarity
+ - Revised comments in `vitest.electron.config.ts`, `vitest.linting.config.ts`, and `vitest.shared.config.ts` to clarify the purpose of eslint disable directives.
+ - Ensured comments accurately reflect the intent of the code and maintain consistency across configuration files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b0efe37)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0efe373fb4caad9e06049fa32b3ec6bd6b52e0b)
+
+
 - 🎨 [style] Refactor code formatting for improved readability
  - Adjusted multiline import statements for better alignment in `cloudProviderDeps.ts`, `resolveCloudProviderOrNull.ts`, and `main.ts`
  - Reformatted comments in `zodIssueFormatting.ts` for consistent line breaks
@@ -1295,6 +1325,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.3.0 [skip ci] [`(decc95e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/decc95e21e2362e68f33af6a1179b177a70a2956)
+
 
 - Update changelogs for v21.2.0 [skip ci] [`(761bd4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/761bd4c64c2e1a20215281a004f455d2cbfbca16)
 

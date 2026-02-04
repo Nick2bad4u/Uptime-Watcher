@@ -4,6 +4,97 @@
 
 All notable changes to this project will be documented in this file.
 
+## [21.4.0] - 2026-02-04
+
+
+[[c7ecd36](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c7ecd36909f0d1124e5ead40922a16615085e194)...
+[9bf28a9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9bf28a94221a8d1312ace5fd0bba7f0281490c65)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c7ecd36909f0d1124e5ead40922a16615085e194...9bf28a94221a8d1312ace5fd0bba7f0281490c65))
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Simplify directory path retrieval in WindowService
+
+ - Refactored the method of obtaining the absolute directory path for the module.
+ - Replaced `import.meta.dirname` with `path.dirname(fileURLToPath(import.meta.url))` for consistency and reliability.
+ - Updated documentation to clarify the standard approach for ESM modules.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(535d281)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/535d281c6635131ff956f06caa8fd5260b9d96a4)
+
+
+- 🚜 [refactor] Update workflow configurations and code structure
+ - 🛠️ [fix] Modify ESLint and Stylelint workflows to use `npm ci --force` for improved dependency installation
+ - 🛠️ [fix] Adjust Flatpak build workflow to enforce `npm ci --force` for consistency
+ - 🛠️ [fix] Enhance SonarCloud workflow to conditionally skip scan if `SONAR_TOKEN` is not available
+ - 🛠️ [fix] Update TruffleHog configuration to exclude URI detectors for better results
+ - 🛠️ [fix] Revise Gitleaks configuration to add multiple allowlists for sensitive data
+ - 🎨 [style] Refactor linter configurations to point to the correct paths
+ - 🎨 [style] Remove deprecated Prettier plugin from configurations
+ - 📝 [docs] Update TypeScript configuration to include additional files for documentation generation
+ - 📝 [docs] Modify CloudStore to streamline backup retrieval logic
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3a29378)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a293780163f550fcc9daa9c72b779314c7be831)
+
+
+- 🚜 [refactor] Streamlines validation and linting
+
+🚜 [refactor] Streamlines monitor form validation by centralizing URL/FQDN options and reusing them across checks, including websocket protocols 🔗
+ - Removes stray type fields and uses safer host key access to keep guards consistent ✅
+🛠️ [fix] Prevents lint rules from running on stdin buffers and limits a mock-return-value rule to test files to avoid false positives 🧪
+🔧 [build] Expands lint enforcement with security, import, node, math, and comment-length rules while aligning plugin wiring to reduce noise 🧰
+🎨 [style] Improves docs site behavior with overscroll/scrollbar safeguards and broader lint ignore coverage, plus type declaration inclusion 🧭
+🧹 [chore] Clarifies scripts and docs comments with extra JSDoc context and usage text formatting for better guidance ✍️
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(665ed19)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/665ed19ef0524d3046f8eb0d655319490dd5a1e6)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update BeastMode and Copilot instructions
+
+ - 🛠️ [fix] Correct tools list in BeastMode agent to include 'digitarald.agent-handoff/handoff'
+ - 🛠️ [fix] Update Electron version in Copilot instructions to v40+
+ - 📝 [docs] Clarify that listed technology versions in Copilot instructions may be out of date
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(65454f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/65454f7280ad82e718ed4cb242239ea477fb07b4)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Refactor import statements for consistency and readability
+ - Standardized import statements across multiple test files to a single line format for better readability.
+ - Adjusted spacing and indentation in various test files to enhance code clarity.
+
+🧪 [test] Improve test coverage and structure
+ - Updated tests in `cloudServiceFsUtils.test.ts` to ensure consistent import style and improved readability.
+ - Enhanced tests in `googleDriveHttpClient.test.ts` by refactoring mock function definitions for clarity.
+ - Refined tests in `snapshot.test.ts` to maintain consistent import statements and improve overall structure.
+ - Modified tests in `pathGuards.test.ts` to ensure uniformity in import statements and enhance readability.
+ - Streamlined tests in `fsSafeOps.test.ts` by consolidating mock function definitions and improving clarity.
+
+📝 [docs] Update comments for clarity
+ - Revised comments in `vitest.electron.config.ts`, `vitest.linting.config.ts`, and `vitest.shared.config.ts` to clarify the purpose of eslint disable directives.
+ - Ensured comments accurately reflect the intent of the code and maintain consistency across configuration files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b0efe37)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0efe373fb4caad9e06049fa32b3ec6bd6b52e0b)
+
+
+
+### 🧹 Chores
+
+- *(release)* V21.4.0 [skip ci] [`(9bf28a9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9bf28a94221a8d1312ace5fd0bba7f0281490c65)
+
+
+- Update changelogs for v21.3.0 [skip ci] [`(decc95e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/decc95e21e2362e68f33af6a1179b177a70a2956)
+
+
+
+
+
+
 ## [21.3.0] - 2026-02-03
 
 
@@ -201,6 +292,22 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(73b9
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade @biomejs/biome from ^2.3.13 to ^2.3.14 for improved functionality.
+ - 🔄 Upgrade @eslint-react/eslint-plugin from ^2.9.3 to ^2.9.4 for better linting support.
+ - 🔄 Upgrade eslint-plugin-react-dom from ^2.9.3 to ^2.9.4 to ensure compatibility with React.
+ - 🔄 Upgrade eslint-plugin-react-hooks-extra from ^2.9.3 to ^2.9.4 for enhanced hook linting.
+ - 🔄 Upgrade eslint-plugin-react-naming-convention from ^2.9.3 to ^2.9.4 for stricter naming conventions.
+ - 🔄 Upgrade eslint-plugin-react-web-api from ^2.9.3 to ^2.9.4 for updated web API linting rules.
+ - 🔄 Upgrade putout from ^41.16.0 to ^41.17.0 for bug fixes and improvements.
+ - 🔄 Upgrade stylelint from ^17.1.0 to ^17.1.1 for better style linting capabilities.
+ - 🔄 Upgrade stylelint-no-unsupported-browser-features from ^8.0.5 to ^8.1.1 for enhanced browser feature support.
+ - 🔄 Upgrade stylelint-plugin-defensive-css from ^1.1.1 to ^2.1.1 for improved defensive CSS practices.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(09f5853)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/09f5853d07cf02b75859579179b00b1ae5645417)
+
 
 - 🔧 [build] Update ESLint plugins and Vite bundle analyzer
 
