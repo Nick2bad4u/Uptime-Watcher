@@ -4,6 +4,88 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+
+[[6ed5bbc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ed5bbca5f0341b97dbc8720e3f5b12d34837470)...
+[7ad0fc7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ad0fc7ef0117e08dd45338c85cb22f767a30e4c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6ed5bbca5f0341b97dbc8720e3f5b12d34837470...7ad0fc7ef0117e08dd45338c85cb22f767a30e4c))
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependency installation commands across workflows and documentation
+
+ - Update installation commands from `npm ci` to `npm install --force --no-audit --no-fund` in:
+   - .github/Github-Actions.instructions.md
+   - .github/prompts/PR-Review.prompt.md
+   - .github/workflows/codeql.yml
+   - .github/workflows/eslint.yml
+   - .github/workflows/flatpak-build.yml
+   - .github/workflows/playwright.yml
+   - .github/workflows/stryker-mutation-testing.yml
+ - Modify support documentation to reflect new installation command for build failures and development setup in SUPPORT.md
+ - Update Dockerfile.dev in ENVIRONMENT_SETUP.md to use the new installation command
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7ad0fc7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ad0fc7ef0117e08dd45338c85cb22f767a30e4c)
+
+
+- 🔧 [build] Update @types/react to version 19.2.11
+
+ - Updated the version of "@types/react" from "^19.2.10" to "^19.2.11" in package-lock.json
+ - Adjusted the resolved URL and integrity hash for the new version
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6ed5bbc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ed5bbca5f0341b97dbc8720e3f5b12d34837470)
+
+
+
+
+
+
+## [21.5.0] - 2026-02-04
+
+
+[[a0a6b11](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a0a6b115ce7b907b5948749334df1af0e962eb43)...
+[386d268](https://github.com/Nick2bad4u/Uptime-Watcher/commit/386d2681c0fa55fe10e79c1dff1ae35f07c7a971)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/a0a6b115ce7b907b5948749334df1af0e962eb43...386d2681c0fa55fe10e79c1dff1ae35f07c7a971))
+
+
+### 🧹 Chores
+
+- *(release)* V21.5.0 [skip ci] [`(386d268)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/386d2681c0fa55fe10e79c1dff1ae35f07c7a971)
+
+
+- Update changelogs for v21.4.0 [skip ci] [`(a0a6b11)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a0a6b115ce7b907b5948749334df1af0e962eb43)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+ - 📦 [dependency] Update versions for several packages to their latest releases:
+   - 🔄 Update `@cspell/cspell-bundled-dicts` and `@cspell/cspell-types` to `^9.6.4`
+   - 🔄 Update Storybook related packages to `^10.2.6`
+   - 🔄 Update `@types/react` to `^19.2.11`
+   - 🔄 Update `cspell` to `^9.6.4`
+   - 🔄 Update `eslint-plugin-storybook` to `^10.2.6`
+   - 🔄 Update `markdown-to-jsx` to `^9.7.0`
+   - 🔄 Update `msw` to `^2.12.8`
+   - 🔄 Update `storybook` to `^10.2.6`
+   - 🔄 Update `vite-bundle-analyzer` to `^1.3.6`
+
+🚜 [refactor] Improve error handling in useUiStore
+ - 🔄 Refactor `openExternal` method to utilize `withErrorHandling` for better error management
+ - 🔄 Remove redundant URL validation logic and integrate error handling directly
+ - 🔄 Simplify logging of external URL opening actions
+ - 🔄 Enhance error reporting by using `createStoreErrorHandler` for consistent error messages
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(778e6cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/778e6cc522fae1553179382f90a223f349528579)
+
+
+
+
+
+
 ## [21.4.0] - 2026-02-04
 
 

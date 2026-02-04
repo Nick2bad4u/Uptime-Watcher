@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[3a29378](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a293780163f550fcc9daa9c72b779314c7be831)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...3a293780163f550fcc9daa9c72b779314c7be831))
+[778e6cc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/778e6cc522fae1553179382f90a223f349528579)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...778e6cc522fae1553179382f90a223f349528579))
 
 
 ### ✨ Features
@@ -1731,6 +1731,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v21.4.0 [skip ci] [`(a0a6b11)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a0a6b115ce7b907b5948749334df1af0e962eb43)
+
+
 - Update changelogs for v21.3.0 [skip ci] [`(decc95e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/decc95e21e2362e68f33af6a1179b177a70a2956)
 
 
@@ -1758,6 +1761,27 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8cad
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+ - 📦 [dependency] Update versions for several packages to their latest releases:
+   - 🔄 Update `@cspell/cspell-bundled-dicts` and `@cspell/cspell-types` to `^9.6.4`
+   - 🔄 Update Storybook related packages to `^10.2.6`
+   - 🔄 Update `@types/react` to `^19.2.11`
+   - 🔄 Update `cspell` to `^9.6.4`
+   - 🔄 Update `eslint-plugin-storybook` to `^10.2.6`
+   - 🔄 Update `markdown-to-jsx` to `^9.7.0`
+   - 🔄 Update `msw` to `^2.12.8`
+   - 🔄 Update `storybook` to `^10.2.6`
+   - 🔄 Update `vite-bundle-analyzer` to `^1.3.6`
+
+🚜 [refactor] Improve error handling in useUiStore
+ - 🔄 Refactor `openExternal` method to utilize `withErrorHandling` for better error management
+ - 🔄 Remove redundant URL validation logic and integrate error handling directly
+ - 🔄 Simplify logging of external URL opening actions
+ - 🔄 Enhance error reporting by using `createStoreErrorHandler` for consistent error messages
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(778e6cc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/778e6cc522fae1553179382f90a223f349528579)
+
 
 - 🔧 [build] Update artifact paths and add verification for build outputs
  - Change artifact upload paths from `dist` to `release` for better organization
