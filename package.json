@@ -710,7 +710,6 @@
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.18.2",
         "@arthurgeron/eslint-plugin-react-usememo": "^3.0.0",
-        "@awmottaz/prettier-plugin-void-html": "^2.0.0",
         "@biomejs/biome": "^2.3.14",
         "@codecov/vite-plugin": "^1.9.1",
         "@commitlint/cli": "^20.4.1",

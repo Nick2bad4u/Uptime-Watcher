@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/oxsecurity/megalinter/refs/heads/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json
 # Config file references
-ACTION_ACTIONLINT_CONFIG_FILE: "config/tools/ActionLintConfig.yaml"
+ACTION_ACTIONLINT_CONFIG_FILE: "config/linting/ActionLintConfig.yaml"
 # Fixes
 APPLY_FIXES: all
 BITBUCKET_COMMENT_REPORTER: false
@@ -74,7 +74,7 @@ JSON_REPORTER: true
 JSON_REPORTER_OUTPUT_DETAIL: detailed
 JSON_V8R_DISABLE_ERRORS_IF_LESS_THAN: 2
 # LLM Advisor configuration
-LLM_ADVISOR_ENABLED: "true"
+LLM_ADVISOR_ENABLED: true
 LLM_ADVISOR_LEVEL: WARNING
 LLM_ADVISOR_POSITION: "after_linter_output"
 LLM_MAX_TOKENS: "1048576"
@@ -121,4 +121,4 @@ TYPESCRIPT_DEFAULT_STYLE: prettier
 TYPESCRIPT_STANDARD_DISABLE_ERRORS: true
 UPDATED_SOURCES_REPORTER: true
 VALIDATE_ALL_CODEBASE: true
-YAML_YAMLLINT_CONFIG_FILE: "config/linting/.yamllint.yaml"
+YAML_YAMLLINT_CONFIG_FILE: "config/linting/.yamllint"

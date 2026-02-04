@@ -79,4 +79,5 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   DISABLE_ERRORS: true
                   FILTER_REGEX_EXCLUDE: ^.libs/
+                  LINTER_RULES_PATH: "config/linting"
                   MARKDOWN_LINT_DISABLE: true

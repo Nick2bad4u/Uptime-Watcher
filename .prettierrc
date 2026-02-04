@@ -148,7 +148,6 @@
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
                     "@softonus/prettier-plugin-duplicate-remover",
-                    "@awmottaz/prettier-plugin-void-html",
                     "prettier-plugin-tailwindcss",
                     "prettier-plugin-merge"
                 ],

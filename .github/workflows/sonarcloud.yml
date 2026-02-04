@@ -22,6 +22,8 @@ jobs:
     sonarcloud:
         name: SonarCloud Code Quality Analysis
         runs-on: ubuntu-latest
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN || secrets.sonar_token }}
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -65,8 +67,14 @@ jobs:
                   echo "Coverage directory contents:"
                   ls -la coverage/ || echo "Coverage directory not found"
 
+            - name: Skip SonarCloud scan without token
+              if: ${{ env.SONAR_TOKEN == '' }}
+              run: |
+                  echo "::warning::SONAR_TOKEN is not available. Skipping SonarCloud scan."
+
             - name: SonarCloud Scan
+              if: ${{ env.SONAR_TOKEN != '' }}
               uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7.0.0
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For PR information
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # SonarCloud auth
+                  SONAR_TOKEN: ${{ env.SONAR_TOKEN }} # SonarCloud auth

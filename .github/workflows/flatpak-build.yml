@@ -102,7 +102,7 @@ jobs:
             - name: Install dependencies
               run: |
                   echo "Installing Node.js dependencies..."
-                  npm ci --prefer-offline --no-audit --progress=false
+                  npm ci --force --prefer-offline --no-audit --progress=false
                   echo "Dependencies installed successfully"
 
             - name: Build application

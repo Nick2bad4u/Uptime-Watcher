@@ -88,6 +88,13 @@
         "../../src/services/dist/**",
         "../../src/theme/dist/**"
     ],
+    "files": [
+        "../../electron/importMeta.node.d.ts",
+        "../../electron/events/eventTypes.catalogue.core.d.ts",
+        "../../electron/events/eventTypes.catalogue.internalCacheDatabase.d.ts",
+        "../../electron/events/eventTypes.catalogue.internalMonitoringSite.d.ts",
+        "../../electron/events/eventTypes.catalogue.public.d.ts"
+    ],
     "include": [
         "../../src/**/*.ts",
         "../../src/**/*.tsx",

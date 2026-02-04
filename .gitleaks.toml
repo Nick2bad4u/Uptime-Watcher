@@ -190,6 +190,35 @@ title     = "Uptime Watcher - Enhanced Secret Detection Configuration"
     regexTarget = "line"
     regexes     = [ '''cubeToken''' ]
 
+[[allowlists]]
+    description = "Ignore Dropbox app key constant (public OAuth client id)"
+    paths       = [ '''electron/services/cloud/internal/cloudServiceSettings\.ts''' ]
+    regexTarget = "line"
+    regexes     = [ '''DEFAULT_DROPBOX_APP_KEY''' ]
+
+[[allowlists]]
+    description = "Ignore historic Dropbox OAuth token placeholders"
+    commits = [
+        "1570ad4",
+        "9436129",
+        "9ea2112",
+    ]
+    paths = [
+        '''electron/services/cloud/CloudService\.ts''',
+        '''electron/services/cloud/internal/cloudServiceSettings\.ts''',
+        '''electron/services/cloud/providers/dropbox/DropboxTokenManager\.ts''',
+    ]
+
+[[allowlists]]
+    description = "Ignore placeholder secrets in secretlint config history"
+    commits     = [ "6e6e7f0" ]
+    paths       = [ '''config/linting/\.secretlintrc\.json$''' ]
+
+[[allowlists]]
+    description = "Ignore legacy Chart.js docs secret example"
+    commits     = [ "57eeeda" ]
+    paths       = [ '''docs/Packages/Chart\.js/getting.*''' ]
+
 # Enhanced allowlist for common development patterns (v8.28+ optimizations)
 [[allowlists]]
     description = "Common non-secret patterns in development"

@@ -30,6 +30,7 @@ jobs:
               with:
                   # === Core Configuration ===
                   template: repository
+                  repositories: ${{ github.repository }}
                   filename: metrics.repository.svg
                   token: ${{ secrets.GITHUB_TOKEN }}
                   committer_branch: metrics

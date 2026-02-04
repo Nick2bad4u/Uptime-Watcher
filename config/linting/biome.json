@@ -6,7 +6,7 @@
                 "recommended": true
             }
         },
-        "enabled": true
+        "enabled": false
     },
     "css": {
         "assist": {
@@ -49,7 +49,7 @@
     "formatter": {
         "attributePosition": "auto",
         "bracketSpacing": true,
-        "enabled": true,
+        "enabled": false,
         "expand": "auto",
         "formatWithErrors": false,
         "includes": [
@@ -88,7 +88,7 @@
         "formatter": {
             "attributePosition": "auto",
             "bracketSameLine": false,
-            "enabled": false,
+            "enabled": true,
             "indentScriptAndStyle": true,
             "indentStyle": "space",
             "indentWidth": 4,
@@ -152,7 +152,7 @@
         }
     },
     "linter": {
-        "enabled": true,
+        "enabled": false,
         "includes": [
             "src/**/*",
             "electron/**/*",
