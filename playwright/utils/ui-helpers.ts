@@ -661,9 +661,17 @@ export async function fillAddSiteForm(
             timeout: WAIT_TIMEOUTS.MEDIUM,
         });
 
+        await fieldLocator.scrollIntoViewIfNeeded().catch(() => undefined);
+
         if (field.inputType === "select") {
+            await expect(fieldLocator).toBeEnabled({
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+            });
             await fieldLocator.selectOption(field.value);
         } else {
+            await expect(fieldLocator).toBeEditable({
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+            });
             await fieldLocator.fill(field.value);
         }
     }

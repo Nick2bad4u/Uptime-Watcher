@@ -158,7 +158,15 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 void (async (): Promise<void> => {
                     try {
                         await withErrorHandling(async () => {
-                            await SystemService.openExternal(url);
+                            try {
+                                await SystemService.openExternal(url);
+                            } catch (error: unknown) {
+                                const underlying = ensureError(error);
+                                throw new Error(
+                                    `Unable to open external link (${urlForMessage}).`,
+                                    { cause: underlying }
+                                );
+                            }
                             logger.user.action("External URL opened", {
                                 url: urlForMessage,
                                 ...(context?.siteName
@@ -169,9 +177,16 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     } catch (error: unknown) {
                         const normalizedError = ensureError(error);
 
+                        // Prefer logging the underlying cause when we wrap an
+                        // error for user-facing messaging.
+                        const underlyingError = ensureError(
+                            (normalizedError as { cause?: unknown }).cause ??
+                                normalizedError
+                        );
+
                         logger.error(
                             "Failed to open external URL via SystemService",
-                            normalizedError,
+                            underlyingError,
                             {
                                 context,
                                 url: urlForMessage,
@@ -179,7 +194,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         );
 
                         logger.user.action("External URL failed", {
-                            error: normalizedError.message,
+                            error: underlyingError.message,
                             url: urlForMessage,
                             ...(context?.siteName
                                 ? { siteName: context.siteName }
@@ -188,7 +203,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
 
                         logStoreAction("UIStore", "openExternalFailed", {
                             context,
-                            error: normalizedError.message,
+                            error: underlyingError.message,
                             url: urlForMessage,
                         });
                     }

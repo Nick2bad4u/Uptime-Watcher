@@ -233,7 +233,14 @@ test.describe(
         ],
     },
     () => {
-        test.setTimeout(240_000);
+        const isCI =
+            typeof process !== "undefined" &&
+            (process.env["CI"] ?? "").toLowerCase() === "true";
+
+        // This suite provisions one monitor per supported type. On CI runners
+        // (especially Windows + Electron), the full loop can legitimately take
+        // several minutes.
+        test.setTimeout(isCI ? 10 * 60_000 : 240_000);
         let electronApp: ElectronApplication;
         let page: Page;
 

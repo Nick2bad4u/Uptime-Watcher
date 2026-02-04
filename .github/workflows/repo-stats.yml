@@ -19,6 +19,8 @@ jobs:
         concurrency:
             group: repo-stats-${{ github.ref }}
             cancel-in-progress: false
+        permissions:
+            contents: write
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
@@ -30,9 +32,10 @@ jobs:
               with:
                   # === Core Configuration ===
                   template: repository
-                  repositories: ${{ github.repository }}
                   filename: metrics.repository.svg
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
+                  user: "${{ github.repository_owner }}"
+                  repo: "${{ github.event.repository.name }}"
                   committer_branch: metrics
                   committer_message: "Update repository metrics [skip ci]"
 
@@ -58,35 +61,23 @@ jobs:
                   retries_delay_output_action: 120 # 2 minutes between output retries
 
                   # === Base Sections ===
-                  base: header, activity, community, repositories, metadata
-                  base_indepth: yes # Deep analysis
-                  commits_authoring: nick2bad4u # Your GitHub username
+                  base: header, metadata
 
                   # === Plugin Configuration ===
-                  plugin_followup: yes # Follow-up issues
+                  plugin_followup: yes # Issues/PR follow-up for this repository
                   plugin_lines: yes # Lines of code metrics
                   plugin_lines_history_limit: 40 # Historical data depth
-                  plugin_lines_repositories_limit: 8 # Repository limit
                   plugin_lines_sections: base # Base sections only
 
                   # === Language Analytics ===
                   plugin_languages: yes # Language statistics
                   plugin_languages_analysis_timeout: 30 # Analysis timeout
-                  plugin_languages_analysis_timeout_repositories: 40
                   plugin_languages_categories: markup, programming
                   plugin_languages_colors: github # GitHub color scheme
-                  plugin_languages_indepth: yes # Deep language analysis
-                  plugin_languages_limit: 30 # Show top 30 languages
+                  plugin_languages_indepth: no
+                  plugin_languages_limit: 15 # Keep output compact
                   plugin_languages_recent_categories: markup, programming
                   plugin_languages_recent_days: 30 # Recent activity window
                   plugin_languages_recent_load: 600 # Data load limit
                   plugin_languages_sections: most-used # Focus on most used
                   plugin_languages_threshold: 0% # Include all languages
-
-                  # === Repository Metrics ===
-                  plugin_repositories: yes # Repository analytics
-                  plugin_repositories_order: featured, pinned, starred, random
-                  repositories_forks: yes # Include forks
-
-                  # === User Filtering ===
-                  users_ignored: none # Don't ignore any users

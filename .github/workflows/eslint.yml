@@ -50,13 +50,11 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-            - name: Cache node modules
-              uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+            - name: Setup Node.js
+              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
               with:
-                  path: .node_modules
-                  key: ${{ runner.os }}-.-node-modules-${{ hashFiles('.package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-.-node-modules-
+                  node-version: "20"
+                  cache: npm
 
             - name: Install all required ESLint plugins
               run: |
@@ -66,20 +64,34 @@ jobs:
               run: npm run check:ipc
 
             - name: Run ESLint
+              run: npx eslint . --ignore-pattern libs --ignore-pattern dist --format stylish || true
+              working-directory: .
+
+            - name: Run ESLint (SARIF)
+              id: eslint_sarif
               env:
                   SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
               run: |
                   rm -f eslint-results.sarif
-                  npx eslint . --ignore-pattern libs --format stylish
-                  npx eslint . --ignore-pattern libs --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif
-              working-directory: .
-              continue-on-error: true
 
-            - name: Run ESLint Microsoft Sarirf Format
-              env:
-                  SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
-              run: |
-                  npx eslint . --ignore-pattern dist --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif
+                  # IMPORTANT:
+                  # - ESLint exits non-zero when it finds issues.
+                  # - GitHub Actions runs bash with `-e`, which would abort the script early.
+                  # - We still want the SARIF file for upload/annotations.
+                  npx eslint . \
+                    --ignore-pattern libs \
+                    --ignore-pattern dist \
+                    --format @microsoft/eslint-formatter-sarif \
+                    --output-file eslint-results.sarif \
+                    || true
+
+                  if [ -f "eslint-results.sarif" ]; then
+                    echo "sarif_present=true" >> "$GITHUB_OUTPUT"
+                    echo "Generated eslint-results.sarif"
+                  else
+                    echo "sarif_present=false" >> "$GITHUB_OUTPUT"
+                    echo "::warning::eslint-results.sarif was not generated; skipping SARIF upload."
+                  fi
               working-directory: .
               continue-on-error: true
 
@@ -88,12 +100,14 @@ jobs:
               working-directory: .
 
             - name: Upload analysis results to GitHub
+              if: ${{ always() && steps.eslint_sarif.outputs.sarif_present == 'true' }}
               uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v2.27.0
               with:
                   sarif_file: eslint-results.sarif
                   wait-for-processing: true
 
             - name: Upload ESLint SARIF as artifact
+              if: ${{ always() && steps.eslint_sarif.outputs.sarif_present == 'true' }}
               uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
               with:
                   name: eslint-results

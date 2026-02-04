@@ -9,7 +9,7 @@ on:
             - completed
 
 concurrency:
-    group: IALINUX-${{ github.ref }}
+    group: "IALINUX-${{ github.ref }}"
     cancel-in-progress: true
 
 permissions:
@@ -24,94 +24,119 @@ jobs:
               with:
                   egress-policy: audit
 
+            - name: Prepare output directory
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  mkdir -p release-dist
+
+            # NOTE: Not every release publishes every Linux package format.
+            # Treat missing assets as non-fatal and upload whatever exists.
+
             - name: Download Linux release assets (linux-)
               id: download_linux
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-linux-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (appimage-)
               id: download_appimage
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-appimage-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (deb-)
               id: download_deb
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-deb-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (pacman-)
               id: download_pacman
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-pacman-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (rpm-)
               id: download_rpm
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-rpm-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (snap-)
               id: download_snap
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-snap-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (freebsd-)
               id: download_freebsd
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-freebsd-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (apk-)
               id: download_apk
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "Uptime-Watcher-apk-*"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
             - name: Download Linux release assets (latest-linux.yml)
               id: download_latest
               uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              continue-on-error: true
               with:
                   latest: true
                   fileName: "latest-linux.yml"
                   out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
+
+            - name: List downloaded release assets
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  echo "Release-dist contents:"
+                  ls -la release-dist/ || true
 
             - name: Upload Linux distributables to archive.org
               uses: Nick2bad4u/internet-archive-upload@947bc6bdf79d0bcf816b576082fd7b503d33ddc9 # v1.6
-              with:
-                  access-key: ${{ secrets.IA_ACCESS_KEY }}
-                  secret-key: ${{ secrets.IA_SECRET_KEY }}
-                  identifier: Uptime-Watcher-linux-${{ steps.download_linux.outputs.tag_name }}
-                  files: release-dist/
               continue-on-error: true
+              with:
+                  access-key: "${{ secrets.IA_ACCESS_KEY }}"
+                  secret-key: "${{ secrets.IA_SECRET_KEY }}"
+                  identifier: "Uptime-Watcher-linux-${{ steps.download_linux.outputs.tag_name }}"
+                  files: release-dist/
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

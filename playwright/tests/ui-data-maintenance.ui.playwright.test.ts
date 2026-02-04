@@ -32,6 +32,7 @@ test.describe(
         ],
     },
     () => {
+        test.setTimeout(90_000);
         let electronApp: ElectronApplication;
         let page: Page;
 

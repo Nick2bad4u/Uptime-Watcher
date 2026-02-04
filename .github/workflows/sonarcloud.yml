@@ -3,7 +3,7 @@ name: SonarCloud Analysis
 
 # Prevent multiple SonarCloud analyses from running simultaneously
 concurrency:
-    group: sonarcloud-${{ github.ref }}
+    group: "sonarcloud-${{ github.ref }}"
     cancel-in-progress: true
 
 on:
@@ -22,8 +22,12 @@ jobs:
     sonarcloud:
         name: SonarCloud Code Quality Analysis
         runs-on: ubuntu-latest
+        if: ${{ github.repository == 'Nick2bad4u/Uptime-Watcher' }}
         env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN || secrets.sonar_token }}
+            # SonarCloud requires a SonarCloud "analysis token".
+            # Do NOT fall back to other secrets (e.g., a GitHub PAT), because
+            # that produces confusing 403 errors.
+            SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -69,12 +73,11 @@ jobs:
 
             - name: Skip SonarCloud scan without token
               if: ${{ env.SONAR_TOKEN == '' }}
-              run: |
-                  echo "::warning::SONAR_TOKEN is not available. Skipping SonarCloud scan."
+              run: echo "::warning::SONAR_TOKEN is not available. Skipping SonarCloud scan."
 
             - name: SonarCloud Scan
               if: ${{ env.SONAR_TOKEN != '' }}
               uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7.0.0
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For PR information
-                  SONAR_TOKEN: ${{ env.SONAR_TOKEN }} # SonarCloud auth
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" # For PR information
+                  SONAR_TOKEN: "${{ env.SONAR_TOKEN }}" # SonarCloud auth

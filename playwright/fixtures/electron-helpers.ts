@@ -261,6 +261,14 @@ export async function launchElectronApp(
 
     const attachWindowMetadata = (page: Page): void => {
         registerPageUserDataDirectory(page, userDataDir);
+
+        // Ensure a consistent viewport across CI/local runs.
+        // When the Electron window is not shown (HEADLESS=true), Chromium can
+        // report a smaller layout viewport which triggers responsive CSS
+        // breakpoints (e.g., hiding table columns) and causes flaky assertions.
+        void page
+            .setViewportSize({ height: 720, width: 1280 })
+            .catch(() => undefined);
     };
 
     registerApplicationUserDataDirectory(app, userDataDir);

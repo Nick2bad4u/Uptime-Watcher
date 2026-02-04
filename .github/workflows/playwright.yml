@@ -87,6 +87,11 @@ jobs:
               env:
                   ELECTRON_DISABLE_SANDBOX: "1"
                   PLAYWRIGHT_CHROMIUM_ARGS: "--no-sandbox --disable-setuid-sandbox"
+                  PLAYWRIGHT_ENABLE_ATTACHMENTS: "1"
+                  # Electron UI runs are resource-heavy on GitHub Windows runners.
+                  # Run single-worker to reduce flaky renderer shutdowns.
+                  PLAYWRIGHT_UI_WORKERS: "1"
+                  PLAYWRIGHT_WORKERS: "1"
                   # TSDoc: PLAYWRIGHT_CHROMIUM_ARGS is set for Chromium sandbox compatibility on Windows/Electron CI runners.
                   # Ensure your Playwright config (playwright.config.ts) reads this variable and passes its value to the Chromium launch args.
                   # See playwright.config.ts, section 'use: { ...chromium launchOptions... }', for implementation details.
