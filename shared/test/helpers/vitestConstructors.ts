@@ -23,6 +23,7 @@ export type ConstructableMock<
  * Creates a constructable Vitest mock constructor.
  *
  * @example
+ *
  * ```ts
  * const socketInstance = { destroy: vi.fn() };
  * const Socket = createMockConstructor(() => socketInstance);
@@ -50,10 +51,7 @@ export function createMockConstructor<
 export function mockConstructableReturnValue<
     TArgs extends readonly unknown[],
     TInstance,
->(
-    mock: MockInstance<(...args: TArgs) => TInstance>,
-    value: TInstance
-): void {
+>(mock: MockInstance<(...args: TArgs) => TInstance>, value: TInstance): void {
     mock.mockImplementation(function mockConstructableReturnValueImpl() {
         return value;
     });
@@ -65,11 +63,10 @@ export function mockConstructableReturnValue<
 export function mockConstructableReturnValueOnce<
     TArgs extends readonly unknown[],
     TInstance,
->(
-    mock: MockInstance<(...args: TArgs) => TInstance>,
-    value: TInstance
-): void {
-    mock.mockImplementationOnce(function mockConstructableReturnValueOnceImpl() {
-        return value;
-    });
+>(mock: MockInstance<(...args: TArgs) => TInstance>, value: TInstance): void {
+    mock.mockImplementationOnce(
+        function mockConstructableReturnValueOnceImpl() {
+            return value;
+        }
+    );
 }

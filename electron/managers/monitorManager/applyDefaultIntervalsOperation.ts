@@ -42,7 +42,9 @@ export interface ApplyDefaultIntervalsDependencies {
 export async function applyDefaultIntervalsOperation(args: {
     readonly defaultCheckIntervalMs: number;
     readonly dependencies: ApplyDefaultIntervalsDependencies;
-    readonly shouldApplyDefaultInterval: (monitor: Site["monitors"][0]) => boolean;
+    readonly shouldApplyDefaultInterval: (
+        monitor: Site["monitors"][0]
+    ) => boolean;
     readonly site: Site;
 }): Promise<void> {
     const {
@@ -53,9 +55,12 @@ export async function applyDefaultIntervalsOperation(args: {
     } = args;
 
     dependencies.logger.debug(
-        interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_INTERVALS_SETTING, {
-            identifier: site.identifier,
-        })
+        interpolateLogTemplate(
+            LOG_TEMPLATES.debug.MONITOR_MANAGER_INTERVALS_SETTING,
+            {
+                identifier: site.identifier,
+            }
+        )
     );
 
     const monitorsNeedingRemediation = site.monitors.filter(
@@ -65,9 +70,12 @@ export async function applyDefaultIntervalsOperation(args: {
 
     if (monitorsNeedingRemediation.length === 0) {
         dependencies.logger.debug(
-            interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS, {
-                identifier: site.identifier,
-            })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,
+                {
+                    identifier: site.identifier,
+                }
+            )
         );
         return;
     }
@@ -84,10 +92,13 @@ export async function applyDefaultIntervalsOperation(args: {
                     });
 
                     dependencies.logger.debug(
-                        interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED, {
-                            interval: defaultCheckIntervalMs / 1000,
-                            monitorId: monitor.id,
-                        })
+                        interpolateLogTemplate(
+                            LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED,
+                            {
+                                interval: defaultCheckIntervalMs / 1000,
+                                monitorId: monitor.id,
+                            }
+                        )
                     );
                 }
 
@@ -116,8 +127,11 @@ export async function applyDefaultIntervalsOperation(args: {
     dependencies.sitesCache.set(site.identifier, updatedSite);
 
     dependencies.logger.info(
-        interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_MANAGER_APPLYING_INTERVALS, {
-            identifier: site.identifier,
-        })
+        interpolateLogTemplate(
+            LOG_TEMPLATES.services.MONITOR_MANAGER_APPLYING_INTERVALS,
+            {
+                identifier: site.identifier,
+            }
+        )
     );
 }

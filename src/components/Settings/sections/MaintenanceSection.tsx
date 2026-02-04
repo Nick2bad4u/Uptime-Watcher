@@ -18,7 +18,9 @@ interface MaintenanceSectionProperties {
     readonly onRefreshHistory: () => void;
     readonly onResetData: () => void;
     readonly onRestoreClick: () => void;
-    readonly onRestoreFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    readonly onRestoreFileChange: (
+        event: ChangeEvent<HTMLInputElement>
+    ) => void;
     readonly refreshButtonIcon: ReactNode;
     readonly resetButtonIcon: ReactNode;
     readonly restoreFileInputRef: RefObject<HTMLInputElement | null>;

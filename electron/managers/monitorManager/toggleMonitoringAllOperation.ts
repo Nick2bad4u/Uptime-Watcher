@@ -16,9 +16,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type {
-    EnhancedLifecycleConfig,
-} from "../MonitorManagerEnhancedLifecycle";
+import type { EnhancedLifecycleConfig } from "../MonitorManagerEnhancedLifecycle";
 
 /**
  * Starts monitoring across all sites.
@@ -33,8 +31,13 @@ export async function startMonitoringAllOperation(args: {
         isMonitoring: boolean
     ) => Promise<MonitoringStartSummary>;
 }): Promise<MonitoringStartSummary> {
-    const { config, eventEmitter, isMonitoring, logger, startAllMonitoringEnhanced } =
-        args;
+    const {
+        config,
+        eventEmitter,
+        isMonitoring,
+        logger,
+        startAllMonitoringEnhanced,
+    } = args;
 
     const summary = await startAllMonitoringEnhanced(config, isMonitoring);
 
@@ -45,7 +48,11 @@ export async function startMonitoringAllOperation(args: {
         );
     }
 
-    if (!summary.isMonitoring && summary.attempted > 0 && !summary.alreadyActive) {
+    if (
+        !summary.isMonitoring &&
+        summary.attempted > 0 &&
+        !summary.alreadyActive
+    ) {
         logger.error(
             "[MonitorManager] No monitors transitioned to an active state during startMonitoring",
             summary
@@ -56,7 +63,8 @@ export async function startMonitoringAllOperation(args: {
         );
 
         // Attach summary for upstream error handling and diagnostics.
-        (error as Error & { summary?: MonitoringStartSummary }).summary = summary;
+        (error as Error & { summary?: MonitoringStartSummary }).summary =
+            summary;
         throw error;
     }
 
@@ -94,7 +102,11 @@ export async function stopMonitoringAllOperation(args: {
         );
     }
 
-    if (summary.isMonitoring && summary.attempted > 0 && !summary.alreadyInactive) {
+    if (
+        summary.isMonitoring &&
+        summary.attempted > 0 &&
+        !summary.alreadyInactive
+    ) {
         logger.error(
             "[MonitorManager] Some monitors failed to stop during stopMonitoring",
             summary
@@ -104,7 +116,8 @@ export async function stopMonitoringAllOperation(args: {
             "Failed to stop monitoring: one or more monitors remain active"
         );
 
-        (error as Error & { summary?: MonitoringStopSummary }).summary = summary;
+        (error as Error & { summary?: MonitoringStopSummary }).summary =
+            summary;
         throw error;
     }
 

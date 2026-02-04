@@ -37,9 +37,6 @@ const options = {
     help: args.includes("--help") || args.includes("-h"),
 };
 
-/**
- *
- */
 function showHelp() {
     console.log(`
 🎭 Playwright Codegen Helper for Uptime-Watcher
@@ -74,9 +71,6 @@ See docs/PLAYWRIGHT_CODEGEN_GUIDE.md for details.
     process.exit(0);
 }
 
-/**
- *
- */
 async function startDevServer() {
     console.log("🚀 Starting development server...");
 
@@ -168,8 +162,8 @@ async function startElectronWithInspector() {
  * Build codegen command for standard web browser testing.
  *
  * @param {string} target - Target URL.
- * @param {{viewport?: string, output?: string}} options - Configuration
- * options.
+ * @param {{ viewport?: string; output?: string }} options - Configuration
+ *   options.
  *
  * @returns {string[]} Command array.
  */
@@ -234,9 +228,6 @@ function runCodegen(cmd) {
     return codegen;
 }
 
-/**
- *
- */
 async function main() {
     // Load custom transformations
     try {
@@ -312,7 +303,7 @@ async function main() {
         } else {
             console.log("🌐 Using development server mode...");
             const target = await startDevServer();
-            /** @type {{viewport?: string, output?: string}} */
+            /** @type {{ viewport?: string; output?: string }} */
             const cmdOptions = { viewport: options.viewport };
             if (options.output) {
                 cmdOptions.output = options.output;

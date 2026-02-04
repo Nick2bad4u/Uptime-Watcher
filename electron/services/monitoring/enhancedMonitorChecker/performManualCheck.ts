@@ -37,7 +37,8 @@ export async function performManualCheckOperation(args: {
     readonly signal: AbortSignal | undefined;
     readonly site: Site;
 }): Promise<StatusUpdate | undefined> {
-    const { config, monitor, monitorId, performDirectCheck, signal, site } = args;
+    const { config, monitor, monitorId, performDirectCheck, signal, site } =
+        args;
 
     // Manual checks can race with scheduled correlated checks.
     // Cancel correlated operations to avoid overlapping writes.

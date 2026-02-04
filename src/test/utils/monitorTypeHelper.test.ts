@@ -395,7 +395,7 @@ describe("monitorTypeHelper", () => {
             await annotate("Type: Monitoring", "type");
 
             const pingResult = await getMonitorTypeConfig("ping");
-                const tcpResult = await getMonitorTypeConfig("port");
+            const tcpResult = await getMonitorTypeConfig("port");
 
             expect(pingResult).toEqual(mockMonitorTypes[1]);
             expect(tcpResult).toEqual(mockMonitorTypes[2]);
@@ -510,7 +510,7 @@ describe("monitorTypeHelper", () => {
             expect(result).toEqual([
                 { label: "HTTP Monitor", value: "http" },
                 { label: "Ping Monitor", value: "ping" },
-                    { label: "TCP Monitor", value: "port" },
+                { label: "TCP Monitor", value: "port" },
             ]);
         });
 
@@ -794,34 +794,38 @@ describe("monitorTypeHelper", () => {
             }));
 
         const monitorFieldDefinitionArb: fc.Arbitrary<MonitorFieldDefinition> =
-            fc.tuple(
-                fc.record({
-                    label: fc.string({ minLength: 1, maxLength: 50 }),
-                    name: fc.string({ minLength: 1, maxLength: 30 }),
-                    required: fc.boolean(),
-                    type: fc.constantFrom(
-                        "number",
-                        "select",
-                        "text",
-                        "url"
-                    ),
-                }),
-                monitorFieldOptionalPropsArb
-            ).map(([requiredProps, optionalProps]) => ({
-                ...requiredProps,
-                ...optionalProps,
-            }));
+            fc
+                .tuple(
+                    fc.record({
+                        label: fc.string({ minLength: 1, maxLength: 50 }),
+                        name: fc.string({ minLength: 1, maxLength: 30 }),
+                        required: fc.boolean(),
+                        type: fc.constantFrom(
+                            "number",
+                            "select",
+                            "text",
+                            "url"
+                        ),
+                    }),
+                    monitorFieldOptionalPropsArb
+                )
+                .map(([requiredProps, optionalProps]) => ({
+                    ...requiredProps,
+                    ...optionalProps,
+                }));
 
-        const monitorTypeConfigArb: fc.Arbitrary<MonitorTypeConfig> = fc.record({
-            description: fc.string({ minLength: 5, maxLength: 200 }),
-            displayName: fc.string({ minLength: 1, maxLength: 50 }),
-            fields: fc.array(monitorFieldDefinitionArb, {
-                minLength: 1,
-                maxLength: 5,
-            }),
-            type: monitorTypeKeyArb,
-            version: fc.string({ minLength: 1, maxLength: 20 }),
-        });
+        const monitorTypeConfigArb: fc.Arbitrary<MonitorTypeConfig> = fc.record(
+            {
+                description: fc.string({ minLength: 5, maxLength: 200 }),
+                displayName: fc.string({ minLength: 1, maxLength: 50 }),
+                fields: fc.array(monitorFieldDefinitionArb, {
+                    minLength: 1,
+                    maxLength: 5,
+                }),
+                type: monitorTypeKeyArb,
+                version: fc.string({ minLength: 1, maxLength: 20 }),
+            }
+        );
 
         describe("clearMonitorTypeCache property tests", () => {
             test.prop([fc.constantFrom("test", "reset", "clear", "refresh")])(
@@ -923,7 +927,9 @@ describe("monitorTypeHelper", () => {
 
             test.prop([
                 fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
-                fc.constantFrom(...(BASE_MONITOR_TYPES as readonly MonitorType[])),
+                fc.constantFrom(
+                    ...(BASE_MONITOR_TYPES as readonly MonitorType[])
+                ),
             ])(
                 "should return undefined when monitor type not found",
                 async (mockTypes, searchType) => {

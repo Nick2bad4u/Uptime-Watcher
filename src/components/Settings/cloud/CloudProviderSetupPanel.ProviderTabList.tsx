@@ -18,7 +18,9 @@ import {
 export interface CloudProviderSetupPanelProviderTabListProperties {
     readonly ariaLabel: string;
     readonly lockedKey: CloudProviderSetupPanelTabKey | null;
-    readonly onAttemptLockedSelect: (key: CloudProviderSetupPanelTabKey) => void;
+    readonly onAttemptLockedSelect: (
+        key: CloudProviderSetupPanelTabKey
+    ) => void;
     readonly onSelect: (key: CloudProviderSetupPanelTabKey) => void;
     readonly selectedKey: CloudProviderSetupPanelTabKey;
 }
@@ -87,7 +89,11 @@ export const CloudProviderSetupPanelProviderTabList = ({
 
             onSelect(match.key);
         },
-        [lockedKey, onAttemptLockedSelect, onSelect]
+        [
+            lockedKey,
+            onAttemptLockedSelect,
+            onSelect,
+        ]
     );
 
     const handleKeyDown = useCallback(
@@ -138,7 +144,12 @@ export const CloudProviderSetupPanelProviderTabList = ({
                 buttonByKeyRef.current.get(nextKey)?.focus();
             });
         },
-        [lockedKey, onAttemptLockedSelect, onSelect, selectedKey]
+        [
+            lockedKey,
+            onAttemptLockedSelect,
+            onSelect,
+            selectedKey,
+        ]
     );
 
     const handleButtonRef = useCallback((element: HTMLButtonElement | null) => {

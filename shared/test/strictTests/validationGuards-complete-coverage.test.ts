@@ -84,15 +84,11 @@ describe(validateSiteSnapshots, () => {
             throw new Error("Expected validation to fail");
         }
 
-        const {issues} = result.error;
+        const { issues } = result.error;
         expect(issues.length).toBeGreaterThan(0);
 
-        const hasIssueForIndex1 = issues.some(
-            (issue) => issue.path[0] === 1
-        );
-        const hasIssueForIndex2 = issues.some(
-            (issue) => issue.path[0] === 2
-        );
+        const hasIssueForIndex1 = issues.some((issue) => issue.path[0] === 1);
+        const hasIssueForIndex2 = issues.some((issue) => issue.path[0] === 2);
 
         expect(hasIssueForIndex1).toBeTruthy();
         expect(hasIssueForIndex2).toBeTruthy();

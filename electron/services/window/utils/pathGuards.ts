@@ -4,7 +4,10 @@ import * as path from "node:path";
  * Normalize a path string for consistent comparisons across platforms.
  *
  * @remarks
- * - Converts to absolute paths before comparison
+ * -
+ *
+ * Converts to absolute paths before comparison
+ *
  * - Normalizes path separators
  * - On Windows, comparisons are case-insensitive
  */
@@ -13,9 +16,7 @@ export function normalizePathForComparison(
     platform: NodeJS.Platform = process.platform
 ): string {
     const normalized = path.resolve(value);
-    return platform === "win32"
-        ? normalized.toLowerCase()
-        : normalized;
+    return platform === "win32" ? normalized.toLowerCase() : normalized;
 }
 
 /**

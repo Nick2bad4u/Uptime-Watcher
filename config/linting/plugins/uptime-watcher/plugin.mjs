@@ -256,9 +256,9 @@ function withUptimeWatcherPlugin(config) {
  * Repo-scoped configs (the ones actually used by this monorepo).
  *
  * @remarks
- * These config entries intentionally include `files`/`ignores` so consumers
- * can `...uptimeWatcherPlugin.configs.repo` without re-declaring all the
- * scoping in `eslint.config.mjs`.
+ * These config entries intentionally include `files`/`ignores` so consumers can
+ * `...uptimeWatcherPlugin.configs.repo` without re-declaring all the scoping in
+ * `eslint.config.mjs`.
  */
 const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
     withUptimeWatcherPlugin({

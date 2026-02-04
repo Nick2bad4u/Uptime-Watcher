@@ -20,15 +20,15 @@ import type { UnknownRecord } from "type-fest";
  * example: database row values, dynamic form data, or validated-but-dynamic
  * payloads).
  *
- * Prefer {@link castIpcResponse} when you can provide a validator.
- * Prefer {@link safeObjectAccess} / runtime guards when the value can be
- * validated.
+ * Prefer {@link castIpcResponse} when you can provide a validator. Prefer
+ * {@link safeObjectAccess} / runtime guards when the value can be validated.
  *
  * Only use this when:
- * - The caller has already validated the value (or consciously accepts the
- *   risk), and
- * - Returning the raw runtime value (including `null`) is required for
- *   backwards compatibility.
+ *
+ * - The caller has already validated the value (or consciously accepts the risk),
+ *   and
+ * - Returning the raw runtime value (including `null`) is required for backwards
+ *   compatibility.
  */
 // eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- Generic is intentionally supplied by callers at dynamic boundaries.
 export function castUnchecked<T>(value: unknown): T {

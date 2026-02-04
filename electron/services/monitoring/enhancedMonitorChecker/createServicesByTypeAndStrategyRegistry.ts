@@ -3,8 +3,8 @@
  *
  * @remarks
  * We keep `servicesByType` as a stable, mutable map so tests can override
- * monitor services (`checker["servicesByType"].set(...)`) without rebuilding the
- * strategy registry.
+ * monitor services (`checker["servicesByType"].set(...)`) without rebuilding
+ * the strategy registry.
  *
  * @packageDocumentation
  */
@@ -49,7 +49,8 @@ export function createServicesByTypeAndStrategyRegistry(args: {
 
     const strategyRegistry = createMonitorStrategyRegistry(
         args.registeredTypes.map((type) => ({
-            getService: (): IMonitorService => getServiceOrThrow(servicesByType, type),
+            getService: (): IMonitorService =>
+                getServiceOrThrow(servicesByType, type),
             type,
         }))
     );

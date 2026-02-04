@@ -12,7 +12,9 @@ interface MonitoringSectionProperties {
     readonly currentHistoryLimit: number;
     readonly icon: IconType;
     readonly isLoading: boolean;
-    readonly onHistoryLimitChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+    readonly onHistoryLimitChange: (
+        event: ChangeEvent<HTMLSelectElement>
+    ) => void;
 }
 
 /**

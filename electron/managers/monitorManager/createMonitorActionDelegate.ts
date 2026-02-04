@@ -8,7 +8,10 @@
 
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import type { MonitorActionDelegate } from "../MonitorManagerEnhancedLifecycle";
 
@@ -34,10 +37,13 @@ export function createMonitorActionDelegate(args: {
         }
 
         logger.warn(
-            interpolateLogTemplate(LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED, {
-                identifier,
-                monitorId: monitorId ?? "all",
-            })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
+                {
+                    identifier,
+                    monitorId: monitorId ?? "all",
+                }
+            )
         );
 
         return false;

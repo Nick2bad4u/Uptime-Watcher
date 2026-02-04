@@ -101,9 +101,7 @@ describe("monitorManager helper operations", () => {
             .mockImplementation(() => undefined);
 
         const action = vi
-            .fn<
-                (identifier: string, monitorId?: string) => Promise<boolean>
-            >()
+            .fn<(identifier: string, monitorId?: string) => Promise<boolean>>()
             .mockResolvedValue(true);
 
         const delegate = createMonitorActionDelegate({
@@ -247,7 +245,12 @@ describe("monitorManager helper operations", () => {
             sitesCache,
         });
 
-        expect(checker.checkMonitor).toHaveBeenCalledWith(site, "m1", false, signal);
+        expect(checker.checkMonitor).toHaveBeenCalledWith(
+            site,
+            "m1",
+            false,
+            signal
+        );
         expect(errorSpy).toHaveBeenCalledTimes(1);
 
         errorSpy.mockRestore();
@@ -321,8 +324,9 @@ describe("monitorManager helper operations", () => {
             })
         ).resolves.toBeTruthy();
 
-        const payload = (eventEmitter.emitTyped as unknown as ReturnType<typeof vi.fn>)
-            .mock.calls[0]?.[1] as unknown;
+        const payload = (
+            eventEmitter.emitTyped as unknown as ReturnType<typeof vi.fn>
+        ).mock.calls[0]?.[1] as unknown;
 
         expect(payload).toBeDefined();
         expect("monitorId" in (payload as Record<string, unknown>)).toBeFalsy();
@@ -346,8 +350,9 @@ describe("monitorManager helper operations", () => {
             })
         ).resolves.toBeTruthy();
 
-        const payload = (eventEmitter.emitTyped as unknown as ReturnType<typeof vi.fn>)
-            .mock.calls[0]?.[1] as unknown;
+        const payload = (
+            eventEmitter.emitTyped as unknown as ReturnType<typeof vi.fn>
+        ).mock.calls[0]?.[1] as unknown;
 
         expect(payload).toBeDefined();
         expect("monitorId" in (payload as Record<string, unknown>)).toBeFalsy();

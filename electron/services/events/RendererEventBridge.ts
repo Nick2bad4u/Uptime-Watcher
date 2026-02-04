@@ -239,7 +239,9 @@ function buildStateSyncPayloadDiagnostics(
     const sites: Site[] =
         payload.action === STATE_SYNC_ACTION.BULK_SYNC ? payload.sites : [];
     const delta: SiteSyncDelta | undefined =
-        payload.action === STATE_SYNC_ACTION.BULK_SYNC ? undefined : payload.delta;
+        payload.action === STATE_SYNC_ACTION.BULK_SYNC
+            ? undefined
+            : payload.delta;
 
     const topDetailsStrings: StateSyncLargeStringDiagnostic[] = [];
     const topMonitorsByHistory: StateSyncMonitorHistoryDiagnostic[] = [];

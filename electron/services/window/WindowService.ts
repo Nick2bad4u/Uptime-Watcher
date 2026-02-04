@@ -66,13 +66,13 @@ import {
  * Absolute directory path for this module.
  *
  * @remarks
- * This module is authored as ESM. `import.meta.dirname` is non-standard and
- * may be `undefined` depending on bundler output / runtime.
+ * This module is authored as ESM. `import.meta.dirname` is non-standard and may
+ * be `undefined` depending on bundler output / runtime.
  *
  * We derive the directory from `import.meta.url`, which is standard and
  * supported consistently in both Node.js ESM and Vite-bundled output.
  */
-const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+const currentDirectory = import.meta.dirname;
 
 const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(currentDirectory);
 
@@ -447,8 +447,7 @@ export class WindowService {
                         if (
                             attempt === MAX_RETRIES ||
                             (resolved.name !== "AbortError" &&
-                                resolved.name !==
-                                    "ViteDevServerNotReadyError")
+                                resolved.name !== "ViteDevServerNotReadyError")
                         ) {
                             logger.debug(
                                 `[WindowService] Vite server not ready (attempt ${attempt}/${MAX_RETRIES}): ${getUnknownErrorMessage(resolved)}`
@@ -462,8 +461,6 @@ export class WindowService {
                     },
                 }
             );
-
-
         } catch (error) {
             throw new Error(
                 `Vite dev server did not become available after ${MAX_RETRIES} attempts`,

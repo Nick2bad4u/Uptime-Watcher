@@ -4,6 +4,7 @@
  * @remarks
  * Extracted to keep `MonitorManager.ts` focused on lifecycle orchestration.
  * This helper:
+ *
  * - Loads the target site from cache
  * - Runs an enhanced monitor check
  * - Logs warnings/errors consistently
@@ -14,7 +15,10 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
@@ -38,21 +42,18 @@ export async function handleScheduledCheckOperation(args: {
     readonly siteIdentifier: string;
     readonly sitesCache: StandardizedCache<Site>;
 }): Promise<void> {
-    const {
-        checker,
-        logger,
-        monitorId,
-        signal,
-        siteIdentifier,
-        sitesCache,
-    } = args;
+    const { checker, logger, monitorId, signal, siteIdentifier, sitesCache } =
+        args;
 
     const site = sitesCache.get(siteIdentifier);
     if (!site) {
         logger.warn(
-            interpolateLogTemplate(LOG_TEMPLATES.warnings.SITE_NOT_FOUND_SCHEDULED, {
-                siteIdentifier,
-            })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.warnings.SITE_NOT_FOUND_SCHEDULED,
+                {
+                    siteIdentifier,
+                }
+            )
         );
         return;
     }

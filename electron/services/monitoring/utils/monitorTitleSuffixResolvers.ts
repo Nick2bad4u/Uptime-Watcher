@@ -31,7 +31,8 @@ export function createHostPortTitleSuffixResolver(args: {
         }
 
         const host = typeof monitor.host === "string" ? monitor.host : "";
-        const port = typeof monitor.port === "number" ? monitor.port : undefined;
+        const port =
+            typeof monitor.port === "number" ? monitor.port : undefined;
 
         if (host.length === 0 || port === undefined) {
             return "";
@@ -76,7 +77,8 @@ export function createTlsTitleSuffixResolver(args: {
             return "";
         }
 
-        const host = typeof monitor.host === "string" ? monitor.host.trim() : "";
+        const host =
+            typeof monitor.host === "string" ? monitor.host.trim() : "";
         if (host.length === 0) {
             return "";
         }

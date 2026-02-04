@@ -53,7 +53,10 @@ export interface RetryOptions {
      * @defaultValue 300
      */
     delayMs?:
-        | ((args: { readonly attempt: number; readonly error: unknown }) => number)
+        | ((args: {
+              readonly attempt: number;
+              readonly error: unknown;
+          }) => number)
         | number;
 
     /**
@@ -103,7 +106,10 @@ export interface RetryOptions {
 function resolveDelayMs(args: {
     readonly attempt: number;
     readonly delay:
-        | ((args: { readonly attempt: number; readonly error: unknown }) => number)
+        | ((args: {
+              readonly attempt: number;
+              readonly error: unknown;
+          }) => number)
         | number;
     readonly error: unknown;
 }): number {

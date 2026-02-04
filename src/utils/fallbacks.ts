@@ -446,10 +446,8 @@ function splitCamelCase(value: string): string {
     let previous = "";
 
     for (const character of value) {
-        const previousIsLowerAscii =
-            previous >= "a" && previous <= "z";
-        const isUpperAscii =
-            character >= "A" && character <= "Z";
+        const previousIsLowerAscii = previous >= "a" && previous <= "z";
+        const isUpperAscii = character >= "A" && character <= "Z";
 
         if (previousIsLowerAscii && isUpperAscii) {
             result += " ";

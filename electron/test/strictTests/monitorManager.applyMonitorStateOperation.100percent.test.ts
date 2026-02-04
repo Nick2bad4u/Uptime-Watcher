@@ -54,9 +54,11 @@ describe(applyMonitorStateOperation, () => {
         const databaseService = {
             executeTransaction: vi
                 .fn()
-                .mockImplementation(async (fn: (db: unknown) => Promise<void>) => {
-                    await fn({});
-                }),
+                .mockImplementation(
+                    async (fn: (db: unknown) => Promise<void>) => {
+                        await fn({});
+                    }
+                ),
         } as unknown as DatabaseService;
 
         const changes: Partial<Monitor> = {
@@ -119,9 +121,11 @@ describe(applyMonitorStateOperation, () => {
         const databaseService = {
             executeTransaction: vi
                 .fn()
-                .mockImplementation(async (fn: (db: unknown) => Promise<void>) => {
-                    await fn({});
-                }),
+                .mockImplementation(
+                    async (fn: (db: unknown) => Promise<void>) => {
+                        await fn({});
+                    }
+                ),
         } as unknown as DatabaseService;
 
         await applyMonitorStateOperation({

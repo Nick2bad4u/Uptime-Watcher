@@ -339,10 +339,7 @@ export async function connectGoogleDrive(
                 accountLabel ?? ""
             );
 
-            await ctx.settings.set(
-                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-                ""
-            );
+            await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
             await ctx.settings.set(SETTINGS_KEY_PROVIDER, "google-drive");
         } catch (error: unknown) {
             // Roll back any partial state so a previously configured provider

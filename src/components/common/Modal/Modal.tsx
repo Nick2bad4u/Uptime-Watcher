@@ -512,7 +512,11 @@ export const Modal = ({
         }
 
         onRequestClose();
-    }, [closeOnOverlayClick, modalId, onRequestClose]);
+    }, [
+        closeOnOverlayClick,
+        modalId,
+        onRequestClose,
+    ]);
 
     const handleCloseButtonClick = useCallback((): void => {
         handleCloseTopMost();

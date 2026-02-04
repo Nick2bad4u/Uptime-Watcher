@@ -37,8 +37,8 @@ export const electronIpcHandlerRequireValidatorRule = {
 
         return {
             /**
-             * Track registrar functions created via:
-             *   const register = createStandardizedIpcRegistrar(...)
+             * Track registrar functions created via: const register =
+             * createStandardizedIpcRegistrar(...)
              *
              * @param {import("@typescript-eslint/utils").TSESTree.VariableDeclarator} node
              */
@@ -73,12 +73,15 @@ export const electronIpcHandlerRequireValidatorRule = {
                 if (node.callee?.type === "Identifier") {
                     if (node.callee.name !== "registerStandardizedIpcHandler") {
                         // Also enforce registrar usage in handler modules.
-                        if (registrarFunctionNames.has(node.callee.name) && (node.arguments ?? []).length < 3) {
-                                context.report({
-                                    messageId: "missingValidator",
-                                    node: node.callee,
-                                });
-                            }
+                        if (
+                            registrarFunctionNames.has(node.callee.name) &&
+                            (node.arguments ?? []).length < 3
+                        ) {
+                            context.report({
+                                messageId: "missingValidator",
+                                node: node.callee,
+                            });
+                        }
 
                         return;
                     }
@@ -89,8 +92,6 @@ export const electronIpcHandlerRequireValidatorRule = {
                             node: node.callee,
                         });
                     }
-
-
                 }
             },
         };

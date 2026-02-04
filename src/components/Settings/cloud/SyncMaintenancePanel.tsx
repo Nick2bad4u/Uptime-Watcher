@@ -112,9 +112,8 @@ export const SyncMaintenancePanel = ({
         [WarningIcon, xsIconSize]
     );
 
-    const [copyResult, setCopyResult] = useState<SyncMaintenanceCopyResult>(
-        null
-    );
+    const [copyResult, setCopyResult] =
+        useState<SyncMaintenanceCopyResult>(null);
 
     const canReset =
         connected &&

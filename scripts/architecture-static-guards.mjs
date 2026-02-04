@@ -332,10 +332,11 @@ async function checkTypedEventUsage(electronFiles, knownEventNames) {
 /**
  * Ensure URL opening stays centralized.
  *
- * @param electronFiles
  * @remarks
  * Direct `shell.openExternal()` calls are easy to sprinkle around the codebase
  * and can accidentally bypass URL validation/allowlisting.
+ *
+ * @param electronFiles
  */
 async function checkElectronShellUsage(electronFiles) {
     const allowedFiles = new Set([
@@ -361,7 +362,10 @@ async function checkElectronShellUsage(electronFiles) {
         }
 
         const content = await readFile(file, "utf8");
-        if (importsShellPattern.test(content) || content.includes("shell.openExternal(")) {
+        if (
+            importsShellPattern.test(content) ||
+            content.includes("shell.openExternal(")
+        ) {
             const relative = toPosixPath(path.relative(ROOT_DIRECTORY, file));
             errors.push(
                 `${relative}: direct Electron shell usage is restricted. Use electron/services/shell/openExternalUtils.ts to open external URLs safely.`
@@ -375,13 +379,17 @@ async function checkElectronShellUsage(electronFiles) {
 /**
  * Ensure window-open handling stays centralized.
  *
- * @param electronFiles
  * @remarks
  * `webContents.setWindowOpenHandler(...)` is a security-sensitive choke point.
+ *
+ * @param electronFiles
  */
 async function checkWindowOpenHandlerUsage(electronFiles) {
     const allowedFiles = new Set([
-        path.resolve(ROOT_DIRECTORY, "electron/services/window/WindowService.ts"),
+        path.resolve(
+            ROOT_DIRECTORY,
+            "electron/services/window/WindowService.ts"
+        ),
     ]);
 
     /** @type {string[]} */
@@ -433,7 +441,11 @@ async function checkInvokeChannelCoverage() {
     /** @type {string[]} */
     const errors = [];
 
-    const [ipcTypesContent, preloadContent, handlerFiles] = await Promise.all([
+    const [
+        ipcTypesContent,
+        preloadContent,
+        handlerFiles,
+    ] = await Promise.all([
         readFile(ipcTypesPath, "utf8"),
         readFile(preloadTypesPath, "utf8"),
         collectFiles(handlersRoot, [".ts"]),
@@ -599,9 +611,6 @@ async function checkInvokeChannelCoverage() {
     return errors;
 }
 
-/**
- *
- */
 async function main() {
     const electronRoot = path.resolve(ROOT_DIRECTORY, "electron");
     const srcRoot = path.resolve(ROOT_DIRECTORY, "src");

@@ -18,7 +18,7 @@
  * @param input - Coverage/coverage-final.json: Istanbul JSON coverage report.
  *
  * @returns Console output listing files with low function and branch coverage,
- * and a summary.
+ *   and a summary.
  */
 
 import * as fs from "node:fs";
@@ -149,7 +149,7 @@ for (const [filePath, data] of Object.entries(coverageData)) {
      * Determines if a branch is covered based on its coverage array or count.
      *
      * @param {number | number[]} branchArray - The branch coverage data, either
-     * a number or an array of numbers.
+     *   a number or an array of numbers.
      *
      * @returns {boolean} True if the branch is covered, false otherwise.
      */
@@ -175,18 +175,18 @@ for (const [filePath, data] of Object.entries(coverageData)) {
      * @property {number} statements.total - Total number of statements.
      * @property {number} statements.covered - Number of covered statements.
      * @property {number} statements.percentage - Percentage of covered
-     * statements.
+     *   statements.
      * @property {object} functions - Function coverage details.
      * @property {number} functions.total - Total number of functions.
      * @property {number} functions.covered - Number of covered functions.
      * @property {number} functions.percentage - Percentage of covered
-     * functions.
+     *   functions.
      * @property {object} branches - Branch coverage details.
      * @property {number} branches.total - Total number of branches.
      * @property {number} branches.covered - Number of covered branches.
      * @property {number} branches.percentage - Percentage of covered branches.
      *
-     * The analysis object summarizes coverage statistics for each file.
+     *   The analysis object summarizes coverage statistics for each file.
      */
     fileAnalysis.push({
         file: relativePath,
@@ -260,7 +260,7 @@ function computeColWidths(displayed) {
     const fileCol = Math.max(
         minFileCol,
         ...displayed.map(
-            (/** @type {{file: string | any[]}} */ f) => f.file.length
+            (/** @type {{ file: string | any[] }} */ f) => f.file.length
         )
     );
     // Other columns get a reasonable width
@@ -289,7 +289,7 @@ function ellipsize(s, max) {
     /**
      * For '...'.
      */
-    const tail = max - head - 3; 
+    const tail = max - head - 3;
     return `${str.slice(0, head)}...${str.slice(-tail)}`;
 }
 
@@ -323,7 +323,7 @@ function printCoverageSection(header, files) {
 
         displayed.forEach((f) => {
             const fmt = (
-                /** @type {{percentage: number, covered: any, total: any}} */ cov
+                /** @type {{ percentage: number; covered: any; total: any }} */ cov
             ) => {
                 if (!cov) return "-";
                 const pct = cov.percentage ?? 0;
@@ -368,7 +368,7 @@ function printCoverageSection(header, files) {
             fileCol
         );
         const cell = (
-            /** @type {{percentage: number, covered: any, total: any}} */ cov
+            /** @type {{ percentage: number; covered: any; total: any }} */ cov
         ) => {
             if (!cov) return padLeft("-", 14);
             const pct = cov.percentage ?? 0;

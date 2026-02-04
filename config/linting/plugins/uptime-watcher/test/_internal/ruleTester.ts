@@ -1,6 +1,5 @@
 import tsParser from "@typescript-eslint/parser";
-import { type Rule,
-RuleTester } from "eslint";
+import { type Rule, RuleTester } from "eslint";
 import * as path from "node:path";
 
 import uptimeWatcherPlugin from "../../plugin.mjs";

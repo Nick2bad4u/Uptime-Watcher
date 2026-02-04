@@ -454,8 +454,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
     }
 
     /**
-     * Returns true if the key represents a cloud-sync object that this transport
-     * is willing to delete.
+     * Returns true if the key represents a cloud-sync object that this
+     * transport is willing to delete.
      *
      * @remarks
      * This is intended for maintenance operations (e.g. remote sync reset) that

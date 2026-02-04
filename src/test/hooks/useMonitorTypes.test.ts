@@ -7,10 +7,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
-import {
-    BASE_MONITOR_TYPES,
-    type MonitorType,
-} from "@shared/types";
+import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import type { MonitorTypeOption } from "@shared/types/monitorTypes";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../../constants";
@@ -375,9 +372,7 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Initialization", "type");
 
-            let resolvePromise: (
-                value: MonitorTypeOption[]
-            ) => void;
+            let resolvePromise: (value: MonitorTypeOption[]) => void;
             const loadPromise = new Promise<MonitorTypeOption[]>((resolve) => {
                 resolvePromise = resolve;
             });
@@ -421,12 +416,12 @@ describe("useMonitorTypes Hook", () => {
             });
 
             // Start refresh
-            let resolveRefresh: (
-                value: MonitorTypeOption[]
-            ) => void;
-            const refreshPromise = new Promise<MonitorTypeOption[]>((resolve) => {
-                resolveRefresh = resolve;
-            });
+            let resolveRefresh: (value: MonitorTypeOption[]) => void;
+            const refreshPromise = new Promise<MonitorTypeOption[]>(
+                (resolve) => {
+                    resolveRefresh = resolve;
+                }
+            );
             mockGetMonitorTypeOptions.mockReturnValue(refreshPromise);
 
             act(() => {
@@ -553,9 +548,7 @@ describe("useMonitorTypes Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Loading", "type");
 
-            let resolvePromise: (
-                value: MonitorTypeOption[]
-            ) => void;
+            let resolvePromise: (value: MonitorTypeOption[]) => void;
             const loadPromise = new Promise<MonitorTypeOption[]>((resolve) => {
                 resolvePromise = resolve;
             });
@@ -673,7 +666,9 @@ describe("useMonitorTypes Hook", () => {
                 fc.array(
                     fc.record({
                         label: fc.string({ minLength: 1, maxLength: 50 }),
-                        value: fc.constantFrom<MonitorType>(...BASE_MONITOR_TYPES),
+                        value: fc.constantFrom<MonitorType>(
+                            ...BASE_MONITOR_TYPES
+                        ),
                     }),
                     { minLength: 0, maxLength: 10 }
                 ),
@@ -767,7 +762,9 @@ describe("useMonitorTypes Hook", () => {
                     { length: optionCount },
                     (_, i): MonitorTypeOption => ({
                         label: `Monitor Type ${i + 1}`,
-                        value: BASE_MONITOR_TYPES[i % BASE_MONITOR_TYPES.length]!,
+                        value: BASE_MONITOR_TYPES[
+                            i % BASE_MONITOR_TYPES.length
+                        ]!,
                     })
                 );
 
@@ -993,40 +990,34 @@ describe("useMonitorTypes Hook", () => {
 
         test.prop(
             [
-                fc.array(
-                    fc.constantFrom<MonitorType>(...BASE_MONITOR_TYPES),
-                    {
-                        minLength: 0,
-                        maxLength: BASE_MONITOR_TYPES.length,
-                    }
-                ),
+                fc.array(fc.constantFrom<MonitorType>(...BASE_MONITOR_TYPES), {
+                    minLength: 0,
+                    maxLength: BASE_MONITOR_TYPES.length,
+                }),
             ],
             {
                 timeout: 1500,
                 numRuns: 5,
             }
-        )(
-            "should accept backend options as-is",
-            async (monitorTypes) => {
-                const monitorOptions: MonitorTypeOption[] = monitorTypes.map(
-                    (type): MonitorTypeOption => ({
-                        label: type.toUpperCase(),
-                        value: type,
-                    })
-                );
+        )("should accept backend options as-is", async (monitorTypes) => {
+            const monitorOptions: MonitorTypeOption[] = monitorTypes.map(
+                (type): MonitorTypeOption => ({
+                    label: type.toUpperCase(),
+                    value: type,
+                })
+            );
 
-                mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
+            mockGetMonitorTypeOptions.mockResolvedValue(monitorOptions);
 
-                const { result } = renderHook(() => useMonitorTypes());
+            const { result } = renderHook(() => useMonitorTypes());
 
-                await waitFor(() => {
-                    expect(result.current.isLoading).toBeFalsy();
-                });
+            await waitFor(() => {
+                expect(result.current.isLoading).toBeFalsy();
+            });
 
-                expect(result.current.options).toEqual(monitorOptions);
-                expect(result.current.error).toBeUndefined();
-            }
-        );
+            expect(result.current.options).toEqual(monitorOptions);
+            expect(result.current.error).toBeUndefined();
+        });
 
         test.prop([fc.integer({ min: 20, max: 50 })], {
             timeout: 1500, // Increase fast-check timeout to 1.5s

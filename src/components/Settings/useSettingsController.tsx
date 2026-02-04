@@ -82,7 +82,9 @@ export interface SettingsControllerState {
         readonly onRefreshHistory: () => void;
         readonly onResetData: () => void;
         readonly onRestoreClick: () => void;
-        readonly onRestoreFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
+        readonly onRestoreFileChange: (
+            event: ChangeEvent<HTMLInputElement>
+        ) => void;
         readonly refreshButtonIcon: ReactNode;
         readonly resetButtonIcon: ReactNode;
         readonly restoreFileInputRef: RefObject<HTMLInputElement | null>;
@@ -93,7 +95,9 @@ export interface SettingsControllerState {
         readonly currentHistoryLimit: number;
         readonly icon: IconType;
         readonly isLoading: boolean;
-        readonly onHistoryLimitChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+        readonly onHistoryLimitChange: (
+            event: ChangeEvent<HTMLSelectElement>
+        ) => void;
     };
     readonly notificationSectionProps: {
         readonly icon: IconType;
@@ -184,15 +188,16 @@ export const useSettingsController = ({
         )
     );
 
-    const { applySettingChanges, handleSettingChange } = useSettingsChangeHandlers(
-        useMemo(
-            () => ({
-                settings,
-                updateSettings,
-            }),
-            [settings, updateSettings]
-        )
-    );
+    const { applySettingChanges, handleSettingChange } =
+        useSettingsChangeHandlers(
+            useMemo(
+                () => ({
+                    settings,
+                    updateSettings,
+                }),
+                [settings, updateSettings]
+            )
+        );
 
     const handleHistoryLimitChange = useCallback(
         async (limit: number) => {
@@ -233,7 +238,11 @@ export const useSettingsController = ({
         await resetSettings();
         clearError();
         logger.user.action("Reset settings to defaults");
-    }, [clearError, requestConfirmation, resetSettings]);
+    }, [
+        clearError,
+        requestConfirmation,
+        resetSettings,
+    ]);
 
     const handleThemeChange = useCallback(
         (themeName: ThemeName) => {
@@ -296,7 +305,10 @@ export const useSettingsController = ({
                 return;
             }
 
-            const normalizedVolume = Math.min(Math.max(sliderValue / 100, 0), 1);
+            const normalizedVolume = Math.min(
+                Math.max(sliderValue / 100, 0),
+                1
+            );
 
             applySettingChanges({
                 inAppAlertVolume: normalizedVolume,
@@ -404,7 +416,8 @@ export const useSettingsController = ({
         [handleThemeChange]
     );
 
-    const isVolumeControlDisabled = !inAppAlertsEnabled || !inAppAlertsSoundEnabled;
+    const isVolumeControlDisabled =
+        !inAppAlertsEnabled || !inAppAlertsSoundEnabled;
     const sliderDisabled = isLoading || isVolumeControlDisabled;
     const clampedVolume = Math.min(Math.max(inAppAlertVolume, 0), 1);
     const volumePercent = Math.round(clampedVolume * 100);
@@ -438,7 +451,11 @@ export const useSettingsController = ({
                 onChange={handleInAppAlertsChange}
             />
         ),
-        [handleInAppAlertsChange, inAppAlertsEnabled, isLoading]
+        [
+            handleInAppAlertsChange,
+            inAppAlertsEnabled,
+            isLoading,
+        ]
     );
 
     const inAppAlertSoundControl = useMemo(
@@ -519,7 +536,11 @@ export const useSettingsController = ({
                 onChange={handleSystemNotificationsChange}
             />
         ),
-        [handleSystemNotificationsChange, isLoading, systemNotificationsEnabled]
+        [
+            handleSystemNotificationsChange,
+            isLoading,
+            systemNotificationsEnabled,
+        ]
     );
 
     const systemNotificationSoundControl = useMemo(
@@ -550,7 +571,15 @@ export const useSettingsController = ({
             systemNotificationsControl,
             systemNotificationSoundControl,
         }),
-        [inAppAlertsControl, inAppAlertSoundControl, inAppAlertVolumeControl, isLoading, isVolumeControlDisabled, systemNotificationsControl, systemNotificationSoundControl]
+        [
+            inAppAlertsControl,
+            inAppAlertSoundControl,
+            inAppAlertVolumeControl,
+            isLoading,
+            isVolumeControlDisabled,
+            systemNotificationsControl,
+            systemNotificationSoundControl,
+        ]
     );
 
     const autoStartControl = useMemo(
@@ -562,7 +591,11 @@ export const useSettingsController = ({
                 onChange={handleAutoStartChange}
             />
         ),
-        [autoStart, handleAutoStartChange, isLoading]
+        [
+            autoStart,
+            handleAutoStartChange,
+            isLoading,
+        ]
     );
 
     const minimizeToTrayControl = useMemo(
@@ -574,7 +607,11 @@ export const useSettingsController = ({
                 onChange={handleMinimizeToTrayChange}
             />
         ),
-        [handleMinimizeToTrayChange, isLoading, minimizeToTray]
+        [
+            handleMinimizeToTrayChange,
+            isLoading,
+            minimizeToTray,
+        ]
     );
 
     const handleSyncNow = useCallback(async () => {
@@ -584,7 +621,10 @@ export const useSettingsController = ({
             setSyncSuccess(true);
             logger.user.action("Synced data from SQLite backend");
         } catch (error: unknown) {
-            logger.error("Failed to sync data from backend", ensureError(error));
+            logger.error(
+                "Failed to sync data from backend",
+                ensureError(error)
+            );
             setError(`Failed to sync data: ${getUserFacingErrorDetail(error)}`);
         }
     }, [fullResyncSites, setError]);
@@ -607,9 +647,15 @@ export const useSettingsController = ({
             });
         } catch (error: unknown) {
             logger.error("Failed to save SQLite backup", ensureError(error));
-            setError(`Failed to save SQLite backup: ${getUserFacingErrorDetail(error)}`);
+            setError(
+                `Failed to save SQLite backup: ${getUserFacingErrorDetail(error)}`
+            );
         }
-    }, [clearError, saveSqliteBackup, setError]);
+    }, [
+        clearError,
+        saveSqliteBackup,
+        setError,
+    ]);
 
     const handleRestoreSQLite = useCallback(
         async (file: File) => {
@@ -637,13 +683,20 @@ export const useSettingsController = ({
                     sizeBytes: restoreSummary.metadata.sizeBytes,
                 });
             } catch (error: unknown) {
-                logger.error("Failed to restore SQLite backup", ensureError(error));
+                logger.error(
+                    "Failed to restore SQLite backup",
+                    ensureError(error)
+                );
                 setError(
                     `Failed to restore SQLite backup: ${getUserFacingErrorDetail(error)}`
                 );
             }
         },
-        [clearError, restoreSqliteBackup, setError]
+        [
+            clearError,
+            restoreSqliteBackup,
+            setError,
+        ]
     );
 
     const handleRestoreFileChange = useCallback(
@@ -746,7 +799,12 @@ export const useSettingsController = ({
             isLoading,
             onHistoryLimitChange: handleHistoryLimitSelectChange,
         }),
-        [currentHistoryLimit, handleHistoryLimitSelectChange, isLoading, MonitoringIcon]
+        [
+            currentHistoryLimit,
+            handleHistoryLimitSelectChange,
+            isLoading,
+            MonitoringIcon,
+        ]
     );
 
     const maintenanceSectionProps = useMemo(
@@ -766,7 +824,22 @@ export const useSettingsController = ({
             showButtonLoading,
             uploadButtonIcon,
         }),
-        [backupSummary, downloadButtonIcon, handleDownloadSQLiteClick, handleResetClick, handleRestoreInputChange, handleRestoreSQLiteClick, handleSyncNowClick, isLoading, MaintenanceIcon, refreshButtonIcon, resetButtonIcon, restoreFileInputRef, showButtonLoading, uploadButtonIcon]
+        [
+            backupSummary,
+            downloadButtonIcon,
+            handleDownloadSQLiteClick,
+            handleResetClick,
+            handleRestoreInputChange,
+            handleRestoreSQLiteClick,
+            handleSyncNowClick,
+            isLoading,
+            MaintenanceIcon,
+            refreshButtonIcon,
+            resetButtonIcon,
+            restoreFileInputRef,
+            showButtonLoading,
+            uploadButtonIcon,
+        ]
     );
 
     const headerBackground = useMemo(

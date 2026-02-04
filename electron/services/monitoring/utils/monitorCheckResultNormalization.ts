@@ -19,7 +19,9 @@ export function toFailure(details?: string): MonitorCheckResult {
 /**
  * Runtime validation guard for {@link MonitorCheckResult}.
  */
-export function isValidServiceResult(value: unknown): value is MonitorCheckResult {
+export function isValidServiceResult(
+    value: unknown
+): value is MonitorCheckResult {
     if (!isRecord(value)) {
         return false;
     }

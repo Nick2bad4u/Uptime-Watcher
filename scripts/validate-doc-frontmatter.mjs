@@ -113,7 +113,7 @@ async function collectMarkdownFiles(startDirectory) {
  * @param {string} content
  * @param {string} filePath
  *
- * @returns {{yamlText: string, bodyOffset: number}}
+ * @returns {{ yamlText: string; bodyOffset: number }}
  */
 function extractFrontMatter(content, filePath) {
     const lines = content.split(/\r?\n/);
@@ -360,8 +360,15 @@ function validateAgainstSchema(schema, data, filePath) {
     // Per-property checks
     for (const [key, rawDefinition] of Object.entries(properties)) {
         const definition = /**
-                            * @type {{type?: string, enum?: string[], minLength?: number, pattern?: string, minItems?: number, items?: {type?: string}}}
-                            */ (rawDefinition);
+         * @type {{
+         *     type?: string;
+         *     enum?: string[];
+         *     minLength?: number;
+         *     pattern?: string;
+         *     minItems?: number;
+         *     items?: { type?: string };
+         * }}
+         */ (rawDefinition);
 
         const value = data[key];
         if (value === undefined || value === null) {
@@ -464,9 +471,6 @@ async function validateFile(markdownPath, schema) {
     return validateAgainstSchema(schema, frontMatter, markdownPath);
 }
 
-/**
- *
- */
 async function main() {
     const schemaRaw = await readFile(FRONTMATTER_SCHEMA_PATH, "utf8");
     const schema = /** @type {JsonObject} */ (JSON.parse(schemaRaw));

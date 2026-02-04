@@ -619,26 +619,28 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
     describe("Complex Data Scenarios", () => {
         it("should handle large datasets", async () => {
-                const largeDataset: MonitorTypeConfig[] = Array.from(
-                    { length: 100 },
-                    (_, i) => ({
-                        type: BASE_MONITOR_TYPES[i % BASE_MONITOR_TYPES.length] ?? "http",
-                        displayName: `Type ${i}`,
-                        description: `Description ${i}`,
-                        version: "1.0",
-                        fields: Array.from({ length: 10 }, (_, fieldIndex) => ({
-                            name: `field-${fieldIndex}`,
-                            type: "text",
-                            required: fieldIndex % 2 === 0,
-                            label: `Field ${fieldIndex}`,
-                        })),
-                    })
-                );
+            const largeDataset: MonitorTypeConfig[] = Array.from(
+                { length: 100 },
+                (_, i) => ({
+                    type:
+                        BASE_MONITOR_TYPES[i % BASE_MONITOR_TYPES.length] ??
+                        "http",
+                    displayName: `Type ${i}`,
+                    description: `Description ${i}`,
+                    version: "1.0",
+                    fields: Array.from({ length: 10 }, (_, fieldIndex) => ({
+                        name: `field-${fieldIndex}`,
+                        type: "text",
+                        required: fieldIndex % 2 === 0,
+                        label: `Field ${fieldIndex}`,
+                    })),
+                })
+            );
 
-                mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
-                    largeDataset
-                );
-                mockSafeExtractIpcData.mockReturnValue(largeDataset);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
+                largeDataset
+            );
+            mockSafeExtractIpcData.mockReturnValue(largeDataset);
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -657,7 +659,8 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 {
                     type: "http",
                     displayName: "Special Characters",
-                    description: "Testing special characters in field definitions",
+                    description:
+                        "Testing special characters in field definitions",
                     version: "1.0",
                     fields: [
                         {

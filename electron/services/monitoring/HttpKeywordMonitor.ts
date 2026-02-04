@@ -83,19 +83,21 @@ type HttpKeywordMonitorConstructor = new (
     config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance;
 
-const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor = ((): HttpKeywordMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () =>
-                createHttpMonitorService<"http-keyword", { keyword: string }>(
-                    behavior
-                ),
-            "HttpKeywordMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor =
+    ((): HttpKeywordMonitorConstructor => {
+        try {
+            return buildMonitorFactory(
+                () =>
+                    createHttpMonitorService<
+                        "http-keyword",
+                        { keyword: string }
+                    >(behavior),
+                "HttpKeywordMonitor"
+            );
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * HTTP keyword monitor service powered by the shared HTTP core.

@@ -2,8 +2,8 @@
  * Scheduled-check execution for {@link EnhancedMonitorChecker}.
  *
  * @remarks
- * Scheduled checks are correlation-aware and should be skipped when a monitor is
- * not marked as `monitoring`.
+ * Scheduled checks are correlation-aware and should be skipped when a monitor
+ * is not marked as `monitoring`.
  *
  * @packageDocumentation
  */

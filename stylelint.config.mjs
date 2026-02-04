@@ -86,7 +86,7 @@ import defineConfig from "stylelint-define-config";
  * ```
  *
  * @returns The complete Stylelint configuration object with all rules and
- * plugins.
+ *   plugins.
  *
  * @public
  *
@@ -694,6 +694,21 @@ const config = defineConfig({
         "declaration-property-value-disallowed-list": null,
         "declaration-property-value-keyword-no-deprecated": true,
         "declaration-property-value-no-unknown": null,
+        "defensive-css/no-mixed-vendor-prefixes": true,
+        /**
+         * Defensive CSS practices enforcement.
+         *
+         * @remarks
+         * `stylelint-plugin-defensive-css` v2+ exposes rules under the
+         * `defensive-css/*` namespace (the old `plugin/use-defensive-css` rule
+         * no longer exists).
+         *
+         * @see {@link https://defensivecss.dev/ | Defensive CSS Guide}
+         */
+        "defensive-css/require-background-repeat": null,
+        "defensive-css/require-flex-wrap": null,
+        "defensive-css/require-overscroll-behavior": true,
+        "defensive-css/require-scrollbar-gutter": true,
         "font-family-name-quotes": "always-where-recommended",
         "font-family-no-duplicate-names": true,
         "font-family-no-missing-generic-family-keyword": true,
@@ -712,19 +727,19 @@ const config = defineConfig({
         "function-url-scheme-disallowed-list": null,
         // Color gamut validation
         "gamut/color-no-out-gamut-range": true,
+
         "hue-degree-notation": "angle",
         "import-notation": "string",
         "keyframe-block-no-duplicate-selectors": true,
+
         "keyframe-declaration-no-important": true,
         "keyframe-selector-notation":
             "percentage-unless-within-keyword-only-block",
-
         // Length rules
         "length-zero-no-unit": true, // Disallow units for zero lengths (0px -> 0) (verified working)
         "lightness-notation": "percentage",
         // Layout and structure
         "max-nesting-depth": 4,
-
         // Media query rules
         "media-feature-name-allowed-list": null,
         "media-feature-name-disallowed-list": null,
@@ -749,11 +764,14 @@ const config = defineConfig({
         // No unknown rules
         "no-unknown-animations": true,
         "no-unknown-custom-media": null,
+
         "no-unknown-custom-properties": null,
+
         "number-max-precision": 15,
         // Taken care of Prettier
         "order/order": null,
         "order/properties-alphabetical-order": null,
+
         // Plugin rules
         "plugin/declaration-block-no-ignored-properties": true,
 
@@ -783,7 +801,6 @@ const config = defineConfig({
                 ],
             },
         ],
-
         /**
          * Performance optimization rules for animations and high-impact
          * properties.
@@ -820,8 +837,8 @@ const config = defineConfig({
             },
         ],
         "plugin/no-restricted-syntax": null,
-        "plugin/no-unresolved-module": null,
 
+        "plugin/no-unresolved-module": null,
         /**
          * Browser feature compatibility validation.
          *
@@ -866,7 +883,6 @@ const config = defineConfig({
                 severity: "warning",
             },
         ],
-
         /**
          * BEM (Block Element Modifier) pattern enforcement.
          *
@@ -913,44 +929,6 @@ const config = defineConfig({
         },
         "plugin/stylelint-group-selectors": true,
         "plugin/use-baseline": null,
-
-        /**
-         * Defensive CSS practices enforcement.
-         *
-         * @remarks
-         * Promotes defensive coding patterns that prevent common CSS issues and
-         * improve layout stability. Some practices are disabled based on
-         * project preferences.
-         *
-         * @see {@link https://defensivecss.dev/ | Defensive CSS Guide}
-         */
-        "plugin/use-defensive-css": [
-            true,
-            {
-                /**
-                 * Defensive CSS practice configurations.
-                 *
-                 * @remarks
-                 * Each option enables specific defensive practices:
-                 *
-                 * - Background-repeat: Ensures backgrounds don't repeat
-                 *   unexpectedly
-                 * - Flex-wrapping: Disabled to allow explicit control over flex
-                 *   behavior
-                 * - Scroll-chaining: Prevents unwanted scroll behavior
-                 *   propagation
-                 * - Scrollbar-gutter: Reserves space for scrollbars to prevent
-                 *   layout shift
-                 * - Vendor-prefix-grouping: Groups vendor prefixes for
-                 *   consistency
-                 */
-                "background-repeat": true,
-                "flex-wrapping": false,
-                "scroll-chaining": true,
-                "scrollbar-gutter": true,
-                "vendor-prefix-grouping": true,
-            },
-        ],
 
         /**
          * Logical properties and values promotion.

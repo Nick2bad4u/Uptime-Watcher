@@ -43,13 +43,14 @@ export interface OperationTelemetryConfig {
  * Typed telemetry payload for the sites store.
  *
  * @remarks
- * This is intentionally *flexible* (values are `unknown`) because telemetry
+ * This is intentionally _flexible_ (values are `unknown`) because telemetry
  * often includes domain objects (e.g. `Partial<Site>`, monitors, sync deltas)
  * whose types may contain unions/optionals that are awkward to model as strict
  * JSON values.
  *
  * The consistency win here is centralizing the payload type and standardizing
- * stage keys (`status`, `success`, `error`) via {@link SitesTelemetryStagePayload}.
+ * stage keys (`status`, `success`, `error`) via
+ * {@link SitesTelemetryStagePayload}.
  */
 export type SitesTelemetryPayload = Readonly<Record<string, unknown>>;
 

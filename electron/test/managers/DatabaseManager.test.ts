@@ -10,9 +10,7 @@ import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
-import {
-    mockConstructableReturnValue,
-} from "@shared/test/helpers/vitestConstructors";
+import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";

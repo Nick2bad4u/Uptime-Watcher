@@ -162,7 +162,10 @@ describe("Operational Hooks", () => {
             errorSpy.mockRestore();
         });
 
-        it("downgrades AbortError logging to debug", async ({ task, annotate }) => {
+        it("downgrades AbortError logging to debug", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");
             await annotate("Category: Utility", "category");
@@ -174,12 +177,16 @@ describe("Operational Hooks", () => {
             const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {
                 // no-op
             });
-            const errorSpy = vi.spyOn(logger, "error").mockImplementation(() => {
-                // no-op
-            });
-            const debugSpy = vi.spyOn(logger, "debug").mockImplementation(() => {
-                // no-op
-            });
+            const errorSpy = vi
+                .spyOn(logger, "error")
+                .mockImplementation(() => {
+                    // no-op
+                });
+            const debugSpy = vi
+                .spyOn(logger, "debug")
+                .mockImplementation(() => {
+                    // no-op
+                });
 
             await expect(
                 withOperationalHooks(mockOperation, {

@@ -51,12 +51,16 @@ export function useSettingsChangeHandlers(args: {
     const { settings, updateSettings } = args;
 
     const applySettingChanges = useCallback(
-        (changes: Partial<AppSettings>, options?: ApplySettingChangesOptions) => {
+        (
+            changes: Partial<AppSettings>,
+            options?: ApplySettingChangesOptions
+        ) => {
             const forceSettingsKeys = new Set(options?.forceKeys);
 
             // Create a safe update object with validated keys
-            const updateEntries: Array<[keyof AppSettings, AppSettings[keyof AppSettings]]> =
-                [];
+            const updateEntries: Array<
+                [keyof AppSettings, AppSettings[keyof AppSettings]]
+            > = [];
 
             // Log and apply changes for allowed keys
             for (const allowedKey of ALLOWED_SETTINGS_KEY_LIST) {
@@ -86,7 +90,10 @@ export function useSettingsChangeHandlers(args: {
             // Warn about invalid keys
             for (const rawKey of Object.keys(changes)) {
                 if (!ALLOWED_SETTINGS_KEY_STRINGS.has(rawKey)) {
-                    logger.warn("Attempted to update invalid settings key", rawKey);
+                    logger.warn(
+                        "Attempted to update invalid settings key",
+                        rawKey
+                    );
                 }
             }
 

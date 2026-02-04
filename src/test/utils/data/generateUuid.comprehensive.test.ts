@@ -1,10 +1,10 @@
 /**
- * @file Comprehensive tests for {@link generateUuid}.
- *
  * @remarks
  * These tests intentionally assert **observable behavior** (format, uniqueness,
  * and feature-detection fallbacks) rather than internal implementation details
  * (e.g. Math.random call counts or exact string outputs).
+ *
+ * @file Comprehensive tests for {@link generateUuid}.
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -21,9 +21,9 @@ interface CryptoLike {
     randomUUID?: () => string;
 }
 
-function installCryptoMock(
-    cryptoValue: CryptoLike | undefined
-): { restore: () => void } {
+function installCryptoMock(cryptoValue: CryptoLike | undefined): {
+    restore: () => void;
+} {
     const original = globalThis.crypto;
     // The runtime property is writable in tests; TS type is readonly.
     globalThis.crypto = cryptoValue as unknown as Crypto;
@@ -41,7 +41,10 @@ describe(generateUuid, () => {
     });
 
     describe("Native crypto.randomUUID Behavior", () => {
-        it("should use crypto.randomUUID when available", async ({ task, annotate }) => {
+        it("should use crypto.randomUUID when available", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");

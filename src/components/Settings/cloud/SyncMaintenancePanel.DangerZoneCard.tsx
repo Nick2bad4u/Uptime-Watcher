@@ -55,8 +55,8 @@ export const SyncMaintenanceDangerZoneCard = ({
             </div>
 
             <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
-                Resetting remote sync deletes remote history and re-seeds from this
-                device. Other devices may need to resync.
+                Resetting remote sync deletes remote history and re-seeds from
+                this device. Other devices may need to resync.
             </ThemedText>
         </div>
     );

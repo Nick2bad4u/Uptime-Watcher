@@ -65,10 +65,7 @@ export interface UseMonitorFieldsResult {
     /** Get required fields for a specific monitor type */
     getRequiredFields: (monitorType: MonitorType) => string[];
     /** Check if a field is required for a monitor type */
-    isFieldRequired: (
-        monitorType: MonitorType,
-        fieldName: string
-    ) => boolean;
+    isFieldRequired: (monitorType: MonitorType, fieldName: string) => boolean;
     /** Whether field definitions are loaded */
     isLoaded: boolean;
 }

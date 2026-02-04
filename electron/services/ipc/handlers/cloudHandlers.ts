@@ -1,5 +1,8 @@
 import type { CloudEnableSyncConfig } from "@shared/types/cloud";
-import type { IpcInvokeChannel, IpcInvokeChannelParams } from "@shared/types/ipc";
+import type {
+    IpcInvokeChannel,
+    IpcInvokeChannelParams,
+} from "@shared/types/ipc";
 
 import { CLOUD_CHANNELS } from "@shared/types/preload";
 import { createSingleFlight } from "@shared/utils/singleFlight";
@@ -107,8 +110,11 @@ export function registerCloudHandlers({
 
     register(
         CLOUD_CHANNELS.migrateBackups,
-        (config: IpcInvokeChannelParams<typeof CLOUD_CHANNELS.migrateBackups>[0]) =>
-            cloudService.migrateBackups(config),
+        (
+            config: IpcInvokeChannelParams<
+                typeof CLOUD_CHANNELS.migrateBackups
+            >[0]
+        ) => cloudService.migrateBackups(config),
         CloudHandlerValidators.migrateBackups
     );
 

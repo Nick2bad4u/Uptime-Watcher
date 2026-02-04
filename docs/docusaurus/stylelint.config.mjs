@@ -68,24 +68,30 @@ export default {
         // Declaration rules
         "declaration-property-value-no-unknown": true,
 
-        // Font rules
-        "font-weight-notation": "numeric",
+        "defensive-css/no-mixed-vendor-prefixes": true,
 
         // "csstools/value-no-unknown-custom-properties": true, // Disabled: Tailwind's dynamic class generation and custom properties are not compatible with this rule. See https://github.com/tailwindlabs/tailwindcss/issues/9602 for details.
 
+        "defensive-css/require-background-repeat": null,
+        "defensive-css/require-flex-wrap": null,
+
+        "defensive-css/require-overscroll-behavior": true,
+
+        "defensive-css/require-scrollbar-gutter": true,
+        // Font rules
+        "font-weight-notation": "numeric",
+
         // Function rules (security and best practices)
         "function-linear-gradient-no-nonstandard-direction": true,
-        "function-url-no-scheme-relative": true,
 
+        "function-url-no-scheme-relative": true,
         // Color gamut validation
         "gamut/color-no-out-gamut-range": true,
 
         "keyframes-name-pattern": null,
         // Layout and structure
         "max-nesting-depth": 4,
-
         "no-unknown-animations": true,
-
         "plugin/declaration-block-no-ignored-properties": true,
         "plugin/no-low-performance-animation-properties": [
             true,
@@ -105,19 +111,8 @@ export default {
                 ],
             },
         ],
-
         // Plugin rules
         "plugin/stylelint-group-selectors": true,
-        "plugin/use-defensive-css": [
-            true,
-            {
-                "background-repeat": true,
-                "flex-wrapping": false,
-                "scroll-chaining": true,
-                "scrollbar-gutter": true,
-                "vendor-prefix-grouping": true,
-            },
-        ],
         "plugin/use-logical-properties-and-values": [
             true,
             { severity: "warning" },

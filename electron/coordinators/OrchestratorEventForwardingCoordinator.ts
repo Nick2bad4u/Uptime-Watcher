@@ -87,29 +87,29 @@ export class OrchestratorEventForwardingCoordinator {
             message:
                 "[OrchestratorEventForwardingCoordinator] Error handling internal:site:added",
             task: async () => {
-            if (!data.site) {
-                logger.error(
-                    "[OrchestratorEventForwardingCoordinator] Received internal:site:added without site payload",
-                    { identifier: data.identifier }
-                );
-                return;
-            }
+                if (!data.site) {
+                    logger.error(
+                        "[OrchestratorEventForwardingCoordinator] Received internal:site:added without site payload",
+                        { identifier: data.identifier }
+                    );
+                    return;
+                }
 
-            const source = data.source ?? SITE_ADDED_SOURCE.USER;
-            const payload = {
-                site: data.site,
-                source,
-                timestamp: data.timestamp,
-            } satisfies OrchestratorEvents["site:added"];
+                const source = data.source ?? SITE_ADDED_SOURCE.USER;
+                const payload = {
+                    site: data.site,
+                    source,
+                    timestamp: data.timestamp,
+                } satisfies OrchestratorEvents["site:added"];
 
-            attachForwardedMetadata({
-                busId: this.busId,
-                forwardedEvent: "site:added",
-                payload,
-                source: data,
-            });
+                attachForwardedMetadata({
+                    busId: this.busId,
+                    forwardedEvent: "site:added",
+                    payload,
+                    source: data,
+                });
 
-            await this.eventBus.emitTyped("site:added", payload);
+                await this.eventBus.emitTyped("site:added", payload);
             },
         });
     };
@@ -125,33 +125,33 @@ export class OrchestratorEventForwardingCoordinator {
             message:
                 "[OrchestratorEventForwardingCoordinator] Error handling internal:site:removed",
             task: async () => {
-            const siteIdentifier =
-                data.identifier ?? data.site?.identifier ?? "unknown-site";
-            const siteName = data.site?.name ?? "Unknown";
-            const cascade = data.cascade === true;
+                const siteIdentifier =
+                    data.identifier ?? data.site?.identifier ?? "unknown-site";
+                const siteName = data.site?.name ?? "Unknown";
+                const cascade = data.cascade === true;
 
-            if (!data.site) {
-                logger.warn(
-                    "[OrchestratorEventForwardingCoordinator] internal:site:removed emitted without site snapshot; using fallback values",
-                    { siteIdentifier }
-                );
-            }
+                if (!data.site) {
+                    logger.warn(
+                        "[OrchestratorEventForwardingCoordinator] internal:site:removed emitted without site snapshot; using fallback values",
+                        { siteIdentifier }
+                    );
+                }
 
-            const payload = {
-                cascade,
-                siteIdentifier,
-                siteName,
-                timestamp: data.timestamp,
-            } satisfies OrchestratorEvents["site:removed"];
+                const payload = {
+                    cascade,
+                    siteIdentifier,
+                    siteName,
+                    timestamp: data.timestamp,
+                } satisfies OrchestratorEvents["site:removed"];
 
-            attachForwardedMetadata({
-                busId: this.busId,
-                forwardedEvent: "site:removed",
-                payload,
-                source: data,
-            });
+                attachForwardedMetadata({
+                    busId: this.busId,
+                    forwardedEvent: "site:removed",
+                    payload,
+                    source: data,
+                });
 
-            await this.eventBus.emitTyped("site:removed", payload);
+                await this.eventBus.emitTyped("site:removed", payload);
             },
         });
     };
@@ -167,29 +167,29 @@ export class OrchestratorEventForwardingCoordinator {
             message:
                 "[OrchestratorEventForwardingCoordinator] Error handling internal:site:updated",
             task: async () => {
-            if (!data.site) {
-                logger.error(
-                    "[OrchestratorEventForwardingCoordinator] Received internal:site:updated without site payload",
-                    { identifier: data.identifier }
-                );
-                return;
-            }
+                if (!data.site) {
+                    logger.error(
+                        "[OrchestratorEventForwardingCoordinator] Received internal:site:updated without site payload",
+                        { identifier: data.identifier }
+                    );
+                    return;
+                }
 
-            const payload = {
-                previousSite: data.previousSite ?? data.site,
-                site: data.site,
-                timestamp: data.timestamp,
-                updatedFields: data.updatedFields ?? [],
-            } satisfies OrchestratorEvents["site:updated"];
+                const payload = {
+                    previousSite: data.previousSite ?? data.site,
+                    site: data.site,
+                    timestamp: data.timestamp,
+                    updatedFields: data.updatedFields ?? [],
+                } satisfies OrchestratorEvents["site:updated"];
 
-            attachForwardedMetadata({
-                busId: this.busId,
-                forwardedEvent: "site:updated",
-                payload,
-                source: data,
-            });
+                attachForwardedMetadata({
+                    busId: this.busId,
+                    forwardedEvent: "site:updated",
+                    payload,
+                    source: data,
+                });
 
-            await this.eventBus.emitTyped("site:updated", payload);
+                await this.eventBus.emitTyped("site:updated", payload);
             },
         });
     };

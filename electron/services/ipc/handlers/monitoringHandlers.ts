@@ -1,4 +1,7 @@
-import type { IpcInvokeChannel, IpcInvokeChannelParams  } from "@shared/types/ipc";
+import type {
+    IpcInvokeChannel,
+    IpcInvokeChannelParams,
+} from "@shared/types/ipc";
 
 import { MONITORING_CHANNELS } from "@shared/types/preload";
 
@@ -42,8 +45,7 @@ export function registerMonitoringHandlers({
             siteIdentifier: IpcInvokeChannelParams<
                 typeof MONITORING_CHANNELS.startMonitoringForSite
             >[0]
-        ) =>
-            uptimeOrchestrator.startMonitoringForSite(siteIdentifier),
+        ) => uptimeOrchestrator.startMonitoringForSite(siteIdentifier),
         MonitoringHandlerValidators.startMonitoringForSite
     );
 
@@ -70,8 +72,7 @@ export function registerMonitoringHandlers({
             siteIdentifier: IpcInvokeChannelParams<
                 typeof MONITORING_CHANNELS.stopMonitoringForSite
             >[0]
-        ) =>
-            uptimeOrchestrator.stopMonitoringForSite(siteIdentifier),
+        ) => uptimeOrchestrator.stopMonitoringForSite(siteIdentifier),
         MonitoringHandlerValidators.stopMonitoringForSite
     );
 

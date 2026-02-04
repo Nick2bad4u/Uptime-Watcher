@@ -118,7 +118,7 @@ const vitestElectronConfig: ViteUserConfigExport = defineConfig({
                 lines: 90, // Minimum 90% line coverage for backend
                 statements: 90, // Minimum 90% statement coverage for backend
             },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @vitest/coverage-v8 types omit runtime-supported options.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @vitest/coverage-v8 types omit runtime-supported options.
         } as any,
         dangerouslyIgnoreUnhandledErrors: false,
         deps: {
@@ -224,7 +224,7 @@ const vitestElectronConfig: ViteUserConfigExport = defineConfig({
             spawnTimeout: 10_000,
             tsconfig: "./config/testing/tsconfig.electron.test.json",
         },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
     } as any,
 }) satisfies UserConfig as UserConfig;
 

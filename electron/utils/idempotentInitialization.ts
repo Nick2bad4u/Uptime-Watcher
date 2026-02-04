@@ -2,10 +2,10 @@
  * Utilities for idempotent, re-entrant initialization flows.
  *
  * @remarks
- * Several Electron services treat `initialize()` as idempotent: if initialization
- * is in-flight, subsequent calls should await the same promise; if initialization
- * succeeds, future calls should no-op; if it fails, future calls should be
- * allowed to retry.
+ * Several Electron services treat `initialize()` as idempotent: if
+ * initialization is in-flight, subsequent calls should await the same promise;
+ * if initialization succeeds, future calls should no-op; if it fails, future
+ * calls should be allowed to retry.
  */
 
 /**

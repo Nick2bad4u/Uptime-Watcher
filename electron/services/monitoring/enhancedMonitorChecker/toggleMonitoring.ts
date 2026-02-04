@@ -9,7 +9,10 @@
  * @packageDocumentation
  */
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 
@@ -57,7 +60,10 @@ export async function startMonitoringOperation(args: {
 
         return true;
     } catch (error) {
-        logger.error(`Failed to start monitoring for monitor ${monitorId}`, error);
+        logger.error(
+            `Failed to start monitoring for monitor ${monitorId}`,
+            error
+        );
         return false;
     }
 }
@@ -105,7 +111,10 @@ export async function stopMonitoringOperation(args: {
 
         return true;
     } catch (error) {
-        logger.error(`Failed to stop monitoring for monitor ${monitorId}`, error);
+        logger.error(
+            `Failed to stop monitoring for monitor ${monitorId}`,
+            error
+        );
         return false;
     }
 }

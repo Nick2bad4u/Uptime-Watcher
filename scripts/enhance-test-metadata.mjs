@@ -233,7 +233,7 @@ const logger = {
     },
     error: (
         /** @type {any} */ message,
-        /** @type {{message: any, name: any, stack: any}} */ error
+        /** @type {{ message: any; name: any; stack: any }} */ error
     ) => {
         perfCounters.errors++;
         if (error instanceof Error) {

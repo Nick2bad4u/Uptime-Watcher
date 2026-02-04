@@ -16,7 +16,7 @@
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 
 import { readNumberEnv } from "@shared/utils/environment";
-import { ensureRecordLike, isRecord  } from "@shared/utils/typeHelpers";
+import { ensureRecordLike, isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";

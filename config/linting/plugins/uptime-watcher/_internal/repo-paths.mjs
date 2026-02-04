@@ -10,8 +10,8 @@ import { normalizePath } from "./path-utils.mjs";
  * Absolute path to the repository root.
  *
  * @remarks
- * Derived relative to this module so the rules stay portable when the
- * workspace is relocated.
+ * Derived relative to this module so the rules stay portable when the workspace
+ * is relocated.
  */
 export const REPO_ROOT = path.resolve(
     import.meta.dirname,

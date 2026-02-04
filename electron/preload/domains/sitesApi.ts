@@ -50,7 +50,9 @@ function safeParseSiteArray(
     const firstIssue = parsed.error.issues.at(0);
     const firstIndex = firstIssue?.path[0];
     const indexSuffix =
-        typeof firstIndex === "number" ? ` (first failure at index ${firstIndex})` : "";
+        typeof firstIndex === "number"
+            ? ` (first failure at index ${firstIndex})`
+            : "";
 
     return {
         error: new Error(

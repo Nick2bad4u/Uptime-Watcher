@@ -120,10 +120,7 @@ const arbitraryInvokeChannel = fc.constantFrom(
 );
 
 const arbitraryZeroParamInvokeChannel = fc.constantFrom(
-    ...(ZERO_PARAM_INVOKE_CHANNELS as [
-        IpcInvokeChannel,
-        ...IpcInvokeChannel[],
-    ])
+    ...(ZERO_PARAM_INVOKE_CHANNELS as [IpcInvokeChannel, ...IpcInvokeChannel[]])
 );
 
 const arbitraryOneParamInvokeChannel = fc.constantFrom(
@@ -589,7 +586,12 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Handler error");
                 });
 
-                registerTestHandler(channel, errorHandler, null, registeredHandlers);
+                registerTestHandler(
+                    channel,
+                    errorHandler,
+                    null,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel
@@ -728,7 +730,12 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     throw new Error("Async error");
                 });
 
-                registerTestHandler(channel, asyncErrorHandler, null, registeredHandlers);
+                registerTestHandler(
+                    channel,
+                    asyncErrorHandler,
+                    null,
+                    registeredHandlers
+                );
 
                 const registeredHandler = mockIpcMain.handle.mock.calls.find(
                     (call) => call[0] === channel

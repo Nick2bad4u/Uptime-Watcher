@@ -482,9 +482,9 @@ describe("IpcService - Comprehensive Coverage", () => {
                     paramCount: expect.any(Number),
                 }),
             });
-            });
+        });
 
-            it("should handle remove-site with site identifier", async ({
+        it("should handle remove-site with site identifier", async ({
             task,
             annotate,
         }) => {

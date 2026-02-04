@@ -59,8 +59,13 @@ describe("monitorManager additional operations", () => {
                 site,
             });
 
-            expect(newMonitors.every((m) => m.checkInterval === 60_000)).toBeTruthy();
-            expect(autoStartNewMonitors).toHaveBeenCalledWith(site, newMonitors);
+            expect(
+                newMonitors.every((m) => m.checkInterval === 60_000)
+            ).toBeTruthy();
+            expect(autoStartNewMonitors).toHaveBeenCalledWith(
+                site,
+                newMonitors
+            );
             expect(debugSpy).toHaveBeenCalled();
 
             debugSpy.mockRestore();
@@ -100,7 +105,9 @@ describe("monitorManager additional operations", () => {
                 .spyOn(logger, "info")
                 .mockImplementation(() => undefined);
 
-            const setupIndividualNewMonitors = vi.fn().mockResolvedValue(undefined);
+            const setupIndividualNewMonitors = vi
+                .fn()
+                .mockResolvedValue(undefined);
 
             const site = createTestSite("s1", {
                 monitors: [createTestMonitor("m1")],
@@ -123,7 +130,9 @@ describe("monitorManager additional operations", () => {
                 .spyOn(logger, "info")
                 .mockImplementation(() => undefined);
 
-            const setupIndividualNewMonitors = vi.fn().mockResolvedValue(undefined);
+            const setupIndividualNewMonitors = vi
+                .fn()
+                .mockResolvedValue(undefined);
 
             const site = createTestSite("s1", {
                 monitors: [createTestMonitor("m1"), createTestMonitor("m2")],
@@ -140,7 +149,9 @@ describe("monitorManager additional operations", () => {
                 throw new Error("Expected site to contain monitor m2");
             }
 
-            expect(setupIndividualNewMonitors).toHaveBeenCalledWith(site, [monitor]);
+            expect(setupIndividualNewMonitors).toHaveBeenCalledWith(site, [
+                monitor,
+            ]);
             expect(infoSpy).toHaveBeenCalled();
 
             infoSpy.mockRestore();
@@ -161,7 +172,9 @@ describe("monitorManager additional operations", () => {
 
             const monitor = site.monitors[0];
             if (!monitor) {
-                throw new Error("Expected site to contain at least one monitor");
+                throw new Error(
+                    "Expected site to contain at least one monitor"
+                );
             }
 
             const statusUpdate = createStatusUpdate({

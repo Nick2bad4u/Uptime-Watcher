@@ -18,11 +18,13 @@
  * - Comprehensive error handling and logging
  *
  * @example
+ *
  * ```typescript
  * const checker = new EnhancedMonitorChecker(config);
  * ```
  *
  * @public
+ *
  * @see {@link MonitorStatusUpdateService} for status update safety
  * @see {@link OperationTimeoutManager} for timeout management
  */
@@ -55,7 +57,10 @@ import { performManualCheckOperation } from "./enhancedMonitorChecker/performMan
 import { performScheduledCheckOperation } from "./enhancedMonitorChecker/performScheduledCheck";
 import { runServiceCheckOperation } from "./enhancedMonitorChecker/runServiceCheck";
 import { saveMonitorHistoryEntry } from "./enhancedMonitorChecker/saveHistoryEntry";
-import { startMonitoringOperation, stopMonitoringOperation } from "./enhancedMonitorChecker/toggleMonitoring";
+import {
+    startMonitoringOperation,
+    stopMonitoringOperation,
+} from "./enhancedMonitorChecker/toggleMonitoring";
 import { validateMonitorForCheck as validateMonitorForCheckImpl } from "./enhancedMonitorChecker/validateMonitorForCheck";
 import { getMonitor } from "./MonitorFactory";
 
@@ -203,10 +208,7 @@ export class EnhancedMonitorChecker {
      */
     public readonly servicesByType: Map<Monitor["type"], IMonitorService>;
 
-    private readonly historyPruneState = new Map<
-        string,
-        HistoryPruneState
-    >();
+    private readonly historyPruneState = new Map<string, HistoryPruneState>();
 
     /**
      * Performs a comprehensive monitor status check with advanced operation
@@ -315,18 +317,27 @@ export class EnhancedMonitorChecker {
                 monitor,
                 monitorId,
                 performDirectCheck: (siteArg, monitorArg, manual, signalArg) =>
-                    this.performDirectCheck(siteArg, monitorArg, manual, signalArg),
+                    this.performDirectCheck(
+                        siteArg,
+                        monitorArg,
+                        manual,
+                        signalArg
+                    ),
                 signal,
                 site,
             });
         }
 
-
         return performScheduledCheckOperation({
             logger,
             monitor,
             monitorId,
-            performCorrelatedCheck: (siteArg, monitorArg, monitorIdArg, signalArg) =>
+            performCorrelatedCheck: (
+                siteArg,
+                monitorArg,
+                monitorIdArg,
+                signalArg
+            ) =>
                 this.performCorrelatedCheck(
                     siteArg,
                     monitorArg,
@@ -491,10 +502,9 @@ export class EnhancedMonitorChecker {
         externalSignal?: AbortSignal
     ): Promise<StatusUpdate | undefined> {
         return performCorrelatedCheckImpl({
-            cleanupOperation:
-                this.operationCoordinator.cleanupOperation.bind(
-                    this.operationCoordinator
-                ),
+            cleanupOperation: this.operationCoordinator.cleanupOperation.bind(
+                this.operationCoordinator
+            ),
             executeMonitorCheck: (context) => this.executeMonitorCheck(context),
             ...(externalSignal ? { externalSignal } : {}),
             handleSuccessfulCheck: (siteArg, monitorArg, checkResult) =>
@@ -508,7 +518,9 @@ export class EnhancedMonitorChecker {
                 this.setupOperationCorrelation(monitorArg, options),
             site,
             updateMonitorStatus: (checkResult) =>
-                this.config.statusUpdateService.updateMonitorStatus(checkResult),
+                this.config.statusUpdateService.updateMonitorStatus(
+                    checkResult
+                ),
         });
     }
 

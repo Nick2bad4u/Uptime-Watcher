@@ -1,4 +1,7 @@
-import type { IpcInvokeChannel, IpcInvokeChannelParams } from "@shared/types/ipc";
+import type {
+    IpcInvokeChannel,
+    IpcInvokeChannelParams,
+} from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { UnknownRecord } from "type-fest";
 
@@ -36,12 +39,15 @@ const buildMonitorValidationCandidate = (
     }
 
     const checkInterval =
-        typeof data["checkInterval"] === "number" ? data["checkInterval"] : 300_000;
+        typeof data["checkInterval"] === "number"
+            ? data["checkInterval"]
+            : 300_000;
     const monitoring =
         typeof data["monitoring"] === "boolean" ? data["monitoring"] : true;
     const retryAttempts =
         typeof data["retryAttempts"] === "number" ? data["retryAttempts"] : 3;
-    const timeout = typeof data["timeout"] === "number" ? data["timeout"] : 10_000;
+    const timeout =
+        typeof data["timeout"] === "number" ? data["timeout"] : 10_000;
 
     return {
         ...data,

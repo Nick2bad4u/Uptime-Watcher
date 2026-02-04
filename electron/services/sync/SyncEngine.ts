@@ -805,7 +805,9 @@ export class SyncEngine {
         // `siteIdentifier` is a cloud-sync routing field (monitors are stored
         // inside their parent site locally). It must never be passed into the
         // orchestrator, because strict monitor validation rejects unknown keys.
-        const monitorFields = safeObjectOmit(config, ["siteIdentifier"] as const);
+        const monitorFields = safeObjectOmit(config, [
+            "siteIdentifier",
+        ] as const);
 
         const base: Monitor = existing ?? {
             checkInterval: config.checkInterval,

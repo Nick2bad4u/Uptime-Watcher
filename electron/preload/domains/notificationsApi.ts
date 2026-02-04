@@ -46,17 +46,18 @@ export interface NotificationsApiInterface {
  *
  * @public
  */
-export const notificationsApi: NotificationsApiInterface = ((): NotificationsApiInterface => {
-    try {
-        return {
-            notifyAppEvent: createVoidInvoker(
-                NOTIFICATION_CHANNELS.notifyAppEvent
-            ),
-            updatePreferences: createVoidInvoker(
-                NOTIFICATION_CHANNELS.updatePreferences
-            ),
-        } as const;
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+export const notificationsApi: NotificationsApiInterface =
+    ((): NotificationsApiInterface => {
+        try {
+            return {
+                notifyAppEvent: createVoidInvoker(
+                    NOTIFICATION_CHANNELS.notifyAppEvent
+                ),
+                updatePreferences: createVoidInvoker(
+                    NOTIFICATION_CHANNELS.updatePreferences
+                ),
+            } as const;
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();

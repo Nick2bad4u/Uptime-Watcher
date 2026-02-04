@@ -84,9 +84,7 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
-import type {
-    ApplicationError,
-} from "@shared/utils/errorHandling";
+import type { ApplicationError } from "@shared/utils/errorHandling";
 
 import {
     STATE_SYNC_ACTION,
@@ -388,39 +386,43 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 this.initializationPromise = promise;
             },
             async () => {
-            try {
-                logger.info("[UptimeOrchestrator] Starting initialization...");
+                try {
+                    logger.info(
+                        "[UptimeOrchestrator] Starting initialization..."
+                    );
 
-                // Step 1: Initialize database first (required by other managers)
-                await this.databaseManager.initialize();
-                logger.info(
-                    "[UptimeOrchestrator] Database manager initialized"
-                );
+                    // Step 1: Initialize database first (required by other managers)
+                    await this.databaseManager.initialize();
+                    logger.info(
+                        "[UptimeOrchestrator] Database manager initialized"
+                    );
 
-                // Step 2: Initialize site manager (loads sites from database)
-                await this.siteManager.initialize();
-                logger.info("[UptimeOrchestrator] Site manager initialized");
+                    // Step 2: Initialize site manager (loads sites from database)
+                    await this.siteManager.initialize();
+                    logger.info(
+                        "[UptimeOrchestrator] Site manager initialized"
+                    );
 
-                // Step 3: Resume monitoring for sites that were monitoring before app restart
-                await this.monitoringLifecycleCoordinator.resumePersistentMonitoring();
-                logger.info(
-                    "[UptimeOrchestrator] Persistent monitoring resumed"
-                );
+                    // Step 3: Resume monitoring for sites that were monitoring before app restart
+                    await this.monitoringLifecycleCoordinator.resumePersistentMonitoring();
+                    logger.info(
+                        "[UptimeOrchestrator] Persistent monitoring resumed"
+                    );
 
-                // Step 4: Validate that managers are properly initialized
-                this.validateInitialization();
+                    // Step 4: Validate that managers are properly initialized
+                    this.validateInitialization();
 
-                logger.info(
-                    "[UptimeOrchestrator] Initialization completed successfully"
-                );
-            } catch (error) {
-                throw this.createContextualError({
-                    cause: error,
-                    code: "ORCHESTRATOR_INITIALIZE_FAILED",
-                    message: "Failed to initialize orchestrator",
-                    operation: "orchestrator.initialize",
-                });
-            }
+                    logger.info(
+                        "[UptimeOrchestrator] Initialization completed successfully"
+                    );
+                } catch (error) {
+                    throw this.createContextualError({
+                        cause: error,
+                        code: "ORCHESTRATOR_INITIALIZE_FAILED",
+                        message: "Failed to initialize orchestrator",
+                        operation: "orchestrator.initialize",
+                    });
+                }
             }
         );
     }

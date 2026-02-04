@@ -49,7 +49,9 @@ export function useSiteDetailsSelectionHandlers(
     currentSiteIdentifier: string,
     setActiveSiteDetailsTab: (tab: SiteDetailsTab) => void,
     setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void
-): { readonly handleMonitorIdChange: (e: ChangeEvent<HTMLSelectElement>) => void } {
+): {
+    readonly handleMonitorIdChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+} {
     const handleMonitorIdChange = useCallback(
         (e: ChangeEvent<HTMLSelectElement>) => {
             applySelectedMonitorIdChange({
@@ -80,7 +82,10 @@ export function useSiteDetailsRemovalHandlers(
     clearError: () => void,
     currentSite: Site,
     deleteSite: (siteIdentifier: string) => Promise<void>,
-    removeMonitorFromSite: (siteIdentifier: string, monitorId: string) => Promise<void>,
+    removeMonitorFromSite: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>,
     requestConfirmation: (options: ConfirmDialogOptions) => Promise<boolean>,
     selectedMonitor: Monitor | undefined
 ): {
@@ -98,7 +103,12 @@ export function useSiteDetailsRemovalHandlers(
                     requestConfirmation,
                 })
         );
-    }, [clearError, currentSite, deleteSite, requestConfirmation]);
+    }, [
+        clearError,
+        currentSite,
+        deleteSite,
+        requestConfirmation,
+    ]);
 
     const handleRemoveMonitor = useCallback(async () => {
         await runSiteDetailsOperation(
@@ -152,23 +162,33 @@ export function useSiteDetailsMonitoringHandlers(
 } {
     const handleCheckNow = useCallback(async () => {
         clearError();
-        await runSiteDetailsOperation("useSiteDetails.handleCheckNow", async () => {
-            logger.user.action("Manual site check initiated", {
-                monitorId: selectedMonitorId,
-                monitorType: currentSite.monitors.find((m) => m.id === selectedMonitorId)?.type,
-                siteIdentifier: currentSite.identifier,
-                siteName: currentSite.name,
-            });
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleCheckNow",
+            async () => {
+                logger.user.action("Manual site check initiated", {
+                    monitorId: selectedMonitorId,
+                    monitorType: currentSite.monitors.find(
+                        (m) => m.id === selectedMonitorId
+                    )?.type,
+                    siteIdentifier: currentSite.identifier,
+                    siteName: currentSite.name,
+                });
 
-            await checkSiteNow(currentSite.identifier, selectedMonitorId);
+                await checkSiteNow(currentSite.identifier, selectedMonitorId);
 
-            logger.user.action("Manual site check completed successfully", {
-                monitorId: selectedMonitorId,
-                siteIdentifier: currentSite.identifier,
-                siteName: currentSite.name,
-            });
-        });
-    }, [checkSiteNow, clearError, currentSite, selectedMonitorId]);
+                logger.user.action("Manual site check completed successfully", {
+                    monitorId: selectedMonitorId,
+                    siteIdentifier: currentSite.identifier,
+                    siteName: currentSite.name,
+                });
+            }
+        );
+    }, [
+        checkSiteNow,
+        clearError,
+        currentSite,
+        selectedMonitorId,
+    ]);
 
     const handleStartSiteMonitoring = useCallback(async () => {
         clearError();
@@ -182,7 +202,11 @@ export function useSiteDetailsMonitoringHandlers(
                 });
             }
         );
-    }, [clearError, currentSite, startSiteMonitoring]);
+    }, [
+        clearError,
+        currentSite,
+        startSiteMonitoring,
+    ]);
 
     const handleStopSiteMonitoring = useCallback(async () => {
         clearError();
@@ -196,29 +220,55 @@ export function useSiteDetailsMonitoringHandlers(
                 });
             }
         );
-    }, [clearError, currentSite, stopSiteMonitoring]);
+    }, [
+        clearError,
+        currentSite,
+        stopSiteMonitoring,
+    ]);
 
     const handleStartMonitoring = useCallback(async () => {
         clearError();
-        await runSiteDetailsOperation("useSiteDetails.handleStartMonitoring", async () => {
-            await startSiteMonitorMonitoring(currentSite.identifier, selectedMonitorId);
-            logger.user.action("Started monitoring", {
-                monitorId: selectedMonitorId,
-                siteIdentifier: currentSite.identifier,
-            });
-        });
-    }, [clearError, currentSite, selectedMonitorId, startSiteMonitorMonitoring]);
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleStartMonitoring",
+            async () => {
+                await startSiteMonitorMonitoring(
+                    currentSite.identifier,
+                    selectedMonitorId
+                );
+                logger.user.action("Started monitoring", {
+                    monitorId: selectedMonitorId,
+                    siteIdentifier: currentSite.identifier,
+                });
+            }
+        );
+    }, [
+        clearError,
+        currentSite,
+        selectedMonitorId,
+        startSiteMonitorMonitoring,
+    ]);
 
     const handleStopMonitoring = useCallback(async () => {
         clearError();
-        await runSiteDetailsOperation("useSiteDetails.handleStopMonitoring", async () => {
-            await stopSiteMonitorMonitoring(currentSite.identifier, selectedMonitorId);
-            logger.user.action("Stopped monitoring", {
-                monitorId: selectedMonitorId,
-                siteIdentifier: currentSite.identifier,
-            });
-        });
-    }, [clearError, currentSite, selectedMonitorId, stopSiteMonitorMonitoring]);
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleStopMonitoring",
+            async () => {
+                await stopSiteMonitorMonitoring(
+                    currentSite.identifier,
+                    selectedMonitorId
+                );
+                logger.user.action("Stopped monitoring", {
+                    monitorId: selectedMonitorId,
+                    siteIdentifier: currentSite.identifier,
+                });
+            }
+        );
+    }, [
+        clearError,
+        currentSite,
+        selectedMonitorId,
+        stopSiteMonitorMonitoring,
+    ]);
 
     return {
         handleCheckNow,
@@ -263,29 +313,38 @@ export function useSiteDetailsSettingsHandlers(
     ) => Promise<void>
 ): {
     readonly handleIntervalChange: (e: ChangeEvent<HTMLSelectElement>) => void;
-    readonly handleRetryAttemptsChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    readonly handleRetryAttemptsChange: (
+        e: ChangeEvent<HTMLInputElement>
+    ) => void;
     readonly handleSaveInterval: () => Promise<void>;
     readonly handleSaveRetryAttempts: () => Promise<void>;
     readonly handleSaveTimeout: () => Promise<void>;
     readonly handleTimeoutChange: (e: ChangeEvent<HTMLInputElement>) => void;
 } {
-
     const handleIntervalChange = useCallback(
         (e: ChangeEvent<HTMLSelectElement>): void => {
-            const newInterval = safeInteger(e.target.value, DEFAULT_CHECK_INTERVAL);
+            const newInterval = safeInteger(
+                e.target.value,
+                DEFAULT_CHECK_INTERVAL
+            );
             setMonitorEditStateById((previous) =>
                 updateMonitorEditStateById({
                     monitorId: selectedMonitorId,
                     previous,
                     updater: (current): MonitorEditState => ({
                         ...current,
-                        intervalChanged: newInterval !== selectedMonitorCheckInterval,
+                        intervalChanged:
+                            newInterval !== selectedMonitorCheckInterval,
                         userEditedCheckIntervalMs: newInterval,
                     }),
                 })
             );
         },
-        [selectedMonitorCheckInterval, selectedMonitorId, setMonitorEditStateById]
+        [
+            selectedMonitorCheckInterval,
+            selectedMonitorId,
+            setMonitorEditStateById,
+        ]
     );
 
     const handleSaveInterval = useCallback(async () => {
@@ -310,8 +369,12 @@ export function useSiteDetailsSettingsHandlers(
 
     const handleTimeoutChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>): void => {
-            const timeoutInSeconds = clampTimeoutSeconds(safeInteger(e.target.value, 5));
-            const currentTimeoutInSeconds = getTimeoutSeconds(selectedMonitorTimeout);
+            const timeoutInSeconds = clampTimeoutSeconds(
+                safeInteger(e.target.value, 5)
+            );
+            const currentTimeoutInSeconds = getTimeoutSeconds(
+                selectedMonitorTimeout
+            );
 
             setMonitorEditStateById((previous) =>
                 updateMonitorEditStateById({
@@ -319,13 +382,18 @@ export function useSiteDetailsSettingsHandlers(
                     previous,
                     updater: (current): MonitorEditState => ({
                         ...current,
-                        timeoutChanged: timeoutInSeconds !== currentTimeoutInSeconds,
+                        timeoutChanged:
+                            timeoutInSeconds !== currentTimeoutInSeconds,
                         userEditedTimeoutSeconds: timeoutInSeconds,
                     }),
                 })
             );
         },
-        [selectedMonitorId, selectedMonitorTimeout, setMonitorEditStateById]
+        [
+            selectedMonitorId,
+            selectedMonitorTimeout,
+            setMonitorEditStateById,
+        ]
     );
 
     const handleSaveTimeout = useCallback(async () => {
@@ -360,13 +428,18 @@ export function useSiteDetailsSettingsHandlers(
                     previous,
                     updater: (current): MonitorEditState => ({
                         ...current,
-                        retryAttemptsChanged: clampedRetryAttempts !== currentRetryAttempts,
+                        retryAttemptsChanged:
+                            clampedRetryAttempts !== currentRetryAttempts,
                         userEditedRetryAttempts: clampedRetryAttempts,
                     }),
                 })
             );
         },
-        [selectedMonitorId, selectedMonitorRetryAttempts, setMonitorEditStateById]
+        [
+            selectedMonitorId,
+            selectedMonitorRetryAttempts,
+            setMonitorEditStateById,
+        ]
     );
 
     const handleSaveRetryAttempts = useCallback(async () => {
@@ -415,7 +488,6 @@ export function useSiteDetailsNameHandler(
     ) => Promise<void>,
     setUserEditedSiteName: (value: string | undefined) => void
 ): { readonly handleSaveName: () => Promise<void> } {
-
     const handleSaveName = useCallback(async () => {
         await runSiteDetailsOperation(
             "useSiteDetails.handleSaveName",

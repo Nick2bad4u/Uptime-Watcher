@@ -18,8 +18,8 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  * Prevents new, inline channel strings from being introduced in handler
  * registration calls.
  *
- * In this codebase, canonical channel constants live in
- * `@shared/types/preload` as `*_CHANNELS` mappings.
+ * In this codebase, canonical channel constants live in `@shared/types/preload`
+ * as `*_CHANNELS` mappings.
  */
 export const electronNoInlineIpcChannelLiteralRule = {
     /**

@@ -78,19 +78,21 @@ type HttpLatencyMonitorConstructor = new (
     config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance;
 
-const HttpLatencyMonitorBase: HttpLatencyMonitorConstructor = ((): HttpLatencyMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () =>
-                createHttpMonitorService<"http-latency", { threshold: number }>(
-                    behavior
-                ),
-            "HttpLatencyMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const HttpLatencyMonitorBase: HttpLatencyMonitorConstructor =
+    ((): HttpLatencyMonitorConstructor => {
+        try {
+            return buildMonitorFactory(
+                () =>
+                    createHttpMonitorService<
+                        "http-latency",
+                        { threshold: number }
+                    >(behavior),
+                "HttpLatencyMonitor"
+            );
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * HTTP latency monitor service driven by the shared HTTP core.

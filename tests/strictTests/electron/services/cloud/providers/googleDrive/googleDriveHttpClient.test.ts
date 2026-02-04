@@ -21,7 +21,9 @@ function createAxiosInstance() {
         delete: vi.fn<
             (url: string, config?: unknown) => Promise<MockAxiosResponse>
         >(),
-        get: vi.fn<(url: string, config?: unknown) => Promise<MockAxiosResponse>>(),
+        get: vi.fn<
+            (url: string, config?: unknown) => Promise<MockAxiosResponse>
+        >(),
         patch: vi.fn<
             (
                 url: string,
@@ -60,9 +62,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -74,10 +75,14 @@ describe("googleDriveHttpClient (strict coverage)", () => {
         expect(result).toEqual({ data: { ok: true } });
 
         expect(api.post).toHaveBeenCalledTimes(1);
-        const [url, requestBody, config] = api.post.mock.calls[0] as [
+        const [
+            url,
+            requestBody,
+            config,
+        ] = api.post.mock.calls[0] as [
             string,
             unknown,
-            { headers: Record<string, string>; params?: unknown }
+            { headers: Record<string, string>; params?: unknown },
         ];
 
         expect(url).toBe("/files");
@@ -102,9 +107,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -112,11 +116,11 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             requestBody: { name: "backup.json" },
         });
 
-        const [_url, _requestBody, config] = api.post.mock.calls[0] as [
-            string,
-            unknown,
-            { params?: unknown }
-        ];
+        const [
+            _url,
+            _requestBody,
+            config,
+        ] = api.post.mock.calls[0] as [string, unknown, { params?: unknown }];
 
         expect(config.params).toBeUndefined();
     });
@@ -136,9 +140,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -153,7 +156,11 @@ describe("googleDriveHttpClient (strict coverage)", () => {
         expect(randomUuidMock).toHaveBeenCalledTimes(1);
 
         expect(uploadApi.post).toHaveBeenCalledTimes(1);
-        const [url, body, config] = uploadApi.post.mock.calls[0] as [
+        const [
+            url,
+            body,
+            config,
+        ] = uploadApi.post.mock.calls[0] as [
             string,
             Buffer,
             {
@@ -177,7 +184,9 @@ describe("googleDriveHttpClient (strict coverage)", () => {
 
         expect(config.headers["Authorization"]).toBe("Bearer token");
         expect(config.headers["Content-Type"]).toContain("multipart/related");
-        expect(config.headers["Content-Type"]).toContain("uptimewatcher_mock-uuid");
+        expect(config.headers["Content-Type"]).toContain(
+            "uptimewatcher_mock-uuid"
+        );
         expect(config.params["uploadType"]).toBe("multipart");
     });
 
@@ -196,9 +205,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -211,10 +219,14 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             },
         });
 
-        const [_url, _body, config] = uploadApi.post.mock.calls[0] as [
+        const [
+            _url,
+            _body,
+            config,
+        ] = uploadApi.post.mock.calls[0] as [
             string,
             Buffer,
-            { params: Record<string, string> }
+            { params: Record<string, string> },
         ];
 
         expect(config.params["uploadType"]).toBe("multipart");
@@ -236,9 +248,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -251,7 +262,7 @@ describe("googleDriveHttpClient (strict coverage)", () => {
         expect(api.get).toHaveBeenCalledTimes(1);
         const [url, config] = api.get.mock.calls[0] as [
             string,
-            { headers: Record<string, string>; params?: unknown }
+            { headers: Record<string, string>; params?: unknown },
         ];
         expect(url).toBe("/files/abc");
         expect(config.headers["Authorization"]).toBe("Bearer token");
@@ -273,9 +284,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -283,7 +293,7 @@ describe("googleDriveHttpClient (strict coverage)", () => {
 
         const [_url, config] = api.get.mock.calls[0] as [
             string,
-            { params?: unknown }
+            { params?: unknown },
         ];
 
         expect(config.params).toBeUndefined();
@@ -293,7 +303,11 @@ describe("googleDriveHttpClient (strict coverage)", () => {
         const api = createAxiosInstance();
         const uploadApi = createAxiosInstance();
 
-        const arrayBuffer = new Uint8Array([1, 2, 3]).buffer;
+        const arrayBuffer = new Uint8Array([
+            1,
+            2,
+            3,
+        ]).buffer;
         api.get.mockResolvedValueOnce({ data: arrayBuffer });
 
         let createCalls = 0;
@@ -305,9 +319,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -317,7 +330,13 @@ describe("googleDriveHttpClient (strict coverage)", () => {
         });
 
         expect(result.data).toBeInstanceOf(Buffer);
-        expect(Buffer.from(result.data as Buffer)).toEqual(Buffer.from([1, 2, 3]));
+        expect(Buffer.from(result.data as Buffer)).toEqual(
+            Buffer.from([
+                1,
+                2,
+                3,
+            ])
+        );
         expect(api.get).toHaveBeenCalledTimes(1);
         const [_url, config] = api.get.mock.calls[0] as [string, unknown];
         expect(config).toMatchObject({ responseType: "arraybuffer" });
@@ -327,7 +346,11 @@ describe("googleDriveHttpClient (strict coverage)", () => {
         const api = createAxiosInstance();
         const uploadApi = createAxiosInstance();
 
-        const view = new Uint8Array([4, 5, 6]);
+        const view = new Uint8Array([
+            4,
+            5,
+            6,
+        ]);
         api.get.mockResolvedValueOnce({ data: view });
 
         let createCalls = 0;
@@ -339,9 +362,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -350,7 +372,13 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             alt: "media",
         });
 
-        expect(result.data).toEqual(Buffer.from([4, 5, 6]));
+        expect(result.data).toEqual(
+            Buffer.from([
+                4,
+                5,
+                6,
+            ])
+        );
     });
 
     it("downloads binary content as a Buffer when alt=media returns a Buffer", async () => {
@@ -368,9 +396,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -397,9 +424,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -423,9 +449,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -459,9 +484,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -487,9 +511,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -502,7 +525,11 @@ describe("googleDriveHttpClient (strict coverage)", () => {
 
         expect(result).toEqual({ data: { updated: true } });
         expect(uploadApi.patch).toHaveBeenCalledTimes(1);
-        const [url, data, config] = uploadApi.patch.mock.calls[0] as [
+        const [
+            url,
+            data,
+            config,
+        ] = uploadApi.patch.mock.calls[0] as [
             string,
             Buffer,
             {
@@ -534,9 +561,8 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             getValidAccessToken: vi.fn().mockResolvedValueOnce("token"),
         };
 
-        const { createGoogleDriveClient } = await import(
-            "../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient"
-        );
+        const { createGoogleDriveClient } =
+            await import("../../../../../../../electron/services/cloud/providers/googleDrive/googleDriveHttpClient");
 
         const client = createGoogleDriveClient(tokenManager as never);
 
@@ -548,10 +574,14 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             },
         });
 
-        const [_url, _data, config] = uploadApi.patch.mock.calls[0] as [
+        const [
+            _url,
+            _data,
+            config,
+        ] = uploadApi.patch.mock.calls[0] as [
             string,
             Buffer,
-            { params: Record<string, string> }
+            { params: Record<string, string> },
         ];
 
         expect(config.params["uploadType"]).toBe("media");

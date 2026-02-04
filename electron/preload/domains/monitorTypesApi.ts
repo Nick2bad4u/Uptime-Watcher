@@ -103,63 +103,64 @@ export interface MonitorTypesApiInterface extends MonitorTypesDomainBridge {
  *
  * @public
  */
-export const monitorTypesApi: MonitorTypesApiInterface = ((): MonitorTypesApiInterface => {
-    try {
-        return {
-            /**
-             * Formats monitor detail information for display.
-             */
-            formatMonitorDetail: createValidatedInvoker(
-                MONITOR_TYPES_CHANNELS.formatMonitorDetail,
-                safeParseStringResult,
-                {
-                    domain: "monitorTypesApi",
-                    guardName: "safeParseStringResult",
-                }
-            ),
+export const monitorTypesApi: MonitorTypesApiInterface =
+    ((): MonitorTypesApiInterface => {
+        try {
+            return {
+                /**
+                 * Formats monitor detail information for display.
+                 */
+                formatMonitorDetail: createValidatedInvoker(
+                    MONITOR_TYPES_CHANNELS.formatMonitorDetail,
+                    safeParseStringResult,
+                    {
+                        domain: "monitorTypesApi",
+                        guardName: "safeParseStringResult",
+                    }
+                ),
 
-            /**
-             * Formats monitor title suffix for display.
-             */
-            formatMonitorTitleSuffix: createValidatedInvoker(
-                MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
-                safeParseStringResult,
-                {
-                    domain: "monitorTypesApi",
-                    guardName: "safeParseStringResult",
-                }
-            ),
+                /**
+                 * Formats monitor title suffix for display.
+                 */
+                formatMonitorTitleSuffix: createValidatedInvoker(
+                    MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
+                    safeParseStringResult,
+                    {
+                        domain: "monitorTypesApi",
+                        guardName: "safeParseStringResult",
+                    }
+                ),
 
-            /**
-             * Gets all available monitor types and their configurations
-             *
-             * @returns Promise resolving to monitor types registry
-             */
-            getMonitorTypes: createValidatedInvoker(
-                MONITOR_TYPES_CHANNELS.getMonitorTypes,
-                safeParseMonitorTypeConfigs,
-                {
-                    domain: "monitorTypesApi",
-                    guardName: "safeParseMonitorTypeConfigs",
-                }
-            ),
+                /**
+                 * Gets all available monitor types and their configurations
+                 *
+                 * @returns Promise resolving to monitor types registry
+                 */
+                getMonitorTypes: createValidatedInvoker(
+                    MONITOR_TYPES_CHANNELS.getMonitorTypes,
+                    safeParseMonitorTypeConfigs,
+                    {
+                        domain: "monitorTypesApi",
+                        guardName: "safeParseMonitorTypeConfigs",
+                    }
+                ),
 
-            /**
-             * Validates monitor configuration data.
-             */
-            validateMonitorData: createValidatedInvoker(
-                MONITOR_TYPES_CHANNELS.validateMonitorData,
-                safeParseValidationResult,
-                {
-                    domain: "monitorTypesApi",
-                    guardName: "safeParseValidationResult",
-                }
-            ),
-        } as const;
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+                /**
+                 * Validates monitor configuration data.
+                 */
+                validateMonitorData: createValidatedInvoker(
+                    MONITOR_TYPES_CHANNELS.validateMonitorData,
+                    safeParseValidationResult,
+                    {
+                        domain: "monitorTypesApi",
+                        guardName: "safeParseValidationResult",
+                    }
+                ),
+            } as const;
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * Type alias for the monitor types domain preload bridge.

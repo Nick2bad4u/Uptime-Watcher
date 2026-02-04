@@ -389,9 +389,7 @@ export function formatErrorMessage(
     for (const [key, value] of Object.entries(params)) {
         // Skip dangerous keys for security (prevent prototype pollution)
         const isDangerousKey =
-            key === "__proto__" ||
-            key === "constructor" ||
-            key === "prototype";
+            key === "__proto__" || key === "constructor" || key === "prototype";
 
         if (!isDangerousKey) {
             const placeholder = `{${key}}`;

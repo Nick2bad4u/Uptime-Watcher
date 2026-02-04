@@ -26,7 +26,7 @@ const KEY_ORDER = [
  *
  * @param {string} text
  *
- * @returns {{frontmatter: string, body: string} | null}
+ * @returns {{ frontmatter: string; body: string } | null}
  */
 function splitFrontmatter(text) {
     const lines = text.split(/\r?\n/);
@@ -61,11 +61,11 @@ function splitFrontmatter(text) {
  *
  * @param {string} frontmatter
  *
- * @returns {{key: string, lines: string[]}[]}
+ * @returns {{ key: string; lines: string[] }[]}
  */
 function parseKeyBlocks(frontmatter) {
     const lines = frontmatter.split(/\r?\n/);
-    /** @type {{key: string, lines: string[]}[]} */
+    /** @type {{ key: string; lines: string[] }[]} */
     const blocks = [];
 
     /** @type {string | null} */
@@ -111,12 +111,12 @@ function parseKeyBlocks(frontmatter) {
  * Reorder key blocks by KEY_ORDER, then remaining keys alphabetically.
  * Formatting inside blocks is preserved exactly.
  *
- * @param {{key: string, lines: string[]}[]} blocks
+ * @param {{ key: string; lines: string[] }[]} blocks
  *
  * @returns {string}
  */
 function reorderBlocks(blocks) {
-    /** @type {Map<string, {key: string, lines: string[]}>} */
+    /** @type {Map<string, { key: string; lines: string[] }>} */
     const byKey = new Map();
     for (const block of blocks) {
         // Anonymous / weird blocks get a synthetic key and are left at the top

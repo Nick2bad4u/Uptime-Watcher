@@ -68,7 +68,11 @@ export const ResponseTimeAnalysisCard = ({
 
     const speedIconColored = useMemo(
         () => <ResponseIcon color={getResponseTimeColor(p50)} />,
-        [getResponseTimeColor, p50, ResponseIcon]
+        [
+            getResponseTimeColor,
+            p50,
+            ResponseIcon,
+        ]
     );
 
     // Memoized style objects to prevent object recreation
@@ -116,7 +120,11 @@ export const ResponseTimeAnalysisCard = ({
 
                 <div className="grid grid-cols-3 gap-4">
                     <div className="flex flex-col items-center text-center">
-                        <ThemedText className="mb-2" size="sm" variant="secondary">
+                        <ThemedText
+                            className="mb-2"
+                            size="sm"
+                            variant="secondary"
+                        >
                             P50
                         </ThemedText>
                         <ThemedText
@@ -128,7 +136,11 @@ export const ResponseTimeAnalysisCard = ({
                         </ThemedText>
                     </div>
                     <div className="flex flex-col items-center text-center">
-                        <ThemedText className="mb-2" size="sm" variant="secondary">
+                        <ThemedText
+                            className="mb-2"
+                            size="sm"
+                            variant="secondary"
+                        >
                             P95
                         </ThemedText>
                         <ThemedText
@@ -140,7 +152,11 @@ export const ResponseTimeAnalysisCard = ({
                         </ThemedText>
                     </div>
                     <div className="flex flex-col items-center text-center">
-                        <ThemedText className="mb-2" size="sm" variant="secondary">
+                        <ThemedText
+                            className="mb-2"
+                            size="sm"
+                            variant="secondary"
+                        >
                             P99
                         </ThemedText>
                         <ThemedText
@@ -156,15 +172,27 @@ export const ResponseTimeAnalysisCard = ({
                 {showAdvancedMetrics ? (
                     <div className="border-primary/20 grid grid-cols-2 gap-4 border-t pt-4">
                         <div className="flex flex-col items-center text-center">
-                            <ThemedText className="mb-2" size="sm" variant="secondary">
+                            <ThemedText
+                                className="mb-2"
+                                size="sm"
+                                variant="secondary"
+                            >
                                 Mean Time To Recovery
                             </ThemedText>
-                            <ThemedText size="lg" style={mttrStyle} weight="medium">
+                            <ThemedText
+                                size="lg"
+                                style={mttrStyle}
+                                weight="medium"
+                            >
                                 {formatDuration(mttr)}
                             </ThemedText>
                         </div>
                         <div className="flex flex-col items-center text-center">
-                            <ThemedText className="mb-2" size="sm" variant="secondary">
+                            <ThemedText
+                                className="mb-2"
+                                size="sm"
+                                variant="secondary"
+                            >
                                 Incidents
                             </ThemedText>
                             <ThemedText

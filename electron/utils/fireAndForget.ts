@@ -2,9 +2,9 @@
  * Fire-and-forget async helpers.
  *
  * @remarks
- * Electron code frequently needs to start background async work from sync
- * event handlers (e.g., app lifecycle events, orchestrator events). Using a
- * plain async IIFE repeatedly leads to duplicated boilerplate and increases the
+ * Electron code frequently needs to start background async work from sync event
+ * handlers (e.g., app lifecycle events, orchestrator events). Using a plain
+ * async IIFE repeatedly leads to duplicated boilerplate and increases the
  * chance of accidental unhandled promise rejections.
  */
 

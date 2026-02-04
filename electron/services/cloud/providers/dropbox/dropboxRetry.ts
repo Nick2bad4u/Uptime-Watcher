@@ -196,7 +196,7 @@ export async function withDropboxRetry<T>(args: {
                 status: retryable?.status,
             });
         },
-            shouldRetry: (error: unknown, attempt: number) => {
+        shouldRetry: (error: unknown, attempt: number) => {
             const retryable = extractRetryableHttpFailure(error);
             return retryable !== null && attempt < maxAttempts;
         },

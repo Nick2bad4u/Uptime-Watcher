@@ -10,7 +10,10 @@
 
 import type { Site } from "@shared/types";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import { logger } from "../../utils/logger";
 
@@ -30,10 +33,13 @@ export async function setupNewMonitorsOperation(args: {
     const { newMonitorIds, setupIndividualNewMonitors, site } = args;
 
     logger.debug(
-        interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS, {
-            count: newMonitorIds.length,
-            identifier: site.identifier,
-        })
+        interpolateLogTemplate(
+            LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS,
+            {
+                count: newMonitorIds.length,
+                identifier: site.identifier,
+            }
+        )
     );
 
     const newMonitors = site.monitors.filter(
@@ -42,9 +48,12 @@ export async function setupNewMonitorsOperation(args: {
 
     if (newMonitors.length === 0) {
         logger.debug(
-            interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS, {
-                identifier: site.identifier,
-            })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,
+                {
+                    identifier: site.identifier,
+                }
+            )
         );
         return;
     }

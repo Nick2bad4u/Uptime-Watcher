@@ -71,7 +71,7 @@ const loadTypedocOutputPaths = async () => {
 /**
  * @param {Map<string, string>} targets - Paths mapped to logging reasons.
  *
- * @returns {Promise<{targetPath: string, reason: string}[]>}
+ * @returns {Promise<{ targetPath: string; reason: string }[]>}
  */
 const removeGeneratedTargets = async (targets) => {
     const removed = [];

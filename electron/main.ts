@@ -485,26 +485,26 @@ class Main {
     private static instance: Main | undefined = undefined;
 
     /** Application service instance for managing app lifecycle and features */
-private readonly applicationService: null | {
+    private readonly applicationService: null | {
         cleanup: () => Promise<void>;
     };
 
-/** Flag to ensure cleanup is only called once */
-private cleanedUp = false;
+    /** Flag to ensure cleanup is only called once */
+    private cleanedUp = false;
 
-private readonly handleUnhandledRejection = (reason: unknown): void => {
+    private readonly handleUnhandledRejection = (reason: unknown): void => {
         const normalizedError = ensureError(reason);
         logger.error("[Main] Unhandled promise rejection", normalizedError);
         void this.performFatalShutdown("unhandledRejection", normalizedError);
     };
 
-private readonly handleUncaughtException = (error: unknown): void => {
+    private readonly handleUncaughtException = (error: unknown): void => {
         const normalizedError = ensureError(error);
         logger.error("[Main] Uncaught exception", normalizedError);
         void this.performFatalShutdown("uncaughtException", normalizedError);
     };
 
-private readonly handleRenderProcessGone = (
+    private readonly handleRenderProcessGone = (
         _event: Event,
         webContents: WebContents,
         details: RenderProcessGoneDetails
@@ -519,7 +519,7 @@ private readonly handleRenderProcessGone = (
         });
     };
 
-private readonly handleChildProcessGone = (
+    private readonly handleChildProcessGone = (
         _event: Event,
         details: unknown
     ): void => {
@@ -534,7 +534,7 @@ private readonly handleChildProcessGone = (
         });
     };
 
-private readonly handleBrowserWindowCreated = (
+    private readonly handleBrowserWindowCreated = (
         _event: Event,
         window: BrowserWindow
     ): void => {
@@ -562,10 +562,10 @@ private readonly handleBrowserWindowCreated = (
         window.once("closed", cleanup);
     };
 
-/**
+    /**
      * Named event handler for safe cleanup on process exit.
      */
-private readonly handleProcessExit = (): void => {
+    private readonly handleProcessExit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously without blocking process exit
@@ -589,10 +589,10 @@ private readonly handleProcessExit = (): void => {
         }
     };
 
-/**
+    /**
      * Named event handler for safe cleanup on app quit.
      */
-private readonly handleAppQuit = (): void => {
+    private readonly handleAppQuit = (): void => {
         if (!this.cleanedUp) {
             this.cleanedUp = true;
             // Handle cleanup asynchronously during app quit
@@ -616,7 +616,7 @@ private readonly handleAppQuit = (): void => {
         }
     };
 
-/**
+    /**
      * Starts the main application lifecycle.
      *
      * @remarks
@@ -627,28 +627,6 @@ private readonly handleAppQuit = (): void => {
         Main.instance ??= new Main();
         return Main.instance;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Runtime check for a cleanup-capable ApplicationService.

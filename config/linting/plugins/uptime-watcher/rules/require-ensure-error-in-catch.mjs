@@ -118,9 +118,8 @@ export const requireEnsureErrorInCatchRule = {
         /**
          * @typedef {{
          *     ensureErrorCall: boolean;
-         *     firstPropertyAccess:
-         *     import("@typescript-eslint/utils").TSESTree.MemberExpression |
-         *     null; name: string;
+         *     firstPropertyAccess: import("@typescript-eslint/utils").TSESTree.MemberExpression | null;
+         *     name: string;
          * }} EnsureErrorState
          */
 

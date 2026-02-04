@@ -222,9 +222,9 @@ describe(useSettingsChangeHandlers, () => {
     it("applies setting changes, honors forceKeys, and warns on invalid keys", async () => {
         const settings = createBaseSettings();
 
-        const updateSettings = vi.fn<
-            (changes: Partial<AppSettings>) => Promise<void>
-        >().mockResolvedValue(undefined);
+        const updateSettings = vi
+            .fn<(changes: Partial<AppSettings>) => Promise<void>>()
+            .mockResolvedValue(undefined);
 
         const { result } = renderHook(() =>
             useSettingsChangeHandlers({
@@ -256,9 +256,9 @@ describe(useSettingsChangeHandlers, () => {
     it("does not call updateSettings when there are no effective changes", async () => {
         const settings = createBaseSettings();
 
-        const updateSettings = vi.fn<
-            (changes: Partial<AppSettings>) => Promise<void>
-        >().mockResolvedValue(undefined);
+        const updateSettings = vi
+            .fn<(changes: Partial<AppSettings>) => Promise<void>>()
+            .mockResolvedValue(undefined);
 
         const { result } = renderHook(() =>
             useSettingsChangeHandlers({

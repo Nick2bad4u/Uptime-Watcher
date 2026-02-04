@@ -321,8 +321,8 @@ async function createBackup(filePath, logger) {
  * @param {string} filePath - Path to custom words file.
  * @param {Logger} logger - Logger instance.
  *
- * @returns {Promise<{content: string, words: Set<string>}>} Current content
- * and words.
+ * @returns {Promise<{ content: string; words: Set<string> }>} Current content
+ *   and words.
  */
 async function readCurrentWords(filePath, logger) {
     let currentWordsContent = "";

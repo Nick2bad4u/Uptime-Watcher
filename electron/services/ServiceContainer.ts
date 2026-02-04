@@ -311,31 +311,31 @@ export class ServiceContainer {
                 this.initializationPromise = promise;
             },
             async () => {
-            logger.info("[ServiceContainer] Initializing services");
-            this.getDatabaseService().initialize();
-            await this.tryInitializeService(
-                this.getConfigurationManager(),
-                "ConfigurationManager"
-            );
-            this.getHistoryRepository();
-            this.getMonitorRepository();
-            this.getSettingsRepository();
-            this.getSiteRepository();
+                logger.info("[ServiceContainer] Initializing services");
+                this.getDatabaseService().initialize();
+                await this.tryInitializeService(
+                    this.getConfigurationManager(),
+                    "ConfigurationManager"
+                );
+                this.getHistoryRepository();
+                this.getMonitorRepository();
+                this.getSettingsRepository();
+                this.getSiteRepository();
 
-            // UptimeOrchestrator is responsible for initializing the stateful
-            // managers it coordinates (DatabaseManager/SiteManager/etc.).
-            await this.getUptimeOrchestrator().initialize();
-            this.getIpcService().setupHandlers();
+                // UptimeOrchestrator is responsible for initializing the stateful
+                // managers it coordinates (DatabaseManager/SiteManager/etc.).
+                await this.getUptimeOrchestrator().initialize();
+                this.getIpcService().setupHandlers();
 
-            // Start background cloud sync polling after IPC is ready.
-            await this.tryInitializeService(
-                this.getCloudSyncScheduler(),
-                "CloudSyncScheduler"
-            );
+                // Start background cloud sync polling after IPC is ready.
+                await this.tryInitializeService(
+                    this.getCloudSyncScheduler(),
+                    "CloudSyncScheduler"
+                );
 
-            logger.info(
-                "[ServiceContainer] All services initialized successfully"
-            );
+                logger.info(
+                    "[ServiceContainer] All services initialized successfully"
+                );
             }
         );
     }

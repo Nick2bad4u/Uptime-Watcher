@@ -22,7 +22,10 @@ import {
     type SettingsRow,
     type SiteRow,
 } from "@shared/types/database";
-import { castUnchecked, isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+import {
+    castUnchecked,
+    isRecord as isSharedRecord,
+} from "@shared/utils/typeHelpers";
 
 import type { DbValue } from "../converters/valueConverters";
 

@@ -19,12 +19,12 @@ const BUILTIN_ERROR_CTORS = new Set([
 ]);
 
 /**
- * ESLint rule requiring Error constructor calls in `catch` blocks to include
- * `{ cause }`.
+ * ESLint rule requiring Error constructor calls in `catch` blocks to include `{
+ * cause }`.
  *
  * @remarks
- * When wrapping errors inside a catch block, use the standard error cause
- * chain so we preserve stack/context across boundaries.
+ * When wrapping errors inside a catch block, use the standard error cause chain
+ * so we preserve stack/context across boundaries.
  */
 export const requireErrorCauseInCatchRule = {
     /**

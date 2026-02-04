@@ -274,9 +274,6 @@ function main() {
  * Usage information.
  */
 
-/**
- *
- */
 function showUsage() {
     console.log(`
 Usage: node extract-test-names.js [options]

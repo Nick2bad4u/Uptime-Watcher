@@ -203,7 +203,8 @@ export class MonitorManager {
      */
     public async setupSiteForMonitoring(site: Site): Promise<void> {
         await setupSiteForMonitoringOperation({
-            applyDefaultIntervals: (siteArg) => this.applyDefaultIntervals(siteArg),
+            applyDefaultIntervals: (siteArg) =>
+                this.applyDefaultIntervals(siteArg),
             autoStartMonitoringIfAppropriate: (siteArg) =>
                 this.autoStartMonitoringIfAppropriate(siteArg),
             eventEmitter: this.eventEmitter,

@@ -75,7 +75,11 @@ async function getGitLastModified(filePath) {
  *
  * @param {string} content - Markdown content.
  *
- * @returns {{frontmatter: Frontmatter | null, content: string, yamlLines: number}}
+ * @returns {{
+ *     frontmatter: Frontmatter | null;
+ *     content: string;
+ *     yamlLines: number;
+ * }}
  */
 function parseFrontmatter(content) {
     const frontmatterMatch = content.match(
@@ -91,7 +95,7 @@ function parseFrontmatter(content) {
     /**
      * +2 for the --- delimiters.
      */
-    const yamlLineCount = yamlContent.split("\n").length + 2; 
+    const yamlLineCount = yamlContent.split("\n").length + 2;
     const contentAfterFrontmatter = content.slice(frontmatterMatch[0].length);
     const yamlLines = yamlContent.split("\n");
 
@@ -385,11 +389,11 @@ async function fixCrossReferences(filePath) {
              * From named capture group.
              */
             const linkText = groups["text"];
- 
+
             /**
              * From named capture group.
              */
-            const linkUrl = groups["url"]; 
+            const linkUrl = groups["url"];
 
             // Fix common path issues
             if (
@@ -586,7 +590,7 @@ function displayMaintenanceReport(report) {
  * Determine whether the current ES module is the entry point.
  *
  * @param {string} moduleUrl - URL for the executing module (typically
- * import.meta.url).
+ *   import.meta.url).
  *
  * @returns {boolean} True when the module is being run directly via Node.
  */

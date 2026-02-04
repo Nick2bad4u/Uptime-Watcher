@@ -25,6 +25,7 @@
                 "*.cjs"
             ],
             "options": {
+                "useTabs": false,
                 "jsdocCapitalizeDescription": true,
                 "jsdocCommentLineStrategy": "keep",
                 "jsdocDescriptionTag": false,
@@ -60,6 +61,7 @@
         {
             "files": "*.css",
             "options": {
+                "useTabs": false,
                 "multilineArraysWrapThreshold": 1,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
@@ -74,6 +76,7 @@
         {
             "files": "eslint.config.mjs",
             "options": {
+                "useTabs": false,
                 "jsdocCapitalizeDescription": true,
                 "jsdocCommentLineStrategy": "keep",
                 "jsdocDescriptionTag": false,
@@ -99,6 +102,7 @@
         {
             "files": "*.user.css",
             "options": {
+                "useTabs": false,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
                     "prettier-plugin-tailwindcss"
@@ -112,6 +116,7 @@
         {
             "files": "tsconfig.*",
             "options": {
+                "useTabs": false,
                 "jsonRecursiveSort": false,
                 "jsonSortOrder": "{\"*\": \"numeric\"}",
                 "plugins": [
@@ -123,6 +128,7 @@
         {
             "files": "*.xml",
             "options": {
+                "useTabs": false,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
                     "@prettier/plugin-xml"
@@ -137,6 +143,7 @@
         {
             "files": "*.html",
             "options": {
+                "useTabs": false,
                 "htmlWhitespaceSensitivity": "strict",
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
@@ -160,12 +167,14 @@
         {
             "files": "*.user.js",
             "options": {
+                "useTabs": false,
                 "printWidth": 80
             }
         },
         {
             "files": "*.md",
             "options": {
+                "useTabs": false,
                 "jsdocCapitalizeDescription": true,
                 "jsdocCommentLineStrategy": "keep",
                 "jsdocDescriptionTag": false,
@@ -191,6 +200,7 @@
         {
             "files": "*.mdx",
             "options": {
+                "useTabs": false,
                 "jsdocCapitalizeDescription": true,
                 "jsdocCommentLineStrategy": "keep",
                 "jsdocDescriptionTag": false,
@@ -217,6 +227,7 @@
         {
             "files": "*.toml",
             "options": {
+                "useTabs": false,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
                     "prettier-plugin-toml"
@@ -232,6 +243,7 @@
                 "**/.htmlhintrc"
             ],
             "options": {
+                "useTabs": false,
                 "jsonRecursiveSort": false,
                 "jsonSortOrder": "{\"*\": \"numeric\"}",
                 "plugins": [
@@ -243,6 +255,7 @@
         {
             "files": "*.sql",
             "options": {
+                "useTabs": false,
                 "language": "sqlite",
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
@@ -253,6 +266,7 @@
         {
             "files": "*.sh",
             "options": {
+                "useTabs": false,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
                     "prettier-plugin-sh"
@@ -262,6 +276,7 @@
         {
             "files": "*.properties",
             "options": {
+                "useTabs": false,
                 "escapeNonLatin1": false,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
@@ -272,6 +287,7 @@
         {
             "files": "*.ini",
             "options": {
+                "useTabs": false,
                 "iniSpaceAroundEquals": true,
                 "keySeparator": " = ",
                 "plugins": [
@@ -283,6 +299,7 @@
         {
             "files": "**/package.json, **/package-lock.json",
             "options": {
+                "useTabs": false,
                 "tabWidth": 2,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",

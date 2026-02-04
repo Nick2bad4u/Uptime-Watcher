@@ -43,16 +43,21 @@ export const SyncMaintenanceOperationLogsDetails = ({
                     key={device.deviceId}
                 >
                     <ThemedText as="div" size="xs" variant="secondary">
-                        {device.deviceId} — {device.operationObjectCount} op object(s)
+                        {device.deviceId} — {device.operationObjectCount} op
+                        object(s)
                     </ThemedText>
                     <div className="settings-paragraph-stack mt-2">
                         <ThemedText as="p" size="xs" variant="tertiary">
                             Oldest:{" "}
-                            {formatOptionalEpochMs(device.oldestCreatedAtEpochMs)}
+                            {formatOptionalEpochMs(
+                                device.oldestCreatedAtEpochMs
+                            )}
                         </ThemedText>
                         <ThemedText as="p" size="xs" variant="tertiary">
                             Newest:{" "}
-                            {formatOptionalEpochMs(device.newestCreatedAtEpochMs)}
+                            {formatOptionalEpochMs(
+                                device.newestCreatedAtEpochMs
+                            )}
                         </ThemedText>
                     </div>
                 </div>

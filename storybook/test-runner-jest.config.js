@@ -1,11 +1,11 @@
 /**
- * @file Storybook test runner configuration.
- *
  * @remarks
  * Jest's default glob matching can misbehave on Windows paths containing
  * parentheses (e.g. "PC (2)") because some glob libraries treat parentheses as
  * extglob tokens. This config switches Storybook story discovery to regex-based
  * matching to avoid that issue.
+ *
+ * @file Storybook test runner configuration.
  */
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, import-x/no-commonjs, import-x/unambiguous, sonarjs/no-require-or-define, unicorn/prefer-module, n/no-unpublished-require -- Storybook test runner loads CommonJS config files

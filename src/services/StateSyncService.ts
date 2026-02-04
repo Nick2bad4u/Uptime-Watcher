@@ -150,9 +150,8 @@ export const StateSyncService: StateSyncServiceContract = {
      * a matching broadcast from the backend before clearing its recovery
      * expectation.
      *
-    * @param handler - Handler invoked with validated
-     *   {@link StateSyncEventData} instances describing bulk or incremental site
-     *   snapshots.
+     * @param handler - Handler invoked with validated {@link StateSyncEventData}
+     *   instances describing bulk or incremental site snapshots.
      *
      * @returns A promise that resolves with a cleanup function which removes
      *   the subscription when invoked.

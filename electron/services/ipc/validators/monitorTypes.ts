@@ -4,9 +4,7 @@
 
 import type { IpcParameterValidator } from "../types";
 
-import {
-    createMonitorValidationPayloadValidator,
-} from "./shared";
+import { createMonitorValidationPayloadValidator } from "./shared";
 import {
     createNoParamsValidator,
     createStringObjectValidator,

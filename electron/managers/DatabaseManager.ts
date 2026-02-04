@@ -62,7 +62,10 @@ import type {
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
 } from "../services/database/utils/backup/databaseBackup";
-import type { ConfigurationManager, HistoryRetentionConfig } from "./ConfigurationManager";
+import type {
+    ConfigurationManager,
+    HistoryRetentionConfig,
+} from "./ConfigurationManager";
 import type { DatabaseManagerRepositories } from "./databaseRepositorySets";
 
 import { DEFAULT_HISTORY_LIMIT } from "../constants";

@@ -168,7 +168,17 @@ function findSharedImports(filePath) {
 /**
  * Format output based on configuration.
  *
- * @param {{filePath: string, fullPath: any, imports: {line: number, content: string, originalImport: string, sharedPath: string, suggestedPath: string}[]}[]} results
+ * @param {{
+ *     filePath: string;
+ *     fullPath: any;
+ *     imports: {
+ *         line: number;
+ *         content: string;
+ *         originalImport: string;
+ *         sharedPath: string;
+ *         suggestedPath: string;
+ *     }[];
+ * }[]} results
  */
 function formatOutput(results) {
     switch (CONFIG.outputFormat) {
@@ -193,10 +203,10 @@ function formatOutput(results) {
 function formatSimple(results) {
     const files = results
         .filter(
-            (/** @type {{imports: string | any[]}} */ r) =>
+            (/** @type {{ imports: string | any[] }} */ r) =>
                 r.imports.length > 0
         )
-        .map((/** @type {{filePath: any}} */ r) => r.filePath);
+        .map((/** @type {{ filePath: any }} */ r) => r.filePath);
     return files.join("\n");
 }
 
@@ -215,7 +225,7 @@ function formatDetailed(results) {
     output += `${"=".repeat(80)}\n\n`;
 
     const filesWithImports = results.filter(
-        (/** @type {{imports: string | any[]}} */ r) => r.imports.length > 0
+        (/** @type {{ imports: string | any[] }} */ r) => r.imports.length > 0
     );
 
     if (filesWithImports.length === 0) {

@@ -5,14 +5,18 @@ import * as path from "node:path";
 
 import type { DatabaseService } from "../DatabaseService";
 
-import { renameIfExists, syncDirectorySafely, syncFileSafely } from "../../../utils/fsSafeOps";
+import {
+    renameIfExists,
+    syncDirectorySafely,
+    syncFileSafely,
+} from "../../../utils/fsSafeOps";
 
 /**
  * Replaces the primary database file with another file on disk.
  *
  * @remarks
- * This safely closes the database before swapping files, handles WAL/SHM/journal
- * sidecar relocation, and attempts rollback on failure.
+ * This safely closes the database before swapping files, handles
+ * WAL/SHM/journal sidecar relocation, and attempts rollback on failure.
  */
 export async function replaceDatabaseFile(args: {
     readonly databaseService: DatabaseService;
@@ -26,11 +30,17 @@ export async function replaceDatabaseFile(args: {
     const targetDir = path.dirname(targetPath);
     const baseName = path.basename(targetPath);
     const timestamp = Date.now();
-    const rollbackPath = path.join(targetDir, `${baseName}.rollback-${timestamp}`);
+    const rollbackPath = path.join(
+        targetDir,
+        `${baseName}.rollback-${timestamp}`
+    );
     const rollbackWalPath = `${rollbackPath}-wal`;
     const rollbackShmPath = `${rollbackPath}-shm`;
     const rollbackJournalPath = `${rollbackPath}-journal`;
-    const incomingPath = path.join(targetDir, `${baseName}.incoming-${timestamp}`);
+    const incomingPath = path.join(
+        targetDir,
+        `${baseName}.incoming-${timestamp}`
+    );
 
     const walPath = `${targetPath}-wal`;
     const shmPath = `${targetPath}-shm`;
@@ -81,7 +91,6 @@ export async function replaceDatabaseFile(args: {
     // re-initialize.
     if (copyError && hadExistingTarget) {
         try {
-
             await fs.rm(targetPath, { force: true });
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
             await fs.rename(rollbackPath, targetPath);
@@ -104,7 +113,6 @@ export async function replaceDatabaseFile(args: {
         // Attempt rollback if we replaced the file.
         if (hadExistingTarget) {
             try {
-
                 await fs.rm(targetPath, { force: true });
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
                 await fs.rename(rollbackPath, targetPath);

@@ -16,7 +16,8 @@ import type {
     IpcInvokeChannel,
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
-    IpcResponse as SharedIpcResponse, VoidIpcInvokeChannel
+    IpcResponse as SharedIpcResponse,
+    VoidIpcInvokeChannel,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
 import type { UnknownRecord } from "type-fest";
@@ -137,7 +138,6 @@ export function createSafeParseAdapter<T>(
     safeParse: (candidate: unknown) => SafeParseResultLike<T>
 ): (candidate: unknown) => SafeParseLike<T> {
     return (candidate): SafeParseLike<T> => {
-
         const parsed = safeParse(candidate);
         if (!isSafeParseResultFailure(parsed)) {
             return { data: parsed.data, success: true };
@@ -156,7 +156,6 @@ export function safeParseBooleanResult(
     if (typeof candidate === "boolean") {
         return { data: candidate, success: true };
     }
-
 
     return {
         error: new Error(
@@ -387,7 +386,9 @@ async function withTimeout<T>(args: {
         const raced = await Promise.race([
             promise,
             new Promise<typeof TIMEOUT>((resolve) => {
-                timeoutId = setTimeout(() => { resolve(TIMEOUT); }, timeoutMs);
+                timeoutId = setTimeout(() => {
+                    resolve(TIMEOUT);
+                }, timeoutMs);
             }),
         ]);
 

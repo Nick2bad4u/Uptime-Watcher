@@ -58,7 +58,12 @@ export const SyncMaintenanceStatusCard = ({
             </ThemedText>
 
             {summary ? (
-                <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-2"
+                    size="xs"
+                    variant="tertiary"
+                >
                     {summary}
                 </ThemedText>
             ) : null}

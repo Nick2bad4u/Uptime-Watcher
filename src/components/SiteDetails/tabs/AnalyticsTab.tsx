@@ -214,7 +214,13 @@ export const AnalyticsTab = ({
             performance: responseTimeColor,
             uptime: availabilityColor,
         };
-    }, [avgResponseTime, currentTheme, getColor, getResponseTimeColor, uptimeValue]);
+    }, [
+        avgResponseTime,
+        currentTheme,
+        getColor,
+        getResponseTimeColor,
+        uptimeValue,
+    ]);
     const variant = getVariant(uptimeValue);
     const progressVariant = variant === "danger" ? "error" : variant;
 
@@ -228,7 +234,11 @@ export const AnalyticsTab = ({
             });
             setSiteDetailsChartTimeRange(range);
         },
-        [monitorType, setSiteDetailsChartTimeRange, siteDetailsChartTimeRange]
+        [
+            monitorType,
+            setSiteDetailsChartTimeRange,
+            siteDetailsChartTimeRange,
+        ]
     );
 
     const handleAdvancedMetricsToggle = useCallback(() => {
@@ -249,12 +259,10 @@ export const AnalyticsTab = ({
     return (
         <div className="space-y-6" data-testid="analytics-tab">
             {totalChecks === 0 ? (
-                <ThemedCard
-                    title="No analytics yet"
-                    variant="secondary"
-                >
+                <ThemedCard title="No analytics yet" variant="secondary">
                     <ThemedText size="sm" variant="secondary">
-                        Run a check (or wait for scheduled checks) to populate uptime and response-time charts.
+                        Run a check (or wait for scheduled checks) to populate
+                        uptime and response-time charts.
                     </ThemedText>
                 </ThemedCard>
             ) : null}

@@ -2,17 +2,17 @@ import { describe, expect, it } from "vitest";
 
 describe("cloudServiceFsUtils (strict coverage)", () => {
     it("ignoreENOENT resolves when the operation succeeds", async () => {
-        const { ignoreENOENT } = await import(
-            "../../../../../../electron/services/cloud/internal/cloudServiceFsUtils"
-        );
+        const { ignoreENOENT } =
+            await import("../../../../../../electron/services/cloud/internal/cloudServiceFsUtils");
 
-        await expect(ignoreENOENT(async () => undefined)).resolves.toBeUndefined();
+        await expect(
+            ignoreENOENT(async () => undefined)
+        ).resolves.toBeUndefined();
     });
 
     it("ignoreENOENT swallows ENOENT", async () => {
-        const { ignoreENOENT } = await import(
-            "../../../../../../electron/services/cloud/internal/cloudServiceFsUtils"
-        );
+        const { ignoreENOENT } =
+            await import("../../../../../../electron/services/cloud/internal/cloudServiceFsUtils");
 
         await expect(
             ignoreENOENT(async () => {
@@ -22,9 +22,8 @@ describe("cloudServiceFsUtils (strict coverage)", () => {
     });
 
     it("ignoreENOENT rethrows non-ENOENT errors", async () => {
-        const { ignoreENOENT } = await import(
-            "../../../../../../electron/services/cloud/internal/cloudServiceFsUtils"
-        );
+        const { ignoreENOENT } =
+            await import("../../../../../../electron/services/cloud/internal/cloudServiceFsUtils");
 
         await expect(
             ignoreENOENT(async () => {

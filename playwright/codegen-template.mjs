@@ -21,7 +21,7 @@
  * @param {string} testName - The name of the test suite.
  * @param {string} testTitle - The title of the individual test.
  * @param {string} testBody - The body of the test containing Playwright actions
- * and assertions.
+ *   and assertions.
  *
  * @usage Replace
  * {{testName}}, {{testTitle}}, and {{testBody}} with appropriate values when generating a test file.

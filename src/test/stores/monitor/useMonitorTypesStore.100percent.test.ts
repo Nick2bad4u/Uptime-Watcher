@@ -174,7 +174,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Mock safeExtractIpcData to return null
             originalSafeExtractIpcData.mockReturnValueOnce(null);
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce([]);
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValueOnce(
+                []
+            );
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
@@ -629,9 +631,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             // Test getFieldConfig method which uses get() internally
-            const fieldConfig = result.current.getFieldConfig(
-                "http"
-            );
+            const fieldConfig = result.current.getFieldConfig("http");
             expect(fieldConfig).toEqual([
                 {
                     name: "testField",
@@ -641,9 +641,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 },
             ]);
 
-            const nonExistentConfig = result.current.getFieldConfig(
-                "ping"
-            );
+            const nonExistentConfig = result.current.getFieldConfig("ping");
             expect(nonExistentConfig).toBeUndefined();
         });
 
@@ -1016,7 +1014,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 {
                     nested: {
                         deep: {
-                            values: [1, 2, 3],
+                            values: [
+                                1,
+                                2,
+                                3,
+                            ],
                         },
                     },
                 },
@@ -1058,25 +1060,27 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Set up mock to resolve after a delay
             let resolveCount = 0;
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(() => {
-                const index = resolveCount++;
-                const monitorTypeCandidate =
-                    BASE_MONITOR_TYPES[index % BASE_MONITOR_TYPES.length];
-                if (monitorTypeCandidate === undefined) {
-                    throw new Error(
-                        "Unexpected missing monitor type from BASE_MONITOR_TYPES"
-                    );
-                }
-                const monitorType = monitorTypeCandidate;
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockImplementation(
+                () => {
+                    const index = resolveCount++;
+                    const monitorTypeCandidate =
+                        BASE_MONITOR_TYPES[index % BASE_MONITOR_TYPES.length];
+                    if (monitorTypeCandidate === undefined) {
+                        throw new Error(
+                            "Unexpected missing monitor type from BASE_MONITOR_TYPES"
+                        );
+                    }
+                    const monitorType = monitorTypeCandidate;
 
-                return Promise.resolve([
-                    createMonitorTypeConfig({
-                        type: monitorType,
-                        displayName: `Type ${index + 1}`,
-                        description: "Test type",
-                    }),
-                ]);
-            });
+                    return Promise.resolve([
+                        createMonitorTypeConfig({
+                            type: monitorType,
+                            displayName: `Type ${index + 1}`,
+                            description: "Test type",
+                        }),
+                    ]);
+                }
+            );
 
             // Make rapid successive calls sequentially to avoid overlapping acts
             for (let i = 0; i < 5; i++) {

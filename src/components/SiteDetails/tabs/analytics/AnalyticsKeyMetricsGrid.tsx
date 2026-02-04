@@ -2,8 +2,8 @@
  * Analytics key metrics grid.
  *
  * @remarks
- * Extracted from {@link AnalyticsTab} to keep the main tab component smaller
- * and to isolate presentation-specific structure.
+ * Extracted from {@link AnalyticsTab} to keep the main tab component smaller and
+ * to isolate presentation-specific structure.
  */
 
 import type { MonitorType } from "@shared/types";
@@ -33,7 +33,10 @@ export interface AnalyticsIconColors {
 type ProgressVariant = ComponentProps<typeof ThemedProgress>["variant"];
 
 type StrictProgressVariant = Exclude<ProgressVariant, undefined>;
-type BadgeVariant = Exclude<ComponentProps<typeof ThemedBadge>["variant"], undefined>;
+type BadgeVariant = Exclude<
+    ComponentProps<typeof ThemedBadge>["variant"],
+    undefined
+>;
 
 /**
  * Props for {@link AnalyticsKeyMetricsGrid}.

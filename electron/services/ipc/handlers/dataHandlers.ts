@@ -17,7 +17,10 @@ import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { validateDatabaseBackupPayload } from "../../database/utils/backup/databaseBackup";
 import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
-import { DataHandlerResultValidators, DataHandlerValidators } from "../validators/data";
+import {
+    DataHandlerResultValidators,
+    DataHandlerValidators,
+} from "../validators/data";
 
 function ensureSqliteFileExtension(rawPath: string): string {
     const ext = path.extname(rawPath);
@@ -134,9 +137,11 @@ export function registerDataHandlers({
 
     register(
         DATA_CHANNELS.importData,
-            (
-                serializedBackup: IpcInvokeChannelParams<typeof DATA_CHANNELS.importData>[0]
-            ) => uptimeOrchestrator.importData(serializedBackup),
+        (
+            serializedBackup: IpcInvokeChannelParams<
+                typeof DATA_CHANNELS.importData
+            >[0]
+        ) => uptimeOrchestrator.importData(serializedBackup),
         DataHandlerValidators.importData
     );
 
@@ -156,11 +161,11 @@ export function registerDataHandlers({
 
     register(
         DATA_CHANNELS.restoreSqliteBackup,
-            async (
-                payload: IpcInvokeChannelParams<
-                    typeof DATA_CHANNELS.restoreSqliteBackup
-                >[0]
-            ) => {
+        async (
+            payload: IpcInvokeChannelParams<
+                typeof DATA_CHANNELS.restoreSqliteBackup
+            >[0]
+        ) => {
             const buffer = Buffer.from(payload.buffer);
             const restorePayload = payload.fileName
                 ? { buffer, fileName: payload.fileName }

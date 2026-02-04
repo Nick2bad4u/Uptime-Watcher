@@ -17,15 +17,13 @@ import {
 // Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
- * ESLint rule ensuring Electron runtime code never depends on renderer
- * bundles.
+ * ESLint rule ensuring Electron runtime code never depends on renderer bundles.
  */
 export const electronNoRendererImportRule = {
     /**
      * @param {{
      *     getFilename: () => any;
-     *     report: (arg0: { data: { module: any }; messageId: string; node: any
-     *     }) => void;
+     *     report: (arg0: { data: { module: any }; messageId: string; node: any }) => void;
      * }} context
      */
     create(context) {

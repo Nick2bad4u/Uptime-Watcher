@@ -7,7 +7,8 @@ import type { SiteDetailsTab } from "../../stores/ui/types";
 import { useSiteDetailsUiStore } from "../../hooks/site/useSiteDetails.uiStore";
 
 vi.mock("zustand/react/shallow", () => ({
-    useShallow: <TState, TSlice>(selector: (state: TState) => TSlice) => selector,
+    useShallow: <TState, TSlice>(selector: (state: TState) => TSlice) =>
+        selector,
 }));
 
 const mockUseUIStore = vi.fn();
@@ -29,8 +30,8 @@ describe(useSiteDetailsUiStore, () => {
             // SyncActiveSiteDetailsTab intentionally omitted
         };
 
-        mockUseUIStore.mockImplementationOnce((selector: (s: typeof state) => unknown) =>
-            selector(state)
+        mockUseUIStore.mockImplementationOnce(
+            (selector: (s: typeof state) => unknown) => selector(state)
         );
 
         const { result } = renderHook(() => useSiteDetailsUiStore());
@@ -58,8 +59,8 @@ describe(useSiteDetailsUiStore, () => {
             syncActiveSiteDetailsTab: sync,
         };
 
-        mockUseUIStore.mockImplementationOnce((selector: (s: typeof state) => unknown) =>
-            selector(state)
+        mockUseUIStore.mockImplementationOnce(
+            (selector: (s: typeof state) => unknown) => selector(state)
         );
 
         const { result } = renderHook(() => useSiteDetailsUiStore());

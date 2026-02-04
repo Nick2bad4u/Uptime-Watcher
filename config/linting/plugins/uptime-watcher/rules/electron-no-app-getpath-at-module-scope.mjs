@@ -20,8 +20,8 @@ const DISALLOWED_METHOD_NAMES = new Set([
  *
  * @remarks
  * Module-scope evaluation happens at import time and can run before
- * `app.whenReady()`. Keeping these calls inside functions prevents
- * startup-time crashes and improves testability.
+ * `app.whenReady()`. Keeping these calls inside functions prevents startup-time
+ * crashes and improves testability.
  */
 export const electronNoAppGetpathAtModuleScopeRule = {
     /**

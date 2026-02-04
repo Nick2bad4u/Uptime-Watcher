@@ -31,9 +31,9 @@ const WINDOWS_RESERVED_BASENAMES = new Set([
  * Produces a filesystem-safe file name.
  *
  * @remarks
- * This is used for user-controlled file names that are persisted to disk.
- * The output is constrained to a conservative character set to avoid
- * path traversal and invalid/reserved filenames (especially on Windows).
+ * This is used for user-controlled file names that are persisted to disk. The
+ * output is constrained to a conservative character set to avoid path traversal
+ * and invalid/reserved filenames (especially on Windows).
  */
 export function createSanitizedFileName(fileName: string): string {
     const MAX_FILE_NAME_LENGTH = 200;

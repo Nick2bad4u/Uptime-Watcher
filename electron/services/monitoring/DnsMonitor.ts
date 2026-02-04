@@ -84,7 +84,10 @@ interface ParsedDnsRecords {
 
 const isString = (value: unknown): value is string => typeof value === "string";
 
-const pickNumber = (primary: unknown, fallback: unknown): number | undefined => {
+const pickNumber = (
+    primary: unknown,
+    fallback: unknown
+): number | undefined => {
     if (typeof primary === "number") {
         return primary;
     }
@@ -200,19 +203,17 @@ const parseMxRecords = (result: unknown): ParsedDnsRecords => {
         };
     }
 
-    const mxRecords = result
-        .filter(isRecord)
-        .flatMap((record) => {
-            const { exchange, priority } = record;
-            if (
-                typeof exchange === "string" &&
-                typeof priority === "number" &&
-                Number.isFinite(priority)
-            ) {
-                return [{ exchange, priority }];
-            }
-            return [];
-        });
+    const mxRecords = result.filter(isRecord).flatMap((record) => {
+        const { exchange, priority } = record;
+        if (
+            typeof exchange === "string" &&
+            typeof priority === "number" &&
+            Number.isFinite(priority)
+        ) {
+            return [{ exchange, priority }];
+        }
+        return [];
+    });
 
     const formattedRecords = mxRecords
         .map((record) => `${record.priority} ${record.exchange}`)
@@ -237,26 +238,27 @@ const parseNaptrRecords = (result: unknown): ParsedDnsRecords => {
         };
     }
 
-    const naptr = result
-        .filter(isRecord)
-        .flatMap((record) => {
-            const { flags, regexp, replacement, service } = record;
-            if (
-                typeof flags === "string" &&
-                typeof regexp === "string" &&
-                typeof replacement === "string" &&
-                typeof service === "string"
-            ) {
-                return [{ flags, regexp, replacement, service }];
-            }
-            return [];
-        });
+    const naptr = result.filter(isRecord).flatMap((record) => {
+        const { flags, regexp, replacement, service } = record;
+        if (
+            typeof flags === "string" &&
+            typeof regexp === "string" &&
+            typeof replacement === "string" &&
+            typeof service === "string"
+        ) {
+            return [{ flags, regexp, replacement, service }];
+        }
+        return [];
+    });
 
     const actualValues = naptr.map((record) => record.replacement);
     return {
         actualValues,
         details: `NAPTR records: ${naptr
-            .map((record) => `${record.flags} ${record.service} ${record.replacement}`)
+            .map(
+                (record) =>
+                    `${record.flags} ${record.service} ${record.replacement}`
+            )
             .join(", ")}`,
         hasRecords: actualValues.length > 0,
         skipExpectedValueCheck: false,
@@ -307,26 +309,27 @@ const parseSrvRecords = (result: unknown): ParsedDnsRecords => {
         };
     }
 
-    const srvRecords = result
-        .filter(isRecord)
-        .flatMap((record) => {
-            const { name, port, priority, weight } = record;
-            if (
-                typeof name === "string" &&
-                typeof port === "number" &&
-                Number.isFinite(port) &&
-                typeof priority === "number" &&
-                Number.isFinite(priority) &&
-                typeof weight === "number" &&
-                Number.isFinite(weight)
-            ) {
-                return [{ name, port, priority, weight }];
-            }
-            return [];
-        });
+    const srvRecords = result.filter(isRecord).flatMap((record) => {
+        const { name, port, priority, weight } = record;
+        if (
+            typeof name === "string" &&
+            typeof port === "number" &&
+            Number.isFinite(port) &&
+            typeof priority === "number" &&
+            Number.isFinite(priority) &&
+            typeof weight === "number" &&
+            Number.isFinite(weight)
+        ) {
+            return [{ name, port, priority, weight }];
+        }
+        return [];
+    });
 
     const formattedRecords = srvRecords
-        .map((record) => `${record.priority} ${record.weight} ${record.port} ${record.name}`)
+        .map(
+            (record) =>
+                `${record.priority} ${record.weight} ${record.port} ${record.name}`
+        )
         .join(", ");
 
     const actualValues = srvRecords.map((record) => record.name);
@@ -348,28 +351,26 @@ const parseTlsaRecords = (result: unknown): ParsedDnsRecords => {
         };
     }
 
-    const tlsa = result
-        .filter(isRecord)
-        .flatMap((record) => {
-            const { certUsage, match, matchingType, selector, usage } = record;
+    const tlsa = result.filter(isRecord).flatMap((record) => {
+        const { certUsage, match, matchingType, selector, usage } = record;
 
-            const resolvedCertUsage = pickNumber(certUsage, usage);
-            const resolvedMatch = pickNumber(match, matchingType);
-            if (
-                typeof resolvedCertUsage === "number" &&
-                typeof resolvedMatch === "number" &&
-                typeof selector === "number"
-            ) {
-                return [
-                    {
-                        certUsage: resolvedCertUsage,
-                        match: resolvedMatch,
-                        selector,
-                    },
-                ];
-            }
-            return [];
-        });
+        const resolvedCertUsage = pickNumber(certUsage, usage);
+        const resolvedMatch = pickNumber(match, matchingType);
+        if (
+            typeof resolvedCertUsage === "number" &&
+            typeof resolvedMatch === "number" &&
+            typeof selector === "number"
+        ) {
+            return [
+                {
+                    certUsage: resolvedCertUsage,
+                    match: resolvedMatch,
+                    selector,
+                },
+            ];
+        }
+        return [];
+    });
 
     const actualValues = tlsa.map(
         (record) => `${record.certUsage}:${record.selector}:${record.match}`

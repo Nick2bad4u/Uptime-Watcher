@@ -26,7 +26,7 @@ const buildDir = path.join(docusaurusDir, "build", "eslint-inspector");
  * @param {string} dirPath - Directory path to check.
  * @param {string[]} expectedFiles - Expected files in directory.
  *
- * @returns {Promise<{exists: boolean, files: string[], missing: string[]}>}
+ * @returns {Promise<{ exists: boolean; files: string[]; missing: string[] }>}
  */
 async function checkDirectory(dirPath, expectedFiles = []) {
     try {
@@ -53,7 +53,7 @@ async function checkDirectory(dirPath, expectedFiles = []) {
  *
  * @param {string} filePath - Path to config file.
  *
- * @returns {Promise<{valid: boolean, content?: string, error?: string}>}
+ * @returns {Promise<{ valid: boolean; content?: string; error?: string }>}
  */
 async function verifyConfigFile(filePath) {
     try {

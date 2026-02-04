@@ -71,19 +71,21 @@ type HttpStatusMonitorConstructor = new (
     config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance;
 
-const HttpStatusMonitorBase: HttpStatusMonitorConstructor = ((): HttpStatusMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () =>
-                createHttpMonitorService<"http-status", { expectedStatus: number }>(
-                    behavior
-                ),
-            "HttpStatusMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const HttpStatusMonitorBase: HttpStatusMonitorConstructor =
+    ((): HttpStatusMonitorConstructor => {
+        try {
+            return buildMonitorFactory(
+                () =>
+                    createHttpMonitorService<
+                        "http-status",
+                        { expectedStatus: number }
+                    >(behavior),
+                "HttpStatusMonitor"
+            );
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * HTTP status monitor service that validates response codes via the shared

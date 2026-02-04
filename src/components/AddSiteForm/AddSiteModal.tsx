@@ -13,12 +13,7 @@
  * @packageDocumentation
  */
 
-import {
-    memo,
-    type NamedExoticComponent,
-    useCallback,
-    useState,
-} from "react";
+import { memo, type NamedExoticComponent, useCallback, useState } from "react";
 
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";

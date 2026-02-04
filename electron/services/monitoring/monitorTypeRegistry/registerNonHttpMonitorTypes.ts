@@ -197,7 +197,8 @@ export function registerNonHttpMonitorTypes(deps: {
     });
 
     deps.registerMonitorType({
-        description: "Monitors TLS certificates for validity and expiry windows",
+        description:
+            "Monitors TLS certificates for validity and expiry windows",
         displayName: "SSL Certificate",
         fields: [
             {
@@ -219,7 +220,8 @@ export function registerNonHttpMonitorTypes(deps: {
                 type: "number",
             },
             {
-                helpText: "Days before expiry to warn and mark the monitor as degraded",
+                helpText:
+                    "Days before expiry to warn and mark the monitor as degraded",
                 label: "Expiry Warning (days)",
                 max: 365,
                 min: 1,
@@ -276,7 +278,8 @@ export function registerNonHttpMonitorTypes(deps: {
                     "Provide one or more edge endpoint URLs separated by commas or new lines.",
                 label: "Edge Endpoints",
                 name: "edgeLocations",
-                placeholder: "https://edge1.example.com\nhttps://edge2.example.com",
+                placeholder:
+                    "https://edge1.example.com\nhttps://edge2.example.com",
                 required: true,
                 type: "text",
             },
@@ -325,7 +328,8 @@ export function registerNonHttpMonitorTypes(deps: {
                 type: "url",
             },
             {
-                helpText: "Replica database status endpoint used for comparison.",
+                helpText:
+                    "Replica database status endpoint used for comparison.",
                 label: "Replica Status URL",
                 name: "replicaStatusUrl",
                 placeholder: "https://replica.example.com/status",
@@ -405,7 +409,8 @@ export function registerNonHttpMonitorTypes(deps: {
                 type: "text",
             },
             {
-                helpText: "Expected heartbeat status value (e.g., ok, healthy).",
+                helpText:
+                    "Expected heartbeat status value (e.g., ok, healthy).",
                 label: "Expected Status",
                 name: "heartbeatExpectedStatus",
                 placeholder: "ok",

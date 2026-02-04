@@ -13,10 +13,9 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * constants.
  *
  * @remarks
- * The preload layer should import canonical channel constants from shared
- * types (e.g. `@shared/types/preload`) instead of redefining channel strings.
- * This prevents drift and keeps AI changes on the established contract
- * codepath.
+ * The preload layer should import canonical channel constants from shared types
+ * (e.g. `@shared/types/preload`) instead of redefining channel strings. This
+ * prevents drift and keeps AI changes on the established contract codepath.
  */
 export const electronPreloadNoInlineIpcChannelConstantRule = {
     /**

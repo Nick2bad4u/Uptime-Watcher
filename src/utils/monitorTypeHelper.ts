@@ -18,7 +18,9 @@ import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 
-function isMonitorTypeConfigArray(value: unknown): value is MonitorTypeConfig[] {
+function isMonitorTypeConfigArray(
+    value: unknown
+): value is MonitorTypeConfig[] {
     return Array.isArray(value) && value.every(isMonitorTypeConfig);
 }
 
@@ -129,9 +131,9 @@ export async function getMonitorTypeConfig(
  * Get form options for monitor type selector.
  *
  * @remarks
- * Returns an array of objects with the shape:
- * `{ label: string, value: MonitorType }` where label is the human-readable
- * display name and value is the monitor type identifier.
+ * Returns an array of objects with the shape: `{ label: string, value:
+ * MonitorType }` where label is the human-readable display name and value is
+ * the monitor type identifier.
  *
  * This format is suitable for use with form select components and dropdown
  * menus. The options are derived from all available monitor types from the

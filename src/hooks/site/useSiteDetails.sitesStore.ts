@@ -52,10 +52,12 @@ export function useSiteDetailsSitesStore(): SiteDetailsSitesStoreSlice {
                     setSelectedMonitorId: state.setSelectedMonitorId,
                     sites: state.sites,
                     startSiteMonitoring: state.startSiteMonitoring,
-                    startSiteMonitorMonitoring: state.startSiteMonitorMonitoring,
+                    startSiteMonitorMonitoring:
+                        state.startSiteMonitorMonitoring,
                     stopSiteMonitoring: state.stopSiteMonitoring,
                     stopSiteMonitorMonitoring: state.stopSiteMonitorMonitoring,
-                    updateMonitorRetryAttempts: state.updateMonitorRetryAttempts,
+                    updateMonitorRetryAttempts:
+                        state.updateMonitorRetryAttempts,
                     updateMonitorTimeout: state.updateMonitorTimeout,
                     updateSiteCheckInterval: state.updateSiteCheckInterval,
                 }),

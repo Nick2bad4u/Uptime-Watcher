@@ -455,9 +455,8 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             // Re-register built-in types many times. This should not grow the
             // registry (Map overwrite), but still exercises the hot path.
             for (let i = 0; i < 1000; i++) {
-                const monitorType = BASE_MONITOR_TYPES[
-                    i % BASE_MONITOR_TYPES.length
-                ]!;
+                const monitorType =
+                    BASE_MONITOR_TYPES[i % BASE_MONITOR_TYPES.length]!;
 
                 const config: BaseMonitorConfig = {
                     type: monitorType,
@@ -470,9 +469,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                             check: vi
                                 .fn()
                                 .mockResolvedValue({ status: "up" as const }),
-                            getType: vi
-                                .fn()
-                                .mockReturnValue(monitorType),
+                            getType: vi.fn().mockReturnValue(monitorType),
                             updateConfig: vi.fn(),
                         }) as IMonitorService,
                     validationSchema: z.object({ type: z.string() }),

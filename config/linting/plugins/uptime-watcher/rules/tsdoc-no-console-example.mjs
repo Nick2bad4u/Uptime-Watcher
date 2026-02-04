@@ -13,8 +13,7 @@ export const tsdocNoConsoleExampleRule = {
     /**
      * @param {{
      *     getSourceCode: () => any;
-     *     report: (arg0: { loc: { end: any; start: any }; messageId: string })
-     *     => void;
+     *     report: (arg0: { loc: { end: any; start: any }; messageId: string }) => void;
      * }} context
      */
     create(context) {

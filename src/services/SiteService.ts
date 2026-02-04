@@ -174,8 +174,8 @@ export const SiteService: SiteServiceContract = {
             new Set(
                 issues
                     .map((issue) => issue.path[0])
-                    .filter((value): value is number =>
-                        typeof value === "number"
+                    .filter(
+                        (value): value is number => typeof value === "number"
                     )
             )
         ).toSorted((a, b) => a - b);

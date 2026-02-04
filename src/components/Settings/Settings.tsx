@@ -24,8 +24,9 @@ export interface SettingsProperties {
  * Settings modal.
  *
  * @remarks
- * This component is intentionally kept as a small, declarative view layer.
- * The bulk of the state + event-handler logic lives in {@link useSettingsController}.
+ * This component is intentionally kept as a small, declarative view layer. The
+ * bulk of the state + event-handler logic lives in
+ * {@link useSettingsController}.
  */
 export const Settings = ({
     onClose,

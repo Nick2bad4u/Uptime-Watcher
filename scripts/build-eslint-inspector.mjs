@@ -222,7 +222,8 @@ async function fixAssetPaths() {
 }
 
 /**
- * Create a local testing version with relative paths for direct browser opening.
+ * Create a local testing version with relative paths for direct browser
+ * opening.
  */
 async function createLocalTestingVersion() {
     try {
@@ -444,7 +445,7 @@ export { buildESLintInspector };
  * deployment.
  *
  * @returns {Promise<void>} Resolves when the copy operation completes
- * successfully.
+ *   successfully.
  */
 export { copyToDocusaurus };
 

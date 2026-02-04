@@ -19,8 +19,8 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * - `const channel = "add-site" satisfies IpcInvokeChannel`
  * - `const channel = "add-site" as IpcInvokeChannel`
  *
- * These are all forms of duplicating channel identifiers in places that are
- * not the shared contract registry. Prefer importing channel constants (e.g.
+ * These are all forms of duplicating channel identifiers in places that are not
+ * the shared contract registry. Prefer importing channel constants (e.g.
  * `SITES_CHANNELS.addSite`) or referencing the shared mappings.
  */
 export const noInlineIpcChannelTypeLiteralsRule = {

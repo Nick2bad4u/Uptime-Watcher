@@ -15,8 +15,8 @@ const ALLOWED_FILE_SUFFIX = "/electron/services/shell/openExternalUtils.ts";
  *
  * @remarks
  * `shell.openExternal()` is a security-sensitive API. This repo centralizes it
- * in `electron/services/shell/openExternalUtils.ts` where URL normalization
- * and allow-list rules can be enforced consistently.
+ * in `electron/services/shell/openExternalUtils.ts` where URL normalization and
+ * allow-list rules can be enforced consistently.
  */
 export const electronNoShellOpenExternalRule = {
     /**

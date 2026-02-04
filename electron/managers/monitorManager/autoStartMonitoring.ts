@@ -63,9 +63,12 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
     }
 
     logger.debug(
-        interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_AUTO_STARTING_SITE, {
-            identifier: site.identifier,
-        })
+        interpolateLogTemplate(
+            LOG_TEMPLATES.debug.MONITOR_MANAGER_AUTO_STARTING_SITE,
+            {
+                identifier: site.identifier,
+            }
+        )
     );
 
     // Start only monitors that have monitoring enabled (respecting individual
@@ -84,9 +87,12 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
 
         if (monitor.id && !monitor.monitoring) {
             logger.debug(
-                interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_INDIVIDUAL, {
-                    monitorId: monitor.id,
-                })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_INDIVIDUAL,
+                    {
+                        monitorId: monitor.id,
+                    }
+                )
             );
             return;
         }
@@ -100,9 +106,12 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
     await Promise.all(startPromises);
 
     logger.info(
-        interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_MANAGER_AUTO_STARTING, {
-            identifier: site.identifier,
-        })
+        interpolateLogTemplate(
+            LOG_TEMPLATES.services.MONITOR_MANAGER_AUTO_STARTING,
+            {
+                identifier: site.identifier,
+            }
+        )
     );
 }
 
@@ -120,16 +129,20 @@ export async function autoStartNewMonitorsOperation(args: {
         monitorId: string
     ) => Promise<boolean>;
 }): Promise<void> {
-    const { logger, newMonitors, siteIdentifier, startMonitoringForSite } = args;
+    const { logger, newMonitors, siteIdentifier, startMonitoringForSite } =
+        args;
 
     // Start new monitors in parallel for better performance
     const startPromises = newMonitors.map(async (monitor) => {
         if (monitor.id && monitor.monitoring) {
             await startMonitoringForSite(siteIdentifier, monitor.id);
             logger.debug(
-                interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_AUTO_STARTED, {
-                    monitorId: monitor.id,
-                })
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.debug.MONITOR_AUTO_STARTED,
+                    {
+                        monitorId: monitor.id,
+                    }
+                )
             );
             return;
         }

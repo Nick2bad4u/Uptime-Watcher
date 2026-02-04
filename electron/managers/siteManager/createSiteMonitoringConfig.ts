@@ -31,7 +31,10 @@ export function createSiteMonitoringConfig(options: {
             try {
                 await monitoringOperations.setHistoryLimit(limit);
             } catch (error) {
-                logger.error(LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED, error);
+                logger.error(
+                    LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED,
+                    error
+                );
                 throw error;
             }
         },
@@ -57,7 +60,10 @@ export function createSiteMonitoringConfig(options: {
                 );
             }
 
-            return monitoringOperations.startMonitoringForSite(identifier, monitorId);
+            return monitoringOperations.startMonitoringForSite(
+                identifier,
+                monitorId
+            );
         },
         stopMonitoring: async (
             identifier: string,
@@ -69,7 +75,10 @@ export function createSiteMonitoringConfig(options: {
                 );
             }
 
-            return monitoringOperations.stopMonitoringForSite(identifier, monitorId);
+            return monitoringOperations.stopMonitoringForSite(
+                identifier,
+                monitorId
+            );
         },
     };
 }

@@ -115,7 +115,12 @@ export function useSiteDetailsCharts(
             data,
             labels,
         };
-    }, [analytics.degradedCount, analytics.downCount, analytics.upCount, currentTheme]);
+    }, [
+        analytics.degradedCount,
+        analytics.downCount,
+        analytics.upCount,
+        currentTheme,
+    ]);
 
     const barChartData = useMemo<StatusBarChartData>(
         () => ({

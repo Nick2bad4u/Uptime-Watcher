@@ -1,4 +1,7 @@
-import type { IpcInvokeChannel, IpcInvokeChannelParams } from "@shared/types/ipc";
+import type {
+    IpcInvokeChannel,
+    IpcInvokeChannelParams,
+} from "@shared/types/ipc";
 
 import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
 import {

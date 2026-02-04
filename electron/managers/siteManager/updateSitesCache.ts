@@ -20,7 +20,10 @@ export interface UpdateSitesCacheOptions {
     readonly emitSyncEvent?: boolean;
     /** Identifier correlated with the emitted sync event. */
     readonly siteIdentifier?: string;
-    /** Sites to use for the sync event payload (defaults to sanitized cache snapshot). */
+    /**
+     * Sites to use for the sync event payload (defaults to sanitized cache
+     * snapshot).
+     */
     readonly sites?: Site[];
     /** Source attributed to the emitted sync event. */
     readonly source?: StateSyncSource;
@@ -38,7 +41,10 @@ export interface UpdateSitesCacheDependencies {
         operation: UptimeEvents["internal:site:cache-updated"]["operation"];
         timestamp?: number;
     }) => Promise<void>;
-    /** Emits a `sites:state-synchronized` event through the manager/state-sync layer. */
+    /**
+     * Emits a `sites:state-synchronized` event through the manager/state-sync
+     * layer.
+     */
     readonly emitSitesStateSynchronized: (payload: {
         action: StateSyncAction;
         siteIdentifier: string;
@@ -54,8 +60,8 @@ export interface UpdateSitesCacheDependencies {
  * Updates the site cache atomically and optionally emits a state-sync event.
  *
  * @remarks
- * Extracted from `SiteManager.updateSitesCache` to reduce file size and
- * isolate snapshot/duplicate-handling logic.
+ * Extracted from `SiteManager.updateSitesCache` to reduce file size and isolate
+ * snapshot/duplicate-handling logic.
  */
 export async function updateSitesCache(
     deps: UpdateSitesCacheDependencies,

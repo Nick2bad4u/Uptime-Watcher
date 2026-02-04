@@ -3,6 +3,7 @@
  *
  * @remarks
  * This component is intentionally presentational. It renders:
+ *
  * - Site name editing
  * - Immutable site identifier display
  */
@@ -123,10 +124,7 @@ export const SettingsTabSiteConfigurationCard = ({
                 <div className="site-settings-field">
                     <SiteSettingsFieldLabel>
                         <span className="inline-flex items-center gap-2">
-                            <IdentifierIcon
-                                aria-hidden
-                                size={fieldIconSize}
-                            />
+                            <IdentifierIcon aria-hidden size={fieldIconSize} />
                             {identifierLabel}
                         </span>
                     </SiteSettingsFieldLabel>

@@ -21,9 +21,7 @@ import type {
 } from "@shared/types/stateSync";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import {
-    deriveSiteSnapshot,
-} from "@shared/utils/siteSnapshots";
+import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -708,8 +706,7 @@ export const createSiteSyncActions = (
                             ...(synchronized
                                 ? {}
                                 : {
-                                      failureReason:
-                                          "backend-not-synchronized",
+                                      failureReason: "backend-not-synchronized",
                                   }),
                         } satisfies SitesTelemetryPayload;
 

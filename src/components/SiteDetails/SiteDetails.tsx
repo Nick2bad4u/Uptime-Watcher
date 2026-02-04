@@ -182,7 +182,6 @@ export const SiteDetails = ({
         siteDetailsChartTimeRange,
         siteExists,
         timeoutChanged,
-
     } = useSiteDetails(useMemo(() => ({ site }), [site]));
 
     const {
@@ -289,19 +288,31 @@ export const SiteDetails = ({
                                 formatDuration={formatDuration}
                                 formatFullTimestamp={formatFullTimestamp}
                                 formatResponseTime={formatResponseTime}
-                                getAvailabilityDescription={getAvailabilityDescription}
+                                getAvailabilityDescription={
+                                    getAvailabilityDescription
+                                }
                                 handleCheckNow={handleCheckNowClick}
                                 handleIntervalChange={handleIntervalChange}
                                 handleRemoveMonitor={handleRemoveMonitor}
                                 handleRemoveSite={handleRemoveSite}
-                                handleRetryAttemptsChange={handleRetryAttemptsChange}
+                                handleRetryAttemptsChange={
+                                    handleRetryAttemptsChange
+                                }
                                 handleSaveInterval={handleSaveInterval}
-                                handleSaveIntervalClick={handleSaveIntervalClick}
+                                handleSaveIntervalClick={
+                                    handleSaveIntervalClick
+                                }
                                 handleSaveName={handleSaveName}
-                                handleSaveRetryAttempts={handleSaveRetryAttempts}
+                                handleSaveRetryAttempts={
+                                    handleSaveRetryAttempts
+                                }
                                 handleSaveTimeout={handleSaveTimeout}
-                                handleStartSiteMonitoring={handleStartSiteMonitoring}
-                                handleStopSiteMonitoring={handleStopSiteMonitoring}
+                                handleStartSiteMonitoring={
+                                    handleStartSiteMonitoring
+                                }
+                                handleStopSiteMonitoring={
+                                    handleStopSiteMonitoring
+                                }
                                 handleTimeoutChange={handleTimeoutChange}
                                 hasUnsavedChanges={hasUnsavedChanges}
                                 intervalChanged={intervalChanged}
@@ -317,10 +328,14 @@ export const SiteDetails = ({
                                 selectedMonitorId={selectedMonitorId}
                                 setLocalName={setLocalName}
                                 setShowAdvancedMetrics={setShowAdvancedMetrics}
-                                setSiteDetailsChartTimeRange={setSiteDetailsChartTimeRange}
+                                setSiteDetailsChartTimeRange={
+                                    setSiteDetailsChartTimeRange
+                                }
                                 showAdvancedMetrics={showAdvancedMetrics}
                                 site={currentSite}
-                                siteDetailsChartTimeRange={siteDetailsChartTimeRange}
+                                siteDetailsChartTimeRange={
+                                    siteDetailsChartTimeRange
+                                }
                                 timeoutChanged={timeoutChanged}
                             />
                         </SurfaceContainer>

@@ -61,13 +61,11 @@ export const CloudProviderSetupPanel = ({
     const activeProviderTab = resolveActiveProviderTab(status);
     const lockedProviderTab = configured ? activeProviderTab : null;
 
-    const [userSelectedProviderTab, setUserSelectedProviderTab] = useState<
-        CloudProviderSetupPanelTabKey | null
-    >(null);
+    const [userSelectedProviderTab, setUserSelectedProviderTab] =
+        useState<CloudProviderSetupPanelTabKey | null>(null);
 
-    const [lockedProviderAttemptTab, setLockedProviderAttemptTab] = useState<
-        CloudProviderSetupPanelTabKey | null
-    >(null);
+    const [lockedProviderAttemptTab, setLockedProviderAttemptTab] =
+        useState<CloudProviderSetupPanelTabKey | null>(null);
 
     const selectedProviderTab: CloudProviderSetupPanelTabKey =
         lockedProviderTab ?? userSelectedProviderTab ?? "dropbox";
@@ -168,9 +166,7 @@ export const CloudProviderSetupPanel = ({
                         size="sm"
                         variant="secondary"
                     >
-                        {isRefreshingStatus
-                            ? "Refreshing…"
-                            : "Refresh status"}
+                        {isRefreshingStatus ? "Refreshing…" : "Refresh status"}
                     </ThemedButton>
 
                     <CloudProviderSetupPanelDisconnectControl

@@ -47,7 +47,10 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
 })();
 
 interface MonitorTypesServiceContract {
-    formatMonitorDetail: (type: MonitorType, details: string) => Promise<string>;
+    formatMonitorDetail: (
+        type: MonitorType,
+        details: string
+    ) => Promise<string>;
     formatMonitorTitleSuffix: (
         type: MonitorType,
         monitor: Monitor

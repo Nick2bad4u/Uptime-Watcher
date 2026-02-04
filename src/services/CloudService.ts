@@ -128,7 +128,9 @@ export const CloudService: CloudServiceContract = {
 
     disconnect: wrap("disconnect", (api) => api.cloud.disconnect()),
 
-    enableSync: wrap("enableSync", (api, config) => api.cloud.enableSync(config)),
+    enableSync: wrap("enableSync", (api, config) =>
+        api.cloud.enableSync(config)
+    ),
 
     getStatus: wrap("getStatus", (api) => api.cloud.getStatus()),
 

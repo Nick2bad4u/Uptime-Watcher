@@ -194,9 +194,7 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
         // NOTE: Vitest v4 removed `test.poolOptions`. Use `maxWorkers` instead.
         maxWorkers: Math.max(
             1,
-            Number(
-                runtimeEnv["MAX_THREADS"] ?? (runtimeEnv["CI"] ? "1" : "8")
-            )
+            Number(runtimeEnv["MAX_THREADS"] ?? (runtimeEnv["CI"] ? "1" : "8"))
         ),
         name: {
             color: "green",

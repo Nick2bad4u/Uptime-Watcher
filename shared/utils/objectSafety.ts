@@ -138,7 +138,10 @@ export interface SafeObjectOmit {
     /**
      * Omitting keys from a nullish input yields an empty object.
      */
-    (obj: null | undefined, keys: readonly PropertyKey[]): Record<string, never>;
+    (
+        obj: null | undefined,
+        keys: readonly PropertyKey[]
+    ): Record<string, never>;
 
     /**
      * Omits the provided keys from the object.
@@ -207,7 +210,8 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
     return result;
 }
 
-export const safeObjectOmit: SafeObjectOmit = safeObjectOmitImpl as SafeObjectOmit;
+export const safeObjectOmit: SafeObjectOmit =
+    safeObjectOmitImpl as SafeObjectOmit;
 
 /**
  * Create a type-safe subset of an object with only specified keys.

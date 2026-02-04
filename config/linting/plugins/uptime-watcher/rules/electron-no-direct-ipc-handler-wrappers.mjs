@@ -17,8 +17,8 @@ import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
  * `withIpcHandler`/`withIpcHandlerValidation`.
  *
  * @remarks
- * This is an explicit "no new codepaths" rule: the only module that should
- * deal with response formatting, timing, and validation plumbing is
+ * This is an explicit "no new codepaths" rule: the only module that should deal
+ * with response formatting, timing, and validation plumbing is
  * `electron/services/ipc/utils.ts`.
  */
 export const electronNoDirectIpcHandlerWrappersRule = {

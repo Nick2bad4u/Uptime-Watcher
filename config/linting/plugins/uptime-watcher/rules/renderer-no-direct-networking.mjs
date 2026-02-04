@@ -27,8 +27,14 @@ export const rendererNoDirectNetworkingRule = {
      *     getSourceCode: () => any;
      *     getFilename: () => any;
      *     report: (arg0: {
-     *         data: { api: string } | { api: string } | { api: string } | {
-     *         api: string }; messageId: string;
+     *         data:
+     *             | { api: string }
+     *             | { api: string }
+     *             | { api: string }
+     *             | {
+     *                   api: string;
+     *               };
+     *         messageId: string;
      *         node: any;
      *     }) => void;
      * }} context

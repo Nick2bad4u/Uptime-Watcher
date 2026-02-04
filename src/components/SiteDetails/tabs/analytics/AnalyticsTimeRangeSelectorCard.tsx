@@ -2,8 +2,8 @@
  * Analytics time-range selector card.
  *
  * @remarks
- * Extracted from {@link AnalyticsTab} to keep the main tab component focused
- * on orchestration.
+ * Extracted from {@link AnalyticsTab} to keep the main tab component focused on
+ * orchestration.
  */
 
 import { type ComponentProps, type JSX, useMemo } from "react";
@@ -56,7 +56,9 @@ export const AnalyticsTimeRangeSelectorCard = ({
         () =>
             CHART_TIME_RANGES.map((range) => {
                 const isSelected = selectedRange === range;
-                const variant: ButtonVariant = isSelected ? "primary" : "secondary";
+                const variant: ButtonVariant = isSelected
+                    ? "primary"
+                    : "secondary";
 
                 return {
                     handleClick: (): void => {

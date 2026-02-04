@@ -45,7 +45,7 @@ for (const config of fileConfigs) {
 
 /**
  * @param {string} text
- * @param {{file: string, domain: string}} config
+ * @param {{ file: string; domain: string }} config
  */
 function updateFile(text, config) {
     let result = updateHeader(text, config);
@@ -56,7 +56,7 @@ function updateFile(text, config) {
 
 /**
  * @param {string} text
- * @param {{file: string, domain: any}} config
+ * @param {{ file: string; domain: any }} config
  */
 function updateHeader(text, config) {
     const title = buildTitle(config.file);
@@ -83,7 +83,7 @@ function updateHeader(text, config) {
 
 /**
  * @param {string} text
- * @param {{domain: string}} config
+ * @param {{ domain: string }} config
  */
 function addDocToDefinitions(text, config) {
     const lines = text.split("\n");
@@ -125,7 +125,7 @@ function addDocToDefinitions(text, config) {
 
 /**
  * @param {string} text
- * @param {{domain: string}} config
+ * @param {{ domain: string }} config
  */
 function addDocToFunctions(text, config) {
     const lines = text.split("\n");

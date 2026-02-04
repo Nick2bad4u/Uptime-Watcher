@@ -2,16 +2,20 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Monitor } from "@shared/types";
 
-import {
-    createServicesByTypeAndStrategyRegistry,
-} from "../../services/monitoring/enhancedMonitorChecker/createServicesByTypeAndStrategyRegistry";
+import { createServicesByTypeAndStrategyRegistry } from "../../services/monitoring/enhancedMonitorChecker/createServicesByTypeAndStrategyRegistry";
 import { performManualCheckOperation } from "../../services/monitoring/enhancedMonitorChecker/performManualCheck";
 import { performScheduledCheckOperation } from "../../services/monitoring/enhancedMonitorChecker/performScheduledCheck";
 
-import type { IMonitorService, MonitorCheckResult } from "../../services/monitoring/types";
+import type {
+    IMonitorService,
+    MonitorCheckResult,
+} from "../../services/monitoring/types";
 import type { MonitorCheckContext } from "../../services/monitoring/checkContext";
 
-import { createTestMonitor, createTestSite } from "../utils/enhanced-testUtilities";
+import {
+    createTestMonitor,
+    createTestSite,
+} from "../utils/enhanced-testUtilities";
 
 describe("enhancedMonitorChecker helper modules", () => {
     describe(createServicesByTypeAndStrategyRegistry, () => {
@@ -72,7 +76,9 @@ describe("enhancedMonitorChecker helper modules", () => {
 
         it("throws when a service is removed from the returned map", async () => {
             const service: IMonitorService = {
-                check: vi.fn().mockResolvedValue({ responseTime: 1, status: "up" }),
+                check: vi
+                    .fn()
+                    .mockResolvedValue({ responseTime: 1, status: "up" }),
                 getType: () => "http",
                 updateConfig: vi.fn(),
             };
@@ -196,8 +202,12 @@ describe("enhancedMonitorChecker helper modules", () => {
                 site,
             });
 
-            expect(operationRegistry.cancelOperations).toHaveBeenCalledWith(monitor.id);
-            expect(monitorRepository.clearActiveOperations).toHaveBeenCalledWith(monitor.id);
+            expect(operationRegistry.cancelOperations).toHaveBeenCalledWith(
+                monitor.id
+            );
+            expect(
+                monitorRepository.clearActiveOperations
+            ).toHaveBeenCalledWith(monitor.id);
 
             expect(performDirectCheck).toHaveBeenCalledWith(
                 site,

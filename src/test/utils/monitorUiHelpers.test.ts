@@ -771,9 +771,10 @@ describe("Monitor UI Helpers", () => {
                     }
                 );
 
-                const result = await monitorUiHelpers.allSupportsResponseTime(
-                    monitorTypes
-                );
+                const result =
+                    await monitorUiHelpers.allSupportsResponseTime(
+                        monitorTypes
+                    );
 
                 // Property: Should only return true if all types are http or port
                 const expectedResult = monitorTypes.every(
@@ -805,25 +806,21 @@ describe("Monitor UI Helpers", () => {
 
                 vi.mocked(getMonitorTypeConfig).mockResolvedValue(config);
 
-                const result = await monitorUiHelpers.getAnalyticsLabel(
-                    monitorType
-                );
+                const result =
+                    await monitorUiHelpers.getAnalyticsLabel(monitorType);
 
                 // Property: Should return custom label when configured
                 expect(result).toBe(customLabel);
             }
         );
 
-        test.prop([
-            fc.constantFrom<MonitorType>(...MONITOR_TYPES_UNDER_TEST),
-        ])(
+        test.prop([fc.constantFrom<MonitorType>(...MONITOR_TYPES_UNDER_TEST)])(
             "should handle getAnalyticsLabel fallback with undefined config",
             async (monitorType) => {
                 vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
-                const result = await monitorUiHelpers.getAnalyticsLabel(
-                    monitorType
-                );
+                const result =
+                    await monitorUiHelpers.getAnalyticsLabel(monitorType);
 
                 // Property: Should return fallback format when config is undefined
                 const expectedFallback = `${monitorType.toUpperCase()} Response Time`;
@@ -916,9 +913,7 @@ describe("Monitor UI Helpers", () => {
             }
         );
 
-        test.prop([
-            fc.constantFrom<MonitorType>(...MONITOR_TYPES_UNDER_TEST),
-        ])(
+        test.prop([fc.constantFrom<MonitorType>(...MONITOR_TYPES_UNDER_TEST)])(
             "should handle error scenarios gracefully",
             async (monitorType) => {
                 const testError = new Error("Configuration fetch failed");
@@ -932,26 +927,21 @@ describe("Monitor UI Helpers", () => {
                 expect(analyticsResult).toBeFalsy();
 
                 const responseTimeResult =
-                    await monitorUiHelpers.supportsResponseTime(
-                        monitorType
-                    );
+                    await monitorUiHelpers.supportsResponseTime(monitorType);
                 expect(responseTimeResult).toBeFalsy();
 
-                const showUrlResult = await monitorUiHelpers.shouldShowUrl(
-                    monitorType
-                );
+                const showUrlResult =
+                    await monitorUiHelpers.shouldShowUrl(monitorType);
                 expect(showUrlResult).toBeFalsy();
 
-                const analyticsLabel = await monitorUiHelpers.getAnalyticsLabel(
-                    monitorType
-                );
+                const analyticsLabel =
+                    await monitorUiHelpers.getAnalyticsLabel(monitorType);
                 expect(analyticsLabel).toBe(
                     `${monitorType.toUpperCase()} Response Time`
                 );
 
-                const helpTexts = await monitorUiHelpers.getMonitorHelpTexts(
-                    monitorType
-                );
+                const helpTexts =
+                    await monitorUiHelpers.getMonitorHelpTexts(monitorType);
                 expect(helpTexts).toEqual({});
             }
         );

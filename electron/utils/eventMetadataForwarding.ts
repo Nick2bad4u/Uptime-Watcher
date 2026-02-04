@@ -189,5 +189,7 @@ export function stripForwardedEventMetadata<
         Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
     }
 
-    return castUnchecked<StrippedForwardedEventMetadata<TPayload>>(clonedPayload);
+    return castUnchecked<StrippedForwardedEventMetadata<TPayload>>(
+        clonedPayload
+    );
 }

@@ -45,7 +45,7 @@ const MAX_REDIRECTS = 3;
 /**
  * 5MB safety cap.
  */
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; 
+const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 // Check for command line flags
 const forceDownload = process.argv.includes("--force");
@@ -56,7 +56,7 @@ const noUpdate = process.argv.includes("--no-update");
  * @property {boolean} hasUpdate - Indicates if an update is available.
  * @property {string} latestVersion - The latest version hash.
  * @property {string | null} currentVersion - The current version hash or null
- * if unknown.
+ *   if unknown.
  * @property {string} [error] - Optional error message if checking failed.
  *
  * @interface UpdateCheckResult
@@ -333,9 +333,6 @@ function download(urlToFetch, destPath, redirectCount = 0) {
     req.on("error", (err) => failAndExit(`Network error: ${err}`));
 }
 
-/**
- *
- */
 async function main() {
     // Handle check-update-only flag (just check, don't download)
     if (checkUpdateOnly) {
@@ -464,9 +461,6 @@ async function main() {
     startDownload();
 }
 
-/**
- *
- */
 function startDownload() {
     verifyNonPlaceholderHash();
     console.log(

@@ -26,7 +26,9 @@ export function resolveConnectionSiteStatus(
 /**
  * Builds a human friendly label representing the active provider.
  */
-export function resolveProviderLabel(status: CloudStatusSummary | null): string {
+export function resolveProviderLabel(
+    status: CloudStatusSummary | null
+): string {
     const provider = status?.provider ?? null;
 
     if (provider === "dropbox") {
@@ -48,9 +50,7 @@ export function resolveProviderLabel(status: CloudStatusSummary | null): string 
                 ? status.providerDetails.accountLabel
                 : undefined;
 
-        return accountLabel
-            ? `Google Drive (${accountLabel})`
-            : "Google Drive";
+        return accountLabel ? `Google Drive (${accountLabel})` : "Google Drive";
     }
 
     if (provider === "webdav") {

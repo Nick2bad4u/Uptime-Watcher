@@ -15,8 +15,7 @@ export const electronNoConsoleRule = {
     /**
      * @param {{
      *     getFilename: () => string;
-     *     report: (arg0: { data: { method: string }; messageId: string; node:
-     *     any }) => void;
+     *     report: (arg0: { data: { method: string }; messageId: string; node: any }) => void;
      * }} context
      */
     create(context) {

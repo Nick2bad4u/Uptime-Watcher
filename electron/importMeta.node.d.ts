@@ -9,8 +9,8 @@
  * properties on `ImportMeta`, which forces unnecessary type assertions or
  * eslint-disable comments.
  *
- * This shim is intentionally scoped to the Electron main-process project
- * (via `tsconfig.electron.json` including the `electron/**` folder) so
+ * This shim is intentionally scoped to the Electron main-process project (via
+ * `tsconfig.electron.json` including the `electron/**` folder) so
  * renderer/browser code is not tempted to rely on Node-only `import.meta`
  * properties.
  */

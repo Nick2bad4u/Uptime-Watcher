@@ -1332,9 +1332,7 @@ describe(WindowService, () => {
 
                 expect(attempts).toBe(2);
                 expect(logger.debug).toHaveBeenCalledWith(
-                    expect.stringMatching(
-                        /Waiting \d+ms before retry 2\/20/u
-                    )
+                    expect.stringMatching(/Waiting \d+ms before retry 2\/20/u)
                 );
             } finally {
                 (globalThis as any).fetch = originalFetch;

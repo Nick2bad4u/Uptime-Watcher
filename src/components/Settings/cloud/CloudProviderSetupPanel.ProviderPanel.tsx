@@ -152,7 +152,8 @@ export const CloudProviderSetupPanelProviderPanel = ({
 }: CloudProviderSetupPanelProviderPanelProperties): JSX.Element => {
     const isSelectedProviderActive =
         activeProviderTab !== null && activeProviderTab === selectedProviderTab;
-    const configuredForSelectedProvider = configured && isSelectedProviderActive;
+    const configuredForSelectedProvider =
+        configured && isSelectedProviderActive;
     const connectedForSelectedProvider = connected && isSelectedProviderActive;
 
     const tab = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(

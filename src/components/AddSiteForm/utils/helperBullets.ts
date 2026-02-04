@@ -112,7 +112,10 @@ export function buildAddSiteFormHelperBullets(
 
     let preferredHelpText: HelperBullet | null = null;
 
-    if (args.helpTexts.primary && !shouldHideFooterHelpText(args.helpTexts.primary)) {
+    if (
+        args.helpTexts.primary &&
+        !shouldHideFooterHelpText(args.helpTexts.primary)
+    ) {
         preferredHelpText = {
             id: `primary-${args.helpTexts.primary}`,
             text: args.helpTexts.primary,

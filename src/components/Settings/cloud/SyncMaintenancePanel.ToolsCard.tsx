@@ -76,8 +76,8 @@ export const SyncMaintenanceToolsCard = ({
             </div>
 
             <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
-                Includes provider status and remote sync preview. Does not include
-                passphrases, encryption keys, or OAuth tokens.
+                Includes provider status and remote sync preview. Does not
+                include passphrases, encryption keys, or OAuth tokens.
             </ThemedText>
 
             {previewText ? (

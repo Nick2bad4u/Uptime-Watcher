@@ -3,7 +3,8 @@
 /**
  * Documentation analytics and health checking script.
  *
- * Provides insights into documentation quality, coverage, and maintenance needs.
+ * Provides insights into documentation quality, coverage, and maintenance
+ * needs.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -22,11 +23,11 @@ const ROOT_DIRECTORY = path.join(__dirname, "..");
  * @property {string[]} missingFrontmatter - Files without proper frontmatter.
  * @property {string[]} outdatedDocs - Files not reviewed recently.
  * @property {Record<string, number>} complexityScore - Complexity metrics per
- * file.
+ *   file.
  * @property {Record<string, number>} wordCounts - Word count per file.
  * @property {string[]} missingTOC - Files that should have table of contents.
  * @property {Record<string, string[]>} brokenLinks - Files with potential
- * broken internal links.
+ *   broken internal links.
  */
 
 /**

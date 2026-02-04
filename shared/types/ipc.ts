@@ -490,13 +490,13 @@ export type IpcInvokeChannel = keyof IpcInvokeChannelMap;
  *
  * - JavaScript functions can be invoked with missing parameters (they become
  *   `undefined`),
- * - tooling/mocks (e.g. Vitest) frequently report `length === 0`,
- * - refactors can accidentally desynchronize handler arity from the shared
+ * - Tooling/mocks (e.g. Vitest) frequently report `length === 0`,
+ * - Refactors can accidentally desynchronize handler arity from the shared
  *   contract.
  *
- * This constant is intentionally co-located with {@link IpcInvokeChannelMap}
- * so that TypeScript will fail compilation whenever a channel is added or
- * removed but the runtime mapping is not updated.
+ * This constant is intentionally co-located with {@link IpcInvokeChannelMap} so
+ * that TypeScript will fail compilation whenever a channel is added or removed
+ * but the runtime mapping is not updated.
  *
  * @public
  */

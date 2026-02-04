@@ -2,6 +2,7 @@
  * Optimized ESLint configuration for Uptime Watcher.
  *
  * This configuration is specifically tailored for:
+ *
  * - Electron-based applications
  * - Domain-driven design with Zustand stores
  * - Service-based backend architecture
@@ -791,14 +792,17 @@ export default defineConfig([
             "eslint-plugin/test-case-shorthand-strings": "error",
             "eslint-plugin/unique-test-case-names": "error",
             "jsdoc/require-description": "warn",
-            "jsdoc/require-jsdoc": ["warn", {
-                "publicOnly": true,
-                "require": {
-                    "ClassDeclaration": true,
-                    "FunctionDeclaration": true,
-                    "MethodDefinition": true,
+            "jsdoc/require-jsdoc": [
+                "warn",
+                {
+                    publicOnly: true,
+                    require: {
+                        ClassDeclaration: true,
+                        FunctionDeclaration: true,
+                        MethodDefinition: true,
+                    },
                 },
-            }],
+            ],
             "jsdoc/require-param-description": "warn",
             "jsdoc/require-returns-description": "warn",
         },
@@ -812,7 +816,7 @@ export default defineConfig([
             // AST-walking rules frequently need null sentinels, early-continue loops,
             // and helper functions scoped to a specific rule.
             "canonical/id-match": "off",
-            "complexity": "off",
+            complexity: "off",
             "consistent-return": "off",
             "etc/no-deprecated": "off",
             "func-style": "off",
@@ -10789,6 +10793,7 @@ export default defineConfig([
             "better-tailwindcss/sort-classes": "off",
             "callback-return": "off",
             "canonical/destructuring-property-newline": "off",
+            "canonical/import-specifier-newline": "off",
             // Deprecated rules - to be removed in future
             "functional/no-promise-reject": "off",
             "functional/no-this-expressions": "off",

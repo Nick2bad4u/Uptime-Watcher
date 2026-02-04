@@ -82,10 +82,7 @@ export function ConditionalResponseTime({
                     // Log the error but gracefully degrade to false (no
                     // response time support) This follows project pattern of
                     // non-critical feature degradation
-                    logger.warn(
-                        "Failed to check response time support",
-                        error
-                    );
+                    logger.warn("Failed to check response time support", error);
                     if (!isCancelled) {
                         setSupportsResponseTime(false);
                         setIsLoading(false);
@@ -149,10 +146,7 @@ export const DetailLabel = ({
                     // Log the error but gracefully degrade to fallback text
                     // This follows project pattern of non-critical feature
                     // degradation
-                    logger.warn(
-                        "Failed to format detail label",
-                        error
-                    );
+                    logger.warn("Failed to format detail label", error);
                     if (!isCancelled) {
                         setFormattedLabel(fallback);
                     }

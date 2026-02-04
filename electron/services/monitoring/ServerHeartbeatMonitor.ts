@@ -236,20 +236,21 @@ type ServerHeartbeatMonitorConstructor = new (
     config?: MonitorServiceConfig
 ) => IMonitorService;
 
-const ServerHeartbeatMonitorBase: ServerHeartbeatMonitorConstructor = ((): ServerHeartbeatMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () =>
-                createRemoteMonitorService<
-                    "server-heartbeat",
-                    ServerHeartbeatContext
-                >(behavior),
-            "ServerHeartbeatMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const ServerHeartbeatMonitorBase: ServerHeartbeatMonitorConstructor =
+    ((): ServerHeartbeatMonitorConstructor => {
+        try {
+            return buildMonitorFactory(
+                () =>
+                    createRemoteMonitorService<
+                        "server-heartbeat",
+                        ServerHeartbeatContext
+                    >(behavior),
+                "ServerHeartbeatMonitor"
+            );
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * Server heartbeat monitor service built atop the shared remote monitor core.

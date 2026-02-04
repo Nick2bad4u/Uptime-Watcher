@@ -48,7 +48,9 @@ type ChannelParams<TChannel extends IpcInvokeChannel> = [
 
 type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
     ...args: ChannelParams<TChannel>
-) => IpcInvokeChannelResult<TChannel> | Promise<IpcInvokeChannelResult<TChannel>>;
+) =>
+    | IpcInvokeChannelResult<TChannel>
+    | Promise<IpcInvokeChannelResult<TChannel>>;
 
 /**
  * Registers an IPC invoke handler with standardized correlation handling,
@@ -63,7 +65,9 @@ export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
 
 function createSafeErrorMessage(error: unknown): string {
     const ensured = ensureError(error);
-    return isNonEmptyString(ensured.message) ? ensured.message : "Unknown error";
+    return isNonEmptyString(ensured.message)
+        ? ensured.message
+        : "Unknown error";
 }
 
 const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
@@ -162,7 +166,9 @@ interface HandlerExecutionSuccess<T> {
     value: T;
 }
 
-type HandlerExecutionResult<T> = HandlerExecutionFailure | HandlerExecutionSuccess<T>;
+type HandlerExecutionResult<T> =
+    | HandlerExecutionFailure
+    | HandlerExecutionSuccess<T>;
 
 /**
  * Options for {@link withIpcHandler} / {@link withIpcHandlerValidation}.
@@ -739,8 +745,9 @@ export function registerStandardizedIpcHandler<
     handler: StrictIpcInvokeHandler<TChannel>,
     validateParams: IpcParameterValidator | null,
     registeredHandlers: Set<IpcInvokeChannel>,
-    validateResult: IpcResultValidator<IpcInvokeChannelResult<TChannel>> | null =
-        null
+    validateResult: IpcResultValidator<
+        IpcInvokeChannelResult<TChannel>
+    > | null = null
 ): void {
     const expectedParamCount = getExpectedParamCount(channelName);
 
@@ -784,99 +791,104 @@ export function registerStandardizedIpcHandler<
     registeredHandlers.add(channelName);
 
     try {
-            ipcMain.handle(
-                channelName,
-                async (_event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
-            const { args, correlationId } =
-                extractIpcCorrelationContext(rawArgs);
+        ipcMain.handle(
+            channelName,
+            async (_event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
+                const { args, correlationId } =
+                    extractIpcCorrelationContext(rawArgs);
 
-            const correlationMetadata =
-                correlationId === undefined ? {} : { correlationId };
+                const correlationMetadata =
+                    correlationId === undefined ? {} : { correlationId };
 
-            // Preserve the dedicated error message for "no-param" channels that
-            // do not use validators.
-            if (validateParams === null && expectedParamCount === 0 && args.length > 0) {
-                logger.warn(
-                    "[IpcHandler] Rejected IPC invocation with unexpected parameters",
-                    withLogContext({
-                        channel: channelName,
-                        ...correlationMetadata,
-                        event: "ipc:handler:unexpected-params",
-                        severity: "warn",
-                    }),
-                    {
-                        paramCount: args.length,
-                    }
-                );
+                // Preserve the dedicated error message for "no-param" channels that
+                // do not use validators.
+                if (
+                    validateParams === null &&
+                    expectedParamCount === 0 &&
+                    args.length > 0
+                ) {
+                    logger.warn(
+                        "[IpcHandler] Rejected IPC invocation with unexpected parameters",
+                        withLogContext({
+                            channel: channelName,
+                            ...correlationMetadata,
+                            event: "ipc:handler:unexpected-params",
+                            severity: "warn",
+                        }),
+                        {
+                            paramCount: args.length,
+                        }
+                    );
 
-                return createErrorResponse(
-                    `Unexpected IPC parameters for ${channelName}. This channel does not accept any parameters.`,
-                    {
+                    return createErrorResponse(
+                        `Unexpected IPC parameters for ${channelName}. This channel does not accept any parameters.`,
+                        {
+                            handler: channelName,
+                            ...correlationMetadata,
+                            paramCount: args.length,
+                        }
+                    );
+                }
+
+                try {
+                    assertChannelParams(channelName, args);
+                } catch (error: unknown) {
+                    const safeError = ensureError(error);
+                    const message =
+                        safeError.message.length > 0
+                            ? safeError.message
+                            : `Invalid IPC parameters for ${channelName}`;
+
+                    logger.warn(
+                        "[IpcHandler] Rejected IPC invocation due to invalid parameter shape",
+                        withLogContext({
+                            channel: channelName,
+                            ...correlationMetadata,
+                            event: "ipc:handler:validation-failed",
+                            severity: "warn",
+                        }),
+                        {
+                            error: message,
+                            paramCount: args.length,
+                        }
+                    );
+
+                    return createErrorResponse(message, {
                         handler: channelName,
                         ...correlationMetadata,
                         paramCount: args.length,
-                    }
-                );
-            }
+                    });
+                }
 
-            try {
-                assertChannelParams(channelName, args);
-            } catch (error: unknown) {
-                const safeError = ensureError(error);
-                const message =
-                    safeError.message.length > 0
-                        ? safeError.message
-                        : `Invalid IPC parameters for ${channelName}`;
-
-                logger.warn(
-                    "[IpcHandler] Rejected IPC invocation due to invalid parameter shape",
-                    withLogContext({
-                        channel: channelName,
-                        ...correlationMetadata,
-                        event: "ipc:handler:validation-failed",
-                        severity: "warn",
-                    }),
-                    {
-                        error: message,
-                        paramCount: args.length,
-                    }
-                );
-
-                return createErrorResponse(message, {
-                    handler: channelName,
-                    ...correlationMetadata,
+                const baseMetadata = {
                     paramCount: args.length,
-                });
-            }
-
-            const baseMetadata = {
-                paramCount: args.length,
-            } satisfies IpcHandlerMetadata;
+                } satisfies IpcHandlerMetadata;
                 const handlerOptions: WithIpcHandlerOptions<
                     IpcInvokeChannelResult<TChannel>
                 > = {
-                ...(correlationId === undefined ? {} : { correlationId }),
-                metadata: baseMetadata,
-                ...(validateResult === null ? {} : { validateResult }),
-            };
+                    ...(correlationId === undefined ? {} : { correlationId }),
+                    metadata: baseMetadata,
+                    ...(validateResult === null ? {} : { validateResult }),
+                };
 
-            if (validateParams === null) {
-                return withIpcHandler(
+                if (validateParams === null) {
+                    return withIpcHandler(
+                        channelName,
+                        () => handler(...args),
+                        handlerOptions
+                    );
+                }
+
+                return withIpcHandlerValidation(
                     channelName,
-                    () => handler(...args),
+                    (...validatedParams: ChannelParams<TChannel>) =>
+                        handler(...validatedParams),
+                    validateParams,
+                    args,
                     handlerOptions
                 );
             }
-
-            return withIpcHandlerValidation(
-                channelName,
-                (...validatedParams: ChannelParams<TChannel>) =>
-                    handler(...validatedParams),
-                validateParams,
-                args,
-                handlerOptions
-            );
-        });
+        );
     } catch (rawError) {
         registeredHandlers.delete(channelName);
 
@@ -913,7 +925,9 @@ export function createStandardizedIpcRegistrar(
         channelName: TChannel,
         handler: StrictIpcInvokeHandler<TChannel>,
         validateParams?: IpcParameterValidator | null,
-        validateResult?: IpcResultValidator<IpcInvokeChannelResult<TChannel>> | null
+        validateResult?: IpcResultValidator<
+            IpcInvokeChannelResult<TChannel>
+        > | null
     ) => {
         registerStandardizedIpcHandler(
             channelName,

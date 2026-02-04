@@ -305,7 +305,7 @@ async function safeReadDir(dir) {
  * @param {string} dir - Directory to search.
  *
  * @returns {Promise<string[]>} - Array of empty directory paths, each relative
- * to ROOT_DIR.
+ *   to ROOT_DIR.
  */
 async function findEmptyDirs(dir) {
     if (!(await isDirectory(dir))) return [];
@@ -385,9 +385,6 @@ async function safeDeleteDir(dirPath) {
     }
 }
 
-/**
- *
- */
 async function main() {
     let totalFound = 0;
     let totalDeleted = 0;

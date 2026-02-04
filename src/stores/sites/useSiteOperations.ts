@@ -433,9 +433,7 @@ export const createSiteOperationsActions = (
             telemetry: {
                 monitorId,
                 siteIdentifier,
-                ...(retryAttempts === undefined
-                    ? {}
-                    : { retryAttempts }),
+                ...(retryAttempts === undefined ? {} : { retryAttempts }),
             },
             value: retryAttempts,
         });

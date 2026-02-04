@@ -5,13 +5,11 @@ interface MockFileHandle {
     readonly sync: ReturnType<typeof vi.fn>;
 }
 
-const renameMock = vi.fn<
-    (sourcePath: string, targetPath: string) => Promise<void>
->();
+const renameMock =
+    vi.fn<(sourcePath: string, targetPath: string) => Promise<void>>();
 
-const openMock = vi.fn<
-    (filePath: string, flags: string) => Promise<MockFileHandle>
->();
+const openMock =
+    vi.fn<(filePath: string, flags: string) => Promise<MockFileHandle>>();
 
 vi.mock("node:fs/promises", () => ({
     open: openMock,
@@ -25,33 +23,34 @@ describe("fsSafeOps (strict coverage)", () => {
     });
 
     it("renameIfExists calls fs.rename on success", async () => {
-        const { renameIfExists } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { renameIfExists } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         renameMock.mockResolvedValueOnce();
 
-        await expect(renameIfExists("/tmp/a", "/tmp/b")).resolves.toBeUndefined();
+        await expect(
+            renameIfExists("/tmp/a", "/tmp/b")
+        ).resolves.toBeUndefined();
         expect(renameMock).toHaveBeenCalledTimes(1);
         expect(renameMock).toHaveBeenCalledWith("/tmp/a", "/tmp/b");
     });
 
     it("renameIfExists treats ENOENT as a no-op", async () => {
-        const { renameIfExists } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { renameIfExists } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         renameMock.mockRejectedValueOnce(
             Object.assign(new Error("missing"), { code: "ENOENT" })
         );
 
-        await expect(renameIfExists("/tmp/a", "/tmp/b")).resolves.toBeUndefined();
+        await expect(
+            renameIfExists("/tmp/a", "/tmp/b")
+        ).resolves.toBeUndefined();
     });
 
     it("renameIfExists rethrows non-ENOENT errors", async () => {
-        const { renameIfExists } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { renameIfExists } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         renameMock.mockRejectedValueOnce(
             Object.assign(new Error("permission"), { code: "EACCES" })
@@ -63,9 +62,8 @@ describe("fsSafeOps (strict coverage)", () => {
     });
 
     it("syncFileSafely syncs and closes on success", async () => {
-        const { syncFileSafely } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { syncFileSafely } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         const handle: MockFileHandle = {
             close: vi.fn().mockResolvedValueOnce(undefined),
@@ -81,9 +79,8 @@ describe("fsSafeOps (strict coverage)", () => {
     });
 
     it("syncFileSafely closes even when sync fails (best-effort)", async () => {
-        const { syncFileSafely } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { syncFileSafely } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         const handle: MockFileHandle = {
             close: vi.fn().mockResolvedValueOnce(undefined),
@@ -97,9 +94,8 @@ describe("fsSafeOps (strict coverage)", () => {
     });
 
     it("syncFileSafely swallows open errors (best-effort)", async () => {
-        const { syncFileSafely } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { syncFileSafely } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         openMock.mockRejectedValueOnce(new Error("open failed"));
 
@@ -107,9 +103,8 @@ describe("fsSafeOps (strict coverage)", () => {
     });
 
     it("syncDirectorySafely syncs and closes on success", async () => {
-        const { syncDirectorySafely } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { syncDirectorySafely } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         const handle: MockFileHandle = {
             close: vi.fn().mockResolvedValueOnce(undefined),
@@ -125,9 +120,8 @@ describe("fsSafeOps (strict coverage)", () => {
     });
 
     it("syncDirectorySafely swallows failures (best-effort)", async () => {
-        const { syncDirectorySafely } = await import(
-            "../../../../electron/utils/fsSafeOps"
-        );
+        const { syncDirectorySafely } =
+            await import("../../../../electron/utils/fsSafeOps");
 
         openMock.mockRejectedValueOnce(new Error("open failed"));
 

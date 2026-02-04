@@ -81,6 +81,7 @@ export interface BaseFormData {
     checkInterval?: number;
     /** Whether monitoring is enabled */
     monitoring?: boolean;
+    require_tld: false;
     /** Number of retry attempts on failure */
     retryAttempts?: number;
     /** Request timeout in milliseconds */
@@ -101,8 +102,8 @@ export interface BaseFormData {
 export interface DynamicFormData extends UnknownRecord {
     /** Monitor check interval in milliseconds */
     checkInterval?: number;
-    /** Whether monitoring is enabled */
     monitoring?: boolean;
+    require_tld: false;
     /** Number of retry attempts on failure */
     retryAttempts?: number;
     /** Request timeout in milliseconds */
@@ -355,18 +356,34 @@ export interface CreateDefaultFormData {
         type: "cdn-edge-consistency"
     ): SetOptional<CdnEdgeConsistencyFormData, CdnEdgeConsistencyOptionalKeys>;
     (type: "dns"): SetOptional<DnsFormData, "host" | "recordType">;
-    (type: "http-header"): SetOptional<HttpHeaderFormData, HttpHeaderOptionalKeys>;
+    (
+        type: "http-header"
+    ): SetOptional<HttpHeaderFormData, HttpHeaderOptionalKeys>;
     (type: "http-json"): SetOptional<HttpJsonFormData, HttpJsonOptionalKeys>;
     (type: "http"): SetOptional<HttpFormData, "url">;
-    (type: "http-keyword"): SetOptional<HttpKeywordFormData, "bodyKeyword" | "url">;
-    (type: "http-latency"): SetOptional<HttpLatencyFormData, HttpLatencyOptionalKeys>;
-    (type: "http-status"): SetOptional<HttpStatusFormData, "expectedStatusCode" | "url">;
+    (
+        type: "http-keyword"
+    ): SetOptional<HttpKeywordFormData, "bodyKeyword" | "url">;
+    (
+        type: "http-latency"
+    ): SetOptional<HttpLatencyFormData, HttpLatencyOptionalKeys>;
+    (
+        type: "http-status"
+    ): SetOptional<HttpStatusFormData, "expectedStatusCode" | "url">;
     (type: "ping"): SetOptional<PingFormData, "host">;
     (type: "port"): SetOptional<PortFormData, "host" | "port">;
-    (type: "replication"): SetOptional<ReplicationFormData, ReplicationOptionalKeys>;
-    (type: "server-heartbeat"): SetOptional<ServerHeartbeatFormData, ServerHeartbeatOptionalKeys>;
-    (type: "ssl"): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
-    (type: "websocket-keepalive"): SetOptional<WebsocketKeepaliveFormData, WebsocketKeepaliveOptionalKeys>;
+    (
+        type: "replication"
+    ): SetOptional<ReplicationFormData, ReplicationOptionalKeys>;
+    (
+        type: "server-heartbeat"
+    ): SetOptional<ServerHeartbeatFormData, ServerHeartbeatOptionalKeys>;
+    (
+        type: "ssl"
+    ): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
+    (
+        type: "websocket-keepalive"
+    ): SetOptional<WebsocketKeepaliveFormData, WebsocketKeepaliveOptionalKeys>;
     (type: MonitorType): SetOptional<BaseFormData, never>;
 }
 
@@ -410,7 +427,7 @@ export function isHttpFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         })
     );
 }
@@ -432,7 +449,7 @@ export function isHttpHeaderFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.headerName === "string" &&
         data.headerName.trim() !== "" &&
@@ -458,7 +475,7 @@ export function isHttpJsonFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.jsonPath === "string" &&
         data.jsonPath.trim() !== "" &&
@@ -484,7 +501,7 @@ export function isHttpKeywordFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.bodyKeyword === "string" &&
         data.bodyKeyword.trim() !== ""
@@ -508,7 +525,7 @@ export function isHttpStatusFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.expectedStatusCode === "number" &&
         Number.isInteger(data.expectedStatusCode) &&
@@ -534,7 +551,7 @@ export function isHttpLatencyFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.maxResponseTime === "number" &&
         Number.isFinite(data.maxResponseTime) &&
@@ -554,7 +571,7 @@ export function isHttpLatencyFormData(
 export function isDnsFormData(
     data: Partial<MonitorFormData>
 ): data is DnsFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (data as UnknownRecord).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -562,9 +579,9 @@ export function isDnsFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             })) &&
         typeof data.recordType === "string" &&
         data.recordType.trim() !== ""
@@ -583,7 +600,7 @@ export function isDnsFormData(
 export function isPingFormData(
     data: Partial<MonitorFormData>
 ): data is PingFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (data as UnknownRecord).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -591,9 +608,9 @@ export function isPingFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             }))
     );
 }
@@ -610,7 +627,7 @@ export function isPingFormData(
 export function isPortFormData(
     data: Partial<MonitorFormData>
 ): data is PortFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (data as UnknownRecord).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -618,9 +635,9 @@ export function isPortFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             })) &&
         typeof data.port === "number" &&
         isValidPort(data.port)
@@ -639,7 +656,7 @@ export function isPortFormData(
 export function isSslFormData(
     data: Partial<MonitorFormData>
 ): data is SslFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (data as UnknownRecord).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -647,9 +664,9 @@ export function isSslFormData(
         host.length > 0 &&
         (isValidHost(host) ||
             isValidFQDN(host, {
-                "allow_trailing_dot": true,
-                "allow_underscores": true,
-                "require_tld": false,
+                allow_trailing_dot: true,
+                allow_underscores: true,
+                require_tld: false,
             })) &&
         typeof data.port === "number" &&
         isValidPort(data.port) &&
@@ -677,7 +694,7 @@ export function isCdnEdgeConsistencyFormData(
         typeof data.baselineUrl === "string" &&
         isValidUrl(data.baselineUrl.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.edgeLocations === "string" &&
         data.edgeLocations.trim() !== ""
@@ -701,12 +718,12 @@ export function isReplicationFormData(
         typeof data.primaryStatusUrl === "string" &&
         isValidUrl(data.primaryStatusUrl.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.replicaStatusUrl === "string" &&
         isValidUrl(data.replicaStatusUrl.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         isNonEmptyString(data.replicationTimestampField) &&
         typeof data.maxReplicationLagSeconds === "number" &&
@@ -732,7 +749,7 @@ export function isServerHeartbeatFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
-            "require_tld": false,
+            require_tld: false,
         }) &&
         isNonEmptyString(data.heartbeatStatusField) &&
         isNonEmptyString(data.heartbeatTimestampField) &&
@@ -761,7 +778,7 @@ export function isWebsocketKeepaliveFormData(
         isValidUrl(data.url.trim(), {
             allowSingleQuotes: true,
             protocols: ["ws", "wss"],
-            "require_tld": false,
+            require_tld: false,
         }) &&
         typeof data.maxPongDelayMs === "number" &&
         Number.isFinite(data.maxPongDelayMs)
@@ -771,8 +788,8 @@ export function isWebsocketKeepaliveFormData(
 /**
  * Registry of type-specific validation functions.
  *
- * When true, prefix each message with a rendered path (e.g. `foo.bar: ...`).
- * whenever a new monitor type is introduced.
+ * @remarks
+ * Keep this registry in sync whenever a new monitor type is introduced.
  *
  * @internal
  */

@@ -104,7 +104,11 @@ describe(buildLogArguments, () => {
             ]
         );
 
-        const [formattedMessage, metadata, urlCandidate] = args;
+        const [
+            formattedMessage,
+            metadata,
+            urlCandidate,
+        ] = args;
 
         expect(formattedMessage).toBe("[CORE] Authorization: [redacted]");
         expect(metadata).toStrictEqual({

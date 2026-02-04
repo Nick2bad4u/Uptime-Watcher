@@ -164,20 +164,21 @@ type HttpHeaderMonitorConstructor = new (
     config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance;
 
-const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor = ((): HttpHeaderMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () =>
-                createHttpMonitorService<
-                    "http-header",
-                    { expectedValue: string; headerName: string }
-                >(behavior),
-            "HttpHeaderMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor =
+    ((): HttpHeaderMonitorConstructor => {
+        try {
+            return buildMonitorFactory(
+                () =>
+                    createHttpMonitorService<
+                        "http-header",
+                        { expectedValue: string; headerName: string }
+                    >(behavior),
+                "HttpHeaderMonitor"
+            );
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * HTTP header monitor service powered by the shared HTTP core.

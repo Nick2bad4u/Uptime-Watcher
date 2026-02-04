@@ -90,12 +90,12 @@ export const AnalyticsChartsGrid = ({
                 </ThemedCard>
             </ConditionalResponseTime>
 
-            <ThemedCard
-                icon={uptimeIcon}
-                title="Uptime Distribution"
-            >
+            <ThemedCard icon={uptimeIcon} title="Uptime Distribution">
                 <div className="h-64">
-                    <UptimeChart data={uptimeChartData} options={doughnutOptions} />
+                    <UptimeChart
+                        data={uptimeChartData}
+                        options={doughnutOptions}
+                    />
                 </div>
             </ThemedCard>
 
@@ -105,7 +105,10 @@ export const AnalyticsChartsGrid = ({
                 title="Status Distribution"
             >
                 <div className="h-64">
-                    <StatusChart data={barChartData} options={barChartOptions} />
+                    <StatusChart
+                        data={barChartData}
+                        options={barChartOptions}
+                    />
                 </div>
             </ThemedCard>
         </div>

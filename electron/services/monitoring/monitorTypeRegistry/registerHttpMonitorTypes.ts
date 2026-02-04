@@ -27,7 +27,9 @@ import { HttpStatusMonitor } from "../HttpStatusMonitor";
  * circular dependencies (it only uses type-only imports).
  */
 export function registerHttpMonitorTypes(deps: {
-    readonly registerHttpMonitorDefinition: (definition: HttpMonitorRegistration) => void;
+    readonly registerHttpMonitorDefinition: (
+        definition: HttpMonitorRegistration
+    ) => void;
     readonly toZodType: (schema: z.ZodType) => z.ZodType;
 }): void {
     deps.registerHttpMonitorDefinition({
@@ -242,7 +244,8 @@ export function registerHttpMonitorTypes(deps: {
             },
             formatDetail: (details: string) => details,
             helpTexts: {
-                primary: "Enter the expected HTTP status code for this endpoint",
+                primary:
+                    "Enter the expected HTTP status code for this endpoint",
                 secondary:
                     "The monitor compares the response status with the expected status each run.",
             },

@@ -477,7 +477,7 @@ async function handleFailure<T>(
         throw error;
     }
 
-        return castUnchecked<T>(null);
+    return castUnchecked<T>(null);
 }
 
 /**

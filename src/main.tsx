@@ -40,7 +40,7 @@ import "./index.css";
  * @throws {@link Error} If the root element with ID "root" is not found.
  */
 function initializeApp(): void {
-        const rootElement = document.querySelector<HTMLElement>("#root");
+    const rootElement = document.querySelector<HTMLElement>("#root");
     if (!rootElement) {
         throw new Error("Root element not found");
     }

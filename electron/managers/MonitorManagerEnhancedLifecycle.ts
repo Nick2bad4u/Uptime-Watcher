@@ -231,7 +231,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
         const monitors = (
             Array.isArray(site.monitors) ? site.monitors : []
         ) as Array<Site["monitors"][0] | undefined>;
-            const siteStarted: { current: boolean } = { current: false };
+        const siteStarted: { current: boolean } = { current: false };
 
         await runSequentially(monitors, async (candidate) => {
             if (!candidate) {
@@ -296,7 +296,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
                 }
 
                 succeeded += 1;
-                    siteStarted.current = true;
+                siteStarted.current = true;
                 await applyMonitorState(
                     site,
                     candidate,
@@ -316,7 +316,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
             }
         });
 
-            if (siteStarted.current) {
+        if (siteStarted.current) {
             config.monitorScheduler.startSite(site);
         }
     });

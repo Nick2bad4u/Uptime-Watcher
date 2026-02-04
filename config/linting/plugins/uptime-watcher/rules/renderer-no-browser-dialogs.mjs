@@ -27,8 +27,7 @@ export const rendererNoBrowserDialogsRule = {
      *     getFilename: () => any;
      *     sourceCode: any;
      *     getSourceCode: () => any;
-     *     report: (arg0: { data: { dialog: any }; messageId: string; node: any
-     *     }) => void;
+     *     report: (arg0: { data: { dialog: any }; messageId: string; node: any }) => void;
      * }} context
      */
     create(context) {

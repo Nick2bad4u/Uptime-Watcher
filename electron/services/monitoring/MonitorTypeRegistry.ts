@@ -29,7 +29,6 @@ import { registerHttpMonitorTypes } from "./monitorTypeRegistry/registerHttpMoni
 import { registerNonHttpMonitorTypes } from "./monitorTypeRegistry/registerNonHttpMonitorTypes";
 import { createHttpMonitorUiConfig } from "./utils/httpMonitorUiConfig";
 
-
 /**
  * Internal registry for all monitor types and their configurations.
  *

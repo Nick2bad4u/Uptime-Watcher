@@ -76,12 +76,10 @@ export class UptimeOrchestratorSubscriptions {
             this.eventHandlers.handleUpdateSitesCacheRequestedEvent
         );
 
-
         this.eventBus.on(
             "internal:database:get-sites-from-cache-requested",
             this.eventHandlers.handleGetSitesFromCacheRequestedEvent
         );
-
 
         this.eventBus.on(
             "internal:database:initialized",
@@ -105,18 +103,15 @@ export class UptimeOrchestratorSubscriptions {
             this.eventHandlers.handleStartMonitoringRequestedEvent
         );
 
-
         this.eventBus.on(
             "internal:site:stop-monitoring-requested",
             this.eventHandlers.handleStopMonitoringRequestedEvent
         );
 
-
         this.eventBus.on(
             "internal:site:is-monitoring-active-requested",
             this.eventHandlers.handleIsMonitoringActiveRequestedEvent
         );
-
 
         this.eventBus.on(
             "internal:site:restart-monitoring-requested",

@@ -225,20 +225,21 @@ type ReplicationMonitorConstructor = new (
     config?: MonitorServiceConfig
 ) => IMonitorService;
 
-const ReplicationMonitorBase: ReplicationMonitorConstructor = ((): ReplicationMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () =>
-                createRemoteMonitorService<
-                    "replication",
-                    ReplicationMonitorContext
-                >(behavior),
-            "ReplicationMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const ReplicationMonitorBase: ReplicationMonitorConstructor =
+    ((): ReplicationMonitorConstructor => {
+        try {
+            return buildMonitorFactory(
+                () =>
+                    createRemoteMonitorService<
+                        "replication",
+                        ReplicationMonitorContext
+                    >(behavior),
+                "ReplicationMonitor"
+            );
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * Replication monitor service built atop the shared remote monitor core.

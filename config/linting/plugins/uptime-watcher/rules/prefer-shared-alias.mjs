@@ -9,8 +9,7 @@
 import * as path from "node:path";
 
 import { normalizePath } from "../_internal/path-utils.mjs";
-import { NORMALIZED_SHARED_DIR,
-SHARED_DIR } from "../_internal/repo-paths.mjs";
+import { NORMALIZED_SHARED_DIR, SHARED_DIR } from "../_internal/repo-paths.mjs";
 
 // Repo path constants live in ../_internal/repo-paths.mjs
 
@@ -21,8 +20,7 @@ export const preferSharedAliasRule = {
     /**
      * @param {{
      *     getFilename: () => any;
-     *     report: (arg0: { fix: (fixer: any) => any; messageId: string; node:
-     *     any }) => void;
+     *     report: (arg0: { fix: (fixer: any) => any; messageId: string; node: any }) => void;
      * }} context
      */
     create(context) {

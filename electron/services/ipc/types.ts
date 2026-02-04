@@ -48,11 +48,11 @@ export type IpcParameterValidator = (
 ) => null | string[];
 
 /**
- * Validates an IPC handler's *success* payload.
+ * Validates an IPC handler's _success_ payload.
  *
  * @remarks
- * This follows the same convention as {@link IpcParameterValidator}:
- * return `null` for success or an array of error strings for failure.
+ * This follows the same convention as {@link IpcParameterValidator}: return
+ * `null` for success or an array of error strings for failure.
  */
 export type IpcResultValidator<TResult> = (
     result: TResult

@@ -133,7 +133,7 @@ const vitestSharedConfig: ViteUserConfigExport = defineConfig({
                 lines: 95, // Very high line coverage for shared code
                 statements: 95, // Very high statement coverage for shared code
             },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @vitest/coverage-v8 typings omit runtime-supported options.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- @vitest/coverage-v8 typings omit runtime-supported options.
         } as any,
         dangerouslyIgnoreUnhandledErrors: false,
         deps: {
@@ -241,7 +241,7 @@ const vitestSharedConfig: ViteUserConfigExport = defineConfig({
             spawnTimeout: 10_000,
             tsconfig: "./config/testing/tsconfig.shared.test.json",
         },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
     } as any,
 }) satisfies UserConfig as UserConfig;
 

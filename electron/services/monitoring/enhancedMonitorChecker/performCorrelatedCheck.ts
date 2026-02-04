@@ -1,7 +1,10 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 

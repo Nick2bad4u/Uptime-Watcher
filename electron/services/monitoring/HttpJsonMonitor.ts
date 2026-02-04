@@ -221,20 +221,21 @@ type HttpJsonMonitorConstructor = new (
     config?: MonitorServiceConfig
 ) => HttpMonitorServiceInstance;
 
-const HttpJsonMonitorBase: HttpJsonMonitorConstructor = ((): HttpJsonMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () =>
-                createHttpMonitorService<
-                    "http-json",
-                    { expectedValue: string; jsonPath: string }
-                >(behavior),
-            "HttpJsonMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const HttpJsonMonitorBase: HttpJsonMonitorConstructor =
+    ((): HttpJsonMonitorConstructor => {
+        try {
+            return buildMonitorFactory(
+                () =>
+                    createHttpMonitorService<
+                        "http-json",
+                        { expectedValue: string; jsonPath: string }
+                    >(behavior),
+                "HttpJsonMonitor"
+            );
+        } catch (error) {
+            throw ensureError(error);
+        }
+    })();
 
 /**
  * HTTP JSON monitor service driven by the shared HTTP core.

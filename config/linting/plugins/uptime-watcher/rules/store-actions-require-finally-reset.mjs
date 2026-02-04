@@ -17,8 +17,7 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
  * This rule is intentionally narrow:
  *
  * - It only targets `src/stores/**` (non-test) files.
- * - It only triggers on direct `set({ isX: true })` calls inside store
- * actions. -
+ * - It only triggers on direct `set({ isX: true })` calls inside store actions. -
  *   It requires a corresponding `set({ isX: false })` to appear inside a
  *   `finally` block in the same function.
  */
@@ -28,8 +27,7 @@ export const storeActionsRequireFinallyResetRule = {
      *     getFilename: () => string;
      *     sourceCode: any;
      *     getSourceCode: () => any;
-     *     report: (arg0: { data: { flag: any }; messageId: string; node: any
-     *     }) => void;
+     *     report: (arg0: { data: { flag: any }; messageId: string; node: any }) => void;
      * }} context
      */
     create(context) {

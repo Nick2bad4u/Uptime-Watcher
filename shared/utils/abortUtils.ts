@@ -557,7 +557,9 @@ export async function raceWithAbort<T>(
                 listenerAttached = false;
                 signal.removeEventListener("abort", handleAbort);
             }
-            rejectWith(createAbortError({ cause: Reflect.get(signal, "reason") }));
+            rejectWith(
+                createAbortError({ cause: Reflect.get(signal, "reason") })
+            );
         }
 
         function settleResolved(value: T): void {

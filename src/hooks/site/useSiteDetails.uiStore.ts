@@ -23,11 +23,14 @@ type SiteDetailsUiStoreSlice = Pick<
     | "syncActiveSiteDetailsTab"
 >;
 
-const noopSyncActiveSiteDetailsTab: UIStore["syncActiveSiteDetailsTab"] = () => {
-    // no-op
-};
+const noopSyncActiveSiteDetailsTab: UIStore["syncActiveSiteDetailsTab"] =
+    () => {
+        // no-op
+    };
 
-const selectSiteDetailsUiStoreSlice = (state: UIStore): SiteDetailsUiStoreSlice => ({
+const selectSiteDetailsUiStoreSlice = (
+    state: UIStore
+): SiteDetailsUiStoreSlice => ({
     activeSiteDetailsTab: state.activeSiteDetailsTab,
     setActiveSiteDetailsTab: state.setActiveSiteDetailsTab,
     setShowAdvancedMetrics: state.setShowAdvancedMetrics,

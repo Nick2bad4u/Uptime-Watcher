@@ -56,10 +56,10 @@ export interface SettingsTabMonitoringConfigurationCardProperties {
     readonly timeoutChanged: boolean;
 }
 
-function getMaxDurationVariant(maxTotalSeconds: number, backoffSeconds: number):
-    | "error"
-    | "success"
-    | "warning" {
+function getMaxDurationVariant(
+    maxTotalSeconds: number,
+    backoffSeconds: number
+): "error" | "success" | "warning" {
     if (backoffSeconds >= 16 || maxTotalSeconds >= 180) {
         return "error";
     }
@@ -228,9 +228,7 @@ export const SettingsTabMonitoringConfigurationCard = ({
                             icon={saveIcon}
                             onClick={onSaveInterval}
                             size="sm"
-                            variant={
-                                intervalChanged ? "primary" : "secondary"
-                            }
+                            variant={intervalChanged ? "primary" : "secondary"}
                         >
                             Save
                         </ThemedButton>
@@ -259,8 +257,7 @@ export const SettingsTabMonitoringConfigurationCard = ({
                                 Intervals below{" "}
                                 {CHECK_INTERVAL_INFLIGHT_WARNING_SECONDS}s may
                                 cause multiple in-flight checks if a request
-                                takes longer than the interval. Not
-                                recommended.
+                                takes longer than the interval. Not recommended.
                             </SiteSettingsHelpText>
                         </div>
                     ) : null}
@@ -350,7 +347,8 @@ export const SettingsTabMonitoringConfigurationCard = ({
                                     <span className="mx-1">×</span>
                                     <span className="inline-flex items-center gap-1">
                                         <RetryIcon aria-hidden size={14} />
-                                        {maxCheckDuration.totalAttempts} attempts
+                                        {maxCheckDuration.totalAttempts}{" "}
+                                        attempts
                                     </span>
                                     <span className="mx-1">+</span>
                                     <span className="inline-flex items-center gap-1">
@@ -366,8 +364,9 @@ export const SettingsTabMonitoringConfigurationCard = ({
                                 </ThemedText>
                                 <div className="mt-2">
                                     <SiteSettingsHelpText icon={InfoIcon}>
-                                        This estimate updates automatically based
-                                        on Timeout and Retry attempts above.
+                                        This estimate updates automatically
+                                        based on Timeout and Retry attempts
+                                        above.
                                     </SiteSettingsHelpText>
                                 </div>
                             </div>

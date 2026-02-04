@@ -65,7 +65,6 @@ export class ThemeManager {
      * Apply theme to document - only if different from currently applied theme
      */
     public applyTheme(theme: Theme): void {
-
         if (typeof document === "undefined") {
             return;
         }
@@ -242,7 +241,7 @@ export class ThemeManager {
      * Add border radius CSS variables from theme.
      */
     private addBorderRadiusVariables(theme: Theme, variables: string[]): void {
-        const {borderRadius} = theme;
+        const { borderRadius } = theme;
         this.forEachRecordEntry(borderRadius, (size, value) => {
             if (typeof value === "string") {
                 variables.push(`  --radius-${size}: ${value};`);
@@ -308,7 +307,7 @@ export class ThemeManager {
      * Add shadow CSS variables from theme.
      */
     private addShadowVariables(theme: Theme, variables: string[]): void {
-        const {shadows} = theme;
+        const { shadows } = theme;
         this.forEachRecordEntry(shadows, (size, value) => {
             if (typeof value === "string") {
                 variables.push(`  --shadow-${size}: ${value};`);
@@ -320,7 +319,7 @@ export class ThemeManager {
      * Add spacing CSS variables from theme.
      */
     private addSpacingVariables(theme: Theme, variables: string[]): void {
-        const {spacing} = theme;
+        const { spacing } = theme;
         this.forEachRecordEntry(spacing, (size, value) => {
             if (typeof value === "string") {
                 variables.push(`  --spacing-${size}: ${value};`);
@@ -332,7 +331,7 @@ export class ThemeManager {
      * Add typography CSS variables from theme.
      */
     private addTypographyVariables(theme: Theme, variables: string[]): void {
-        const {typography} = theme;
+        const { typography } = theme;
         if (!isRecord(typography)) {
             return;
         }
@@ -345,10 +344,7 @@ export class ThemeManager {
     /**
      * Add font size CSS variables from typography.
      */
-    private addFontSizeVariables(
-        fontSize: unknown,
-        variables: string[]
-    ): void {
+    private addFontSizeVariables(fontSize: unknown, variables: string[]): void {
         this.forEachRecordEntry(fontSize, (size, value) => {
             if (typeof value === "string") {
                 variables.push(`  --font-size-${size}: ${value};`);
@@ -447,7 +443,6 @@ export class ThemeManager {
      * @param theme - Theme to apply classes for
      */
     private applyThemeClasses(theme: Theme): void {
-
         if (typeof document === "undefined") {
             return;
         }

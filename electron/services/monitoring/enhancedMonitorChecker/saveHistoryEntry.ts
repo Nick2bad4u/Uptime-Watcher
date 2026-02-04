@@ -80,8 +80,8 @@ export async function saveMonitorHistoryEntry(args: {
 
                 const currentCount =
                     await dependencies.historyRepository.getHistoryCount(
-                    monitor.id
-                );
+                        monitor.id
+                    );
 
                 if (currentCount > pruneThreshold) {
                     await dependencies.historyRepository.pruneHistory(

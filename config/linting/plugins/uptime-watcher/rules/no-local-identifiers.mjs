@@ -10,8 +10,8 @@
  * ESLint rule disallowing local helper definitions by identifier name.
  *
  * @remarks
- * Used as a configurable drift guard to prevent reintroducing duplicated
- * helper functions/variables across modules.
+ * Used as a configurable drift guard to prevent reintroducing duplicated helper
+ * functions/variables across modules.
  */
 export const noLocalIdentifiersRule = {
     /**

@@ -3,7 +3,10 @@
  * application updates using electron-updater.
  */
 
-import { UPDATE_STATUS, type UpdateStatusEventData } from "@shared/types/events";
+import {
+    UPDATE_STATUS,
+    type UpdateStatusEventData,
+} from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { autoUpdater } from "electron-updater";

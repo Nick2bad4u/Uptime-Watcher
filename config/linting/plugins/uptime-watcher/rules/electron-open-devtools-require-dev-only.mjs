@@ -12,8 +12,8 @@ import { normalizePath } from "../_internal/path-utils.mjs";
  * ESLint rule requiring `openDevTools()` calls to live in dev-only code paths.
  *
  * @remarks
- * Opening DevTools in production is noisy, can leak information, and is
- * usually unintended. This rule is intentionally conservative: it allows
+ * Opening DevTools in production is noisy, can leak information, and is usually
+ * unintended. This rule is intentionally conservative: it allows
  * `*.openDevTools()` only inside functions/methods whose name includes "dev".
  */
 export const electronOpenDevtoolsRequireDevOnlyRule = {

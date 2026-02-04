@@ -9,8 +9,8 @@
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
- * ESLint rule disallowing `import.meta.dirname` / `import.meta.filename` in
- * the Electron main process source.
+ * ESLint rule disallowing `import.meta.dirname` / `import.meta.filename` in the
+ * Electron main process source.
  *
  * @remarks
  * While Node.js may provide these properties, Vite/Electron bundling can

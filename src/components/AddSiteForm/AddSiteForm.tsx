@@ -243,7 +243,12 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         secondary: helpTexts.secondary ?? "",
                     },
                 }),
-            [addMode, checkIntervalLabel, helpTexts.primary, helpTexts.secondary]
+            [
+                addMode,
+                checkIntervalLabel,
+                helpTexts.primary,
+                helpTexts.secondary,
+            ]
         );
 
         // Normalize potential undefined values from the store for robust

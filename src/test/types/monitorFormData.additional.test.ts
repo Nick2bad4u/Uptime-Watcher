@@ -594,7 +594,12 @@ describe("monitorFormData functions - Additional Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Constructor", "type");
 
-            const types = ["dns", "http", "ping", "port"] as const;
+            const types = [
+                "dns",
+                "http",
+                "ping",
+                "port",
+            ] as const;
 
             for (const type of types) {
                 const result = createDefaultFormData(type);

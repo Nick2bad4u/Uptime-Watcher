@@ -544,11 +544,13 @@ export class StatusUpdateManager {
         const monitorCountValue = event.monitorCount;
         const siteCountValue = event.siteCount;
         const timestampValue = event["timestamp"];
-        const {activeMonitors} = event;
-        const {reason} = event;
+        const { activeMonitors } = event;
+        const { reason } = event;
 
         const monitorCount =
-            typeof monitorCountValue === "number" ? monitorCountValue : undefined;
+            typeof monitorCountValue === "number"
+                ? monitorCountValue
+                : undefined;
         const siteCount =
             typeof siteCountValue === "number" ? siteCountValue : undefined;
         const timestamp =
@@ -559,9 +561,7 @@ export class StatusUpdateManager {
             ...(timestamp === undefined ? {} : { timestamp }),
             ...(monitorCount === undefined ? {} : { monitorCount }),
             ...(siteCount === undefined ? {} : { siteCount }),
-            ...(typeof activeMonitors === "number"
-                ? { activeMonitors }
-                : {}),
+            ...(typeof activeMonitors === "number" ? { activeMonitors } : {}),
             ...(typeof reason === "string" ? { reason } : {}),
         } satisfies SitesTelemetryPayload;
 

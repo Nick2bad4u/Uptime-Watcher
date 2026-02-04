@@ -57,8 +57,8 @@ export const systemApi: SystemApiInterface = ((): SystemApiInterface => {
              *
              * @remarks
              * This method triggers the app to quit and automatically install a
-             * downloaded update. This is typically called after the user confirms they
-             * want to install an available update.
+             * downloaded update. This is typically called after the user
+             * confirms they want to install an available update.
              */
             quitAndInstall: createValidatedInvoker(
                 SYSTEM_CHANNELS.quitAndInstall,
@@ -73,8 +73,8 @@ export const systemApi: SystemApiInterface = ((): SystemApiInterface => {
              * Writes the provided string to the OS clipboard.
              *
              * @remarks
-             * Uses Electron's main-process clipboard API to avoid browser clipboard
-             * permission issues in hardened Electron contexts.
+             * Uses Electron's main-process clipboard API to avoid browser
+             * clipboard permission issues in hardened Electron contexts.
              */
             writeClipboardText: createValidatedInvoker(
                 SYSTEM_CHANNELS.writeClipboardText,

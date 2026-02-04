@@ -37,9 +37,7 @@ import {
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 
 import type { IpcParameterValidator } from "../types";
-import type {
-    ParameterValueValidationResult,
-} from "./utils/parameterValidation";
+import type { ParameterValueValidationResult } from "./utils/parameterValidation";
 
 import {
     MAX_DIAGNOSTICS_METADATA_BYTES,
@@ -723,19 +721,10 @@ function createMonitorValidationPayloadValidator(
 
 export {
     createBackupKeyValidator,
-
     createMonitorValidationPayloadValidator,
-
     createPreloadGuardReportValidator,
-
-
-
     createSiteIdentifierAndMonitorIdValidator,
     createSiteIdentifierValidator,
-
-
-
-
     validateCloudBackupMigrationRequest,
     validateCloudEnableSyncConfig,
     validateCloudFilesystemProviderConfig,

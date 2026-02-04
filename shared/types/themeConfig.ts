@@ -9,11 +9,7 @@
  * @packageDocumentation
  */
 
-import type {
-    PartialDeep,
-    SetOptional,
-    UnknownRecord,
-} from "type-fest";
+import type { PartialDeep, SetOptional, UnknownRecord } from "type-fest";
 
 import { isObject } from "../utils/typeGuards";
 import { castUnchecked, ensureRecordLike } from "../utils/typeHelpers";
@@ -867,8 +863,14 @@ export function mergeThemeConfig(
             baseTheme.components,
             overrides.components
         ),
-        shadows: mergeSection<ShadowConfig>(baseTheme.shadows, overrides.shadows),
-        spacing: mergeSection<SpacingConfig>(baseTheme.spacing, overrides.spacing),
+        shadows: mergeSection<ShadowConfig>(
+            baseTheme.shadows,
+            overrides.shadows
+        ),
+        spacing: mergeSection<SpacingConfig>(
+            baseTheme.spacing,
+            overrides.spacing
+        ),
         typography: mergeSection<TypographyConfig>(
             baseTheme.typography,
             overrides.typography

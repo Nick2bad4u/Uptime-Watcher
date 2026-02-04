@@ -39,13 +39,15 @@ type Sqlite3WasmRuntimeModule = Omit<
     };
 };
 
-vi.mock("node-sqlite3-wasm", () =>
-    ({
-        Database: MockDatabase,
-        default: {
+vi.mock(
+    "node-sqlite3-wasm",
+    () =>
+        ({
             Database: MockDatabase,
-        },
-    }) satisfies Partial<Sqlite3WasmRuntimeModule>
+            default: {
+                Database: MockDatabase,
+            },
+        }) satisfies Partial<Sqlite3WasmRuntimeModule>
 );
 
 describe("snapshot (strict coverage)", () => {
@@ -57,9 +59,8 @@ describe("snapshot (strict coverage)", () => {
     });
 
     it("creates a VACUUM snapshot, escaping single-quotes", async () => {
-        const { createVacuumSnapshot } = await import(
-            "../../../../../../electron/services/database/dataBackupService/snapshot"
-        );
+        const { createVacuumSnapshot } =
+            await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         const execCalls: string[] = [];
         execHook = (sql) => {
@@ -77,9 +78,9 @@ describe("snapshot (strict coverage)", () => {
             fileMustExist: true,
         });
 
-        expect(execCalls.some((sql) => sql.includes("PRAGMA busy_timeout"))).toBeTruthy(
-
-        );
+        expect(
+            execCalls.some((sql) => sql.includes("PRAGMA busy_timeout"))
+        ).toBeTruthy();
         expect(execCalls).toContain(
             "VACUUM INTO '/tmp/backup-snap''shot.sqlite'"
         );
@@ -87,9 +88,8 @@ describe("snapshot (strict coverage)", () => {
     });
 
     it("continues when PRAGMA busy_timeout fails", async () => {
-        const { createVacuumSnapshot } = await import(
-            "../../../../../../electron/services/database/dataBackupService/snapshot"
-        );
+        const { createVacuumSnapshot } =
+            await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         const execCalls: string[] = [];
         execHook = (sql) => {
@@ -104,17 +104,18 @@ describe("snapshot (strict coverage)", () => {
             snapshotPath: "/tmp/backup-snapshot.sqlite",
         });
 
-        expect(execCalls.some((sql) => sql.includes("PRAGMA busy_timeout"))).toBeTruthy(
-
+        expect(
+            execCalls.some((sql) => sql.includes("PRAGMA busy_timeout"))
+        ).toBeTruthy();
+        expect(execCalls).toContain(
+            "VACUUM INTO '/tmp/backup-snapshot.sqlite'"
         );
-        expect(execCalls).toContain("VACUUM INTO '/tmp/backup-snapshot.sqlite'");
         expect(databaseInstances[0]?.close).toHaveBeenCalledTimes(1);
     });
 
     it("rejects NUL bytes in snapshotPath but still closes the temp connection", async () => {
-        const { createVacuumSnapshot } = await import(
-            "../../../../../../electron/services/database/dataBackupService/snapshot"
-        );
+        const { createVacuumSnapshot } =
+            await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         const execCalls: string[] = [];
         execHook = (sql) => {
@@ -134,9 +135,8 @@ describe("snapshot (strict coverage)", () => {
     });
 
     it("createConsistentSnapshot returns the snapshot path on the first attempt", async () => {
-        const { createConsistentSnapshot } = await import(
-            "../../../../../../electron/services/database/dataBackupService/snapshot"
-        );
+        const { createConsistentSnapshot } =
+            await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         execHook = () => undefined;
 
@@ -164,9 +164,8 @@ describe("snapshot (strict coverage)", () => {
     });
 
     it("createConsistentSnapshot rethrows non-lock errors", async () => {
-        const { createConsistentSnapshot } = await import(
-            "../../../../../../electron/services/database/dataBackupService/snapshot"
-        );
+        const { createConsistentSnapshot } =
+            await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         execHook = (sql) => {
             if (sql.includes("VACUUM INTO")) {
@@ -201,18 +200,20 @@ describe("snapshot (strict coverage)", () => {
     });
 
     it("createConsistentSnapshot retries once on SQLITE_BUSY and restores the primary connection", async () => {
-        const { createConsistentSnapshot } = await import(
-            "../../../../../../electron/services/database/dataBackupService/snapshot"
-        );
+        const { createConsistentSnapshot } =
+            await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         let vacuumAttempts = 0;
         execHook = (sql) => {
             if (sql.includes("VACUUM INTO")) {
                 vacuumAttempts += 1;
                 if (vacuumAttempts === 1) {
-                    throw Object.assign(new Error("SQLITE_BUSY: database is locked"), {
-                        code: "SQLITE_BUSY",
-                    });
+                    throw Object.assign(
+                        new Error("SQLITE_BUSY: database is locked"),
+                        {
+                            code: "SQLITE_BUSY",
+                        }
+                    );
                 }
             }
         };
@@ -244,17 +245,19 @@ describe("snapshot (strict coverage)", () => {
     });
 
     it("createConsistentSnapshot still reinitializes the primary connection if the retry fails", async () => {
-        const { createConsistentSnapshot } = await import(
-            "../../../../../../electron/services/database/dataBackupService/snapshot"
-        );
+        const { createConsistentSnapshot } =
+            await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         let vacuumAttempts = 0;
         execHook = (sql) => {
             if (sql.includes("VACUUM INTO")) {
                 vacuumAttempts += 1;
-                throw Object.assign(new Error(`SQLITE_BUSY attempt ${vacuumAttempts}`), {
-                    code: "SQLITE_BUSY",
-                });
+                throw Object.assign(
+                    new Error(`SQLITE_BUSY attempt ${vacuumAttempts}`),
+                    {
+                        code: "SQLITE_BUSY",
+                    }
+                );
             }
         };
 

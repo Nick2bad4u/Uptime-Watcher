@@ -59,11 +59,7 @@ export const SettingsTabDangerZoneCard = ({
                     >
                         Remove Site
                     </ThemedText>
-                    <ThemedText
-                        className="mb-4"
-                        size="xs"
-                        variant="tertiary"
-                    >
+                    <ThemedText className="mb-4" size="xs" variant="tertiary">
                         This action cannot be undone. All history data for this
                         site will be lost.
                     </ThemedText>

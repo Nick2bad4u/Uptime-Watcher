@@ -2,8 +2,8 @@
  * Manual check operation helpers.
  *
  * @remarks
- * Extracted from {@link MonitorManager} to keep the manager focused on
- * lifecycle orchestration.
+ * Extracted from {@link MonitorManager} to keep the manager focused on lifecycle
+ * orchestration.
  *
  * @packageDocumentation
  */
@@ -11,7 +11,10 @@
 import type { Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -50,7 +53,11 @@ export async function checkSiteManuallyOperation(args: {
     if (monitorId) {
         const site = dependencies.sitesCache.get(identifier);
         if (site) {
-            const result = await dependencies.checkMonitor(site, monitorId, true);
+            const result = await dependencies.checkMonitor(
+                site,
+                monitorId,
+                true
+            );
 
             // Only emit event if result is available
             if (result) {
@@ -74,14 +81,19 @@ export async function checkSiteManuallyOperation(args: {
     const site = dependencies.sitesCache.get(identifier);
     if (!site?.monitors.length) {
         dependencies.logger.warn(
-            interpolateLogTemplate(LOG_TEMPLATES.warnings.SITE_NOT_FOUND_MANUAL, {
-                identifier,
-            })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.warnings.SITE_NOT_FOUND_MANUAL,
+                {
+                    identifier,
+                }
+            )
         );
         return undefined;
     }
 
-    const firstMonitorId = site.monitors.find((monitor) => Boolean(monitor.id))?.id;
+    const firstMonitorId = site.monitors.find((monitor) =>
+        Boolean(monitor.id)
+    )?.id;
     if (firstMonitorId) {
         return checkSiteManuallyOperation({
             dependencies,

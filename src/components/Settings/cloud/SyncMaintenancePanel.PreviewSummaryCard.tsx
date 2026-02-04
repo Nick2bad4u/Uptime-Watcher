@@ -3,7 +3,10 @@ import type { JSX } from "react";
 
 import { useCallback } from "react";
 
-import type { PreviewStats, PreviewViewModel } from "./SyncMaintenancePanel.model";
+import type {
+    PreviewStats,
+    PreviewViewModel,
+} from "./SyncMaintenancePanel.model";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -74,20 +77,35 @@ export const SyncMaintenancePreviewSummaryCard = ({
             {previewStats ? (
                 <SyncMaintenancePreviewMetrics stats={previewStats} />
             ) : (
-                <ThemedText as="p" className="mt-3" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-3"
+                    size="xs"
+                    variant="tertiary"
+                >
                     {previewView.previewText}
                 </ThemedText>
             )}
 
             {preview?.operationObjectCount === 0 ? (
-                <ThemedText as="p" className="mt-3" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-3"
+                    size="xs"
+                    variant="tertiary"
+                >
                     No change history has been uploaded yet. This is normal on
                     the first device until you make changes with Sync enabled.
                 </ThemedText>
             ) : null}
 
             {previewView.otherObjectsText ? (
-                <ThemedText as="p" className="mt-2" size="xs" variant="tertiary">
+                <ThemedText
+                    as="p"
+                    className="mt-2"
+                    size="xs"
+                    variant="tertiary"
+                >
                     {previewView.otherObjectsText}
                 </ThemedText>
             ) : null}

@@ -186,7 +186,7 @@ function isDirectoryReference(relativeUrl, sourceFilePath) {
  *
  * @param {string} relativeUrl - Relative URL from the markdown file.
  * @param {string} sourceFilePath - Absolute or relative path to the markdown
- * file being linted.
+ *   file being linted.
  *
  * @returns {boolean} True when the URL resolves to a concrete file.
  */

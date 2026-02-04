@@ -6,8 +6,7 @@
  */
 
 /**
- * ESLint rule preventing redeclaration of canonical shared contract
- * interfaces.
+ * ESLint rule preventing redeclaration of canonical shared contract interfaces.
  *
  * @remarks
  * This helps ensure Electron and renderer layers import the shared contracts
@@ -16,8 +15,7 @@
 export const noRedeclareSharedContractInterfacesRule = {
     /**
      * @param {{
-     *     report: (arg0: { node: any; messageId: string; data: { name: any }
-     *     }) => void;
+     *     report: (arg0: { node: any; messageId: string; data: { name: any } }) => void;
      * }} context
      */
     create(context) {

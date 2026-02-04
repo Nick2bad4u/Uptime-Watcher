@@ -39,7 +39,7 @@ function formatSafeParseError(error: unknown): string[] {
         return ["Invalid response"];
     }
 
-    const {issues} = (error as { readonly issues?: unknown });
+    const { issues } = error as { readonly issues?: unknown };
     if (!Array.isArray(issues)) {
         return ["Invalid response"];
     }

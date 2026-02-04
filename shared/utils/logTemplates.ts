@@ -549,7 +549,6 @@ export function interpolateLogTemplate(
                 : formatValue(value);
         }
     );
-
 }
 
 /**

@@ -2,10 +2,11 @@
  * Monitor state persistence and event emission.
  *
  * @remarks
- * Extracted from {@link MonitorManager} to keep the manager focused on
- * lifecycle orchestration.
+ * Extracted from {@link MonitorManager} to keep the manager focused on lifecycle
+ * orchestration.
  *
  * This helper:
+ *
  * - Mutates the cached monitor + site objects
  * - Persists the monitor changes inside a transaction
  * - Emits the canonical `monitor:status-changed` payload
@@ -29,10 +30,10 @@ import { withDatabaseOperation } from "../../utils/operationalHooks";
  * @public
  */
 export interface ApplyMonitorStateDependencies {
-	readonly databaseService: DatabaseService;
-	readonly eventEmitter: TypedEventBus<UptimeEvents>;
-	readonly monitorRepository: MonitorRepository;
-	readonly sitesCache: StandardizedCache<Site>;
+    readonly databaseService: DatabaseService;
+    readonly eventEmitter: TypedEventBus<UptimeEvents>;
+    readonly monitorRepository: MonitorRepository;
+    readonly sitesCache: StandardizedCache<Site>;
 }
 
 /**
@@ -42,57 +43,57 @@ export interface ApplyMonitorStateDependencies {
  * @param args - Operation arguments.
  */
 export async function applyMonitorStateOperation(args: {
-	readonly changes: Partial<Monitor>;
-	readonly dependencies: ApplyMonitorStateDependencies;
-	readonly monitor: Monitor;
-	readonly newStatus: MonitorStatus;
-	readonly site: Site;
+    readonly changes: Partial<Monitor>;
+    readonly dependencies: ApplyMonitorStateDependencies;
+    readonly monitor: Monitor;
+    readonly newStatus: MonitorStatus;
+    readonly site: Site;
 }): Promise<void> {
-	const { changes, dependencies, monitor, newStatus, site } = args;
+    const { changes, dependencies, monitor, newStatus, site } = args;
 
-	const previousStatus = monitor.status;
+    const previousStatus = monitor.status;
 
-	// Update cached monitor object
-	Object.assign(monitor, changes);
+    // Update cached monitor object
+    Object.assign(monitor, changes);
 
-	// Update monitor in cached site
-	const monitorIndex = site.monitors.findIndex((m) => m.id === monitor.id);
-	if (monitorIndex !== -1) {
-		site.monitors[monitorIndex] = monitor;
-	}
+    // Update monitor in cached site
+    const monitorIndex = site.monitors.findIndex((m) => m.id === monitor.id);
+    if (monitorIndex !== -1) {
+        site.monitors[monitorIndex] = monitor;
+    }
 
-	// Update cached site
-	dependencies.sitesCache.set(site.identifier, site);
+    // Update cached site
+    dependencies.sitesCache.set(site.identifier, site);
 
-	// Persist to database within transaction
-	await withDatabaseOperation(
-		async () =>
-			dependencies.databaseService.executeTransaction((db) => {
-				const monitorTx =
-					dependencies.monitorRepository.createTransactionAdapter(db);
+    // Persist to database within transaction
+    await withDatabaseOperation(
+        async () =>
+            dependencies.databaseService.executeTransaction((db) => {
+                const monitorTx =
+                    dependencies.monitorRepository.createTransactionAdapter(db);
 
-				monitorTx.update(monitor.id, changes);
-				return Promise.resolve();
-			}),
-		"monitor-manager-apply-state-change",
-		dependencies.eventEmitter,
-		{ changes, monitorId: monitor.id }
-	);
+                monitorTx.update(monitor.id, changes);
+                return Promise.resolve();
+            }),
+        "monitor-manager-apply-state-change",
+        dependencies.eventEmitter,
+        { changes, monitorId: monitor.id }
+    );
 
-	// Emit status-changed event with full payload
-	const statusUpdate: StatusUpdate = {
-		monitor,
-		monitorId: monitor.id,
-		previousStatus,
-		responseTime: monitor.responseTime,
-		site,
-		siteIdentifier: site.identifier,
-		status: newStatus,
-		timestamp: new Date().toISOString(),
-	};
+    // Emit status-changed event with full payload
+    const statusUpdate: StatusUpdate = {
+        monitor,
+        monitorId: monitor.id,
+        previousStatus,
+        responseTime: monitor.responseTime,
+        site,
+        siteIdentifier: site.identifier,
+        status: newStatus,
+        timestamp: new Date().toISOString(),
+    };
 
-	await dependencies.eventEmitter.emitTyped(
-		"monitor:status-changed",
-		statusUpdate
-	);
+    await dependencies.eventEmitter.emitTyped(
+        "monitor:status-changed",
+        statusUpdate
+    );
 }

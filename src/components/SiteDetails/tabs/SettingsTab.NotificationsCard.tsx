@@ -44,9 +44,7 @@ export const SettingsTabNotificationsCard = ({
 
     const toggleIcon = useMemo(() => {
         const ToggleIconComponent = isSiteMuted ? UnlockIcon : LockIcon;
-        return (
-            <ToggleIconComponent aria-hidden size={buttonIconSize} />
-        );
+        return <ToggleIconComponent aria-hidden size={buttonIconSize} />;
     }, [buttonIconSize, isSiteMuted]);
 
     return (

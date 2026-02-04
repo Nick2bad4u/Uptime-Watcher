@@ -5,7 +5,10 @@ import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDepend
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 import type { MonitorCheckResult } from "../types";
 
-import { createMonitorCheckContext, type MonitorCheckContext } from "../checkContext";
+import {
+    createMonitorCheckContext,
+    type MonitorCheckContext,
+} from "../checkContext";
 import { resolveStatusUpdateDetails } from "../utils/monitorCheckResultNormalization";
 
 /**
@@ -137,11 +140,15 @@ export async function performDirectCheck(args: {
             monitor: freshMonitorWithHistory,
         };
 
-        const didStatusChange = statusUpdate.status !== statusUpdate.previousStatus;
+        const didStatusChange =
+            statusUpdate.status !== statusUpdate.previousStatus;
 
         // Emit proper typed events like the traditional monitoring system.
         if (didStatusChange) {
-            await eventEmitter.emitTyped("monitor:status-changed", statusUpdate);
+            await eventEmitter.emitTyped(
+                "monitor:status-changed",
+                statusUpdate
+            );
         }
 
         // Emit monitor up/down events using the same canonical helper used by
@@ -149,7 +156,10 @@ export async function performDirectCheck(args: {
         //
         // Preserve existing behavior: manual checks on paused monitors do not
         // emit up/down events.
-        if (didStatusChange && (!isManualCheck || monitor.status !== "paused")) {
+        if (
+            didStatusChange &&
+            (!isManualCheck || monitor.status !== "paused")
+        ) {
             await emitStatusChangeEvents(
                 site,
                 monitor,

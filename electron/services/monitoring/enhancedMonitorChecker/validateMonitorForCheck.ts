@@ -18,7 +18,9 @@ export function validateMonitorForCheck(
     }
 
     if (!monitor.id) {
-        logger.error(`Monitor missing id for ${site.identifier}, skipping check.`);
+        logger.error(
+            `Monitor missing id for ${site.identifier}, skipping check.`
+        );
         return false;
     }
 

@@ -1,4 +1,7 @@
-import type { IpcInvokeChannel, IpcInvokeChannelParams } from "@shared/types/ipc";
+import type {
+    IpcInvokeChannel,
+    IpcInvokeChannelParams,
+} from "@shared/types/ipc";
 
 import { SITES_CHANNELS } from "@shared/types/preload";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
@@ -62,17 +65,21 @@ export function registerSiteHandlers({
     register(
         SITES_CHANNELS.updateSite,
         (
-            identifier: IpcInvokeChannelParams<typeof SITES_CHANNELS.updateSite>[0],
+            identifier: IpcInvokeChannelParams<
+                typeof SITES_CHANNELS.updateSite
+            >[0],
             updates: IpcInvokeChannelParams<typeof SITES_CHANNELS.updateSite>[1]
-        ) =>
-            uptimeOrchestrator.updateSite(identifier, updates),
+        ) => uptimeOrchestrator.updateSite(identifier, updates),
         SiteHandlerValidators.updateSite
     );
 
     register(
         SITES_CHANNELS.removeSite,
-        (identifier: IpcInvokeChannelParams<typeof SITES_CHANNELS.removeSite>[0]) =>
-            uptimeOrchestrator.removeSite(identifier),
+        (
+            identifier: IpcInvokeChannelParams<
+                typeof SITES_CHANNELS.removeSite
+            >[0]
+        ) => uptimeOrchestrator.removeSite(identifier),
         SiteHandlerValidators.removeSite
     );
 
@@ -82,9 +89,10 @@ export function registerSiteHandlers({
             siteIdentifier: IpcInvokeChannelParams<
                 typeof SITES_CHANNELS.removeMonitor
             >[0],
-            monitorId: IpcInvokeChannelParams<typeof SITES_CHANNELS.removeMonitor>[1]
-        ) =>
-            uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId),
+            monitorId: IpcInvokeChannelParams<
+                typeof SITES_CHANNELS.removeMonitor
+            >[1]
+        ) => uptimeOrchestrator.removeMonitor(siteIdentifier, monitorId),
         SiteHandlerValidators.removeMonitor
     );
 

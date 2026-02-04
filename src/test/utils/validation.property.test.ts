@@ -528,11 +528,15 @@ describe("Validation Utils Property-Based Tests", () => {
 
         fcTest.prop([
             fc.oneof(
-                fc
-                    .string()
-                    .filter(
-                        (s) => !["http", "port", "ping", "dns"].includes(s)
-                    ),
+                fc.string().filter(
+                    (s) =>
+                        ![
+                            "http",
+                            "port",
+                            "ping",
+                            "dns",
+                        ].includes(s)
+                ),
                 fc.integer(),
                 fc.boolean(),
                 fc.constant(null),

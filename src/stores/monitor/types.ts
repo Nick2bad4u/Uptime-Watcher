@@ -16,7 +16,10 @@ import type { Simplify } from "type-fest";
  * @public
  */
 export interface MonitorTypesActions {
-    formatMonitorDetail: (type: MonitorType, details: string) => Promise<string>;
+    formatMonitorDetail: (
+        type: MonitorType,
+        details: string
+    ) => Promise<string>;
     formatMonitorTitleSuffix: (
         type: MonitorType,
         monitor: Monitor

@@ -44,12 +44,9 @@ export function useInAppAlertTonePreview(args: {
         volumePreviewTimeoutRef.current = null;
     }, []);
 
-    const setPendingVolume = useCallback(
-        (normalizedVolume: number) => {
-            pendingVolumeRef.current = clampNormalizedVolume(normalizedVolume);
-        },
-        []
-    );
+    const setPendingVolume = useCallback((normalizedVolume: number) => {
+        pendingVolumeRef.current = clampNormalizedVolume(normalizedVolume);
+    }, []);
 
     const playPreviewAtVolume = useCallback(
         (normalizedVolume: number) => {

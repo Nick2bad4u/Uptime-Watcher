@@ -9,7 +9,10 @@
 
 import type { Site } from "@shared/types";
 
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import { logger } from "../../utils/logger";
 
@@ -25,7 +28,9 @@ export async function setupIndividualNewMonitorsOperation(args: {
     ) => Promise<void>;
     readonly defaultCheckIntervalMs: number;
     readonly newMonitors: Site["monitors"];
-    readonly shouldApplyDefaultInterval: (monitor: Site["monitors"][0]) => boolean;
+    readonly shouldApplyDefaultInterval: (
+        monitor: Site["monitors"][0]
+    ) => boolean;
     readonly site: Site;
 }): Promise<void> {
     const {
@@ -51,8 +56,11 @@ export async function setupIndividualNewMonitorsOperation(args: {
     }
 
     logger.debug(
-        interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_AUTO_START, {
-            identifier: site.identifier,
-        })
+        interpolateLogTemplate(
+            LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_AUTO_START,
+            {
+                identifier: site.identifier,
+            }
+        )
     );
 }

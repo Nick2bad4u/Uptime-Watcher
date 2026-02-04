@@ -381,7 +381,8 @@ export class SnapshotSyncCoordinator {
     ): void {
         fireAndForgetLogged({
             logger,
-            message: "[UptimeOrchestrator] Error handling update-sites-cache-requested:",
+            message:
+                "[UptimeOrchestrator] Error handling update-sites-cache-requested:",
             task: async () => {
                 await this.handleUpdateSitesCacheRequest(data);
             },
@@ -392,7 +393,8 @@ export class SnapshotSyncCoordinator {
     public handleGetSitesFromCacheRequestedEvent(): void {
         fireAndForgetLogged({
             logger,
-            message: "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
+            message:
+                "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
             task: async () => {
                 await this.handleGetSitesFromCacheRequest();
             },

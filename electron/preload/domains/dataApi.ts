@@ -107,7 +107,8 @@ export const dataApi: DataApiInterface = ((): DataApiInterface => {
             /**
              * Imports application data from a JSON string
              *
-             * @param jsonData - JSON string containing application data to import
+             * @param jsonData - JSON string containing application data to
+             *   import
              *
              * @returns Promise resolving to a boolean success flag
              */

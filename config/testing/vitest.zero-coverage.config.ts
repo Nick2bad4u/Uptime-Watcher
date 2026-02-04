@@ -1,5 +1,5 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file overrides for config typings */
- 
+
 /**
  * Specialized Vitest configuration optimized for zero-coverage detection runs.
  *

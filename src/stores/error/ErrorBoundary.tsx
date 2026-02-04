@@ -17,10 +17,11 @@
  * - TypeScript support with proper error type handling
  *
  * @example
+ *
  * ```tsx
  * <ErrorBoundary>
  *     <StoreConnectedComponent />
- * </ErrorBoundary>
+ * </ErrorBoundary>;
  * ```
  *
  * @public

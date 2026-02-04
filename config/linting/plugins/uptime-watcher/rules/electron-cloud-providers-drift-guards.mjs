@@ -17,8 +17,7 @@ export const electronCloudProvidersDriftGuardsRule = {
     /**
      * @param {{
      *     getFilename: () => string;
-     *     report: (arg0: { node: any; messageId: string; data?: any }) =>
-     *     void;
+     *     report: (arg0: { node: any; messageId: string; data?: any }) => void;
      * }} context
      */
     create(context) {

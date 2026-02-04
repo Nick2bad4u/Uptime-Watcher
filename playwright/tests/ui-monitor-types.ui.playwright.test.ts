@@ -346,9 +346,7 @@ test.describe(
                 expect(typedConfigs.length).toBeGreaterThan(0);
 
                 const actualTypes = Array.from(
-                    new Set(
-                        typedConfigs.map((config) => config.type)
-                    )
+                    new Set(typedConfigs.map((config) => config.type))
                 ).sort((first, second) => first.localeCompare(second));
 
                 const expectedTypes = Array.from(BASE_MONITOR_TYPES).sort(

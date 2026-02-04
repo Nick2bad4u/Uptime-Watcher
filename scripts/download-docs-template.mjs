@@ -332,8 +332,7 @@ function showHelp() {
  */
 class Logger {
     /**
-     * @param {boolean} [verbose] - Enable verbose logging. Default is
-     * `false`.
+     * @param {boolean} [verbose] - Enable verbose logging. Default is `false`.
      */
     constructor(verbose = false) {
         /** @type {boolean} */

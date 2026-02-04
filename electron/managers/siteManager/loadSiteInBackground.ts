@@ -1,7 +1,10 @@
 import type { Site } from "@shared/types";
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
-import { interpolateLogTemplate, LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+    interpolateLogTemplate,
+    LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { SiteRepositoryService } from "../../services/database/SiteRepositoryService";
@@ -50,7 +53,9 @@ export interface LoadSiteInBackgroundDeps {
  * Extracted from `SiteManager` to keep the manager file smaller while
  * preserving the non-blocking, observability-focused behavior.
  */
-export async function loadSiteInBackground(deps: LoadSiteInBackgroundDeps): Promise<void> {
+export async function loadSiteInBackground(
+    deps: LoadSiteInBackgroundDeps
+): Promise<void> {
     try {
         logger.debug(
             interpolateLogTemplate(LOG_TEMPLATES.debug.BACKGROUND_LOAD_START, {
@@ -91,9 +96,12 @@ export async function loadSiteInBackground(deps: LoadSiteInBackgroundDeps): Prom
         }
 
         logger.debug(
-            interpolateLogTemplate(LOG_TEMPLATES.debug.SITE_BACKGROUND_LOAD_FAILED, {
-                identifier: deps.identifier,
-            })
+            interpolateLogTemplate(
+                LOG_TEMPLATES.debug.SITE_BACKGROUND_LOAD_FAILED,
+                {
+                    identifier: deps.identifier,
+                }
+            )
         );
 
         await deps.emitSiteCacheMissSafe({
@@ -103,9 +111,12 @@ export async function loadSiteInBackground(deps: LoadSiteInBackgroundDeps): Prom
         });
     } catch (error) {
         logger.debug(
-            interpolateLogTemplate(LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED, {
-                identifier: deps.identifier,
-            }),
+            interpolateLogTemplate(
+                LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED,
+                {
+                    identifier: deps.identifier,
+                }
+            ),
             error
         );
 

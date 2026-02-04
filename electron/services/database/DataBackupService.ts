@@ -21,7 +21,10 @@ import {
 import { replaceDatabaseFile } from "./dataBackupService/replaceDatabaseFile";
 import { createSanitizedFileName } from "./dataBackupService/sanitizeBackupFileName";
 import { createConsistentSnapshot } from "./dataBackupService/snapshot";
-import { createTempDirectory, removeDirectorySafe } from "./dataBackupService/tempDirectories";
+import {
+    createTempDirectory,
+    removeDirectorySafe,
+} from "./dataBackupService/tempDirectories";
 import { writeFileWithinDirectory } from "./dataBackupService/writeFileWithinDirectory";
 import { SiteLoadingError } from "./interfaces";
 import {
@@ -387,20 +390,20 @@ export class DataBackupService {
 
                     preRestoreSnapshotDir =
                         await createTempDirectory(BACKUP_TEMP_PREFIX);
-                    const preRestoreSnapshotPath =
-                        createConsistentSnapshot({
-                            databaseService: this.databaseService,
-                            dbPath,
-                            logger: this.logger,
-                            snapshotDir: preRestoreSnapshotDir,
-                            snapshotFileName: PRERESTORE_SNAPSHOT_FILE_NAME,
-                        });
+                    const preRestoreSnapshotPath = createConsistentSnapshot({
+                        databaseService: this.databaseService,
+                        dbPath,
+                        logger: this.logger,
+                        snapshotDir: preRestoreSnapshotDir,
+                        snapshotFileName: PRERESTORE_SNAPSHOT_FILE_NAME,
+                    });
 
                     const preRestoreRaw = await createDatabaseBackup({
                         dbPath: preRestoreSnapshotPath,
                         fileName: `pre-restore-${timestamp}.sqlite`,
                     });
-                    const preRestore = normalizeBackupResultMetadata(preRestoreRaw);
+                    const preRestore =
+                        normalizeBackupResultMetadata(preRestoreRaw);
                     const normalizedPreRestoreName = preRestore.fileName.trim();
                     const preRestoreFileName = createSanitizedFileName(
                         normalizedPreRestoreName.length > 0
