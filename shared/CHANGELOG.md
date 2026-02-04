@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[3cfabc7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3cfabc7a19de0c7c8785ef1781c97be701cf81fc)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...3cfabc7a19de0c7c8785ef1781c97be701cf81fc))
+[b19500a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b19500a06279ea270e2b1c76e618c6c06bf24f2c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...b19500a06279ea270e2b1c76e618c6c06bf24f2c))
 
 
 ### ✨ Features
@@ -642,6 +642,43 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a29e
 
 ### 🚜 Refactor
 
+- 🚜 [refactor] Enhance monitor type handling and validation
+ - 🛠️ [fix] Introduce buildMonitorValidationCandidate to standardize monitor data structure
+ - 🔧 [build] Normalize monitor type strings to prevent empty values
+ - 🛠️ [fix] Update validateMonitorData to utilize the new validation candidate structure
+ - 📝 [docs] Improve error messages for required fields in validation schemas
+ - 🎨 [style] Refactor monitor schemas to ensure consistent error handling
+ - 🧪 [test] Update tests to reflect changes in monitor type handling and validation logic
+ - 🔧 [build] Adjust Vite and Vitest configurations to improve project structure and type resolution
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b19500a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b19500a06279ea270e2b1c76e618c6c06bf24f2c)
+
+
+- 🚜 [refactor] Standardizes monitor type typing
+
+🚜 [refactor] Aligns monitor type identifiers across shared models, IPC contracts, and renderer state to reduce drift and enforce consistent option values.
+ - Adds runtime validation when serializing monitor type metadata and avoids trimming inputs to preserve canonical identifiers.
+🚜 [refactor] Tightens monitor model fields by using shared DNS record type unions for record selection.
+📝 [docs] Updates audit notes and guide maintenance steps to reflect new validation and tooling commands.
+🧪 [test] Adjusts fixtures and expectations to use supported monitor types and new option fallbacks.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4e174c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e174c79e81ba39537a157057be37cff9a922461)
+
+
+- 🚜 [refactor] Centralizes IPC helpers
+
+🚜 [refactor] Removes duplicate renderer IPC and monitor-form helpers to rely on shared contracts and tighter runtime validation
+ - 🛠️ [fix] Adds stricter monitor type checks and DNS record typing for safer defaults
+🛠️ [fix] Aligns site snapshot parsing with safe-parse results for clearer error diagnostics and payload handling
+🚜 [refactor] Simplifies update lifecycle state to shared status events and drops stored release metadata
+🚜 [refactor] Standardizes sites telemetry payload typing for consistent logging
+🧪 [test] Updates coverage and fuzz suites to match shared helpers and stricter validation
+📝 [docs] Refreshes architecture and workflow docs to reflect removed helpers and updated IPC flows
+🎨 [style] Documents memoization lint rule rationale while keeping rules disabled
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eb93cd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eb93cde67ec61395ec8f83fef08a3f71d763e8e)
+
+
 - 🚜 [refactor] Improves IPC safety and linting
 
 🚜 [refactor] Adds optional payload parsing and schema validation to improve IPC runtime safety and inference
@@ -1258,6 +1295,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.2.0 [skip ci] [`(761bd4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/761bd4c64c2e1a20215281a004f455d2cbfbca16)
+
 
 - Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
 

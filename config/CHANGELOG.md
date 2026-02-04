@@ -8,11 +8,72 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[206552b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/206552b1756a5216597d9a88bf30895081886eaf)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...206552b1756a5216597d9a88bf30895081886eaf))
+[4ecb590](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4ecb59095e65c929b9c4bfb46b6d5ea9ba847e4d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...4ecb59095e65c929b9c4bfb46b6d5ea9ba847e4d))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds security-focused lint rules
+
+✨ [feat] Adds guardrails for Electron usage, renderer env access, and error rethrowing to reduce security and reliability regressions
+🧪 [test] Adds coverage for new lint rules
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c38fe30)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c38fe308cf2b516134fb030940229c11c3e86c88)
+
+
+- ✨ [feat] Adds Electron lint guardrails
+
+✨ [feat] Adds Electron lint guardrails for native dialogs and non-standard module metadata to reduce automation hangs and runtime crashes
+ - ✨ [feat] Registers the new guardrails in the core Electron lint profile
+🛠️ [fix] Adds automation-safe backup handling and standard directory resolution in the Electron main process to avoid blocked UI and bundler fragility
+🛠️ [fix] Sanitizes debugger-injected node options when launching Electron for automation to prevent startup stalls
+🧪 [test] Aligns monitor-type and lint rule tests with canonical types and new checks for consistent coverage
+ - 🧪 [test] Adds rule documentation integrity validation for lint metadata links
+📝 [docs] Adds rule guides and removes an outdated architecture note
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b687493)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b687493d3586c551c347ad037d9bffdc1b8768ec)
+
+
+- ✨ [feat] Enhance ESLint and TypeScript configurations
+
+ - 🛠️ [fix] Update TypeScript configuration files to include new ESLint plugins:
+   - Added paths for `eslint-plugin-comment-length` and `eslint-plugin-total-functions` in `tsconfig.js.json`.
+   - Excluded `test-runner-jest.config.js` from TypeScript builds.
+
+ - 🛠️ [fix] Clean up `tsconfig.test.json` by removing unnecessary test paths for linting.
+
+ - ✨ [feat] Introduce new TypeScript declaration files for ESLint plugins:
+   - Created `eslint-plugin-comment-length.d.ts` and `eslint-plugin-total-functions.d.ts` with default exports.
+
+ - 📝 [docs] Update documentation for custom linting rules:
+   - Corrected naming conventions for several `uptime-watcher` rules in `LINT_GUARDRAILS_AND_CUSTOM_RULES.md`.
+
+ - 🧪 [test] Add a new Vitest configuration for linting tests:
+   - Created `vitest.linting.config.ts` to run RuleTester suites for internal ESLint plugins.
+
+ - 🔧 [build] Modify `vite.config.ts` to include the new linting test configuration.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ed6a4f1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ed6a4f16eee1bede8555e8e9637ede7767a2f455)
+
+
+- ✨ [feat] Modularize ESLint rules for uptime-watcher plugin
+ - 🆕 Add `renderer-no-preload-bridge-writes` rule to prevent mutations of `window.electronAPI` in renderer code.
+ - 🆕 Introduce `renderer-no-window-open` rule to disallow `window.open` usage in renderer code for external navigation.
+ - 🆕 Implement `require-ensureError-in-catch` rule to enforce normalization of caught `unknown` errors before property access.
+ - 🆕 Create `shared-no-outside-imports` rule to prevent shared modules from importing renderer or Electron runtime code.
+ - 🆕 Add `shared-types-no-local-isPlainObject` rule to disallow local declarations of `isPlainObject` in shared/types.
+ - 🆕 Introduce `store-actions-require-finally-reset` rule to ensure Zustand store busy flags are reset in `finally` blocks.
+ - 🆕 Add `test-no-mock-return-value-constructors` rule to prevent mocking constructors with `mockReturnValue`.
+ - 🆕 Implement `tsdoc-no-console-example` rule to disallow console usage in TSDoc example code blocks.
+🧪 [test] Add tests for new ESLint rules in uptime-watcher plugin
+ - 🆕 Create tests for `electron-no-console` rule to validate console usage in Electron context.
+ - 🆕 Add tests for `renderer-no-window-open` rule to ensure proper handling of `window.open`.
+ - 🆕 Implement tests for `require-ensureError-in-catch` rule to check for normalization of caught errors.
+ - 🆕 Include tests for other newly added rules to ensure compliance and functionality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9bab9dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9bab9dc636f8759fc9be79c63971f35b5fc8c184)
+
 
 - ✨ [feat] Adds lint drift guards and mock helpers
 
@@ -52,6 +113,60 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1f4d
 
 
 ### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Adds IPC result checks
+
+🛠️ [fix] Improves IPC handling by validating success payloads and returning safe errors when checks fail ✅🧯
+ - 🛠️ [fix] Records result validation issues in handler metadata for diagnostics 🧾
+🚜 [refactor] Tightens handler argument typing to reduce mismatch risk 🧩
+✨ [feat] Adds schema-backed validators for backup and restore results 🗂️
+🧹 [chore] Updates agent configuration to allow user invocation 🤖
+🎨 [style] Cleans up minor lint-rule formatting 🧽
+🧪 [test] Extends IPC tests and fixtures for result validation and new metadata fields 🧪
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4ecb590)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4ecb59095e65c929b9c4bfb46b6d5ea9ba847e4d)
+
+
+- 🛠️ [fix] Implement linting rules for uptime-watcher plugin
+
+ - ✨ [feat] Add tests for `electron-sync-no-local-ascii-digits` rule to prevent usage of local ASCII digits in specific files.
+ - ✨ [feat] Introduce `logger-no-error-in-context` rule to avoid logging errors with context in certain files.
+ - ✨ [feat] Create `monitor-fallback-consistency` rule to ensure fallback monitor types are consistent and valid.
+ - ✨ [feat] Add `no-call-identifiers` rule to restrict usage of banned function calls in specified files.
+ - ✨ [feat] Implement `no-deprecated-exports` rule to prevent exporting deprecated values.
+ - ✨ [feat] Add `no-inline-ipc-channel-type-literals` rule to avoid inline type literals for IPC channels.
+ - ✨ [feat] Introduce `no-local-error-normalizers` rule to restrict local error normalizers in specific files.
+ - ✨ [feat] Create `no-local-identifiers` rule to prevent usage of banned local identifiers.
+ - ✨ [feat] Implement `no-local-record-guards` rule to restrict local record guards in certain files.
+ - ✨ [feat] Add `no-onedrive` rule to prevent usage of OneDrive paths in specific files.
+ - ✨ [feat] Introduce `no-redeclare-shared-contract-interfaces` rule to avoid redeclaring shared interfaces.
+ - ✨ [feat] Create `no-regexp-v-flag` rule to prevent usage of the 'v' flag in regular expressions.
+ - ✨ [feat] Implement `prefer-app-alias` rule to encourage the use of application aliases in imports.
+ - ✨ [feat] Add `prefer-shared-alias` rule to enforce shared aliases in imports.
+ - ✨ [feat] Introduce `prefer-try-get-error-code` rule to encourage using a helper function for error codes.
+ - ✨ [feat] Create `preload-no-local-is-plain-object` rule to restrict local plain object checks in preload scripts.
+ - ✨ [feat] Implement `renderer-no-browser-dialogs` rule to prevent usage of browser dialogs in renderer processes.
+ - ✨ [feat] Add `renderer-no-direct-bridge-readiness` rule to enforce service helper usage for bridge readiness.
+ - ✨ [feat] Create `renderer-no-direct-electron-log` rule to prevent direct usage of electron-log in renderer.
+ - ✨ [feat] Implement `renderer-no-direct-networking` rule to restrict direct networking calls in renderer.
+ - ✨ [feat] Add `renderer-no-direct-preload-bridge` rule to prevent direct access to preload bridge.
+ - ✨ [feat] Create `renderer-no-electron-import` rule to restrict direct imports from electron in renderer.
+ - ✨ [feat] Implement `renderer-no-import-internal-service-utils` rule to prevent internal service utility imports in renderer.
+ - ✨ [feat] Add `renderer-no-ipc-renderer-usage` rule to restrict usage of ipcRenderer in renderer.
+ - ✨ [feat] Create `renderer-no-preload-bridge-writes` rule to prevent writing to preload bridge.
+ - ✨ [feat] Implement `renderer-no-window-open` rule to restrict usage of window.open in renderer.
+ - ✨ [feat] Add `require-ensure-error-in-catch` rule to enforce error handling in catch blocks.
+ - ✨ [feat] Create `shared-no-outside-imports` rule to prevent outside imports in shared modules.
+ - ✨ [feat] Implement `shared-types-no-local-is-plain-object` rule to restrict local plain object checks in shared types.
+ - ✨ [feat] Add `store-actions-require-finally-reset` rule to enforce finally blocks in store actions.
+ - ✨ [feat] Create `test-no-mock-return-value-constructors` rule to prevent mocking return value constructors in tests.
+ - ✨ [feat] Add `tsdoc-no-console-example` rule to prevent console usage in TSDoc examples.
+ - 🧹 [chore] Remove outdated `uptime-watcher-plugin.rules.test.ts` file as it is no longer needed.
+ - 🎨 [style] Update `eslint.config.mjs` to adjust rules for internal helper filenames and other configurations.
+ - 🚜 [refactor] Refactor `SaveButton.tsx` to use `useMemo` for button variant calculation based on disabled state.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2630c00)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2630c00e7b5a9a1b7795e6b59fde6eea90f41ff6)
+
 
 - 🛠️ [fix] Improves cancellation safety
 
@@ -174,6 +289,31 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85d4
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Add default lint configs
+
+🚜 [refactor] Adds default presets to simplify reuse
+ - Keeps plugin registration centralized for reuse
+🎨 [style] Normalizes rule and test formatting for clarity
+ - Improves JSDoc structure without behavior changes
+🧪 [test] Refines linting test runtime environment handling
+ - Avoids direct env access and relaxes assertion checks
+🧹 [chore] Updates docs and script ordering metadata
+ - Refreshes audit references and IPC inventory notes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(38ae7df)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/38ae7dfeec205358d934f8640ef8ed3b155daf5d)
+
+
+- 🚜 [refactor] Enhance uptime-watcher ESLint plugin configuration
+ - 📝 Update README.md to include usage instructions for repo-scoped presets
+ - 🛠️ Add error handling and registration functions for the uptime-watcher plugin in plugin.mjs
+ - 🧪 Introduce tests for plugin configurations to ensure expected keys and structure
+ - 🔧 Modify tsconfig.eslint.json to specify output directories for builds
+ - 🔧 Add new linting test scripts in package.json for better test coverage
+ - 🔧 Update Vitest configurations across multiple files to ensure proper type exports
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b8d69f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b8d69f4c6c0cbc0721e10f87716dff71f0e6ce62)
+
 
 - 🚜 [refactor] Tightens type safety and guards
 
@@ -569,6 +709,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 ### 🧹 Chores
 
+- Update changelogs for v21.2.0 [skip ci] [`(761bd4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/761bd4c64c2e1a20215281a004f455d2cbfbca16)
+
+
 - Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
 
 
@@ -590,6 +733,29 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies and improve TypeScript checks
+
+ - 🛠️ [fix] Enhance `check:configs` script to include TypeScript linting for uptime-watcher
+ - 🔄 [update] Upgrade `@commitlint` packages to version 20.4.1 for improved commit message validation
+ - 🔄 [update] Upgrade `@cspell` packages to version 9.6.3 for better spell checking
+ - 🔄 [update] Upgrade `@eslint-react/eslint-plugin` to version 2.9.3 for enhanced React linting
+ - 🔄 [update] Upgrade `@putout/eslint` to version 5.0.3 for improved linting capabilities
+ - 🔄 [update] Upgrade `@storybook` packages to version 10.2.4 for the latest features and fixes
+ - 🔄 [update] Upgrade `@stryker-mutator` packages to version 9.5.1 for better mutation testing
+ - 🔄 [update] Upgrade `@types/node` to version 25.2.0 for compatibility with the latest Node.js features
+ - 🔄 [update] Upgrade `@vitejs/plugin-react` to version 5.1.3 for improved React support in Vite
+ - 🔄 [update] Upgrade `cspell` to version 9.6.3 for enhanced spell checking
+ - 🔄 [update] Upgrade `eslint-plugin-react-dom` to version 2.9.3 for better React DOM linting
+ - 🔄 [update] Upgrade `jsdom` to version 28.0.0 for the latest DOM features
+ - 🔄 [update] Upgrade `knip` to version 5.83.0 for improved dependency management
+ - 🔄 [update] Upgrade `storybook` to version 10.2.4 for the latest features and fixes
+ - 🔄 [update] Upgrade `stylelint-plugin-defensive-css` to version 1.1.1 for better CSS linting
+ - 🔄 [update] Upgrade `stylelint-plugin-use-baseline` to version 1.2.2 for improved CSS baseline checks
+ - 🔄 [update] Upgrade `vite-bundle-analyzer` to version 1.3.4 for enhanced bundle analysis
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(508dd22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/508dd2255e740fdb652d6a890d68aac15e032547)
+
 
 - 🔧 [build] Update ESLint configuration and dependencies
  - 🆕 Add `eslint-plugin-eslint-plugin` to enhance linting capabilities

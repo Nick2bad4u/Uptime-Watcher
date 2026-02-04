@@ -8,11 +8,46 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[bca82d2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...bca82d273fcc9ad52fe0fd6c159a4a0033a7d4b4))
+[b687493](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b687493d3586c551c347ad037d9bffdc1b8768ec)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...b687493d3586c551c347ad037d9bffdc1b8768ec))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds Electron lint guardrails
+
+✨ [feat] Adds Electron lint guardrails for native dialogs and non-standard module metadata to reduce automation hangs and runtime crashes
+ - ✨ [feat] Registers the new guardrails in the core Electron lint profile
+🛠️ [fix] Adds automation-safe backup handling and standard directory resolution in the Electron main process to avoid blocked UI and bundler fragility
+🛠️ [fix] Sanitizes debugger-injected node options when launching Electron for automation to prevent startup stalls
+🧪 [test] Aligns monitor-type and lint rule tests with canonical types and new checks for consistent coverage
+ - 🧪 [test] Adds rule documentation integrity validation for lint metadata links
+📝 [docs] Adds rule guides and removes an outdated architecture note
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b687493)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b687493d3586c551c347ad037d9bffdc1b8768ec)
+
+
+- ✨ [feat] Enhance ESLint and TypeScript configurations
+
+ - 🛠️ [fix] Update TypeScript configuration files to include new ESLint plugins:
+   - Added paths for `eslint-plugin-comment-length` and `eslint-plugin-total-functions` in `tsconfig.js.json`.
+   - Excluded `test-runner-jest.config.js` from TypeScript builds.
+
+ - 🛠️ [fix] Clean up `tsconfig.test.json` by removing unnecessary test paths for linting.
+
+ - ✨ [feat] Introduce new TypeScript declaration files for ESLint plugins:
+   - Created `eslint-plugin-comment-length.d.ts` and `eslint-plugin-total-functions.d.ts` with default exports.
+
+ - 📝 [docs] Update documentation for custom linting rules:
+   - Corrected naming conventions for several `uptime-watcher` rules in `LINT_GUARDRAILS_AND_CUSTOM_RULES.md`.
+
+ - 🧪 [test] Add a new Vitest configuration for linting tests:
+   - Created `vitest.linting.config.ts` to run RuleTester suites for internal ESLint plugins.
+
+ - 🔧 [build] Modify `vite.config.ts` to include the new linting test configuration.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ed6a4f1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ed6a4f16eee1bede8555e8e9637ede7767a2f455)
+
 
 - ✨ [feat] Adds lint drift guards and mock helpers
 
@@ -345,6 +380,57 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(16d9
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Add default lint configs
+
+🚜 [refactor] Adds default presets to simplify reuse
+ - Keeps plugin registration centralized for reuse
+🎨 [style] Normalizes rule and test formatting for clarity
+ - Improves JSDoc structure without behavior changes
+🧪 [test] Refines linting test runtime environment handling
+ - Avoids direct env access and relaxes assertion checks
+🧹 [chore] Updates docs and script ordering metadata
+ - Refreshes audit references and IPC inventory notes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(38ae7df)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/38ae7dfeec205358d934f8640ef8ed3b155daf5d)
+
+
+- 🚜 [refactor] Enhance monitor type handling and validation
+ - 🛠️ [fix] Introduce buildMonitorValidationCandidate to standardize monitor data structure
+ - 🔧 [build] Normalize monitor type strings to prevent empty values
+ - 🛠️ [fix] Update validateMonitorData to utilize the new validation candidate structure
+ - 📝 [docs] Improve error messages for required fields in validation schemas
+ - 🎨 [style] Refactor monitor schemas to ensure consistent error handling
+ - 🧪 [test] Update tests to reflect changes in monitor type handling and validation logic
+ - 🔧 [build] Adjust Vite and Vitest configurations to improve project structure and type resolution
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b19500a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b19500a06279ea270e2b1c76e618c6c06bf24f2c)
+
+
+- 🚜 [refactor] Standardizes monitor type typing
+
+🚜 [refactor] Aligns monitor type identifiers across shared models, IPC contracts, and renderer state to reduce drift and enforce consistent option values.
+ - Adds runtime validation when serializing monitor type metadata and avoids trimming inputs to preserve canonical identifiers.
+🚜 [refactor] Tightens monitor model fields by using shared DNS record type unions for record selection.
+📝 [docs] Updates audit notes and guide maintenance steps to reflect new validation and tooling commands.
+🧪 [test] Adjusts fixtures and expectations to use supported monitor types and new option fallbacks.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4e174c7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e174c79e81ba39537a157057be37cff9a922461)
+
+
+- 🚜 [refactor] Centralizes IPC helpers
+
+🚜 [refactor] Removes duplicate renderer IPC and monitor-form helpers to rely on shared contracts and tighter runtime validation
+ - 🛠️ [fix] Adds stricter monitor type checks and DNS record typing for safer defaults
+🛠️ [fix] Aligns site snapshot parsing with safe-parse results for clearer error diagnostics and payload handling
+🚜 [refactor] Simplifies update lifecycle state to shared status events and drops stored release metadata
+🚜 [refactor] Standardizes sites telemetry payload typing for consistent logging
+🧪 [test] Updates coverage and fuzz suites to match shared helpers and stricter validation
+📝 [docs] Refreshes architecture and workflow docs to reflect removed helpers and updated IPC flows
+🎨 [style] Documents memoization lint rule rationale while keeping rules disabled
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eb93cd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eb93cde67ec61395ec8f83fef08a3f71d763e8e)
+
 
 - 🚜 [refactor] Clarifies monitoring wiring
 
@@ -776,6 +862,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v21.2.0 [skip ci] [`(761bd4c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/761bd4c64c2e1a20215281a004f455d2cbfbca16)
+
+
 - Update changelogs for v21.1.0 [skip ci] [`(7b8d429)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b8d4290831f4f0c982a64665136fe7895272b3b)
 
 
@@ -807,6 +896,29 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies and improve TypeScript checks
+
+ - 🛠️ [fix] Enhance `check:configs` script to include TypeScript linting for uptime-watcher
+ - 🔄 [update] Upgrade `@commitlint` packages to version 20.4.1 for improved commit message validation
+ - 🔄 [update] Upgrade `@cspell` packages to version 9.6.3 for better spell checking
+ - 🔄 [update] Upgrade `@eslint-react/eslint-plugin` to version 2.9.3 for enhanced React linting
+ - 🔄 [update] Upgrade `@putout/eslint` to version 5.0.3 for improved linting capabilities
+ - 🔄 [update] Upgrade `@storybook` packages to version 10.2.4 for the latest features and fixes
+ - 🔄 [update] Upgrade `@stryker-mutator` packages to version 9.5.1 for better mutation testing
+ - 🔄 [update] Upgrade `@types/node` to version 25.2.0 for compatibility with the latest Node.js features
+ - 🔄 [update] Upgrade `@vitejs/plugin-react` to version 5.1.3 for improved React support in Vite
+ - 🔄 [update] Upgrade `cspell` to version 9.6.3 for enhanced spell checking
+ - 🔄 [update] Upgrade `eslint-plugin-react-dom` to version 2.9.3 for better React DOM linting
+ - 🔄 [update] Upgrade `jsdom` to version 28.0.0 for the latest DOM features
+ - 🔄 [update] Upgrade `knip` to version 5.83.0 for improved dependency management
+ - 🔄 [update] Upgrade `storybook` to version 10.2.4 for the latest features and fixes
+ - 🔄 [update] Upgrade `stylelint-plugin-defensive-css` to version 1.1.1 for better CSS linting
+ - 🔄 [update] Upgrade `stylelint-plugin-use-baseline` to version 1.2.2 for improved CSS baseline checks
+ - 🔄 [update] Upgrade `vite-bundle-analyzer` to version 1.3.4 for enhanced bundle analysis
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(508dd22)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/508dd2255e740fdb652d6a890d68aac15e032547)
+
 
 - 🔧 [build] Update TypeScript configuration files for improved build info management
  - 🛠️ Update `tsBuildInfoFile` paths in multiple TypeScript configuration files to ensure consistency
