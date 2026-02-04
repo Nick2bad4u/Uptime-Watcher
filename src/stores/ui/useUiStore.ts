@@ -32,11 +32,8 @@
 
 import type { Site } from "@shared/types";
 
-import { ensureError } from "@shared/utils/errorHandling";
-import {
-    getSafeUrlForLogging,
-    validateExternalOpenUrlCandidate,
-} from "@shared/utils/urlSafety";
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -52,8 +49,8 @@ import type {
 
 import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
-import { useErrorStore } from "../error/useErrorStore";
 import { createPersistConfig, logStoreAction } from "../utils";
+import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
 interface UIPersistedState {
     activeSiteDetailsTab: SiteDetailsTab;
@@ -151,43 +148,24 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             ): void => {
                 logStoreAction("UIStore", "openExternal", { context });
 
-                const requestedUrl = url;
                 const urlForMessage = getSafeUrlForLogging(url);
 
-                const validation =
-                    validateExternalOpenUrlCandidate(requestedUrl);
-
-                if ("reason" in validation) {
-                    logger.warn(
-                        "Blocked attempt to open invalid external URL",
-                        {
-                            context,
-                            reason: validation.reason,
-                            url: urlForMessage,
-                        }
-                    );
-
-                    useErrorStore
-                        .getState()
-                        .setStoreError(
-                            "system-open-external",
-                            `Unable to open external link (${urlForMessage}): URL ${validation.reason}`
-                        );
-
-                    return;
-                }
+                const errorHandler = createStoreErrorHandler(
+                    "system-open-external",
+                    "ui.openExternal"
+                );
 
                 void (async (): Promise<void> => {
                     try {
-                        await SystemService.openExternal(
-                            validation.normalizedUrl
-                        );
-                        logger.user.action("External URL opened", {
-                            url: urlForMessage,
-                            ...(context?.siteName
-                                ? { siteName: context.siteName }
-                                : {}),
-                        });
+                        await withErrorHandling(async () => {
+                            await SystemService.openExternal(url);
+                            logger.user.action("External URL opened", {
+                                url: urlForMessage,
+                                ...(context?.siteName
+                                    ? { siteName: context.siteName }
+                                    : {}),
+                            });
+                        }, errorHandler);
                     } catch (error: unknown) {
                         const normalizedError = ensureError(error);
 
@@ -213,13 +191,6 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                             error: normalizedError.message,
                             url: urlForMessage,
                         });
-
-                        useErrorStore
-                            .getState()
-                            .setStoreError(
-                                "system-open-external",
-                                `Unable to open external link (${urlForMessage}): ${normalizedError.message}`
-                            );
                     }
                 })();
             },

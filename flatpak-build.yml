@@ -126,7 +126,8 @@ modules:
               set -e
 
               # Pre-build validation
-              echo "Building Uptime Watcher Flatpak v$(grep '\"version\"' package.json | cut -d'\"' -f4)"
+              APP_VERSION="$(node -p "require('./package.json').version")"
+              echo "Building Uptime Watcher Flatpak v${APP_VERSION}"
               echo "Node.js version:" && node --version
               echo "npm version:" && npm --version
 
@@ -152,7 +153,11 @@ modules:
               find /app/node_modules -name "*.node" -exec chmod +x {} \; 2>/dev/null || true
 
               # Copy static assets
-              cp -r icons /app/
+              if [ -d "icons" ]; then
+                  cp -r icons /app/
+              else
+                  echo "No ./icons directory present; skipping"
+              fi
               cp package.json /app/
               chmod 644 /app/package.json
 
