@@ -30,6 +30,8 @@ license
 **/*.yaml
 **/*.desktop
 **/*.txt
+**/*.mdx
+**/static/**
 CNAME
 **/*.ico
 stylelintcache

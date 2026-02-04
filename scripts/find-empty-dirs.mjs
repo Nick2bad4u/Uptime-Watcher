@@ -385,6 +385,11 @@ async function safeDeleteDir(dirPath) {
     }
 }
 
+/**
+ * Scan configured directories for empty folders and optionally delete them.
+ *
+ * @returns {Promise<void>} Resolves after reporting results.
+ */
 async function main() {
     let totalFound = 0;
     let totalDeleted = 0;

@@ -23,7 +23,10 @@ export const preloadNoLocalIsPlainObjectRule = {
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
-        if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/preload/`)) {
+        if (
+            filename === "<input>" ||
+            !filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/preload/`)
+        ) {
             return {};
         }
 

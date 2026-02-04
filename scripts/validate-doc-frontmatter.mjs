@@ -471,6 +471,11 @@ async function validateFile(markdownPath, schema) {
     return validateAgainstSchema(schema, frontMatter, markdownPath);
 }
 
+/**
+ * Validate docs front matter against the shared JSON schema.
+ *
+ * @returns {Promise<void>} Resolves after reporting any violations.
+ */
 async function main() {
     const schemaRaw = await readFile(FRONTMATTER_SCHEMA_PATH, "utf8");
     const schema = /** @type {JsonObject} */ (JSON.parse(schemaRaw));

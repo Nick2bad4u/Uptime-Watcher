@@ -196,6 +196,11 @@ async function checkFile(markdownPath, issues) {
     }
 }
 
+/**
+ * Scan documentation markdown files for broken local links.
+ *
+ * @returns {Promise<void>} Resolves after reporting any link issues.
+ */
 async function main() {
     /**
      * @type {string | any[]}

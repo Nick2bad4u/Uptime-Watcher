@@ -23,9 +23,10 @@ const DIALOG_METHOD_NAMES = new Set([
  * escape hatch.
  *
  * @remarks
- * Native dialogs are a common source of test flakiness/hangs in E2E automation.
- * We require any Electron main-process module that calls `dialog.*` to also
- * contain a guard that bypasses the dialog when running under automation.
+ * Native dialogs are a common source of test flakiness/hangs in E2E
+ * automation. We require any Electron main-process module that calls
+ * `dialog.*` to also contain a guard that bypasses the dialog when running
+ * under automation.
  *
  * The rule requires an explicit `readProcessEnv("PLAYWRIGHT_TEST"|"HEADLESS")`
  * call in the module.

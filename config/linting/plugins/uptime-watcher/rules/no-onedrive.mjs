@@ -25,6 +25,10 @@ export const noOneDriveRule = {
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
+        if (normalizedFilename === "<input>") {
+            return {};
+        }
+
         // Ignore tests to avoid creating busywork when describing previous
         // State.
         if (

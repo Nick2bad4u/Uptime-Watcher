@@ -25,6 +25,10 @@ export const noLocalErrorNormalizersRule = {
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
+        if (normalizedFilename === "<input>") {
+            return {};
+        }
+
         // Allow declarations inside the canonical shared helper module.
         if (normalizedFilename.endsWith("/shared/utils/errorHandling.ts")) {
             return {};

@@ -81,6 +81,7 @@
         "**/*.tsx",
         "**/*.js",
         "**/*.jsx",
+        "**/*.d.ts",
         "src/**/*",
         "static/**/*",
         "sidebars.ts",

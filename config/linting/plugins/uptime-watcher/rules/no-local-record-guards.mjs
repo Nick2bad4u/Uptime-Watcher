@@ -25,6 +25,10 @@ export const noLocalRecordGuardsRule = {
     create(context) {
         const normalizedFilename = normalizePath(context.getFilename());
 
+        if (normalizedFilename === "<input>") {
+            return {};
+        }
+
         // Allow declarations inside the canonical shared helper modules.
         if (
             normalizedFilename.endsWith("/shared/utils/typeHelpers.ts") ||

@@ -94,6 +94,7 @@ export class ExampleRepository {
   *  ```typescript
   *
   *
+  *
   *  const repo = new ExampleRepository({ databaseService });
   *  ```;
   *
@@ -108,6 +109,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *  await repo.create({
@@ -159,6 +161,7 @@ export class ExampleRepository {
   *  ```typescript
   *
   *
+  *
   *  const examples = await repo.findAll();
   *  ```;
   *
@@ -178,6 +181,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *  const example = await repo.findById("123");
@@ -205,6 +209,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *  await repo.update("123", { name: "Updated Name" });
@@ -264,6 +269,7 @@ export class ExampleRepository {
   *  ```typescript
   *
   *
+  *
   *  await repo.deleteById("123");
   *  ```;
   *
@@ -306,6 +312,7 @@ export class ExampleRepository {
   *  ```typescript
   *
   *
+  *
   *  await repo.deleteAll();
   *  ```;
   *
@@ -344,6 +351,7 @@ export class ExampleRepository {
   *
   * @example
   *  ```typescript
+  *
   *
   *
   *  await repo.bulkInsert([record1, record2, record3]);

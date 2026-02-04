@@ -3,7 +3,7 @@
 /**
  * Post-process recorded Playwright tests with lint-compliant transforms.
  *
- * Usage: node scripts/transform-test.mjs <input-file> [output-file].
+ * Usage: `node scripts/transform-test.mjs INPUT_FILE [output-file]`.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -14,7 +14,7 @@ const outputFile = process.argv[3] || inputFile;
 
 if (!inputFile) {
     console.error(
-        "Usage: node scripts/transform-test.mjs <input-file> [output-file]"
+        "Usage: node scripts/transform-test.mjs INPUT_FILE [output-file]"
     );
     process.exit(1);
 }

@@ -271,9 +271,10 @@ function main() {
 }
 
 /**
- * Usage information.
+ * Print CLI usage information for the test-name extractor.
+ *
+ * @returns {void}
  */
-
 function showUsage() {
     console.log(`
 Usage: node extract-test-names.js [options]

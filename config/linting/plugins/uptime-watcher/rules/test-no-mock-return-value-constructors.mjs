@@ -5,6 +5,8 @@
  * @file Rule: test-no-mock-return-value-constructors
  */
 
+import { normalizePath } from "../_internal/path-utils.mjs";
+
 /**
  * Vitest safety guard.
  *
@@ -21,6 +23,7 @@
 export const testNoMockReturnValueConstructorsRule = {
     /**
      * @param {{
+        *     getFilename: () => string;
      *     report: (arg0: {
      *         node: any;
      *         messageId: string;
@@ -29,6 +32,29 @@ export const testNoMockReturnValueConstructorsRule = {
      * }} context
      */
     create(context) {
+        const normalizedFilename = normalizePath(context.getFilename());
+
+        const isTestFile =
+            normalizedFilename.includes("/test/") ||
+            normalizedFilename.includes("/tests/") ||
+            normalizedFilename.includes("/__tests__/") ||
+            normalizedFilename.endsWith(".test.ts") ||
+            normalizedFilename.endsWith(".test.tsx") ||
+            normalizedFilename.endsWith(".test.js") ||
+            normalizedFilename.endsWith(".test.jsx") ||
+            normalizedFilename.endsWith(".test.mjs") ||
+            normalizedFilename.endsWith(".test.cjs") ||
+            normalizedFilename.endsWith(".spec.ts") ||
+            normalizedFilename.endsWith(".spec.tsx") ||
+            normalizedFilename.endsWith(".spec.js") ||
+            normalizedFilename.endsWith(".spec.jsx") ||
+            normalizedFilename.endsWith(".spec.mjs") ||
+            normalizedFilename.endsWith(".spec.cjs");
+
+        if (normalizedFilename === "<input>" || !isTestFile) {
+            return {};
+        }
+
         const extractMockTargetName = (/** @type {any} */ node) => {
                 const unwrapped = unwrapExpression(node);
                 if (!unwrapped) {

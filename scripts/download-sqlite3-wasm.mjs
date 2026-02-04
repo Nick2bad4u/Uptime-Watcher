@@ -333,6 +333,11 @@ function download(urlToFetch, destPath, redirectCount = 0) {
     req.on("error", (err) => failAndExit(`Network error: ${err}`));
 }
 
+/**
+ * Orchestrate update checks and download the node-sqlite3-wasm binary.
+ *
+ * @returns {Promise<void>} Resolves after completing the workflow.
+ */
 async function main() {
     // Handle check-update-only flag (just check, don't download)
     if (checkUpdateOnly) {
@@ -461,6 +466,11 @@ async function main() {
     startDownload();
 }
 
+/**
+ * Validate configuration and kick off the download workflow.
+ *
+ * @returns {void}
+ */
 function startDownload() {
     verifyNonPlaceholderHash();
     console.log(

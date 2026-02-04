@@ -24,7 +24,10 @@ export const electronSyncNoLocalAsciiDigitsRule = {
     create(context) {
         const filename = normalizePath(context.getFilename());
 
-        if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/services/sync/`)) {
+        if (
+            filename === "<input>" ||
+            !filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/services/sync/`)
+        ) {
             return {};
         }
 

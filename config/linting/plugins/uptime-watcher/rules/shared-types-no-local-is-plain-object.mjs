@@ -24,7 +24,10 @@ export const sharedTypesNoLocalIsPlainObjectRule = {
     create(context) {
         const filename = normalizePath(context.getFilename());
 
-        if (!filename.startsWith(`${NORMALIZED_SHARED_DIR}/types/`)) {
+        if (
+            filename === "<input>" ||
+            !filename.startsWith(`${NORMALIZED_SHARED_DIR}/types/`)
+        ) {
             return {};
         }
 

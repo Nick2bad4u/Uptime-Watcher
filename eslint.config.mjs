@@ -145,7 +145,7 @@ import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
 import reactPerfPlugin from "eslint-plugin-react-perf";
 // eslint-disable-next-line import-x/default -- Working fine just old
 import preferFunctionComponent from "eslint-plugin-react-prefer-function-component";
-import reactRefresh from "eslint-plugin-react-refresh";
+import reactRefreshPlugin from "eslint-plugin-react-refresh";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginReactTest from "eslint-plugin-react-require-testid";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -725,7 +725,6 @@ export default defineConfig([
             "no-use-extend-native": eslintPluginNoUseExtendNative,
             perfectionist: pluginPerfectionist,
             promise: pluginPromise,
-            "react-hooks": reactHooks,
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
@@ -753,7 +752,6 @@ export default defineConfig([
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...eslintPluginUnicorn.configs.all.rules,
-            ...reactHooks.configs["recommended-latest"].rules,
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
@@ -774,9 +772,49 @@ export default defineConfig([
             ...pluginTotalFunctions.configs.recommended.rules,
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
+
+            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
+            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
+            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
+            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
+            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
+            "@microsoft/sdl/no-cookies": "warn",
+            "@microsoft/sdl/no-document-domain": "warn",
+            "@microsoft/sdl/no-document-write": "warn",
+            "@microsoft/sdl/no-electron-node-integration": "warn",
+            "@microsoft/sdl/no-html-method": "warn",
+            "@microsoft/sdl/no-inner-html": "warn",
+            "@microsoft/sdl/no-insecure-random": "off",
+            "@microsoft/sdl/no-insecure-url": "warn",
+            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
+            "@microsoft/sdl/no-postmessage-star-origin": "warn",
+            "@microsoft/sdl/no-unsafe-alloc": "warn",
+            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/no-explicit-any": "warn",
             "@typescript-eslint/no-unsafe-assignment": "warn",
             "@typescript-eslint/no-unsafe-member-access": "warn",
+            "comment-length/limit-multi-line-comments": [
+                "warn",
+                {
+                    ignoreCommentsWithCode: true,
+                    ignoreUrls: true,
+                    logicalWrap: true,
+                    maxLength: 120,
+                    mode: "compact-on-overflow",
+                    tabSize: 2,
+                },
+            ],
+            "comment-length/limit-single-line-comments": [
+                "warn",
+                {
+                    ignoreCommentsWithCode: true,
+                    ignoreUrls: true,
+                    logicalWrap: true,
+                    maxLength: 120,
+                    mode: "compact-on-overflow",
+                    tabSize: 2,
+                },
+            ],
             "eslint-plugin/consistent-output": "error",
             "eslint-plugin/meta-property-ordering": "warn",
             "eslint-plugin/no-matching-violation-suggest-message-ids": "error",
@@ -791,6 +829,55 @@ export default defineConfig([
             "eslint-plugin/test-case-property-ordering": "warn",
             "eslint-plugin/test-case-shorthand-strings": "error",
             "eslint-plugin/unique-test-case-names": "error",
+            "import-x/consistent-type-specifier-style": "off",
+            "import-x/default": "warn",
+            // This rule is primarily designed for Webpack chunk naming.
+            // Uptime-Watcher uses Vite/Electron bundling, so the rule is
+            // misleading noise.
+            "import-x/dynamic-import-chunkname": "off",
+            "import-x/export": "warn",
+            "import-x/exports-last": "off",
+            "import-x/extensions": "warn",
+            "import-x/first": "warn",
+            "import-x/group-exports": "off",
+            "import-x/max-dependencies": "off",
+            // Import/Export Rules (import-x/*)
+            "import-x/named": "warn",
+            "import-x/namespace": "warn",
+            "import-x/newline-after-import": "warn",
+            "import-x/no-absolute-path": "warn",
+            "import-x/no-amd": "warn",
+            "import-x/no-anonymous-default-export": "warn",
+            "import-x/no-commonjs": "warn",
+            "import-x/no-cycle": "warn",
+            "import-x/no-default-export": "off",
+            "import-x/no-deprecated": "warn",
+            "import-x/no-duplicates": "warn",
+            "import-x/no-dynamic-require": "warn",
+            "import-x/no-empty-named-blocks": "warn",
+            "import-x/no-extraneous-dependencies": "warn",
+            "import-x/no-import-module-exports": "warn",
+            "import-x/no-internal-modules": "off",
+            "import-x/no-mutable-exports": "warn",
+            "import-x/no-named-as-default": "off",
+            "import-x/no-named-as-default-member": "off",
+            "import-x/no-named-default": "warn",
+            "import-x/no-named-export": "off",
+            "import-x/no-namespace": "off",
+            "import-x/no-nodejs-modules": "off", // Allow Node.js modules for Electron backend
+            "import-x/no-relative-packages": "warn",
+            "import-x/no-relative-parent-imports": "off",
+            "import-x/no-rename-default": "warn",
+            "import-x/no-restricted-paths": "warn",
+            "import-x/no-self-import": "warn",
+            "import-x/no-unresolved": "off",
+            "import-x/no-unused-modules": "warn",
+            "import-x/no-useless-path-segments": "warn",
+            "import-x/no-webpack-loader-syntax": "warn",
+            "import-x/order": "off", // Conflicts with other rules
+            "import-x/prefer-default-export": "off",
+            "import-x/prefer-namespace-import": "off",
+            "import-x/unambiguous": "warn",
             "jsdoc/require-description": "warn",
             "jsdoc/require-jsdoc": [
                 "warn",
@@ -805,6 +892,140 @@ export default defineConfig([
             ],
             "jsdoc/require-param-description": "warn",
             "jsdoc/require-returns-description": "warn",
+            // Math
+            "math/abs": "warn",
+            "math/prefer-exponentiation-operator": "warn",
+            "math/prefer-math-sum-precise": "warn",
+            // Node
+            "n/callback-return": "warn",
+            "n/exports-style": "warn",
+            "n/file-extension-in-import": "off", // Allow missing file extensions for imports
+            "n/global-require": "warn",
+            "n/handle-callback-err": "warn",
+            "n/no-callback-literal": "warn",
+            "n/no-missing-file-extension": "off", // Allow missing file extensions for imports
+            "n/no-missing-import": "off", // Allow missing imports for dynamic imports
+            "n/no-mixed-requires": "warn",
+            "n/no-new-require": "warn",
+            "n/no-path-concat": "warn",
+            "n/no-process-env": [
+                "error",
+                {
+                    allowedVariables: [
+                        "NODE_ENV",
+                        "HEADLESS",
+                        "CI",
+                        "TEST_MODE",
+                    ],
+                },
+            ],
+            "n/no-restricted-import": "warn",
+            "n/no-restricted-require": "warn",
+            "n/no-sync": [
+                "warn",
+                {
+                    ignores: [
+                        "enableSync",
+                        "requestFullSync",
+                        "stateSync",
+                        "setupCacheSync",
+                        "useBackendFocusSync",
+                    ],
+                },
+            ],
+            "n/no-top-level-await": "warn",
+            "n/no-unpublished-import": [
+                "warn",
+                {
+                    allowModules: [
+                        "electron",
+                        "node",
+                        "electron-debug",
+                        "electron-devtools-installer",
+                        "eslint-plugin-storybook",
+                        "index.css",
+                        "styles.css",
+                        "main.css",
+                        "header.css",
+                        "footer.css",
+                    ],
+                },
+            ],
+            "n/no-unsupported-features/es-builtins": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/es-syntax": [
+                "warn",
+                {
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/no-unsupported-features/node-builtins": [
+                "warn",
+                {
+                    allowExperimental: true,
+                    ignores: [],
+                    version: ">=24.0.0",
+                },
+            ],
+            "n/prefer-global/buffer": "warn",
+            "n/prefer-global/console": "warn",
+            "n/prefer-global/process": "warn",
+            "n/prefer-global/text-decoder": "warn",
+            "n/prefer-global/text-encoder": "warn",
+            "n/prefer-global/url": "warn",
+            "n/prefer-global/url-search-params": "warn",
+            "n/prefer-node-protocol": "warn",
+            "n/prefer-promises/dns": "warn",
+            "n/prefer-promises/fs": "warn",
+            "security/detect-non-literal-fs-filename": "off",
+            "security/detect-object-injection": "off",
+            "sort-class-members/sort-class-members": [
+                "warn",
+                {
+                    accessorPairPositioning: "together",
+                    order: [
+                        "[static-properties]",
+                        "[properties]",
+                        "[conventional-private-properties]",
+                        "[arrow-function-properties]",
+                        "[everything-else]",
+                        "[accessor-pairs]",
+                        "[getters]",
+                        "[setters]",
+                        "[static-methods]",
+                        "[async-methods]",
+                        "[methods]",
+                        "[conventional-private-methods]",
+                    ],
+                    sortInterfaces: true,
+                    stopAfterFirstProblem: false,
+                },
+            ],
+            "total-functions/no-hidden-type-assertions": "off",
+            "total-functions/no-nested-fp-ts-effects": "off",
+            "total-functions/no-partial-division": "off",
+            "total-functions/no-partial-url-constructor": "off",
+            "total-functions/no-unsafe-mutable-readonly-assignment": "off",
+            "total-functions/no-unsafe-readonly-mutable-assignment": "off",
+            "total-functions/no-unsafe-type-assertion": "off",
+            "total-functions/require-strict-mode": "off",
+            "xss/no-mixed-html": [
+                "off",
+                {
+                    encoders: [
+                        "utils.htmlEncode()",
+                        "CSS.escape()",
+                        "Number()",
+                    ],
+                    unsafe: [".html()"],
+                },
+            ],
         },
     },
     {
@@ -1779,6 +2000,7 @@ export default defineConfig([
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
+
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
@@ -3178,7 +3400,7 @@ export default defineConfig([
             "react-hooks-addons": reactHooksAddons,
             "react-perf": reactPerfPlugin,
             "react-prefer-function-component": preferFunctionComponent,
-            "react-refresh": reactRefresh,
+            "react-refresh": reactRefreshPlugin,
             "react-require-testid": pluginReactTest,
             "react-useeffect": reactUseEffect,
             redos: pluginRedos,
@@ -3221,7 +3443,7 @@ export default defineConfig([
             // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
-            ...reactRefresh.configs.vite.rules,
+            ...reactRefreshPlugin.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
@@ -6343,7 +6565,7 @@ export default defineConfig([
             "react-hooks-addons": reactHooksAddons,
             "react-perf": reactPerfPlugin,
             "react-prefer-function-component": preferFunctionComponent,
-            "react-refresh": reactRefresh,
+            "react-refresh": reactRefreshPlugin,
             "react-require-testid": pluginReactTest,
             "react-useeffect": reactUseEffect,
             redos: pluginRedos,
@@ -6385,7 +6607,7 @@ export default defineConfig([
             // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
-            ...reactRefresh.configs.vite.rules,
+            ...reactRefreshPlugin.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
@@ -9738,8 +9960,7 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
-            "scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}",
-            "scripts/download-docs-template.mjs",
+            "scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}"
         ],
         ignores: [
             "scripts/coverage/**/*",
@@ -9996,7 +10217,7 @@ export default defineConfig([
             "jsdoc/check-access": "warn", // Recommended
             "jsdoc/check-alignment": "warn", // Recommended
             "jsdoc/check-indentation": "off",
-            "jsdoc/check-line-alignment": "warn",
+            "jsdoc/check-line-alignment": "off",
             "jsdoc/check-param-names": "warn", // Recommended
             "jsdoc/check-property-names": "warn", // Recommended
             "jsdoc/check-syntax": "warn",
@@ -10070,7 +10291,13 @@ export default defineConfig([
             "jsdoc/ts-no-empty-object-type": "warn",
             "jsdoc/ts-no-unnecessary-template-expression": "warn",
             "jsdoc/ts-prefer-function-type": "warn",
-            "jsdoc/type-formatting": "warn",
+            "jsdoc/type-formatting": [
+                "off",
+                {
+                    enableFixer: false,
+                    objectFieldIndent: "  ",
+                },
+            ],
             "jsdoc/valid-types": "off", // Tooling scripts frequently use TS-style imports/types
             // "jsdoc/check-examples": "warn", // Deprecated and not for ESLint >= 8
             // "jsdoc/rejct-any-type": "warn", // broken

@@ -23,7 +23,10 @@ export const electronNoLocalStringSafetyHelpersRule = {
     create(context) {
         const filename = normalizePath(context.getFilename());
 
-        if (!filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/services/`)) {
+        if (
+            filename === "<input>" ||
+            !filename.startsWith(`${NORMALIZED_ELECTRON_DIR}/services/`)
+        ) {
             return {};
         }
 

@@ -131,9 +131,9 @@ export async function getMonitorTypeConfig(
  * Get form options for monitor type selector.
  *
  * @remarks
- * Returns an array of objects with the shape: `{ label: string, value:
- * MonitorType }` where label is the human-readable display name and value is
- * the monitor type identifier.
+ * Returns option objects with the shape `{ label: string, value: MonitorType }`.
+ * Label is the human-readable display name and value is the monitor type
+ * identifier.
  *
  * This format is suitable for use with form select components and dropdown
  * menus. The options are derived from all available monitor types from the

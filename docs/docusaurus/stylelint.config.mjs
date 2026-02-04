@@ -56,34 +56,37 @@ export default {
         // Color rules
         "color-function-notation": "modern",
 
+        "color-hex-length": "long",
+
         "color-named": "never",
+        "comment-empty-line-before": null,
         // CSS nesting and tools
         "csstools/use-nesting": "always",
-        "declaration-no-important": null,
 
         // "a11y/media-prefers-reduced-motion": true, -- no Stylelint 16 Support
         // "a11y/no-outline-none": true,
         // "a11y/selector-pseudo-class-focus": true,
 
+        "declaration-no-important": null,
+
         // Declaration rules
         "declaration-property-value-no-unknown": true,
 
-        "defensive-css/no-mixed-vendor-prefixes": true,
-
         // "csstools/value-no-unknown-custom-properties": true, // Disabled: Tailwind's dynamic class generation and custom properties are not compatible with this rule. See https://github.com/tailwindlabs/tailwindcss/issues/9602 for details.
 
+        "defensive-css/no-mixed-vendor-prefixes": true,
         "defensive-css/require-background-repeat": null,
+
         "defensive-css/require-flex-wrap": null,
 
         "defensive-css/require-overscroll-behavior": true,
-
         "defensive-css/require-scrollbar-gutter": true,
+
         // Font rules
         "font-weight-notation": "numeric",
 
         // Function rules (security and best practices)
         "function-linear-gradient-no-nonstandard-direction": true,
-
         "function-url-no-scheme-relative": true,
         // Color gamut validation
         "gamut/color-no-out-gamut-range": true,

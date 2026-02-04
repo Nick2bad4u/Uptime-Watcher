@@ -336,7 +336,7 @@ async function checkTypedEventUsage(electronFiles, knownEventNames) {
  * Direct `shell.openExternal()` calls are easy to sprinkle around the codebase
  * and can accidentally bypass URL validation/allowlisting.
  *
- * @param electronFiles
+ * @param {string[]} electronFiles
  */
 async function checkElectronShellUsage(electronFiles) {
     const allowedFiles = new Set([
@@ -382,7 +382,7 @@ async function checkElectronShellUsage(electronFiles) {
  * @remarks
  * `webContents.setWindowOpenHandler(...)` is a security-sensitive choke point.
  *
- * @param electronFiles
+ * @param {string[]} electronFiles
  */
 async function checkWindowOpenHandlerUsage(electronFiles) {
     const allowedFiles = new Set([
@@ -467,8 +467,9 @@ async function checkInvokeChannelCoverage() {
     for (const match of invokeMapSlice.matchAll(
         /^\s*"(?<channel>[^"]+)"\s*:\s*{/gm
     )) {
-        if (match.groups?.channel) {
-            declaredChannels.add(match.groups.channel);
+        const channel = match.groups?.["channel"];
+        if (channel) {
+            declaredChannels.add(channel);
         }
     }
 
@@ -487,7 +488,7 @@ async function checkInvokeChannelCoverage() {
     const definitionHeader =
         /const\s+(?<prefix>[\dA-Z_]+)_CHANNELS_DEFINITION\b[^=]*=\s*{/g;
     for (const headerMatch of preloadContent.matchAll(definitionHeader)) {
-        const prefix = headerMatch.groups?.prefix;
+        const prefix = headerMatch.groups?.["prefix"];
         if (!prefix) {
             continue;
         }
@@ -516,8 +517,8 @@ async function checkInvokeChannelCoverage() {
         for (const entryMatch of objectBody.matchAll(
             /^\s*(?<key>\w+)\s*:\s*"(?<channel>[^"]+)"\s*,?\s*$/gm
         )) {
-            const key = entryMatch.groups?.key;
-            const channel = entryMatch.groups?.channel;
+            const key = entryMatch.groups?.["key"];
+            const channel = entryMatch.groups?.["channel"];
             if (!key || !channel) {
                 continue;
             }
@@ -554,7 +555,7 @@ async function checkInvokeChannelCoverage() {
             );
 
             for (const usageMatch of content.matchAll(usagePattern)) {
-                const prop = usageMatch.groups?.prop;
+                const prop = usageMatch.groups?.["prop"];
                 if (!prop) {
                     continue;
                 }
@@ -611,6 +612,11 @@ async function checkInvokeChannelCoverage() {
     return errors;
 }
 
+/**
+ * Run all architecture guard checks and exit with a non-zero code on failure.
+ *
+ * @returns {Promise<void>} Resolves after reporting any violations.
+ */
 async function main() {
     const electronRoot = path.resolve(ROOT_DIRECTORY, "electron");
     const srcRoot = path.resolve(ROOT_DIRECTORY, "src");

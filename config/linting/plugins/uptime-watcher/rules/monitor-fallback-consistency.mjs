@@ -230,7 +230,7 @@ export const monitorFallbackConsistencyRule = {
      */
     create(context) {
         const filename = normalizePath(context.getFilename());
-        if (!filename.endsWith("/src/constants.ts")) {
+        if (filename === "<input>" || !filename.endsWith("/src/constants.ts")) {
             return {};
         }
 

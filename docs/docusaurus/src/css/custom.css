@@ -4144,18 +4144,25 @@ html {
 .navbar-sidebar {
     position: fixed !important;
     z-index: calc(var(--ifm-z-index-fixed) + 10) !important;
+
     /* Fix overflow that might clip interactive elements */
     overflow-x: visible !important;
     overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    scrollbar-gutter: stable !important;
+
     /* Ensure pointer events work */
     pointer-events: auto !important;
+
     /* Proper positioning and dimensions */
     top: 0 !important;
     bottom: 0 !important;
     width: var(--ifm-navbar-sidebar-width) !important;
+
     /* Use top/bottom instead of explicit height for better control */
     height: 100vh !important;
     max-height: 100vh !important;
+
     /* Ensure content fits properly */
     display: flex !important;
     flex-direction: column !important;
@@ -4231,6 +4238,8 @@ html {
     .navbar-sidebar__items {
         flex: 1 !important;
         overflow-y: auto !important;
+        overscroll-behavior: contain !important;
+        scrollbar-gutter: stable !important;
         max-height: calc(100vh - var(--ifm-navbar-height)) !important;
     }
 
@@ -4382,9 +4391,9 @@ html {
     }
 }
 
-/* ================================================== */
-/* 🏠 HOMEPAGE-SPECIFIC MOBILE FIXES                  */
-/* ================================================== */
+/* ==================================================
+ * 🏠 HOMEPAGE-SPECIFIC MOBILE FIXES
+ * ================================================== */
 
 /**
  * Hide the navbar sidebar "Back to main menu" panel on non-documentation pages.

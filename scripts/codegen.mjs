@@ -37,6 +37,11 @@ const options = {
     help: args.includes("--help") || args.includes("-h"),
 };
 
+/**
+ * Print usage information and exit immediately.
+ *
+ * @returns {void}
+ */
 function showHelp() {
     console.log(`
 🎭 Playwright Codegen Helper for Uptime-Watcher
@@ -71,6 +76,11 @@ See docs/PLAYWRIGHT_CODEGEN_GUIDE.md for details.
     process.exit(0);
 }
 
+/**
+ * Start the Vite dev server and resolve once it is reachable.
+ *
+ * @returns {Promise<string>} Base URL for the running dev server.
+ */
 async function startDevServer() {
     console.log("🚀 Starting development server...");
 
@@ -228,6 +238,11 @@ function runCodegen(cmd) {
     return codegen;
 }
 
+/**
+ * Entrypoint for the Playwright codegen helper.
+ *
+ * @returns {Promise<void>} Resolves after codegen completes.
+ */
 async function main() {
     // Load custom transformations
     try {
