@@ -66,13 +66,11 @@ import {
  * Absolute directory path for this module.
  *
  * @remarks
- * This module is authored as ESM. `import.meta.dirname` is non-standard and may
- * be `undefined` depending on bundler output / runtime.
- *
- * We derive the directory from `import.meta.url`, which is standard and
- * supported consistently in both Node.js ESM and Vite-bundled output.
+ * This module is authored as ESM, so we derive the directory from
+ * `import.meta.url`, which is standard and supported consistently in both
+ * Node.js ESM and Vite-bundled output.
  */
-const currentDirectory = import.meta.dirname;
+const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(currentDirectory);
 
