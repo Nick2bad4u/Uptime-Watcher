@@ -8,11 +8,23 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[1b706eb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1b706ebb8bcb445d81c69b0971b90068f4d6f5a3)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...1b706ebb8bcb445d81c69b0971b90068f4d6f5a3))
+[ba2d861](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba2d86143623d14dfde86de09cb1ebb4d24349f5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...ba2d86143623d14dfde86de09cb1ebb4d24349f5))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds PWA support and UI refactors
+
+✨ [feat] Adds an installable docs experience with offline support and manifest assets
+🚜 [refactor] Refactors shell logic into reusable hooks/components to reduce complexity and keep loading, sidebar, and update UI behavior consistent
+ - 🚜 [refactor] Extracts delayed loading and compact sidebar dismissal into shared hooks
+🚜 [refactor] Centralizes add-site defaults, normalization, and validation to prevent drift between UI state and submission
+🛠️ [fix] Improves URL and IPC validation plus status update subscription handling to harden trust boundaries and avoid stale callbacks
+🚜 [refactor] Consolidates shared utilities for byte-size formatting, volume normalization, sqlite restore checks, and cloud notifications
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(538f58a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/538f58a4de1747c57f9ac14c5c75f8dbeb5e19ff)
+
 
 - ✨ [feat] Adds lint drift guards and mock helpers
 
@@ -1325,6 +1337,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.7.0 [skip ci] [`(0592f72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)
+
 
 - Update changelogs for v21.6.0 [skip ci] [`(5b9bd1f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b9bd1fecda795b5401af5f0fb14a3b27faa828e)
 
