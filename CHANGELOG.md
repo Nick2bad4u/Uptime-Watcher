@@ -4,12 +4,78 @@
 
 All notable changes to this project will be documented in this file.
 
+## [21.8.0] - 2026-02-05
+
+
+[[0592f72](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)...
+[413fa1b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/413fa1bfd4e2775a7c8ed5b89a1a63a221bc7416)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/0592f72e410c1505e11cad7346ba4dc2b97eef64...413fa1bfd4e2775a7c8ed5b89a1a63a221bc7416))
+
+
+### 🧹 Chores
+
+- *(release)* V21.8.0 [skip ci] [`(413fa1b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/413fa1bfd4e2775a7c8ed5b89a1a63a221bc7416)
+
+
+- Update changelogs for v21.7.0 [skip ci] [`(0592f72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade @eslint-react/eslint-plugin from ^2.9.4 to ^2.10.0 for improved linting capabilities.
+ - 🔄 Upgrade @storybook/addon-a11y from ^10.2.6 to ^10.2.7 for better accessibility features.
+ - 🔄 Upgrade multiple Storybook addons from ^10.2.6 to ^10.2.7 to ensure compatibility and access to the latest features:
+   - @storybook/addon-docs
+   - @storybook/addon-links
+   - @storybook/addon-themes
+   - @storybook/addon-vitest
+   - @storybook/builder-vite
+   - @storybook/react
+   - @storybook/react-vite
+ - 🔄 Upgrade @types/node from ^25.2.0 to ^25.2.1 for type definitions.
+ - 🔄 Upgrade @types/react from ^19.2.11 to ^19.2.13 for updated type definitions.
+ - 🔄 Upgrade cpy-cli from ^6.0.0 to ^7.0.0 for enhanced file copying functionality.
+ - 🔄 Upgrade eslint-plugin-jsdoc from ^62.5.1 to ^62.5.2 for improved JSDoc linting.
+ - 🔄 Upgrade eslint-plugin-perfectionist from ^5.4.0 to ^5.5.0 for better code quality checks.
+ - 🔄 Upgrade eslint-plugin-react-dom from ^2.9.4 to ^2.10.0 for React DOM linting improvements.
+ - 🔄 Upgrade eslint-plugin-react-hooks-extra from ^2.9.4 to ^2.10.0 for additional hooks linting rules.
+ - 🔄 Upgrade eslint-plugin-react-naming-convention from ^2.9.4 to ^2.10.0 for naming convention checks.
+ - 🔄 Upgrade eslint-plugin-react-web-api from ^2.9.4 to ^2.10.0 for web API linting enhancements.
+ - 🔄 Upgrade eslint-plugin-storybook from ^10.2.6 to ^10.2.7 for Storybook linting improvements.
+ - 🔄 Upgrade putout from ^41.18.0 to ^41.18.1 for better code transformation capabilities.
+ - 🔄 Upgrade storybook from ^10.2.6 to ^10.2.7 for the latest features and fixes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3a30716)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a30716a181f76cec7520b91195db11d2fad695f)
+
+
+
+
+
+
 ## [21.7.0] - 2026-02-05
 
 
 [[5b9bd1f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b9bd1fecda795b5401af5f0fb14a3b27faa828e)...
 [79f6199](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79f61992525bfa9e18178ea6b7851859c6757cce)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5b9bd1fecda795b5401af5f0fb14a3b27faa828e...79f61992525bfa9e18178ea6b7851859c6757cce))
+
+
+### ✨ Features
+
+- ✨ [feat] Adds PWA support and UI refactors
+
+✨ [feat] Adds an installable docs experience with offline support and manifest assets
+🚜 [refactor] Refactors shell logic into reusable hooks/components to reduce complexity and keep loading, sidebar, and update UI behavior consistent
+ - 🚜 [refactor] Extracts delayed loading and compact sidebar dismissal into shared hooks
+🚜 [refactor] Centralizes add-site defaults, normalization, and validation to prevent drift between UI state and submission
+🛠️ [fix] Improves URL and IPC validation plus status update subscription handling to harden trust boundaries and avoid stale callbacks
+🚜 [refactor] Consolidates shared utilities for byte-size formatting, volume normalization, sqlite restore checks, and cloud notifications
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(538f58a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/538f58a4de1747c57f9ac14c5c75f8dbeb5e19ff)
+
 
 
 ### 🧹 Chores
@@ -22,6 +88,14 @@ All notable changes to this project will be documented in this file.
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update BeastMode agent prompt for enhanced code review
+
+ - Refine the prompt for the DeDupe Loop to emphasize checking for duplicate code paths and legacy code paths.
+ - Maintain focus on comprehensive codebase review, architectural optimization, and adherence to modern best practices.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(307c0f5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/307c0f5d443a6930d686c55cc26201ea9280a936)
+
 
 - 🔧 [build] Update GitHub workflows and configurations
  - 🛠️ [fix] Add GITLEAKS_CONFIG environment variable to gitleaks.yml for custom configuration

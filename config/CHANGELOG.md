@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[5edf1c9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5edf1c9fb263af60ef56d5bed8bbf4a95f82739a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...5edf1c9fb263af60ef56d5bed8bbf4a95f82739a))
+[ba2d861](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba2d86143623d14dfde86de09cb1ebb4d24349f5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...ba2d86143623d14dfde86de09cb1ebb4d24349f5))
 
 
 ### ✨ Features
@@ -752,6 +752,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.7.0 [skip ci] [`(0592f72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)
+
 
 - Update changelogs for v21.6.0 [skip ci] [`(5b9bd1f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b9bd1fecda795b5401af5f0fb14a3b27faa828e)
 

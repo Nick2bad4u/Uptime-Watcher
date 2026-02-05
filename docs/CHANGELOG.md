@@ -8,11 +8,23 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[5edf1c9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5edf1c9fb263af60ef56d5bed8bbf4a95f82739a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...5edf1c9fb263af60ef56d5bed8bbf4a95f82739a))
+[3a30716](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a30716a181f76cec7520b91195db11d2fad695f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...3a30716a181f76cec7520b91195db11d2fad695f))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds PWA support and UI refactors
+
+✨ [feat] Adds an installable docs experience with offline support and manifest assets
+🚜 [refactor] Refactors shell logic into reusable hooks/components to reduce complexity and keep loading, sidebar, and update UI behavior consistent
+ - 🚜 [refactor] Extracts delayed loading and compact sidebar dismissal into shared hooks
+🚜 [refactor] Centralizes add-site defaults, normalization, and validation to prevent drift between UI state and submission
+🛠️ [fix] Improves URL and IPC validation plus status update subscription handling to harden trust boundaries and avoid stale callbacks
+🚜 [refactor] Consolidates shared utilities for byte-size formatting, volume normalization, sqlite restore checks, and cloud notifications
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(538f58a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/538f58a4de1747c57f9ac14c5c75f8dbeb5e19ff)
+
 
 - ✨ [feat] Adds Electron lint guardrails
 
@@ -906,6 +918,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v21.7.0 [skip ci] [`(0592f72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)
+
+
 - Update changelogs for v21.6.0 [skip ci] [`(5b9bd1f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b9bd1fecda795b5401af5f0fb14a3b27faa828e)
 
 
@@ -952,6 +967,34 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade @eslint-react/eslint-plugin from ^2.9.4 to ^2.10.0 for improved linting capabilities.
+ - 🔄 Upgrade @storybook/addon-a11y from ^10.2.6 to ^10.2.7 for better accessibility features.
+ - 🔄 Upgrade multiple Storybook addons from ^10.2.6 to ^10.2.7 to ensure compatibility and access to the latest features:
+   - @storybook/addon-docs
+   - @storybook/addon-links
+   - @storybook/addon-themes
+   - @storybook/addon-vitest
+   - @storybook/builder-vite
+   - @storybook/react
+   - @storybook/react-vite
+ - 🔄 Upgrade @types/node from ^25.2.0 to ^25.2.1 for type definitions.
+ - 🔄 Upgrade @types/react from ^19.2.11 to ^19.2.13 for updated type definitions.
+ - 🔄 Upgrade cpy-cli from ^6.0.0 to ^7.0.0 for enhanced file copying functionality.
+ - 🔄 Upgrade eslint-plugin-jsdoc from ^62.5.1 to ^62.5.2 for improved JSDoc linting.
+ - 🔄 Upgrade eslint-plugin-perfectionist from ^5.4.0 to ^5.5.0 for better code quality checks.
+ - 🔄 Upgrade eslint-plugin-react-dom from ^2.9.4 to ^2.10.0 for React DOM linting improvements.
+ - 🔄 Upgrade eslint-plugin-react-hooks-extra from ^2.9.4 to ^2.10.0 for additional hooks linting rules.
+ - 🔄 Upgrade eslint-plugin-react-naming-convention from ^2.9.4 to ^2.10.0 for naming convention checks.
+ - 🔄 Upgrade eslint-plugin-react-web-api from ^2.9.4 to ^2.10.0 for web API linting enhancements.
+ - 🔄 Upgrade eslint-plugin-storybook from ^10.2.6 to ^10.2.7 for Storybook linting improvements.
+ - 🔄 Upgrade putout from ^41.18.0 to ^41.18.1 for better code transformation capabilities.
+ - 🔄 Upgrade storybook from ^10.2.6 to ^10.2.7 for the latest features and fixes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3a30716)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a30716a181f76cec7520b91195db11d2fad695f)
+
 
 - 🔧 [build] Update GitHub workflows and configurations
  - 🛠️ [fix] Add GITLEAKS_CONFIG environment variable to gitleaks.yml for custom configuration
