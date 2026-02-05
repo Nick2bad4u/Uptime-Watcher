@@ -41,13 +41,14 @@ describe(formatByteSize, () => {
         expect(formatByteSize(1024 ** 4)).toBe("1.0 TB");
     });
 
-    test.prop([
-        fc.integer({ min: 0, max: Number.MAX_SAFE_INTEGER }),
-    ])("always returns a compact unit string", (bytes) => {
-        const result = formatByteSize(bytes);
+    test.prop([fc.integer({ min: 0, max: Number.MAX_SAFE_INTEGER })])(
+        "always returns a compact unit string",
+        (bytes) => {
+            const result = formatByteSize(bytes);
 
-        expect(typeof result).toBe("string");
-        expect(result.length).toBeGreaterThan(0);
-        expect(result).toMatch(/\s(?:B|KB|MB|GB|TB)$/);
-    });
+            expect(typeof result).toBe("string");
+            expect(result.length).toBeGreaterThan(0);
+            expect(result).toMatch(/\s(?:B|KB|MB|GB|TB)$/);
+        }
+    );
 });

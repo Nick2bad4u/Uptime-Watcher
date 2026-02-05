@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ComponentProps, ReactElement } from "react";
+import type { ComponentProps, Key, ReactElement } from "react";
 
 import { ThemedSelect } from "@app/theme/components/ThemedSelect";
 import { ThemedText } from "@app/theme/components/ThemedText";
@@ -24,8 +24,17 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 type ThemedSelectProps = ComponentProps<typeof ThemedSelect>;
 
+type StoryArgsWithKey<TProps> = TProps & { key?: Key };
+
 const MonitorTypeSelectStory = (args: ThemedSelectProps): ReactElement => {
-    const { value = "http", onChange, id = "monitor-type", ...rest } = args;
+    const {
+        value = "http",
+        onChange,
+        id = "monitor-type",
+        key: ignoredKey,
+        ...rest
+    } = args as StoryArgsWithKey<ThemedSelectProps>;
+    void ignoredKey;
     const [selectedValue, setSelectedValue] = useState(value);
 
     return (
@@ -59,34 +68,46 @@ const MonitorTypeSelectStory = (args: ThemedSelectProps): ReactElement => {
 };
 
 export const MonitorTypes: Story = {
-    render: (args) => <MonitorTypeSelectStory {...args} />,
+    render: (args) => {
+        const { key: ignoredKey, ...safeArgs } =
+            args as StoryArgsWithKey<ThemedSelectProps>;
+        void ignoredKey;
+
+        return <MonitorTypeSelectStory {...safeArgs} />;
+    },
 };
 
 export const Disabled: Story = {
-    render: (args) => (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-                width: "260px",
-            }}
-        >
-            <label htmlFor="disabled-select">
-                <ThemedText variant="secondary">Environment</ThemedText>
-            </label>
-            <ThemedSelect
-                {...args}
-                disabled
-                id="disabled-select"
-                value="production"
+    render: (args) => {
+        const { key: ignoredKey, ...safeArgs } =
+            args as StoryArgsWithKey<ThemedSelectProps>;
+        void ignoredKey;
+
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                    width: "260px",
+                }}
             >
-                <option value="development">Development</option>
-                <option value="staging">Staging</option>
-                <option value="production">Production</option>
-            </ThemedSelect>
-        </div>
-    ),
+                <label htmlFor="disabled-select">
+                    <ThemedText variant="secondary">Environment</ThemedText>
+                </label>
+                <ThemedSelect
+                    {...safeArgs}
+                    disabled
+                    id="disabled-select"
+                    value="production"
+                >
+                    <option value="development">Development</option>
+                    <option value="staging">Staging</option>
+                    <option value="production">Production</option>
+                </ThemedSelect>
+            </div>
+        );
+    },
     args: {
         disabled: true,
         "aria-label": "Environment",

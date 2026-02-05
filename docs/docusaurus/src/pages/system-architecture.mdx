@@ -3,19 +3,14 @@ title: System Architecture Overview
 description: Comprehensive system architecture and component relationships
 ---
 
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
-import Layout from '@theme/Layout';
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
 import Mermaid from '@theme/Mermaid';
 
 export default function SystemArchitecture() {
     return (
-        <Layout
-            title="System Architecture Overview"
-            description="Comprehensive system architecture and component relationships for Uptime Watcher"
-        >
-            <div className="container margin-vert--lg">
-                <div className="row">
-                    <div className="col">
+        <div className="container margin-vert--lg">
+            <div className="row">
+                <div className="col">
 
                         # System Architecture Overview
 
@@ -530,10 +525,9 @@ end
 
                         The diagrams above illustrate the core architecture and component interactions of Uptime Watcher. For deeper insights into each module, see the [API documentation](../api/overview.md) and [code references](../../src) for implementation details and maintainability guidelines.
 
-                    </div>
                 </div>
             </div>
-        </Layout>
+        </div>
     );
 
 }

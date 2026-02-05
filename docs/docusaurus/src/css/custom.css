@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable declaration-no-important, keyframes-name-pattern, scales/font-sizes, time-min-milliseconds, plugin/no-low-performance-animation-properties, plugin/use-logical-properties-and-values, plugin/use-logical-units, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion -- Docusaurus CSS patterns provide explicit reduced-motion fallbacks */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, plugin/use-logical-properties-and-values, plugin/use-logical-units, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion -- Docusaurus CSS patterns provide explicit reduced-motion fallbacks */
 
 /**
  * Global CSS overrides for Docusaurus documentation site.
@@ -190,8 +190,9 @@ body:not([class*="docs-"]):not([class*="blog-"]) #copy-page-button-container {
     }
 }
 
-.theme-doc-sidebar-menu .menu__link {
-    transition: all 0.05s ease;
+.theme-doc-sidebar-menu .menu__link,
+.menu__list {
+    transition: all 0.1s ease;
 }
 
 /* Category header accent classes - order by specificity */
@@ -334,6 +335,30 @@ body:not([class*="docs-"]):not([class*="blog-"]) #copy-page-button-container {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-menu .menu__link:hover,
+    .theme-doc-sidebar-menu .menu__link:focus {
+        background: rgb(0 0 0 / 4%);
+        transition: none;
+    }
+}
+
 .theme-doc-sidebar-menu .menu__link:hover,
 .theme-doc-sidebar-menu .menu__link:focus {
     background: rgb(0 0 0 / 4%);
@@ -439,7 +464,7 @@ body:not([class*="docs-"]):not([class*="blog-"]) #copy-page-button-container {
 }
 
 .menu__list-item-collapsible .menu__caret {
-    transition: transform 0.08s ease;
+    transition: transform 0.1s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -448,13 +473,36 @@ body:not([class*="docs-"]):not([class*="blog-"]) #copy-page-button-container {
     }
 }
 
-.menu__list {
-    transition: all 0.08s ease;
-}
-
 /* Base typography - must come before specific selectors */
 @media (prefers-reduced-motion: reduce),
     screen and (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    h1,
+    h2,
+    h3 {
+        position: relative;
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
     h1,
     h2,
     h3 {
@@ -575,9 +623,31 @@ h3 {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .theme-doc-sidebar-item-link,
+    .theme-doc-sidebar-item-category {
+        transition: none !important;
+    }
+}
+
+.tabs__item,
 .theme-doc-sidebar-item-link,
 .theme-doc-sidebar-item-category {
-    transition: all 0.05s ease !important;
+    transition: all 0.1s ease !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -793,6 +863,51 @@ h3 {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > h1,
+    .markdown > h2,
+    .markdown > h3,
+    .markdown > h4,
+    .markdown > h5,
+    .markdown > h6,
+    .markdown > p,
+    .markdown > div,
+    .markdown > section,
+    .markdown > article {
+        animation: none !important;
+    }
+}
+
 .markdown > h1,
 .markdown > h2,
 .markdown > h3,
@@ -803,7 +918,7 @@ h3 {
 .markdown > div,
 .markdown > section,
 .markdown > article {
-    animation: slideInFast 0.08s ease-out !important;
+    animation: slideInFast 0.1s ease-out !important;
 }
 
 /* -------------------------------------------------- */
@@ -942,6 +1057,48 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"],
+    .navbar__item button[title*="Switch"] {
+        position: relative;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 50% !important;
+        backdrop-filter: blur(10px);
+        background: var(--glass-backdrop) !important;
+        block-size: 40px !important;
+        inline-size: 40px !important;
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
     .navbar__item button[aria-label*="color mode"],
     .navbar__item button[title*="Switch"] {
         position: relative;
@@ -1146,6 +1303,36 @@ h3 {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .navbar__item button[aria-label*="color mode"]:hover,
+    .navbar__item button[title*="Switch"]:hover,
+    .navbar__item button[aria-label*="color mode"]:focus,
+    .navbar__item button[title*="Switch"]:focus {
+        animation: none;
+        transform: scale(1.1);
+    }
+}
+
 .navbar__item button[aria-label*="color mode"]:hover,
 .navbar__item button[title*="Switch"]:hover,
 .navbar__item button[aria-label*="color mode"]:focus,
@@ -1220,7 +1407,7 @@ h3 {
 
 .footer__title {
     color: #ffffff;
-    font-size: 1.1rem;
+    font-size: 1.125rem;
     font-weight: 700;
     margin-block-end: 1rem;
 }
@@ -1326,7 +1513,7 @@ h3 {
 .footer__copyright {
     border-block-start: 1px solid var(--color-neutral-dark);
     color: #888888;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-style: italic;
     margin-block-start: 2rem;
     padding-block-start: 2rem;
@@ -1977,6 +2164,60 @@ h3 {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .button,
+    .button--primary,
+    .button--secondary {
+        position: relative;
+        overflow: hidden;
+        border: none !important;
+        border-radius: var(--border-radius-modern) !important;
+        background: linear-gradient(
+            135deg,
+            var(--ifm-color-primary) 0%,
+            var(--ifm-color-primary-dark) 100%
+        ) !important;
+        box-shadow: 0 4px 15px rgb(var(--ifm-color-primary-rgb), 0.3);
+        transition: none;
+    }
+}
+
 .button,
 .button--primary,
 .button--secondary {
@@ -2243,6 +2484,27 @@ h3 {
             opacity: 0;
         }
     }
+    @media screen and (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+    @media screen and (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
+    @media screen and (prefers-reduced-motion: reduce) {
+        .scroll-fade,
+        .scroll-slide {
+            animation: none;
+            opacity: 0;
+        }
+    }
 
     .scroll-fade,
     .scroll-slide {
@@ -2451,6 +2713,33 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .markdown > div,
+    .theme-doc-markdown > div,
+    article,
+    .animate-slide-up {
+        animation: none;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
     .markdown > div,
     .theme-doc-markdown > div,
     article,
@@ -2806,9 +3095,11 @@ article,
     *,
     *::before,
     *::after {
+        /* stylelint-disable time-min-milliseconds -- Reduced-motion mode intentionally forces near-instant transitions/animations */
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        /* stylelint-enable time-min-milliseconds */
     }
 }
 
@@ -3622,7 +3913,7 @@ html {
             box-shadow: 0 4px 20px rgb(0 0 0 / 15%);
             color: #ffffff;
             content: attr(data-tooltip-enhanced);
-            font-size: 0.85rem;
+            font-size: 0.875rem;
             inset-block-end: 100%;
             inset-inline-start: 50%;
             opacity: 0;
@@ -3642,7 +3933,7 @@ html {
         box-shadow: 0 4px 20px rgb(0 0 0 / 15%);
         color: #ffffff;
         content: attr(data-tooltip-enhanced);
-        font-size: 0.85rem;
+        font-size: 0.875rem;
         inset-block-end: 100%;
         inset-inline-start: 50%;
         opacity: 0;
@@ -3950,6 +4241,39 @@ html {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:hover .dropdown__menu,
+    .dropdown .dropdown__menu,
+    .dropdown--show .dropdown__menu,
+    .dropdown--hoverable:focus .dropdown__menu {
+        transition: none !important;
+    }
+}
+
 .dropdown .dropdown__menu,
 .dropdown--show .dropdown__menu,
 .dropdown--hoverable:hover .dropdown__menu,
@@ -3961,15 +4285,10 @@ html {
         transform 0.1s ease !important;
 }
 
-/* Speed up tab transitions */
 @media (prefers-reduced-motion: reduce) {
     .tabs__item {
         transition: none !important;
     }
-}
-
-.tabs__item {
-    transition: all 0.1s ease !important;
 }
 
 /* Speed up modal and overlay transitions */
@@ -4090,6 +4409,33 @@ html {
     }
 }
 
+@media screen and (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .modal,
+    .backdrop,
+    .DocSearch-Modal,
+    .DocSearch-Container {
+        transition: none !important;
+    }
+}
+
 .modal,
 .backdrop,
 .DocSearch-Modal,
@@ -4145,8 +4491,8 @@ html {
     position: fixed !important;
     z-index: calc(var(--ifm-z-index-fixed) + 10) !important;
 
-    /* Fix overflow that might clip interactive elements */
-    overflow-x: visible !important;
+    /* Avoid horizontal spill that can cause a "blank" looking panel */
+    overflow-x: hidden !important;
     overflow-y: auto !important;
     overscroll-behavior: contain !important;
     scrollbar-gutter: stable !important;
@@ -4168,31 +4514,11 @@ html {
     flex-direction: column !important;
 }
 
-/* Fix transform-based positioning that creates stacking contexts */
-@media (prefers-reduced-motion: reduce) {
-    .navbar-sidebar {
-        /* Override default transform positioning with left positioning */
-        left: calc(-1 * var(--ifm-navbar-sidebar-width)) !important;
-        transform: none !important;
-        transition: none !important;
-    }
-}
-
-.navbar-sidebar {
-    /* Override default transform positioning with left positioning */
-    left: calc(-1 * var(--ifm-navbar-sidebar-width)) !important;
-    transform: none !important;
-    transition:
-        left var(--ifm-transition-fast) ease-in-out,
-        opacity var(--ifm-transition-fast) ease-in-out !important;
-}
-
-.navbar-sidebar--show .navbar-sidebar {
-    left: 0 !important;
-    transform: none !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
+/*
+ * Important: do not override Docusaurus' transform-based open/close mechanics.
+ * Doing so can desync the shell (.navbar-sidebar) from the active panel
+ * (.theme-layout-navbar-sidebar-panel), resulting in an empty/blank sidebar.
+ */
 
 /* Fix navbar backdrop z-index */
 .navbar-sidebar__backdrop {
@@ -4203,10 +4529,10 @@ html {
 
 /* Responsive navbar fixes for narrow screens */
 @media (width <= 996px) {
-    /* Ensure html and body don't clip the navbar */
+    /* Prevent horizontal scroll / clipping artifacts on mobile */
     html,
     body {
-        overflow-x: visible !important;
+        overflow-x: hidden !important;
     }
 
     /* Hide non-essential navbar items on mobile to prevent cramming */
@@ -4231,7 +4557,6 @@ html {
     /* Ensure all sidebar content is interactive */
     .navbar-sidebar--show .navbar-sidebar {
         pointer-events: auto !important;
-        overflow: visible !important;
     }
 
     /* Fix sidebar content sizing to prevent it being too tall */
@@ -4254,8 +4579,6 @@ html {
         position: relative !important;
         z-index: calc(var(--ifm-z-index-fixed) + 12) !important;
         pointer-events: auto !important;
-        overflow: visible !important;
-        display: inline-grid !important;
     }
 
     /* Fix the sidebar menu panel z-index */
@@ -4303,36 +4626,17 @@ html {
         z-index: 1;
     }
 
-    /* Additional fix: ensure no parent containers clip the sidebar */
-    .navbar-sidebar__brand,
-    .navbar-sidebar__items {
+    /* Avoid changing layout primitives (flex/grid) in the sidebar; only fix clipping. */
+    .navbar-sidebar__brand {
         overflow: visible !important;
-        display: inline-grid !important;
     }
 }
 
 /* Additional responsive fixes for very narrow screens */
 @media (width <= 768px) {
-    /* Ensure no overflow clipping anywhere in the document */
-    html,
-    body,
-    [id="__docusaurus"] {
-        overflow-x: visible !important;
-    }
-
-    /* Ensure the navbar sidebar container doesn't get clipped */
-    .navbar-sidebar,
-    .navbar-sidebar--show {
-        overflow: visible !important;
-        contain: none !important;
-    }
-
-    /* Fix any transform contexts that might interfere */
-    .navbar-sidebar,
-    .navbar-sidebar__items,
-    .navbar-sidebar__brand {
-        transform: none !important;
-        will-change: auto !important;
+    /* Use the official variable so Docusaurus layout + animations stay consistent */
+    :root {
+        --ifm-navbar-sidebar-width: min(83vw, 400px);
     }
 
     /* Force hide non-essential navbar items - prevent reappearing when search becomes icon */
@@ -4362,11 +4666,7 @@ html {
         white-space: nowrap;
     }
 
-    /* Critical fix: ensure sidebar width is correct and not clipped */
-    .navbar-sidebar {
-        width: min(83vw, 400px) !important;
-        max-width: 83vw !important;
-    }
+    /* Keep the sidebar width driven by --ifm-navbar-sidebar-width (set above). */
 }
 
 /* Extra small screens - prevent any navbar cramming */
@@ -4400,10 +4700,7 @@ html {
  * This panel is only relevant for docs pages with nested sidebar navigation.
  * On the homepage and other non-doc pages, it creates visual noise.
  */
-body:not([class*="docs-"]):not([class*="blog-"]) .navbar-sidebar__item.menu,
-body:not([class*="docs-"]):not([class*="blog-"]) .navbar-sidebar__back,
-body:not([class*="docs-"]):not([class*="blog-"])
-    .theme-layout-navbar-sidebar-panel {
+body:not([class*="docs-"]):not([class*="blog-"]) .navbar-sidebar__back {
     display: none !important;
     visibility: hidden !important;
 }

@@ -152,7 +152,11 @@ const validateDnsMonitorFormData = (data: Partial<DnsFormData>): string[] => [
         data.recordType,
         "Record type is required for DNS monitors"
     ),
-    ...validateOptionalTrimmedStringField("dns", "expectedValue", data.expectedValue),
+    ...validateOptionalTrimmedStringField(
+        "dns",
+        "expectedValue",
+        data.expectedValue
+    ),
 ];
 
 const validatePortMonitorFormData = (data: Partial<PortFormData>): string[] => [

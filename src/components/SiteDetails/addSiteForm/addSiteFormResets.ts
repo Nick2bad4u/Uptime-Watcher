@@ -1,6 +1,4 @@
-import type {
-    MonitorValidationFieldValues,
-} from "../../../utils/monitorValidationFields";
+import type { MonitorValidationFieldValues } from "../../../utils/monitorValidationFields";
 
 import { DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES } from "./addSiteFormDefaults";
 
@@ -111,7 +109,8 @@ export function resetFieldsForMonitorType(args: {
             value: currentValues.bodyKeyword,
         },
         {
-            defaultValue: DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.expectedStatusCode,
+            defaultValue:
+                DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.expectedStatusCode,
             name: "expectedStatusCode",
             setter: setters.setExpectedStatusCode,
             value: currentValues.expectedStatusCode,
@@ -136,7 +135,8 @@ export function resetFieldsForMonitorType(args: {
             value: currentValues.jsonPath,
         },
         {
-            defaultValue: DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.expectedJsonValue,
+            defaultValue:
+                DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.expectedJsonValue,
             name: "expectedJsonValue",
             setter: setters.setExpectedJsonValue,
             value: currentValues.expectedJsonValue,
@@ -161,13 +161,15 @@ export function resetFieldsForMonitorType(args: {
             value: currentValues.maxReplicationLagSeconds,
         },
         {
-            defaultValue: DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.primaryStatusUrl,
+            defaultValue:
+                DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.primaryStatusUrl,
             name: "primaryStatusUrl",
             setter: setters.setPrimaryStatusUrl,
             value: currentValues.primaryStatusUrl,
         },
         {
-            defaultValue: DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.replicaStatusUrl,
+            defaultValue:
+                DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.replicaStatusUrl,
             name: "replicaStatusUrl",
             setter: setters.setReplicaStatusUrl,
             value: currentValues.replicaStatusUrl,

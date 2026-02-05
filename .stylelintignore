@@ -10,6 +10,9 @@
 # Docusaurus cache and generated files
 .docusaurus
 
+# Docusaurus generated/placeholder docs (non-style files; may be extensionless placeholders)
+docs/docusaurus/docs/documents/ADR-*
+
 # Docusaurus Build Directory
 /build/
 

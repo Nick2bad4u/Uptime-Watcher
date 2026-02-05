@@ -3,19 +3,14 @@ title: IPC Communication Architecture
 description: Inter-Process Communication patterns and data flow in Uptime Watcher
 ---
 
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
-import Layout from '@theme/Layout';
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
 import Mermaid from '@theme/Mermaid';
 
 export default function IpcCommunication() {
     return (
-        <Layout
-            title="IPC Communication Architecture"
-            description="Inter-Process Communication patterns and data flow in Uptime Watcher"
-        >
-            <div className="container margin-vert--lg">
-                <div className="row">
-                    <div className="col">
+        <div className="container margin-vert--lg">
+            <div className="row">
+                <div className="col">
 
 # IPC Communication Architecture
 
@@ -386,10 +381,9 @@ This diagram illustrates the security boundaries and validation in IPC:
 
 The IPC architecture ensures type-safe, secure communication between processes while maintaining high performance and developer ergonomics through strong TypeScript typing and runtime validation.
 
-                    </div>
                 </div>
             </div>
-        </Layout>
+        </div>
     );
 
 }

@@ -3,9 +3,7 @@ import type {
     MonitorValidationFieldValuesInput,
 } from "../../../utils/monitorValidationFields";
 
-import {
-    buildMonitorValidationFieldValues,
-} from "../../../utils/monitorValidationFields";
+import { buildMonitorValidationFieldValues } from "../../../utils/monitorValidationFields";
 
 /**
  * Default UI-facing monitor field inputs for the AddSiteForm hook.

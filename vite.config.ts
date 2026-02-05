@@ -940,6 +940,7 @@ export default defineConfig(({ command, mode }) => {
                 "vitest.electron.config.ts",
                 "vitest.shared.config.ts",
                 "vitest.linting.config.ts",
+                "vitest.storybook.config.ts",
             ],
             // Improve test output
             reporters: [

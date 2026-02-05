@@ -12,8 +12,9 @@ export type AddMode = "existing" | "new";
  *
  * @remarks
  * This helper is intentionally shared between:
- * - the UI state hook (`useAddSiteForm`)
- * - the submission utility (`Submit.tsx`)
+ *
+ * - The UI state hook (`useAddSiteForm`)
+ * - The submission utility (`Submit.tsx`)
  *
  * Keeping the rules and error messages centralized prevents drift.
  */

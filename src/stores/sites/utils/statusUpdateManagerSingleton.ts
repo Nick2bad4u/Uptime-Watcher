@@ -4,9 +4,7 @@ import {
     type StatusUpdateHandlerOptions,
     StatusUpdateManager,
 } from "./statusUpdateHandler";
-import {
-    resolveExpectedListenerCount,
-} from "./statusUpdateSubscriptionSummary";
+import { resolveExpectedListenerCount } from "./statusUpdateSubscriptionSummary";
 
 type StatusUpdateCallback = (update: StatusUpdate) => void;
 
@@ -14,8 +12,9 @@ type StatusUpdateCallback = (update: StatusUpdate) => void;
  * Lazily initialized module-level singleton for renderer status updates.
  *
  * @remarks
- * The sites sync layer intentionally keeps a singleton {@link StatusUpdateManager}
- * to avoid duplicate event subscriptions across components.
+ * The sites sync layer intentionally keeps a singleton
+ * {@link StatusUpdateManager} to avoid duplicate event subscriptions across
+ * components.
  *
  * The callback can change between subscriptions (different components), so the
  * manager must not capture a stale callback reference. Instead, we keep a
@@ -40,13 +39,16 @@ export function getStatusUpdateCallback(): StatusUpdateCallback | undefined {
     return statusUpdateManagerSingleton.callback;
 }
 
-/** Registers (or replaces) the status update callback used by the singleton dispatcher. */
+/** Registers (or replaces) the status update callback used by the singleton
+dispatcher. */
 export function setStatusUpdateCallback(callback: StatusUpdateCallback): void {
     statusUpdateManagerSingleton.callback = callback;
 }
 
 /** Returns the active {@link StatusUpdateManager} instance (if initialized). */
-export function getStatusUpdateManagerInstance(): StatusUpdateManager | undefined {
+export function getStatusUpdateManagerInstance():
+    | StatusUpdateManager
+    | undefined {
     return statusUpdateManagerSingleton.instance;
 }
 

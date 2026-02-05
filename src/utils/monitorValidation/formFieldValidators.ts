@@ -59,8 +59,8 @@ export function validateRequiredNumberField<
  * Validates a required integer field.
  *
  * @remarks
- * For form UX we treat non-integer values the same as missing/invalid input
- * and return the provided `missingMessage` rather than schema-specific errors.
+ * For form UX we treat non-integer values the same as missing/invalid input and
+ * return the provided `missingMessage` rather than schema-specific errors.
  */
 export function validateRequiredIntegerField<
     TType extends MonitorType,

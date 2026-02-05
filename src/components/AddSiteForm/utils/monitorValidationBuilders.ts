@@ -1,12 +1,8 @@
 import type { MonitorType } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
-import type {
-    PartialMonitorFormDataByType,
-} from "../../../utils/monitorValidation";
-import type {
-    MonitorValidationFieldValues,
-} from "../../../utils/monitorValidationFields";
+import type { PartialMonitorFormDataByType } from "../../../utils/monitorValidation";
+import type { MonitorValidationFieldValues } from "../../../utils/monitorValidationFields";
 
 import {
     parseOptionalInteger,
@@ -25,7 +21,10 @@ export type MonitorValidationBuilderMap = {
 };
 
 const monitorValidationBuilders: MonitorValidationBuilderMap = {
-    "cdn-edge-consistency": ({ baselineUrl, edgeLocations }): UnknownRecord => ({
+    "cdn-edge-consistency": ({
+        baselineUrl,
+        edgeLocations,
+    }): UnknownRecord => ({
         baselineUrl: toOptionalString(baselineUrl),
         edgeLocations: toOptionalString(edgeLocations),
     }),
@@ -53,7 +52,11 @@ const monitorValidationBuilders: MonitorValidationBuilderMap = {
     http: ({ url }): UnknownRecord => ({
         url: toOptionalString(url),
     }),
-    "http-header": ({ expectedHeaderValue, headerName, url }): UnknownRecord => ({
+    "http-header": ({
+        expectedHeaderValue,
+        headerName,
+        url,
+    }): UnknownRecord => ({
         expectedHeaderValue: toOptionalString(expectedHeaderValue),
         headerName: toOptionalString(headerName),
         url: toOptionalString(url),
@@ -88,7 +91,9 @@ const monitorValidationBuilders: MonitorValidationBuilderMap = {
         replicaStatusUrl,
         replicationTimestampField,
     }): UnknownRecord => ({
-        maxReplicationLagSeconds: parseOptionalInteger(maxReplicationLagSeconds),
+        maxReplicationLagSeconds: parseOptionalInteger(
+            maxReplicationLagSeconds
+        ),
         primaryStatusUrl: toOptionalString(primaryStatusUrl),
         replicaStatusUrl: toOptionalString(replicaStatusUrl),
         replicationTimestampField: toOptionalString(replicationTimestampField),
@@ -101,7 +106,9 @@ const monitorValidationBuilders: MonitorValidationBuilderMap = {
         url,
     }): UnknownRecord => ({
         heartbeatExpectedStatus: toOptionalString(heartbeatExpectedStatus),
-        heartbeatMaxDriftSeconds: parseOptionalInteger(heartbeatMaxDriftSeconds),
+        heartbeatMaxDriftSeconds: parseOptionalInteger(
+            heartbeatMaxDriftSeconds
+        ),
         heartbeatStatusField: toOptionalString(heartbeatStatusField),
         heartbeatTimestampField: toOptionalString(heartbeatTimestampField),
         url: toOptionalString(url),

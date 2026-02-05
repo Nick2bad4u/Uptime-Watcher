@@ -47,21 +47,31 @@ export function createDynamicFieldChangeHandlers(
     return {
         baselineUrl: toStringSetter(setters.setBaselineUrl),
         bodyKeyword: toStringSetter(setters.setBodyKeyword),
-        certificateWarningDays: toStringSetter(setters.setCertificateWarningDays),
+        certificateWarningDays: toStringSetter(
+            setters.setCertificateWarningDays
+        ),
         edgeLocations: toStringSetter(setters.setEdgeLocations),
         expectedHeaderValue: toStringSetter(setters.setExpectedHeaderValue),
         expectedJsonValue: toStringSetter(setters.setExpectedJsonValue),
         expectedStatusCode: toStringSetter(setters.setExpectedStatusCode),
         expectedValue: toStringSetter(setters.setExpectedValue),
         headerName: toStringSetter(setters.setHeaderName),
-        heartbeatExpectedStatus: toStringSetter(setters.setHeartbeatExpectedStatus),
-        heartbeatMaxDriftSeconds: toStringSetter(setters.setHeartbeatMaxDriftSeconds),
+        heartbeatExpectedStatus: toStringSetter(
+            setters.setHeartbeatExpectedStatus
+        ),
+        heartbeatMaxDriftSeconds: toStringSetter(
+            setters.setHeartbeatMaxDriftSeconds
+        ),
         heartbeatStatusField: toStringSetter(setters.setHeartbeatStatusField),
-        heartbeatTimestampField: toStringSetter(setters.setHeartbeatTimestampField),
+        heartbeatTimestampField: toStringSetter(
+            setters.setHeartbeatTimestampField
+        ),
         host: toStringSetter(setters.setHost),
         jsonPath: toStringSetter(setters.setJsonPath),
         maxPongDelayMs: toStringSetter(setters.setMaxPongDelayMs),
-        maxReplicationLagSeconds: toStringSetter(setters.setMaxReplicationLagSeconds),
+        maxReplicationLagSeconds: toStringSetter(
+            setters.setMaxReplicationLagSeconds
+        ),
         // Canonical backend field is `maxResponseTime` (milliseconds).
         // UI state uses `maxResponseTimeMs` for clarity.
         maxResponseTime: toStringSetter(setters.setMaxResponseTimeMs),
@@ -69,7 +79,9 @@ export function createDynamicFieldChangeHandlers(
         primaryStatusUrl: toStringSetter(setters.setPrimaryStatusUrl),
         recordType: toStringSetter(setters.setRecordType),
         replicaStatusUrl: toStringSetter(setters.setReplicaStatusUrl),
-        replicationTimestampField: toStringSetter(setters.setReplicationTimestampField),
+        replicationTimestampField: toStringSetter(
+            setters.setReplicationTimestampField
+        ),
         url: toStringSetter(setters.setUrl),
     };
 }

@@ -3,19 +3,14 @@ title: Engineering Tooling Pipelines
 description: Diagrams for linting, type-checking, documentation, and site builds
 ---
 
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
-import Layout from '@theme/Layout';
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
 import Mermaid from '@theme/Mermaid';
 
 export default function EngineeringTooling() {
   return (
-    <Layout
-      title="Engineering Tooling Pipelines"
-      description="Detailed diagrams for linting, type-checking, documentation, and site builds"
-    >
-      <div className="container margin-vert--lg">
-        <div className="row">
-          <div className="col">
+        <div className="container margin-vert--lg">
+            <div className="row">
+                <div className="col">
 
 # Engineering Tooling Pipelines
 
@@ -54,7 +49,7 @@ This topology shows how `package.json` scripts fan out into ESLint, Stylelint, P
     subgraph Stylelint["Stylelint runner"]
         StylelintRunner["stylelint --cache --cache-location .cache/stylelintcache"]
         StylelintConfig["stylelint.config.mjs"]
-        StylelintDocsConfig["docs/docusaurus/stylelint.config.mjs"]
+        StylelintConfig["stylelint.config.mjs"]
         StylelintCache[".cache/stylelintcache"]
     end
 
@@ -325,10 +320,9 @@ Beyond linting/type-checking, `npm run quality` is the umbrella command CI uses 
 
 With these diagrams you can quickly trace the exact scripts and configuration files responsible for quality gates, documentation output, and the Docusaurus website lifecycle. Keep them handy when extending tooling or triaging CI issues.
 
-          </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </Layout>
 
 );
 }

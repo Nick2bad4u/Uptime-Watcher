@@ -173,7 +173,6 @@
         "**/dist/**",
         "**/coverage/**"
     ],
-    "stylelint.configFile": "./stylelint.config.mjs",
     "stylelint.customSyntax": "",
     "stylelint.enable": true,
     "stylelint.reportInvalidScopeDisables": true,
