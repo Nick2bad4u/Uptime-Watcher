@@ -35,6 +35,7 @@ import { SelectField } from "./SelectField";
 import { handleSubmit } from "./Submit";
 import { TextField } from "./TextField";
 import "./AddSiteForm.css";
+import { createDynamicFieldChangeHandlers } from "./utils/dynamicFieldChangeHandlers";
 import {
     buildAddSiteFormHelperBullets,
     type HelperBullet,
@@ -297,82 +298,33 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
-            () => ({
-                baselineUrl: (value: number | string): void => {
-                    setBaselineUrl(String(value));
-                },
-                bodyKeyword: (value: number | string): void => {
-                    setBodyKeyword(String(value));
-                },
-                certificateWarningDays: (value: number | string): void => {
-                    setCertificateWarningDays(String(value));
-                },
-                edgeLocations: (value: number | string): void => {
-                    setEdgeLocations(String(value));
-                },
-                expectedHeaderValue: (value: number | string): void => {
-                    setExpectedHeaderValue(String(value));
-                },
-                expectedJsonValue: (value: number | string): void => {
-                    setExpectedJsonValue(String(value));
-                },
-                expectedStatusCode: (value: number | string): void => {
-                    setExpectedStatusCode(String(value));
-                },
-                expectedValue: (value: number | string): void => {
-                    setExpectedValue(String(value));
-                },
-                headerName: (value: number | string): void => {
-                    setHeaderName(String(value));
-                },
-                heartbeatExpectedStatus: (value: number | string): void => {
-                    setHeartbeatExpectedStatus(String(value));
-                },
-                heartbeatMaxDriftSeconds: (value: number | string): void => {
-                    setHeartbeatMaxDriftSeconds(String(value));
-                },
-                heartbeatStatusField: (value: number | string): void => {
-                    setHeartbeatStatusField(String(value));
-                },
-                heartbeatTimestampField: (value: number | string): void => {
-                    setHeartbeatTimestampField(String(value));
-                },
-                host: (value: number | string): void => {
-                    setHost(String(value));
-                },
-                jsonPath: (value: number | string): void => {
-                    setJsonPath(String(value));
-                },
-                maxPongDelayMs: (value: number | string): void => {
-                    setMaxPongDelayMs(String(value));
-                },
-                maxReplicationLagSeconds: (value: number | string): void => {
-                    setMaxReplicationLagSeconds(String(value));
-                },
-                // Canonical backend field is `maxResponseTime` (milliseconds).
-                // UI state uses `maxResponseTimeMs` for clarity.
-                maxResponseTime: (value: number | string): void => {
-                    setMaxResponseTimeMs(String(value));
-                },
-                port: (value: number | string): void => {
-                    setPort(String(value));
-                },
-                primaryStatusUrl: (value: number | string): void => {
-                    setPrimaryStatusUrl(String(value));
-                },
-                recordType: (value: number | string): void => {
-                    setRecordType(String(value));
-                },
-                replicaStatusUrl: (value: number | string): void => {
-                    setReplicaStatusUrl(String(value));
-                },
-                replicationTimestampField: (value: number | string): void => {
-                    setReplicationTimestampField(String(value));
-                },
-                url: (value: number | string): void => {
-                    setUrl(String(value));
-                },
-            }),
+            () =>
+                createDynamicFieldChangeHandlers({
+                    setBaselineUrl,
+                    setBodyKeyword,
+                    setCertificateWarningDays,
+                    setEdgeLocations,
+                    setExpectedHeaderValue,
+                    setExpectedJsonValue,
+                    setExpectedStatusCode,
+                    setExpectedValue,
+                    setHeaderName,
+                    setHeartbeatExpectedStatus,
+                    setHeartbeatMaxDriftSeconds,
+                    setHeartbeatStatusField,
+                    setHeartbeatTimestampField,
+                    setHost,
+                    setJsonPath,
+                    setMaxPongDelayMs,
+                    setMaxReplicationLagSeconds,
+                    setMaxResponseTimeMs,
+                    setPort,
+                    setPrimaryStatusUrl,
+                    setRecordType,
+                    setReplicaStatusUrl,
+                    setReplicationTimestampField,
+                    setUrl,
+                }),
             [
                 setBaselineUrl,
                 setBodyKeyword,

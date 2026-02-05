@@ -33,10 +33,12 @@ import {
     cleanupDebugStoreSubscriptions as cleanupDebugStoreSubscriptionsImpl,
     subscribeToDebugStores as subscribeToDebugStoresImpl,
 } from "./app/debug/debugStoreSubscriptions";
+import { useDelayedLoadingOverlay } from "./app/loading/useDelayedLoadingOverlay";
 import {
     cleanupSidebarMediaQueryListener,
     setupSidebarMediaQueryListener,
 } from "./app/sidebar/sidebarMediaQueryListener";
+import { useCompactSidebarAutoDismiss } from "./app/sidebar/useCompactSidebarAutoDismiss";
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import { synchronizeNotificationPreferences } from "./components/Alerts/alertCoordinator";
 import { StatusAlertToaster } from "./components/Alerts/StatusAlertToaster";
@@ -51,8 +53,7 @@ import { SidebarLayoutProvider } from "./components/Layout/SidebarLayoutProvider
 import { SidebarRevealButton } from "./components/Layout/SidebarRevealButton/SidebarRevealButton";
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
-import { UI_DELAYS } from "./constants";
-import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from "./constants/layout";
+import { UpdateNotificationBanner } from "./components/Updates/UpdateNotificationBanner";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
@@ -66,18 +67,9 @@ import { usePromptDialogVisibility } from "./stores/ui/usePromptDialogStore";
 import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
 import { ThemedBox } from "./theme/components/ThemedBox";
-import { ThemedButton } from "./theme/components/ThemedButton";
 import { ThemedText } from "./theme/components/ThemedText";
 import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
-import { AppIcons } from "./utils/icons";
-import { tryGetMediaQueryList } from "./utils/mediaQueries";
-
-const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
-    ".app-sidebar",
-    ".app-topbar__sidebar-toggle",
-    ".sidebar-reveal-button",
-] as const;
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -207,10 +199,6 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
     const { isDark } = useTheme();
 
-    // Delayed loading state to prevent flash for quick operations
-    const [showLoadingOverlay, setShowLoadingOverlay] =
-        useState<boolean>(false);
-
     // Track if initial app initialization is complete to prevent loading overlay flash
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
@@ -269,55 +257,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         [isCompactViewport, setSidebarCollapsedPreference]
     );
 
-    // Create stable callbacks to avoid direct setState in useEffect
-    const clearLoadingOverlay = useCallback(() => {
-        setShowLoadingOverlay(false);
-    }, []);
-    const showLoadingOverlayCallback = useCallback(() => {
-        setShowLoadingOverlay(true);
-    }, []);
-
-    /**
-     * Only show loading overlay if loading takes more than 100ms and app is
-     * initialized. This prevents flash for quick operations and during initial
-     * app startup.
-     */
-    useEffect(
-        function handleLoadingOverlay(): (() => void) | undefined {
-            // Only proceed if app is initialized
-            if (isInitialized) {
-                if (!isLoading) {
-                    // Defer the state update to comply with the project
-                    // lint rule that forbids setState calls directly within an
-                    // effect.
-                    const clearTimeoutId = setTimeout(
-                        clearLoadingOverlay,
-                        UI_DELAYS.STATE_UPDATE_DEFER
-                    );
-
-                    return (): void => {
-                        clearTimeout(clearTimeoutId);
-                    };
-                }
-
-                const timeoutId = setTimeout(
-                    showLoadingOverlayCallback,
-                    UI_DELAYS.LOADING_OVERLAY
-                );
-
-                return (): void => {
-                    clearTimeout(timeoutId);
-                };
-            }
-            return () => {};
-        },
-        [
-            clearLoadingOverlay,
-            isInitialized,
-            isLoading,
-            showLoadingOverlayCallback,
-        ]
-    );
+    const showLoadingOverlay = useDelayedLoadingOverlay({
+        isInitialized,
+        isLoading,
+    });
 
     /**
      * Initializes the application by setting up stores, cache sync, and status
@@ -423,6 +366,14 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         []
     );
 
+    const closeCompactSidebar = useCallback((): void => {
+        setCompactSidebarOpen(false);
+    }, []);
+
+    const closeNonCompactSidebar = useCallback((): void => {
+        persistSidebarPreference(false);
+    }, [persistSidebarPreference]);
+
     const cleanupSidebarListener = useCallback(() => {
         cleanupSidebarMediaQueryListener({
             refs: {
@@ -450,54 +401,13 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     );
 
     // Auto-dismiss the navigation drawer on compact viewports once focus leaves it.
-    useEffect(
-        function handleCompactSidebarAutoDismissal(): () => void {
-            const mediaQuery =
-                sidebarMediaQueryRef.current ??
-                tryGetMediaQueryList(SIDEBAR_COLLAPSE_MEDIA_QUERY);
-
-            if (!isSidebarOpen || !(mediaQuery?.matches ?? false)) {
-                return () => {};
-            }
-
-            const handlePointerDown = (event: PointerEvent): void => {
-                const { target } = event;
-                if (!(target instanceof HTMLElement)) {
-                    return;
-                }
-
-                const interactedWithinSidebar =
-                    SIDEBAR_DISMISS_INTERACTIVE_SELECTORS.some(
-                        (selector) => target.closest(selector) !== null
-                    );
-
-                if (interactedWithinSidebar) {
-                    return;
-                }
-
-                if (isCompactViewport) {
-                    setCompactSidebarOpen(false);
-                } else {
-                    persistSidebarPreference(false);
-                }
-            };
-
-            document.addEventListener("pointerdown", handlePointerDown, true);
-
-            return () => {
-                document.removeEventListener(
-                    "pointerdown",
-                    handlePointerDown,
-                    true
-                );
-            };
-        },
-        [
-            isCompactViewport,
-            isSidebarOpen,
-            persistSidebarPreference,
-        ]
-    );
+    useCompactSidebarAutoDismiss({
+        closeCompactSidebar,
+        closeNonCompactSidebar,
+        isCompactViewport,
+        isSidebarOpen,
+        sidebarMediaQueryRef,
+    });
 
     const toggleSidebar = useCallback(() => {
         if (isCompactViewport) {
@@ -617,120 +527,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
         ) : null;
 
-    const UpdateWarningIcon = AppIcons.status.warning;
-    const UpdateAvailableIcon = AppIcons.actions.refresh;
-    const UpdateDownloadingIcon = AppIcons.actions.refreshAlt;
-    const UpdateReadyIcon = AppIcons.status.upFilled;
-
     const handleUpdateButtonClick = useCallback(() => {
         void handleUpdateAction();
     }, [handleUpdateAction]);
 
-    // Helper function to render update notification to reduce complexity
-    const renderUpdateNotification = (): JSX.Element | null => {
-        if (
-            !(
-                updateStatus === "available" ||
-                updateStatus === "downloading" ||
-                updateStatus === "downloaded" ||
-                updateStatus === "error"
-            )
-        ) {
-            return null;
-        }
-
-        if (updateStatus === "error") {
-            return (
-                <div
-                    aria-live="assertive"
-                    className="fixed inset-x-0 top-12 z-50"
-                    role="alert"
-                >
-                    <ThemedBox
-                        className={`update-alert update-alert--${updateStatus}`}
-                        padding="md"
-                        surface="elevated"
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                                <div className="update-alert__icon">
-                                    <UpdateWarningIcon
-                                        className="update-alert__icon-symbol"
-                                        size={20}
-                                    />
-                                </div>
-                                <ThemedText size="sm" variant="error">
-                                    {updateError ??
-                                        UI_MESSAGES.UPDATE_ERROR_FALLBACK}
-                                </ThemedText>
-                            </div>
-                            <ThemedButton
-                                className="update-alert__action ml-4"
-                                onClick={handleUpdateButtonClick}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                {UI_MESSAGES.UPDATE_DISMISS_BUTTON}
-                            </ThemedButton>
-                        </div>
-                    </ThemedBox>
-                </div>
-            );
-        }
-
-        return (
-            <output aria-live="polite" className="fixed inset-x-0 top-12 z-50">
-                <ThemedBox
-                    className={`update-alert update-alert--${updateStatus}`}
-                    padding="md"
-                    surface="elevated"
-                >
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <div className="update-alert__icon">
-                                {updateStatus === "available" ? (
-                                    <UpdateAvailableIcon
-                                        className="update-alert__icon-symbol"
-                                        size={20}
-                                    />
-                                ) : null}
-                                {updateStatus === "downloading" ? (
-                                    <UpdateDownloadingIcon
-                                        className="update-alert__icon-symbol"
-                                        size={20}
-                                    />
-                                ) : null}
-                                {updateStatus === "downloaded" ? (
-                                    <UpdateReadyIcon
-                                        className="update-alert__icon-symbol"
-                                        size={20}
-                                    />
-                                ) : null}
-                            </div>
-                            <ThemedText size="sm" variant="primary">
-                                {updateStatus === "available" &&
-                                    UI_MESSAGES.UPDATE_AVAILABLE}
-                                {updateStatus === "downloading" &&
-                                    UI_MESSAGES.UPDATE_DOWNLOADING}
-                                {updateStatus === "downloaded" &&
-                                    UI_MESSAGES.UPDATE_DOWNLOADED}
-                            </ThemedText>
-                        </div>
-                        {updateStatus === "downloaded" && (
-                            <ThemedButton
-                                className="update-alert__action ml-4"
-                                onClick={handleUpdateButtonClick}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                {UI_MESSAGES.UPDATE_RESTART_BUTTON}
-                            </ThemedButton>
-                        )}
-                    </div>
-                </ThemedBox>
-            </output>
-        );
-    };
 
     return (
         <ErrorBoundary>
@@ -783,7 +583,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                                 </div>
                             ) : null}
 
-                            {renderUpdateNotification()}
+                            <UpdateNotificationBanner
+                                onAction={handleUpdateButtonClick}
+                                updateError={updateError}
+                                updateStatus={updateStatus}
+                            />
 
                             <Header />
 

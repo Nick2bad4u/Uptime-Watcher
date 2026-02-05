@@ -10,7 +10,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { logger } from "../../../utils/logger";
 
 import {
-    IpcValidators,
     createErrorResponse,
     createSuccessResponse,
     registerStandardizedIpcHandler,
@@ -18,6 +17,7 @@ import {
     withIpcHandler,
     withIpcHandlerValidation,
 } from "../../../services/ipc/utils";
+import { IpcValidators } from "../../../services/ipc/validators/IpcValidators";
 import {
     DATA_CHANNELS,
     MONITORING_CHANNELS,

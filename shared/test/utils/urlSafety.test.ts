@@ -10,6 +10,7 @@ import {
     isPrivateNetworkHostname,
     tryGetSafeThirdPartyHttpUrl,
     validateExternalOpenUrlCandidate,
+    validateHttpUrlCandidate,
 } from "../../utils/urlSafety";
 
 describe("urlSafety", () => {
@@ -223,6 +224,47 @@ describe("urlSafety", () => {
             expect(result.safeUrlForLogging).toBe(
                 "https://dropbox.com/oauth2/authorize"
             );
+        });
+    });
+
+    describe(validateHttpUrlCandidate, () => {
+        it("accepts http(s) URLs and trims whitespace", () => {
+            const result = validateHttpUrlCandidate("  https://example.com  ");
+            expect(result.ok).toBeTruthy();
+            if (result.ok === false) {
+                throw new Error(
+                    `Expected ok result, got rejection: ${result.reason}`
+                );
+            }
+            expect(result.normalizedUrl).toBe("https://example.com");
+        });
+
+        it("rejects non-http(s) protocols", () => {
+            const result = validateHttpUrlCandidate("mailto:test@example.com");
+            expect(result.ok).toBeFalsy();
+        });
+
+        it("rejects http(s) URLs containing CR/LF", () => {
+            const result = validateHttpUrlCandidate("https://example.com\nInjected");
+            expect(result.ok).toBeFalsy();
+        });
+
+        it("rejects http(s) URLs containing ASCII control characters", () => {
+            const result = validateHttpUrlCandidate("https://example.com/\0oops");
+            expect(result.ok).toBeFalsy();
+        });
+
+        it("honors a custom byte budget", () => {
+            const result = validateHttpUrlCandidate("https://example.com", {
+                maxBytes: 10,
+            });
+            expect(result.ok).toBeFalsy();
+            if ("reason" in result) {
+                expect(result.reason).toContain("must not exceed");
+                return;
+            }
+
+            throw new Error("Expected rejection");
         });
     });
 

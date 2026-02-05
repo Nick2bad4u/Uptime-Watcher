@@ -43,7 +43,7 @@ import {
     MAX_DIAGNOSTICS_METADATA_BYTES,
     MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
 } from "../diagnosticsLimits";
-import { IpcValidators } from "../utils";
+import { IpcValidators } from "./IpcValidators";
 import { createStringWithBudgetedObjectValidator } from "./utils/commonValidators";
 import {
     createParamValidator,

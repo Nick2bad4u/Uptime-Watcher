@@ -23,13 +23,8 @@ import {
     normalizeLogValue,
     withLogContext,
 } from "@shared/utils/loggingContext";
-import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import {
-    isNonEmptyString,
-    isValidUrl,
-} from "@shared/validation/validatorUtils";
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 
 import type {
@@ -77,42 +72,6 @@ const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
 
 const getExpectedParamCount = (channelName: IpcInvokeChannel): number =>
     IPC_INVOKE_CHANNEL_PARAM_COUNTS[channelName];
-
-/**
- * Maximum byte length accepted for URL parameters passed through IPC.
- *
- * @remarks
- * This is a defense-in-depth limit to prevent accidental or malicious oversized
- * payloads (e.g. multi-megabyte strings) from forcing expensive parsing or
- * logging work at IPC boundaries.
- */
-const MAX_IPC_URL_UTF_BYTES = 32_768;
-
-function validateIpcUrlStringGuards(
-    value: string,
-    paramName: string
-): null | string {
-    return /[\n\r]/u.test(value)
-        ? `${paramName} must not contain newlines`
-        : null;
-}
-
-const validateIpcUrlPayloadGuards = (
-    value: unknown,
-    paramName: string
-): null | string => {
-    if (typeof value !== "string") {
-        return null;
-    }
-
-    const byteLength = getUtfByteLength(value);
-
-    if (byteLength > MAX_IPC_URL_UTF_BYTES) {
-        return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
-    }
-
-    return validateIpcUrlStringGuards(value, paramName);
-};
 
 /** Maximum bytes allowed for IPC error messages returned to the renderer. */
 const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
@@ -299,140 +258,6 @@ async function executeIpcHandler<T>(
         };
     }
 }
-
-/**
- * Standard parameter validation utilities for common IPC operations.
- */
-export const IpcValidators = {
-    /**
-     * Validates an optional string parameter using validator.
-     *
-     * @param value - Value to validate
-     * @param paramName - Parameter name for error messages
-     *
-     * @returns Error message or null if valid
-     */
-    optionalString: (value: unknown, paramName: string): null | string => {
-        if (value !== undefined && !isNonEmptyString(value)) {
-            return `${paramName} must be a non-empty string when provided`;
-        }
-        return null;
-    },
-
-    /**
-     * Validates a required boolean parameter.
-     *
-     * @param value - Value to validate
-     * @param paramName - Parameter name for error messages
-     *
-     * @returns Error message or null if valid
-     */
-    requiredBoolean: (value: unknown, paramName: string): null | string => {
-        if (typeof value !== "boolean") {
-            return `${paramName} must be a boolean`;
-        }
-        return null;
-    },
-
-    /**
-     * Validates a required URL parameter intended for opening via
-     * `shell.openExternal`.
-     *
-     * @remarks
-     * This differs from {@link requiredUrl} by allowing `mailto:` in addition to
-     * `http:` and `https:`. It also enforces the same defense-in-depth size and
-     * newline constraints used by {@link requiredUrl}.
-     */
-    requiredExternalOpenUrl: (
-        value: unknown,
-        paramName: string
-    ): null | string => {
-        const guardError = validateIpcUrlPayloadGuards(value, paramName);
-        if (guardError) {
-            return guardError;
-        }
-
-        const validation = validateExternalOpenUrlCandidate(value);
-        if ("reason" in validation) {
-            return `${paramName} ${validation.reason}`;
-        }
-
-        return null;
-    },
-
-    /**
-     * Validates a required number parameter.
-     *
-     * @param value - Value to validate
-     * @param paramName - Parameter name for error messages
-     *
-     * @returns Error message or null if valid
-     */
-    requiredNumber: (value: unknown, paramName: string): null | string => {
-        if (typeof value !== "number" || Number.isNaN(value)) {
-            return `${paramName} must be a valid number`;
-        }
-        return null;
-    },
-
-    /**
-     * Validates a required object parameter.
-     *
-     * @param value - Value to validate
-     * @param paramName - Parameter name for error messages
-     *
-     * @returns Error message or null if valid
-     */
-    requiredObject: (value: unknown, paramName: string): null | string => {
-        if (
-            typeof value !== "object" ||
-            value === null ||
-            Array.isArray(value)
-        ) {
-            return `${paramName} must be a valid object`;
-        }
-        return null;
-    },
-    /**
-     * Validates a required string parameter using validator.
-     *
-     * @param value - Value to validate
-     * @param paramName - Parameter name for error messages
-     *
-     * @returns Error message or null if valid
-     */
-    requiredString: (value: unknown, paramName: string): null | string => {
-        if (!isNonEmptyString(value)) {
-            return `${paramName} must be a non-empty string`;
-        }
-        return null;
-    },
-
-    /**
-     * Validates a required URL parameter restricted to safe protocols.
-     *
-     * @param value - Value to validate
-     * @param paramName - Parameter name for error messages
-     *
-     * @returns Error message or null if valid
-     */
-    requiredUrl: (value: unknown, paramName: string): null | string => {
-        const guardError = validateIpcUrlPayloadGuards(value, paramName);
-        if (guardError) {
-            return guardError;
-        }
-
-        if (
-            !isValidUrl(value, {
-                disallowAuth: true,
-            })
-        ) {
-            return `${paramName} must be a valid http(s) URL`;
-        }
-
-        return null;
-    },
-} as const;
 
 /**
  * Converts an {@link ArrayBufferView} into a standalone {@link ArrayBuffer}

@@ -3,7 +3,7 @@ import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 import type { IpcParameterValidator } from "../../types";
 
-import { IpcValidators } from "../../utils";
+import { IpcValidators } from "../IpcValidators";
 import {
     createParamValidator,
     type ParameterValueValidationResult,

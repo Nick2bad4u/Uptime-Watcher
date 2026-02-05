@@ -47,6 +47,10 @@ const modernEnhancementsClientModule = fileURLToPath(
     new URL("src/js/modernEnhancements.ts", import.meta.url)
 );
 
+const pwaThemeColor = "#2E2A33";
+const pwaTileColor = "#2E2A33";
+const pwaMaskIconColor = "#71B041";
+
 /**
  * Docusaurus site configuration for the Uptime Watcher documentation.
  *
@@ -94,6 +98,60 @@ const config: Config = {
     // This uses our custom typedoc.config.json configuration for better docs
     plugins: [
         "docusaurus-plugin-image-zoom",
+        [
+            "@docusaurus/plugin-pwa",
+            {
+                debug: process.env["DOCUSAURUS_PWA_DEBUG"] === "true",
+                offlineModeActivationStrategies: [
+                    "appInstalled",
+                    "standalone",
+                    "queryString",
+                ],
+                pwaHead: [
+                    {
+                        href: `${baseUrl}manifest.json`,
+                        rel: "manifest",
+                        tagName: "link",
+                    },
+                    {
+                        content: pwaThemeColor,
+                        name: "theme-color",
+                        tagName: "meta",
+                    },
+                    {
+                        content: "yes",
+                        name: "apple-mobile-web-app-capable",
+                        tagName: "meta",
+                    },
+                    {
+                        content: "default",
+                        name: "apple-mobile-web-app-status-bar-style",
+                        tagName: "meta",
+                    },
+                    {
+                        href: `${baseUrl}img/icon-192.png`,
+                        rel: "apple-touch-icon",
+                        tagName: "link",
+                    },
+                    {
+                        color: pwaMaskIconColor,
+                        href: `${baseUrl}img/icon-512.svg`,
+                        rel: "mask-icon",
+                        tagName: "link",
+                    },
+                    {
+                        content: `${baseUrl}img/icon-192.png`,
+                        name: "msapplication-TileImage",
+                        tagName: "meta",
+                    },
+                    {
+                        content: pwaTileColor,
+                        name: "msapplication-TileColor",
+                        tagName: "meta",
+                    },
+                ],
+            },
+        ],
         [
             "docusaurus-plugin-copy-page-button",
             {

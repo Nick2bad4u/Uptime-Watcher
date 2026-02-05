@@ -5,86 +5,19 @@ import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview"
 import type { StoreApi, UseBoundStore } from "zustand";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create } from "zustand";
 
-import { AppNotificationService } from "../../services/AppNotificationService";
 import { CloudService } from "../../services/CloudService";
 import { logger } from "../../services/logger";
-import { useAlertStore } from "../alerts/useAlertStore";
-import { useSettingsStore } from "../settings/useSettingsStore";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-
-const CLOUD_OPERATION_STARTED_TOAST_TTL_MS = 15_000;
-
-const dismissToastSafely = (toastId: null | string): void => {
-    if (!toastId) {
-        return;
-    }
-
-    useAlertStore.getState().dismissToast(toastId);
-};
-
-const enqueueCloudToast = (args: {
-    message?: string | undefined;
-    title: string;
-    ttlMs?: number | undefined;
-    variant: "error" | "info" | "success";
-}): string => {
-    // Store actions are allowed to use Zustand stores directly.
-    const toast = useAlertStore.getState().enqueueToast({
-        ...(args.message === undefined ? {} : { message: args.message }),
-        ...(args.ttlMs === undefined ? {} : { ttlMs: args.ttlMs }),
-        title: args.title,
-        variant: args.variant,
-    });
-
-    return toast.id;
-};
-
-const enqueueCloudOperationStartedToast = (args: {
-    message?: string | undefined;
-    title: string;
-}): string =>
-    enqueueCloudToast({
-        message: args.message,
-        title: args.title,
-        ttlMs: CLOUD_OPERATION_STARTED_TOAST_TTL_MS,
-        variant: "info",
-    });
-
-async function dispatchSystemNotificationIfEnabled(request: {
-    body?: string | undefined;
-    title: string;
-}): Promise<void> {
-    const { systemNotificationsEnabled } = useSettingsStore.getState().settings;
-    if (!systemNotificationsEnabled) {
-        return;
-    }
-
-    try {
-        await AppNotificationService.notifyAppEvent({
-            ...(request.body === undefined ? {} : { body: request.body }),
-            title: request.title,
-        });
-    } catch (error: unknown) {
-        logger.debug(
-            "[CloudStore] Failed to dispatch system notification",
-            ensureError(error)
-        );
-    }
-}
-
-function enqueueCloudErrorToast(title: string, error: unknown): void {
-    // Use shared user-facing error detail for notifications
-    const userFacingMessage = getUserFacingErrorDetail(error);
-
-    enqueueCloudToast({
-        message: userFacingMessage,
-        title,
-        variant: "error",
-    });
-}
+import {
+    dismissToastSafely,
+    dispatchSystemNotificationIfEnabled,
+    enqueueCloudErrorToast,
+    enqueueCloudOperationStartedToast,
+    enqueueCloudToast,
+    getCloudUserFacingErrorDetail,
+} from "./utils/cloudStoreNotifications";
 
 /**
  * Cloud domain store for provider connection, sync, and remote backups.
@@ -235,7 +168,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudErrorToast("Failed to connect Dropbox", error);
 
                     void dispatchSystemNotificationIfEnabled({
-                        body: getUserFacingErrorDetail(error),
+                        body: getCloudUserFacingErrorDetail(error),
                         title: "Failed to connect Dropbox",
                     });
                     throw safeError;
@@ -291,7 +224,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     );
 
                     void dispatchSystemNotificationIfEnabled({
-                        body: getUserFacingErrorDetail(error),
+                        body: getCloudUserFacingErrorDetail(error),
                         title: "Failed to connect Google Drive",
                     });
                     throw safeError;
@@ -443,7 +376,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudErrorToast("Backup migration failed", error);
 
                     void dispatchSystemNotificationIfEnabled({
-                        body: getUserFacingErrorDetail(error),
+                        body: getCloudUserFacingErrorDetail(error),
                         title: "Backup migration failed",
                     });
                     throw safeError;
@@ -525,7 +458,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudErrorToast("Sync failed", error);
 
                     void dispatchSystemNotificationIfEnabled({
-                        body: getUserFacingErrorDetail(error),
+                        body: getCloudUserFacingErrorDetail(error),
                         title: "Sync failed",
                     });
                     throw safeError;
@@ -594,7 +527,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudErrorToast("Remote sync reset failed", error);
 
                     void dispatchSystemNotificationIfEnabled({
-                        body: getUserFacingErrorDetail(error),
+                        body: getCloudUserFacingErrorDetail(error),
                         title: "Remote sync reset failed",
                     });
                     throw safeError;
@@ -648,7 +581,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudErrorToast("Backup restore failed", error);
 
                     void dispatchSystemNotificationIfEnabled({
-                        body: getUserFacingErrorDetail(error),
+                        body: getCloudUserFacingErrorDetail(error),
                         title: "Backup restore failed",
                     });
                     throw safeError;
@@ -736,7 +669,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudErrorToast("Backup upload failed", error);
 
                     void dispatchSystemNotificationIfEnabled({
-                        body: getUserFacingErrorDetail(error),
+                        body: getCloudUserFacingErrorDetail(error),
                         title: "Backup upload failed",
                     });
                     throw safeError;

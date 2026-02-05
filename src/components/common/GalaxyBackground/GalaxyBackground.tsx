@@ -1,93 +1,17 @@
 import React, { useId, useMemo } from "react";
 
 import "./GalaxyBackground.css";
+import {
+    createAtmospherePlanetGradientIds,
+    createBandPlanetGradientIds,
+    deriveNumericSeedFromPrefix,
+    generateStarfieldBoxShadow,
+    normalizeReactSvgIdPrefix,
+} from "./galaxyBackgroundUtils";
 
 interface GalaxyBackgroundProperties {
     readonly className?: string;
     readonly isDark?: boolean;
-}
-
-/**
- * Generates a pseudo-random box-shadow string for stars.
- *
- * @param count - Number of stars to render.
- * @param isDark - Whether dark mode is active.
- * @param seed - Seed used to deterministically position stars.
- *
- * @returns Box-shadow string representing star positions.
- */
-const createSeededRandom = (seed: number): (() => number) => {
-    let value = seed % 2_147_483_647;
-    if (value <= 0) {
-        value += 2_147_483_646;
-    }
-
-    return () => {
-        value = (value * 16_807) % 2_147_483_647;
-        return (value - 1) / 2_147_483_646;
-    };
-};
-
-const generateBoxShadow = (
-    count: number,
-    isDark: boolean,
-    seed: number
-): string => {
-    let value = "";
-    const colors = isDark
-        ? [
-              "rgb(255 255 255)", // White
-              "rgb(224 242 254)", // Light Blue
-              "rgb(250 232 255)", // Light Purple
-              "rgb(240 253 250)", // Light Teal
-              "rgb(221 214 254)", // Violet
-              "rgb(251 207 232)", // Pink
-              "rgb(165 243 252)", // Cyan
-          ]
-        : [
-              "rgb(15 23 42)", // Slate 900
-              "rgb(30 41 59)", // Slate 800
-              "rgb(51 65 85)", // Slate 700
-              "rgb(71 85 105)", // Slate 600
-              "rgb(100 116 139)", // Slate 500
-          ];
-
-    const random = createSeededRandom(seed);
-
-    for (let i = 0; i < count; i++) {
-        const x = Math.floor(random() * 2500);
-        const y = Math.floor(random() * 2000);
-        const color = colors[Math.floor(random() * colors.length)];
-        value += `${x}px ${y}px ${color}, `;
-    }
-    return value.slice(0, -2);
-};
-
-function createBandPlanetGradientIds(
-    uniquePrefix: string,
-    planetNumber: 1 | 2
-): {
-    readonly bands: string;
-    readonly core: string;
-    readonly highlight: string;
-} {
-    return {
-        bands: `${uniquePrefix}-planet${planetNumber}-bands`,
-        core: `${uniquePrefix}-planet${planetNumber}-core`,
-        highlight: `${uniquePrefix}-planet${planetNumber}-highlight`,
-    };
-}
-
-function createAtmospherePlanetGradientIds(uniquePrefix: string): {
-    readonly atmosphere: string;
-    readonly core: string;
-    readonly highlight: string;
-} {
-    return {
-        atmosphere: `${uniquePrefix}-planet3-atmosphere`,
-        core: `${uniquePrefix}-planet3-core`,
-        highlight: `${uniquePrefix}-planet3-highlight`,
-    };
 }
 
 function createPlanetHighlightGradient(args: {
@@ -111,7 +35,10 @@ export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
     isDark = true,
 }) => {
     const reactId = useId();
-    const uniquePrefix = useMemo(() => reactId.replaceAll(":", ""), [reactId]);
+    const uniquePrefix = useMemo(
+        () => normalizeReactSvgIdPrefix(reactId),
+        [reactId]
+    );
 
     const planetOneIds = useMemo(
         () => createBandPlanetGradientIds(uniquePrefix, 1),
@@ -128,32 +55,45 @@ export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
         [uniquePrefix]
     );
 
-    const seedBase = useMemo(() => {
-        const characters = uniquePrefix.split("");
-        let total = 1;
-
-        for (const [index, character] of characters.entries()) {
-            const codePoint = character.codePointAt(0) ?? 0;
-            total += codePoint * (index + 1);
-        }
-
-        return total;
-    }, [uniquePrefix]);
+    const seedBase = useMemo(
+        () => deriveNumericSeedFromPrefix(uniquePrefix),
+        [uniquePrefix]
+    );
 
     const starsSmall = useMemo(
-        () => generateBoxShadow(700, isDark, seedBase + 1),
+        () =>
+            generateStarfieldBoxShadow({
+                count: 700,
+                isDark,
+                seed: seedBase + 1,
+            }),
         [isDark, seedBase]
     );
     const starsMedium = useMemo(
-        () => generateBoxShadow(200, isDark, seedBase + 2),
+        () =>
+            generateStarfieldBoxShadow({
+                count: 200,
+                isDark,
+                seed: seedBase + 2,
+            }),
         [isDark, seedBase]
     );
     const starsLarge = useMemo(
-        () => generateBoxShadow(100, isDark, seedBase + 3),
+        () =>
+            generateStarfieldBoxShadow({
+                count: 100,
+                isDark,
+                seed: seedBase + 3,
+            }),
         [isDark, seedBase]
     );
     const starsTwinkle = useMemo(
-        () => generateBoxShadow(50, isDark, seedBase + 4),
+        () =>
+            generateStarfieldBoxShadow({
+                count: 50,
+                isDark,
+                seed: seedBase + 4,
+            }),
         [isDark, seedBase]
     );
 

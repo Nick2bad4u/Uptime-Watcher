@@ -28,6 +28,9 @@ import type {
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
 import type { SitesTelemetryPayload } from "./utils/operationHelpers";
+import type {
+    StatusUpdateSubscriptionResult,
+} from "./utils/statusUpdateHandler";
 
 import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
@@ -35,12 +38,16 @@ import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { createStateSyncEventHandler } from "./utils/stateSyncEventHandler";
 import {
-    StatusUpdateManager,
-    type StatusUpdateSubscriptionResult,
-} from "./utils/statusUpdateHandler";
+    ensureStatusUpdateManager,
+    getStatusUpdateCallback,
+    getStatusUpdateManagerInstance,
+    resetStatusUpdateManagerSingleton,
+    resolveFallbackExpectedListenerCount,
+    setStatusUpdateCallback,
+    unsubscribeStatusUpdateManager,
+} from "./utils/statusUpdateManagerSingleton";
 import {
     buildStatusSubscriptionFailureSummary,
-    resolveExpectedListenerCount,
     resolveManagerExpectedListenerCount,
 } from "./utils/statusUpdateSubscriptionSummary";
 
@@ -176,23 +183,6 @@ export interface SiteSyncDependencies {
     ) => void;
 }
 
-// Singleton instance management for status updates, lazily initialized to
-// avoid unnecessary object creation.
-//
-// IMPORTANT: Callbacks can change between subscriptions (different components),
-// so the manager must not capture a stale callback reference.
-const statusUpdateManager: {
-    callback: ((update: StatusUpdate) => void) | undefined;
-    instance: StatusUpdateManager | undefined;
-} = {
-    callback: undefined,
-    instance: undefined,
-};
-
-function dispatchStatusUpdate(update: StatusUpdate): void {
-    statusUpdateManager.callback?.(update);
-}
-
 /**
  * Resets the module-level status update manager singleton.
  *
@@ -205,13 +195,8 @@ function dispatchStatusUpdate(update: StatusUpdate): void {
  * @internal
  */
 export function resetStatusUpdateManagerForTesting(): void {
-    statusUpdateManager.instance?.unsubscribe();
-    statusUpdateManager.instance = undefined;
-    statusUpdateManager.callback = undefined;
+    resetStatusUpdateManagerSingleton();
 }
-
-const resolveFallbackExpectedListenerCount = (): number =>
-    resolveExpectedListenerCount(StatusUpdateManager);
 
 /**
  * Creates site synchronization actions with injected dependencies.
@@ -341,7 +326,7 @@ export const createSiteSyncActions = (
                 "sites-sync",
                 "retryStatusSubscription"
             );
-            const effectiveCallback = callback ?? statusUpdateManager.callback;
+            const effectiveCallback = callback ?? getStatusUpdateCallback();
 
             if (!effectiveCallback) {
                 const message =
@@ -366,10 +351,7 @@ export const createSiteSyncActions = (
                 return fallbackSummary;
             }
 
-            if (statusUpdateManager.instance) {
-                statusUpdateManager.instance.unsubscribe();
-                statusUpdateManager.instance = undefined;
-            }
+            unsubscribeStatusUpdateManager();
 
             deps.setStatusSubscriptionSummary(undefined);
 
@@ -382,7 +364,7 @@ export const createSiteSyncActions = (
                 "sites-sync",
                 "subscribeToStatusUpdates"
             );
-            const effectiveCallback = callback ?? statusUpdateManager.callback;
+            const effectiveCallback = callback ?? getStatusUpdateCallback();
 
             if (!effectiveCallback) {
                 const initializationMessage =
@@ -407,46 +389,15 @@ export const createSiteSyncActions = (
                 return fallbackSummary;
             }
 
-            statusUpdateManager.callback = effectiveCallback;
-            statusUpdateManager.instance ??= new StatusUpdateManager({
+            setStatusUpdateCallback(effectiveCallback);
+            const managerInstance = ensureStatusUpdateManager({
                 fullResyncSites: actions.fullResyncSites,
                 getSites: deps.getSites,
-                onUpdate: dispatchStatusUpdate,
                 setSites: deps.setSites,
             });
 
             const executeSubscription =
                 async (): Promise<StatusUpdateSubscriptionSummary> => {
-                    const managerInstance = statusUpdateManager.instance;
-
-                    if (!managerInstance) {
-                        const initializationMessage =
-                            "StatusUpdateManager instance is not initialized";
-                        errorHandler.setError(initializationMessage);
-                        logger.error(
-                            "Status update subscription attempted without an initialized manager",
-                            initializationMessage
-                        );
-                        const fallbackSummary =
-                            buildStatusSubscriptionFailureSummary({
-                                errors: [initializationMessage],
-                                expectedListeners:
-                                    resolveFallbackExpectedListenerCount(),
-                                message:
-                                    "Failed to subscribe to status updates",
-                            });
-
-                        deps.setStatusSubscriptionSummary(fallbackSummary);
-
-                        logStoreAction(
-                            "SitesStore",
-                            "subscribeToStatusUpdates",
-                            fallbackSummary
-                        );
-
-                        return fallbackSummary;
-                    }
-
                     try {
                         const {
                             errors,
@@ -510,7 +461,7 @@ export const createSiteSyncActions = (
                                 errors: [normalizedError.message],
                                 expectedListeners:
                                     resolveManagerExpectedListenerCount(
-                                        statusUpdateManager.instance,
+                                        getStatusUpdateManagerInstance(),
                                         resolveFallbackExpectedListenerCount()
                                     ),
                                 message:
@@ -729,9 +680,7 @@ export const createSiteSyncActions = (
             );
         },
         unsubscribeFromStatusUpdates: () => {
-            statusUpdateManager.instance?.unsubscribe();
-            statusUpdateManager.instance = undefined;
-            statusUpdateManager.callback = undefined;
+            resetStatusUpdateManagerSingleton();
             deps.setStatusSubscriptionSummary(undefined);
             const result: StatusUpdateUnsubscribeResult = {
                 message: "Successfully unsubscribed from status updates",

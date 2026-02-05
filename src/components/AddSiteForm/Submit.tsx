@@ -4,7 +4,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 import type { SyntheticEvent } from "react";
-import type { Simplify, UnknownRecord } from "type-fest";
+import type { Simplify } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
@@ -26,13 +26,20 @@ import {
     buildMonitorValidationFieldValues,
     type MonitorValidationFieldValues,
 } from "../../utils/monitorValidationFields";
+import { validateAddModeSelection } from "./utils/addModeValidation";
+import { resolveMonitorValidationBuilder } from "./utils/monitorValidationBuilders";
+import { safeTrim } from "./utils/valueNormalization";
 
-/**
- * Safely trims a string value. Returns empty string for non-strings.
- */
-function safeTrim(value: unknown): string {
-    return typeof value === "string" ? value.trim() : "";
+function withUrlField<TPayload extends object>(
+    payload: TPayload,
+    url: string
+): TPayload & { url: string } {
+    return {
+        ...payload,
+        url,
+    };
 }
+
 
 /**
  * Store actions interface for form submission operations.
@@ -82,231 +89,28 @@ export type FormSubmitProperties = Simplify<
         }
 >;
 
-const toOptionalString = (value?: string): string | undefined => {
-    const trimmedValue = safeTrim(value);
-    return trimmedValue.length > 0 ? trimmedValue : undefined;
-};
-
-const parseOptionalInteger = (value?: string): number | undefined => {
-    const trimmedValue = safeTrim(value);
-    if (trimmedValue.length === 0) {
-        return undefined;
-    }
-
-    const parsed = Number.parseInt(trimmedValue, 10);
-    return Number.isNaN(parsed) ? undefined : parsed;
-};
-
-type MonitorValidationBuilderMap = {
-    [K in MonitorType]: (
-        fields: MonitorValidationFieldValues
-    ) => PartialMonitorFormDataByType<K>;
-};
-
-// NOTE: The builders below intentionally mirror the field-mapping logic in
-// `buildMonitorFormData`. When adding new monitor types or fields, update both
-// the validation builders and the form-data builder so that client-side
-// validation and monitor creation stay in sync.
-const monitorValidationBuilders: MonitorValidationBuilderMap = {
-    "cdn-edge-consistency": ({
-        baselineUrl,
-        edgeLocations,
-    }): UnknownRecord => ({
-        baselineUrl: toOptionalString(baselineUrl),
-        edgeLocations: toOptionalString(edgeLocations),
-    }),
-    dns: ({ expectedValue, host, recordType }): UnknownRecord => {
-        const trimmedRecordType = safeTrim(recordType);
-        const candidate = toOptionalString(expectedValue);
-        const basePayload: UnknownRecord = {
-            host: toOptionalString(host),
-            recordType: trimmedRecordType || undefined,
-        };
-
-        if (
-            trimmedRecordType.length > 0 &&
-            trimmedRecordType.toUpperCase() !== "ANY" &&
-            candidate !== undefined
-        ) {
-            return {
-                ...basePayload,
-                expectedValue: candidate,
-            } satisfies UnknownRecord;
-        }
-
-        return basePayload;
-    },
-    http: ({ url }): UnknownRecord => ({
-        url: toOptionalString(url),
-    }),
-    "http-header": ({
-        expectedHeaderValue,
-        headerName,
-        url,
-    }): UnknownRecord => ({
-        expectedHeaderValue: toOptionalString(expectedHeaderValue),
-        headerName: toOptionalString(headerName),
-        url: toOptionalString(url),
-    }),
-    "http-json": ({ expectedJsonValue, jsonPath, url }): UnknownRecord => ({
-        expectedJsonValue: toOptionalString(expectedJsonValue),
-        jsonPath: toOptionalString(jsonPath),
-        url: toOptionalString(url),
-    }),
-    "http-keyword": ({ bodyKeyword, url }): UnknownRecord => ({
-        bodyKeyword: toOptionalString(bodyKeyword),
-        url: toOptionalString(url),
-    }),
-    "http-latency": ({ maxResponseTime, url }): UnknownRecord => ({
-        maxResponseTime: parseOptionalInteger(maxResponseTime),
-        url: toOptionalString(url),
-    }),
-    "http-status": ({ expectedStatusCode, url }): UnknownRecord => ({
-        expectedStatusCode: parseOptionalInteger(expectedStatusCode),
-        url: toOptionalString(url),
-    }),
-    ping: ({ host }): UnknownRecord => ({
-        host: toOptionalString(host),
-    }),
-    port: ({ host, port }): UnknownRecord => ({
-        host: toOptionalString(host),
-        port: parseOptionalInteger(port),
-    }),
-    replication: ({
-        maxReplicationLagSeconds,
-        primaryStatusUrl,
-        replicaStatusUrl,
-        replicationTimestampField,
-    }): UnknownRecord => ({
-        maxReplicationLagSeconds: parseOptionalInteger(
-            maxReplicationLagSeconds
-        ),
-        primaryStatusUrl: toOptionalString(primaryStatusUrl),
-        replicaStatusUrl: toOptionalString(replicaStatusUrl),
-        replicationTimestampField: toOptionalString(replicationTimestampField),
-    }),
-    "server-heartbeat": ({
-        heartbeatExpectedStatus,
-        heartbeatMaxDriftSeconds,
-        heartbeatStatusField,
-        heartbeatTimestampField,
-        url,
-    }): UnknownRecord => ({
-        heartbeatExpectedStatus: toOptionalString(heartbeatExpectedStatus),
-        heartbeatMaxDriftSeconds: parseOptionalInteger(
-            heartbeatMaxDriftSeconds
-        ),
-        heartbeatStatusField: toOptionalString(heartbeatStatusField),
-        heartbeatTimestampField: toOptionalString(heartbeatTimestampField),
-        url: toOptionalString(url),
-    }),
-    ssl: ({ certificateWarningDays, host, port }): UnknownRecord => ({
-        certificateWarningDays: parseOptionalInteger(certificateWarningDays),
-        host: toOptionalString(host),
-        port: parseOptionalInteger(port),
-    }),
-    "websocket-keepalive": ({ maxPongDelayMs, url }): UnknownRecord => ({
-        maxPongDelayMs: parseOptionalInteger(maxPongDelayMs),
-        url: toOptionalString(url),
-    }),
-};
-
-const monitorValidationBuilderLookup: MonitorValidationBuilderMap =
-    monitorValidationBuilders;
-
-const resolveMonitorValidationBuilder = <K extends MonitorType>(
-    monitorType: K
-): MonitorValidationBuilderMap[K] => {
-    const candidate = monitorValidationBuilderLookup[monitorType];
-
-    if (typeof candidate !== "function") {
-        throw new TypeError(`Unsupported monitor type: ${monitorType}`);
-    }
-
-    return candidate;
-};
-
-const determineDnsExpectedValue = (
-    trimmedRecordType: string,
-    expectedValue?: string
-): string | undefined => {
-    if (trimmedRecordType.length === 0) {
-        return undefined;
-    }
-
-    if (trimmedRecordType.toUpperCase() === "ANY") {
-        return undefined;
-    }
-
-    return toOptionalString(expectedValue);
-};
-
-const buildMonitorFormData = (
-    properties: FormSubmitProperties
-): UnknownRecord => {
-    const trimmedRecordType = safeTrim(properties.recordType);
-    const formData: UnknownRecord = {
-        baselineUrl: toOptionalString(properties.baselineUrl),
-        bodyKeyword: toOptionalString(properties.bodyKeyword),
-        certificateWarningDays: parseOptionalInteger(
-            properties.certificateWarningDays
-        ),
-        checkInterval: properties.checkIntervalMs,
-        edgeLocations: toOptionalString(properties.edgeLocations),
-        expectedHeaderValue: toOptionalString(properties.expectedHeaderValue),
-        expectedJsonValue: toOptionalString(properties.expectedJsonValue),
-        expectedStatusCode: parseOptionalInteger(properties.expectedStatusCode),
-        expectedValue: determineDnsExpectedValue(
-            trimmedRecordType,
-            properties.expectedValue
-        ),
-        headerName: toOptionalString(properties.headerName),
-        heartbeatExpectedStatus: toOptionalString(
-            properties.heartbeatExpectedStatus
-        ),
-        heartbeatMaxDriftSeconds: parseOptionalInteger(
-            properties.heartbeatMaxDriftSeconds
-        ),
-        heartbeatStatusField: toOptionalString(properties.heartbeatStatusField),
-        heartbeatTimestampField: toOptionalString(
-            properties.heartbeatTimestampField
-        ),
-        host: toOptionalString(properties.host),
-        jsonPath: toOptionalString(properties.jsonPath),
-        maxPongDelayMs: parseOptionalInteger(properties.maxPongDelayMs),
-        maxReplicationLagSeconds: parseOptionalInteger(
-            properties.maxReplicationLagSeconds
-        ),
-        maxResponseTime: parseOptionalInteger(properties.maxResponseTimeMs),
-        port: parseOptionalInteger(properties.port),
-        primaryStatusUrl: toOptionalString(properties.primaryStatusUrl),
-        recordType: trimmedRecordType || undefined,
-        replicaStatusUrl: toOptionalString(properties.replicaStatusUrl),
-        replicationTimestampField: toOptionalString(
-            properties.replicationTimestampField
-        ),
-    };
-
-    const sanitizedUrl = toOptionalString(properties.url);
-    if (sanitizedUrl !== undefined) {
-        formData["url"] = sanitizedUrl;
-    }
-
-    if (formData["expectedValue"] === undefined) {
-        delete formData["expectedValue"];
-    }
-
-    return formData;
-};
 
 /**
  * Creates a monitor object based on the form data using the shared utility.
  * This ensures consistent monitor defaults and validation across the app.
  */
-function createMonitor(properties: FormSubmitProperties): Monitor {
+function createMonitor(
+    properties: FormSubmitProperties,
+    fields: MonitorValidationFieldValues
+): Monitor {
     const { checkIntervalMs, generateUuid, monitorType } = properties;
-    const formData = buildMonitorFormData(properties);
-    const baseMonitor = createMonitorObject(monitorType, formData);
+    const builder = resolveMonitorValidationBuilder(monitorType);
+    const formData = builder(fields);
+
+    // Historical behavior: the form always forwards the URL field into the
+    // monitor creation payload, even for monitor types that primarily use
+    // host/port fields. Several tests (and some UI flows) rely on this
+    // consistent presence.
+    const urlCandidate = safeTrim(fields.url);
+    const baseMonitor = createMonitorObject(
+        monitorType,
+        urlCandidate.length > 0 ? withUrlField(formData, urlCandidate) : formData
+    );
 
     return {
         ...baseMonitor,
@@ -314,41 +118,6 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
         checkInterval: checkIntervalMs,
         id: generateUuid(),
     };
-}
-
-/**
- * Validates the add mode selection and site information.
- *
- * @remarks
- * The {@link AddSiteForm} component performs an immediate UI-level check for a
- * missing site name when `addMode === "new"` and will block submission before
- * calling this function. This helper remains as a defensive guard for other
- * potential callers of {@link handleSubmit} (including tests) and to ensure
- * consistent error messaging when the submission utility is reused outside the
- * primary form.
- *
- * @param addMode - Mode of adding ("existing" or "new").
- * @param name - Site name for new sites.
- * @param selectedExistingSite - Selected existing site identifier.
- *
- * @returns Array of validation error messages.
- */
-function validateAddMode(
-    addMode: "existing" | "new",
-    name: string,
-    selectedExistingSite: string
-): string[] {
-    const errors: string[] = [];
-
-    if (addMode === "new" && !safeTrim(name)) {
-        errors.push("Site name is required");
-    }
-
-    if (addMode === "existing" && !selectedExistingSite) {
-        errors.push("Please select a site to add the monitor to");
-    }
-
-    return errors;
 }
 
 /**
@@ -581,11 +350,11 @@ export async function handleSubmit(
         selectedExistingSite: Boolean(selectedExistingSite),
     });
 
-    const synchronousValidationErrors = validateAddMode(
+    const synchronousValidationErrors = validateAddModeSelection({
         addMode,
         name,
-        selectedExistingSite
-    );
+        selectedExistingSite,
+    });
 
     if (synchronousValidationErrors.length > 0) {
         logger.debug("Form validation failed (synchronous phase)", {
@@ -652,7 +421,7 @@ export async function handleSubmit(
 
     const result = await withUtilityErrorHandling(
         async () => {
-            const monitor = createMonitor(properties);
+            const monitor = createMonitor(properties, monitorValidationFields);
             await performSubmission(properties, monitor);
             onSuccess?.();
             return true; // Success indicator

@@ -53,6 +53,14 @@ import {
     buildMonitorValidationFieldValues,
     type MonitorValidationFieldValues,
 } from "../../utils/monitorValidationFields";
+import { validateAddModeSelection } from "../AddSiteForm/utils/addModeValidation";
+import {
+    DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS,
+} from "./addSiteForm/addSiteFormDefaults";
+import {
+    resetFieldsForModeChange,
+    resetFieldsForMonitorType,
+} from "./addSiteForm/addSiteFormResets";
 
 /**
  * Form actions interface containing all form manipulation functions.
@@ -230,266 +238,7 @@ export type UseAddSiteFormReturnWithMonitorFields = UseAddSiteFormReturn & {
     monitorFieldsLoaded: boolean;
 };
 
-// Helper types/functions for add site form logic (reduces function length by
-// composition)
 type MonitorFieldValues = MonitorValidationFieldValues;
-
-const resetFieldsForMonitorType = (
-    currentFieldNames: Set<string>,
-    currentValues: MonitorFieldValues,
-    setters: {
-        setBaselineUrl: (value: string) => void;
-        setBodyKeyword: (value: string) => void;
-        setCertificateWarningDays: (value: string) => void;
-        setEdgeLocations: (value: string) => void;
-        setExpectedHeaderValue: (value: string) => void;
-        setExpectedJsonValue: (value: string) => void;
-        setExpectedStatusCode: (value: string) => void;
-        setExpectedValue: (value: string) => void;
-        setHeaderName: (value: string) => void;
-        setHeartbeatExpectedStatus: (value: string) => void;
-        setHeartbeatMaxDriftSeconds: (value: string) => void;
-        setHeartbeatStatusField: (value: string) => void;
-        setHeartbeatTimestampField: (value: string) => void;
-        setHost: (value: string) => void;
-        setJsonPath: (value: string) => void;
-        setMaxPongDelayMs: (value: string) => void;
-        setMaxReplicationLagSeconds: (value: string) => void;
-        setMaxResponseTimeMs: (value: string) => void;
-        setPort: (value: string) => void;
-        setPrimaryStatusUrl: (value: string) => void;
-        setRecordType: (value: string) => void;
-        setReplicaStatusUrl: (value: string) => void;
-        setReplicationTimestampField: (value: string) => void;
-        setUrl: (value: string) => void;
-    }
-): void => {
-    const fieldResetters: Array<{
-        defaultValue: string;
-        name: string;
-        setter: (value: string) => void;
-        value: string;
-    }> = [
-        {
-            defaultValue: "",
-            name: "baselineUrl",
-            setter: setters.setBaselineUrl,
-            value: currentValues.baselineUrl,
-        },
-        {
-            defaultValue: "",
-            name: "url",
-            setter: setters.setUrl,
-            value: currentValues.url,
-        },
-        {
-            defaultValue: "",
-            name: "host",
-            setter: setters.setHost,
-            value: currentValues.host,
-        },
-        {
-            defaultValue: "",
-            name: "port",
-            setter: setters.setPort,
-            value: currentValues.port,
-        },
-        {
-            defaultValue: "A",
-            name: "recordType",
-            setter: setters.setRecordType,
-            value: currentValues.recordType,
-        },
-        {
-            defaultValue: "",
-            name: "expectedValue",
-            setter: setters.setExpectedValue,
-            value: currentValues.expectedValue,
-        },
-        {
-            defaultValue: "30",
-            name: "certificateWarningDays",
-            setter: setters.setCertificateWarningDays,
-            value: currentValues.certificateWarningDays,
-        },
-        {
-            defaultValue: "",
-            name: "edgeLocations",
-            setter: setters.setEdgeLocations,
-            value: currentValues.edgeLocations,
-        },
-        {
-            defaultValue: "",
-            name: "bodyKeyword",
-            setter: setters.setBodyKeyword,
-            value: currentValues.bodyKeyword,
-        },
-        {
-            defaultValue: "200",
-            name: "expectedStatusCode",
-            setter: setters.setExpectedStatusCode,
-            value: currentValues.expectedStatusCode,
-        },
-        {
-            defaultValue: "",
-            name: "headerName",
-            setter: setters.setHeaderName,
-            value: currentValues.headerName,
-        },
-        {
-            defaultValue: "",
-            name: "expectedHeaderValue",
-            setter: setters.setExpectedHeaderValue,
-            value: currentValues.expectedHeaderValue,
-        },
-        {
-            defaultValue: "",
-            name: "jsonPath",
-            setter: setters.setJsonPath,
-            value: currentValues.jsonPath,
-        },
-        {
-            defaultValue: "",
-            name: "expectedJsonValue",
-            setter: setters.setExpectedJsonValue,
-            value: currentValues.expectedJsonValue,
-        },
-        {
-            defaultValue: "2000",
-            name: "maxResponseTime",
-            setter: setters.setMaxResponseTimeMs,
-            value: currentValues.maxResponseTime,
-        },
-        {
-            defaultValue: "1500",
-            name: "maxPongDelayMs",
-            setter: setters.setMaxPongDelayMs,
-            value: currentValues.maxPongDelayMs,
-        },
-        {
-            defaultValue: "10",
-            name: "maxReplicationLagSeconds",
-            setter: setters.setMaxReplicationLagSeconds,
-            value: currentValues.maxReplicationLagSeconds,
-        },
-        {
-            defaultValue: "",
-            name: "primaryStatusUrl",
-            setter: setters.setPrimaryStatusUrl,
-            value: currentValues.primaryStatusUrl,
-        },
-        {
-            defaultValue: "",
-            name: "replicaStatusUrl",
-            setter: setters.setReplicaStatusUrl,
-            value: currentValues.replicaStatusUrl,
-        },
-        {
-            defaultValue: "lastAppliedTimestamp",
-            name: "replicationTimestampField",
-            setter: setters.setReplicationTimestampField,
-            value: currentValues.replicationTimestampField,
-        },
-        {
-            defaultValue: "status",
-            name: "heartbeatStatusField",
-            setter: setters.setHeartbeatStatusField,
-            value: currentValues.heartbeatStatusField,
-        },
-        {
-            defaultValue: "timestamp",
-            name: "heartbeatTimestampField",
-            setter: setters.setHeartbeatTimestampField,
-            value: currentValues.heartbeatTimestampField,
-        },
-        {
-            defaultValue: "ok",
-            name: "heartbeatExpectedStatus",
-            setter: setters.setHeartbeatExpectedStatus,
-            value: currentValues.heartbeatExpectedStatus,
-        },
-        {
-            defaultValue: "60",
-            name: "heartbeatMaxDriftSeconds",
-            setter: setters.setHeartbeatMaxDriftSeconds,
-            value: currentValues.heartbeatMaxDriftSeconds,
-        },
-    ];
-
-    for (const field of fieldResetters) {
-        if (
-            !currentFieldNames.has(field.name) &&
-            field.value !== field.defaultValue
-        ) {
-            field.setter(field.defaultValue);
-        }
-    }
-};
-
-const resetFieldsForModeChange = (
-    addMode: FormMode,
-    setters: {
-        setName: (value: string) => void;
-        setSiteIdentifier: (value: string) => void;
-    }
-): void => {
-    if (addMode === "new") {
-        setters.setName("");
-        setters.setSiteIdentifier(generateUuid());
-    } else {
-        setters.setName("");
-    }
-};
-
-/**
- * Validates form fields based on operation mode and monitor type requirements.
- *
- * @remarks
- * Performs comprehensive validation including mode-specific checks (site name
- * for new sites, existing site selection for existing sites) and dynamic field
- * validation based on the selected monitor type's required fields.
- *
- * @param addMode - Form operation mode (new site vs existing site)
- * @param name - Site name for new sites
- * @param selectedExistingSite - Selected existing site for monitor addition
- * @param monitorType - Type of monitor being configured
- * @param fieldValues - Current field values from the form
- * @param getFields - Function to get required fields for monitor type
- *
- * @returns True if form data is valid, false otherwise
- *
- * @internal
- */
-const validateFormFields = (
-    addMode: FormMode,
-    name: string,
-    selectedExistingSite: string,
-    monitorType: MonitorType,
-    fieldValues: MonitorFieldValues,
-    getFields: (type: MonitorType) => Array<{ name: string; required: boolean }>
-): boolean => {
-    // Basic validation for mode and name
-    if (addMode === "new" && !name.trim()) {
-        return false;
-    }
-    if (addMode === "existing" && !selectedExistingSite) {
-        return false;
-    }
-
-    // Dynamic validation based on monitor type fields
-    const currentFields = getFields(monitorType);
-    const lookup: Record<string, string> = fieldValues;
-    for (const field of currentFields) {
-        if (field.required) {
-            const rawValue = lookup[field.name] ?? "";
-            if (rawValue.trim().length === 0) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
 
 /**
  * Hook for managing add site form state and operations.
@@ -523,36 +272,72 @@ const trimLeadingWhitespace = (value: string): string => value.trimStart();
  */
 export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     // Form field state
-    const [url, setUrl] = useState("");
-    const [baselineUrl, setBaselineUrl] = useState("");
-    const [host, setHost] = useState("");
-    const [port, setPort] = useState("");
-    const [recordType, setRecordType] = useState("A");
-    const [expectedValue, setExpectedValue] = useState("");
-    const [edgeLocations, setEdgeLocations] = useState("");
-    const [bodyKeyword, setBodyKeyword] = useState("");
-    const [expectedStatusCode, setExpectedStatusCode] = useState("200");
-    const [expectedHeaderValue, setExpectedHeaderValue] = useState("");
-    const [expectedJsonValue, setExpectedJsonValue] = useState("");
-    const [headerName, setHeaderName] = useState("");
-    const [jsonPath, setJsonPath] = useState("");
-    const [maxResponseTimeMs, setMaxResponseTimeMs] = useState("2000");
-    const [maxPongDelayMs, setMaxPongDelayMs] = useState("1500");
-    const [maxReplicationLagSeconds, setMaxReplicationLagSeconds] =
-        useState("10");
-    const [certificateWarningDays, setCertificateWarningDays] = useState("30");
-    const [primaryStatusUrl, setPrimaryStatusUrl] = useState("");
-    const [replicaStatusUrl, setReplicaStatusUrl] = useState("");
-    const [replicationTimestampField, setReplicationTimestampField] = useState(
-        "lastAppliedTimestamp"
+    const [url, setUrl] = useState(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.url);
+    const [baselineUrl, setBaselineUrl] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.baselineUrl
     );
-    const [heartbeatStatusField, setHeartbeatStatusField] = useState("status");
-    const [heartbeatTimestampField, setHeartbeatTimestampField] =
-        useState("timestamp");
-    const [heartbeatExpectedStatus, setHeartbeatExpectedStatus] =
-        useState("ok");
-    const [heartbeatMaxDriftSeconds, setHeartbeatMaxDriftSeconds] =
-        useState("60");
+    const [host, setHost] = useState(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.host);
+    const [port, setPort] = useState(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.port);
+    const [recordType, setRecordType] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.recordType
+    );
+    const [expectedValue, setExpectedValue] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedValue
+    );
+    const [edgeLocations, setEdgeLocations] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.edgeLocations
+    );
+    const [bodyKeyword, setBodyKeyword] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.bodyKeyword
+    );
+    const [expectedStatusCode, setExpectedStatusCode] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedStatusCode
+    );
+    const [expectedHeaderValue, setExpectedHeaderValue] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedHeaderValue
+    );
+    const [expectedJsonValue, setExpectedJsonValue] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedJsonValue
+    );
+    const [headerName, setHeaderName] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.headerName
+    );
+    const [jsonPath, setJsonPath] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.jsonPath
+    );
+    const [maxResponseTimeMs, setMaxResponseTimeMs] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.maxResponseTimeMs
+    );
+    const [maxPongDelayMs, setMaxPongDelayMs] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.maxPongDelayMs
+    );
+    const [maxReplicationLagSeconds, setMaxReplicationLagSeconds] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.maxReplicationLagSeconds
+    );
+    const [certificateWarningDays, setCertificateWarningDays] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.certificateWarningDays
+    );
+    const [primaryStatusUrl, setPrimaryStatusUrl] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.primaryStatusUrl
+    );
+    const [replicaStatusUrl, setReplicaStatusUrl] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.replicaStatusUrl
+    );
+    const [replicationTimestampField, setReplicationTimestampField] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.replicationTimestampField
+    );
+    const [heartbeatStatusField, setHeartbeatStatusField] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatStatusField
+    );
+    const [heartbeatTimestampField, setHeartbeatTimestampField] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatTimestampField
+    );
+    const [heartbeatExpectedStatus, setHeartbeatExpectedStatus] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatExpectedStatus
+    );
+    const [heartbeatMaxDriftSeconds, setHeartbeatMaxDriftSeconds] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatMaxDriftSeconds
+    );
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
     const [checkIntervalMs, setCheckIntervalMs] = useState(
@@ -646,7 +431,10 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
             const currentFieldNames = new Set(
                 fieldDefinitions.map((field) => field.name)
             );
-            resetFieldsForMonitorType(currentFieldNames, monitorFieldValues, {
+            resetFieldsForMonitorType({
+                currentFieldNames,
+                currentValues: monitorFieldValues,
+                setters: {
                 setBaselineUrl,
                 setBodyKeyword,
                 setCertificateWarningDays,
@@ -671,6 +459,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
                 setReplicaStatusUrl,
                 setReplicationTimestampField,
                 setUrl,
+                },
             });
         },
         [
@@ -707,7 +496,9 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     // Reset name and site identifier when switching modes - using useEffect to avoid render-time setState
     useEffect(
         function resetFieldsOnAddModeChange() {
-            resetFieldsForModeChange(addMode, {
+            resetFieldsForModeChange({
+                addMode,
+                generateSiteIdentifier: generateUuid,
                 setName: setSanitizedName,
                 setSiteIdentifier,
             });
@@ -720,15 +511,31 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     );
 
     const isFormValid = useCallback(
-        () =>
-            validateFormFields(
-                addMode,
-                name,
-                selectedExistingSite,
-                monitorType,
-                monitorFieldValues,
-                getFields
-            ),
+        () => {
+            if (
+                validateAddModeSelection({
+                    addMode,
+                    name,
+                    selectedExistingSite,
+                }).length > 0
+            ) {
+                return false;
+            }
+
+            // Dynamic validation based on monitor type fields
+            const currentFields = getFields(monitorType);
+            const lookup: Record<string, string> = monitorFieldValues;
+            for (const field of currentFields) {
+                if (field.required) {
+                    const rawValue = lookup[field.name] ?? "";
+                    if (rawValue.trim().length === 0) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        },
         [
             addMode,
             getFields,
@@ -740,30 +547,56 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     );
 
     const resetForm = useCallback(() => {
-        setBaselineUrl("");
-        setUrl("");
-        setHost("");
-        setPort("");
-        setRecordType("A");
-        setExpectedValue("");
-        setEdgeLocations("");
-        setBodyKeyword("");
-        setExpectedStatusCode("200");
-        setExpectedHeaderValue("");
-        setExpectedJsonValue("");
-        setHeaderName("");
-        setJsonPath("");
-        setMaxPongDelayMs("1500");
-        setMaxReplicationLagSeconds("10");
-        setMaxResponseTimeMs("2000");
-        setCertificateWarningDays("30");
-        setPrimaryStatusUrl("");
-        setReplicaStatusUrl("");
-        setReplicationTimestampField("lastAppliedTimestamp");
-        setHeartbeatStatusField("status");
-        setHeartbeatTimestampField("timestamp");
-        setHeartbeatExpectedStatus("ok");
-        setHeartbeatMaxDriftSeconds("60");
+        setBaselineUrl(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.baselineUrl);
+        setUrl(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.url);
+        setHost(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.host);
+        setPort(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.port);
+        setRecordType(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.recordType);
+        setExpectedValue(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedValue);
+        setEdgeLocations(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.edgeLocations);
+        setBodyKeyword(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.bodyKeyword);
+        setExpectedStatusCode(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedStatusCode
+        );
+        setExpectedHeaderValue(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedHeaderValue
+        );
+        setExpectedJsonValue(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.expectedJsonValue
+        );
+        setHeaderName(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.headerName);
+        setJsonPath(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.jsonPath);
+        setMaxPongDelayMs(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.maxPongDelayMs);
+        setMaxReplicationLagSeconds(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.maxReplicationLagSeconds
+        );
+        setMaxResponseTimeMs(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.maxResponseTimeMs
+        );
+        setCertificateWarningDays(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.certificateWarningDays
+        );
+        setPrimaryStatusUrl(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.primaryStatusUrl
+        );
+        setReplicaStatusUrl(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.replicaStatusUrl
+        );
+        setReplicationTimestampField(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.replicationTimestampField
+        );
+        setHeartbeatStatusField(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatStatusField
+        );
+        setHeartbeatTimestampField(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatTimestampField
+        );
+        setHeartbeatExpectedStatus(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatExpectedStatus
+        );
+        setHeartbeatMaxDriftSeconds(
+            DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.heartbeatMaxDriftSeconds
+        );
         setSanitizedName("");
         setMonitorType("http");
         setCheckIntervalMs(DEFAULT_CHECK_INTERVAL);

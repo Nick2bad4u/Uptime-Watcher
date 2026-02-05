@@ -8,8 +8,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-const clampNormalizedVolume = (value: number): number =>
-    Math.min(Math.max(value, 0), 1);
+import { clampNormalizedVolume } from "./utils/volumeNormalization";
 
 /**
  * Provides helpers for scheduling and playing the in-app alert sound preview.

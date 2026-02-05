@@ -1,0 +1,22 @@
+{
+    "background_color": "#2E2A33",
+    "description": "Uptime Watcher documentation, architecture notes, and API references.",
+    "display": "standalone",
+    "icons": [
+        {
+            "sizes": "192x192",
+            "src": "img/icon-192.png",
+            "type": "image/png"
+        },
+        {
+            "sizes": "512x512",
+            "src": "img/icon-transparent-512.png",
+            "type": "image/png"
+        }
+    ],
+    "name": "Uptime Watcher Documentation",
+    "scope": ".",
+    "short_name": "Uptime Docs",
+    "start_url": ".",
+    "theme_color": "#2E2A33"
+}

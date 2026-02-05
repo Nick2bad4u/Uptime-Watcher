@@ -33,7 +33,7 @@
  * @packageDocumentation
  */
 
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import { validateHttpUrlCandidate } from "@shared/utils/urlSafety";
 
 import { logger } from "../../services/logger";
 
@@ -83,11 +83,21 @@ export const parseUptimeValue = (uptimeString: string): number => {
  * @public
  */
 export const safeGetHostname = (urlString: string): string => {
-    if (!isValidUrl(urlString)) {
+    const validation = validateHttpUrlCandidate(urlString, {
+        // Preserve previous behavior: `isValidUrl()` does not disallow auth by
+        // default, and hostname extraction is safe even when credentials are
+        // present.
+        disallowAuth: false,
+        // Keep this guard lenient enough to avoid changing runtime behavior for
+        // legitimate long-but-valid URLs, while still enforcing a hard budget.
+        maxBytes: 32_768,
+    });
+
+    if (!validation.ok) {
         return "";
     }
     try {
-        return new URL(urlString).hostname;
+        return new URL(validation.normalizedUrl).hostname;
     } catch {
         return "";
     }

@@ -202,6 +202,7 @@ GIT_USER=<username> GITHUB_TOKEN=<token> yarn deploy
 - **🔍 Search**: Full-text search across all documentation
 - **📱 Mobile Responsive**: Optimized mobile experience
 - **🌙 Dark Mode**: Toggle between light and dark themes
+- **📦 PWA**: Installable app experience + offline mode (via `@docusaurus/plugin-pwa`)
 - **🔗 Cross-References**: Internal linking between docs
 - **📈 Analytics**: Built-in analytics tracking
 - **🏷️ Versioning**: Documentation versioning support
@@ -236,6 +237,14 @@ For technical improvements:
 ## 🆘 Troubleshooting
 
 ### Common Issues
+
+**PWA / Service Worker Issues**
+
+```bash
+# Enable verbose PWA debug logs during build
+set DOCUSAURUS_PWA_DEBUG=true
+npm run build
+```
 
 **Build Failures**
 

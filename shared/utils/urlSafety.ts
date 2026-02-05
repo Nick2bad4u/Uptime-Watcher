@@ -11,6 +11,7 @@
 
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import validator from "validator";
 
 /** Maximum accepted UTF-8 byte budget for user-supplied external-open URLs. */
@@ -55,6 +56,40 @@ export type ExternalOpenUrlAcceptedResult = Readonly<{
 export type ExternalOpenUrlValidationResult =
     | ExternalOpenUrlAcceptedResult
     | ExternalOpenUrlRejectedResult;
+
+/**
+ * Result of validating an HTTP(S) URL candidate.
+ *
+ * @remarks
+ * This is intentionally shaped similarly to
+ * {@link ExternalOpenUrlValidationResult} so IPC validators and UI layers can
+ * consistently surface a short `reason` string without re-implementing
+ * trimming, newline checks, or byte-budget limits.
+ */
+export type HttpUrlRejectedResult = Readonly<{
+    ok: false;
+    /**
+     * A short message fragment starting with "must" suitable for prefixing with
+     * a field name (e.g. "url").
+     */
+    reason: string;
+    /** A redacted representation safe for logs and user-facing errors. */
+    safeUrlForLogging: string;
+}>;
+
+/** Accepted result from {@link validateHttpUrlCandidate}. */
+export type HttpUrlAcceptedResult = Readonly<{
+    /** A normalized URL safe for subsequent parsing/validation. */
+    normalizedUrl: string;
+    ok: true;
+    /** A redacted representation safe for logs and user-facing errors. */
+    safeUrlForLogging: string;
+}>;
+
+/** Discriminated union result from {@link validateHttpUrlCandidate}. */
+export type HttpUrlValidationResult =
+    | HttpUrlAcceptedResult
+    | HttpUrlRejectedResult;
 
 function getRedactedPathname(pathname: string): string {
     return pathname
@@ -104,6 +139,109 @@ export function getSafeUrlForLogging(rawUrl: string): string {
     } catch {
         return "[unparseable-url]";
     }
+}
+
+/**
+ * Validates and normalizes a URL intended to be used as an HTTP(S) endpoint.
+ *
+ * @remarks
+ * Unlike {@link validateExternalOpenUrlCandidate}, this helper rejects all
+ * non-HTTP(S) schemes (including `mailto:`) and is tuned for places where the
+ * application expects to fetch or monitor a web endpoint.
+ *
+ * This is primarily used at IPC trust boundaries to ensure consistent
+ * enforcement of:
+ * - trimming and empty-string handling
+ * - UTF-8 byte budgets (defense-in-depth against oversized payloads)
+ * - newline/control-character rejection (CRLF injection protection)
+ * - validator.js URL semantics via {@link isValidUrl}
+ */
+export function validateHttpUrlCandidate(
+    rawUrl: unknown,
+    options?: {
+        /**
+         * When true, reject `https://user:pass@host` style credentials.
+         *
+         * @defaultValue true
+         */
+        readonly disallowAuth?: boolean;
+        /** Maximum UTF-8 byte budget accepted for the URL string. */
+        readonly maxBytes?: number;
+    }
+): HttpUrlValidationResult {
+    const maxBytes = options?.maxBytes ?? MAX_EXTERNAL_OPEN_URL_BYTES;
+    const disallowAuth = options?.disallowAuth ?? true;
+
+    let safeUrlForLogging = FALLBACK_SAFE_URL_FOR_LOGGING;
+
+    if (typeof rawUrl !== "string") {
+        return {
+            ok: false,
+            reason: "must be a string",
+            safeUrlForLogging,
+        };
+    }
+
+    const normalizedUrl = rawUrl.trim();
+
+    if (
+        normalizedUrl.length > 0 &&
+        getUtfByteLength(normalizedUrl) <= maxBytes &&
+        !/[\n\r]/u.test(normalizedUrl) &&
+        !hasAsciiControlCharacters(normalizedUrl)
+    ) {
+        safeUrlForLogging = getSafeUrlForLogging(normalizedUrl);
+    }
+
+    if (normalizedUrl.length === 0) {
+        return {
+            ok: false,
+            reason: "must be a non-empty string",
+            safeUrlForLogging,
+        };
+    }
+
+    if (getUtfByteLength(normalizedUrl) > maxBytes) {
+        return {
+            ok: false,
+            reason: `must not exceed ${maxBytes} bytes`,
+            safeUrlForLogging,
+        };
+    }
+
+    if (/[\n\r]/u.test(normalizedUrl)) {
+        return {
+            ok: false,
+            reason: "must not contain newlines",
+            safeUrlForLogging,
+        };
+    }
+
+    if (hasAsciiControlCharacters(normalizedUrl)) {
+        return {
+            ok: false,
+            reason: "must not contain control characters",
+            safeUrlForLogging,
+        };
+    }
+
+    if (
+        !isValidUrl(normalizedUrl, {
+            disallowAuth,
+        })
+    ) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging,
+        };
+    }
+
+    return {
+        normalizedUrl,
+        ok: true,
+        safeUrlForLogging: getSafeUrlForLogging(normalizedUrl),
+    };
 }
 
 type HttpUrlNormalizationResult =

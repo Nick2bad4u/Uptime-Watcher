@@ -9,28 +9,8 @@ import {
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { formatByteSize } from "../../../utils/formatting/formatByteSize";
 import { AppIcons, getIconSize } from "../../../utils/icons";
-
-function formatBytes(bytes: number): string {
-    if (!Number.isFinite(bytes) || bytes <= 0) {
-        return "0 B";
-    }
-
-    const units = [
-        "B",
-        "KB",
-        "MB",
-        "GB",
-        "TB",
-    ] as const;
-    const exponent = Math.min(
-        units.length - 1,
-        Math.floor(Math.log(bytes) / Math.log(1024))
-    );
-    const value = bytes / 1024 ** exponent;
-    const formatted = exponent === 0 ? value.toFixed(0) : value.toFixed(1);
-    return `${formatted} ${units[exponent]}`;
-}
 
 /**
  * Props for {@link RemoteBackupsPanel}.
@@ -148,7 +128,7 @@ export const RemoteBackupsPanel = ({
                                     variant="tertiary"
                                 >
                                     {createdAt} ·{" "}
-                                    {formatBytes(backup.metadata.sizeBytes)}
+                                    {formatByteSize(backup.metadata.sizeBytes)}
                                     {encryptionSuffix}
                                 </ThemedText>
                             </div>

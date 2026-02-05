@@ -19,6 +19,7 @@ import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedSlider } from "../../theme/components/ThemedSlider";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { isThemeName, type ThemeName } from "../../theme/types";
+import { formatByteSize } from "../../utils/formatting/formatByteSize";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
@@ -26,29 +27,14 @@ import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { useInAppAlertTonePreview } from "./useInAppAlertTonePreview";
 import { useSettingsChangeHandlers } from "./useSettingsChangeHandlers";
 import { useSettingsModel } from "./useSettingsModel";
-
-const formatBackupSize = (bytes: number): string => {
-    if (!Number.isFinite(bytes) || bytes < 0) {
-        return `${bytes}`;
-    }
-
-    const units = [
-        "B",
-        "KB",
-        "MB",
-        "GB",
-    ] as const;
-    let value = bytes;
-    let unitIndex = 0;
-
-    while (value >= 1024 && unitIndex < units.length - 1) {
-        value /= 1024;
-        unitIndex += 1;
-    }
-
-    const precision = value >= 10 || unitIndex === 0 ? 0 : 1;
-    return `${value.toFixed(precision)} ${units[unitIndex]}`;
-};
+import {
+    tryBuildSerializedDatabaseRestorePayloadFromFile,
+} from "./utils/sqliteRestorePayload";
+import {
+    clampNormalizedVolume,
+    convertNormalizedVolumeToSliderPercent,
+    convertSliderPercentToNormalizedVolume,
+} from "./utils/volumeNormalization";
 
 /**
  * The derived UI state/props for the Settings modal.
@@ -305,10 +291,8 @@ export const useSettingsController = ({
                 return;
             }
 
-            const normalizedVolume = Math.min(
-                Math.max(sliderValue / 100, 0),
-                1
-            );
+            const normalizedVolume =
+                convertSliderPercentToNormalizedVolume(sliderValue);
 
             applySettingChanges({
                 inAppAlertVolume: normalizedVolume,
@@ -340,7 +324,7 @@ export const useSettingsController = ({
 
         clearVolumePreviewTimeout();
 
-        const normalizedVolume = Math.min(Math.max(inAppAlertVolume, 0), 1);
+        const normalizedVolume = clampNormalizedVolume(inAppAlertVolume);
 
         if (normalizedVolume <= 0) {
             return;
@@ -419,8 +403,8 @@ export const useSettingsController = ({
     const isVolumeControlDisabled =
         !inAppAlertsEnabled || !inAppAlertsSoundEnabled;
     const sliderDisabled = isLoading || isVolumeControlDisabled;
-    const clampedVolume = Math.min(Math.max(inAppAlertVolume, 0), 1);
-    const volumePercent = Math.round(clampedVolume * 100);
+    const clampedVolume = clampNormalizedVolume(inAppAlertVolume);
+    const volumePercent = convertNormalizedVolumeToSliderPercent(clampedVolume);
     const automaticPreviewSuppressed = prefersReducedMotion;
     const isVolumeSilent = clampedVolume <= 0;
 
@@ -436,7 +420,7 @@ export const useSettingsController = ({
 
         return {
             formattedDate,
-            formattedSize: formatBackupSize(lastBackupMetadata.sizeBytes),
+            formattedSize: formatByteSize(lastBackupMetadata.sizeBytes),
             retentionHintDays: lastBackupMetadata.retentionHintDays,
             schemaVersion: lastBackupMetadata.schemaVersion,
         };
@@ -661,21 +645,19 @@ export const useSettingsController = ({
         async (file: File) => {
             clearError();
             try {
-                if (file.size === 0) {
-                    throw new Error("Selected SQLite backup file is empty");
+                const payloadResult =
+                    await tryBuildSerializedDatabaseRestorePayloadFromFile({
+                        file,
+                        maxBytes: MAX_IPC_SQLITE_RESTORE_BYTES,
+                    });
+
+                if (payloadResult.ok === false) {
+                    throw new Error(payloadResult.message);
                 }
 
-                if (file.size > MAX_IPC_SQLITE_RESTORE_BYTES) {
-                    throw new Error(
-                        `Selected SQLite backup is too large to restore (${file.size} > ${MAX_IPC_SQLITE_RESTORE_BYTES} bytes).`
-                    );
-                }
-
-                const payload = {
-                    buffer: await file.arrayBuffer(),
-                    fileName: file.name,
-                };
-                const restoreSummary = await restoreSqliteBackup(payload);
+                const restoreSummary = await restoreSqliteBackup(
+                    payloadResult.payload
+                );
                 setSyncSuccess(true);
                 logger.user.action("Restored SQLite backup", {
                     checksum: restoreSummary.metadata.checksum,
