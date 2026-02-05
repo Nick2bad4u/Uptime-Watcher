@@ -116,16 +116,11 @@ jobs:
                   rm -rf ./temp/eslint-plugin-mirror
                   mkdir -p ./temp/eslint-plugin-mirror
 
-                  # Copy the plugin folder contents into the mirror repo root.
-                  cp -R "${SOURCE_DIR}/." ./temp/eslint-plugin-mirror/
-
-                  # Also include the stable wrapper file (handy for internal consumers).
-                  cp "config/linting/plugins/uptime-watcher.mjs" ./temp/eslint-plugin-mirror/uptime-watcher.mjs
-
             - name: Push to target repository
               shell: bash
               working-directory: ./temp/eslint-plugin-mirror
               env:
+                  SOURCE_DIR: ${{ env.SOURCE_DIR }}
                   EVENT_NAME: ${{ github.event_name }}
                   TARGET_REPO: ${{ steps.target.outputs.repo }}
                   TARGET_BRANCH: ${{ github.event.inputs.target_branch }}
@@ -136,7 +131,7 @@ jobs:
 
                   TARGET_BRANCH="${TARGET_BRANCH:-main}"
 
-                  git init
+                  git init -b "${TARGET_BRANCH}"
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -150,6 +145,19 @@ jobs:
                   else
                       git checkout -B "${TARGET_BRANCH}"
                   fi
+
+                  # IMPORTANT: populate the mirror repo AFTER checking out the
+                  # target branch. If we copy files before checkout they are
+                  # untracked and `git checkout` aborts with:
+                  #   "untracked working tree files would be overwritten by checkout"
+                  #
+                  # Keep `.git/` intact, wipe everything else, then copy the
+                  # plugin sources from the main repo workspace.
+                  find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf -- {} +
+                  cp -a "${GITHUB_WORKSPACE}/${SOURCE_DIR}/." .
+
+                  # Also include the stable wrapper file (handy for internal consumers).
+                  cp -a "${GITHUB_WORKSPACE}/config/linting/plugins/uptime-watcher.mjs" ./uptime-watcher.mjs
 
                   git add -A
 

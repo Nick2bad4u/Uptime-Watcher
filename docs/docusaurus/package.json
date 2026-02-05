@@ -27,6 +27,7 @@
     "files": [],
     "scripts": {
         "build": "npm run generate-docs && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
+        "build:default": "docusaurus build",
         "build:fast": "cross-env DOCUSAURUS_ENABLE_EXPERIMENTAL=true docusaurus build",
         "build:local": "npm run generate-docs:local && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
         "clear": "docusaurus clear",
