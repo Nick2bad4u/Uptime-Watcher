@@ -4,12 +4,27 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [21.6.0] - 2026-02-05
 
 
 [[6ed5bbc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ed5bbca5f0341b97dbc8720e3f5b12d34837470)...
-[7ad0fc7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ad0fc7ef0117e08dd45338c85cb22f767a30e4c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6ed5bbca5f0341b97dbc8720e3f5b12d34837470...7ad0fc7ef0117e08dd45338c85cb22f767a30e4c))
+[f7d61f0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f7d61f0a0e8a04329f12231b293f30663600259f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6ed5bbca5f0341b97dbc8720e3f5b12d34837470...f7d61f0a0e8a04329f12231b293f30663600259f))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 3 updates [`(729f043)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/729f043cad5313e699685b990e43a3e715f2b670)
+
+
+
+### 🧹 Chores
+
+- *(release)* V21.6.0 [skip ci] [`(f7d61f0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f7d61f0a0e8a04329f12231b293f30663600259f)
+
+
+- Update changelogs for v21.5.0 [skip ci] [`(bb5aa5e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb5aa5e4f1cf7fa1863ab299b52bb4fa91c069d2)
+
 
 
 ### 🔧 Build System
