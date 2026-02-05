@@ -277,6 +277,58 @@ const jsonSchemaValidatorRules = enableJsonSchemaValidation
 const require = createRequire(import.meta.url);
 const ROOT_DIR = import.meta.dirname;
 
+/**
+ * Repo-scoped uptime-watcher flat configs.
+ *
+ * @remarks
+ * The plugin is typed as `ESLint.Plugin`, whose type doesn't model the
+ * conventional `configs` export strongly. We intentionally downcast here so
+ * consumers can spread the repo presets without CheckJS false-positives.
+ *
+ * @type {import("eslint").Linter.Config[]}
+ */
+const uptimeWatcherRepoConfigs =
+    /** @type {any} */ (uptimeWatcherPlugin).configs?.["repo"] ?? [];
+
+/**
+ * Controls eslint-plugin-file-progress behavior.
+ *
+ * @remarks
+ * The file-progress rule is great for interactive CLI runs, but it produces
+ * extremely large logs when output is redirected to a file.
+ *
+ * Supported values:
+ * - (unset) / "on": enable progress and show file names
+ * - "nofile": enable progress but hide file names
+ * - "off" / "0" / "false": disable progress
+ */
+const UW_ESLINT_PROGRESS_MODE = (
+    process.env["UW_ESLINT_PROGRESS"] ?? "on"
+).toLowerCase();
+
+const IS_CI = (process.env["CI"] ?? "").toLowerCase() === "true";
+const DISABLE_PROGRESS =
+    UW_ESLINT_PROGRESS_MODE === "off" ||
+    UW_ESLINT_PROGRESS_MODE === "0" ||
+    UW_ESLINT_PROGRESS_MODE === "false";
+const HIDE_PROGRESS_FILENAMES = UW_ESLINT_PROGRESS_MODE === "nofile";
+
+/** @type {import("eslint").Linter.Config} */
+const fileProgressOverridesConfig = {
+    name: "CLI: file progress overrides",
+    rules: {
+        // The preset already auto-hides on CI, but we also support explicit
+        // local toggles.
+        "progress/activate": DISABLE_PROGRESS ? 0 : 1,
+    },
+    settings: {
+        progress: {
+            hide: IS_CI || DISABLE_PROGRESS,
+            hideFileName: HIDE_PROGRESS_FILENAMES,
+        },
+    },
+};
+
 if (!process.env["RECHECK_JAR"]) {
     const resolvedRecheckJarPath = (() => {
         try {
@@ -295,14 +347,18 @@ if (!process.env["RECHECK_JAR"]) {
 
 import { defineConfig, globalIgnores } from "@eslint/config-helpers";
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// #region Global Configs and Rules
+// MARK: Global Configs and Rules
+// ═══════════════════════════════════════════════════════════════════════════════
 export default defineConfig([
     globalIgnores(["**/CHANGELOG.md"]),
     gitignore({
         name: "Global - .gitignore Rules",
         root: true,
         strict: true,
-    }), // MARK: Global Configs and Rules
-    // stylistic.configs.customize({
+    }),
+    // Stylistic.configs.customize({
     //     arrowParens: true,
     //     blockSpacing: true,
     //     braceStyle: "stroustrup",
@@ -373,11 +429,14 @@ export default defineConfig([
         ],
         name: "Global: Ignore Patterns **/**",
     },
+    // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
-    // MARK: Base Flat Configs
+    // #region Base Flat Configs
+    // MARK:  Base Flat Configs
     // ═══════════════════════════════════════════════════════════════════════════════
     importX.flatConfigs.typescript,
-    progress.configs.recommended,
+    progress.configs["recommended-ci"],
+    fileProgressOverridesConfig,
     noBarrelFiles.flat,
     // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
@@ -387,8 +446,10 @@ export default defineConfig([
     ...pluginCasePolice.configs.recommended,
     ...jsdocPlugin.configs["examples-and-default-expressions"],
 
+    // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
-    // MARK: Github Config Rules
+    // #region Custom Flat Configs
+    // MARK:  Github Config Rules
     // ═══════════════════════════════════════════════════════════════════════════════
     // NOTE:
     // `eslint-plugin-github` rules are written for JS/TS and assume the ESLint
@@ -421,96 +482,15 @@ export default defineConfig([
     //         : "GitHub: typescript (ts/tsx only)",
     //     })
     // ),
+    // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
+    // #region Custom Global Rules
     // MARK: Custom Global Rules
     // ═══════════════════════════════════════════════════════════════════════════════
-    {
-        files: [
-            "src/**/*.{ts,tsx}",
-            "electron/**/*.{ts,tsx}",
-            "docs/**/*.{ts,tsx}",
-            "scripts/**/*.{ts,tsx}",
-        ],
-        ignores: [
-            "shared/types/**/*",
-            "**/*.d.ts",
-        ],
-        name: "Shared Contract Interface Guard",
-        rules: {
-            "uptime-watcher/no-redeclare-shared-contract-interfaces": "error",
-        },
-    },
-    {
-        files: ["src/constants.ts"],
-        name: "Src: Monitor Fallback Consistency",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/monitor-fallback-consistency": "error",
-        },
-    },
-    {
-        files: ["electron/services/ipc/handlers/**/*.{ts,tsx}"],
-        ignores: ["electron/test/**/*"],
-        name: "Electron: IPC Handler Validation Guardrails",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/electron-ipc-handler-require-validator": "error",
-        },
-    },
-    {
-        files: ["electron/**/*.{ts,tsx}"],
-        ignores: ["electron/test/**/*"],
-        name: "Electron: Logger Enforcement",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/electron-no-console": "error",
-            "uptime-watcher/electron-no-direct-ipc-handle": "error",
-            "uptime-watcher/electron-no-direct-ipc-handler-wrappers": "error",
-            "uptime-watcher/electron-no-direct-ipc-main-import": "error",
-            "uptime-watcher/electron-no-inline-ipc-channel-literal": "error",
-            "uptime-watcher/electron-no-inline-ipc-channel-type-argument":
-                "error",
-            "uptime-watcher/electron-no-renderer-import": "error",
-            "uptime-watcher/electron-prefer-read-process-env": "error",
-            "uptime-watcher/electron-preload-no-direct-ipc-renderer-usage":
-                "error",
-            "uptime-watcher/electron-preload-no-inline-ipc-channel-constant":
-                "error",
-            "uptime-watcher/no-inline-ipc-channel-type-literals": "error",
-        },
-    },
-    {
-        files: ["**/*.{ts,tsx}"],
-        name: "TSDoc: Logger Examples",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/tsdoc-no-console-example": "error",
-        },
-    },
-    {
-        files: [
-            "docs/**/*.{ts,tsx}",
-            "electron/**/*.{ts,tsx}",
-            "src/**/*.{ts,tsx}",
-            "storybook/**/*.{ts,tsx}",
-        ],
-        ignores: ["shared/**/*"],
-        name: "Shared: Alias Imports",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/prefer-shared-alias": "error",
-        },
-    },
+    // Prefer the repo-scoped preset configs shipped with the internal plugin.
+    // This keeps rule coverage aligned with the plugin implementation and
+    // avoids accidental drift (or missing plugin registration).
+    ...uptimeWatcherRepoConfigs,
     {
         files: ["storybook/**/*.{ts,tsx,js,jsx,mts,mjs}"],
         name: "Storybook: Dev Helpers - storybook/**/*.{ts,tsx,js,jsx,mts,mjs}",
@@ -518,75 +498,6 @@ export default defineConfig([
             "import-x/no-extraneous-dependencies": "off",
             "n/no-extraneous-import": "off",
             "sonarjs/no-implicit-dependencies": "off",
-        },
-    },
-    {
-        files: ["shared/**/*.{ts,tsx,cts,mts}"],
-        name: "Shared: Layer Isolation",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/shared-no-outside-imports": "error",
-        },
-    },
-    {
-        files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
-        ignores: ["src/test/**/*"],
-        name: "Renderer: Electron Isolation",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/no-inline-ipc-channel-type-literals": "error",
-            "uptime-watcher/renderer-no-browser-dialogs": "error",
-            "uptime-watcher/renderer-no-direct-bridge-readiness": "error",
-            "uptime-watcher/renderer-no-direct-electron-log": "error",
-            "uptime-watcher/renderer-no-direct-networking": "error",
-            "uptime-watcher/renderer-no-direct-preload-bridge": "error",
-            "uptime-watcher/renderer-no-electron-import": "error",
-            "uptime-watcher/renderer-no-import-internal-service-utils": "error",
-            "uptime-watcher/renderer-no-ipc-renderer-usage": "error",
-            "uptime-watcher/renderer-no-preload-bridge-writes": "error",
-            "uptime-watcher/renderer-no-window-open": "error",
-        },
-    },
-    {
-        files: ["src/stores/**/*.{ts,tsx}"],
-        ignores: ["src/test/**/*"],
-        name: "Zustand Stores: Busy flags must reset",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/store-actions-require-finally-reset": "error",
-        },
-    },
-    {
-        files: [
-            "electron/**/*.{ts,tsx}",
-            "shared/**/*.{ts,tsx}",
-            "src/**/*.{ts,tsx}",
-            "storybook/**/*.{ts,tsx}",
-            "scripts/**/*.{ts,tsx,js,jsx,mts,mjs,cjs,cts}",
-        ],
-        ignores: [
-            "electron/test/**/*",
-            "src/test/**/*",
-            "shared/test/**/*",
-        ],
-        name: "Global: No Deprecated Exports",
-        plugins: {
-            "uptime-watcher": uptimeWatcherPlugin,
-        },
-        rules: {
-            "uptime-watcher/logger-no-error-in-context": "error",
-            "uptime-watcher/no-deprecated-exports": "error",
-            "uptime-watcher/no-local-error-normalizers": "error",
-            "uptime-watcher/no-local-record-guards": "error",
-            "uptime-watcher/no-onedrive": "error",
-            "uptime-watcher/prefer-app-alias": "error",
-            "uptime-watcher/require-ensure-error-in-catch": "error",
         },
     },
     {
@@ -599,8 +510,10 @@ export default defineConfig([
             "array-func/prefer-array-from": "off",
         },
     },
+    // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
-    // MARK: Global Language Options
+    // #region Global Language Options
+    // MARK:  Global Language Options
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         languageOptions: {
@@ -630,8 +543,10 @@ export default defineConfig([
         },
         name: "Global Language Options **/**",
     },
+    // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
-    // MARK: Global Settings
+    // #region Global Settings
+    // MARK:  Global Settings
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         name: "Global Settings Options **/**",
@@ -671,7 +586,9 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
+    // #region ESLint Plugin config
     // MARK: ESLint Plugin config
     // ═══════════════════════════════════════════════════════════════════════════════
     {
@@ -737,6 +654,10 @@ export default defineConfig([
             zod: zod,
         },
         rules: {
+            // IMPORTANT: we spread the preset rules explicitly because we
+            // override `rules` below (which would otherwise drop the preset).
+            ...eslintPluginEslintPlugin.configs["all-type-checked"].rules,
+
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
             // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -816,15 +737,36 @@ export default defineConfig([
                 },
             ],
             "eslint-plugin/consistent-output": "error",
+            "eslint-plugin/fixer-return": "error",
             "eslint-plugin/meta-property-ordering": "warn",
+            "eslint-plugin/no-deprecated-context-methods": "error",
+            "eslint-plugin/no-deprecated-report-api": "error",
+            "eslint-plugin/no-identical-tests": "error",
             "eslint-plugin/no-matching-violation-suggest-message-ids": "error",
+            "eslint-plugin/no-meta-replaced-by": "error",
+            "eslint-plugin/no-meta-schema-default": "error",
+            "eslint-plugin/no-missing-message-ids": "error",
+            "eslint-plugin/no-missing-placeholders": "error",
+            "eslint-plugin/no-only-tests": "error",
             "eslint-plugin/no-property-in-node": "error",
+            "eslint-plugin/no-unused-message-ids": "error",
+            "eslint-plugin/no-unused-placeholders": "error",
+            "eslint-plugin/no-useless-token-range": "error",
+            "eslint-plugin/prefer-message-ids": "error",
+            "eslint-plugin/prefer-object-rule": "error",
+            "eslint-plugin/prefer-output-null": "error",
             "eslint-plugin/prefer-placeholders": "warn",
             "eslint-plugin/prefer-replace-text": "error",
             "eslint-plugin/report-message-format": "warn",
+            "eslint-plugin/require-meta-default-options": "error",
             "eslint-plugin/require-meta-docs-description": "warn",
             "eslint-plugin/require-meta-docs-recommended": "warn",
             "eslint-plugin/require-meta-docs-url": "error",
+            "eslint-plugin/require-meta-fixable": "error",
+            "eslint-plugin/require-meta-has-suggestions": "error",
+            "eslint-plugin/require-meta-schema": "error",
+            "eslint-plugin/require-meta-schema-description": "error",
+            "eslint-plugin/require-meta-type": "error",
             "eslint-plugin/require-test-case-name": "warn",
             "eslint-plugin/test-case-property-ordering": "warn",
             "eslint-plugin/test-case-shorthand-strings": "error",
@@ -1104,6 +1046,7 @@ export default defineConfig([
             "total-functions/require-strict-mode": "off",
         },
     },
+    // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: YAML/YML files
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -11117,6 +11060,16 @@ export default defineConfig([
             // Scripts commonly use void/Promise-returning callbacks where the
             // return value is intentionally ignored.
             "@typescript-eslint/strict-void-return": "off",
+        },
+    },
+
+    // Ensure Electron override wins over any later preset configs.
+    {
+        files: ["electron/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
+        name: "Electron: disable unicorn import.meta suggestions",
+        rules: {
+            "unicorn/prefer-import-meta-properties": "off",
         },
     },
     eslintConfigPrettier,

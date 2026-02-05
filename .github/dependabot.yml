@@ -66,7 +66,7 @@ updates:
           - "dependabot"
           - "dependencies"
       commit-message:
-          prefix: "[dependency]"
+          prefix: "[dependency][skip-ci]"
           prefix-development: "[dev-dependency][skip-ci]"
           include: "scope"
       groups:
@@ -98,7 +98,7 @@ updates:
           - "dependencies"
       commit-message:
           include: "scope"
-          prefix: "[dependency][docusaurus]"
+          prefix: "[dependency][docusaurus][skip-ci]"
           prefix-development: "[dev-dependency][docusaurus][skip-ci]"
 
       groups:

@@ -41,6 +41,7 @@ interface MonitorCreationScenario {
     readonly dynamicFields: DynamicFieldInput[];
     readonly monitorType: string;
     readonly siteLabel: string;
+    readonly url?: string;
 }
 
 /**
@@ -183,8 +184,20 @@ const normalizeFieldValue = (
 const buildMonitorScenario = (
     config: MonitorTypeConfig
 ): MonitorCreationScenario => {
-    const dynamicFields: DynamicFieldInput[] = config.fields
-        .filter((field) => field.required)
+    const requiredFields = config.fields.filter((field) => field.required);
+
+    // Many monitor types expose their primary target as a `url` field.
+    // Our UI helpers already support a dedicated `url` option, so lift that
+    // field out of the dynamic field loop.
+    //
+    // This avoids filling the same input twice (once via `options.url` and
+    // again via dynamic fields), which can trigger expensive validation and
+    // re-render cycles mid-step and has proven flaky in headless Electron.
+    const urlField = requiredFields.find((field) => field.name === "url");
+    const urlValue = urlField ? normalizeFieldValue(config, urlField) : undefined;
+
+    const dynamicFields: DynamicFieldInput[] = requiredFields
+        .filter((field) => field.name !== "url")
         .map((field) => {
             const isSelect = field.type === "select";
             const value = normalizeFieldValue(config, field);
@@ -200,6 +213,7 @@ const buildMonitorScenario = (
         dynamicFields,
         monitorType: config.type,
         siteLabel: config.displayName,
+        ...(urlValue ? { url: urlValue } : {}),
     } satisfies MonitorCreationScenario;
 };
 
@@ -237,10 +251,13 @@ test.describe(
             typeof process !== "undefined" &&
             (process.env["CI"] ?? "").toLowerCase() === "true";
 
+        const monitorTypesTimeoutMs = isCI ? 15 * 60_000 : 8 * 60_000;
+
         // This suite provisions one monitor per supported type. On CI runners
         // (especially Windows + Electron), the full loop can legitimately take
         // several minutes.
-        test.setTimeout(isCI ? 10 * 60_000 : 240_000);
+        test.describe.configure({ timeout: monitorTypesTimeoutMs });
+
         let electronApp: ElectronApplication;
         let page: Page;
 
@@ -383,6 +400,7 @@ test.describe(
                             dynamicFields: scenario.dynamicFields,
                             monitorType: scenario.monitorType,
                             name: siteName,
+                            ...(scenario.url ? { url: scenario.url } : {}),
                         });
                     });
                 }

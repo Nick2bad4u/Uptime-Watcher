@@ -161,10 +161,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                             try {
                                 await SystemService.openExternal(url);
                             } catch (error: unknown) {
-                                const underlying = ensureError(error);
                                 throw new Error(
                                     `Unable to open external link (${urlForMessage}).`,
-                                    { cause: underlying }
+                                    { cause: error }
                                 );
                             }
                             logger.user.action("External URL opened", {

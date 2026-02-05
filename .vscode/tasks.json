@@ -262,7 +262,7 @@
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
-            "script": "lint:fix",
+            "script": "lint:fix:quiet",
             "type": "npm"
         },
         {
@@ -696,7 +696,7 @@
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
-            "script": "lint:all:fix",
+            "script": "lint:all:fix:quiet",
             "type": "npm"
         },
         {

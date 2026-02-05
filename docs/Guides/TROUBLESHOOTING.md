@@ -566,7 +566,8 @@ Recommended extensions for optimal development:
 npm run debug:electron        # Debug Electron main process
 npm run electron-dev:debug    # Debug Electron with Vite
 npm run type-check:all        # Check TypeScript across all configs
-npm run lint:fix              # Auto-fix linting issues
+npm run lint:fix              # Auto-fix linting issues (interactive)
+npm run lint:fix:quiet        # Same as lint:fix but with quieter CLI output (preferred for redirected logs)
 ```
 
 ### Testing During Debugging

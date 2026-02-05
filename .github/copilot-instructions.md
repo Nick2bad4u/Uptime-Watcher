@@ -76,6 +76,7 @@ applyTo: "**"
   - Electron dev-mode CSP warnings referencing `unsafe-eval`
   - Codecov `get-pre-signed-url` failures when running locally
 - Redirect terminal output to files only when running linting, testing, or type-checking commands; all other commands can stream output directly to the terminal.
+- If you are getting truncated output from any command, you should redirect the command to a file and read it using proper tools.
 - Track multi-step tasks in a to-do list, using the todo tool or the `TODO.md` file in the repo root. Always write detailed descriptions of each TODO item so that anyone can understand the task and its context.
 - Use the todo list to break larger tasks into granular, actionable steps. Err on the side of more detailed subtasks for complex changes, but keep the list proportional to the scope of the work.
 

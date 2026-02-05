@@ -7,11 +7,11 @@ last_reviewed: "2026-01-26"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "ui"
-  - "react"
-  - "zustand"
-  - "development"
+ - "uptime-watcher"
+ - "ui"
+ - "react"
+ - "zustand"
+ - "development"
 ---
 
 # UI Feature Development Guide

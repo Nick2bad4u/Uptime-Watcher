@@ -89,15 +89,30 @@ export const noCallIdentifiersRule = {
             {
                 type: "object",
                 additionalProperties: false,
+                description:
+                    "Configuration for banned identifier calls (both direct calls and member calls).",
                 properties: {
                     banned: {
                         type: "array",
+                        description:
+                            "List of identifier names that must not be called.",
                         items: {
                             type: "object",
                             additionalProperties: false,
+                            description:
+                                "A single banned identifier entry.",
                             properties: {
-                                name: { type: "string", minLength: 1 },
-                                message: { type: "string" },
+                                name: {
+                                    type: "string",
+                                    minLength: 1,
+                                    description:
+                                        "Identifier name to ban (e.g., 'danger' or 'openExternal').",
+                                },
+                                message: {
+                                    type: "string",
+                                    description:
+                                        "Optional guidance shown in the lint error (e.g., what to import instead).",
+                                },
                             },
                             required: ["name"],
                         },
@@ -105,6 +120,7 @@ export const noCallIdentifiersRule = {
                 },
             },
         ],
+        defaultOptions: [{ banned: [] }],
         messages: {
             bannedCall: "Calling '{{name}}' is not allowed. {{details}}",
         },

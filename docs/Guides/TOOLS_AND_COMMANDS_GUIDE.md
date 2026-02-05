@@ -190,6 +190,9 @@ Additional patterns:
 - `npm run test:shared` — shared package suites that exercise code reused by both runtimes.
 - `npm run type-check:test` — strict TypeScript program that only targets the test graph; run this whenever you add new helpers or mocks.
 - `npm run lint:fix` / `npm run lint:all:fix` — baseline lint passes before and after writing new suites to keep noise out of coverage runs.
+  - If you are redirecting output to a file (or running via VS Code tasks), prefer the quiet variants to avoid multi-thousand-line logs from the file-progress plugin:
+    - `npm run lint:fix:quiet`
+    - `npm run lint:all:fix:quiet`
 
 These scripts should all run cleanly before pursuing coverage work so regressions surface in the suite that introduced them instead of inside aggregate coverage output.
 
@@ -246,6 +249,7 @@ These scripts should all run cleanly before pursuing coverage work so regression
   - `npm: Test` runs the main Vitest suite (`npm run test`).
   - `npm: Test:Coverage` runs `npm run test:coverage` to collect coverage.
   - `npm: Lint`, `npm: Lint:Fix`, and `npm: Lint:All:Fix` wrap the ESLint/TypeScript/Stylelint pipeline.
+    - This repo's `Lint:Fix` and `Lint:All:Fix` tasks use the quiet scripts under the hood to keep task output readable.
   - `npm: Type-check:All` mirrors `npm run type-check:all` and is the go-to for strict type validation.
 
 Formatting notes:

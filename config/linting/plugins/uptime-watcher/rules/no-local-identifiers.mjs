@@ -108,17 +108,34 @@ export const noLocalIdentifiersRule = {
             {
                 type: "object",
                 additionalProperties: false,
+                description:
+                    "Configuration for banned local identifier definitions (functions and/or variables).",
                 properties: {
                     banned: {
                         type: "array",
+                        description:
+                            "List of identifier names that must not be defined locally.",
                         items: {
                             type: "object",
                             additionalProperties: false,
+                            description:
+                                "A single banned identifier entry.",
                             properties: {
-                                name: { type: "string", minLength: 1 },
-                                message: { type: "string" },
+                                name: {
+                                    type: "string",
+                                    minLength: 1,
+                                    description:
+                                        "Identifier name to ban from local declaration.",
+                                },
+                                message: {
+                                    type: "string",
+                                    description:
+                                        "Optional guidance shown in the lint error (e.g., what module to import from).",
+                                },
                                 kinds: {
                                     type: "array",
+                                    description:
+                                        "Restrict this entry to specific declaration kinds.",
                                     items: {
                                         enum: ["function", "variable"],
                                     },
@@ -130,6 +147,7 @@ export const noLocalIdentifiersRule = {
                 },
             },
         ],
+        defaultOptions: [{ banned: [] }],
         messages: {
             banned: "Local definition of '{{name}}' is not allowed. {{details}}",
         },

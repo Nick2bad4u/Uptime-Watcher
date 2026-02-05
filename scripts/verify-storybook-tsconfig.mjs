@@ -68,7 +68,7 @@ const main = async () => {
         })();
         throw new Error(
             `Failed to parse Storybook tsconfig at ${STORYBOOK_TSCONFIG_PATH}: ${normalizedMessage}`,
-            cause ? { cause } : undefined
+            { cause: error }
         );
     }
 
