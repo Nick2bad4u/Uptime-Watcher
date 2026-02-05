@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[bb5aa5e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb5aa5e4f1cf7fa1863ab299b52bb4fa91c069d2)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...bb5aa5e4f1cf7fa1863ab299b52bb4fa91c069d2))
+[5edf1c9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5edf1c9fb263af60ef56d5bed8bbf4a95f82739a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...5edf1c9fb263af60ef56d5bed8bbf4a95f82739a))
 
 
 ### ✨ Features
@@ -906,6 +906,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v21.6.0 [skip ci] [`(5b9bd1f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b9bd1fecda795b5401af5f0fb14a3b27faa828e)
+
+
 - Update changelogs for v21.5.0 [skip ci] [`(bb5aa5e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb5aa5e4f1cf7fa1863ab299b52bb4fa91c069d2)
 
 
@@ -949,6 +952,39 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update GitHub workflows and configurations
+ - 🛠️ [fix] Add GITLEAKS_CONFIG environment variable to gitleaks.yml for custom configuration
+ - 🧹 [chore] Refactor mirror-eslint-plugin.yml to improve source directory handling and ensure proper file copying
+ - 🧹 [chore] Clean up .secretlintignore by removing unnecessary patterns and adding specific files to ignore
+ - 🛠️ [fix] Update .secretlintrc.json to include new secretlint rules for enhanced security checks
+ - 🗑️ [delete] Remove obsolete glossary.md file from documentation
+ - 🔧 [build] Enhance package.json scripts for better documentation build and linting processes
+ - 🔧 [build] Update package-lock.json to include new secretlint rules dependencies
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5edf1c9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5edf1c9fb263af60ef56d5bed8bbf4a95f82739a)
+
+
+- 🔧 [build] Update linting scripts and dependencies
+ - ✨ [feat] Add quiet variants for linting commands to suppress output
+ - 🔧 [build] Update `babel-plugin-react-compiler` to version 1.0.0
+ - 🔧 [build] Upgrade `eslint-plugin-jsdoc` to version 62.5.1
+ - 🔧 [build] Upgrade `markdown-to-jsx` to version 9.7.2
+ - 🔧 [build] Upgrade `putout` to version 41.18.0
+ - 🔧 [build] Update package manager to npm@11.9.0
+
+🧪 [test] Refactor Playwright tests for better timeout management
+ - 🔧 [fix] Change `test.setTimeout` to `test.describe.configure` for timeout settings
+ - ✨ [feat] Introduce `url` field in `MonitorCreationScenario` to avoid duplicate input handling
+
+🛠️ [fix] Improve error handling in `verify-storybook-tsconfig.mjs`
+ - 🔧 [fix] Update error throwing to include the original error as cause
+
+🛠️ [fix] Refactor error handling in `useUiStore.ts`
+ - 🔧 [fix] Change error handling to directly use the caught error instead of wrapping it
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ecde092)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ecde0921305bcbc8259a1861ae86d2ca8b3f146d)
+
 
 - 🔧 [build] Update dependency installation commands across workflows and documentation
 
