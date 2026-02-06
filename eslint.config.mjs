@@ -14,7 +14,7 @@
  */
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
 /* eslint-disable import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
-/* eslint-disable n/no-unpublished-import -- ESLint config file, dev dependencies are fine */
+ 
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import { flatConfig } from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
@@ -117,6 +117,7 @@ import pluginNoUnwaited from "eslint-plugin-no-unawaited-dot-catch-throw";
 import nounsanitized from "eslint-plugin-no-unsanitized";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import eslintPluginNoUseExtendNative from "eslint-plugin-no-use-extend-native";
+import nodeDependencies from "eslint-plugin-node-dependencies";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import observers from "eslint-plugin-observers";
 import packageJson from "eslint-plugin-package-json";
@@ -128,6 +129,8 @@ import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginPromise from "eslint-plugin-promise";
+import * as publint from "eslint-plugin-publint";
+import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
 import pluginReact from "eslint-plugin-react";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import react19upgrade from "eslint-plugin-react-19-upgrade";
@@ -148,6 +151,7 @@ import preferFunctionComponent from "eslint-plugin-react-prefer-function-compone
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginReactTest from "eslint-plugin-react-require-testid";
+import eslintReactRsc from "eslint-plugin-react-rsc";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import reactUseEffect from "eslint-plugin-react-useeffect";
 import eslintReactWeb from "eslint-plugin-react-web-api";
@@ -234,30 +238,34 @@ const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
 const jsonSchemaValidatorRules = enableJsonSchemaValidation
     ? { "json-schema-validator/no-invalid": "error" }
     : {};
+// @dword-design/eslint-plugin-import-alias
+// @dword-design/import-alias
+// @ospm/eslint-plugin-react-signals-hooks
+// @putout/eslint
+// @putout/eslint-flat
+// ESLint Tools
 // Unused and Uninstalled Plugins:
-// import putout from "eslint-plugin-putout";
-// import pluginPii from "eslint-plugin-pii"; - broken
-// import * as nodeDependenciesPlugin from "eslint-plugin-node-dependencies"; Broken with isJson undefined error
 // eslint-config-prettier
 // eslint-find-rules
 // eslint-formatter-compact -- Built into eslint
 // eslint-import-resolver-node -- Replaced by import-x
+// eslint-plugin-es-x
+// eslint-plugin-fsecond
 // eslint-plugin-json
 // eslint-plugin-no-inferred-method-name
+// eslint-plugin-no-inferred-method-name
+// eslint-plugin-pkg-json -- Package appears to be broken or incompatible
 // eslint-plugin-react-native
 // eslint-plugin-react-x
-// eslint-plugin-no-inferred-method-name
-// eslint-plugin-fsecond
-// eslint-plugin-es-x
-// @dword-design/import-alias
+// eslint-plugin-solid
+// eslint-plugin-tree-shaking
 // eslint-plugin-typesafe -- Broken
 // eslint-plugin-use-selector-with -- Broken
 // eslint-plugin-zod-import -- Didn't test but does similar function to import-zod
-// @fluentui/eslint-plugin-react-components
-// eslint-plugin-solid
-// @ospm/eslint-plugin-react-signals-hooks
-// eslint-plugin-pkg-json -- Package appears to be broken or incompatible
-// ESLint Tools
+// eslint-plugin-zod-x -- uninstalled and discontinued and turned into eslint-plugin-zod
+// eslint-plugin-node-dependencies: enabled (scoped to **/package.json)
+// import pluginPii from "eslint-plugin-pii"; - broken
+// import putout from "eslint-plugin-putout";
 // Import { FlatCompat } from "@eslint/eslintrc";
 // Const flatCompat = new FlatCompat();
 // Don't use
@@ -1217,31 +1225,34 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Package.json Linting (PubLint)
     // ═══════════════════════════════════════════════════════════════════════════════
-    // {
-    //     name: "Package - **/Package.json - Publint",
-    //     files: ["**/package.json"],
-    //     languageOptions: {
-    //         parser: publintParser,
-    //     },
-    //     plugins: { publint },
-    //     rules: {
-    //         /**
-    //          * The 'error' type messages created by publint will cause eslint
-    //          * errors
-    //          */
-    //         "publint/error": "error",
-    //         /**
-    //          * The 'suggestion' type messages created by publint will cause
-    //          * eslint warns
-    //          */
-    //         "publint/suggestion": "warn",
-    //         /**
-    //          * The 'warning' type messages created by publint will cause eslint
-    //          * warns
-    //          */
-    //         "publint/warning": "warn",
-    //     },
-    // },
+    {
+        files: ["**/package.json"],
+        languageOptions: {
+            parser: publintParser,
+        },
+        name: "Package - **/Package.json - Publint",
+        plugins: { publint },
+        rules: {
+            /**
+             * The 'error' type messages created by publint will cause eslint
+             * errors
+             */
+            "publint/error": "error",
+            /**
+             * The 'suggestion' type messages created by publint will cause
+             * eslint warns
+             */
+            // Publint is oriented around npm package publication hygiene.
+            // This repository is an Electron application, so most "suggestions"
+            // are noise and don't represent real user impact.
+            "publint/suggestion": "warn",
+            /**
+             * The 'warning' type messages created by publint will cause eslint
+             * warns
+             */
+            "publint/warning": "warn",
+        },
+    },
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Package.json Linting
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1252,9 +1263,37 @@ export default defineConfig([
             parserOptions: { jsonSyntax: "JSON" },
         },
         name: "Package - **/Package.json",
-        plugins: { json: json, "package-json": packageJson },
+        plugins: {
+            json: json,
+            "node-dependencies": nodeDependencies,
+            "package-json": packageJson,
+        },
         rules: {
             ...json.configs.recommended.rules,
+            // NOTE: Keeping node-dependencies scoped to package.json avoids perf + parser issues.
+            "node-dependencies/absolute-version": [
+                    "error",
+                    "never", // Or always
+            ],
+            // Can be noisy depending on how transitive deps declare engines.
+            "node-dependencies/compat-engines": "off",
+            "node-dependencies/no-deprecated": [
+                    "error",
+                    {
+                            // User-request: you'll uninstall these; keep lint green in the meantime.
+                            allows: [],
+                            devDependencies: true,
+                    },
+            ],
+            "node-dependencies/no-dupe-deps": "error",
+            "node-dependencies/prefer-caret-range-version": "error",
+            "node-dependencies/prefer-tilde-range-version": "off",
+            // This rule is currently not viable for most ecosystems (many packages
+            // do not publish provenance metadata consistently).
+            "node-dependencies/require-provenance-deps": "off",
+            // Deprecated rule
+            "node-dependencies/valid-engines": "off",
+            "node-dependencies/valid-semver": "error",
             // Package.json Plugin Rules (package-json/*)
             "package-json/bin-name-casing": "warn",
             "package-json/exports-subpaths-style": "warn",
@@ -1271,7 +1310,7 @@ export default defineConfig([
             "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
             "package-json/require-engines": "warn",
-            "package-json/require-exports": "warn",
+            "package-json/require-exports": "off", // Not needed for Electron applications
             "package-json/require-files": "off", // Not needed for Electron applications
             "package-json/require-homepage": "warn",
             "package-json/require-keywords": "warn",
@@ -1281,12 +1320,13 @@ export default defineConfig([
             "package-json/require-peerDependencies": "off",
             "package-json/require-repository": "error",
             "package-json/require-scripts": "warn",
-            "package-json/require-sideEffects": "warn",
+            "package-json/require-sideEffects": "off",
             "package-json/require-type": "warn",
             "package-json/require-types": "off", // Not needed for Electron applications
             "package-json/require-version": "warn",
             "package-json/restrict-dependency-ranges": "warn",
             "package-json/restrict-private-properties": "warn",
+            // This repo intentionally uses stable camelCase script names.
             "package-json/scripts-name-casing": "warn",
             "package-json/sort-collections": "warn",
             "package-json/specify-peers-locally": "warn",
@@ -1580,6 +1620,9 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.json"],
+        // Package.json has a dedicated config block above that uses jsonc-eslint-parser
+        // (needed for some package.json-specific tooling rules).
+        ignores: ["**/package.json"],
         language: "json/json",
         name: "JSON - **/*.JSON",
         plugins: {
@@ -1817,6 +1860,7 @@ export default defineConfig([
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
+            "@eslint-react/rsc": eslintReactRsc,
             "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
@@ -2005,6 +2049,8 @@ export default defineConfig([
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {
@@ -3277,6 +3323,7 @@ export default defineConfig([
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
+            "@eslint-react/rsc": eslintReactRsc,
             "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
@@ -3492,6 +3539,8 @@ export default defineConfig([
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {
@@ -4991,6 +5040,7 @@ export default defineConfig([
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
+            "@eslint-react/rsc": eslintReactRsc,
             "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
@@ -5175,6 +5225,8 @@ export default defineConfig([
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {
@@ -6443,6 +6495,7 @@ export default defineConfig([
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
             "@eslint-react/naming-convention": eslintReactNamingConvention,
+            "@eslint-react/rsc": eslintReactRsc,
             "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
@@ -6648,6 +6701,8 @@ export default defineConfig([
             "@eslint-react/prefer-namespace-import": "off",
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {

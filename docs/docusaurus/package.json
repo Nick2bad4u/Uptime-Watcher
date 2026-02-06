@@ -19,12 +19,16 @@
         "type": "git",
         "url": "git+https://github.com/Nick2bad4u/Uptime-Watcher-Docusaurus.git"
     },
-    "license": "UnLicense",
+    "license": "UNLICENSED",
     "author": "Nick2bad4u",
-    "contributors": [],
-    "main": "src/index.tsx",
-    "directories": {},
-    "files": [],
+    "contributors": [
+        {
+            "name": "Nick2bad4u",
+            "url": "https://github.com/Nick2bad4u"
+        }
+    ],
+    "type": "commonjs",
+    "main": "src/pages/index.tsx",
     "scripts": {
         "build": "npm run generate-docs && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
         "build:default": "docusaurus build",
@@ -44,11 +48,11 @@
         "serve": "docusaurus serve",
         "start": "docusaurus start",
         "swizzle": "docusaurus swizzle",
+        "type-check": "tsc --project tsconfig.json --noEmit",
         "typecheck": "tsc --project tsconfig.json --noEmit",
         "write-heading-ids": "docusaurus write-heading-ids",
         "write-translations": "docusaurus write-translations"
     },
-    "config": {},
     "browserslist": {
         "development": [
             "last 3 chrome version",
@@ -103,12 +107,8 @@
         "typedoc-plugin-replace-text": "^4.2.0",
         "typescript": "^5.9.3"
     },
-    "bundleDependencies": [],
     "engines": {
         "node": ">=18.0"
     },
-    "os": [],
-    "cpu": [],
-    "preferGlobal": false,
-    "publishConfig": {}
+    "preferGlobal": false
 }

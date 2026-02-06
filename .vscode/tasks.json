@@ -119,7 +119,7 @@
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
-            "script": "updateDeps",
+            "script": "update-deps",
             "type": "npm"
         },
         {
