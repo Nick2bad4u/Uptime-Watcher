@@ -74,12 +74,21 @@ import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 import { createSiteMonitoringConfig } from "./siteManager/createSiteMonitoringConfig";
-import { formatSiteValidationErrors } from "./siteManager/formatSiteValidationErrors";
+import {
+    getSiteSnapshotForMutation as getSiteSnapshotForMutationHelper,
+} from "./siteManager/getSiteSnapshotForMutation";
 import { loadSiteInBackground } from "./siteManager/loadSiteInBackground";
+import {
+    emitSiteAddedAndStateSynchronized as emitSiteAddedAndStateSynchronizedHelper,
+    emitSiteCacheMissSafe as emitSiteCacheMissSafeHelper,
+    emitSiteCacheUpdated as emitSiteCacheUpdatedHelper,
+    emitSiteUpdatedAndStateSynchronized as emitSiteUpdatedAndStateSynchronizedHelper,
+} from "./siteManager/siteManagerEventEmitters";
 import {
     updateSitesCache,
     type UpdateSitesCacheOptions,
 } from "./siteManager/updateSitesCache";
+import { validateSite as validateSiteHelper } from "./siteManager/validateSite";
 import { SiteManagerStateSync } from "./SiteManagerStateSync";
 
 /**
@@ -135,17 +144,14 @@ export class SiteManager {
         operation: UptimeEvents["internal:site:cache-miss"]["operation"];
         timestamp?: number;
     }): Promise<void> {
-        try {
-            await this.eventEmitter.emitTyped("internal:site:cache-miss", {
-                backgroundLoading: args.backgroundLoading,
-                identifier: args.identifier,
-                operation: args.operation,
-                timestamp: args.timestamp ?? Date.now(),
-            });
-        } catch (error) {
-            // Observability only: never crash callers.
-            logger.debug(LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR, error);
-        }
+        return emitSiteCacheMissSafeHelper(
+            {
+                emitSitesStateSynchronized: (payload) =>
+                    this.emitSitesStateSynchronized(payload),
+                eventEmitter: this.eventEmitter,
+            },
+            args
+        );
     }
 
     /**
@@ -156,11 +162,14 @@ export class SiteManager {
         operation: UptimeEvents["internal:site:cache-updated"]["operation"];
         timestamp?: number;
     }): Promise<void> {
-        await this.eventEmitter.emitTyped("internal:site:cache-updated", {
-            identifier: args.identifier,
-            operation: args.operation,
-            timestamp: args.timestamp ?? Date.now(),
-        });
+        return emitSiteCacheUpdatedHelper(
+            {
+                emitSitesStateSynchronized: (payload) =>
+                    this.emitSitesStateSynchronized(payload),
+                eventEmitter: this.eventEmitter,
+            },
+            args
+        );
     }
 
     /**
@@ -177,23 +186,14 @@ export class SiteManager {
         timestamp?: number;
         updatedFields: readonly string[];
     }): Promise<void> {
-        const timestamp = args.timestamp ?? Date.now();
-
-        await this.eventEmitter.emitTyped("internal:site:updated", {
-            identifier: args.identifier,
-            operation: "updated",
-            previousSite: structuredClone(args.previousSite),
-            site: structuredClone(args.site),
-            timestamp,
-            updatedFields: Array.from(args.updatedFields),
-        });
-
-        await this.emitSitesStateSynchronized({
-            action: STATE_SYNC_ACTION.UPDATE,
-            siteIdentifier: args.identifier,
-            source: STATE_SYNC_SOURCE.DATABASE,
-            timestamp,
-        });
+        return emitSiteUpdatedAndStateSynchronizedHelper(
+            {
+                emitSitesStateSynchronized: (payload) =>
+                    this.emitSitesStateSynchronized(payload),
+                eventEmitter: this.eventEmitter,
+            },
+            args
+        );
     }
 
     /**
@@ -204,24 +204,14 @@ export class SiteManager {
         source: SiteAddedSource;
         timestamp?: number;
     }): Promise<void> {
-        const timestamp = args.timestamp ?? Date.now();
-        const site = structuredClone(args.site);
-
-        await this.eventEmitter.emitTyped("internal:site:added", {
-            identifier: site.identifier,
-            operation: "added",
-            site,
-            source: args.source,
-            timestamp,
-        });
-
-        // Preserve existing behavior (UPDATE action) for state consistency.
-        await this.emitSitesStateSynchronized({
-            action: STATE_SYNC_ACTION.UPDATE,
-            siteIdentifier: site.identifier,
-            source: STATE_SYNC_SOURCE.DATABASE,
-            timestamp,
-        });
+        return emitSiteAddedAndStateSynchronizedHelper(
+            {
+                emitSitesStateSynchronized: (payload) =>
+                    this.emitSitesStateSynchronized(payload),
+                eventEmitter: this.eventEmitter,
+            },
+            args
+        );
     }
 
     /**
@@ -763,20 +753,11 @@ export class SiteManager {
     private async getSiteSnapshotForMutation(
         identifier: string
     ): Promise<Site> {
-        const cachedSite = this.sitesCache.get(identifier);
-        if (cachedSite) {
-            return structuredClone(cachedSite);
-        }
-
-        const siteFromDatabase =
-            await this.siteRepositoryService.getSiteFromDatabase(identifier);
-
-        if (!siteFromDatabase) {
-            throw new Error(`Site with identifier ${identifier} not found`);
-        }
-
-        this.sitesCache.set(identifier, siteFromDatabase);
-        return structuredClone(siteFromDatabase);
+        return getSiteSnapshotForMutationHelper(
+            this.sitesCache,
+            this.siteRepositoryService,
+            identifier
+        );
     }
 
     /**
@@ -795,14 +776,7 @@ export class SiteManager {
      * @internal
      */
     private async validateSite(site: Site): Promise<void> {
-        const validationResult =
-            await this.configurationManager.validateSiteConfiguration(site);
-
-        if (!validationResult.success) {
-            throw new Error(
-                `Site validation failed for '${site.identifier}': ${this.formatValidationErrors(validationResult.errors)}`
-            );
-        }
+        return validateSiteHelper(this.configurationManager, site);
     }
 
     /** Returns the current monotonic state sync revision. */
@@ -988,23 +962,5 @@ export class SiteManager {
         return createSiteMonitoringConfig({
             monitoringOperations: this.monitoringOperations,
         });
-    }
-
-    /**
-     * Formats validation errors for better readability.
-     *
-     * @remarks
-     * Used internally to format error messages for display or logging.
-     *
-     * @param errors - Array of error messages.
-     *
-     * @returns Formatted error string.
-     *
-     * @internal
-     */
-    private formatValidationErrors(
-        errors: readonly string[] | undefined
-    ): string {
-        return formatSiteValidationErrors(errors);
     }
 }

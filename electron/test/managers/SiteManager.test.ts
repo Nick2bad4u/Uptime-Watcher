@@ -17,6 +17,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SiteManager } from "../../managers/SiteManager";
+import { formatSiteValidationErrors } from "../../managers/siteManager/formatSiteValidationErrors";
 import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
 import type { Site } from "@shared/types";
@@ -835,26 +836,26 @@ describe(SiteManager, () => {
                 ).resolves.toBeTruthy();
             });
         });
-        describe("formatValidationErrors", () => {
+        describe(formatSiteValidationErrors, () => {
             it("should format validation errors array", () => {
                 const errors = [
                     "Error 1",
                     "Error 2",
                     "Error 3",
                 ];
-                const formatted = manager["formatValidationErrors"](errors);
+                const formatted = formatSiteValidationErrors(errors);
 
                 expect(formatted).toContain("Error 1");
                 expect(formatted).toContain("Error 2");
                 expect(formatted).toContain("Error 3");
             });
             it("should handle empty errors array", () => {
-                const formatted = manager["formatValidationErrors"]([]);
+                const formatted = formatSiteValidationErrors([]);
 
                 expect(formatted).toBe("");
             });
             it("should handle undefined errors", () => {
-                const formatted = manager["formatValidationErrors"](undefined);
+                const formatted = formatSiteValidationErrors(undefined);
 
                 expect(formatted).toBe("");
             });

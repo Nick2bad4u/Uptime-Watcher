@@ -9,6 +9,7 @@ import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { SiteManager } from "../../managers/SiteManager";
+import { formatSiteValidationErrors } from "../../managers/siteManager/formatSiteValidationErrors";
 import type { IMonitoringOperations } from "../../managers/SiteManager.types";
 
 /**
@@ -1691,21 +1692,16 @@ describe("SiteManager - Comprehensive", () => {
         });
     });
 
-    describe("formatValidationErrors", () => {
-        beforeEach(() => {
-            siteManager = new SiteManager(mockDeps);
-        });
-
+    describe(formatSiteValidationErrors, () => {
         it("should format single error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const result = siteManager["formatValidationErrors"]([
-                "Single error",
-            ]);
-            expect(result).toBe("Single error");
+            expect(formatSiteValidationErrors(["Single error"])).toBe(
+                "Single error"
+            );
         });
 
         it("should format multiple errors", async ({ task, annotate }) => {
@@ -1714,11 +1710,9 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const result = siteManager["formatValidationErrors"]([
-                "Error 1",
-                "Error 2",
-            ]);
-            expect(result).toBe("\n  - Error 1\n  - Error 2");
+            expect(formatSiteValidationErrors(["Error 1", "Error 2"])).toBe(
+                "\n  - Error 1\n  - Error 2"
+            );
         });
 
         it("should handle empty error", async ({ task, annotate }) => {
@@ -1727,10 +1721,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const result = siteManager["formatValidationErrors"]([
-                undefined as any,
-            ]);
-            expect(result).toBe("");
+            expect(formatSiteValidationErrors([undefined as any])).toBe("");
         });
     });
 

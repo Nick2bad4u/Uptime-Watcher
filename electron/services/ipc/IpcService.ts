@@ -1,4 +1,3 @@
-import type { EventMetadata } from "@shared/types/events";
 import type { IpcInvokeChannel } from "@shared/types/ipc";
 import type {
     SiteIdentifierSnapshot,
@@ -9,7 +8,6 @@ import type {
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-import { isRecord } from "@shared/utils/typeHelpers";
 import { ipcMain } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -30,36 +28,11 @@ import { registerSettingsHandlers } from "./handlers/settingsHandlers";
 import { registerSiteHandlers } from "./handlers/siteHandlers";
 import { registerStateSyncHandlers } from "./handlers/stateSyncHandlers";
 import { registerSystemHandlers } from "./handlers/systemHandlers";
+import {
+    type NormalizedStateSyncStatusEvent,
+    normalizeStateSyncPayload,
+} from "./internal/stateSyncStatusNormalization";
 
-/**
- * Lightweight, normalized view of the `sites:state-synchronized` event used
- * exclusively for IPC status bookkeeping.
- */
-type NormalizedStateSyncStatusEvent =
-    | {
-          readonly _meta?: EventMetadata | undefined;
-          readonly action: typeof STATE_SYNC_ACTION.BULK_SYNC;
-          readonly revision: number;
-          readonly siteCount: number;
-          readonly sites: readonly SiteIdentifierSnapshot[];
-          readonly source: StateSyncSource;
-          readonly timestamp: number;
-          readonly truncated?: boolean | undefined;
-      }
-    | {
-          readonly _meta?: EventMetadata | undefined;
-          readonly action:
-              | typeof STATE_SYNC_ACTION.DELETE
-              | typeof STATE_SYNC_ACTION.UPDATE;
-          readonly delta: {
-              readonly addedSites: readonly SiteIdentifierSnapshot[];
-              readonly removedSiteIdentifiers: readonly string[];
-              readonly updatedSites: readonly SiteIdentifierSnapshot[];
-          };
-          readonly revision: number;
-          readonly source: StateSyncSource;
-          readonly timestamp: number;
-      };
 
 /**
  * Centralizes registration and lifecycle management of Electron IPC handlers.
@@ -84,7 +57,7 @@ export class IpcService {
     private readonly cloudService: CloudService;
 
     private readonly handleStateSyncStatusUpdate = (data: unknown): void => {
-        const normalized = this.normalizeStateSyncPayload(data);
+        const normalized = normalizeStateSyncPayload(data);
         if (!normalized) {
             logger.warn(
                 "[IpcService] Ignoring malformed sites:state-synchronized payload",
@@ -97,139 +70,6 @@ export class IpcService {
 
         this.updateStateSyncStatusFromEvent(normalized);
     };
-
-    private static isValidStateSyncSource(
-        candidate: unknown
-    ): candidate is StateSyncSource {
-        return (
-            candidate === STATE_SYNC_SOURCE.CACHE ||
-            candidate === STATE_SYNC_SOURCE.DATABASE ||
-            candidate === STATE_SYNC_SOURCE.FRONTEND ||
-            candidate === STATE_SYNC_SOURCE.IMPORT ||
-            candidate === STATE_SYNC_SOURCE.MONITOR_UPDATE
-        );
-    }
-
-    private static buildIdentifierOnlySites(
-        candidate: unknown
-    ): SiteIdentifierSnapshot[] {
-        if (!Array.isArray(candidate)) {
-            return [];
-        }
-
-        return candidate
-            .filter(isRecord)
-            .map((siteCandidate) => siteCandidate["identifier"])
-            .filter(
-                (identifier): identifier is string =>
-                    typeof identifier === "string"
-            )
-            .map((identifier) => ({ identifier }));
-    }
-
-    /**
-     * Normalizes a raw state-sync event payload into a lightweight shape the
-     * IPC layer can safely consume.
-     *
-     * @remarks
-     * We intentionally avoid validating full site payloads here. State sync
-     * events can be high-frequency and large, and IPC only needs identifiers
-     * and counts to maintain {@link StateSyncStatusSummary}.
-     */
-    private normalizeStateSyncPayload(
-        candidate: unknown
-    ): NormalizedStateSyncStatusEvent | null {
-        if (!isRecord(candidate)) {
-            return null;
-        }
-
-        const { action, revision, source, timestamp } = candidate;
-
-        if (
-            (action !== STATE_SYNC_ACTION.BULK_SYNC &&
-                action !== STATE_SYNC_ACTION.DELETE &&
-                action !== STATE_SYNC_ACTION.UPDATE) ||
-            !IpcService.isValidStateSyncSource(source) ||
-            typeof timestamp !== "number" ||
-            !Number.isFinite(timestamp) ||
-            typeof revision !== "number" ||
-            !Number.isFinite(revision)
-        ) {
-            return null;
-        }
-
-        if (action === STATE_SYNC_ACTION.BULK_SYNC) {
-            const {
-                siteCount: siteCountCandidate,
-                sites: sitesCandidate,
-                truncated,
-            } = candidate;
-
-            if (
-                typeof siteCountCandidate !== "number" ||
-                !Number.isFinite(siteCountCandidate) ||
-                !Array.isArray(sitesCandidate)
-            ) {
-                return null;
-            }
-
-            const isTruncated = truncated === true;
-            const sites = isTruncated
-                ? []
-                : IpcService.buildIdentifierOnlySites(sitesCandidate);
-
-            return {
-                action,
-                revision,
-                // Preserve the declared count even if we drop invalid site entries.
-                siteCount: Math.max(0, Math.trunc(siteCountCandidate)),
-                sites,
-                source,
-                timestamp,
-                truncated: isTruncated,
-            };
-        }
-
-        const { delta: deltaCandidate } = candidate;
-        if (!isRecord(deltaCandidate)) {
-            return null;
-        }
-
-        const {
-            addedSites: addedSitesCandidate,
-            removedSiteIdentifiers: removedSiteIdentifiersCandidate,
-            updatedSites: updatedSitesCandidate,
-        } = deltaCandidate;
-
-        if (
-            !Array.isArray(addedSitesCandidate) ||
-            !Array.isArray(updatedSitesCandidate) ||
-            !Array.isArray(removedSiteIdentifiersCandidate)
-        ) {
-            return null;
-        }
-
-        const addedSites =
-            IpcService.buildIdentifierOnlySites(addedSitesCandidate);
-        const updatedSites = IpcService.buildIdentifierOnlySites(
-            updatedSitesCandidate
-        );
-        const removedSiteIdentifiers = removedSiteIdentifiersCandidate.filter(
-            (identifier): identifier is string => typeof identifier === "string"
-        );
-
-        return {
-            action,
-            delta: {
-                addedSites,
-                removedSiteIdentifiers,
-                updatedSites,
-            },
-            revision,
-            source,
-            timestamp,
-        };
-    }
 
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,

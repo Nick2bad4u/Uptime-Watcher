@@ -1,8 +1,6 @@
 import type {
-    Monitor,
     MonitoringStartSummary,
     MonitoringStopSummary,
-    Site,
     StatusUpdate,
 } from "@shared/types";
 
@@ -19,6 +17,10 @@ import type {
 
 import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
+import {
+    collectMonitorsToResume,
+    resumeMonitoringCandidates,
+} from "./utils/persistentMonitoringResumption";
 
 type EmitTyped = <TEventName extends EventKey<UptimeEvents>>(
     eventName: TEventName,
@@ -99,77 +101,37 @@ export class MonitoringLifecycleCoordinator {
             // Get all sites from cache (loaded during site manager initialization)
             const sites = this.siteManager.getSitesFromCache();
 
-            // Find all monitors that were actively monitoring before restart
-            const monitorsToResume: Array<{ monitor: Monitor; site: Site }> =
-                [];
-
-            for (const site of sites) {
-                // Only consider sites where monitoring is enabled
-                if (site.monitoring) {
-                    // Find monitors within this site that were actively monitoring
-                    const activeMonitors = site.monitors.filter(
-                        (monitor) => monitor.monitoring
-                    );
-                    for (const monitor of activeMonitors) {
-                        monitorsToResume.push({ monitor, site });
-                    }
-                }
-            }
+            const monitorsToResume = collectMonitorsToResume(sites);
+            const monitoringSiteCount = sites.filter((site) => site.monitoring)
+                .length;
 
             if (monitorsToResume.length === 0) {
                 logger.info(
-                    "[UptimeOrchestrator] No monitors require monitoring resumption"
+                    "[MonitoringLifecycleCoordinator] No monitors require monitoring resumption"
                 );
                 return;
             }
 
             logger.info(
-                `[UptimeOrchestrator] Resuming monitoring for ${monitorsToResume.length} monitors across ${sites.filter((s) => s.monitoring).length} sites`
+                `[MonitoringLifecycleCoordinator] Resuming monitoring for ${monitorsToResume.length} monitors across ${monitoringSiteCount} sites`
             );
 
-            // Resume monitoring for each monitor individually
-            const resumePromises = monitorsToResume.map(
-                async ({ monitor, site }) => {
-                    try {
-                        const success =
-                            await this.monitorManager.startMonitoringForSite(
-                                site.identifier,
-                                monitor.id
-                            );
-
-                        if (success) {
-                            logger.debug(
-                                `[UptimeOrchestrator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
-                            );
-                        } else {
-                            logger.warn(
-                                `[UptimeOrchestrator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
-                            );
-                        }
-
-                        return success;
-                    } catch (error) {
-                        logger.error(
-                            `[UptimeOrchestrator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
-                            error
-                        );
-                        return false;
-                    }
-                }
-            );
-
-            // Wait for all to complete (use allSettled to handle failures gracefully)
-            const results = await Promise.allSettled(resumePromises);
-            const successCount = results.filter(
-                (result) => result.status === "fulfilled" && result.value
-            ).length;
+            const { attempted, succeeded } = await resumeMonitoringCandidates({
+                candidates: monitorsToResume,
+                logger,
+                startMonitoringForSite: (identifier, monitorId) =>
+                    this.monitorManager.startMonitoringForSite(
+                        identifier,
+                        monitorId
+                    ),
+            });
 
             logger.info(
-                `[UptimeOrchestrator] Monitoring resumption completed: ${successCount}/${monitorsToResume.length} monitors`
+                `[MonitoringLifecycleCoordinator] Monitoring resumption completed: ${succeeded}/${attempted} monitors`
             );
         } catch (error) {
             logger.error(
-                "[UptimeOrchestrator] Critical error during monitoring resumption:",
+                "[MonitoringLifecycleCoordinator] Critical error during monitoring resumption:",
                 error
             );
             // Don't throw - allow app initialization to continue

@@ -29,7 +29,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { Simplify, UnknownRecord } from "type-fest";
+import type { Simplify } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import {
@@ -40,22 +40,24 @@ import { isObject } from "@shared/utils/typeGuards";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { EventEmitter } from "node:events";
 
+import type {
+    ArrayPayload as InternalArrayPayload,
+    NonArrayObjectPayload as InternalNonArrayObjectPayload,
+} from "./utils/typedEventPayloadUtils";
+
 import { logger as baseLogger } from "../utils/logger";
 import { isEventMetadata } from "./eventMetadataGuards";
+import {
+    attachMetadata,
+    attachOriginalMetadata,
+    cloneArrayPayload,
+    cloneObjectPayload,
+    defineHiddenProperty,
+    getHiddenProperty,
+    resolveOriginalMetadata,
+} from "./utils/typedEventPayloadUtils";
 
 const logger = createTemplateLogger(baseLogger);
-
-interface MetaCarrier {
-    readonly _meta: EventMetadata;
-}
-
-interface OriginalMetaCarrier {
-    readonly _originalMeta: EventMetadata;
-}
-
-const resolveOriginalMetadata = (
-    ...candidates: readonly unknown[]
-): EventMetadata | undefined => candidates.find(isEventMetadata);
 
 /**
  * Internal symbol used to carry original metadata through event forwarding.
@@ -63,89 +65,6 @@ const resolveOriginalMetadata = (
 export const ORIGINAL_METADATA_SYMBOL: unique symbol = Symbol(
     "typed-event-bus:original-meta"
 );
-
-const defineHiddenProperty = (
-    target: object,
-    key: string | symbol,
-    value: unknown,
-    options?: { enumerable?: boolean }
-): void => {
-    Object.defineProperty(target, key, {
-        configurable: false,
-        enumerable: options?.enumerable ?? true,
-        value,
-        writable: false,
-    });
-};
-
-const structuredCloneFn =
-    typeof globalThis.structuredClone === "function"
-        ? globalThis.structuredClone.bind(globalThis)
-        : undefined;
-
-const cloneArrayPayload = <TPayload extends ArrayPayload>(
-    payload: TPayload
-): TPayload => {
-    if (structuredCloneFn) {
-        try {
-            return structuredCloneFn(payload);
-        } catch {
-            // Fall through to manual cloning for non-cloneable payload entries (e.g., functions).
-        }
-    }
-
-    return castUnchecked<TPayload>(Array.from(payload));
-};
-
-const cloneObjectPayload = <TPayload extends NonArrayObjectPayload>(
-    payload: TPayload
-): TPayload => {
-    if (structuredCloneFn) {
-        try {
-            return structuredCloneFn(payload);
-        } catch {
-            // Fall through to manual cloning for non-cloneable payload entries (e.g., functions).
-        }
-    }
-
-    const prototype = Reflect.getPrototypeOf(payload) ?? Object.prototype;
-    const clone: NonArrayObjectPayload = { ...payload };
-    Reflect.setPrototypeOf(clone, prototype);
-    return castUnchecked<TPayload>(clone);
-};
-
-const getHiddenProperty = (
-    target: NonArrayObjectPayload,
-    key: string | symbol
-): unknown => {
-    if (!Reflect.has(target, key)) {
-        return undefined;
-    }
-
-    return Reflect.get(target, key);
-};
-
-const attachMetadata: <TPayload extends object>(
-    payload: TPayload,
-    metadata: EventMetadata,
-    options?: { enumerable?: boolean }
-) => asserts payload is MetaCarrier & TPayload = (
-    payload,
-    metadata,
-    options
-) => {
-    defineHiddenProperty(payload, "_meta", metadata, options);
-};
-
-const attachOriginalMetadata: <TPayload extends object>(
-    payload: TPayload,
-    metadata: EventMetadata
-) => asserts payload is OriginalMetaCarrier & TPayload = (
-    payload,
-    metadata
-) => {
-    defineHiddenProperty(payload, "_originalMeta", metadata);
-};
 
 /**
  * Diagnostic information about a {@link TypedEventBus} instance.
@@ -210,7 +129,7 @@ export interface EventBusDiagnostics<
 /**
  * Read-only array payload supported by the event bus.
  */
-type ArrayPayload = readonly unknown[] | unknown[];
+type ArrayPayload = InternalArrayPayload;
 
 /**
  * Primitive payload supported by the event bus.
@@ -229,9 +148,7 @@ type PrimitivePayload =
  * The optional `length` exclusion prevents accidental array matches.
  */
 // Use Type-Fest's canonical unknown-record typing for object payloads.
-type NonArrayObjectPayload = UnknownRecord & {
-    readonly length?: never;
-};
+type NonArrayObjectPayload = InternalNonArrayObjectPayload;
 
 /**
  * Supported event payload value for the typed event bus.

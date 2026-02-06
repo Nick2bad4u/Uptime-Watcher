@@ -12,19 +12,10 @@ import type {
 } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
-import {
-    IPC_INVOKE_CHANNEL_PARAM_COUNTS,
-    isIpcCorrelationEnvelope,
-} from "@shared/types/ipc";
-import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
-import { generateCorrelationId } from "@shared/utils/correlation";
+import { IPC_INVOKE_CHANNEL_PARAM_COUNTS } from "@shared/types/ipc";
 import { ensureError } from "@shared/utils/errorHandling";
-import {
-    normalizeLogValue,
-    withLogContext,
-} from "@shared/utils/loggingContext";
+import { withLogContext } from "@shared/utils/loggingContext";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 
 import type {
@@ -33,9 +24,18 @@ import type {
     IpcResultValidator,
 } from "./types";
 
-import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
-import { truncateUtfString } from "./diagnosticsLimits";
+import {
+    extractIpcCorrelationContext,
+} from "./internal/ipcCorrelationContext";
+import {
+    createSafeErrorMessage,
+} from "./internal/ipcErrorUtils";
+import {
+    executeIpcHandler,
+    type HandlerExecutionResult,
+} from "./internal/ipcHandlerExecution";
+import { shouldLogHandler } from "./internal/ipcLogging";
 
 type ChannelParams<TChannel extends IpcInvokeChannel> = [
     ...IpcInvokeChannelParams<TChannel>,
@@ -58,34 +58,8 @@ export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
     validateResult?: IpcResultValidator<IpcInvokeChannelResult<TChannel>> | null
 ) => void;
 
-function createSafeErrorMessage(error: unknown): string {
-    const ensured = ensureError(error);
-    return isNonEmptyString(ensured.message)
-        ? ensured.message
-        : "Unknown error";
-}
-
-const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
-    MONITOR_TYPES_CHANNELS.formatMonitorDetail,
-    MONITOR_TYPES_CHANNELS.getMonitorTypes,
-]);
-
 const getExpectedParamCount = (channelName: IpcInvokeChannel): number =>
     IPC_INVOKE_CHANNEL_PARAM_COUNTS[channelName];
-
-/** Maximum bytes allowed for IPC error messages returned to the renderer. */
-const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
-
-const normalizeIpcErrorMessage = (message: string): string => {
-    // Truncate first to cap redaction work for huge messages.
-    const preview = truncateUtfString(
-        message,
-        MAX_IPC_ERROR_MESSAGE_UTF_BYTES
-    ).value;
-
-    const normalized = normalizeLogValue(preview);
-    return typeof normalized === "string" ? normalized : preview;
-};
 
 /**
  * Structured metadata describing IPC handler execution characteristics.
@@ -113,21 +87,6 @@ interface IpcHandlerMetadata extends UnknownRecord {
     validationErrors?: readonly string[];
 }
 
-interface HandlerExecutionFailure {
-    duration: number;
-    errorMessage: string;
-    outcome: "error";
-}
-
-interface HandlerExecutionSuccess<T> {
-    duration: number;
-    outcome: "success";
-    value: T;
-}
-
-type HandlerExecutionResult<T> =
-    | HandlerExecutionFailure
-    | HandlerExecutionSuccess<T>;
 
 /**
  * Options for {@link withIpcHandler} / {@link withIpcHandlerValidation}.
@@ -157,107 +116,6 @@ function assertChannelParams<TChannel extends IpcInvokeChannel>(
     }
 }
 
-interface ExtractedIpcContext {
-    readonly args: readonly unknown[];
-    readonly correlationId?: CorrelationId;
-}
-
-const extractIpcCorrelationContext = (
-    args: readonly unknown[]
-): ExtractedIpcContext => {
-    const correlationEnvelope = args.at(-1);
-    if (isIpcCorrelationEnvelope(correlationEnvelope)) {
-        return {
-            args: args.slice(0, -1),
-            correlationId: correlationEnvelope.correlationId,
-        } satisfies ExtractedIpcContext;
-    }
-
-    return { args } satisfies ExtractedIpcContext;
-};
-
-function shouldLogHandler(channelName: string): boolean {
-    return isDev() && !HIGH_FREQUENCY_OPERATIONS.has(channelName);
-}
-
-async function executeIpcHandler<T>(
-    channelName: string,
-    handler: () => Promise<T> | T,
-    options?: WithIpcHandlerOptions<T>
-): Promise<HandlerExecutionResult<T>> {
-    const startTime = Date.now();
-    const logStart = shouldLogHandler(channelName);
-    const correlationId = options?.correlationId ?? generateCorrelationId();
-    const startMetadata = options?.metadata;
-
-    if (logStart) {
-        const metadata =
-            startMetadata && Object.keys(startMetadata).length > 0
-                ? { handler: channelName, ...startMetadata }
-                : { handler: channelName };
-        logger.debug(
-            `[IpcHandler] Starting ${channelName}`,
-            withLogContext({
-                channel: channelName,
-                correlationId,
-                event: "ipc:handler:start",
-                severity: "debug",
-            }),
-            metadata
-        );
-    }
-
-    try {
-        const value = await handler();
-        const duration = Date.now() - startTime;
-
-        if (logStart) {
-            logger.debug(
-                `[IpcHandler] Completed ${channelName}`,
-                withLogContext({
-                    channel: channelName,
-                    correlationId,
-                    event: "ipc:handler:completed",
-                    severity: "debug",
-                }),
-                {
-                    duration,
-                    handler: channelName,
-                }
-            );
-        }
-
-        return {
-            duration,
-            outcome: "success",
-            value,
-        };
-    } catch (error) {
-        const duration = Date.now() - startTime;
-        const rawErrorMessage = getUserFacingErrorDetail(error);
-        const errorMessage = normalizeIpcErrorMessage(rawErrorMessage);
-
-        logger.error(
-            `[IpcHandler] Failed ${channelName}`,
-            withLogContext({
-                channel: channelName,
-                correlationId,
-                event: "ipc:handler:failed",
-                severity: "error",
-            }),
-            {
-                duration,
-                error: errorMessage,
-            }
-        );
-
-        return {
-            duration,
-            errorMessage,
-            outcome: "error",
-        };
-    }
-}
 
 /**
  * Converts an {@link ArrayBufferView} into a standalone {@link ArrayBuffer}

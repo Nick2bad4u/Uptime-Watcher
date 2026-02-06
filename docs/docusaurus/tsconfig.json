@@ -75,7 +75,8 @@
         "**/*.test.*",
         "**/*.spec.*"
     ],
-    "extends": "./tsconfig.typedoc.json",
+    "extends": "@docusaurus/tsconfig",
+    "files": [],
     "include": [
         "**/*.ts",
         "**/*.tsx",

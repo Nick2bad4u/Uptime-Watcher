@@ -19,16 +19,10 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import type { EventKey, EventMiddleware, TypedEventMap } from "./TypedEventBus";
 
 import { logger as baseLogger } from "../utils/logger";
+import { tryStructuredClone } from "./utils/structuredClone";
 
 const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
 const NON_SERIALIZABLE_PLACEHOLDER = "[Unserializable object]" as const;
-
-type StructuredClone = <T>(value: T) => T;
-
-const structuredCloneFn: StructuredClone | undefined =
-    typeof globalThis.structuredClone === "function"
-        ? globalThis.structuredClone.bind(globalThis)
-        : undefined;
 
 type CloneableValue = object;
 
@@ -185,14 +179,10 @@ const formatLoggableData = (data: unknown): unknown => {
         try {
             return cloneObjectForLogging(data);
         } catch {
-            if (structuredCloneFn) {
-                try {
-                    return structuredCloneFn(data);
-                } catch {
-                    return safeSerialize(data);
-                }
+            const cloned = tryStructuredClone(data);
+            if (cloned !== undefined) {
+                return cloned;
             }
-
             return safeSerialize(data);
         }
     }

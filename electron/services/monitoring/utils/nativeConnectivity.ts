@@ -31,6 +31,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import type { MonitorCheckResult } from "../types";
 
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
+import { sleepMs } from "../shared/sleepMs";
 
 /* eslint-disable @microsoft/sdl/no-insecure-url -- Scheme literals are used only for stripping input; they are not used as navigated/executed URLs. */
 
@@ -90,6 +91,22 @@ const DEFAULT_OPTIONS: Required<ConnectivityOptions> = {
     retryDelay: 1000,
     timeout: 5000,
 };
+
+const computeRetryDelayMs = (
+    options: Required<ConnectivityOptions>,
+    attemptsLeft: number
+): number => options.retryDelay * (options.retries - attemptsLeft + 2);
+
+const createRetryErrorResult = (
+    error: unknown,
+    options: Required<ConnectivityOptions>,
+    attemptsLeft: number
+): MonitorCheckResult => ({
+    details: `Check failed on attempt ${options.retries - attemptsLeft + 2}`,
+    error: getUserFacingErrorDetail(error),
+    responseTime: options.timeout,
+    status: "down",
+});
 
 /**
  * Result of a TCP port connectivity check
@@ -542,7 +559,7 @@ export async function checkConnectivityWithRetry(
     options: ConnectivityOptions = {},
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
-    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const opts = { ...DEFAULT_OPTIONS, ...options } as Required<ConnectivityOptions>;
 
     const attemptCheck = async (
         attemptsLeft: number
@@ -568,38 +585,23 @@ export async function checkConnectivityWithRetry(
             }
 
             // Wait before retry
-            const retryDelayMs =
-                opts.retryDelay * (opts.retries - attemptsLeft + 2);
-            if (signal) {
-                await delay(retryDelayMs, undefined, { signal });
-            } else {
-                await delay(retryDelayMs);
-            }
+            const retryDelayMs = computeRetryDelayMs(opts, attemptsLeft);
+            await sleepMs(retryDelayMs, signal);
 
             return await attemptCheck(attemptsLeft - 1);
         } catch (error) {
             if (signal?.aborted) {
                 throw createAbortError({ cause: error });
             }
-            const errorResult: MonitorCheckResult = {
-                details: `Check failed on attempt ${opts.retries - attemptsLeft + 2}`,
-                error: getUserFacingErrorDetail(error),
-                responseTime: opts.timeout,
-                status: "down",
-            };
+            const errorResult = createRetryErrorResult(error, opts, attemptsLeft);
 
             if (attemptsLeft === 0) {
                 return errorResult;
             }
 
             // Wait before retry
-            const retryDelayMs =
-                opts.retryDelay * (opts.retries - attemptsLeft + 2);
-            if (signal) {
-                await delay(retryDelayMs, undefined, { signal });
-            } else {
-                await delay(retryDelayMs);
-            }
+            const retryDelayMs = computeRetryDelayMs(opts, attemptsLeft);
+            await sleepMs(retryDelayMs, signal);
 
             return attemptCheck(attemptsLeft - 1);
         }

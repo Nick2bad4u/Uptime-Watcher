@@ -14,12 +14,11 @@
  */
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
 /* eslint-disable import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
- 
+
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import { flatConfig } from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
 import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
-import eslintReact from "@eslint-react/eslint-plugin";
 import { fixupPluginRules } from "@eslint/compat";
 import css from "@eslint/css";
 import js from "@eslint/js";
@@ -155,6 +154,7 @@ import eslintReactRsc from "eslint-plugin-react-rsc";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import reactUseEffect from "eslint-plugin-react-useeffect";
 import eslintReactWeb from "eslint-plugin-react-web-api";
+import eslintReactX from "eslint-plugin-react-x";
 // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginRedos from "eslint-plugin-redos";
 import pluginRegexp from "eslint-plugin-regexp";
@@ -256,7 +256,7 @@ const jsonSchemaValidatorRules = enableJsonSchemaValidation
 // eslint-plugin-no-inferred-method-name
 // eslint-plugin-pkg-json -- Package appears to be broken or incompatible
 // eslint-plugin-react-native
-// eslint-plugin-react-x
+// eslint-plugin-react-x -- installed directly (preferred modular package from Rel1cx/eslint-react)
 // eslint-plugin-solid
 // eslint-plugin-tree-shaking
 // eslint-plugin-typesafe -- Broken
@@ -402,6 +402,8 @@ export default defineConfig([
             "**/coverage/**",
             "**/dist-scripts/**",
             "**/dist/**",
+            "**/*.css.d.ts",
+            "**/*.module.css.d.ts",
             "**/html/**",
             "**/node_modules/**",
             "**/package-lock.json",
@@ -1286,6 +1288,7 @@ export default defineConfig([
                     },
             ],
             "node-dependencies/no-dupe-deps": "error",
+            "node-dependencies/no-restricted-deps": "off",
             "node-dependencies/prefer-caret-range-version": "error",
             "node-dependencies/prefer-tilde-range-version": "off",
             // This rule is currently not viable for most ecosystems (many packages
@@ -1830,6 +1833,7 @@ export default defineConfig([
             "docs/docusaurus/build/**",
             "docs/docusaurus/.docusaurus/**",
             "docs/docusaurus/**/*.css",
+            "docs/docusaurus/**/*.css.d.ts",
         ],
         languageOptions: {
             globals: {
@@ -1856,12 +1860,6 @@ export default defineConfig([
         name: "Docusaurus - docs/docusaurus/**/*.{TS,TSX,MJS,CJS,JS,JSX,MTS,CTS}",
         plugins: {
             "@docusaurus": pluginDocusaurus,
-            "@eslint-react": eslintReact,
-            "@eslint-react/dom": eslintReactDom,
-            "@eslint-react/hooks-extra": eslintReactHooksExtra,
-            "@eslint-react/naming-convention": eslintReactNamingConvention,
-            "@eslint-react/rsc": eslintReactRsc,
-            "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
@@ -1915,8 +1913,14 @@ export default defineConfig([
             prettier: pluginPrettier,
             promise: pluginPromise,
             react: pluginReact,
+            "react-dom": eslintReactDom,
             "react-hooks": reactHooks,
             "react-hooks-addons": reactHooksAddons,
+            "react-hooks-extra": eslintReactHooksExtra,
+            "react-naming-convention": eslintReactNamingConvention,
+            "react-rsc": eslintReactRsc,
+            "react-web-api": eslintReactWeb,
+            "react-x": eslintReactX,
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
@@ -1972,7 +1976,11 @@ export default defineConfig([
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...eslintReactX.configs["recommended-type-checked"].rules,
+            ...eslintReactDom.configs.recommended.rules,
+            ...eslintReactWeb.configs.recommended.rules,
+            ...eslintReactHooksExtra.configs.recommended.rules,
+            ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
@@ -1996,61 +2004,6 @@ export default defineConfig([
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
-            "@eslint-react/avoid-shorthand-boolean": "off",
-            "@eslint-react/dom/no-missing-button-type": "warn",
-            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
-            "@eslint-react/dom/no-string-style-prop": "error",
-            "@eslint-react/dom/no-unknown-property": "warn",
-            "@eslint-react/dom/no-unsafe-target-blank": "warn",
-            /* DOM subplugin */
-            "@eslint-react/dom/no-void-elements-with-children": "warn",
-            "@eslint-react/dom/prefer-namespace-import": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
-            /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
-            "@eslint-react/jsx-dollar": "warn",
-            "@eslint-react/jsx-key-before-spread": "warn",
-            "@eslint-react/jsx-no-iife": "warn",
-            "@eslint-react/jsx-no-undef": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
-            "@eslint-react/jsx-shorthand-fragment": "warn",
-            "@eslint-react/jsx-uses-react": "warn",
-            "@eslint-react/jsx-uses-vars": "warn",
-            "@eslint-react/naming-convention/component-name": "warn",
-            "@eslint-react/naming-convention/context-name": "warn",
-            /* Naming convention subplugin */
-            "@eslint-react/naming-convention/filename": "off",
-            "@eslint-react/naming-convention/filename-extension": "off",
-            "@eslint-react/naming-convention/use-state": "warn",
-            "@eslint-react/no-children-prop": "warn",
-            "@eslint-react/no-class-component": "warn",
-            "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-leaked-conditional-rendering": "warn",
-            "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-missing-context-display-name": "warn",
-            "@eslint-react/no-misused-capture-owner-stack": "warn",
-            "@eslint-react/no-nested-component-definitions": "warn",
-            "@eslint-react/no-unnecessary-key": "warn",
-            "@eslint-react/no-unnecessary-use-callback": "off",
-            "@eslint-react/no-unnecessary-use-memo": "off",
-            "@eslint-react/no-unnecessary-use-prefix": "warn",
-            "@eslint-react/no-unnecessary-use-ref": "warn",
-            "@eslint-react/no-unstable-context-value": "warn",
-            "@eslint-react/no-unstable-default-props": "warn",
-            "@eslint-react/no-unused-props": "warn",
-            "@eslint-react/no-unused-state": "warn",
-            "@eslint-react/no-useless-forward-ref": "warn",
-            "@eslint-react/no-useless-fragment": "warn",
-            "@eslint-react/prefer-destructuring-assignment": "warn",
-            "@eslint-react/prefer-namespace-import": "off",
-            "@eslint-react/prefer-react-namespace-import": "off",
-            "@eslint-react/prefer-read-only-props": "warn",
-            // This project does not use React Server Components; keep RSC-only rules disabled.
-            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {
@@ -2957,7 +2910,22 @@ export default defineConfig([
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
+            "react-dom/no-missing-button-type": "warn",
+            "react-dom/no-missing-iframe-sandbox": "warn",
+            "react-dom/no-string-style-prop": "error",
+            "react-dom/no-unknown-property": "warn",
+            "react-dom/no-unsafe-target-blank": "warn",
+            /* DOM subplugin */
+            "react-dom/no-void-elements-with-children": "warn",
+            "react-dom/prefer-namespace-import": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
+            /* Hooks extra subplugin */
+            "react-hooks-extra/no-direct-set-state-in-use-effect":
+                "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             "react-hooks/fbt": "warn",
@@ -2968,6 +2936,47 @@ export default defineConfig([
             "react-hooks/no-deriving-state-in-effects": "warn",
             "react-hooks/rule-suppression": "warn",
             "react-hooks/syntax": "warn",
+            "react-hooks/todo": "off",
+            "react-naming-convention/component-name": "warn",
+            "react-naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "react-naming-convention/filename": "off",
+            "react-naming-convention/filename-extension": "off",
+            "react-naming-convention/use-state": "warn",
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "react-rsc/function-definition": "off",
+            "react-x/jsx-dollar": "warn",
+            "react-x/jsx-key-before-spread": "warn",
+            "react-x/jsx-no-iife": "warn",
+            "react-x/jsx-no-undef": "warn",
+            "react-x/jsx-shorthand-boolean": "warn",
+            "react-x/jsx-shorthand-fragment": "warn",
+            "react-x/jsx-uses-react": "warn",
+            "react-x/jsx-uses-vars": "warn",
+            "react-x/no-children-prop": "warn",
+            "react-x/no-class-component": "warn",
+            "react-x/no-duplicate-key": "warn",
+            "react-x/no-leaked-conditional-rendering": "warn",
+            "react-x/no-missing-component-display-name": "warn",
+            "react-x/no-missing-context-display-name": "warn",
+            "react-x/no-misused-capture-owner-stack": "warn",
+            "react-x/no-nested-component-definitions": "warn",
+            "react-x/no-unnecessary-key": "warn",
+            "react-x/no-unnecessary-use-callback": "off",
+            "react-x/no-unnecessary-use-memo": "off",
+            "react-x/no-unnecessary-use-prefix": "warn",
+            "react-x/no-unnecessary-use-ref": "warn",
+            "react-x/no-unstable-context-value": "warn",
+            "react-x/no-unstable-default-props": "warn",
+            "react-x/no-unused-class-component-members": "warn",
+            "react-x/no-unused-props": "warn",
+            "react-x/no-unused-state": "warn",
+            "react-x/no-useless-forward-ref": "warn",
+            "react-x/no-useless-fragment": "warn",
+            "react-x/prefer-destructuring-assignment": "warn",
+            "react-x/prefer-namespace-import": "off",
+            "react-x/prefer-react-namespace-import": "off",
+            "react-x/prefer-read-only-props": "warn",
             "react/forbid-component-props": "off",
             // Disable problematic rules for Docusaurus
             "react/function-component-definition": "off", // Allow Docusaurus component patterns
@@ -3319,12 +3328,6 @@ export default defineConfig([
         name: "TypeScript Frontend - src/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@arthurgeron/react-usememo": flatConfig,
-            "@eslint-react": eslintReact,
-            "@eslint-react/dom": eslintReactDom,
-            "@eslint-react/hooks-extra": eslintReactHooksExtra,
-            "@eslint-react/naming-convention": eslintReactNamingConvention,
-            "@eslint-react/rsc": eslintReactRsc,
-            "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
@@ -3384,15 +3387,21 @@ export default defineConfig([
             react: pluginReact,
             "react-19-upgrade": react19upgrade,
             "react-compiler": reactCompiler,
+            "react-dom": eslintReactDom,
             "react-form-fields": pluginReactFormFields,
             "react-hook-form": pluginReactHookForm,
             "react-hooks": reactHooks,
             "react-hooks-addons": reactHooksAddons,
+            "react-hooks-extra": eslintReactHooksExtra,
+            "react-naming-convention": eslintReactNamingConvention,
             "react-perf": reactPerfPlugin,
             "react-prefer-function-component": preferFunctionComponent,
             "react-refresh": reactRefreshPlugin,
             "react-require-testid": pluginReactTest,
+            "react-rsc": eslintReactRsc,
             "react-useeffect": reactUseEffect,
+            "react-web-api": eslintReactWeb,
+            "react-x": eslintReactX,
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
@@ -3453,7 +3462,11 @@ export default defineConfig([
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...eslintReactX.configs["recommended-type-checked"].rules,
+            ...eslintReactDom.configs.recommended.rules,
+            ...eslintReactWeb.configs.recommended.rules,
+            ...eslintReactHooksExtra.configs.recommended.rules,
+            ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
@@ -3487,60 +3500,6 @@ export default defineConfig([
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
-            "@eslint-react/avoid-shorthand-boolean": "off",
-            "@eslint-react/dom/no-missing-button-type": "warn",
-            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
-            "@eslint-react/dom/no-unknown-property": "warn",
-            "@eslint-react/dom/no-unsafe-target-blank": "warn",
-            /* DOM subplugin */
-            "@eslint-react/dom/no-void-elements-with-children": "warn",
-            "@eslint-react/dom/prefer-namespace-import": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
-            /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
-            "@eslint-react/jsx-dollar": "warn",
-            "@eslint-react/jsx-key-before-spread": "warn",
-            "@eslint-react/jsx-no-iife": "warn",
-            "@eslint-react/jsx-no-undef": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
-            "@eslint-react/jsx-shorthand-fragment": "warn",
-            "@eslint-react/jsx-uses-react": "warn",
-            "@eslint-react/jsx-uses-vars": "warn",
-            "@eslint-react/naming-convention/component-name": "warn",
-            "@eslint-react/naming-convention/context-name": "warn",
-            /* Naming convention subplugin */
-            "@eslint-react/naming-convention/filename": "off",
-            "@eslint-react/naming-convention/filename-extension": "off",
-            "@eslint-react/naming-convention/use-state": "warn",
-            "@eslint-react/no-children-prop": "warn",
-            "@eslint-react/no-class-component": "warn",
-            "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-leaked-conditional-rendering": "warn",
-            "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-missing-context-display-name": "warn",
-            "@eslint-react/no-misused-capture-owner-stack": "warn",
-            "@eslint-react/no-nested-component-definitions": "warn",
-            "@eslint-react/no-unnecessary-key": "warn",
-            "@eslint-react/no-unnecessary-use-callback": "off",
-            "@eslint-react/no-unnecessary-use-memo": "off",
-            "@eslint-react/no-unnecessary-use-prefix": "warn",
-            "@eslint-react/no-unnecessary-use-ref": "warn",
-            "@eslint-react/no-unstable-context-value": "warn",
-            "@eslint-react/no-unstable-default-props": "warn",
-            "@eslint-react/no-unused-props": "warn",
-            "@eslint-react/no-unused-state": "warn",
-            "@eslint-react/no-useless-forward-ref": "warn",
-            "@eslint-react/no-useless-fragment": "warn",
-            "@eslint-react/prefer-destructuring-assignment": "warn",
-            "@eslint-react/prefer-namespace-import": "off",
-            "@eslint-react/prefer-react-namespace-import": "off",
-            "@eslint-react/prefer-read-only-props": "warn",
-            // This project does not use React Server Components; keep RSC-only rules disabled.
-            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {
@@ -4415,6 +4374,13 @@ export default defineConfig([
             "react-19-upgrade/no-prop-types": "warn",
             "react-19-upgrade/no-proptypes": "warn",
             "react-19-upgrade/no-string-refs": "error",
+            "react-dom/no-missing-button-type": "warn",
+            "react-dom/no-missing-iframe-sandbox": "warn",
+            "react-dom/no-unknown-property": "warn",
+            "react-dom/no-unsafe-target-blank": "warn",
+            /* DOM subplugin */
+            "react-dom/no-void-elements-with-children": "warn",
+            "react-dom/prefer-namespace-import": "warn",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -4422,6 +4388,13 @@ export default defineConfig([
             "react-form-fields/styled-no-only-value-prop": "error",
             "react-hook-form/no-use-watch": "error",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
+            /* Hooks extra subplugin */
+            "react-hooks-extra/no-direct-set-state-in-use-effect":
+                "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             // React Hooks
@@ -4435,6 +4408,13 @@ export default defineConfig([
             "react-hooks/rule-suppression": "warn",
             "react-hooks/rules-of-hooks": "error",
             "react-hooks/syntax": "warn",
+            "react-hooks/todo": "off",
+            "react-naming-convention/component-name": "warn",
+            "react-naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "react-naming-convention/filename": "off",
+            "react-naming-convention/filename-extension": "off",
+            "react-naming-convention/use-state": "warn",
             "react-prefer-function-component/react-prefer-function-component": [
                 "error",
                 {
@@ -4559,7 +4539,41 @@ export default defineConfig([
                     enableComponents: [],
                 },
             ],
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "react-rsc/function-definition": "off",
             "react-useeffect/no-non-function-return": "error",
+            "react-x/jsx-dollar": "warn",
+            "react-x/jsx-key-before-spread": "warn",
+            "react-x/jsx-no-iife": "warn",
+            "react-x/jsx-no-undef": "warn",
+            "react-x/jsx-shorthand-boolean": "warn",
+            "react-x/jsx-shorthand-fragment": "warn",
+            "react-x/jsx-uses-react": "warn",
+            "react-x/jsx-uses-vars": "warn",
+            "react-x/no-children-prop": "warn",
+            "react-x/no-class-component": "warn",
+            "react-x/no-duplicate-key": "warn",
+            "react-x/no-leaked-conditional-rendering": "warn",
+            "react-x/no-missing-component-display-name": "warn",
+            "react-x/no-missing-context-display-name": "warn",
+            "react-x/no-misused-capture-owner-stack": "warn",
+            "react-x/no-nested-component-definitions": "warn",
+            "react-x/no-unnecessary-key": "warn",
+            "react-x/no-unnecessary-use-callback": "off",
+            "react-x/no-unnecessary-use-memo": "off",
+            "react-x/no-unnecessary-use-prefix": "warn",
+            "react-x/no-unnecessary-use-ref": "warn",
+            "react-x/no-unstable-context-value": "warn",
+            "react-x/no-unstable-default-props": "warn",
+            "react-x/no-unused-class-component-members": "warn",
+            "react-x/no-unused-props": "warn",
+            "react-x/no-unused-state": "warn",
+            "react-x/no-useless-forward-ref": "warn",
+            "react-x/no-useless-fragment": "warn",
+            "react-x/prefer-destructuring-assignment": "warn",
+            "react-x/prefer-namespace-import": "off",
+            "react-x/prefer-react-namespace-import": "off",
+            "react-x/prefer-read-only-props": "warn",
             // React
             "react/boolean-prop-naming": "warn",
             "react/button-has-type": "warn",
@@ -5036,12 +5050,6 @@ export default defineConfig([
         },
         name: "Electron Backend -  - electron/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            "@eslint-react": eslintReact,
-            "@eslint-react/dom": eslintReactDom,
-            "@eslint-react/hooks-extra": eslintReactHooksExtra,
-            "@eslint-react/naming-convention": eslintReactNamingConvention,
-            "@eslint-react/rsc": eslintReactRsc,
-            "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
@@ -5097,8 +5105,14 @@ export default defineConfig([
             prettier: pluginPrettier,
             promise: pluginPromise,
             react: pluginReact,
+            "react-dom": eslintReactDom,
             "react-hooks": reactHooks,
             "react-hooks-addons": reactHooksAddons,
+            "react-hooks-extra": eslintReactHooksExtra,
+            "react-naming-convention": eslintReactNamingConvention,
+            "react-rsc": eslintReactRsc,
+            "react-web-api": eslintReactWeb,
+            "react-x": eslintReactX,
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
@@ -5155,7 +5169,11 @@ export default defineConfig([
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...eslintReactX.configs["recommended-type-checked"].rules,
+            ...eslintReactDom.configs.recommended.rules,
+            ...eslintReactWeb.configs.recommended.rules,
+            ...eslintReactHooksExtra.configs.recommended.rules,
+            ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
@@ -5174,59 +5192,6 @@ export default defineConfig([
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
-            "@eslint-react/avoid-shorthand-boolean": "off",
-            "@eslint-react/dom/no-missing-button-type": "warn",
-            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
-            "@eslint-react/dom/no-unknown-property": "warn",
-            "@eslint-react/dom/no-unsafe-target-blank": "warn",
-            /* DOM subplugin */
-            "@eslint-react/dom/no-void-elements-with-children": "warn",
-            "@eslint-react/dom/prefer-namespace-import": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
-            /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
-            "@eslint-react/jsx-dollar": "warn",
-            "@eslint-react/jsx-no-iife": "warn",
-            "@eslint-react/jsx-no-undef": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
-            "@eslint-react/jsx-shorthand-fragment": "warn",
-            "@eslint-react/jsx-uses-react": "warn",
-            "@eslint-react/jsx-uses-vars": "warn",
-            "@eslint-react/naming-convention/component-name": "warn",
-            "@eslint-react/naming-convention/context-name": "warn",
-            /* Naming convention subplugin */
-            "@eslint-react/naming-convention/filename": "off",
-            "@eslint-react/naming-convention/filename-extension": "off",
-            "@eslint-react/naming-convention/use-state": "warn",
-            "@eslint-react/no-children-prop": "warn",
-            "@eslint-react/no-class-component": "warn",
-            "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-leaked-conditional-rendering": "warn",
-            "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-missing-context-display-name": "warn",
-            "@eslint-react/no-misused-capture-owner-stack": "warn",
-            "@eslint-react/no-nested-component-definitions": "warn",
-            "@eslint-react/no-unnecessary-key": "warn",
-            "@eslint-react/no-unnecessary-use-callback": "off",
-            "@eslint-react/no-unnecessary-use-memo": "off",
-            "@eslint-react/no-unnecessary-use-prefix": "warn",
-            "@eslint-react/no-unnecessary-use-ref": "warn",
-            "@eslint-react/no-unstable-context-value": "warn",
-            "@eslint-react/no-unstable-default-props": "warn",
-            "@eslint-react/no-unused-props": "warn",
-            "@eslint-react/no-unused-state": "warn",
-            "@eslint-react/no-useless-forward-ref": "warn",
-            "@eslint-react/no-useless-fragment": "warn",
-            "@eslint-react/prefer-destructuring-assignment": "warn",
-            "@eslint-react/prefer-namespace-import": "off",
-            "@eslint-react/prefer-react-namespace-import": "off",
-            "@eslint-react/prefer-read-only-props": "warn",
-            // This project does not use React Server Components; keep RSC-only rules disabled.
-            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {
@@ -6147,7 +6112,21 @@ export default defineConfig([
             "promise/prefer-await-to-then": "warn",
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
+            "react-dom/no-missing-button-type": "warn",
+            "react-dom/no-missing-iframe-sandbox": "warn",
+            "react-dom/no-unknown-property": "warn",
+            "react-dom/no-unsafe-target-blank": "warn",
+            /* DOM subplugin */
+            "react-dom/no-void-elements-with-children": "warn",
+            "react-dom/prefer-namespace-import": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
+            /* Hooks extra subplugin */
+            "react-hooks-extra/no-direct-set-state-in-use-effect":
+                "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             "react-hooks/fbt": "warn",
@@ -6158,6 +6137,46 @@ export default defineConfig([
             "react-hooks/no-deriving-state-in-effects": "warn",
             "react-hooks/rule-suppression": "warn",
             "react-hooks/syntax": "warn",
+            "react-hooks/todo": "off",
+            "react-naming-convention/component-name": "warn",
+            "react-naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "react-naming-convention/filename": "off",
+            "react-naming-convention/filename-extension": "off",
+            "react-naming-convention/use-state": "warn",
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "react-rsc/function-definition": "off",
+            "react-x/jsx-dollar": "warn",
+            "react-x/jsx-no-iife": "warn",
+            "react-x/jsx-no-undef": "warn",
+            "react-x/jsx-shorthand-boolean": "warn",
+            "react-x/jsx-shorthand-fragment": "warn",
+            "react-x/jsx-uses-react": "warn",
+            "react-x/jsx-uses-vars": "warn",
+            "react-x/no-children-prop": "warn",
+            "react-x/no-class-component": "warn",
+            "react-x/no-duplicate-key": "warn",
+            "react-x/no-leaked-conditional-rendering": "warn",
+            "react-x/no-missing-component-display-name": "warn",
+            "react-x/no-missing-context-display-name": "warn",
+            "react-x/no-misused-capture-owner-stack": "warn",
+            "react-x/no-nested-component-definitions": "warn",
+            "react-x/no-unnecessary-key": "warn",
+            "react-x/no-unnecessary-use-callback": "off",
+            "react-x/no-unnecessary-use-memo": "off",
+            "react-x/no-unnecessary-use-prefix": "warn",
+            "react-x/no-unnecessary-use-ref": "warn",
+            "react-x/no-unstable-context-value": "warn",
+            "react-x/no-unstable-default-props": "warn",
+            "react-x/no-unused-class-component-members": "warn",
+            "react-x/no-unused-props": "warn",
+            "react-x/no-unused-state": "warn",
+            "react-x/no-useless-forward-ref": "warn",
+            "react-x/no-useless-fragment": "warn",
+            "react-x/prefer-destructuring-assignment": "warn",
+            "react-x/prefer-namespace-import": "off",
+            "react-x/prefer-react-namespace-import": "off",
+            "react-x/prefer-read-only-props": "warn",
             // Security for backend
             "redos/no-vulnerable": "error",
             // RegExp
@@ -6491,12 +6510,6 @@ export default defineConfig([
         name: "TypeScript Shared - shared/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
             "@arthurgeron/react-usememo": flatConfig,
-            "@eslint-react": eslintReact,
-            "@eslint-react/dom": eslintReactDom,
-            "@eslint-react/hooks-extra": eslintReactHooksExtra,
-            "@eslint-react/naming-convention": eslintReactNamingConvention,
-            "@eslint-react/rsc": eslintReactRsc,
-            "@eslint-react/web-api": eslintReactWeb,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
@@ -6555,15 +6568,21 @@ export default defineConfig([
             react: pluginReact,
             "react-19-upgrade": react19upgrade,
             "react-compiler": reactCompiler,
+            "react-dom": eslintReactDom,
             "react-form-fields": pluginReactFormFields,
             "react-hook-form": pluginReactHookForm,
             "react-hooks": reactHooks,
             "react-hooks-addons": reactHooksAddons,
+            "react-hooks-extra": eslintReactHooksExtra,
+            "react-naming-convention": eslintReactNamingConvention,
             "react-perf": reactPerfPlugin,
             "react-prefer-function-component": preferFunctionComponent,
             "react-refresh": reactRefreshPlugin,
             "react-require-testid": pluginReactTest,
+            "react-rsc": eslintReactRsc,
             "react-useeffect": reactUseEffect,
+            "react-web-api": eslintReactWeb,
+            "react-x": eslintReactX,
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
@@ -6623,7 +6642,11 @@ export default defineConfig([
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
-            ...eslintReact.configs["recommended-type-checked"].rules,
+            ...eslintReactX.configs["recommended-type-checked"].rules,
+            ...eslintReactDom.configs.recommended.rules,
+            ...eslintReactWeb.configs.recommended.rules,
+            ...eslintReactHooksExtra.configs.recommended.rules,
+            ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...pluginMicrosoftSdl.configs.required.rules,
@@ -6649,60 +6672,6 @@ export default defineConfig([
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
-            "@eslint-react/avoid-shorthand-boolean": "off",
-            "@eslint-react/dom/no-missing-button-type": "warn",
-            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
-            "@eslint-react/dom/no-unknown-property": "warn",
-            "@eslint-react/dom/no-unsafe-target-blank": "warn",
-            /* DOM subplugin */
-            "@eslint-react/dom/no-void-elements-with-children": "warn",
-            "@eslint-react/dom/prefer-namespace-import": "warn",
-            "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
-            /* Hooks extra subplugin */
-            "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
-            "@eslint-react/jsx-dollar": "warn",
-            "@eslint-react/jsx-key-before-spread": "warn",
-            "@eslint-react/jsx-no-iife": "warn",
-            "@eslint-react/jsx-no-undef": "warn",
-            "@eslint-react/jsx-shorthand-boolean": "warn",
-            "@eslint-react/jsx-shorthand-fragment": "warn",
-            "@eslint-react/jsx-uses-react": "warn",
-            "@eslint-react/jsx-uses-vars": "warn",
-            "@eslint-react/naming-convention/component-name": "warn",
-            "@eslint-react/naming-convention/context-name": "warn",
-            /* Naming convention subplugin */
-            "@eslint-react/naming-convention/filename": "off",
-            "@eslint-react/naming-convention/filename-extension": "off",
-            "@eslint-react/naming-convention/use-state": "warn",
-            "@eslint-react/no-children-prop": "warn",
-            "@eslint-react/no-class-component": "warn",
-            "@eslint-react/no-duplicate-key": "warn",
-            "@eslint-react/no-leaked-conditional-rendering": "warn",
-            "@eslint-react/no-missing-component-display-name": "warn",
-            "@eslint-react/no-missing-context-display-name": "warn",
-            "@eslint-react/no-misused-capture-owner-stack": "warn",
-            "@eslint-react/no-nested-component-definitions": "warn",
-            "@eslint-react/no-unnecessary-key": "warn",
-            "@eslint-react/no-unnecessary-use-callback": "off",
-            "@eslint-react/no-unnecessary-use-memo": "off",
-            "@eslint-react/no-unnecessary-use-prefix": "warn",
-            "@eslint-react/no-unnecessary-use-ref": "warn",
-            "@eslint-react/no-unstable-context-value": "warn",
-            "@eslint-react/no-unstable-default-props": "warn",
-            "@eslint-react/no-unused-props": "warn",
-            "@eslint-react/no-unused-state": "warn",
-            "@eslint-react/no-useless-forward-ref": "warn",
-            "@eslint-react/no-useless-fragment": "warn",
-            "@eslint-react/prefer-destructuring-assignment": "warn",
-            "@eslint-react/prefer-namespace-import": "off",
-            "@eslint-react/prefer-react-namespace-import": "off",
-            "@eslint-react/prefer-read-only-props": "warn",
-            // This project does not use React Server Components; keep RSC-only rules disabled.
-            "@eslint-react/rsc/function-definition": "off",
             "@jcoreio/implicit-dependencies/no-implicit": [
                 "off",
                 {
@@ -7605,6 +7574,13 @@ export default defineConfig([
             "react-19-upgrade/no-prop-types": "warn",
             "react-19-upgrade/no-proptypes": "warn",
             "react-19-upgrade/no-string-refs": "error",
+            "react-dom/no-missing-button-type": "warn",
+            "react-dom/no-missing-iframe-sandbox": "warn",
+            "react-dom/no-unknown-property": "warn",
+            "react-dom/no-unsafe-target-blank": "warn",
+            /* DOM subplugin */
+            "react-dom/no-void-elements-with-children": "warn",
+            "react-dom/prefer-namespace-import": "warn",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -7612,6 +7588,13 @@ export default defineConfig([
             "react-form-fields/styled-no-only-value-prop": "error",
             "react-hook-form/no-use-watch": "error",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
+                "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
+                "off",
+            /* Hooks extra subplugin */
+            "react-hooks-extra/no-direct-set-state-in-use-effect":
+                "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             // React Hooks
@@ -7625,6 +7608,13 @@ export default defineConfig([
             "react-hooks/rule-suppression": "warn",
             "react-hooks/rules-of-hooks": "error",
             "react-hooks/syntax": "warn",
+            "react-hooks/todo": "off",
+            "react-naming-convention/component-name": "warn",
+            "react-naming-convention/context-name": "warn",
+            /* Naming convention subplugin */
+            "react-naming-convention/filename": "off",
+            "react-naming-convention/filename-extension": "off",
+            "react-naming-convention/use-state": "warn",
             "react-prefer-function-component/react-prefer-function-component": [
                 "error",
                 {
@@ -7749,7 +7739,41 @@ export default defineConfig([
                     enableComponents: [],
                 },
             ],
+            // This project does not use React Server Components; keep RSC-only rules disabled.
+            "react-rsc/function-definition": "off",
             "react-useeffect/no-non-function-return": "error",
+            "react-x/jsx-dollar": "warn",
+            "react-x/jsx-key-before-spread": "warn",
+            "react-x/jsx-no-iife": "warn",
+            "react-x/jsx-no-undef": "warn",
+            "react-x/jsx-shorthand-boolean": "warn",
+            "react-x/jsx-shorthand-fragment": "warn",
+            "react-x/jsx-uses-react": "warn",
+            "react-x/jsx-uses-vars": "warn",
+            "react-x/no-children-prop": "warn",
+            "react-x/no-class-component": "warn",
+            "react-x/no-duplicate-key": "warn",
+            "react-x/no-leaked-conditional-rendering": "warn",
+            "react-x/no-missing-component-display-name": "warn",
+            "react-x/no-missing-context-display-name": "warn",
+            "react-x/no-misused-capture-owner-stack": "warn",
+            "react-x/no-nested-component-definitions": "warn",
+            "react-x/no-unnecessary-key": "warn",
+            "react-x/no-unnecessary-use-callback": "off",
+            "react-x/no-unnecessary-use-memo": "off",
+            "react-x/no-unnecessary-use-prefix": "warn",
+            "react-x/no-unnecessary-use-ref": "warn",
+            "react-x/no-unstable-context-value": "warn",
+            "react-x/no-unstable-default-props": "warn",
+            "react-x/no-unused-class-component-members": "warn",
+            "react-x/no-unused-props": "warn",
+            "react-x/no-unused-state": "warn",
+            "react-x/no-useless-forward-ref": "warn",
+            "react-x/no-useless-fragment": "warn",
+            "react-x/prefer-destructuring-assignment": "warn",
+            "react-x/prefer-namespace-import": "off",
+            "react-x/prefer-react-namespace-import": "off",
+            "react-x/prefer-read-only-props": "warn",
             // React
             "react/boolean-prop-naming": "warn",
             "react/button-has-type": "warn",
@@ -10761,13 +10785,6 @@ export default defineConfig([
         name: "Storybook Stories - storybook/**/*.stories.tsx",
         rules: {
             "@arthurgeron/react-usememo/require-usememo": "off",
-            "@eslint-react/jsx-no-iife": "off",
-            "@eslint-react/jsx-shorthand-fragment": "off",
-            "@eslint-react/no-useless-fragment": "off",
-            "@eslint-react/prefer-destructuring-assignment": "off",
-            // Storybook stories are demo code, loosen the grip for now
-            "@eslint-react/prefer-read-only-props": "off",
-            "@eslint-react/prefer-shorthand-fragment": "off",
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@metamask/design-tokens/color-no-hex": "off",
             "@typescript-eslint/array-type": "off",
@@ -10801,6 +10818,12 @@ export default defineConfig([
             "react-perf/jsx-no-jsx-as-prop": "off",
             "react-perf/jsx-no-new-function-as-prop": "off",
             "react-perf/jsx-no-new-object-as-prop": "off",
+            "react-x/jsx-no-iife": "off",
+            "react-x/jsx-shorthand-fragment": "off",
+            "react-x/no-useless-fragment": "off",
+            "react-x/prefer-destructuring-assignment": "off",
+            // Storybook stories are demo code, loosen the grip for now
+            "react-x/prefer-read-only-props": "off",
             "react/jsx-fragments": "off",
             "react/jsx-no-bind": "off",
             "react/jsx-no-useless-fragment": "off",
@@ -10851,7 +10874,7 @@ export default defineConfig([
         name: "Theme Component Override - ThemedSelect.tsx",
         rules: {
             // This component must expose the underlying <select> element ref.
-            "@eslint-react/no-forward-ref": "off",
+            "react-x/no-forward-ref": "off",
         },
     },
     {
@@ -11007,12 +11030,6 @@ export default defineConfig([
         files: ["**/**"],
         name: "Global: Globals",
         rules: {
-            "@eslint-react/debug/class-component": "off", // Debugging not needed
-            "@eslint-react/debug/function-component": "off", // Debugging not needed
-            "@eslint-react/debug/hook": "off", // Debugging not needed
-            "@eslint-react/debug/is-from-react": "off", // Debugging not needed
-            "@eslint-react/debug/jsx": "off", // Debugging not needed
-            "@eslint-react/debug/react-hooks": "off", // Debugging not needed
             // Better-tailwindcss
             "better-tailwindcss/multiline": "off",
             "better-tailwindcss/sort-classes": "off",
@@ -11035,6 +11052,8 @@ export default defineConfig([
             "prefer-arrow/prefer-arrow-functions": "off", // Too strict
             // Styled-components-a11y (and jsx-a11y equivalents)
             "styled-components-a11y/lang": "off",
+            "uptime-watcher/no-call-identifiers": "off",
+            "uptime-watcher/no-local-identifiers": "off",
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     },

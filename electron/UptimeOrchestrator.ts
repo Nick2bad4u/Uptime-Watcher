@@ -119,6 +119,13 @@ import {
 import { TypedEventBus } from "./events/TypedEventBus";
 import { UptimeOrchestratorSubscriptions } from "./orchestrator/UptimeOrchestratorSubscriptions";
 import { createContextualApplicationError } from "./orchestrator/utils/createContextualApplicationError";
+import {
+    buildMonitorScopedOperationContext,
+} from "./orchestrator/utils/monitorScope";
+import {
+    createEmitSystemError,
+    createEmitUptimeEvent,
+} from "./orchestrator/utils/uptimeEventEmitters";
 import { UptimeOrchestratorEventHandlers } from "./UptimeOrchestratorEventHandlers";
 import { runIdempotentInitialization } from "./utils/idempotentInitialization";
 import { diagnosticsLogger, logger } from "./utils/logger";
@@ -643,18 +650,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        const isMonitorScoped =
-            typeof monitorId === "string" && monitorId.length > 0;
-        const operation = isMonitorScoped
-            ? "orchestrator.startMonitoringForMonitor"
-            : "orchestrator.startMonitoringForSite";
-        const code = isMonitorScoped
-            ? "ORCHESTRATOR_START_MONITORING_FOR_MONITOR_FAILED"
-            : "ORCHESTRATOR_START_MONITORING_FOR_SITE_FAILED";
-
-        const message = isMonitorScoped
-            ? `Failed to start monitoring for monitor ${monitorId} on site ${identifier}`
-            : `Failed to start monitoring for site ${identifier}`;
+        const context = buildMonitorScopedOperationContext({
+            identifier,
+            kind: "start",
+            monitorId,
+        });
 
         return this.runWithContext(
             () =>
@@ -663,10 +663,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     monitorId
                 ),
             {
-                code,
-                details: { identifier, monitorId },
-                message,
-                operation,
+                code: context.code,
+                details: context.details,
+                message: context.message,
+                operation: context.operation,
             }
         );
     }
@@ -714,17 +714,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        const isMonitorScoped =
-            typeof monitorId === "string" && monitorId.length > 0;
-        const operation = isMonitorScoped
-            ? "orchestrator.stopMonitoringForMonitor"
-            : "orchestrator.stopMonitoringForSite";
-        const code = isMonitorScoped
-            ? "ORCHESTRATOR_STOP_MONITORING_FOR_MONITOR_FAILED"
-            : "ORCHESTRATOR_STOP_MONITORING_FOR_SITE_FAILED";
-        const message = isMonitorScoped
-            ? `Failed to stop monitoring for monitor ${monitorId} on site ${identifier}`
-            : `Failed to stop monitoring for site ${identifier}`;
+        const context = buildMonitorScopedOperationContext({
+            identifier,
+            kind: "stop",
+            monitorId,
+        });
 
         return this.runWithContext(
             () =>
@@ -733,10 +727,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     monitorId
                 ),
             {
-                code,
-                details: { identifier, monitorId },
-                message,
-                operation,
+                code: context.code,
+                details: context.details,
+                message: context.message,
+                operation: context.operation,
             }
         );
     }
@@ -896,33 +890,31 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.databaseManager = dependencies.databaseManager;
         this.monitorManager = dependencies.monitorManager;
         this.siteManager = dependencies.siteManager;
+
+        const emitTyped = createEmitUptimeEvent(this);
+        const emitSystemError = createEmitSystemError(this);
         this.historyLimitCoordinator = new HistoryLimitCoordinator({
             databaseManager: this.databaseManager,
             eventBus: this,
         });
 
         this.siteLifecycleCoordinator = new SiteLifecycleCoordinator({
-            createContextualError: (input): ApplicationError =>
-                this.createContextualError(input),
-            emitSystemError: async (payload): Promise<void> => {
-                await this.emitTyped("system:error", payload);
-            },
+            createContextualError: this.createContextualError.bind(this),
+            emitSystemError,
             monitorManager: this.monitorManager,
             siteManager: this.siteManager,
         });
 
         this.monitoringLifecycleCoordinator =
             new MonitoringLifecycleCoordinator({
-                emitTyped: (eventName, payload): Promise<void> =>
-                    this.emitTyped(eventName as string, payload),
+                emitTyped,
                 monitorManager: this.monitorManager,
                 siteManager: this.siteManager,
             });
 
         this.snapshotSyncCoordinator = new SnapshotSyncCoordinator({
             busId: ORCHESTRATOR_BUS_ID,
-            emitTyped: (eventName, payload): Promise<void> =>
-                this.emitTyped(eventName as string, payload),
+            emitTyped,
             monitorManager: this.monitorManager,
             siteManager: this.siteManager,
         });
