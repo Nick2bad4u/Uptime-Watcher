@@ -6,6 +6,7 @@
  * @file Rule: require-error-cause-in-catch
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 const BUILTIN_ERROR_CTORS = new Set([
@@ -34,7 +35,7 @@ export const requireErrorCauseInCatchRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

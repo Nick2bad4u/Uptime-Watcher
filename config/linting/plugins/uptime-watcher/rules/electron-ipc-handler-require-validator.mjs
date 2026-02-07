@@ -6,6 +6,7 @@
  * @file Rule: electron-ipc-handler-require-validator
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -20,7 +21,7 @@ export const electronIpcHandlerRequireValidatorRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename(),
+        const rawFilename = getContextFilename(context),
             normalizedFilename = normalizePath(rawFilename);
 
         if (

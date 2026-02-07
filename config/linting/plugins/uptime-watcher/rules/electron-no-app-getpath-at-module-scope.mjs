@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 const DISALLOWED_METHOD_NAMES = new Set([
     "getAppPath",
@@ -35,7 +36,7 @@ export const electronNoAppGetpathAtModuleScopeRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

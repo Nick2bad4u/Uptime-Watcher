@@ -6,6 +6,7 @@
  * @file Rule: electron-preload-no-direct-ipc-renderer-usage
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -24,7 +25,7 @@ export const electronPreloadNoDirectIpcRendererUsageRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename(),
+        const rawFilename = getContextFilename(context),
             normalizedFilename = normalizePath(rawFilename);
 
         if (

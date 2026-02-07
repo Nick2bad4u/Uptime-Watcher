@@ -6,6 +6,7 @@
  * @file Rule: electron-preload-no-inline-ipc-channel-constant
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -25,7 +26,7 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename(),
+        const rawFilename = getContextFilename(context),
             normalizedFilename = normalizePath(rawFilename);
 
         if (

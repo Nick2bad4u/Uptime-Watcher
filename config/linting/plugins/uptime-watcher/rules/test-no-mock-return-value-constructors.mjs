@@ -5,6 +5,7 @@
  * @file Rule: test-no-mock-return-value-constructors
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -32,7 +33,7 @@ export const testNoMockReturnValueConstructorsRule = {
      * }} context
      */
     create(context) {
-        const normalizedFilename = normalizePath(context.getFilename());
+        const normalizedFilename = normalizePath(getContextFilename(context));
 
         const isTestFile =
             normalizedFilename.includes("/test/") ||

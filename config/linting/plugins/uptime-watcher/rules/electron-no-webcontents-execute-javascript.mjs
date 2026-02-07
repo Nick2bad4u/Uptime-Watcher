@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 /**
  * ESLint rule disallowing `webContents.executeJavaScript()` in Electron
@@ -26,7 +27,7 @@ export const electronNoWebcontentsExecuteJavascriptRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 /**
  * ESLint rule requiring `BrowserWindow` `webPreferences.preload`.
@@ -24,7 +25,7 @@ export const electronBrowserwindowRequirePreloadRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

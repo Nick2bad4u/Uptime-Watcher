@@ -6,6 +6,10 @@
  * @file Rule: renderer-no-process-env
  */
 
+import {
+    getContextFilename,
+    getContextSourceCode,
+} from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -29,7 +33,7 @@ export const rendererNoProcessEnvRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (
@@ -43,7 +47,7 @@ export const rendererNoProcessEnvRule = {
         return {
             /** @param {any} program */
             Program(program) {
-                const sourceCode = context.getSourceCode();
+                const sourceCode = getContextSourceCode(context);
                 const text = sourceCode.getText(program);
 
                 if (!text.includes("process.env")) {

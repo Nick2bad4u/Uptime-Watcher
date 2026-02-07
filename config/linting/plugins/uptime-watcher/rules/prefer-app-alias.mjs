@@ -8,6 +8,7 @@
 
 import * as path from "node:path";
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR, SRC_DIR } from "../_internal/repo-paths.mjs";
 
@@ -26,7 +27,7 @@ export const preferAppAliasRule = {
      * }} context
      */
     create(context) {
-        const filename = context.getFilename(),
+        const filename = getContextFilename(context),
             normalizedFilename = normalizePath(filename);
 
         if (

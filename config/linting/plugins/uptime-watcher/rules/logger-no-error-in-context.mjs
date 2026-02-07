@@ -5,6 +5,7 @@
  * @file Rule: logger-no-error-in-context
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 import {
     NORMALIZED_ELECTRON_DIR,
@@ -25,7 +26,7 @@ export const loggerNoErrorInContextRule = {
      * }} context
      */
     create(context) {
-        const normalizedFilename = normalizePath(context.getFilename());
+        const normalizedFilename = normalizePath(getContextFilename(context));
 
         if (
             normalizedFilename === "<input>" ||

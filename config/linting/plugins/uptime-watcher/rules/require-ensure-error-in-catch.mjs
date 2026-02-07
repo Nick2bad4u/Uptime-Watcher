@@ -5,6 +5,10 @@
  * @file Rule: require-ensure-error-in-catch
  */
 
+import {
+    getContextFilename,
+    getContextSourceCode,
+} from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -25,7 +29,7 @@ export const requireEnsureErrorInCatchRule = {
      * }} context
      */
     create(context) {
-        const normalizedFilename = normalizePath(context.getFilename());
+        const normalizedFilename = normalizePath(getContextFilename(context));
 
         if (
             normalizedFilename === "<input>" ||
@@ -47,7 +51,7 @@ export const requireEnsureErrorInCatchRule = {
             return {};
         }
 
-        const sourceCode = context.sourceCode ?? context.getSourceCode(),
+        const sourceCode = getContextSourceCode(context),
             { visitorKeys } = sourceCode;
 
         /**

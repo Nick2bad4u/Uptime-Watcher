@@ -8,6 +8,7 @@
 
 import * as path from "node:path";
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SHARED_DIR, SHARED_DIR } from "../_internal/repo-paths.mjs";
 
@@ -24,7 +25,7 @@ export const preferSharedAliasRule = {
      * }} context
      */
     create(context) {
-        const filename = context.getFilename(),
+        const filename = getContextFilename(context),
             normalizedFilename = normalizePath(filename);
 
         if (

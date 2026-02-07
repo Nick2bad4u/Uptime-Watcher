@@ -6,6 +6,10 @@
  * @file Rule: electron-prefer-read-process-env
  */
 
+import {
+    getContextFilename,
+    getContextSourceCode,
+} from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -21,7 +25,7 @@ export const electronPreferReadProcessEnvRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename(),
+        const rawFilename = getContextFilename(context),
             normalizedFilename = normalizePath(rawFilename);
 
         if (
@@ -41,7 +45,7 @@ export const electronPreferReadProcessEnvRule = {
         return {
             /** @param {any} node */
             Program(node) {
-                const sourceCode = context.getSourceCode(),
+                const sourceCode = getContextSourceCode(context),
                     text = sourceCode.getText();
                 if (text.includes("process.env")) {
                     context.report({

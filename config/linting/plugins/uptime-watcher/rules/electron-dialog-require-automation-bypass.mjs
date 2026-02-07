@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 const DIALOG_METHOD_NAMES = new Set([
     "showErrorBox",
@@ -44,7 +45,7 @@ export const electronDialogRequireAutomationBypassRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

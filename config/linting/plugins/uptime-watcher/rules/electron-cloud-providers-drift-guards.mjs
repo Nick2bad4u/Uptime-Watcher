@@ -6,6 +6,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
 // Repo path constants live in ../_internal/repo-paths.mjs
@@ -21,7 +22,7 @@ export const electronCloudProvidersDriftGuardsRule = {
      * }} context
      */
     create(context) {
-        const filename = normalizePath(context.getFilename());
+        const filename = normalizePath(getContextFilename(context));
         if (
             !filename.startsWith(
                 `${NORMALIZED_ELECTRON_DIR}/services/cloud/providers/`

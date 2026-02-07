@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 /**
  * ESLint rule disallowing `import.meta.dirname` / `import.meta.filename` in the
@@ -29,7 +30,7 @@ export const electronNoImportMetaDirnameRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

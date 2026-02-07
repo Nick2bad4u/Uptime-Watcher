@@ -9,6 +9,8 @@
 /**
  * ESLint rule detecting console usage within TSDoc example code blocks.
  */
+import { getContextSourceCode } from "../_internal/eslint-context-compat.mjs";
+
 export const tsdocNoConsoleExampleRule = {
     /**
      * @param {{
@@ -17,7 +19,7 @@ export const tsdocNoConsoleExampleRule = {
      * }} context
      */
     create(context) {
-        const sourceCode = context.getSourceCode();
+        const sourceCode = getContextSourceCode(context);
 
         return {
             Program() {

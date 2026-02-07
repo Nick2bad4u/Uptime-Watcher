@@ -6,6 +6,7 @@
  * @file Rule: no-inline-ipc-channel-type-literals
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -31,7 +32,7 @@ export const noInlineIpcChannelTypeLiteralsRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename(),
+        const rawFilename = getContextFilename(context),
             normalizedFilename = normalizePath(rawFilename);
 
         if (normalizedFilename === "<input>") {

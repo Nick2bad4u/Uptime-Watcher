@@ -243,15 +243,15 @@ export async function performPingCheckWithRetry(
         return await withOperationalHooks(
             async () => performSinglePingCheck(host, timeout, signal),
             {
+                context: {
+                    host: safeHostForLogging,
+                },
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                 maxRetries: totalAttempts,
                 // Keep the operation name stable to avoid exploding log/event
                 // cardinality. Include the host in the operational context
                 // instead.
                 operationName: "connectivity-check",
-                context: {
-                    host: safeHostForLogging,
-                },
                 ...(signal ? { signal } : {}),
             }
         );

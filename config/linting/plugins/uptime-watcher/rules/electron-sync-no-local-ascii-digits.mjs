@@ -5,6 +5,7 @@
  * @file Rule: electron-sync-no-local-ascii-digits
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
@@ -22,7 +23,7 @@ export const electronSyncNoLocalAsciiDigitsRule = {
      * }} context
      */
     create(context) {
-        const filename = normalizePath(context.getFilename());
+        const filename = normalizePath(getContextFilename(context));
 
         if (
             filename === "<input>" ||

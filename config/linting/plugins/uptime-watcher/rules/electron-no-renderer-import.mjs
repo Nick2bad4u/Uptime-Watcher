@@ -9,6 +9,7 @@
 import * as path from "node:path";
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import {
     NORMALIZED_ELECTRON_DIR,
     NORMALIZED_SRC_DIR,
@@ -27,7 +28,7 @@ export const electronNoRendererImportRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename(),
+        const rawFilename = getContextFilename(context),
             normalizedFilename = normalizePath(rawFilename);
 
         if (

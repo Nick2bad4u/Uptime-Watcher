@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 const ALLOWED_FILE_SUFFIX = "/electron/services/shell/openExternalUtils.ts";
 
@@ -26,7 +27,7 @@ export const electronNoShellOpenExternalRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

@@ -6,6 +6,7 @@
  * @file Rule: electron-open-devtools-require-dev-only
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -24,7 +25,7 @@ export const electronOpenDevtoolsRequireDevOnlyRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename();
+        const rawFilename = getContextFilename(context);
         const normalizedFilename = normalizePath(rawFilename);
 
         if (

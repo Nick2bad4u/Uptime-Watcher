@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 const ALLOWED_WINDOW_SERVICE_SUFFIX =
     "/electron/services/window/WindowService.ts";
@@ -26,7 +27,7 @@ export const electronNoBrowserwindowOutsideWindowserviceRule = {
      * }} context
      */
     create(context) {
-        const normalizedFilename = normalizePath(context.getFilename());
+        const normalizedFilename = normalizePath(getContextFilename(context));
 
         if (
             normalizedFilename === "<input>" ||

@@ -6,6 +6,10 @@
  * @file Rule: renderer-no-browser-dialogs
  */
 
+import {
+    getContextFilename,
+    getContextSourceCode,
+} from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
@@ -31,9 +35,9 @@ export const rendererNoBrowserDialogsRule = {
      * }} context
      */
     create(context) {
-        const rawFilename = context.getFilename(),
+        const rawFilename = getContextFilename(context),
             normalizedFilename = normalizePath(rawFilename),
-            sourceCode = context.sourceCode ?? context.getSourceCode();
+            sourceCode = getContextSourceCode(context);
 
         if (
             normalizedFilename === "<input>" ||

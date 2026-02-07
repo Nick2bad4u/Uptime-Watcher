@@ -7,6 +7,7 @@
  */
 
 import { normalizePath } from "../_internal/path-utils.mjs";
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 
 /**
  * ESLint rule disallowing console usage in Electron runtime code.
@@ -19,7 +20,7 @@ export const electronNoConsoleRule = {
      * }} context
      */
     create(context) {
-        const filename = normalizePath(context.getFilename());
+        const filename = normalizePath(getContextFilename(context));
 
         if (
             !filename.includes("/electron/") ||

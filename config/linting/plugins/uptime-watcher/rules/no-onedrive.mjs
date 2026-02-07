@@ -6,6 +6,10 @@
  * @file Rule: no-onedrive
  */
 
+import {
+    getContextFilename,
+    getContextSourceCode,
+} from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -23,7 +27,7 @@ export const noOneDriveRule = {
      * }} context
      */
     create(context) {
-        const normalizedFilename = normalizePath(context.getFilename());
+        const normalizedFilename = normalizePath(getContextFilename(context));
 
         if (normalizedFilename === "<input>") {
             return {};
@@ -52,7 +56,7 @@ export const noOneDriveRule = {
              * @param {any} node
              */
             Program(node) {
-                const sourceCode = context.getSourceCode(),
+                const sourceCode = getContextSourceCode(context),
                     text = sourceCode.getText();
                 if (!bannedPattern.test(text)) {
                     return;

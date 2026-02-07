@@ -5,6 +5,7 @@
  * @file Rule: shared-types-no-local-is-plain-object
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SHARED_DIR } from "../_internal/repo-paths.mjs";
 
@@ -22,7 +23,7 @@ export const sharedTypesNoLocalIsPlainObjectRule = {
      * }} context
      */
     create(context) {
-        const filename = normalizePath(context.getFilename());
+        const filename = normalizePath(getContextFilename(context));
 
         if (
             filename === "<input>" ||

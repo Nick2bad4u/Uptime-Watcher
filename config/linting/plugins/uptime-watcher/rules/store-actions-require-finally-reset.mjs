@@ -5,6 +5,10 @@
  * @file Rule: store-actions-require-finally-reset
  */
 
+import {
+    getContextFilename,
+    getContextSourceCode,
+} from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 
@@ -31,7 +35,7 @@ export const storeActionsRequireFinallyResetRule = {
      * }} context
      */
     create(context) {
-        const normalizedFilename = normalizePath(context.getFilename());
+        const normalizedFilename = normalizePath(getContextFilename(context));
 
         if (
             normalizedFilename === "<input>" ||
@@ -47,7 +51,7 @@ export const storeActionsRequireFinallyResetRule = {
             return {};
         }
 
-        const sourceCode = context.sourceCode ?? context.getSourceCode(),
+        const sourceCode = getContextSourceCode(context),
             { visitorKeys } = sourceCode;
 
         /**

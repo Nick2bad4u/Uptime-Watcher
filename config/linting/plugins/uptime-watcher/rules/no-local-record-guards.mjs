@@ -6,6 +6,7 @@
  * @file Rule: no-local-record-guards
  */
 
+import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
 import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
@@ -23,7 +24,7 @@ export const noLocalRecordGuardsRule = {
      * }} context
      */
     create(context) {
-        const normalizedFilename = normalizePath(context.getFilename());
+        const normalizedFilename = normalizePath(getContextFilename(context));
 
         if (normalizedFilename === "<input>") {
             return {};
