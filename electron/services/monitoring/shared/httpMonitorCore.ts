@@ -103,7 +103,6 @@ export interface HttpMonitorBehavior<
     }) => MonitorCheckResult | Promise<MonitorCheckResult>;
     /** Human-readable label describing the operation (used in retry metadata). */
     readonly operationLabel: string;
-    /** Scope label used for structured logging (e.g. "HttpMonitor"). */
     readonly scope: string;
     /** Literal monitor type handled by the concrete service. */
     readonly type: TType;

@@ -24,6 +24,7 @@ import {
     ensureMonitorType,
     type MonitorByType,
 } from "./monitorCoreHelpers";
+import { createMonitorRetryPlan } from "./monitorRetryUtils";
 import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
 import { createMonitorErrorResult } from "./monitorServiceHelpers";
 import {
@@ -129,6 +130,7 @@ export function createRemoteMonitorService<
                 typedMonitor,
                 this.config
             );
+            const { totalAttempts } = createMonitorRetryPlan(retryAttempts);
 
             const operationName = behavior.getOperationName(
                 configuration.context
@@ -166,7 +168,7 @@ export function createRemoteMonitorService<
                     () => behavior.executeCheck(executionArgs),
                     {
                         failureLogLevel: behavior.failureLogLevel ?? "warn",
-                        maxRetries: retryAttempts + 1,
+                        maxRetries: totalAttempts,
                         operationName,
                         ...(executionArgs.signal
                             ? { signal: executionArgs.signal }

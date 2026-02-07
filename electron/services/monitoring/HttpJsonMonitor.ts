@@ -5,7 +5,6 @@
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -15,119 +14,15 @@ import {
     type HttpMonitorBehavior,
     type HttpMonitorServiceInstance,
 } from "./shared/httpMonitorCore";
+import {
+    extractJsonValueAtPath,
+    isParseFailure,
+    parseJsonPayload,
+    stringifyJsonValue,
+} from "./shared/httpMonitorJsonUtils";
+import { getTrimmedNonEmptyString } from "./shared/httpMonitorStringUtils";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
-
-function getTrimmedString(value: unknown): null | string {
-    if (typeof value !== "string") {
-        return null;
-    }
-
-    const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
-}
-
-function extractValueAtPath(payload: unknown, path: string): unknown {
-    if (payload === null || payload === undefined) {
-        return undefined;
-    }
-
-    const segments = path.split(".").filter((segment) => segment.length > 0);
-    let current: unknown = payload;
-
-    for (const segment of segments) {
-        if (current === null || current === undefined) {
-            return undefined;
-        }
-
-        const tokens = segment
-            .split("[")
-            .map((token) => token.replace("]", ""));
-        const [firstToken, ...indexTokens] = tokens;
-        const propertyToken = firstToken ?? "";
-
-        if (propertyToken.length > 0) {
-            if (!isRecord(current)) {
-                return undefined;
-            }
-
-            current = current[propertyToken];
-        }
-
-        for (const indexToken of indexTokens) {
-            if (indexToken.length === 0) {
-                return undefined;
-            }
-
-            const parsedIndex = Number.parseInt(indexToken, 10);
-            if (Number.isNaN(parsedIndex)) {
-                return undefined;
-            }
-
-            if (!Array.isArray(current)) {
-                return undefined;
-            }
-
-            current = current[parsedIndex];
-        }
-    }
-
-    return current;
-}
-
-function stringifyValue(value: unknown): string {
-    if (typeof value === "string") {
-        return value.trim();
-    }
-
-    if (typeof value === "number" || typeof value === "boolean") {
-        return String(value);
-    }
-
-    if (value === null) {
-        return "null";
-    }
-
-    try {
-        return JSON.stringify(value);
-    } catch (error: unknown) {
-        const normalizedError = ensureError(error);
-        logger.warn("[HttpJsonMonitor] Failed to serialise JSON value", {
-            message: normalizedError.message,
-        });
-        return "[unserializable]";
-    }
-}
-
-function parsePayload(
-    data: unknown
-): { error: Error; ok: false } | { ok: true; payload: unknown } {
-    if (typeof data === "string") {
-        try {
-            return {
-                ok: true,
-                payload: JSON.parse(data),
-            };
-        } catch (error) {
-            const normalizedError = ensureError(error);
-            logger.warn("[HttpJsonMonitor] Failed to parse JSON payload", {
-                message: normalizedError.message,
-            });
-            return {
-                error: normalizedError,
-                ok: false,
-            };
-        }
-    }
-
-    return { ok: true, payload: data };
-}
-
-function isParseError(
-    result: ReturnType<typeof parsePayload>
-): result is { error: Error; ok: false } {
-    return !result.ok;
-}
 
 /**
  * Runtime configuration contract for HTTP JSON monitor instances.
@@ -141,9 +36,13 @@ const behavior: HttpMonitorBehavior<
     { expectedValue: string; jsonPath: string }
 > = {
     evaluateResponse: ({ context, response, responseTime }) => {
-        const parseResult = parsePayload(response.data);
+        const parseResult = parseJsonPayload(response.data, (error) => {
+            logger.warn("[HttpJsonMonitor] Failed to parse JSON payload", {
+                message: ensureError(error).message,
+            });
+        });
 
-        if (isParseError(parseResult)) {
+        if (isParseFailure(parseResult)) {
             const { error } = parseResult;
             return {
                 details: `JSON parsing failed: ${error.message}`,
@@ -152,7 +51,7 @@ const behavior: HttpMonitorBehavior<
             };
         }
 
-        const actualValue = extractValueAtPath(
+        const actualValue = extractJsonValueAtPath(
             parseResult.payload,
             context.jsonPath
         );
@@ -165,7 +64,11 @@ const behavior: HttpMonitorBehavior<
             };
         }
 
-        const actualAsString = stringifyValue(actualValue);
+        const actualAsString = stringifyJsonValue(actualValue, (error) => {
+            logger.warn("[HttpJsonMonitor] Failed to serialise JSON value", {
+                message: ensureError(error).message,
+            });
+        });
         if (actualAsString === context.expectedValue) {
             return {
                 details: `JSON path "${context.jsonPath}" matched expected value`,
@@ -184,8 +87,10 @@ const behavior: HttpMonitorBehavior<
     scope: "HttpJsonMonitor",
     type: "http-json",
     validateMonitorSpecifics: (monitor: HttpJsonMonitorConfig) => {
-        const jsonPath = getTrimmedString(monitor.jsonPath);
-        const expectedValue = getTrimmedString(monitor.expectedJsonValue);
+        const jsonPath = getTrimmedNonEmptyString(monitor.jsonPath);
+        const expectedValue = getTrimmedNonEmptyString(
+            monitor.expectedJsonValue
+        );
 
         if (!jsonPath) {
             return {

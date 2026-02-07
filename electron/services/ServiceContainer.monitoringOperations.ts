@@ -1,6 +1,6 @@
 /**
- * Helper factory for creating the {@link IMonitoringOperations} adapter used
- * by {@link SiteManager}.
+ * Helper factory for creating the {@link IMonitoringOperations} adapter used by
+ * {@link SiteManager}.
  *
  * @remarks
  * `ServiceContainer` must wire `SiteManager` to `MonitorManager` without

@@ -5,7 +5,6 @@
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -15,71 +14,13 @@ import {
     type HttpMonitorBehavior,
     type HttpMonitorServiceInstance,
 } from "./shared/httpMonitorCore";
+import {
+    getTrimmedNonEmptyString,
+    normalizeHeaderValue,
+    resolveHeaderValue,
+} from "./shared/httpMonitorStringUtils";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
-
-const TRIMMED_HEADER_VALUE_MAX_LENGTH = 2048;
-
-function getTrimmedString(value: unknown): null | string {
-    if (typeof value !== "string") {
-        return null;
-    }
-
-    const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
-}
-
-function normalizeHeaderName(value: string): string {
-    return value.trim().toLowerCase();
-}
-
-function normalizeHeaderValue(value: string): string {
-    const trimmed = value.trim();
-    if (trimmed.length > TRIMMED_HEADER_VALUE_MAX_LENGTH) {
-        return `${trimmed.slice(0, TRIMMED_HEADER_VALUE_MAX_LENGTH)}…`;
-    }
-
-    return trimmed;
-}
-
-function resolveHeaderValue(headers: unknown, name: string): null | string {
-    const normalizedName = normalizeHeaderName(name);
-    if (!isSharedRecord(headers)) {
-        return null;
-    }
-
-    const rawValue = headers[normalizedName];
-
-    if (rawValue === undefined || rawValue === null) {
-        return null;
-    }
-
-    if (Array.isArray(rawValue)) {
-        return rawValue.map(String).join(", ");
-    }
-
-    if (typeof rawValue === "string") {
-        return rawValue;
-    }
-
-    if (typeof rawValue === "number" || typeof rawValue === "boolean") {
-        return String(rawValue);
-    }
-
-    if (rawValue instanceof Date) {
-        return rawValue.toISOString();
-    }
-
-    try {
-        return JSON.stringify(rawValue);
-    } catch (error: unknown) {
-        logger.warn(
-            "[HttpHeaderMonitor] Unable to serialise header value",
-            ensureError(error)
-        );
-        return "[unserializable]";
-    }
-}
 
 /**
  * Runtime configuration contract for HTTP header monitor instances.
@@ -93,10 +34,16 @@ const behavior: HttpMonitorBehavior<
     { expectedValue: string; headerName: string }
 > = {
     evaluateResponse: ({ context, response, responseTime }) => {
-        const resolvedValue = resolveHeaderValue(
-            response.headers,
-            context.headerName
-        );
+        const resolvedValue = resolveHeaderValue({
+            headerName: context.headerName,
+            headers: response.headers,
+            onSerializeError: (error) => {
+                logger.warn(
+                    "[HttpHeaderMonitor] Unable to serialise header value",
+                    ensureError(error)
+                );
+            },
+        });
 
         if (resolvedValue === null) {
             return {
@@ -127,8 +74,10 @@ const behavior: HttpMonitorBehavior<
     scope: "HttpHeaderMonitor",
     type: "http-header",
     validateMonitorSpecifics: (monitor: HttpHeaderMonitorConfig) => {
-        const headerName = getTrimmedString(monitor.headerName);
-        const expectedValue = getTrimmedString(monitor.expectedHeaderValue);
+        const headerName = getTrimmedNonEmptyString(monitor.headerName);
+        const expectedValue = getTrimmedNonEmptyString(
+            monitor.expectedHeaderValue
+        );
 
         if (!headerName) {
             return {

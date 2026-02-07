@@ -25,6 +25,7 @@ import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
+import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -85,7 +86,7 @@ export class SslMonitor implements IMonitorService {
         signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         try {
-            const totalAttempts = retryAttempts + 1;
+            const { totalAttempts } = createMonitorRetryPlan(retryAttempts);
             const onRetryHandler = isDev()
                 ? (attempt: number, error: Error): void => {
                       logger.debug(

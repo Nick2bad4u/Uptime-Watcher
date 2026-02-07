@@ -62,8 +62,9 @@ export function createParamValidator(
 
     return (params: readonly unknown[]): null | string[] => {
         const errors: string[] = [];
+        const { length: paramsLength } = params;
 
-        if (params.length !== expectedCount) {
+        if (paramsLength !== expectedCount) {
             errors.push(countMessage);
 
             if (options.stopOnCountMismatch) {
@@ -72,7 +73,8 @@ export function createParamValidator(
         }
 
         validators.forEach((validate, index) => {
-            const error = validate(params[index]);
+            const [paramValue] = params.slice(index, index + 1);
+            const error = validate(paramValue);
             if (!error) {
                 return;
             }

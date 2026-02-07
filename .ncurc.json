@@ -28,8 +28,7 @@
     "format": [
         "dep",
         "time",
-        "ownerChanged",
-        "repo"
+        "ownerChanged"
     ],
     "global": false,
     "groupFunction": {},
@@ -61,5 +60,5 @@
     "timeout": 0,
     "upgrade": true,
     "verbose": false,
-    "workspaces": false
+    "workspaces": true
 }

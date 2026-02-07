@@ -36,7 +36,9 @@ const toTruncatedBodyString = (value: unknown): string | undefined => {
     // Axios may surface ArrayBuffer / Uint8Array payloads when configured for
     // binary responses.
     if (value instanceof Uint8Array) {
-        return Buffer.from(value).toString("utf8").slice(0, MAX_FALLBACK_BODY_CHARS);
+        return Buffer.from(value)
+            .toString("utf8")
+            .slice(0, MAX_FALLBACK_BODY_CHARS);
     }
 
     if (value instanceof ArrayBuffer) {
@@ -135,8 +137,11 @@ export async function requestGoogleOAuthToken(
         }
 
         const normalized = ensureError(error);
-        throw new Error(`Google OAuth ${input.operationLabel} failed: ${normalized.message}`, {
-            cause: error,
-        });
+        throw new Error(
+            `Google OAuth ${input.operationLabel} failed: ${normalized.message}`,
+            {
+                cause: error,
+            }
+        );
     }
 }

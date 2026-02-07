@@ -25,6 +25,7 @@ import type {
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { withOperationalHooks } from "../../utils/operationalHooks";
+import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -67,6 +68,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
             timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
         });
+        const { totalAttempts } = createMonitorRetryPlan(retryAttempts);
 
         try {
             return await withOperationalHooks(
@@ -79,7 +81,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     ),
                 {
                     failureLogLevel: "warn",
-                    maxRetries: retryAttempts + 1,
+                    maxRetries: totalAttempts,
                     operationName: `WebSocket keepalive for ${urlCandidate}`,
                     ...(signal ? { signal } : {}),
                 }

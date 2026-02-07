@@ -15,7 +15,7 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
 /* eslint-disable import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
 
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import { flatConfig } from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
 import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
@@ -27,11 +27,11 @@ import markdown from "@eslint/markdown";
 // Import html from "eslint-plugin-html";
 import html from "@html-eslint/eslint-plugin";
 import * as htmlParser from "@html-eslint/parser";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginDesignTokens from "@metamask/eslint-plugin-design-tokens";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
 import rushStackSecurity from "@rushstack/eslint-plugin-security";
 import stylistic from "@stylistic/eslint-plugin";
@@ -43,166 +43,166 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import * as eslintMdx from "eslint-mdx";
 import antfu from "eslint-plugin-antfu";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCanonical from "eslint-plugin-canonical";
 import pluginCasePolice from "eslint-plugin-case-police";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginCleanCode from "eslint-plugin-clean-code";
 // New plugins from user request
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginCleanTimer from "eslint-plugin-clean-timer";
 import eslintPluginCommentLength from "eslint-plugin-comment-length";
 import pluginCompat from "eslint-plugin-compat";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginCssModules from "eslint-plugin-css-modules";
 import depend from "eslint-plugin-depend";
 import pluginDeprecation from "eslint-plugin-deprecation";
 import eslintPluginEslintPlugin from "eslint-plugin-eslint-plugin";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import etc from "eslint-plugin-etc";
 import { plugin as ex } from "eslint-plugin-exception-handling";
 import progress from "eslint-plugin-file-progress";
 import pluginFilenameExport from "eslint-plugin-filename-export";
 import pluginFormatSQL from "eslint-plugin-format-sql";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginFunctionNames from "eslint-plugin-function-name";
 import pluginFunctional from "eslint-plugin-functional";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginGoodEffects from "eslint-plugin-goodeffects";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginGranular from "eslint-plugin-granular-selectors";
 import { importX } from "eslint-plugin-import-x";
 // Zod Tree Shaking Plugin https://github.com/colinhacks/zod/issues/4433#issuecomment-2921500831
 import importZod from "eslint-plugin-import-zod";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import istanbul from "eslint-plugin-istanbul";
 import jsdocPlugin from "eslint-plugin-jsdoc";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsxA11y from "eslint-plugin-jsx-a11y";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginJsxPlus from "eslint-plugin-jsx-plus";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import listeners from "eslint-plugin-listeners";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginLoadableImports from "eslint-plugin-loadable-imports";
 import eslintPluginMath from "eslint-plugin-math";
 import * as mdx from "eslint-plugin-mdx";
 import moduleInterop from "eslint-plugin-module-interop";
 import nodePlugin from "eslint-plugin-n";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNeverThrow from "eslint-plugin-neverthrow";
 import nitpick from "eslint-plugin-nitpick";
 import noBarrelFiles from "eslint-plugin-no-barrel-files";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNoConstructBind from "eslint-plugin-no-constructor-bind";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNoExplicitTypeExports from "eslint-plugin-no-explicit-type-exports";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginNFDAR from "eslint-plugin-no-function-declare-after-return";
 // Import * as tailwind4 from "tailwind-csstree";
 import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
 import pluginRegexLook from "eslint-plugin-no-lookahead-lookbehind-regexp";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import noSecrets from "eslint-plugin-no-secrets";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNoUnary from "eslint-plugin-no-unary-plus";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNoUnwaited from "eslint-plugin-no-unawaited-dot-catch-throw";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import nounsanitized from "eslint-plugin-no-unsanitized";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import eslintPluginNoUseExtendNative from "eslint-plugin-no-use-extend-native";
 import nodeDependencies from "eslint-plugin-node-dependencies";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import observers from "eslint-plugin-observers";
 import packageJson from "eslint-plugin-package-json";
 import paths from "eslint-plugin-paths";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import playwright from "eslint-plugin-playwright";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginPromise from "eslint-plugin-promise";
 import * as publint from "eslint-plugin-publint";
 import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
 import pluginReact from "eslint-plugin-react";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import react19upgrade from "eslint-plugin-react-19-upgrade";
 import reactCompiler from "eslint-plugin-react-compiler";
 import eslintReactDom from "eslint-plugin-react-dom";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginReactFormFields from "eslint-plugin-react-form-fields";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginReactHookForm from "eslint-plugin-react-hook-form";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactHooksAddons from "eslint-plugin-react-hooks-addons";
 import eslintReactHooksExtra from "eslint-plugin-react-hooks-extra";
 import eslintReactNamingConvention from "eslint-plugin-react-naming-convention";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import reactPerfPlugin from "eslint-plugin-react-perf";
 // eslint-disable-next-line import-x/default -- Working fine just old
 import preferFunctionComponent from "eslint-plugin-react-prefer-function-component";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginReactTest from "eslint-plugin-react-require-testid";
 import eslintReactRsc from "eslint-plugin-react-rsc";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import reactUseEffect from "eslint-plugin-react-useeffect";
 import eslintReactWeb from "eslint-plugin-react-web-api";
 import eslintReactX from "eslint-plugin-react-x";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginRedos from "eslint-plugin-redos";
 import pluginRegexp from "eslint-plugin-regexp";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginJSDoc from "eslint-plugin-require-jsdoc";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSafeJSX from "eslint-plugin-safe-jsx";
 import pluginSecurity from "eslint-plugin-security";
 import sonarjs, { configs as sonarjsConfigs } from "eslint-plugin-sonarjs";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSortClassMembers from "eslint-plugin-sort-class-members";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSortDestructure from "eslint-plugin-sort-destructure-keys";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSortKeysFix from "eslint-plugin-sort-keys-fix";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSortReactDependency from "eslint-plugin-sort-react-dependency-arrays";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import sqlTemplate from "eslint-plugin-sql-template";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSSR from "eslint-plugin-ssr-friendly";
 import storybook from "eslint-plugin-storybook";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import styledA11y from "eslint-plugin-styled-components-a11y";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSwitchCase from "eslint-plugin-switch-case";
 import tailwind from "eslint-plugin-tailwindcss";
 import pluginTestingLibrary from "eslint-plugin-testing-library";
 import eslintPluginToml from "eslint-plugin-toml";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginTopLevel from "eslint-plugin-toplevel";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginTotalFunctions from "eslint-plugin-total-functions";
 import pluginTsdoc from "eslint-plugin-tsdoc";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginTSDocRequire from "eslint-plugin-tsdoc-require";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginUseMemo from "eslint-plugin-usememo-recommendations";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginValidateJSX from "eslint-plugin-validate-jsx-nesting";
 // import * as cssPlugin from "eslint-plugin-css"
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginWriteGood from "eslint-plugin-write-good-comments";
-// @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import xss from "eslint-plugin-xss";
 import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
@@ -455,7 +455,6 @@ export default defineConfig([
     ...storybook.configs["flat/recommended"],
     ...pluginCasePolice.configs.recommended,
     ...jsdocPlugin.configs["examples-and-default-expressions"],
-
     // #endregion
     // ═══════════════════════════════════════════════════════════════════════════════
     // #region Custom Flat Configs
@@ -667,16 +666,15 @@ export default defineConfig([
             // IMPORTANT: we spread the preset rules explicitly because we
             // override `rules` below (which would otherwise drop the preset).
             ...eslintPluginEslintPlugin.configs["all-type-checked"].rules,
-
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
@@ -703,7 +701,6 @@ export default defineConfig([
             ...pluginTotalFunctions.configs.recommended.rules,
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
-
             "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
             "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
             "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
@@ -1331,7 +1328,19 @@ export default defineConfig([
             "package-json/restrict-private-properties": "warn",
             // This repo intentionally uses stable camelCase script names.
             "package-json/scripts-name-casing": "warn",
-            "package-json/sort-collections": "warn",
+                "package-json/sort-collections": [ "warn",
+                [
+                    "config",
+                    "dependencies",
+                    "devDependencies",
+                    "exports",
+                    "optionalDependencies",
+                    // "overrides",
+                    "peerDependencies",
+                    "peerDependenciesMeta",
+                    "scripts"
+                ],
+            ],
             "package-json/specify-peers-locally": "warn",
             "package-json/unique-dependencies": "warn",
             "package-json/valid-author": "warn",
@@ -1791,7 +1800,6 @@ export default defineConfig([
             "tailwind/migration-from-tailwind-2": "warn",
             "tailwind/no-arbitrary-value": "warn",
             "tailwind/no-contradicting-classname": "warn",
-
             /**
              * Performance issue with the plugin, somewhat mitigated setting
              * cssFiles to an empty array.
@@ -1949,13 +1957,13 @@ export default defineConfig([
             // TypeScript backend rules
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
@@ -1995,7 +2003,6 @@ export default defineConfig([
             ...styledA11y.flatConfigs.strict.rules,
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
-
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
             "@docusaurus/prefer-docusaurus-heading": "warn",
@@ -3433,13 +3440,13 @@ export default defineConfig([
             // TypeScript rules
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
             ...reactRefreshPlugin.configs.vite.rules,
@@ -4805,7 +4812,6 @@ export default defineConfig([
             // "tailwind/migration-from-tailwind-2": "warn",
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
-
             /**
              * Performance issue with the plugin, somewhat mitigated setting
              * cssFiles to an empty array.
@@ -5141,13 +5147,13 @@ export default defineConfig([
             // TypeScript Backend (Electron) Rules
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
@@ -6613,13 +6619,13 @@ export default defineConfig([
             // TypeScript rules
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
             ...reactRefreshPlugin.configs.vite.rules,
@@ -8005,7 +8011,6 @@ export default defineConfig([
             // "tailwind/migration-from-tailwind-2": "warn",
             // "tailwind/no-arbitrary-value": "warn",
             // "tailwind/no-contradicting-classname": "warn",
-
             /**
              * Performance issue with the plugin, somewhat mitigated setting
              * cssFiles to an empty array.
@@ -8291,13 +8296,13 @@ export default defineConfig([
         rules: {
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...comments.recommended.rules,
@@ -8580,13 +8585,13 @@ export default defineConfig([
             // Test Files Backend Rules (Electron Tests)
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...eslintPluginUnicorn.configs.all.rules,
@@ -8865,13 +8870,13 @@ export default defineConfig([
         rules: {
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...comments.recommended.rules,
@@ -9130,13 +9135,13 @@ export default defineConfig([
             // Benchmark Files Rules
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...comments.recommended.rules,
@@ -9424,13 +9429,13 @@ export default defineConfig([
             // TypeScript backend rules
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["recommended"].rules,
             ...tseslint.configs["strictTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["strict"].rules,
             ...tseslint.configs["stylisticTypeChecked"],
-            // @ts-ignore -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
             ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs.all.rules,
             ...importX.flatConfigs.recommended.rules,
@@ -10235,7 +10240,6 @@ export default defineConfig([
             // Start from upstream defaults for JS so new recommended rules are
             // picked up automatically when eslint-plugin-jsdoc updates.
             ...jsdocPlugin.configs["flat/recommended"].rules,
-
             "jsdoc/check-access": "warn", // Recommended
             "jsdoc/check-alignment": "warn", // Recommended
             "jsdoc/check-indentation": "off",
@@ -10848,7 +10852,7 @@ export default defineConfig([
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
-    // MARK: Theme Components Override
+    // MARK: Theme Component Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["src/theme/**/*.{ts,tsx,cts,mts}"],
@@ -10928,8 +10932,18 @@ export default defineConfig([
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
-    // MARK: Disable JSON Sort-keys
+    // MARK: Disables
     // ═══════════════════════════════════════════════════════════════════════════════
+    {
+        files: ["electron/services/ipc/validators/**/*.ts"],
+        name: "IPC Validators - Allow explicit boolean compare",
+        plugins: {
+            "@typescript-eslint": tseslint,
+        },
+        rules: {
+            "@typescript-eslint/no-unnecessary-boolean-literal-compare": "off",
+        },
+    },
     {
         files: [
             "**/package.json",
@@ -11136,7 +11150,6 @@ export default defineConfig([
             "@typescript-eslint/strict-void-return": "off",
         },
     },
-
     // Ensure Electron override wins over any later preset configs.
     {
         files: ["electron/**/*.{ts,tsx}"],

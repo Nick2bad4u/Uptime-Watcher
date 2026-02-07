@@ -1,7 +1,10 @@
+import type { Monitor } from "@shared/types";
+
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { RETRY_CONSTRAINTS } from "../../constants";
 import { logger } from "../../services/logger";
+import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
 
 /**
  * Clamps retry attempts to the UI/validation constraints.
@@ -40,6 +43,17 @@ export const DEFAULT_MONITOR_EDIT_STATE: MonitorEditState = {
 };
 
 /**
+ * Minimal setter type used for updating per-monitor edit state.
+ *
+ * @public
+ */
+export type MonitorEditStateByIdSetter = (
+    updater: (
+        previous: Readonly<Record<string, MonitorEditState>>
+    ) => Record<string, MonitorEditState>
+) => void;
+
+/**
  * Updates the monitor edit-state map for a specific monitor id.
  *
  * @public
@@ -55,6 +69,53 @@ export function updateMonitorEditStateById(args: {
         ...args.previous,
         [args.monitorId]: args.updater(current),
     };
+}
+
+/**
+ * Applies a per-monitor edit state update using the shared setter signature.
+ *
+ * @public
+ */
+export function applyMonitorEditStateUpdate(args: {
+    readonly monitorId: string;
+    readonly setMonitorEditStateById: MonitorEditStateByIdSetter;
+    readonly updater: (current: MonitorEditState) => MonitorEditState;
+}): void {
+    const { monitorId, setMonitorEditStateById, updater } = args;
+
+    setMonitorEditStateById((previous) =>
+        updateMonitorEditStateById({ monitorId, previous, updater })
+    );
+}
+
+/**
+ * Validates a monitor field and throws a logged error when invalid.
+ *
+ * @public
+ */
+export async function validateMonitorFieldOrThrow(args: {
+    readonly fieldName: "checkInterval" | "retryAttempts" | "timeout";
+    readonly monitorType: Monitor["type"];
+    readonly siteIdentifier: string;
+    readonly value: number;
+}): Promise<void> {
+    const { fieldName, monitorType, siteIdentifier, value } = args;
+
+    const validationResult = await validateMonitorFieldClientSide(
+        monitorType,
+        fieldName,
+        value
+    );
+
+    if (validationResult.success) {
+        return;
+    }
+
+    const validationError = new Error(
+        `Validation failed: ${validationResult.errors.join(", ")}`
+    );
+    logger.site.error(siteIdentifier, validationError);
+    throw validationError;
 }
 
 /**

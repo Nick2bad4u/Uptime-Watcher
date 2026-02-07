@@ -2,15 +2,13 @@
  * Cloud-specific IPC parameter validators.
  *
  * @remarks
- * This module intentionally contains validators that are only used by the
- * cloud IPC handlers. These validators previously lived in
- * `electron/services/ipc/validators/shared.ts`, which was becoming a
- * catch-all and growing too large.
+ * This module intentionally contains validators that are only used by the cloud
+ * IPC handlers. These validators previously lived in
+ * `electron/services/ipc/validators/shared.ts`, which was becoming a catch-all
+ * and growing too large.
  */
 
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
-import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
@@ -24,10 +22,8 @@ import {
     createParamValidator,
     toValidationResult,
 } from "./utils/parameterValidation";
-import {
-    isRequiredRecordError,
-    requireRecordParam,
-} from "./utils/recordValidation";
+import { requireRecordParamValue } from "./utils/recordValidation";
+import { collectStringSafetyErrors } from "./utils/stringValidation";
 
 /** Maximum byte budget accepted for cloud backup object keys. */
 const MAX_BACKUP_KEY_BYTES: number = 2048;
@@ -38,8 +34,8 @@ const MAX_ENCRYPTION_PASSPHRASE_BYTES: number = 1024;
 export const validateCloudFilesystemProviderConfig: IpcParameterValidator =
     createParamValidator(1, [
         (config): ParameterValueValidationResult => {
-            const recordResult = requireRecordParam(config, "config");
-            if (isRequiredRecordError(recordResult)) {
+            const recordResult = requireRecordParamValue(config, "config");
+            if (recordResult.ok === false) {
                 return recordResult.error;
             }
 
@@ -125,8 +121,8 @@ export const validateCloudFilesystemProviderConfig: IpcParameterValidator =
 export const validateCloudEnableSyncConfig: IpcParameterValidator =
     createParamValidator(1, [
         (config): ParameterValueValidationResult => {
-            const recordResult = requireRecordParam(config, "config");
-            if (isRequiredRecordError(recordResult)) {
+            const recordResult = requireRecordParamValue(config, "config");
+            if (recordResult.ok === false) {
                 return recordResult.error;
             }
 
@@ -143,8 +139,8 @@ export const validateCloudBackupMigrationRequest: IpcParameterValidator =
         (config): ParameterValueValidationResult => {
             const errors: string[] = [];
 
-            const recordResult = requireRecordParam(config, "config");
-            if (isRequiredRecordError(recordResult)) {
+            const recordResult = requireRecordParamValue(config, "config");
+            if (recordResult.ok === false) {
                 return recordResult.error;
             }
 
@@ -194,17 +190,18 @@ export const validateEncryptionPassphrasePayload: IpcParameterValidator =
             }
 
             const passphrase = candidate;
-            if (
-                getUtfByteLength(passphrase) > MAX_ENCRYPTION_PASSPHRASE_BYTES
-            ) {
-                errors.push(
-                    `passphrase must not exceed ${MAX_ENCRYPTION_PASSPHRASE_BYTES} bytes`
-                );
-            }
-
-            if (hasAsciiControlCharacters(passphrase)) {
-                errors.push("passphrase must not contain control characters");
-            }
+            errors.push(
+                ...collectStringSafetyErrors(passphrase, {
+                    forbidControlChars: {
+                        message:
+                            "passphrase must not contain control characters",
+                    },
+                    maxBytes: {
+                        limit: MAX_ENCRYPTION_PASSPHRASE_BYTES,
+                        message: `passphrase must not exceed ${MAX_ENCRYPTION_PASSPHRASE_BYTES} bytes`,
+                    },
+                })
+            );
 
             if (passphrase.trim().length < 8) {
                 errors.push(
@@ -246,17 +243,18 @@ export function createBackupKeyValidator(
 
             const key = normalizePathSeparatorsToPosix(value).trim();
 
-            if (getUtfByteLength(key) > MAX_BACKUP_KEY_BYTES) {
-                return toValidationResult(
-                    `${paramName} must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`
-                );
-            }
-
-            // Reject ASCII control characters including NUL.
-            if (hasAsciiControlCharacters(key)) {
-                return toValidationResult(
-                    `${paramName} must not contain control characters`
-                );
+            const safetyErrors = collectStringSafetyErrors(key, {
+                forbidControlChars: {
+                    message: `${paramName} must not contain control characters`,
+                },
+                maxBytes: {
+                    limit: MAX_BACKUP_KEY_BYTES,
+                    message: `${paramName} must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`,
+                },
+            });
+            const [firstSafetyError] = safetyErrors;
+            if (firstSafetyError) {
+                return toValidationResult(firstSafetyError);
             }
 
             if (!key.startsWith("backups/")) {
@@ -291,9 +289,7 @@ export function createBackupKeyValidator(
             }
 
             if (
-                segments.some(
-                    (segment) => segment === "." || segment === ".."
-                )
+                segments.some((segment) => segment === "." || segment === "..")
             ) {
                 return toValidationResult(
                     `${paramName} must not contain path traversal segments`

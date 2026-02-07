@@ -16,23 +16,14 @@ import type { Monitor, Site } from "@shared/types";
 
 import type { SiteDetailsTab } from "../../stores/ui/types";
 import type { ConfirmDialogOptions } from "../ui/useConfirmDialog";
-import type { MonitorEditState } from "./useSiteDetails.utils";
+import type { MonitorEditStateByIdSetter } from "./useSiteDetails.utils";
 
 import { logger } from "../../services/logger";
-import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
 import { timeoutSecondsToMs } from "../../utils/timeoutUtils";
-import { updateMonitorEditStateById } from "./useSiteDetails.utils";
-
-/**
- * Minimal setter type used for updating per-monitor edit state.
- *
- * @public
- */
-export type MonitorEditStateByIdSetter = (
-    updater: (
-        previous: Readonly<Record<string, MonitorEditState>>
-    ) => Record<string, MonitorEditState>
-) => void;
+import {
+    applyMonitorEditStateUpdate,
+    validateMonitorFieldOrThrow,
+} from "./useSiteDetails.utils";
 
 /**
  * Applies a newly selected monitor ID and keeps analytics tabs aligned.
@@ -240,19 +231,12 @@ export async function saveMonitorCheckInterval(args: {
         updateSiteCheckInterval,
     } = args;
 
-    const validationResult = await validateMonitorFieldClientSide(
-        selectedMonitorType ?? "http",
-        "checkInterval",
-        localCheckIntervalMs
-    );
-
-    if (!validationResult.success) {
-        const validationError = new Error(
-            `Validation failed: ${validationResult.errors.join(", ")}`
-        );
-        logger.site.error(currentSiteIdentifier, validationError);
-        throw validationError;
-    }
+    await validateMonitorFieldOrThrow({
+        fieldName: "checkInterval",
+        monitorType: selectedMonitorType ?? "http",
+        siteIdentifier: currentSiteIdentifier,
+        value: localCheckIntervalMs,
+    });
 
     await updateSiteCheckInterval(
         currentSiteIdentifier,
@@ -260,17 +244,15 @@ export async function saveMonitorCheckInterval(args: {
         localCheckIntervalMs
     );
 
-    setMonitorEditStateById((previous) =>
-        updateMonitorEditStateById({
-            monitorId: selectedMonitorId,
-            previous,
-            updater: (current) => ({
-                ...current,
-                intervalChanged: false,
-                userEditedCheckIntervalMs: undefined,
-            }),
-        })
-    );
+    applyMonitorEditStateUpdate({
+        monitorId: selectedMonitorId,
+        setMonitorEditStateById,
+        updater: (current) => ({
+            ...current,
+            intervalChanged: false,
+            userEditedCheckIntervalMs: undefined,
+        }),
+    });
 
     logger.user.action("Updated check interval", {
         monitorId: selectedMonitorId,
@@ -306,19 +288,12 @@ export async function saveMonitorTimeout(args: {
     } = args;
 
     const timeoutInMs = timeoutSecondsToMs(localTimeoutSeconds);
-    const validationResult = await validateMonitorFieldClientSide(
-        selectedMonitorType ?? "http",
-        "timeout",
-        timeoutInMs
-    );
-
-    if (!validationResult.success) {
-        const validationError = new Error(
-            `Validation failed: ${validationResult.errors.join(", ")}`
-        );
-        logger.site.error(currentSiteIdentifier, validationError);
-        throw validationError;
-    }
+    await validateMonitorFieldOrThrow({
+        fieldName: "timeout",
+        monitorType: selectedMonitorType ?? "http",
+        siteIdentifier: currentSiteIdentifier,
+        value: timeoutInMs,
+    });
 
     await updateMonitorTimeout(
         currentSiteIdentifier,
@@ -326,17 +301,15 @@ export async function saveMonitorTimeout(args: {
         timeoutInMs
     );
 
-    setMonitorEditStateById((previous) =>
-        updateMonitorEditStateById({
-            monitorId: selectedMonitorId,
-            previous,
-            updater: (current) => ({
-                ...current,
-                timeoutChanged: false,
-                userEditedTimeoutSeconds: undefined,
-            }),
-        })
-    );
+    applyMonitorEditStateUpdate({
+        monitorId: selectedMonitorId,
+        setMonitorEditStateById,
+        updater: (current) => ({
+            ...current,
+            timeoutChanged: false,
+            userEditedTimeoutSeconds: undefined,
+        }),
+    });
 
     logger.user.action("Updated monitor timeout", {
         monitorId: selectedMonitorId,
@@ -371,19 +344,12 @@ export async function saveMonitorRetryAttempts(args: {
         updateMonitorRetryAttempts,
     } = args;
 
-    const validationResult = await validateMonitorFieldClientSide(
-        selectedMonitorType ?? "http",
-        "retryAttempts",
-        localRetryAttempts
-    );
-
-    if (!validationResult.success) {
-        const validationError = new Error(
-            `Validation failed: ${validationResult.errors.join(", ")}`
-        );
-        logger.site.error(currentSiteIdentifier, validationError);
-        throw validationError;
-    }
+    await validateMonitorFieldOrThrow({
+        fieldName: "retryAttempts",
+        monitorType: selectedMonitorType ?? "http",
+        siteIdentifier: currentSiteIdentifier,
+        value: localRetryAttempts,
+    });
 
     await updateMonitorRetryAttempts(
         currentSiteIdentifier,
@@ -391,17 +357,15 @@ export async function saveMonitorRetryAttempts(args: {
         localRetryAttempts
     );
 
-    setMonitorEditStateById((previous) =>
-        updateMonitorEditStateById({
-            monitorId: selectedMonitorId,
-            previous,
-            updater: (current) => ({
-                ...current,
-                retryAttemptsChanged: false,
-                userEditedRetryAttempts: undefined,
-            }),
-        })
-    );
+    applyMonitorEditStateUpdate({
+        monitorId: selectedMonitorId,
+        setMonitorEditStateById,
+        updater: (current) => ({
+            ...current,
+            retryAttemptsChanged: false,
+            userEditedRetryAttempts: undefined,
+        }),
+    });
 
     logger.user.action("Updated monitor retry attempts", {
         monitorId: selectedMonitorId,

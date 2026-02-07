@@ -13,17 +13,9 @@ import {
     type HttpMonitorBehavior,
     type HttpMonitorServiceInstance,
 } from "./shared/httpMonitorCore";
+import { getTrimmedNonEmptyString } from "./shared/httpMonitorStringUtils";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
-
-function getTrimmedKeyword(value: unknown): null | string {
-    if (typeof value !== "string") {
-        return null;
-    }
-
-    const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
-}
 
 /**
  * Runtime configuration contract for HTTP keyword monitor instances.
@@ -60,7 +52,7 @@ const behavior: HttpMonitorBehavior<"http-keyword", { keyword: string }> = {
     scope: "HttpKeywordMonitor",
     type: "http-keyword",
     validateMonitorSpecifics: (monitor: HttpKeywordMonitorConfig) => {
-        const keyword = getTrimmedKeyword(monitor.bodyKeyword);
+        const keyword = getTrimmedNonEmptyString(monitor.bodyKeyword);
 
         if (!keyword) {
             return {

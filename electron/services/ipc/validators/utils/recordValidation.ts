@@ -18,6 +18,15 @@ export const isRequiredRecordError = (
 ): result is Extract<RequiredRecordResult, { readonly ok: false }> =>
     !result.ok;
 
+/**
+ * Result returned by {@link requireRecordParamValue}.
+ *
+ * @internal
+ */
+export type RecordParamValueResult =
+    | { readonly error: readonly string[]; readonly ok: false }
+    | { readonly ok: true; readonly record: UnknownRecord };
+
 const FORBIDDEN_RECORD_KEYS = new Set<string>([
     "__proto__",
     "constructor",
@@ -62,4 +71,34 @@ export function requireRecordParam(
     }
 
     return { ok: true, record: value };
+}
+
+/**
+ * Returns a record when valid, or an error array when invalid.
+ *
+ * @remarks
+ * This helper provides a compact alternative to the common `requireRecordParam`
+ * + `isRequiredRecordError` pattern in IPC validators.
+ *
+ * @param value - Candidate record value.
+ * @param paramName - Parameter name used in error messages.
+ *
+ * @returns The normalized record or an array of validation errors.
+ *
+ * @internal
+ */
+export function requireRecordParamValue(
+    value: unknown,
+    paramName: string
+): RecordParamValueResult {
+    const result = requireRecordParam(value, paramName);
+
+    if (isRequiredRecordError(result)) {
+        return {
+            error: result.error ?? [`${paramName} must be a valid object`],
+            ok: false,
+        };
+    }
+
+    return { ok: true, record: result.record };
 }

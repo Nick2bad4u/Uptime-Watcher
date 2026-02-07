@@ -15,8 +15,10 @@ import { type ChangeEvent, useCallback } from "react";
 
 import type { SiteDetailsTab } from "../../stores/ui/types";
 import type { ConfirmDialogOptions } from "../ui/useConfirmDialog";
-import type { MonitorEditStateByIdSetter } from "./useSiteDetails.operations";
-import type { MonitorEditState } from "./useSiteDetails.utils";
+import type {
+    MonitorEditState,
+    MonitorEditStateByIdSetter,
+} from "./useSiteDetails.utils";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { logger } from "../../services/logger";

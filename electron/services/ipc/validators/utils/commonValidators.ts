@@ -1,5 +1,4 @@
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
-import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 import type { IpcParameterValidator } from "../../types";
 
@@ -9,7 +8,8 @@ import {
     type ParameterValueValidationResult,
     toValidationResult,
 } from "./parameterValidation";
-import { isRequiredRecordError, requireRecordParam } from "./recordValidation";
+import { requireRecordParamValue } from "./recordValidation";
+import { validateRequiredStringPayload } from "./stringPayloadValidation";
 
 /** Maximum byte budget accepted for clipboard payloads transported over IPC. */
 const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
@@ -114,8 +114,11 @@ export function createStringWithBudgetedObjectValidator(
                 IpcValidators.requiredString(value, stringParamName)
             ),
         (value): ParameterValueValidationResult => {
-            const recordResult = requireRecordParam(value, objectParamName);
-            if (isRequiredRecordError(recordResult)) {
+            const recordResult = requireRecordParamValue(
+                value,
+                objectParamName
+            );
+            if (recordResult.ok === false) {
                 return recordResult.error;
             }
 
@@ -149,25 +152,11 @@ export function createSingleExternalOpenUrlValidator(
  */
 export function createClipboardTextValidator(): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): ParameterValueValidationResult => {
-            const error = IpcValidators.requiredString(value, "text");
-            if (error) {
-                return toValidationResult(error);
-            }
-
-            if (typeof value !== "string") {
-                // Defensive: requiredString already enforces this.
-                return toValidationResult("text must be a string");
-            }
-
-            const text = value;
-            if (getUtfByteLength(text) > MAX_CLIPBOARD_TEXT_BYTES) {
-                return toValidationResult(
-                    `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`
-                );
-            }
-
-            return null;
-        },
+        (value): ParameterValueValidationResult =>
+            validateRequiredStringPayload(value, {
+                maxBytes: MAX_CLIPBOARD_TEXT_BYTES,
+                maxBytesMessage: `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`,
+                paramName: "text",
+            }),
     ]);
 }

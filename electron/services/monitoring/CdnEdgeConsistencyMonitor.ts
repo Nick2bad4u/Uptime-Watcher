@@ -26,6 +26,7 @@ import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { createTimeoutSignal } from "./shared/abortSignalUtils";
+import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -84,6 +85,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
             timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
         });
+        const { totalAttempts } = createMonitorRetryPlan(retryAttempts);
 
         try {
             return await withOperationalHooks(
@@ -96,7 +98,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                     ),
                 {
                     failureLogLevel: "warn",
-                    maxRetries: retryAttempts + 1,
+                    maxRetries: totalAttempts,
                     operationName: `CDN edge consistency check for ${baselineUrl}`,
                     ...(signal ? { signal } : {}),
                 }
