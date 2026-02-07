@@ -53,7 +53,7 @@ handoffs:
    agent: BeastMode
    prompt: "As an autonomous agent, conduct a comprehensive review of my codebase for improvements, bugs, and architectural optimization. Execute a dynamic, iterative plan with a strong focus on refactoring: actively identify inline utility functions and generic logic embedded in larger files, moving them to appropriate utility modules to reduce file size and enhance modularity. Categorize findings into high-priority bugs (e.g., security, crashes), medium-priority enhancements (e.g., performance, readability, utility extraction), and low-priority tweaks. Rigorously check for duplicate logic. Make sure we always are checking for duplicate code paths and legacy code paths to remove. Always adhere to modern best practices. Each iteration, target a different code section or pattern. Prioritize novel discoveries and adapt based on previous insights. Implement all fixes directly—including code movement,etc—and summarize the specific refactoring and corrections achieved in this iteration."
    send: true
-tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'sqlite/*', 'tavily-remote-mcp-system/*', 'vscode-mcp/*', 'memory', 'todo']
+tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'sqlite/*', 'tavily-remote-mcp-system/*', 'vscode-mcp/*', 'github/*', 'memory', 'todo']
 ---
 
 <instructions>
