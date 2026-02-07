@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[ba2d861](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba2d86143623d14dfde86de09cb1ebb4d24349f5)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...ba2d86143623d14dfde86de09cb1ebb4d24349f5))
+[fba5b2f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...fba5b2fd7b79ad096c6d1c8fac3b7430d8350117))
 
 
 ### ✨ Features
@@ -843,6 +843,42 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5063
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Centralizes validation helpers
+
+🚜 [refactor] Extracts shared validation utilities to reduce duplication
+ - Improves consistency for record, string, restore, and notification checks
+🚜 [refactor] Normalizes monitor retry handling and HTTP parsing helpers
+ - Aligns retry attempts and consolidates JSON/header string handling
+🧹 [chore] Updates tooling configs and dependency versions
+ - Adjusts linting directives, overrides order, and package upgrades
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fba5b2f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)
+
+
+- 🚜 [refactor] Centralizes service helpers
+
+🚜 [refactor] Extracts service wiring helpers to reduce inline adapter logic and guard cache access during initialization.
+🚜 [refactor] Centralizes cloud OAuth token requests with consistent parsing and error messages for interactive and refresh flows.
+🚜 [refactor] Consolidates history prune limit and retry-attempt normalization, routing connectivity retries through shared hooks with safer host logging.
+🚜 [refactor] Moves cloud IPC validators into a dedicated module and streamlines monitor title suffix resolution and docs.
+🧪 [test] Removes connectivity retry tests aligned with the new retry path.
+🔧 [build] Reorders overrides and bumps lint tooling versions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2b0d3cf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2b0d3cff014d03d289ef4125f146fa7618fa8575)
+
+
+- 🚜 [refactor] Improves orchestration helpers
+
+🚜 [refactor] Extracts orchestration, event, IPC, and monitoring utilities to centralize error contexts, payload cloning, resumption flows, and handler execution for steadier runtime behavior
+🚜 [refactor] Simplifies site management event emission and validation through shared helpers to reduce duplication and keep state sync signaling consistent
+🧹 [chore] Adds CSS module typings generation and checks to strengthen docs type safety
+🧹 [chore] Updates linting setup to use modular React rule sets and ignore generated style typings
+🧹 [chore] Expands type-check scripts to include docs and refreshes tooling versions
+🧪 [test] Updates validation error formatter tests to use the shared helper
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e211183)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e21118338ea05544555b144e96a93b0cc291f68f)
+
 
 - 🚜 [refactor] Simplify directory path retrieval in WindowService
 
@@ -1752,6 +1788,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v21.8.0 [skip ci] [`(ab638db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab638db37e31f1dd81354c239e718550f795d4aa)
+
+
 - Update changelogs for v21.7.0 [skip ci] [`(0592f72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)
 
 
@@ -1801,6 +1840,28 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update linting rules and dependencies
+ - 🛠️ [fix] Import `normalizePath` in multiple linting rules to ensure path normalization is consistently applied.
+ - 🛠️ [fix] Refactor `no-deprecated-exports` rule to use `getContextSourceCode` for better source code handling.
+ - 🛠️ [fix] Update `hasLocalBinding` function in multiple renderer rules to improve scope handling and prevent infinite loops.
+ - 🛠️ [fix] Enhance `waitForBoundingBoxToSettle` utility to reduce flakiness in UI tests by ensuring element stability before interactions.
+ - 📝 [docs] Update Docusaurus configuration to include Storybook documentation.
+ - 🧪 [test] Adjust timeout for UI tests to accommodate slower environments.
+ - 🧹 [chore] Update package dependencies, including `eslint-plugin-antfu` and `eslint-plugin-es-x`, to their latest versions for improved linting capabilities.
+ - 🧹 [chore] Modify workspace configuration in `package.json` to include `uptime-watcher` plugin for better project structure.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b03e2a1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b03e2a1f9d273d56c7479fc7ab8a0582c024e271)
+
+
+- 🔧 [build] Refactor linting rules to use context compatibility utilities
+
+ - 🛠️ Update all linting rules in the uptime-watcher plugin to replace direct calls to `context.getFilename()` with `getContextFilename(context)` for improved compatibility.
+ - 🛠️ Modify rules to utilize `getContextSourceCode(context)` where applicable, enhancing source code access consistency.
+ - 📝 Ensure that all rules maintain their original functionality while improving code maintainability and readability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1721ef9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1721ef9a5a85e06fc863a43cf33857588c3c56cf)
+
 
 - 🔧 [build] Update linting scripts and dependencies
  - ✨ [feat] Add quiet variants for linting commands to suppress output

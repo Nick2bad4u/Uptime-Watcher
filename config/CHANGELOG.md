@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[ba2d861](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba2d86143623d14dfde86de09cb1ebb4d24349f5)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...ba2d86143623d14dfde86de09cb1ebb4d24349f5))
+[fba5b2f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...fba5b2fd7b79ad096c6d1c8fac3b7430d8350117))
 
 
 ### ✨ Features
@@ -289,6 +289,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85d4
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Centralizes validation helpers
+
+🚜 [refactor] Extracts shared validation utilities to reduce duplication
+ - Improves consistency for record, string, restore, and notification checks
+🚜 [refactor] Normalizes monitor retry handling and HTTP parsing helpers
+ - Aligns retry attempts and consolidates JSON/header string handling
+🧹 [chore] Updates tooling configs and dependency versions
+ - Adjusts linting directives, overrides order, and package upgrades
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fba5b2f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)
+
 
 - 🚜 [refactor] Update workflow configurations and code structure
  - 🛠️ [fix] Modify ESLint and Stylelint workflows to use `npm ci --force` for improved dependency installation
@@ -753,6 +765,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 ### 🧹 Chores
 
+- Update changelogs for v21.8.0 [skip ci] [`(ab638db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab638db37e31f1dd81354c239e718550f795d4aa)
+
+
 - Update changelogs for v21.7.0 [skip ci] [`(0592f72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)
 
 
@@ -792,6 +807,37 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update linting configuration and package details
+ - 🛠️ [fix] Add ESLint and related plugins to exceptions in .npmpackagejsonlintrc.json
+ - 🧹 [chore] Extend .stylelintignore to exclude Storybook static files
+ - 🔧 [build] Include maintainers and contributors in uptime-watcher ESLint plugin package.json
+ - 🔧 [build] Add new script for checking scripts in package.json
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6f69449)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6f69449c22553efe8972166ac75af4fd50cac469)
+
+
+- 🔧 [build] Update linting rules and dependencies
+ - 🛠️ [fix] Import `normalizePath` in multiple linting rules to ensure path normalization is consistently applied.
+ - 🛠️ [fix] Refactor `no-deprecated-exports` rule to use `getContextSourceCode` for better source code handling.
+ - 🛠️ [fix] Update `hasLocalBinding` function in multiple renderer rules to improve scope handling and prevent infinite loops.
+ - 🛠️ [fix] Enhance `waitForBoundingBoxToSettle` utility to reduce flakiness in UI tests by ensuring element stability before interactions.
+ - 📝 [docs] Update Docusaurus configuration to include Storybook documentation.
+ - 🧪 [test] Adjust timeout for UI tests to accommodate slower environments.
+ - 🧹 [chore] Update package dependencies, including `eslint-plugin-antfu` and `eslint-plugin-es-x`, to their latest versions for improved linting capabilities.
+ - 🧹 [chore] Modify workspace configuration in `package.json` to include `uptime-watcher` plugin for better project structure.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b03e2a1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b03e2a1f9d273d56c7479fc7ab8a0582c024e271)
+
+
+- 🔧 [build] Refactor linting rules to use context compatibility utilities
+
+ - 🛠️ Update all linting rules in the uptime-watcher plugin to replace direct calls to `context.getFilename()` with `getContextFilename(context)` for improved compatibility.
+ - 🛠️ Modify rules to utilize `getContextSourceCode(context)` where applicable, enhancing source code access consistency.
+ - 📝 Ensure that all rules maintain their original functionality while improving code maintainability and readability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1721ef9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1721ef9a5a85e06fc863a43cf33857588c3c56cf)
+
 
 - 🔧 [build] Update GitHub workflows and configurations
  - 🛠️ [fix] Add GITLEAKS_CONFIG environment variable to gitleaks.yml for custom configuration

@@ -4,6 +4,150 @@
 
 All notable changes to this project will be documented in this file.
 
+## [21.9.0] - 2026-02-07
+
+
+[[5c98343](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c9834313115e8cc138e9bd7cea0eb4ea81f96d4)...
+[e05c904](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e05c9047b1b0c7419c6939d81d201d62e3b555d1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5c9834313115e8cc138e9bd7cea0eb4ea81f96d4...e05c9047b1b0c7419c6939d81d201d62e3b555d1))
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Centralizes validation helpers
+
+🚜 [refactor] Extracts shared validation utilities to reduce duplication
+ - Improves consistency for record, string, restore, and notification checks
+🚜 [refactor] Normalizes monitor retry handling and HTTP parsing helpers
+ - Aligns retry attempts and consolidates JSON/header string handling
+🧹 [chore] Updates tooling configs and dependency versions
+ - Adjusts linting directives, overrides order, and package upgrades
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fba5b2f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)
+
+
+- 🚜 [refactor] Centralizes service helpers
+
+🚜 [refactor] Extracts service wiring helpers to reduce inline adapter logic and guard cache access during initialization.
+🚜 [refactor] Centralizes cloud OAuth token requests with consistent parsing and error messages for interactive and refresh flows.
+🚜 [refactor] Consolidates history prune limit and retry-attempt normalization, routing connectivity retries through shared hooks with safer host logging.
+🚜 [refactor] Moves cloud IPC validators into a dedicated module and streamlines monitor title suffix resolution and docs.
+🧪 [test] Removes connectivity retry tests aligned with the new retry path.
+🔧 [build] Reorders overrides and bumps lint tooling versions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2b0d3cf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2b0d3cff014d03d289ef4125f146fa7618fa8575)
+
+
+- 🚜 [refactor] Improves orchestration helpers
+
+🚜 [refactor] Extracts orchestration, event, IPC, and monitoring utilities to centralize error contexts, payload cloning, resumption flows, and handler execution for steadier runtime behavior
+🚜 [refactor] Simplifies site management event emission and validation through shared helpers to reduce duplication and keep state sync signaling consistent
+🧹 [chore] Adds CSS module typings generation and checks to strengthen docs type safety
+🧹 [chore] Updates linting setup to use modular React rule sets and ignore generated style typings
+🧹 [chore] Expands type-check scripts to include docs and refreshes tooling versions
+🧪 [test] Updates validation error formatter tests to use the shared helper
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e211183)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e21118338ea05544555b144e96a93b0cc291f68f)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improves docs motion and sidebar UX
+
+🛠️ [fix] Improves settings restore error detection to surface failures when error messages are returned.
+ - Avoids silently treating error payloads as successes.
+🎨 [style] Broadens reduced-motion handling and smooths transition timing across navigation, headings, content animations, buttons, dropdowns, modals, and scroll effects.
+ - Keeps motion accessible and consistent.
+🎨 [style] Stabilizes mobile sidebar overflow and width to prevent blank panels and horizontal spill, while fine-tuning footer and tooltip typography sizes.
+🚜 [refactor] Normalizes formatting in form validation helpers, field reset mappings, and status update utilities for readability.
+📝 [docs] Simplifies docs pages by relying on the default page wrapper instead of explicit layout nesting.
+ - Reduces redundant structure and lint suppression.
+🧹 [chore] Updates lint and secret ignore lists and points CSS linting to the shared config to remove duplicate setup.
+🧪 [test] Cleans UI demo stories by ignoring injected keys and skips loading demo test config during Vite runs.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb2ed77)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb2ed7708dcbbc7da0778142c0a29df4c86f144f)
+
+
+
+### 🧹 Chores
+
+- *(release)* V21.9.0 [skip ci] [`(e05c904)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e05c9047b1b0c7419c6939d81d201d62e3b555d1)
+
+
+- 🧹 [chore] Add workspaces configuration for Docusaurus documentation
+
+ - Introduced a new "workspaces" section in package.json to manage dependencies for the Docusaurus documentation located in the "docs/docusaurus/" directory.
+ - This change facilitates better organization and management of the documentation project within the monorepo structure.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6a6127)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a6a6127ed75ad2238b0bc97968ca4ac71b9b4f24)
+
+
+- Update changelogs for v21.8.0 [skip ci] [`(ab638db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab638db37e31f1dd81354c239e718550f795d4aa)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update linting configuration and package details
+ - 🛠️ [fix] Add ESLint and related plugins to exceptions in .npmpackagejsonlintrc.json
+ - 🧹 [chore] Extend .stylelintignore to exclude Storybook static files
+ - 🔧 [build] Include maintainers and contributors in uptime-watcher ESLint plugin package.json
+ - 🔧 [build] Add new script for checking scripts in package.json
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6f69449)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6f69449c22553efe8972166ac75af4fd50cac469)
+
+
+- 🔧 [build] Update linting rules and dependencies
+ - 🛠️ [fix] Import `normalizePath` in multiple linting rules to ensure path normalization is consistently applied.
+ - 🛠️ [fix] Refactor `no-deprecated-exports` rule to use `getContextSourceCode` for better source code handling.
+ - 🛠️ [fix] Update `hasLocalBinding` function in multiple renderer rules to improve scope handling and prevent infinite loops.
+ - 🛠️ [fix] Enhance `waitForBoundingBoxToSettle` utility to reduce flakiness in UI tests by ensuring element stability before interactions.
+ - 📝 [docs] Update Docusaurus configuration to include Storybook documentation.
+ - 🧪 [test] Adjust timeout for UI tests to accommodate slower environments.
+ - 🧹 [chore] Update package dependencies, including `eslint-plugin-antfu` and `eslint-plugin-es-x`, to their latest versions for improved linting capabilities.
+ - 🧹 [chore] Modify workspace configuration in `package.json` to include `uptime-watcher` plugin for better project structure.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b03e2a1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b03e2a1f9d273d56c7479fc7ab8a0582c024e271)
+
+
+- 🔧 [build] Refactor linting rules to use context compatibility utilities
+
+ - 🛠️ Update all linting rules in the uptime-watcher plugin to replace direct calls to `context.getFilename()` with `getContextFilename(context)` for improved compatibility.
+ - 🛠️ Modify rules to utilize `getContextSourceCode(context)` where applicable, enhancing source code access consistency.
+ - 📝 Ensure that all rules maintain their original functionality while improving code maintainability and readability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1721ef9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1721ef9a5a85e06fc863a43cf33857588c3c56cf)
+
+
+- 🔧 [build] Update ESLint and Stylelint configurations
+
+ - 🛠️ [fix] Remove unnecessary ESLint disable comments in `eslint.config.mjs`
+ - ✨ [feat] Add `eslint-plugin-node-dependencies` and `eslint-plugin-react-rsc` for enhanced linting capabilities
+ - 📝 [docs] Update comments to clarify the purpose of various ESLint plugins
+ - 🔄 [refactor] Enable `publint` for package.json linting with specific rules for error, suggestion, and warning types
+ - ⚡ [perf] Adjust `node-dependencies` rules to improve performance and reduce noise in linting
+ - 🧹 [chore] Remove deprecated and unused ESLint plugins from the configuration
+ - 🎨 [style] Clean up `stylelint.config.mjs` by removing unnecessary comments
+ - 🔧 [build] Update `package.json` to include new files for packaging and improve dependency management
+ - 🔄 [refactor] Update `package-lock.json` to reflect changes in dependencies, including upgrading `electron` to version 40.2.1 and removing deprecated types
+ - 🧹 [chore] Clean up `package.json` by removing unnecessary fields and ensuring proper structure
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4b2d7b2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4b2d7b2d7e37125d301a4b94af4f7cb739c43e14)
+
+
+- 🔧 [build] Update tools list in BeastMode agent
+
+ - 🛠️ Refactor tools array to include additional vscode-mcp commands for enhanced functionality.
+ - 🔍 Ensure comprehensive coverage of tasks by adding 'list_workspaces' and 'open_files' commands.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5c98343)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c9834313115e8cc138e9bd7cea0eb4ea81f96d4)
+
+
+
+
+
+
 ## [21.8.0] - 2026-02-05
 
 

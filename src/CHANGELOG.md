@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[ba2d861](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba2d86143623d14dfde86de09cb1ebb4d24349f5)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...ba2d86143623d14dfde86de09cb1ebb4d24349f5))
+[fba5b2f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...fba5b2fd7b79ad096c6d1c8fac3b7430d8350117))
 
 
 ### ✨ Features
@@ -863,6 +863,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e251
 
 ### 🚜 Refactor
 
+- 🚜 [refactor] Centralizes validation helpers
+
+🚜 [refactor] Extracts shared validation utilities to reduce duplication
+ - Improves consistency for record, string, restore, and notification checks
+🚜 [refactor] Normalizes monitor retry handling and HTTP parsing helpers
+ - Aligns retry attempts and consolidates JSON/header string handling
+🧹 [chore] Updates tooling configs and dependency versions
+ - Adjusts linting directives, overrides order, and package upgrades
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fba5b2f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)
+
+
 - 🚜 [refactor] Update workflow configurations and code structure
  - 🛠️ [fix] Modify ESLint and Stylelint workflows to use `npm ci --force` for improved dependency installation
  - 🛠️ [fix] Adjust Flatpak build workflow to enforce `npm ci --force` for consistency
@@ -1600,6 +1612,22 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aa7f
 
 ### 🎨 Styling
 
+- 🎨 [style] Improves docs motion and sidebar UX
+
+🛠️ [fix] Improves settings restore error detection to surface failures when error messages are returned.
+ - Avoids silently treating error payloads as successes.
+🎨 [style] Broadens reduced-motion handling and smooths transition timing across navigation, headings, content animations, buttons, dropdowns, modals, and scroll effects.
+ - Keeps motion accessible and consistent.
+🎨 [style] Stabilizes mobile sidebar overflow and width to prevent blank panels and horizontal spill, while fine-tuning footer and tooltip typography sizes.
+🚜 [refactor] Normalizes formatting in form validation helpers, field reset mappings, and status update utilities for readability.
+📝 [docs] Simplifies docs pages by relying on the default page wrapper instead of explicit layout nesting.
+ - Reduces redundant structure and lint suppression.
+🧹 [chore] Updates lint and secret ignore lists and points CSS linting to the shared config to remove duplicate setup.
+🧪 [test] Cleans UI demo stories by ignoring injected keys and skips loading demo test config during Vite runs.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb2ed77)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb2ed7708dcbbc7da0778142c0a29df4c86f144f)
+
+
 - 🎨 [style] Refactor import statements for consistency and readability
  - Standardized import statements across multiple test files to a single line format for better readability.
  - Adjusted spacing and indentation in various test files to enhance code clarity.
@@ -1742,6 +1770,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.8.0 [skip ci] [`(ab638db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab638db37e31f1dd81354c239e718550f795d4aa)
+
 
 - Update changelogs for v21.7.0 [skip ci] [`(0592f72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0592f72e410c1505e11cad7346ba4dc2b97eef64)
 
