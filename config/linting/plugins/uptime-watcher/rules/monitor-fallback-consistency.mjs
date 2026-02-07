@@ -10,8 +10,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as ts from "typescript";
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 import { SHARED_DIR } from "../_internal/repo-paths.mjs";
 
 const SHARED_TYPES_PATH = path.resolve(SHARED_DIR, "types.ts");

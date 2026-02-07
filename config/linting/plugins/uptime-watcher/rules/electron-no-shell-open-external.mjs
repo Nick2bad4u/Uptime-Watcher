@@ -6,8 +6,8 @@
  * @file Rule: electron-no-shell-open-external
  */
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 
 const ALLOWED_FILE_SUFFIX = "/electron/services/shell/openExternalUtils.ts";
 

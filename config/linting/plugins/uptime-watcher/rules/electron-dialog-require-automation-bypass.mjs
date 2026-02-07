@@ -6,8 +6,8 @@
  * @file Rule: electron-dialog-require-automation-bypass
  */
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 
 const DIALOG_METHOD_NAMES = new Set([
     "showErrorBox",

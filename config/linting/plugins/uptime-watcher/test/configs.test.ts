@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import uptimeWatcherPlugin from "../../uptime-watcher.mjs";
+import uptimeWatcherPlugin from "../plugin.mjs";
 
 interface FlatConfigLike {
     files?: unknown;

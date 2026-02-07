@@ -8,8 +8,8 @@
 
 import * as path from "node:path";
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 import {
     NORMALIZED_ELECTRON_DIR,
     NORMALIZED_SRC_DIR,

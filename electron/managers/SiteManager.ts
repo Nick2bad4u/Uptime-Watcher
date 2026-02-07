@@ -146,8 +146,9 @@ export class SiteManager {
     }): Promise<void> {
         return emitSiteCacheMissSafeHelper(
             {
-                emitSitesStateSynchronized: (payload) =>
-                    this.emitSitesStateSynchronized(payload),
+                emitSitesStateSynchronized: async (payload): Promise<void> => {
+                    await this.emitSitesStateSynchronized(payload);
+                },
                 eventEmitter: this.eventEmitter,
             },
             args
@@ -164,8 +165,9 @@ export class SiteManager {
     }): Promise<void> {
         return emitSiteCacheUpdatedHelper(
             {
-                emitSitesStateSynchronized: (payload) =>
-                    this.emitSitesStateSynchronized(payload),
+                emitSitesStateSynchronized: async (payload): Promise<void> => {
+                    await this.emitSitesStateSynchronized(payload);
+                },
                 eventEmitter: this.eventEmitter,
             },
             args
@@ -188,8 +190,9 @@ export class SiteManager {
     }): Promise<void> {
         return emitSiteUpdatedAndStateSynchronizedHelper(
             {
-                emitSitesStateSynchronized: (payload) =>
-                    this.emitSitesStateSynchronized(payload),
+                emitSitesStateSynchronized: async (payload): Promise<void> => {
+                    await this.emitSitesStateSynchronized(payload);
+                },
                 eventEmitter: this.eventEmitter,
             },
             args
@@ -206,8 +209,9 @@ export class SiteManager {
     }): Promise<void> {
         return emitSiteAddedAndStateSynchronizedHelper(
             {
-                emitSitesStateSynchronized: (payload) =>
-                    this.emitSitesStateSynchronized(payload),
+                emitSitesStateSynchronized: async (payload): Promise<void> => {
+                    await this.emitSitesStateSynchronized(payload);
+                },
                 eventEmitter: this.eventEmitter,
             },
             args

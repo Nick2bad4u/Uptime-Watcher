@@ -52,15 +52,23 @@ export const rendererNoBrowserDialogsRule = {
          * @param {any} node
          */
         function hasLocalBinding(name, node) {
-            let scope = sourceCode.getScope(node);
-            while (scope) {
+            let scope = sourceCode.getScope(
+                /** @type {import("estree").Node} */ (node)
+            );
+
+            while (true) {
                 const variable = scope.set.get(name);
                 if (variable && variable.defs.length > 0) {
                     return true;
                 }
-                scope = scope.upper;
+
+                const upper = scope.upper;
+                if (!upper) {
+                    return false;
+                }
+
+                scope = upper;
             }
-            return false;
         }
 
         /**

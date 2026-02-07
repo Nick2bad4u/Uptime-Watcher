@@ -6,8 +6,8 @@
  * @file Rule: electron-no-browserwindow-outside-windowservice
  */
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 
 const ALLOWED_WINDOW_SERVICE_SUFFIX =
     "/electron/services/window/WindowService.ts";

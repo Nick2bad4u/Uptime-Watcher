@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
-import uptimeWatcherPlugin from "../../uptime-watcher.mjs";
+import uptimeWatcherPlugin from "../plugin.mjs";
 
 interface RuleWithMeta {
     readonly meta?: {

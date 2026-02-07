@@ -1,0 +1,44 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "name": "eslint-plugin-uptime-watcher",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Uptime Watcher internal ESLint plugin (workspace package)",
+    "keywords": [
+        "eslint",
+        "eslintplugin",
+        "uptime-watcher"
+    ],
+    "homepage": "https://github.com/Nick2bad4u/Uptime-Watcher",
+    "bugs": {
+        "url": "https://github.com/Nick2bad4u/Uptime-Watcher/issues",
+        "email": "20943337+Nick2bad4u@users.noreply.github.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Nick2bad4u/Uptime-Watcher.git"
+    },
+    "license": "UNLICENSED",
+    "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://nick2bad4u.github.io/Uptime-Watcher/)",
+    "type": "module",
+    "exports": {
+        ".": "./plugin.mjs"
+    },
+    "scripts": {
+        "lint": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx",
+        "lint:fix": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx --fix",
+        "test": "vitest run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "eslint": "^9.39.2"
+    },
+    "devDependencies": {
+        "@typescript-eslint/parser": "^8.54.0",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.18"
+    },
+    "engines": {
+        "node": ">=20.19.0"
+    }
+}

@@ -7,4 +7,4 @@
  * @file Stable uptime-watcher ESLint plugin wrapper.
  */
 
-export { default } from "./uptime-watcher/plugin.mjs";
+export { default } from "eslint-plugin-uptime-watcher";

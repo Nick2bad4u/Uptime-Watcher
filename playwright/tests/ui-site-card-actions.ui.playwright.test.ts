@@ -133,6 +133,11 @@ test.describe(
                 tag: ["@ui", "@monitor-identifiers"],
             },
             async () => {
+                // This test creates an additional site via the modal on top of
+                // the per-test setup site created in beforeEach. On slower
+                // runners that extra workflow can exceed the suite default.
+                test.setTimeout(120_000);
+
                 const sslSiteName = generateSiteName("SSL Identifier");
 
                 await createSiteViaModal(page, {

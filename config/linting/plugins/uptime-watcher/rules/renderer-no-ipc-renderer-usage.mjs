@@ -32,7 +32,7 @@ export const rendererNoIpcRendererUsageRule = {
      *     sourceCode?: any;
      *     report: (descriptor: {
      *         messageId: string;
-     *         node: import("@typescript-eslint/utils").TSESTree.Node;
+        *         node: any;
      *         data?: Record<string, unknown>;
      *     }) => void;
      * }} context
@@ -55,18 +55,26 @@ export const rendererNoIpcRendererUsageRule = {
 
         /**
          * @param {string} name
-         * @param {import("@typescript-eslint/utils").TSESTree.Node} node
+         * @param {any} node
          */
         function hasLocalBinding(name, node) {
-            let scope = sourceCode.getScope(node);
-            while (scope) {
+            let scope = sourceCode.getScope(
+                /** @type {import("estree").Node} */ (node)
+            );
+
+            while (true) {
                 const variable = scope.set.get(name);
                 if (variable && variable.defs.length > 0) {
                     return true;
                 }
-                scope = scope.upper;
+
+                const upper = scope.upper;
+                if (!upper) {
+                    return false;
+                }
+
+                scope = upper;
             }
-            return false;
         }
 
         /**

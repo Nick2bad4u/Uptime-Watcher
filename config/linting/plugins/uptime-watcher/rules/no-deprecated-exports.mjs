@@ -6,25 +6,25 @@
  * @file Rule: no-deprecated-exports
  */
 
-const DEPRECATED_TAG_PATTERN = /@deprecated\b/iv;
-
 /**
  * ESLint rule disallowing exports of declarations annotated with @deprecated.
  */
+
+import { getContextSourceCode } from "../_internal/eslint-context-compat.mjs";
+
+const DEPRECATED_TAG_PATTERN = /@deprecated\b/iv;
+
 export const noDeprecatedExportsRule = {
     /**
      * @param {{
      *     sourceCode?: any;
      *     getSourceCode?: () => any;
-     *     report: (descriptor: {
-     *         messageId: string;
-     *         node: import("@typescript-eslint/utils").TSESTree.Node;
-     *     }) => void;
+    *     report: (descriptor: { messageId: string; node: any }) => void;
      * }} context
      */
     create(context) {
         const inspectedNodes = new WeakSet(),
-            sourceCode = context.sourceCode ?? context.getSourceCode?.();
+            sourceCode = getContextSourceCode(context);
 
         if (!sourceCode) {
             return {};
@@ -33,24 +33,26 @@ export const noDeprecatedExportsRule = {
         /**
          * Retrieves the closest JSDoc comment associated with a node.
          *
-         * @param {import("@typescript-eslint/utils").TSESTree.Node | null | undefined} node
+         * @param {any} node
          *   - Node to inspect.
          *
-         * @returns {import("@typescript-eslint/utils").TSESTree.BlockComment | null}
+         * @returns {any}
          */
         function getJSDocument(node) {
             if (!node) {
                 return null;
             }
 
+            const estreeNode = /** @type {import("estree").Node} */ (node);
+
             if (typeof sourceCode.getJSDocComment === "function") {
-                const jsdoc = sourceCode.getJSDocComment(node);
+                const jsdoc = sourceCode.getJSDocComment(estreeNode);
                 if (jsdoc) {
                     return jsdoc;
                 }
             }
 
-            const comments = sourceCode.getCommentsBefore(node);
+            const comments = sourceCode.getCommentsBefore(estreeNode);
             if (!comments || comments.length === 0) {
                 return null;
             }
@@ -64,11 +66,11 @@ export const noDeprecatedExportsRule = {
                 return null;
             }
 
-            if (!lastComment.loc || !node.loc) {
+            if (!lastComment.loc || !estreeNode.loc) {
                 return null;
             }
 
-            if (lastComment.loc.end.line < node.loc.start.line - 1) {
+            if (lastComment.loc.end.line < estreeNode.loc.start.line - 1) {
                 return null;
             }
 
@@ -78,9 +80,9 @@ export const noDeprecatedExportsRule = {
         /**
          * Reports when the inspected node carries a @deprecated tag.
          *
-         * @param {import("@typescript-eslint/utils").TSESTree.Node | null | undefined} targetNode
+         * @param {import("estree").Node | null | undefined} targetNode
          *   - Node whose JSDoc should be analysed.
-         * @param {import("@typescript-eslint/utils").TSESTree.Node} reportNode
+         * @param {import("estree").Node} reportNode
          *   - Node to attach the ESLint violation to.
          */
         function reportIfDeprecated(targetNode, reportNode) {
@@ -107,7 +109,7 @@ export const noDeprecatedExportsRule = {
 
         return {
             /**
-             * @param {import("@typescript-eslint/utils").TSESTree.ExportDefaultDeclaration} node
+             * @param {any} node
              */
             ExportDefaultDeclaration(node) {
                 if (
@@ -122,7 +124,7 @@ export const noDeprecatedExportsRule = {
             },
 
             /**
-             * @param {import("@typescript-eslint/utils").TSESTree.ExportNamedDeclaration} node
+             * @param {any} node
              */
             ExportNamedDeclaration(node) {
                 if (node.declaration) {

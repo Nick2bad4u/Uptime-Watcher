@@ -32,6 +32,14 @@ export const tsdocNoConsoleExampleRule = {
                         continue;
                     }
 
+                    if (!comment.range) {
+                        continue;
+                    }
+
+                    if (!comment.range) {
+                        continue;
+                    }
+
                     const consolePattern = /console\.[A-Za-z]+/v,
                         examplePattern = /```[\s\S]*?```/gv;
                     let match;

@@ -6,8 +6,8 @@
  * @file Rule: electron-no-webcontents-execute-javascript
  */
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 
 /**
  * ESLint rule disallowing `webContents.executeJavaScript()` in Electron

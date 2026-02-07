@@ -6,8 +6,8 @@
  * @file Rule: electron-no-direct-ipc-main-import
  */
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 import { NORMALIZED_ELECTRON_DIR } from "../_internal/repo-paths.mjs";
 
 // Repo path constants live in ../_internal/repo-paths.mjs

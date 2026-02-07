@@ -425,6 +425,10 @@ const config: Config = {
                             label: "🧪 ESLint Config",
                         },
                         {
+                            label: "📚 Storybook",
+                            to: "/storybook/",
+                        },
+                        {
                             label: "📝 TSDoc Standards",
                             to: "/docs/category/-tsdoc-documentation",
                         },

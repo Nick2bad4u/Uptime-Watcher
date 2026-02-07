@@ -6,8 +6,8 @@
  * @file Rule: electron-no-app-getpath-at-module-scope
  */
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 
 const DISALLOWED_METHOD_NAMES = new Set([
     "getAppPath",

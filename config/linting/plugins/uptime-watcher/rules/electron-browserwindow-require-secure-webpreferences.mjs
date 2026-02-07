@@ -6,8 +6,8 @@
  * @file Rule: electron-browserwindow-require-secure-webpreferences
  */
 
-import { normalizePath } from "../_internal/path-utils.mjs";
 import { getContextFilename } from "../_internal/eslint-context-compat.mjs";
+import { normalizePath } from "../_internal/path-utils.mjs";
 
 const REQUIRED_WEB_PREFERENCES = [
     { key: "contextIsolation", expected: true },

@@ -92,7 +92,12 @@ const config: StorybookConfig = {
         options: {},
     },
     stories: ["./stories/**/*.stories.tsx"],
-    viteFinal: (existingConfig) => {
+    viteFinal: (existingConfig, options) => {
+        // We deploy Storybook under a sub-path of the GitHub Pages site
+        // (`/Uptime-Watcher/storybook/`). Using a relative base keeps the build
+        // portable and prevents absolute `/assets/...` URLs from breaking.
+        const shouldUseRelativeBase = options.configType === "PRODUCTION";
+
         const toArray = (
             plugins: PluginOption | PluginOption[] | undefined
         ): PluginOption[] => {
@@ -159,6 +164,7 @@ const config: StorybookConfig = {
         return mergeConfig(
             {
                 ...existingConfig,
+                ...(shouldUseRelativeBase ? { base: "./" } : {}),
                 plugins,
             },
             baseViteConfig

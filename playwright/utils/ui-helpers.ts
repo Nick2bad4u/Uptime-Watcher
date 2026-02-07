@@ -35,6 +35,67 @@ const UI_STABILIZATION_DELAYS = {
 } as const;
 
 /**
+ * Waits until an element's bounding box stops moving.
+ *
+ * @remarks
+ * Playwright's built-in "stable" actionability check can still fail when a
+ * control is continuously animating (e.g. micro-layout shifts on Electron)
+ * even though it becomes interactable shortly after. This helper reduces
+ * flakiness by explicitly waiting for positional stability before clicking.
+ */
+async function waitForBoundingBoxToSettle(args: {
+    locator: Locator;
+    settleMs: number;
+    timeoutMs: number;
+}): Promise<void> {
+    const { locator, settleMs, timeoutMs } = args;
+    const pollIntervalMs = 100;
+
+    let lastBox: Awaited<ReturnType<Locator["boundingBox"]>> | null = null;
+    let stableSince = Date.now();
+
+    await expect
+        .poll(
+            async () => {
+                const now = Date.now();
+                const nextBox = await locator.boundingBox().catch(() => null);
+
+                if (!nextBox) {
+                    stableSince = now;
+                    lastBox = null;
+                    return false;
+                }
+
+                if (!lastBox) {
+                    lastBox = nextBox;
+                    stableSince = now;
+                    return false;
+                }
+
+                const hasMoved =
+                    Math.abs(nextBox.x - lastBox.x) >= 0.5 ||
+                    Math.abs(nextBox.y - lastBox.y) >= 0.5 ||
+                    Math.abs(nextBox.width - lastBox.width) >= 0.5 ||
+                    Math.abs(nextBox.height - lastBox.height) >= 0.5;
+
+                if (hasMoved) {
+                    lastBox = nextBox;
+                    stableSince = now;
+                    return false;
+                }
+
+                lastBox = nextBox;
+                return now - stableSince >= settleMs;
+            },
+            {
+                intervals: [pollIntervalMs],
+                timeout: timeoutMs,
+            }
+        )
+        .toBe(true);
+}
+
+/**
  * Form selectors for the Add Site form.
  */
 export const FORM_SELECTORS = {
@@ -354,7 +415,14 @@ export async function openAddSiteModal(page: Page): Promise<void> {
     // repeated trial clicks for this specific control.
     // eslint-disable-next-line playwright/no-wait-for-timeout -- Intentional debounce for animated Add Site button
     await page.waitForTimeout(UI_STABILIZATION_DELAYS.ADD_SITE_BUTTON_MS);
-    await addSiteButton.click();
+
+    await waitForBoundingBoxToSettle({
+        locator: addSiteButton,
+        settleMs: 250,
+        timeoutMs: WAIT_TIMEOUTS.LONG,
+    });
+
+    await addSiteButton.click({ timeout: WAIT_TIMEOUTS.LONG });
 
     // Wait for modal overlay to appear
     const addSiteFormContainer = page.getByTestId("add-site-form");
@@ -1003,9 +1071,6 @@ export async function openSettingsModal(page: Page): Promise<void> {
                 return false;
             }
             const modal = settingsRoot.closest("dialog") ?? settingsRoot;
-            if (!modal) {
-                return false;
-            }
             const opacityValue = Number.parseFloat(
                 getComputedStyle(modal).opacity ?? "0"
             );
