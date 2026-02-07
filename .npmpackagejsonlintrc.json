@@ -58,7 +58,10 @@
             {
                 "exceptions": [
                     "vitest-environment-browser",
-                    "prettier-plugin-multiline-arrays"
+                    "prettier-plugin-multiline-arrays",
+                    "eslint",
+                    "@eslint/js",
+                    "eslint-plugin-uptime-watcher"
                 ]
             }
         ],

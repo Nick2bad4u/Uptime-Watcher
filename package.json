@@ -86,6 +86,7 @@
         "check:js:test": "npm run check:js",
         "check:other:all": "tsc --build config/testing/tsconfig.AllOtherRoot.json",
         "check:playwright": "tsc --build playwright/tsconfig.json",
+        "check:scripts": "npm run type-check:scripts",
         "check:shared": "tsc --build tsconfig.shared.json",
         "check:shared:test": "tsc --build config/testing/tsconfig.shared.test.json",
         "check:storybook": "tsc --project storybook/tsconfig.json --noEmit",
@@ -614,97 +615,97 @@
         "extends": "eslint.config.mjs"
     },
     "overrides": {
-    "*": {
-      "vite": "$vite",
-      "eslint": "$eslint",
-      "@typescript-eslint/parser": "$@typescript-eslint/parser",
-      "@typescript-eslint/utils": "$@typescript-eslint/utils",
-      "prettier": "$prettier",
-      "stylelint": "$stylelint",
-      "typescript": "$typescript",
-      "tsx": "$tsx",
-      "typedoc": "$typedoc",
-      "vitest": "$vitest",
-      "@typescript-eslint/eslint-plugin": "$@typescript-eslint/eslint-plugin"
+        "@codecov/vite-plugin": {
+            "vite": "$vite"
+        },
+        "@react-scan/vite-plugin-react-scan": {
+            "react-scan": "$react-scan",
+            "vite": "$vite"
+        },
+        "@typescript-eslint/eslint-plugin": {
+            "eslint": "$eslint"
+        },
+        "@typescript-eslint/experimental-utils": {
+            "eslint": "$eslint"
+        },
+        "@typescript-eslint/parser": {
+            "eslint": "$eslint"
+        },
+        "*": {
+            "vite": "$vite",
+            "eslint": "$eslint",
+            "@typescript-eslint/parser": "$@typescript-eslint/parser",
+            "@typescript-eslint/utils": "$@typescript-eslint/utils",
+            "prettier": "$prettier",
+            "stylelint": "$stylelint",
+            "typescript": "$typescript",
+            "tsx": "$tsx",
+            "typedoc": "$typedoc",
+            "vitest": "$vitest",
+            "@typescript-eslint/eslint-plugin": "$@typescript-eslint/eslint-plugin"
+        },
+        "eslint-etc": {
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-deprecation": {
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-etc": {
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-fsecond": {
+            "@typescript-eslint/parser": {
+                "eslint": "$eslint"
+            },
+            "@typescript-eslint/utils": {
+                "eslint": "$eslint"
+            },
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-istanbul": {
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-no-lookahead-lookbehind-regexp": {
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-react-form-fields": {
+            "@typescript-eslint/experimental-utils": {
+                "eslint": "$eslint"
+            },
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-safe-jsx": {
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-total-functions": {
+            "eslint": "$eslint"
+        },
+        "eslint-plugin-usememo-recommendations": {
+            "@typescript-eslint/utils": {
+                "eslint": "$eslint"
+            },
+            "eslint": "$eslint"
+        },
+        "is-immutable-type": {
+            "eslint": "$eslint"
+        },
+        "stylelint-config-standard-scss": {
+            "stylelint": "$stylelint"
+        },
+        "stylelint-group-selectors": {
+            "stylelint": "$stylelint"
+        },
+        "stylelint-high-performance-animation": {
+            "stylelint": "$stylelint"
+        },
+        "vite": {
+            "tsx": "$tsx"
+        },
+        "zod-fast-check": {
+            "fast-check": "$fast-check",
+            "zod": "$zod"
+        }
     },
-    "@codecov/vite-plugin": {
-      "vite": "$vite"
-    },
-    "@react-scan/vite-plugin-react-scan": {
-      "react-scan": "$react-scan",
-      "vite": "$vite"
-    },
-    "@typescript-eslint/eslint-plugin": {
-      "eslint": "$eslint"
-    },
-    "@typescript-eslint/experimental-utils": {
-      "eslint": "$eslint"
-    },
-    "@typescript-eslint/parser": {
-      "eslint": "$eslint"
-    },
-    "eslint-etc": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-deprecation": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-etc": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-fsecond": {
-      "@typescript-eslint/parser": {
-        "eslint": "$eslint"
-      },
-      "@typescript-eslint/utils": {
-        "eslint": "$eslint"
-      },
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-istanbul": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-no-lookahead-lookbehind-regexp": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-react-form-fields": {
-      "@typescript-eslint/experimental-utils": {
-        "eslint": "$eslint"
-      },
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-safe-jsx": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-total-functions": {
-      "eslint": "$eslint"
-    },
-    "eslint-plugin-usememo-recommendations": {
-      "@typescript-eslint/utils": {
-        "eslint": "$eslint"
-      },
-      "eslint": "$eslint"
-    },
-    "is-immutable-type": {
-      "eslint": "$eslint"
-    },
-    "stylelint-config-standard-scss": {
-      "stylelint": "$stylelint"
-    },
-    "stylelint-group-selectors": {
-      "stylelint": "$stylelint"
-    },
-    "stylelint-high-performance-animation": {
-      "stylelint": "$stylelint"
-    },
-    "vite": {
-      "tsx": "$tsx"
-    },
-    "zod-fast-check": {
-      "fast-check": "$fast-check",
-      "zod": "$zod"
-    }
-  },
     "dependencies": {
         "axios": "^1.13.4",
         "chart.js": "^4.5.1",

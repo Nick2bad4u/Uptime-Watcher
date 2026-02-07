@@ -858,3 +858,4 @@ CNAME
 **/docs/docusaurus/src/js/modernEnhancements.ts
 **/docs/docusaurus/src/pages/index.tsx
 **/docs/docusaurus/sidebars.ts
+**/docs/docusaurus/static/storybook/**
