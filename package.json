@@ -42,6 +42,9 @@
         "shared/**",
         "assets/**"
     ],
+    "workspaces": [
+        "docs/docusaurus/"
+    ],
     "scripts": {
         "ai:context": "npm run context",
         "analyze:ipc": "tsx scripts/analyze-ipc-channels.ts",
