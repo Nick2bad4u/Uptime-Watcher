@@ -25,6 +25,10 @@ import { RETRY_BACKOFF } from "../../../constants";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
+import {
+    normalizeAdditionalRetryAttempts,
+    toTotalAttempts,
+} from "../shared/monitorRetryUtils";
 import { performSinglePortCheck } from "./portChecker";
 import { handlePortCheckError } from "./portErrorHandling";
 
@@ -85,15 +89,12 @@ export async function performPortCheckWithRetry(
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     try {
-        const normalizedRetries =
-            typeof maxRetries === "number" && Number.isFinite(maxRetries)
-                ? Math.max(0, Math.floor(maxRetries))
-                : 0;
+        const normalizedRetries = normalizeAdditionalRetryAttempts(maxRetries);
 
         // Convert "additional retries" to "total attempts" for
         // withOperationalHooks maxRetries=3 means: 1 initial attempt + 3
         // retries = 4 total attempts
-        const totalAttempts = normalizedRetries + 1;
+        const totalAttempts = toTotalAttempts(normalizedRetries);
 
         // Prepare base configuration for operational hooks
         const baseConfig = {

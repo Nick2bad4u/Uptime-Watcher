@@ -25,6 +25,12 @@
     "doctorTest": "npm run test",
     "enginesNode": false,
     "errorLevel": 1,
+    "format": [
+        "dep",
+        "time",
+        "ownerChanged",
+        "repo"
+    ],
     "global": false,
     "groupFunction": {},
     "install": "never",
@@ -42,6 +48,10 @@
     "prefix": "",
     "registry": "https://registry.npmjs.org/",
     "registryType": "npm",
+    "reject": [
+        "eslint",
+        "@eslint/js"
+    ],
     "removeRange": false,
     "retry": 3,
     "root": true,

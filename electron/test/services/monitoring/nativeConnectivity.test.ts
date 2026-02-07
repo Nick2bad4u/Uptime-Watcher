@@ -46,7 +46,6 @@ vi.mock("node:perf_hooks", () => ({
 import {
     checkConnectivity,
     checkHttpConnectivity,
-    checkConnectivityWithRetry,
 } from "../../../services/monitoring/utils/nativeConnectivity";
 // Import the mocked modules to get access to the mock functions
 import * as dns from "node:dns/promises";
@@ -233,74 +232,6 @@ describe("Native Connectivity with Degraded State", () => {
             expect(result.details).toBe(
                 "Failed to connect to slow-dns.example.com"
             );
-        });
-    });
-    describe(checkConnectivityWithRetry, () => {
-        it("should return 'degraded' on final attempt if consistently degraded", async () => {
-            // Arrange
-            mockDns.resolve4.mockResolvedValue(["192.168.1.1"]);
-            const mockSocket = {
-                setTimeout: vi.fn(),
-                on: vi.fn((event, callback) => {
-                    if (event === "error") {
-                        setTimeout(() => callback(), 10);
-                    }
-                }),
-                connect: vi.fn(),
-                destroy: vi.fn(),
-                removeAllListeners: vi.fn(),
-            };
-
-            mockNet.Socket.mockImplementation(function MockSocketInstance() {
-                return mockSocket as unknown as net.Socket;
-            });
-            // Act
-            const result = await checkConnectivityWithRetry("example.com", {
-                retries: 2,
-                retryDelay: 100,
-            });
-            // Assert
-            expect(result.status).toBe("degraded");
-            expect(result.details).toBe(
-                "DNS resolution successful, but no open ports found"
-            );
-        });
-        it("should succeed on retry if connection improves", async () => {
-            // Arrange
-            let callCount = 0;
-            const listeners = new Map<string, (...args: unknown[]) => void>();
-            const mockSocket = {
-                setTimeout: vi.fn(),
-                on: vi.fn((event, callback) => {
-                    listeners.set(event, callback);
-                }),
-                connect: vi.fn(() => {
-                    callCount++;
-
-                    if (callCount === 1) {
-                        // Fail on first attempt
-                        setTimeout(() => listeners.get("error")?.(), 10);
-                        return;
-                    }
-
-                    // Succeed on second attempt
-                    setTimeout(() => listeners.get("connect")?.(), 10);
-                }),
-                destroy: vi.fn(),
-                removeAllListeners: vi.fn(),
-            };
-
-            mockNet.Socket.mockImplementation(function MockSocketInstance() {
-                return mockSocket as unknown as net.Socket;
-            });
-            // Act
-            const result = await checkConnectivityWithRetry("example.com", {
-                retries: 2,
-                retryDelay: 100,
-            });
-            // Assert
-            expect(result.status).toBe("up");
-            expect(result.details).toContain("TCP connection successful");
         });
     });
     describe("Status validation", () => {

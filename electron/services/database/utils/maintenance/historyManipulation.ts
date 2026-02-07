@@ -9,6 +9,7 @@ import {
 import { isDev } from "../../../../electronUtils";
 import { logger } from "../../../../utils/logger";
 import { queryForIds } from "../queries/typedQueries";
+import { normalizeHistoryPruneLimit } from "./historyPruneLimit";
 
 /**
  * Utility functions for manipulating monitor history data in the database.
@@ -41,15 +42,6 @@ const HISTORY_MANIPULATION_QUERIES = {
     SELECT_EXCESS_ENTRIES:
         "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
 } as const;
-
-const normalizePruneLimit = (limit: number): null | number => {
-    if (!Number.isFinite(limit)) {
-        return null;
-    }
-
-    const normalized = Math.floor(limit);
-    return normalized > 0 ? normalized : null;
-};
 
 /**
  * Add a new history entry for a monitor.
@@ -248,7 +240,7 @@ export function pruneHistoryForMonitor(
     monitorId: string,
     limit: number
 ): void {
-    const normalizedLimit = normalizePruneLimit(limit);
+    const normalizedLimit = normalizeHistoryPruneLimit(limit);
     if (!normalizedLimit) {
         return;
     }

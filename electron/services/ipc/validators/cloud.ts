@@ -10,7 +10,7 @@ import {
     validateCloudEnableSyncConfig,
     validateCloudFilesystemProviderConfig,
     validateEncryptionPassphrasePayload,
-} from "./shared";
+} from "./cloudValidation";
 import { createNoParamsValidator } from "./utils/commonValidators";
 
 /**

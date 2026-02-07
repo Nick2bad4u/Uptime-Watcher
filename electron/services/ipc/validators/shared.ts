@@ -22,10 +22,6 @@ import { isRecord } from "@shared/utils/typeHelpers";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import {
-    MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
-    validateFilesystemBaseDirectoryCandidate,
-} from "@shared/validation/filesystemBaseDirectoryValidation";
-import {
     validateSiteSnapshot,
     validateSiteUpdate,
 } from "@shared/validation/guards";
@@ -66,11 +62,6 @@ import {
  */
 const MAX_IMPORT_DATA_PAYLOAD_BYTES: number = MAX_IPC_JSON_IMPORT_BYTES;
 
-/** Maximum byte budget accepted for cloud backup object keys. */
-const MAX_BACKUP_KEY_BYTES: number = 2048;
-
-/** Maximum byte budget accepted for encryption passphrases. */
-const MAX_ENCRYPTION_PASSPHRASE_BYTES: number = 1024;
 
 /** Maximum byte budget accepted for user-supplied restore filenames. */
 const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
@@ -167,146 +158,6 @@ const validateSiteUpdatePayload: IpcParameterValidator = createParamValidator(
         },
     ]
 );
-
-const validateCloudFilesystemProviderConfig: IpcParameterValidator =
-    createParamValidator(1, [
-        (config): ParameterValueValidationResult => {
-            const recordResult = requireRecordParam(config, "config");
-            if (isRequiredRecordError(recordResult)) {
-                return recordResult.error;
-            }
-
-            const { record } = recordResult;
-            const baseDirectoryError = IpcValidators.requiredString(
-                record["baseDirectory"],
-                "baseDirectory"
-            );
-            if (baseDirectoryError) {
-                return toValidationResult(baseDirectoryError);
-            }
-
-            const baseDirectoryCandidate = record["baseDirectory"];
-            if (typeof baseDirectoryCandidate !== "string") {
-                // Defensive: requiredString already enforces this.
-                return toValidationResult("baseDirectory must be a string");
-            }
-
-            const baseDirectoryRaw = baseDirectoryCandidate;
-            const issues = validateFilesystemBaseDirectoryCandidate(
-                baseDirectoryRaw,
-                { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }
-            );
-
-            // Preserve the historical IPC error message wording + ordering.
-            const errors: string[] = [];
-            for (const issue of issues) {
-                switch (issue.code) {
-                    case "control-chars": {
-                        errors.push(
-                            "baseDirectory must not contain control characters"
-                        );
-                        break;
-                    }
-                    case "empty": {
-                        errors.push("baseDirectory must not be empty");
-                        break;
-                    }
-                    case "not-absolute": {
-                        errors.push(
-                            "baseDirectory must be an absolute path (e.g. C:/Backups or /home/user/backups)"
-                        );
-                        break;
-                    }
-                    case "not-string": {
-                        errors.push("baseDirectory must be a string");
-                        break;
-                    }
-                    case "null-byte": {
-                        errors.push(
-                            "baseDirectory must not contain a null byte"
-                        );
-                        break;
-                    }
-                    case "too-large": {
-                        errors.push(
-                            `baseDirectory must not exceed ${issue.maxBytes} bytes`
-                        );
-                        break;
-                    }
-                    case "whitespace": {
-                        errors.push(
-                            "baseDirectory must not have leading or trailing whitespace"
-                        );
-                        break;
-                    }
-                    case "windows-device-namespace": {
-                        errors.push(
-                            String.raw`baseDirectory must not use Windows device namespace paths (\\?\ or \\.\)`
-                        );
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
-            }
-
-            return errors.length > 0 ? errors : null;
-        },
-    ]);
-
-const validateCloudEnableSyncConfig: IpcParameterValidator =
-    createParamValidator(1, [
-        (config): ParameterValueValidationResult => {
-            const recordResult = requireRecordParam(config, "config");
-            if (isRequiredRecordError(recordResult)) {
-                return recordResult.error;
-            }
-
-            const { record } = recordResult;
-            const { enabled } = record;
-            return typeof enabled === "boolean"
-                ? null
-                : toValidationResult("enabled must be a boolean");
-        },
-    ]);
-
-const validateCloudBackupMigrationRequest: IpcParameterValidator =
-    createParamValidator(1, [
-        (config): ParameterValueValidationResult => {
-            const errors: string[] = [];
-
-            const recordResult = requireRecordParam(config, "config");
-            if (isRequiredRecordError(recordResult)) {
-                return recordResult.error;
-            }
-
-            const { record } = recordResult;
-
-            const { deleteSource, limit, target } = record;
-            if (typeof deleteSource !== "boolean") {
-                errors.push("deleteSource must be a boolean");
-            }
-
-            if (target !== "plaintext" && target !== "encrypted") {
-                errors.push("target must be 'plaintext' or 'encrypted'");
-            }
-
-            if (limit !== undefined) {
-                const limitError = IpcValidators.requiredNumber(limit, "limit");
-                if (limitError) {
-                    errors.push(limitError);
-                } else if (
-                    typeof limit === "number" &&
-                    (!Number.isInteger(limit) || limit <= 0)
-                ) {
-                    errors.push("limit must be a positive integer");
-                }
-            }
-
-            return errors.length > 0 ? errors : null;
-        },
-    ]);
 
 const validatePreloadGuardReport: IpcParameterValidator = createParamValidator(
     1,
@@ -589,125 +440,6 @@ const validateImportDataPayload: IpcParameterValidator = createParamValidator(
     ]
 );
 
-const validateEncryptionPassphrasePayload: IpcParameterValidator =
-    createParamValidator(1, [
-        (candidate): ParameterValueValidationResult => {
-            const errors: string[] = [];
-
-            const stringError = IpcValidators.requiredString(
-                candidate,
-                "passphrase"
-            );
-            if (stringError) {
-                return toValidationResult(stringError);
-            }
-
-            if (typeof candidate !== "string") {
-                // Defensive: requiredString already enforces this.
-                return toValidationResult("passphrase must be a string");
-            }
-
-            const passphrase = candidate;
-            if (
-                getUtfByteLength(passphrase) > MAX_ENCRYPTION_PASSPHRASE_BYTES
-            ) {
-                errors.push(
-                    `passphrase must not exceed ${MAX_ENCRYPTION_PASSPHRASE_BYTES} bytes`
-                );
-            }
-
-            if (hasAsciiControlCharacters(passphrase)) {
-                errors.push("passphrase must not contain control characters");
-            }
-
-            if (passphrase.trim().length < 8) {
-                errors.push(
-                    "passphrase must be at least 8 characters (after trimming)"
-                );
-            }
-
-            return errors.length > 0 ? errors : null;
-        },
-    ]);
-
-function createBackupKeyValidator(paramName: string): IpcParameterValidator {
-    return createParamValidator(1, [
-        (value): ParameterValueValidationResult => {
-            const error = IpcValidators.requiredString(value, paramName);
-            if (error) {
-                return toValidationResult(error);
-            }
-
-            if (typeof value !== "string") {
-                // Defensive: requiredString already enforces this.
-                return toValidationResult(`${paramName} must be a string`);
-            }
-
-            const key = normalizePathSeparatorsToPosix(value).trim();
-
-            if (getUtfByteLength(key) > MAX_BACKUP_KEY_BYTES) {
-                return toValidationResult(
-                    `${paramName} must not exceed ${MAX_BACKUP_KEY_BYTES} bytes`
-                );
-            }
-
-            // Reject ASCII control characters including NUL.
-            if (hasAsciiControlCharacters(key)) {
-                return toValidationResult(
-                    `${paramName} must not contain control characters`
-                );
-            }
-
-            if (!key.startsWith("backups/")) {
-                return toValidationResult(
-                    `${paramName} must start with 'backups/'`
-                );
-            }
-
-            if (key === "backups/" || key.endsWith("/")) {
-                return toValidationResult(
-                    `${paramName} must reference a backup object key`
-                );
-            }
-
-            // Defense-in-depth: provider keys are logical identifiers, not OS
-            // paths or URLs. CloudService asserts the same invariants.
-            if (
-                key.startsWith("/") ||
-                key.includes(":") ||
-                key.includes("://")
-            ) {
-                return toValidationResult(
-                    `${paramName} must be a relative provider key`
-                );
-            }
-
-            const segments = key.split("/");
-            if (segments.some((segment) => segment.length === 0)) {
-                return toValidationResult(
-                    `${paramName} must not contain empty path segments`
-                );
-            }
-
-            if (
-                segments.some((segment) => segment === "." || segment === "..")
-            ) {
-                return toValidationResult(
-                    `${paramName} must not contain path traversal segments`
-                );
-            }
-
-            if (key.endsWith(".metadata.json")) {
-                return toValidationResult(
-                    `${paramName} must reference the backup object, not metadata`
-                );
-            }
-
-            return null;
-        },
-    ]);
-}
-
 function createMonitorValidationPayloadValidator(
     monitorTypeParamName: string,
     dataParamName: string
@@ -720,15 +452,10 @@ function createMonitorValidationPayloadValidator(
 }
 
 export {
-    createBackupKeyValidator,
     createMonitorValidationPayloadValidator,
     createPreloadGuardReportValidator,
     createSiteIdentifierAndMonitorIdValidator,
     createSiteIdentifierValidator,
-    validateCloudBackupMigrationRequest,
-    validateCloudEnableSyncConfig,
-    validateCloudFilesystemProviderConfig,
-    validateEncryptionPassphrasePayload,
     validateImportDataPayload,
     validateNotificationPreferences,
     validateNotifyAppEvent,

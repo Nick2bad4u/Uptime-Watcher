@@ -1,18 +1,15 @@
 import { ensureError } from "@shared/utils/errorHandling";
-import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import axios from "axios";
 import * as z from "zod";
 
 import type { SecretStore } from "../../secrets/SecretStore";
+import type { GoogleTokenResponse } from "./googleDriveTokenSchemas";
 
 import { logger } from "../../../../utils/logger";
 import { readStoredJsonSecret } from "../oauthStoredTokens";
 import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
-import {
-    googleTokenResponseSchema,
-    tryParseGoogleOAuthErrorResponse,
-} from "./googleDriveTokenSchemas";
+import { requestGoogleOAuthToken } from "./googleDriveOAuthTokenRequest";
 
 /**
  * Persisted Google Drive OAuth tokens.
@@ -100,62 +97,22 @@ export class GoogleDriveTokenManager {
 
     private async refresh(
         refreshToken: string
-    ): Promise<z.infer<typeof googleTokenResponseSchema>> {
-        const body = new URLSearchParams({
-            client_id: this.clientId,
-            grant_type: "refresh_token",
-            refresh_token: refreshToken,
-        });
-
-        if (this.clientSecret) {
-            body.set("client_secret", this.clientSecret);
-        }
-
+    ): Promise<GoogleTokenResponse> {
         try {
-            const response = await axios.post(
-                "https://oauth2.googleapis.com/token",
-                body.toString(),
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
-                }
-            );
-
-            return googleTokenResponseSchema.parse(response.data);
+            return await requestGoogleOAuthToken({
+                clientId: this.clientId,
+                ...(this.clientSecret ? { clientSecret: this.clientSecret } : {}),
+                operationLabel: "refresh",
+                params: {
+                    grant_type: "refresh_token",
+                    refresh_token: refreshToken,
+                },
+            });
         } catch (error) {
-            // Ensure we normalize the caught value so downstream logging or
-            // rethrowing remains Error-shaped, but keep Axios shape checks on
-            // the original value. In practice, some callers/tests provide
-            // Axios-like objects that are not `instanceof Error`.
-            const safeError = ensureError(error);
-
-            if (axios.isAxiosError(error)) {
-                const oauthError = tryParseGoogleOAuthErrorResponse(
-                    error.response?.data
-                );
-
-                if (oauthError) {
-                    const details = oauthError.error_description
-                        ? `${oauthError.error} (${oauthError.error_description})`
-                        : oauthError.error;
-                    const sanitized = normalizeLogValue(details);
-                    const safeDetails =
-                        typeof sanitized === "string"
-                            ? sanitized
-                            : oauthError.error;
-
-                    throw new Error(
-                        `Google OAuth refresh failed: ${safeDetails}`,
-                        {
-                            cause: error,
-                        }
-                    );
-                }
-            }
-
-            throw safeError;
+            // The shared request helper throws helpful contextual errors for
+            // Axios failures. For non-Axios failures, preserve the historical
+            // behavior of throwing a normalized Error instance.
+            throw ensureError(error);
         }
     }
 

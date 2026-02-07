@@ -31,7 +31,6 @@ import { setTimeout as delay } from "node:timers/promises";
 import type { MonitorCheckResult } from "../types";
 
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
-import { sleepMs } from "../shared/sleepMs";
 
 /* eslint-disable @microsoft/sdl/no-insecure-url -- Scheme literals are used only for stripping input; they are not used as navigated/executed URLs. */
 
@@ -60,10 +59,6 @@ export interface ConnectivityOptions {
     method?: "dns" | "http" | "tcp";
     /** Array of ports to try for TCP connectivity */
     ports?: number[];
-    /** Number of retry attempts */
-    retries?: number;
-    /** Delay between retry attempts in milliseconds */
-    retryDelay?: number;
     /** Timeout for each connectivity attempt in milliseconds */
     timeout?: number;
 }
@@ -87,26 +82,8 @@ const DEFAULT_OPTIONS: Required<ConnectivityOptions> = {
         993,
         995,
     ],
-    retries: 3,
-    retryDelay: 1000,
     timeout: 5000,
 };
-
-const computeRetryDelayMs = (
-    options: Required<ConnectivityOptions>,
-    attemptsLeft: number
-): number => options.retryDelay * (options.retries - attemptsLeft + 2);
-
-const createRetryErrorResult = (
-    error: unknown,
-    options: Required<ConnectivityOptions>,
-    attemptsLeft: number
-): MonitorCheckResult => ({
-    details: `Check failed on attempt ${options.retries - attemptsLeft + 2}`,
-    error: getUserFacingErrorDetail(error),
-    responseTime: options.timeout,
-    status: "down",
-});
 
 /**
  * Result of a TCP port connectivity check
@@ -533,79 +510,4 @@ export async function checkConnectivity(
         responseTime: Math.round(performance.now() - startTime),
         status: "down",
     };
-}
-
-/**
- * Performs a connectivity check with automatic retry logic
- *
- * @example
- *
- * ```typescript
- * // Check with retries and exponential backoff
- * const result = await checkConnectivityWithRetry("unstable-server.com", {
- *     retries: 3,
- *     retryDelay: 1000,
- *     timeout: 5000,
- * });
- * ```
- *
- * @param host - Target hostname or IP address to check
- * @param options - Configuration options including retry settings
- *
- * @returns Promise resolving to MonitorCheckResult
- */
-export async function checkConnectivityWithRetry(
-    host: string,
-    options: ConnectivityOptions = {},
-    signal?: AbortSignal
-): Promise<MonitorCheckResult> {
-    const opts = { ...DEFAULT_OPTIONS, ...options } as Required<ConnectivityOptions>;
-
-    const attemptCheck = async (
-        attemptsLeft: number
-    ): Promise<MonitorCheckResult> => {
-        if (signal?.aborted) {
-            throw createAbortError({
-                cause: Reflect.get(signal, "reason"),
-            });
-        }
-
-        try {
-            const result = await checkConnectivity(
-                host,
-                {
-                    ...opts,
-                    retries: 0, // Prevent nested retries
-                },
-                signal
-            );
-
-            if (result.status === "up" || attemptsLeft === 0) {
-                return result;
-            }
-
-            // Wait before retry
-            const retryDelayMs = computeRetryDelayMs(opts, attemptsLeft);
-            await sleepMs(retryDelayMs, signal);
-
-            return await attemptCheck(attemptsLeft - 1);
-        } catch (error) {
-            if (signal?.aborted) {
-                throw createAbortError({ cause: error });
-            }
-            const errorResult = createRetryErrorResult(error, opts, attemptsLeft);
-
-            if (attemptsLeft === 0) {
-                return errorResult;
-            }
-
-            // Wait before retry
-            const retryDelayMs = computeRetryDelayMs(opts, attemptsLeft);
-            await sleepMs(retryDelayMs, signal);
-
-            return attemptCheck(attemptsLeft - 1);
-        }
-    };
-
-    return attemptCheck(opts.retries);
 }

@@ -50,6 +50,7 @@
  */
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
@@ -59,6 +60,10 @@ import { RETRY_BACKOFF } from "../../../constants";
 import { isDev } from "../../../electronUtils";
 import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
+import {
+    normalizeAdditionalRetryAttempts,
+    toTotalAttempts,
+} from "../shared/monitorRetryUtils";
 import { checkConnectivity, checkHttpConnectivity } from "./nativeConnectivity";
 import { handlePingCheckError } from "./pingErrorHandling";
 
@@ -125,9 +130,13 @@ export async function performSinglePingCheck(
             return result;
         }
 
+        // Explicitly disable retries at the lower-level helper: this wrapper
+        // provides the retry/backoff behavior via `withOperationalHooks`.
+        const connectivityOptions = { retries: 0, timeout };
+
         const result = signal
-            ? await checkConnectivity(host, { retries: 0, timeout }, signal)
-            : await checkConnectivity(host, { retries: 0, timeout });
+            ? await checkConnectivity(host, connectivityOptions, signal)
+            : await checkConnectivity(host, connectivityOptions);
 
         if (result.status !== "up") {
             throw new Error(
@@ -210,20 +219,21 @@ export async function performPingCheckWithRetry(
     maxRetries: number,
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
-    const normalizedRetries =
-        typeof maxRetries === "number" && Number.isFinite(maxRetries)
-            ? Math.max(0, Math.floor(maxRetries))
-            : 0;
+    const normalizedRetries = normalizeAdditionalRetryAttempts(maxRetries);
 
     // With operational hooks, `maxRetries` is interpreted as the total number
     // of attempts. The public API for this helper exposes `maxRetries` as the
     // number of additional retry attempts after the initial call (0 = one
     // attempt). Convert the caller value into an attempt count here.
-    const totalAttempts = normalizedRetries + 1;
+    const totalAttempts = toTotalAttempts(normalizedRetries);
+
+    const safeHostForLogging = isValidUrl(host)
+        ? getSafeUrlForLogging(host)
+        : host;
 
     if (isDev()) {
         logger.debug("Starting connectivity check with retry", {
-            host,
+            host: safeHostForLogging,
             maxRetries: normalizedRetries,
             timeout,
         });
@@ -235,13 +245,19 @@ export async function performPingCheckWithRetry(
             {
                 initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                 maxRetries: totalAttempts,
+                // Keep the operation name stable to avoid exploding log/event
+                // cardinality. Include the host in the operational context
+                // instead.
                 operationName: "connectivity-check",
+                context: {
+                    host: safeHostForLogging,
+                },
                 ...(signal ? { signal } : {}),
             }
         );
     } catch (error) {
         return handlePingCheckError(error, {
-            host,
+            host: safeHostForLogging,
             maxRetries: normalizedRetries,
             timeout,
         });

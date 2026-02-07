@@ -14,14 +14,9 @@
  *
  * @public
  */
-import type { Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
-import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-
 import type { UptimeEvents } from "../events/eventTypes";
-import type { IMonitoringOperations } from "../managers/SiteManager.types";
-import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
 import { TypedEventBus } from "../events/TypedEventBus";
 import { ConfigurationManager } from "../managers/ConfigurationManager";
@@ -43,6 +38,8 @@ import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
 import { MonitorOperationRegistry } from "./monitoring/MonitorOperationRegistry";
 import { NotificationService } from "./notifications/NotificationService";
+import { createMonitoringOperations } from "./ServiceContainer.monitoringOperations";
+import { createSitesCacheGetter } from "./ServiceContainer.siteCacheAccessor";
 import { hasInitializeMethod, isPromiseLike } from "./ServiceContainer.utils";
 import { ServiceContainerEventForwarder } from "./ServiceContainerEventForwarder";
 import { SyncEngine } from "./sync/SyncEngine";
@@ -673,17 +670,9 @@ export class ServiceContainer {
                 "MonitorManagerEventBus"
             );
 
-            // Get sites cache function
-            const getSitesCache = (): StandardizedCache<Site> => {
-                if (!this.siteManager) {
-                    throw new Error(
-                        "Service dependency error: SiteManager not fully initialized. " +
-                            "This usually indicates a circular dependency or incorrect initialization order. " +
-                            "Ensure ServiceContainer.initialize() completes before accessing SiteManager functionality."
-                    );
-                }
-                return this.siteManager.getSitesCache();
-            };
+            const getSitesCache = createSitesCacheGetter({
+                getSiteManager: () => this.siteManager,
+            });
 
             // Create enhanced monitoring services
             const enhancedServices =
@@ -795,91 +784,11 @@ export class ServiceContainer {
      */
     public getSiteManager(): SiteManager {
         if (!this.siteManager) {
-            const monitoringOperations: IMonitoringOperations = {
-                /**
-                 * Sets the history limit for monitor data retention.
-                 *
-                 * @remarks
-                 * Delegates to {@link DatabaseManager.setHistoryLimit}.
-                 *
-                 * @param limit - Maximum number of history entries to retain.
-                 *
-                 * @returns Promise that resolves when the limit is set.
-                 *
-                 * @throws Error if setting the limit fails.
-                 */
-                setHistoryLimit: async (limit: number): Promise<void> => {
-                    try {
-                        const databaseManager = this.getDatabaseManager();
-                        await databaseManager.setHistoryLimit(limit);
-                        logger.debug(
-                            `[ServiceContainer] History limit set to ${limit} via DatabaseManager`
-                        );
-                    } catch (error) {
-                        logger.error(
-                            "[ServiceContainer] Failed to set history limit",
-                            {
-                                error: getUserFacingErrorDetail(error),
-                                limit,
-                            }
-                        );
-                        throw error;
-                    }
-                },
-                /**
-                 * Sets up new monitors for a site.
-                 *
-                 * @param site - The {@link Site} to set up monitors for.
-                 * @param newMonitorIds - Array of monitor IDs to set up.
-                 *
-                 * @returns Promise that resolves when setup is complete.
-                 */
-                setupNewMonitors: async (
-                    site: Site,
-                    newMonitorIds: string[]
-                ): Promise<void> => {
-                    const monitorManager = this.getMonitorManager();
-                    return monitorManager.setupNewMonitors(site, newMonitorIds);
-                },
-                /**
-                 * Starts monitoring for a site and monitor ID.
-                 *
-                 * @param identifier - The site identifier.
-                 * @param monitorId - The monitor ID.
-                 *
-                 * @returns Promise resolving to true if monitoring started,
-                 *   false otherwise.
-                 */
-                startMonitoringForSite: async (
-                    identifier: string,
-                    monitorId: string
-                ): Promise<boolean> => {
-                    const monitorManager = this.getMonitorManager();
-                    return monitorManager.startMonitoringForSite(
-                        identifier,
-                        monitorId
-                    );
-                },
-                /**
-                 * Stops monitoring for a site and monitor ID.
-                 *
-                 * @param identifier - The site identifier.
-                 * @param monitorId - The monitor ID.
-                 *
-                 * @returns Promise resolving to true if monitoring stopped,
-                 *   false otherwise.
-                 */
-                stopMonitoringForSite: async (
-                    identifier: string,
-                    monitorId: string
-                ): Promise<boolean> => {
-                    const monitorManager = this.getMonitorManager();
-                    return monitorManager.stopMonitoringForSite(
-                        identifier,
-                        monitorId
-                    );
-                },
-            };
+            const monitoringOperations = createMonitoringOperations({
+                enableDebugLogging: this.config.enableDebugLogging === true,
+                getDatabaseManager: () => this.getDatabaseManager(),
+                getMonitorManager: () => this.getMonitorManager(),
+            });
             const siteEventBus = new TypedEventBus<UptimeEvents>(
                 "SiteManagerEventBus"
             );

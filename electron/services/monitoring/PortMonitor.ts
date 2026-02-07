@@ -1,11 +1,9 @@
 /**
- * TCP/UDP port monitoring service for network connectivity health checks.
+ * TCP port monitoring service for network connectivity health checks.
  *
  * @remarks
- * Provides comprehensive port monitoring capabilities for TCP and UDP endpoints
- * with configurable timeouts, retry logic, and intelligent connection handling.
- * Designed for reliable network connectivity verification across various
- * protocols.
+ * Provides port monitoring capabilities for TCP endpoints with configurable
+ * timeouts and retry logic.
  *
  * @example
  *

@@ -1,17 +1,14 @@
 /**
- * Network connectivity monitoring service using ICMP ping for network
- * reachability checks.
+ * Network connectivity monitoring service for host/endpoint reachability.
  *
  * @remarks
- * Provides comprehensive ping monitoring capabilities for network hosts and
- * endpoints with configurable timeouts, retry logic, and detailed response time
- * measurement. Designed for reliable network connectivity verification using
- * native system ping utilities.
+ * Despite the historical "Ping" naming, this monitor uses **native
+ * TCP/DNS/HTTP connectivity checks** (via {@link performPingCheckWithRetry})
+ * rather than ICMP ping. This keeps behaviour consistent across platforms and
+ * avoids relying on privileged ICMP sockets or external system utilities.
  *
- * The service uses the node-ping wrapper around system ping utilities for
- * cross-platform compatibility, ensuring consistent behavior across Windows,
- * macOS, and Linux platforms. Only cross-platform ping options are used to
- * maximize compatibility.
+ * The check auto-detects URL targets (HTTP/HTTPS) vs host targets (TCP/DNS)
+ * and applies retry/backoff behaviour through the operational hooks layer.
  *
  * @example
  *

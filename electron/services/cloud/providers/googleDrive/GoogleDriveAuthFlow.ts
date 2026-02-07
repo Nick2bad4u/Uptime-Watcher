@@ -1,9 +1,6 @@
-import type * as z from "zod";
-
 import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
-import { ensureError } from "@shared/utils/errorHandling";
-import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
-import axios from "axios";
+
+import type { GoogleTokenResponse } from "./googleDriveTokenSchemas";
 
 import {
     createOAuthState,
@@ -11,11 +8,7 @@ import {
 } from "../../oauth/LoopbackOAuthServer";
 import { createPkcePair } from "../../oauth/pkce";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
-import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
-import {
-    googleTokenResponseSchema,
-    tryParseGoogleOAuthErrorResponse,
-} from "./googleDriveTokenSchemas";
+import { requestGoogleOAuthToken } from "./googleDriveOAuthTokenRequest";
 
 /**
  * Result of a successful Google Drive OAuth connect flow.
@@ -132,73 +125,18 @@ export class GoogleDriveAuthFlow {
         code: string;
         codeVerifier: string;
         redirectUri: string;
-    }): Promise<z.infer<typeof googleTokenResponseSchema>> {
-        const body = new URLSearchParams({
-            client_id: this.clientId,
-            code: args.code,
-            code_verifier: args.codeVerifier,
-            grant_type: "authorization_code",
-            redirect_uri: args.redirectUri,
+    }): Promise<GoogleTokenResponse> {
+        return requestGoogleOAuthToken({
+            clientId: this.clientId,
+            ...(this.clientSecret ? { clientSecret: this.clientSecret } : {}),
+            operationLabel: "token exchange",
+            params: {
+                code: args.code,
+                code_verifier: args.codeVerifier,
+                grant_type: "authorization_code",
+                redirect_uri: args.redirectUri,
+            },
         });
-
-        if (this.clientSecret) {
-            body.set("client_secret", this.clientSecret);
-        }
-
-        try {
-            const response = await axios.post(
-                "https://oauth2.googleapis.com/token",
-                body.toString(),
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
-                }
-            );
-
-            return googleTokenResponseSchema.parse(response.data);
-        } catch (error: unknown) {
-            if (axios.isAxiosError(error)) {
-                const status = error.response?.status;
-                const data: unknown = error.response?.data;
-
-                const parsed =
-                    typeof data === "string" ? tryParseJsonRecord(data) : data;
-
-                const oauthError = tryParseGoogleOAuthErrorResponse(parsed);
-                const errorName = oauthError?.error;
-                const errorDescription = oauthError?.error_description;
-
-                if (errorName) {
-                    const prefix = `Google OAuth token exchange failed (${status ?? "unknown"}): ${errorName}`;
-                    const message = errorDescription
-                        ? `${prefix} - ${errorDescription}`
-                        : prefix;
-                    throw new Error(message, { cause: error });
-                }
-
-                let fallbackBody: string | undefined = undefined;
-                if (typeof data === "string") {
-                    fallbackBody = data.slice(0, 500);
-                } else if (data instanceof Uint8Array) {
-                    fallbackBody = Buffer.from(data)
-                        .toString("utf8")
-                        .slice(0, 500);
-                }
-
-                const message = `Google OAuth token exchange failed (${status ?? "unknown"}): ${fallbackBody ?? error.message}`;
-                throw new Error(message, { cause: error });
-            }
-
-            const normalized = ensureError(error);
-            throw new Error(
-                `Google OAuth token exchange failed: ${normalized.message}`,
-                {
-                    cause: error,
-                }
-            );
-        }
     }
 
     public constructor(args: { clientId: string; clientSecret?: string }) {

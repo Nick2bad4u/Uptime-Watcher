@@ -51,6 +51,7 @@ import {
     deleteHistoryByMonitorId,
     pruneHistoryForMonitor,
 } from "./utils/maintenance/historyManipulation";
+import { normalizeHistoryPruneLimit } from "./utils/maintenance/historyPruneLimit";
 import {
     findHistoryByMonitorId,
     getHistoryCount,
@@ -107,15 +108,6 @@ const HISTORY_QUERIES = {
         "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?",
     SELECT_MONITOR_IDS: "SELECT id FROM monitors",
 } as const;
-
-const normalizePruneLimit = (limit: number): null | number => {
-    if (!Number.isFinite(limit)) {
-        return null;
-    }
-
-    const normalized = Math.floor(limit);
-    return normalized > 0 ? normalized : null;
-};
 
 /**
  * Repository for managing history data persistence.
@@ -431,7 +423,7 @@ export class HistoryRepository {
      * @throws Error if the database operation fails.
      */
     public async pruneHistory(monitorId: string, limit: number): Promise<void> {
-        const normalizedLimit = normalizePruneLimit(limit);
+        const normalizedLimit = normalizeHistoryPruneLimit(limit);
         if (!normalizedLimit) {
             return;
         }
@@ -596,7 +588,7 @@ export class HistoryRepository {
      *   greater than 0.
      */
     public pruneAllHistoryInternal(db: Database, limit: number): void {
-        const normalizedLimit = normalizePruneLimit(limit);
+        const normalizedLimit = normalizeHistoryPruneLimit(limit);
         if (!normalizedLimit) {
             return;
         }
@@ -639,7 +631,7 @@ export class HistoryRepository {
         monitorId: string,
         limit: number
     ): void {
-        const normalizedLimit = normalizePruneLimit(limit);
+        const normalizedLimit = normalizeHistoryPruneLimit(limit);
         if (!normalizedLimit) {
             return;
         }
