@@ -559,6 +559,15 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Event Processing", "type");
 
+            // WindowService treats CI as headless (by design) to avoid showing
+            // real windows in automated environments. This test asserts the
+            // non-headless behavior, so we must temporarily clear those flags.
+            const originalCI = process.env["CI"];
+            const originalHeadless = process.env["HEADLESS"];
+
+            delete process.env["CI"];
+            delete process.env["HEADLESS"];
+
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
@@ -575,6 +584,18 @@ describe(WindowService, () => {
                 "[WindowService] Main window ready to show"
             );
             expect(window.show).toHaveBeenCalled();
+
+            // Restore env
+            if (originalCI === undefined) {
+                delete process.env["CI"];
+            } else {
+                process.env["CI"] = originalCI;
+            }
+            if (originalHeadless === undefined) {
+                delete process.env["HEADLESS"];
+            } else {
+                process.env["HEADLESS"] = originalHeadless;
+            }
         });
 
         it("should avoid showing the window when headless flags are set", async ({

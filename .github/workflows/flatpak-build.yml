@@ -27,6 +27,20 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+            - name: Free disk space (Flatpak builds are huge)
+              run: |
+                  echo "Disk usage before cleanup:"
+                  df -h
+
+                  # Remove large preinstalled toolchains we don't need for this job.
+                  # This is a common workaround for GitHub-hosted runners when
+                  # building large artifacts (Flatpak/OSTree + Electron).
+                  sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+                  sudo apt-get clean || true
+
+                  echo "Disk usage after cleanup:"
+                  df -h
+
             - name: Cache Flatpak runtimes and SDKs
               uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
               with:
@@ -108,6 +122,13 @@ jobs:
             - name: Build application
               run: |
                   npm run build
+
+            - name: Prune devDependencies (reduce Flatpak size)
+              run: |
+                  echo "Pruning devDependencies to reduce node_modules footprint..."
+                  npm prune --omit=dev
+                  echo "Disk usage after prune:"
+                  df -h
 
             - name: Smoke-check build artifacts
               run: |

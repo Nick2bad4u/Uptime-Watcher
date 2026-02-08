@@ -32,4 +32,8 @@ jobs:
               with:
                   base: ""
                   head: ${{ github.ref_name }}
-                  extra_args: --results=verified,unknown --exclude-detectors=URI
+                  # Only fail the job for VERIFIED secrets.
+                  # Unverified/unknown results are often high-noise in OSS repos
+                  # (example strings, docs, placeholder tokens) and already
+                  # covered by other scanners (gitleaks, etc.).
+                  extra_args: --results=verified --exclude-detectors=URI

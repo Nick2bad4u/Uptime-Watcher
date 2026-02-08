@@ -398,10 +398,12 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle Date objects as errors", () => {
-            const dateError = new Date("2023-01-01");
+            // Use a midday UTC time to avoid timezone shifting the calendar day
+            // (which makes this assertion flaky across CI runners).
+            const dateError = new Date("2023-01-01T12:00:00.000Z");
             const result = ensureError(dateError);
             expect(result).toBeInstanceOf(Error);
-            expect(result.message).toContain("2022"); // Date parses to the day before due to timezone
+            expect(result.message).toContain("2023");
         });
 
         it("should handle RegExp objects as errors", () => {

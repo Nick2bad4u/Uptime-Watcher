@@ -2,9 +2,7 @@
 
 #
 
-# This file suppresses _known false positives_ reported by gitleaks when scanning
-
-# the full git history.
+# Suppress _known false positives_ when scanning the full git history.
 
 #
 

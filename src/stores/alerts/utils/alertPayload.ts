@@ -85,9 +85,7 @@ function deriveAlertTimestamp(timestamp: string): number {
 /**
  * Converts a {@link StatusUpdate} into a {@link StatusAlertInput}.
  */
-export function mapStatusUpdateToAlert(
-    update: StatusUpdate
-): StatusAlertInput {
+export function mapStatusUpdateToAlert(update: StatusUpdate): StatusAlertInput {
     const siteName = deriveSiteName(update);
     const monitorName = deriveMonitorName(update.monitor, update.monitorId);
     const timestamp = deriveAlertTimestamp(update.timestamp);

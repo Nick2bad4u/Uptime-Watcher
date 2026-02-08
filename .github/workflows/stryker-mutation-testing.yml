@@ -192,8 +192,13 @@ jobs:
                   # Add additional performance optimizations for CI
                   Write-Host "⚡ Applying CI performance optimizations..."
                   try {
-                    # Added timeout (10 minutes per mutation) and max concurrent test runners to prevent resource exhaustion
-                    npx stryker run --concurrency "$CONCURRENCY" --maxConcurrentTestRunners 1 --timeoutMS 600000 --logLevel warn --fileLogLevel error
+                    # Added timeout (10 minutes per mutation) to prevent resource exhaustion
+                    npx stryker run --concurrency "$CONCURRENCY" --timeoutMS 600000 --logLevel warn --fileLogLevel error
+
+                    if ($LASTEXITCODE -ne 0) {
+                      throw "Stryker exited with code $LASTEXITCODE"
+                    }
+
                     Write-Host "✅ Stryker completed successfully"
                   } catch {
                       Write-Host "❌ Stryker failed with error: $($_.Exception.Message)"

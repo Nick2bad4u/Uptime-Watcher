@@ -552,8 +552,10 @@ describe(ThemeManager, () => {
             }
             const end = performance.now();
 
-            // Should complete within reasonable time (less than 100ms for 100 applications)
-            expect(end - start).toBeLessThan(100);
+            const budgetMs = process.env["CI"] ? 500 : 100;
+            // CI runners (especially Windows) are much noisier/slower; keep a
+            // tighter local budget but avoid flaky CI failures.
+            expect(end - start).toBeLessThan(budgetMs);
         });
 
         it("should handle CSS variable generation efficiently", async ({
@@ -573,8 +575,8 @@ describe(ThemeManager, () => {
             }
             const end = performance.now();
 
-            // Should complete within reasonable time
-            expect(end - start).toBeLessThan(100);
+            const budgetMs = process.env["CI"] ? 750 : 100;
+            expect(end - start).toBeLessThan(budgetMs);
         });
     });
 });

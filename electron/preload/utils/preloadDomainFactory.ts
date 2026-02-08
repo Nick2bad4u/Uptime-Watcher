@@ -18,8 +18,8 @@ export interface PreloadDomainFactoryOptions<T> {
     /** Creates the real, fully-featured domain API. */
     readonly create: () => T;
     /**
-     * Creates a fallback domain API used when {@link PreloadDomainFactoryOptions.create}
-     * throws.
+     * Creates a fallback domain API used when
+     * {@link PreloadDomainFactoryOptions.create} throws.
      *
      * @param unavailableError - A sanitized error explaining that the preload
      *   domain is unavailable.
@@ -51,7 +51,9 @@ export function acceptUnusedPreloadArguments(
  * - Logs the root cause for diagnostics.
  * - Returns a typed fallback API whose methods should fail deterministically.
  */
-export function createPreloadDomain<T>(options: PreloadDomainFactoryOptions<T>): T {
+export function createPreloadDomain<T>(
+    options: PreloadDomainFactoryOptions<T>
+): T {
     const { create, createFallback, domain } = options;
 
     try {

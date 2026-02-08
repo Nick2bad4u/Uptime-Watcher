@@ -60,6 +60,12 @@ updates:
             # Ignore local workspace dependencies completely
           - dependency-name: "@shared/*"
           - dependency-name: "file:*"
+          # Dependabot has been returning `unknown_error` for these three
+          # packages for weeks (no actionable error details). Ignoring them
+          # prevents Dependabot runs from repeatedly failing on the same items.
+          - dependency-name: "form-data"
+          - dependency-name: "qs"
+          - dependency-name: "tough-cookie"
 
       labels:
           - "npm"
@@ -92,6 +98,11 @@ updates:
       allow:
           # Allow both direct and indirect updates for all packages
           - dependency-type: "all"
+      ignore:
+          # Keep the docs workspace green too.
+          - dependency-name: "form-data"
+          - dependency-name: "qs"
+          - dependency-name: "tough-cookie"
       labels:
           - "npm"
           - "dependabot"

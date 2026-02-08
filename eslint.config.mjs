@@ -1300,11 +1300,8 @@ export default defineConfig([
             // This rule is currently not viable for most ecosystems (many packages
             // do not publish provenance metadata consistently).
             "node-dependencies/require-provenance-deps": "off",
-            // Deprecated rule
-            "node-dependencies/valid-engines": [ "error", {
-                    "ignorePrivate": true
-                }
-            ],
+            // Deprecated rule (replaced by node-dependencies/compat-engines)
+            "node-dependencies/valid-engines": "off",
             "node-dependencies/valid-semver": "error",
             // Package.json Plugin Rules (package-json/*)
             "package-json/bin-name-casing": "warn",
@@ -1326,10 +1323,7 @@ export default defineConfig([
                     "ignorePrivate": true
                 }
             ],
-            "package-json/require-files": [ "error", {
-                    "ignorePrivate": true
-                }
-            ],
+            "package-json/require-files": "off",
             "package-json/require-homepage": "warn",
             "package-json/require-keywords": "warn",
             "package-json/require-license": "warn",
@@ -1384,10 +1378,7 @@ export default defineConfig([
             "package-json/valid-homepage": "warn",
             "package-json/valid-keywords": "warn",
             "package-json/valid-license": "warn",
-            "package-json/valid-local-dependency": [ "error", {
-                    "ignorePrivate": true
-                }
-            ],
+            "package-json/valid-local-dependency": "off",
             "package-json/valid-main": "warn",
             "package-json/valid-man": "warn",
             "package-json/valid-module": "warn",

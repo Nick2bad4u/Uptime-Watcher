@@ -23,7 +23,5 @@ export function buildPlaywrightBackupPath(args: {
         PLAYWRIGHT_BACKUP_DIRECTORY
     );
 
-    return ensureSqliteFileExtension(
-        path.join(automationDir, args.fileName)
-    );
+    return ensureSqliteFileExtension(path.join(automationDir, args.fileName));
 }
