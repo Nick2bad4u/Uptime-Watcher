@@ -1,0 +1,28 @@
+# .gitleaksignore
+
+#
+
+# This file suppresses _known false positives_ reported by gitleaks when scanning
+
+# the full git history.
+
+#
+
+# Each entry is a "Fingerprint" value from a gitleaks finding.
+
+# See: <https://github.com/gitleaks/gitleaks#-gitleaksignore>
+
+9436129ac38c9ac8acc719740f9290d0c80e25f9:electron/services/cloud/internal/cloudServiceSettings.ts\:dropbox-api-token:18
+9ea2112b5cea87f1163261bb4881577951b49bbe:electron/services/cloud/providers/dropbox/DropboxTokenManager.ts\:dropbox-api-token:49
+9ea2112b5cea87f1163261bb4881577951b49bbe:electron/services/cloud/providers/dropbox/DropboxTokenManager.ts\:dropbox-api-token:172
+1570ad477286705b78440c5d7594839521ec36ff:electron/services/cloud/CloudService.ts\:dropbox-api-token:111
+
+6e6e7f009807ad5af960210e54390b48e058e34e:.secretlintrc.json\:github-pat:43
+6e6e7f009807ad5af960210e54390b48e058e34e:.secretlintrc.json\:github-app-token:44
+6e6e7f009807ad5af960210e54390b48e058e34e:.secretlintrc.json\:slack-bot-token:52
+6e6e7f009807ad5af960210e54390b48e058e34e:.secretlintrc.json\:slack-user-token:53
+6e6e7f009807ad5af960210e54390b48e058e34e:.secretlintrc.json\:jwt:133
+6e6e7f009807ad5af960210e54390b48e058e34e:.secretlintrc.json\:gcp-api-key:134
+6e6e7f009807ad5af960210e54390b48e058e34e:.secretlintrc.json\:stripe-access-token:135
+
+57eeedac7971be3d6e2378358fd418f94135f278:docs/Packages/Chart.js/getting-started/usage.md\:jwt:152

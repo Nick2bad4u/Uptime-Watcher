@@ -27,7 +27,6 @@
             "url": "https://github.com/Nick2bad4u"
         }
     ],
-    "type": "commonjs",
     "scripts": {
         "build": "npm run generate-docs && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
         "build:default": "docusaurus build",
