@@ -199,14 +199,14 @@
 
 body {
     margin: 0;
-    min-block-size: 100vb;
+    min-block-size: 100dvb;
     min-inline-size: 320px;
 }
 
 [id="root"] {
     margin: 0 auto;
-    block-size: 100vb;
-    max-block-size: 100vb;
+    block-size: 100dvb;
+    max-block-size: 100dvb;
     max-inline-size: 100vi;
     text-align: start;
 }
@@ -247,7 +247,8 @@ body {
     transition: background 0.2s ease;
 
     &:hover,
-    &:focus {
+    &:focus,
+    &:focus-visible {
         background: var(--color-text-tertiary, #64748b);
     }
 }
@@ -262,7 +263,8 @@ body {
         background: var(--color-border-primary, #1b2535);
 
         &:hover,
-        &:focus {
+        &:focus,
+        &:focus-visible {
             background: var(--color-text-secondary, #9da8c2);
         }
     }

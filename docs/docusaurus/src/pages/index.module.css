@@ -149,7 +149,10 @@
     display: grid;
     align-items: center;
     gap: 4rem;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+        [hero-media] 1fr
+        [hero-text] 1fr
+        [hero-end];
 }
 
 .heroText {
@@ -843,7 +846,8 @@
     display: grid;
     margin: 0 auto;
     gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* prettier-ignore */
+    grid-template-columns: [status-grid-start] repeat(auto-fit, [status-grid-col] minmax(300px, 1fr)) [status-grid-end];
     max-inline-size: 1000px;
 }
 
@@ -1071,7 +1075,10 @@
     display: grid;
     align-items: center;
     gap: 4rem;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+        [tech-info] 1fr
+        [tech-code] 1fr
+        [tech-end];
     /* Prevent content from expanding beyond container */
     max-inline-size: 100%;
     min-inline-size: 0;
@@ -1447,7 +1454,7 @@
 @media screen and (width <= 1200px) {
     .heroContent {
         gap: 3rem;
-        grid-template-columns: 1fr;
+        grid-template-columns: [hero-stack] 1fr [hero-end];
         text-align: center;
     }
 
@@ -1467,11 +1474,11 @@
 
     .techContent {
         gap: 3rem;
-        grid-template-columns: 1fr;
+        grid-template-columns: [tech-stack] 1fr [tech-end];
     }
 
     .statusGrid {
-        grid-template-columns: 1fr;
+        grid-template-columns: [status-grid-stack] 1fr [status-grid-end];
     }
 }
 

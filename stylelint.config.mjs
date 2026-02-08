@@ -1,6 +1,3 @@
- 
- 
-
 /**
  * Comprehensive Stylelint configuration for the Uptime Watcher project.
  *
@@ -694,7 +691,6 @@ const config = defineConfig({
         "declaration-property-value-disallowed-list": null,
         "declaration-property-value-keyword-no-deprecated": true,
         "declaration-property-value-no-unknown": null,
-        "defensive-css/no-mixed-vendor-prefixes": true,
         /**
          * Defensive CSS practices enforcement.
          *
@@ -705,10 +701,48 @@ const config = defineConfig({
          *
          * @see {@link https://defensivecss.dev/ | Defensive CSS Guide}
          */
+        "defensive-css/no-accidental-hover": null,
+        "defensive-css/no-fixed-sizes": null,
+        "defensive-css/no-list-style-none": [
+            true,
+            {
+                fix: true,
+                severity: "warning",
+            },
+        ],
+        "defensive-css/no-mixed-vendor-prefixes": null,
         "defensive-css/require-background-repeat": null,
+        "defensive-css/require-custom-property-fallback": null,
+        "defensive-css/require-dynamic-viewport-height": [
+            true,
+            {
+                fix: true,
+                severity: "warning",
+            },
+        ],
         "defensive-css/require-flex-wrap": null,
-        "defensive-css/require-overscroll-behavior": true,
-        "defensive-css/require-scrollbar-gutter": true,
+        "defensive-css/require-focus-visible": null,
+        "defensive-css/require-named-grid-lines": [
+            true,
+            {
+                columns: [
+                    true,
+                    {
+                        severity: "warning",
+                    },
+                ],
+                rows: [
+                    true,
+                    {
+                        severity: "warning",
+                    },
+                ],
+            },
+        ],
+        "defensive-css/require-overscroll-behavior": null,
+        "defensive-css/require-prefers-reduced-motion": null,
+        "defensive-css/require-scrollbar-gutter": null,
+        "display-notation": "short",
         "font-family-name-quotes": "always-where-recommended",
         "font-family-no-duplicate-names": true,
         "font-family-no-missing-generic-family-keyword": true,
@@ -1090,7 +1124,6 @@ const config = defineConfig({
          */
         // SCSS specific rules (stylelint-scss)
         "scss/at-each-key-value-single-line": true,
-
         "scss/at-function-named-arguments": "always",
         "scss/at-import-partial-extension-allowed-list": null,
         "scss/at-import-partial-extension-disallowed-list": null,
@@ -1103,7 +1136,6 @@ const config = defineConfig({
         "scss/block-no-redundant-nesting": true,
         "scss/comment-no-loud": null,
         "scss/declaration-nested-properties": null,
-
         "scss/declaration-property-value-no-unknown": true,
         "scss/dimension-no-non-numeric-values": true,
         "scss/dollar-variable-colon-newline-after": "always",
@@ -1125,6 +1157,7 @@ const config = defineConfig({
         "scss/no-unused-private-members": true,
         "scss/partial-no-import": true,
         "scss/property-no-unknown": true,
+        "scss/selector-class-pattern": null,
         "scss/selector-nest-combinators": null,
         "scss/selector-no-redundant-nesting-selector": null,
         "scss/selector-no-union-class-name": true,

@@ -183,7 +183,7 @@
     display: grid;
     gap: clamp(0.75rem, 0.6rem + 0.35vi, 1.25rem);
     grid-auto-rows: minmax(0, 1fr);
-    grid-template-columns: 100%;
+    grid-template-columns: [compact-status-col] 100% [compact-status-end];
     inline-size: fit-content;
     justify-items: start;
     margin-inline: auto;
@@ -240,7 +240,10 @@
 .site-card__compact-metrics {
     display: grid;
     gap: clamp(0.75rem, 0.6rem + 0.4vi, 1.1rem);
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+        [compact-metric-start]
+        repeat(2, [compact-metric-col] minmax(0, 1fr))
+        [compact-metric-end];
 }
 
 .site-card__compact-metric {

@@ -4,7 +4,7 @@
 
 .app-container {
     background-color: var(--color-background-primary);
-    min-block-size: 100vb;
+    min-block-size: 100dvb;
 }
 
 .modal-container {
@@ -35,10 +35,13 @@
     display: grid;
     overflow: hidden;
     background: linear-gradient(180deg, rgb(15 23 42) 0%, rgb(8 11 19) 100%);
-    block-size: 100vb;
-    grid-template-columns: minmax(18rem, 20rem) minmax(0, 1fr);
+    block-size: 100dvb;
+    grid-template-columns:
+        [shell-sidebar] minmax(18rem, 20rem)
+        [shell-main] minmax(0, 1fr)
+        [shell-end];
     inline-size: 100%;
-    max-block-size: 100vb;
+    max-block-size: 100dvb;
     transition:
         background var(--transition-normal),
         grid-template-columns var(--transition-normal);
@@ -50,16 +53,19 @@
 }
 
 .app-shell--sidebar-closed {
-    grid-template-columns: 0 minmax(0, 1fr);
+    grid-template-columns:
+        [shell-sidebar] 0
+        [shell-main] minmax(0, 1fr)
+        [shell-end];
 }
 
 @media (width <= 1024px) {
     .app-shell {
-        grid-template-columns: 1fr;
+        grid-template-columns: [shell-stack] 1fr [shell-end];
     }
 
     .app-shell--sidebar-closed {
-        grid-template-columns: 1fr;
+        grid-template-columns: [shell-stack] 1fr [shell-end];
     }
 }
 
@@ -88,10 +94,10 @@
             transparent 76%
         ),
         color-mix(in srgb, var(--shadow-base-color) 65%, transparent);
-    block-size: 100vb;
+    block-size: 100dvb;
     grid-column: 2 / -1;
     grid-row: 1;
-    max-block-size: 100vb;
+    max-block-size: 100dvb;
     min-inline-size: 0;
     overflow-block: auto;
     overflow-inline: hidden;
@@ -153,7 +159,7 @@
 
 @media (width <= 1024px) {
     .app-shell {
-        grid-template-columns: 1fr;
+        grid-template-columns: [shell-stack] 1fr [shell-end];
     }
 
     .app-shell__main {
@@ -200,7 +206,7 @@
     display: grid;
     margin: 0 auto;
     gap: 2rem;
-    grid-template-columns: 1fr;
+    grid-template-columns: [layout-main] 1fr [layout-end];
     max-inline-size: 100%;
 
     @media (width >= 768px) {
@@ -208,7 +214,10 @@
     }
 
     @media (width >= 1024px) {
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns:
+            [layout-main] 2fr
+            [layout-aside] 1fr
+            [layout-end];
         max-inline-size: 64rem;
     }
 

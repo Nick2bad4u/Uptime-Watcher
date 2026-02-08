@@ -10,40 +10,46 @@
     grid-auto-rows: minmax(15rem, auto);
 
     /* Default: Responsive auto-fit */
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    /* prettier-ignore */
+    grid-template-columns: [overview-grid-start] repeat(auto-fit, [overview-grid-col] minmax(17rem, 1fr)) [overview-grid-end];
 }
 
 /* Ensure optimal layout at different breakpoints */
 @media (width >= 1920px) {
     .dashboard-overview__grid {
         gap: 1.5rem;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        /* prettier-ignore */
+        grid-template-columns: [overview-grid-start] repeat(3, [overview-grid-col] minmax(0, 1fr)) [overview-grid-end];
     }
 }
 
 @media (width >= 1440px) and (width < 1920px) {
     .dashboard-overview__grid {
         gap: 1.35rem;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        /* prettier-ignore */
+        grid-template-columns: [overview-grid-start] repeat(3, [overview-grid-col] minmax(0, 1fr)) [overview-grid-end];
     }
 }
 
 @media (width >= 1200px) and (width < 1440px) {
     .dashboard-overview__grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* prettier-ignore */
+        grid-template-columns: [overview-grid-start] repeat(2, [overview-grid-col] minmax(0, 1fr)) [overview-grid-end];
     }
 }
 
 @media (width >= 1024px) and (width < 1200px) {
     .dashboard-overview__grid {
         gap: 1.1rem;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* prettier-ignore */
+        grid-template-columns: [overview-grid-start] repeat(2, [overview-grid-col] minmax(0, 1fr)) [overview-grid-end];
     }
 }
 
 @media (width >= 768px) and (width < 1024px) {
     .dashboard-overview__grid {
-        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+        /* prettier-ignore */
+        grid-template-columns: [overview-grid-start] repeat(auto-fit, [overview-grid-col] minmax(15rem, 1fr)) [overview-grid-end];
     }
 }
 
@@ -277,6 +283,7 @@
 
     .dashboard-overview__grid {
         gap: 0.75rem;
-        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+        /* prettier-ignore */
+        grid-template-columns: [overview-grid-start] repeat(auto-fit, [overview-grid-col] minmax(13rem, 1fr)) [overview-grid-end];
     }
 }

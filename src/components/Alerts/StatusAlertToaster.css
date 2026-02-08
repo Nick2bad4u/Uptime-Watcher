@@ -26,7 +26,11 @@
     color: var(--color-text-primary, #0f172a);
     cursor: pointer;
     gap: var(--spacing-md, 1rem);
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns:
+        [status-alert-icon] auto
+        [status-alert-content] 1fr
+        [status-alert-actions] auto
+        [status-alert-end];
     pointer-events: auto;
     text-align: start;
     transition: transform 160ms ease-out;

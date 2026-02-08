@@ -2971,7 +2971,8 @@ article,
     .responsive-grid {
         display: grid;
         gap: 2rem;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        /* prettier-ignore */
+        grid-template-columns: [responsive-grid-start] repeat(auto-fit, [responsive-grid-col] minmax(300px, 1fr)) [responsive-grid-end];
     }
 }
 
@@ -4506,8 +4507,8 @@ html {
     width: var(--ifm-navbar-sidebar-width) !important;
 
     /* Use top/bottom instead of explicit height for better control */
-    height: 100vh !important;
-    max-height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
 
     /* Ensure content fits properly */
     display: flex !important;
@@ -4565,7 +4566,7 @@ html {
         overflow-y: auto !important;
         overscroll-behavior: contain !important;
         scrollbar-gutter: stable !important;
-        max-height: calc(100vh - var(--ifm-navbar-height)) !important;
+        max-height: calc(100dvh - var(--ifm-navbar-height)) !important;
     }
 
     /* Ensure the sidebar brand area doesn't take too much space */

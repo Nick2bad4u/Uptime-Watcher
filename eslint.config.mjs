@@ -1344,7 +1344,7 @@ export default defineConfig([
             ],
             "package-json/require-version": "warn",
             "package-json/restrict-dependency-ranges": "warn",
-            "package-json/restrict-private-properties": "warn",
+            "package-json/restrict-private-properties": "off",
             // This repo intentionally uses stable camelCase script names.
             "package-json/scripts-name-casing": "warn",
                 "package-json/sort-collections": [ "warn",

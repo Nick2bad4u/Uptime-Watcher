@@ -158,7 +158,11 @@
         inset 0 0 0 1px rgb(255 255 255 / 5%),
         0 20px 40px -8px rgb(8 12 24 / 24%);
     gap: var(--density-row-gap, 0.5rem);
-    grid-template-columns: minmax(0, 1.4fr) minmax(140px, 0.9fr) auto;
+    grid-template-columns:
+        [history-main] minmax(0, 1.4fr)
+        [history-detail] minmax(140px, 0.9fr)
+        [history-actions] auto
+        [history-end];
     transition:
         border-color var(--transition-fast),
         box-shadow var(--transition-fast),
@@ -166,7 +170,10 @@
 }
 
 .history-tab__row--no-detail {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns:
+        [history-main] minmax(0, 1fr)
+        [history-actions] auto
+        [history-end];
 }
 
 .history-tab__row:hover,
@@ -287,7 +294,10 @@
 
 @media (width <= 900px) {
     .history-tab__row {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns:
+            [history-main] minmax(0, 1fr)
+            [history-actions] auto
+            [history-end];
     }
 
     .history-tab__row-detail {
@@ -299,7 +309,7 @@
 @media (width <= 640px) {
     .history-tab__row,
     .history-tab__row--no-detail {
-        grid-template-columns: 1fr;
+        grid-template-columns: [history-stack] 1fr [history-end];
     }
 
     .history-tab__row-detail {

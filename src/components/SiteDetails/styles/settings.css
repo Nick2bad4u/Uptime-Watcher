@@ -134,7 +134,8 @@
 .site-settings-info-grid {
     display: grid;
     gap: clamp(1.25rem, 1rem + 0.75vi, 1.75rem);
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    /* prettier-ignore */
+    grid-template-columns: repeat(auto-fit, [settings-info-col] minmax(17rem, 1fr));
 }
 
 .site-settings-info-grid__column {

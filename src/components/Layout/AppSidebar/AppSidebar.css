@@ -9,7 +9,7 @@
         color-mix(in srgb, var(--color-surface-overlay) 94%, transparent) 0%,
         color-mix(in srgb, var(--color-surface-base) 96%, transparent) 100%
     );
-    block-size: 100vb;
+    block-size: 100dvb;
     border-inline-end: 1px solid
         color-mix(in srgb, var(--color-border-secondary) 68%, transparent);
     box-shadow:
@@ -31,7 +31,7 @@
             color-mix(in srgb, var(--color-surface-overlay) 94%, transparent) 0%,
             color-mix(in srgb, var(--color-surface-base) 96%, transparent) 100%
         );
-        block-size: 100vb;
+        block-size: 100dvb;
         border-inline-end: 1px solid
             color-mix(in srgb, var(--color-border-secondary) 68%, transparent);
         box-shadow:
@@ -46,9 +46,9 @@
     @media (width >= 1024px) {
         position: sticky;
         align-self: flex-start;
-        block-size: calc(100vb - (var(--app-sidebar-sticky-offset) * 2));
+        block-size: calc(100dvb - (var(--app-sidebar-sticky-offset) * 2));
         inset-block-start: var(--app-sidebar-sticky-offset);
-        max-block-size: calc(100vb - (var(--app-sidebar-sticky-offset) * 2));
+        max-block-size: calc(100dvb - (var(--app-sidebar-sticky-offset) * 2));
     }
 }
 
@@ -84,7 +84,11 @@
     display: grid;
     align-items: center;
     gap: 0.9rem;
-    grid-template-columns: auto auto 1fr;
+    grid-template-columns:
+        [brand-icon] auto
+        [brand-toggle] auto
+        [brand-title] 1fr
+        [brand-end];
 }
 
 .app-sidebar__brand-trigger {
@@ -706,7 +710,10 @@
 @media (width <= 640px) {
     .app-sidebar__brand {
         gap: 0.75rem;
-        grid-template-columns: auto 1fr;
+        grid-template-columns:
+            [brand-toggle] auto
+            [brand-title] 1fr
+            [brand-end];
     }
 
     .app-sidebar__brand-logo {
@@ -760,6 +767,6 @@
     }
 
     .app-sidebar__inner {
-        block-size: 100vb;
+        block-size: 100dvb;
     }
 }

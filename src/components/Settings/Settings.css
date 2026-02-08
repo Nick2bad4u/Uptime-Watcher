@@ -564,13 +564,15 @@
     display: grid;
     align-items: start;
     gap: clamp(0.875rem, 0.7rem + 0.5vi, 1.25rem);
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* prettier-ignore */
+    grid-template-columns: [settings-notifications-start] repeat(2, [settings-notifications-col] minmax(0, 1fr)) [settings-notifications-end];
 }
 
 .settings-toggle-stack {
     display: grid;
     gap: clamp(0.875rem, 0.7rem + 0.5vi, 1.25rem);
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* prettier-ignore */
+    grid-template-columns: [settings-toggle-start] repeat(auto-fit, [settings-toggle-col] minmax(300px, 1fr)) [settings-toggle-end];
 }
 
 .settings-subcard {
@@ -659,7 +661,8 @@
 .settings-metrics {
     display: grid;
     gap: 0.75rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* prettier-ignore */
+    grid-template-columns: [settings-metrics-start] repeat(2, [settings-metrics-col] minmax(0, 1fr)) [settings-metrics-end];
 }
 
 .settings-metric {
@@ -687,7 +690,8 @@
 .settings-metric__breakdown {
     display: grid;
     gap: 0.75rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* prettier-ignore */
+    grid-template-columns: [settings-breakdown-start] repeat(3, [settings-breakdown-col] minmax(0, 1fr)) [settings-breakdown-end];
     margin-block-start: 0.25rem;
 }
 
@@ -717,7 +721,7 @@
 
 .settings-details__summary {
     cursor: pointer;
-    list-style: none;
+    list-style: "";
 
     &::-webkit-details-marker {
         display: none;
@@ -754,11 +758,15 @@
 
 @media (width <= 540px) {
     .settings-metrics {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            [settings-metrics-stack] 1fr
+            [settings-metrics-end];
     }
 
     .settings-metric__breakdown {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            [settings-breakdown-stack] 1fr
+            [settings-breakdown-end];
     }
 }
 
@@ -973,11 +981,13 @@
 /* Responsiveness */
 @media (width <= 1024px) {
     .settings-notifications-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            [settings-notifications-stack] 1fr
+            [settings-notifications-end];
     }
 
     .settings-toggle-stack {
-        grid-template-columns: 1fr;
+        grid-template-columns: [settings-toggle-stack] 1fr [settings-toggle-end];
     }
 }
 

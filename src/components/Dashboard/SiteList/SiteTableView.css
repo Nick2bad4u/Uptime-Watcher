@@ -93,13 +93,14 @@
     padding: var(--density-row-block) var(--density-row-inline);
     gap: var(--density-row-gap);
     grid-template-columns:
-        var(--site-table-col-site)
-        var(--site-table-col-monitor)
-        var(--site-table-col-status)
-        var(--site-table-col-uptime)
-        var(--site-table-col-response)
-        var(--site-table-col-running)
-        var(--site-table-col-controls);
+        [site-table-site] var(--site-table-col-site)
+        [site-table-monitor] var(--site-table-col-monitor)
+        [site-table-status] var(--site-table-col-status)
+        [site-table-uptime] var(--site-table-col-uptime)
+        [site-table-response] var(--site-table-col-response)
+        [site-table-running] var(--site-table-col-running)
+        [site-table-controls] var(--site-table-col-controls)
+        [site-table-end];
 
     @media (width <= 1200px) {
         padding: 0.75rem 1rem;

@@ -161,9 +161,10 @@
     align-items: stretch;
     gap: clamp(1.25rem, 1rem + 1.25vi, 2.25rem);
     grid-template-columns:
-        minmax(0, 1.2fr)
-        minmax(0, 1.5fr)
-        minmax(220px, 0.7fr);
+        [topbar-left] minmax(0, 1.2fr)
+        [topbar-center] minmax(0, 1.5fr)
+        [topbar-right] minmax(220px, 0.7fr)
+        [topbar-end];
     padding-inline-end: clamp(1.25rem, 1rem + 1.25vi, 1.75rem);
 }
 
@@ -878,7 +879,7 @@
     padding: 0;
     margin: 0;
     gap: 0.2rem;
-    list-style: none;
+    list-style: "";
 }
 
 .status-subscription-indicator__tooltip-list-item {
@@ -1108,7 +1109,7 @@
 
 @media (width <= 1024px) {
     .app-topbar__grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: [topbar-stack] 1fr [topbar-stack-end];
     }
 
     .app-topbar__controls {

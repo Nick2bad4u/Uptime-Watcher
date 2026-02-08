@@ -98,10 +98,8 @@
     display: grid;
     justify-content: stretch;
     gap: var(--site-grid-gap);
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(var(--site-grid-column-min), 1fr)
-    );
+    /* prettier-ignore */
+    grid-template-columns: [site-grid-start] repeat(auto-fit, [site-grid-col-start] minmax(var(--site-grid-column-min), 1fr) [site-grid-col-end]) [site-grid-end];
 }
 
 .site-grid--compact {
@@ -553,7 +551,10 @@
     display: grid;
     gap: 1.4rem;
     grid-auto-flow: row dense;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+    grid-template-columns:
+        [stacked-main] minmax(0, 1.35fr)
+        [stacked-secondary] minmax(0, 0.85fr)
+        [stacked-end];
 }
 
 .site-card__stacked-column {
@@ -784,7 +785,7 @@
     padding: 0;
     margin: 0;
     gap: 0.75rem;
-    list-style: none;
+    list-style: "";
 }
 
 .site-card__monitor-item {
@@ -945,7 +946,7 @@
 
 @media (width <= 1200px) {
     .site-card__stacked-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: [stacked-single] 1fr [stacked-end];
     }
 
     .site-card__stacked-column--history,
@@ -979,10 +980,8 @@
     gap: var(--site-card-metric-gap, 0.85rem);
     grid-auto-flow: dense;
     grid-auto-rows: minmax(0, 1fr);
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(var(--site-card-metric-min-width, 9.5rem), 1fr)
-    );
+    /* prettier-ignore */
+    grid-template-columns: [metric-grid-start] repeat(auto-fit, [metric-grid-col-start] minmax(var(--site-card-metric-min-width, 9.5rem), 1fr) [metric-grid-col-end]) [metric-grid-end];
 }
 
 .metric-card__tooltip {
