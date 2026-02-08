@@ -8,11 +8,41 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[b03e2a1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b03e2a1f9d273d56c7479fc7ab8a0582c024e271)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...b03e2a1f9d273d56c7479fc7ab8a0582c024e271))
+[142b425](https://github.com/Nick2bad4u/Uptime-Watcher/commit/142b42503ec2c715eea6e85aae3cf91c1bca4865)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...142b42503ec2c715eea6e85aae3cf91c1bca4865))
 
 
 ### ✨ Features
+
+- ✨ [feat] Enhance system API and preload domain management
+ - 🛠️ Refactor system API initialization to use `createPreloadDomain` for better error handling and fallback support.
+ - 🔧 Introduce `createSystemApiFallback` to provide deterministic fallback methods for unavailable API calls.
+ - 📝 Add utility functions in `preloadDomainFactory` for safely constructing preload domains and accepting unused arguments.
+
+✨ [feat] Implement event guard helpers
+ - 🛠️ Create `createStringUnionGuard` to validate string unions.
+ - 🔧 Add `isUnknownRecord` and `hasFiniteTimestamp` for type narrowing and validation.
+
+✨ [feat] Improve IPC service state synchronization
+ - 🛠️ Refactor state synchronization logic to use `StateSyncStatusTracker` for better encapsulation and management of state sync status.
+ - 🔧 Remove redundant state sync status management from `IpcService` and delegate to the new tracker.
+ - 📝 Update handlers to utilize the new state sync tracker for status updates.
+
+✨ [feat] Enhance data handling and validation
+ - 🔧 Introduce `buildPlaywrightBackupPath` and `ensureSqliteFileExtension` for consistent SQLite backup path management.
+ - 🛠️ Refactor data handlers to utilize new utility functions for backup path construction.
+ - 📝 Improve validation logic in `cloudValidation` and `restoreValidation` to streamline error handling.
+
+✨ [feat] Refactor alert handling and telemetry
+ - 🔧 Move alert mapping logic to a new utility file `alertPayload` for better organization and reusability.
+ - 🛠️ Update `StatusUpdateManager` to use new utility functions for building status update payloads and telemetry objects.
+ - 📝 Clean up alert store by removing unused functions and consolidating alert mapping logic.
+
+🧪 [test] Update alert store tests to reflect changes in alert mapping
+ - 🔧 Adjust tests to import `mapStatusUpdateToAlert` from the new utility file.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f0907e3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0907e3068a9ec964f69bbead5f8e0004e6c21d7)
+
 
 - ✨ [feat] Adds PWA support and UI refactors
 
@@ -762,6 +792,16 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Add .gitleaksignore to suppress known false positives
+ - Introduced a new .gitleaksignore file to manage false positive entries from gitleaks scans
+ - Included fingerprints for various sensitive tokens and keys to prevent unnecessary alerts
+
+🔧 [build] Remove CommonJS type from package.json
+ - Removed the "type": "commonjs" entry from the Docusaurus package.json for better compatibility with ES modules
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(142b425)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/142b42503ec2c715eea6e85aae3cf91c1bca4865)
+
+
 - 📝 [docs] Improve documentation formatting consistency
 
 📝 [docs] Improves table alignment, example spacing, and quote style to keep rendered docs consistent and readable
@@ -946,6 +986,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v21.9.0 [skip ci] [`(7bae946)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bae946d612f6da022553c060d732db93223866f)
+
+
 - Update changelogs for v21.8.0 [skip ci] [`(ab638db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab638db37e31f1dd81354c239e718550f795d4aa)
 
 
@@ -998,6 +1041,22 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies and tools versions
+
+ - 🔧 Update `enhanced-resolve` from `5.18.3` to `5.19.0`
+ - 🔧 Update `es-module-lexer` from `1.7.0` to `2.0.0`
+ - 🔧 Update `lodash` from `4.17.21` to `4.17.23`
+ - 🔧 Update `rollup` from `2.38.5` to `2.79.2`
+ - 🔧 Update `terser-webpack-plugin` from `5.3.14` to `5.3.16`
+ - 🔧 Update `watchpack` from `2.4.4` to `2.5.1`
+ - 🔧 Update `webpack` from `5.99.9` to `5.105.0`
+ - 🔧 Update `tapable` from `2.2.0` to `2.3.0`
+ - 🔧 Update `browserslist` from `4.26.3` to `4.28.1`
+ - 📝 Add new dependency `acorn-import-phases` version `1.0.4`
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3a8596e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a8596eecd4f26fbaf83ed8f4e3ecba826c7e80c)
+
 
 - 🔧 [build] Update linting rules and dependencies
  - 🛠️ [fix] Import `normalizePath` in multiple linting rules to ensure path normalization is consistently applied.

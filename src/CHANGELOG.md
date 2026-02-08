@@ -8,11 +8,41 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[fba5b2f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fba5b2fd7b79ad096c6d1c8fac3b7430d8350117)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...fba5b2fd7b79ad096c6d1c8fac3b7430d8350117))
+[4077b52](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4077b52c4633678237f6707a2564c1a74eda2f9a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...4077b52c4633678237f6707a2564c1a74eda2f9a))
 
 
 ### ✨ Features
+
+- ✨ [feat] Enhance system API and preload domain management
+ - 🛠️ Refactor system API initialization to use `createPreloadDomain` for better error handling and fallback support.
+ - 🔧 Introduce `createSystemApiFallback` to provide deterministic fallback methods for unavailable API calls.
+ - 📝 Add utility functions in `preloadDomainFactory` for safely constructing preload domains and accepting unused arguments.
+
+✨ [feat] Implement event guard helpers
+ - 🛠️ Create `createStringUnionGuard` to validate string unions.
+ - 🔧 Add `isUnknownRecord` and `hasFiniteTimestamp` for type narrowing and validation.
+
+✨ [feat] Improve IPC service state synchronization
+ - 🛠️ Refactor state synchronization logic to use `StateSyncStatusTracker` for better encapsulation and management of state sync status.
+ - 🔧 Remove redundant state sync status management from `IpcService` and delegate to the new tracker.
+ - 📝 Update handlers to utilize the new state sync tracker for status updates.
+
+✨ [feat] Enhance data handling and validation
+ - 🔧 Introduce `buildPlaywrightBackupPath` and `ensureSqliteFileExtension` for consistent SQLite backup path management.
+ - 🛠️ Refactor data handlers to utilize new utility functions for backup path construction.
+ - 📝 Improve validation logic in `cloudValidation` and `restoreValidation` to streamline error handling.
+
+✨ [feat] Refactor alert handling and telemetry
+ - 🔧 Move alert mapping logic to a new utility file `alertPayload` for better organization and reusability.
+ - 🛠️ Update `StatusUpdateManager` to use new utility functions for building status update payloads and telemetry objects.
+ - 📝 Clean up alert store by removing unused functions and consolidating alert mapping logic.
+
+🧪 [test] Update alert store tests to reflect changes in alert mapping
+ - 🔧 Adjust tests to import `mapStatusUpdateToAlert` from the new utility file.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f0907e3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f0907e3068a9ec964f69bbead5f8e0004e6c21d7)
+
 
 - ✨ [feat] Adds PWA support and UI refactors
 
@@ -1770,6 +1800,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v21.9.0 [skip ci] [`(7bae946)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bae946d612f6da022553c060d732db93223866f)
+
 
 - Update changelogs for v21.8.0 [skip ci] [`(ab638db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab638db37e31f1dd81354c239e718550f795d4aa)
 
