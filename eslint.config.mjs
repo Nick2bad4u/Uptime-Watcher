@@ -356,7 +356,7 @@ if (!process.env["RECHECK_JAR"]) {
 import { defineConfig, globalIgnores } from "@eslint/config-helpers";
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// #region Global Configs and Rules
+// #region 🌍 Global Configs and Rules
 // MARK: Global Configs and Rules
 // ═══════════════════════════════════════════════════════════════════════════════
 export default defineConfig([
@@ -440,8 +440,8 @@ export default defineConfig([
         name: "Global: Ignore Patterns **/**",
     },
     // #endregion
+    // #region 🧱 Base Flat Configs
     // ═══════════════════════════════════════════════════════════════════════════════
-    // #region Base Flat Configs
     // MARK:  Base Flat Configs
     // ═══════════════════════════════════════════════════════════════════════════════
     importX.flatConfigs.typescript,
@@ -455,9 +455,13 @@ export default defineConfig([
     ...storybook.configs["flat/recommended"],
     ...pluginCasePolice.configs.recommended,
     ...jsdocPlugin.configs["examples-and-default-expressions"],
+    // Prefer the repo-scoped preset configs shipped with the internal plugin.
+    // This keeps rule coverage aligned with the plugin implementation and
+    // avoids accidental drift (or missing plugin registration).
+    ...uptimeWatcherRepoConfigs,
     // #endregion
+    // #region 🧩 Custom Flat Configs
     // ═══════════════════════════════════════════════════════════════════════════════
-    // #region Custom Flat Configs
     // MARK:  Github Config Rules
     // ═══════════════════════════════════════════════════════════════════════════════
     // NOTE:
@@ -492,14 +496,10 @@ export default defineConfig([
     //     })
     // ),
     // #endregion
+    // #region 🧭 Custom Global Rules
     // ═══════════════════════════════════════════════════════════════════════════════
-    // #region Custom Global Rules
     // MARK: Custom Global Rules
     // ═══════════════════════════════════════════════════════════════════════════════
-    // Prefer the repo-scoped preset configs shipped with the internal plugin.
-    // This keeps rule coverage aligned with the plugin implementation and
-    // avoids accidental drift (or missing plugin registration).
-    ...uptimeWatcherRepoConfigs,
     {
         files: ["storybook/**/*.{ts,tsx,js,jsx,mts,mjs}"],
         name: "Storybook: Dev Helpers - storybook/**/*.{ts,tsx,js,jsx,mts,mjs}",
@@ -520,8 +520,8 @@ export default defineConfig([
         },
     },
     // #endregion
+    // #region 🗣️ Global Language Options
     // ═══════════════════════════════════════════════════════════════════════════════
-    // #region Global Language Options
     // MARK:  Global Language Options
     // ═══════════════════════════════════════════════════════════════════════════════
     {
@@ -553,8 +553,8 @@ export default defineConfig([
         name: "Global Language Options **/**",
     },
     // #endregion
+    // #region ⚙️ Global Settings
     // ═══════════════════════════════════════════════════════════════════════════════
-    // #region Global Settings
     // MARK:  Global Settings
     // ═══════════════════════════════════════════════════════════════════════════════
     {
@@ -596,8 +596,8 @@ export default defineConfig([
         },
     },
     // #endregion
+    // #region 🔌 ESLint Plugin config
     // ═══════════════════════════════════════════════════════════════════════════════
-    // #region ESLint Plugin config
     // MARK: ESLint Plugin config
     // ═══════════════════════════════════════════════════════════════════════════════
     {
@@ -1054,6 +1054,7 @@ export default defineConfig([
         },
     },
     // #endregion
+    // #region 🧾 YAML/YML files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: YAML/YML files
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1107,6 +1108,8 @@ export default defineConfig([
             "yml/vue-custom-block/no-parsing-error": "warn",
         },
     },
+    // #endregion
+    // #region 🌐 HTML files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: HTML files
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1186,6 +1189,8 @@ export default defineConfig([
             ],
         },
     },
+    // #endregion
+    // #region 🧩 HTML in JS/TS files (HTML Literals)
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: HTML in JS/TS files (HTML Literals)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1221,6 +1226,8 @@ export default defineConfig([
             ],
         },
     },
+    // #endregion
+    // #region 📦 Package.json Linting (PubLint)
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Package.json Linting (PubLint)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1252,6 +1259,8 @@ export default defineConfig([
             "publint/warning": "warn",
         },
     },
+    // #endregion
+    // #region 📦 Package.json Linting
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Package.json Linting
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1292,7 +1301,10 @@ export default defineConfig([
             // do not publish provenance metadata consistently).
             "node-dependencies/require-provenance-deps": "off",
             // Deprecated rule
-            "node-dependencies/valid-engines": "off",
+            "node-dependencies/valid-engines": [ "error", {
+                    "ignorePrivate": true
+                }
+            ],
             "node-dependencies/valid-semver": "error",
             // Package.json Plugin Rules (package-json/*)
             "package-json/bin-name-casing": "warn",
@@ -1310,19 +1322,32 @@ export default defineConfig([
             "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
             "package-json/require-engines": "warn",
-            "package-json/require-exports": "off", // Not needed for Electron applications
-            "package-json/require-files": "off", // Not needed for Electron applications
+            "package-json/require-exports": [ "error", {
+                    "ignorePrivate": true
+                }
+            ],
+            "package-json/require-files": [ "error", {
+                    "ignorePrivate": true
+                }
+            ],
             "package-json/require-homepage": "warn",
             "package-json/require-keywords": "warn",
             "package-json/require-license": "warn",
             "package-json/require-name": "warn",
-            "package-json/require-optionalDependencies": "off", // Not needed for Electron applications
+            "package-json/require-optionalDependencies": "off",
             "package-json/require-peerDependencies": "off",
             "package-json/require-repository": "error",
             "package-json/require-scripts": "warn",
             "package-json/require-sideEffects": "off",
-            "package-json/require-type": "warn",
-            "package-json/require-types": "off", // Not needed for Electron applications
+            // Not needed for Electron applications and Breaks Docusaurus
+            "package-json/require-type": [ "error", {
+                    "ignorePrivate": true
+                }
+            ],
+            "package-json/require-types": [ "error", {
+                    "ignorePrivate": true
+                }
+            ],
             "package-json/require-version": "warn",
             "package-json/restrict-dependency-ranges": "warn",
             "package-json/restrict-private-properties": "warn",
@@ -1359,7 +1384,10 @@ export default defineConfig([
             "package-json/valid-homepage": "warn",
             "package-json/valid-keywords": "warn",
             "package-json/valid-license": "warn",
-            "package-json/valid-local-dependency": "off",
+            "package-json/valid-local-dependency": [ "error", {
+                    "ignorePrivate": true
+                }
+            ],
             "package-json/valid-main": "warn",
             "package-json/valid-man": "warn",
             "package-json/valid-module": "warn",
@@ -1378,6 +1406,8 @@ export default defineConfig([
             "package-json/valid-workspaces": "warn",
         },
     },
+    // #endregion
+    // #region 🧬 MDX files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: MDX Eslint Rules (mdx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1403,6 +1433,8 @@ export default defineConfig([
             "react/react-in-jsx-scope": "off",
         },
     },
+    // #endregion
+    // #region 🧱 MDX CodeBlocks
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: MDX CodeBlocks
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1428,6 +1460,8 @@ export default defineConfig([
             "prefer-const": "error",
         },
     },
+    // #endregion
+    // #region 📝 Markdown files (with Remark linting)
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Markdown (md/*, markdown/*, markup/*, atom/*, rss/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1480,6 +1514,8 @@ export default defineConfig([
             }),
         },
     },
+    // #endregion
+    // #region 🎨 CSS files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: CSS (css/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1510,6 +1546,8 @@ export default defineConfig([
             "css/use-layers": "off",
         },
     },
+    // #endregion
+    // #region 🧾 JSONC/JSON files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: JSONC (jsonc/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1627,6 +1665,8 @@ export default defineConfig([
             ],
         },
     },
+    // #endregion
+    // #region 🧾 JSON files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: JSON (json/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1656,6 +1696,8 @@ export default defineConfig([
             ],
         },
     },
+    // #endregion
+    // #region 🧾 JSON5 files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: JSON5 (json5/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1680,6 +1722,8 @@ export default defineConfig([
             ],
         },
     },
+    // #endregion
+    // #region 🧾 TOML files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: TOML (toml/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1717,6 +1761,8 @@ export default defineConfig([
             "toml/vue-custom-block/no-parsing-error": "warn",
         },
     },
+    // #endregion
+    // #region ⚛️ TSX/JSX files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: TSX/JSX (tsx/*, jsx/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1831,6 +1877,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 🦖 Docusaurus files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Docusaurus (docusaurus/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -3239,6 +3287,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 🎨 Docusaurus CSS
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Docusaurus CSS (docs/docusaurus/**/*.css)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -3291,6 +3341,8 @@ export default defineConfig([
         },
         settings: {},
     },
+    // #endregion
+    // #region 🖥️ TypeScript Frontend
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: TypeScript Frontend (src/**/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -5014,6 +5066,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region ⚡ Electron Backend
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Electron Backend - (electron/**/*)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -6479,6 +6533,8 @@ export default defineConfig([
             react: { version: "19" },
         },
     },
+    // #endregion
+    // #region 🔁 TypeScript Shared
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: TypeScript Shared - shared/**/*
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -8237,6 +8293,8 @@ export default defineConfig([
             ],
         },
     },
+    // #endregion
+    // #region 🧪 Tests (Frontend)
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Tests (Frontend)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -8290,7 +8348,6 @@ export default defineConfig([
             "undefined-css-classes": pluginUndefinedCss,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
-            "uptime-watcher": uptimeWatcherPlugin,
             vitest: vitest,
         },
         rules: {
@@ -8464,7 +8521,6 @@ export default defineConfig([
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
-            "uptime-watcher/test-no-mock-return-value-constructors": "error",
             "vitest/no-alias-methods": "warn",
             "vitest/no-commented-out-tests": "warn",
             "vitest/no-conditional-expect": "off",
@@ -8482,7 +8538,8 @@ export default defineConfig([
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
-            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors.
+            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors
+            // (enabled via uptime-watcher `configs.repo`).
             // When running with --fix, this rule rewrites safe constructible
             // mocks back into `mockReturnValue*`, which can crash when the mock
             // is used with `new`.
@@ -8531,6 +8588,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 🧪 Tests (Frontend)
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Tests (Backend)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -8578,7 +8637,6 @@ export default defineConfig([
             "testing-library": pluginTestingLibrary,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
-            "uptime-watcher": uptimeWatcherPlugin,
             vitest: vitest,
         },
         rules: {
@@ -8752,7 +8810,6 @@ export default defineConfig([
             "unicorn/prefer-global-this": "off", // Allow globalThis for test setups
             "unicorn/prefer-optional-catch-binding": "off", // Allow optional catch binding for test flexibility
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
-            "uptime-watcher/test-no-mock-return-value-constructors": "error",
             "vitest/no-alias-methods": "warn",
             "vitest/no-commented-out-tests": "warn",
             "vitest/no-conditional-expect": "off",
@@ -8770,7 +8827,8 @@ export default defineConfig([
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
-            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors.
+            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors
+            // (enabled via uptime-watcher `configs.repo`).
             "vitest/prefer-mock-return-shorthand": "off",
             "vitest/prefer-spy-on": "off",
             "vitest/prefer-strict-boolean-matchers": "off",
@@ -8815,6 +8873,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 🧪 Tests (Backend)
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Tests (Shared)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -8864,7 +8924,6 @@ export default defineConfig([
             "undefined-css-classes": pluginUndefinedCss,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
-            "uptime-watcher": uptimeWatcherPlugin,
             vitest: vitest,
         },
         rules: {
@@ -9014,7 +9073,6 @@ export default defineConfig([
             "unicorn/no-unused-properties": "off", // Allow unused properties in test setups
             "unicorn/no-useless-undefined": "off", // Allow undefined in test setups
             "unicorn/prevent-abbreviations": "off", // Too many false positives in tests
-            "uptime-watcher/test-no-mock-return-value-constructors": "error",
             "vitest/no-alias-methods": "warn",
             "vitest/no-commented-out-tests": "warn",
             "vitest/no-conditional-expect": "off",
@@ -9032,7 +9090,8 @@ export default defineConfig([
             "vitest/prefer-comparison-matcher": "warn",
             "vitest/prefer-describe-function-title": "warn",
             "vitest/prefer-expect-resolves": "warn",
-            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors.
+            // NOTE: conflicts with uptime-watcher/test-no-mock-return-value-constructors
+            // (enabled via uptime-watcher `configs.repo`).
             // When running with --fix, this rule rewrites safe constructible
             // mocks back into `mockReturnValue*`, which can crash when the mock
             // is used with `new`.
@@ -9081,6 +9140,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region ⏱️ Benchmarks
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Benchmarks
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -9336,6 +9397,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 🧾 TypeScript Config files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: TypeScript Config files
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -9982,6 +10045,8 @@ export default defineConfig([
             react: { version: "19" },
         },
     },
+    // #endregion
+    // #region 📜 Scripts
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Scripts
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10212,6 +10277,8 @@ export default defineConfig([
             react: { version: "19" },
         },
     },
+    // #endregion
+    // #region 📚 JS JsDoc
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: JS JsDoc
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10335,6 +10402,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 🧾 JS/MJS Configuration files
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: JS/MJS Configuration files
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10574,6 +10643,8 @@ export default defineConfig([
             react: { version: "19" },
         },
     },
+    // #endregion
+    // #region 🎭 Playwright Tests
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Tests (Playwright)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10721,6 +10792,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 🧪 Strict Tests
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Tests (Strict)
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10758,6 +10831,8 @@ export default defineConfig([
             },
         },
     },
+    // #endregion
+    // #region 📖 Storybook
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Storybook
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10781,6 +10856,8 @@ export default defineConfig([
             "unicorn/prefer-import-meta-properties": "off",
         },
     },
+    // #endregion
+    // #region 📚 Storybook Stories
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Storybook Stories
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10851,6 +10928,8 @@ export default defineConfig([
             "tsdoc-require/require": "off",
         },
     },
+    // #endregion
+    // #region 🎭 Theme Component Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Theme Component Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10912,6 +10991,8 @@ export default defineConfig([
             "react/no-multi-comp": "off",
         },
     },
+    // #endregion
+    // #region 🤖 GitHub Workflows YAML/YML
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Github Workflows YAML/YML
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10931,6 +11012,8 @@ export default defineConfig([
             "yml/sort-keys": "off",
         },
     },
+    // #endregion
+    // #region 📴 Disables
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Disables
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -10961,59 +11044,9 @@ export default defineConfig([
             "jsonc/array-bracket-newline": "off",
         },
     },
-    {
-        files: ["electron/services/sync/**/*.{ts,tsx}"],
-        ignores: ["electron/services/sync/syncEngineUtils.ts"],
-        name: "Electron: Cloud Sync Drift Guards",
-        rules: {
-            "uptime-watcher/electron-sync-no-local-ascii-digits": "error",
-        },
-    },
-    {
-        files: ["electron/services/cloud/providers/**/*.{ts,tsx}"],
-        name: "Electron: Cloud Providers Drift Guards",
-        rules: {
-            "uptime-watcher/electron-cloud-providers-drift-guards": "error",
-        },
-    },
-    {
-        files: ["shared/types/**/*.{ts,tsx}"],
-        name: "Shared: Types Drift Guards",
-        rules: {
-            "uptime-watcher/shared-types-no-local-is-plain-object": "error",
-        },
-    },
-    {
-        files: ["electron/preload/**/*.{ts,tsx}"],
-        name: "Preload: Drift Guards",
-        rules: {
-            "uptime-watcher/preload-no-local-is-plain-object": "error",
-        },
-    },
-    {
-        files: ["electron/services/**/*.{ts,tsx}"],
-        ignores: ["electron/services/sync/syncEngineUtils.ts"],
-        name: "Electron: String Safety Drift Guards",
-        rules: {
-            "uptime-watcher/electron-no-local-string-safety-helpers": "error",
-        },
-    },
-    {
-        files: ["electron/services/**/*.{ts,tsx}"],
-        ignores: ["electron/services/shell/openExternalUtils.ts"],
-        name: "Electron: Error Formatting Drift Guards",
-        rules: {
-            "uptime-watcher/electron-no-ad-hoc-error-code-suffix": "error",
-            "uptime-watcher/prefer-try-get-error-code": "error",
-        },
-    },
-    {
-        files: ["**/*.{ts,tsx}"],
-        name: "Global: Regex Drift Guards",
-        rules: {
-            "uptime-watcher/no-regexp-v-flag": "error",
-        },
-    },
+    // NOTE: uptime-watcher drift-guard rules are enabled (and scoped) by the
+    // internal plugin's `configs.repo` preset (`...uptimeWatcherRepoConfigs`).
+    // Keep them centralized there to avoid config drift.
     {
         files: ["**/**"],
         name: "Global: Stylistic Overrides",
@@ -11037,6 +11070,8 @@ export default defineConfig([
             ],
         },
     },
+    // #endregion
+    // #region 🛠️ Global Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Global Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -11159,5 +11194,8 @@ export default defineConfig([
             "unicorn/prefer-import-meta-properties": "off",
         },
     },
+    // #endregion
+    // #region 🧹 Prettier Disable Config
     eslintConfigPrettier,
+    // #endregion
 ]);

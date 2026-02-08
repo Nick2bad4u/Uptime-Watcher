@@ -332,6 +332,17 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
     }),
     withUptimeWatcherPlugin({
         files: [
+            "**/*.{spec,test}.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "**/*.{spec,test}.*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "**/__tests__/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "**/test/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+            "**/tests/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+        ],
+        name: "uptime-watcher:vitest-constructible-mock-safety",
+        rules: errorRulesFor(["test-no-mock-return-value-constructors"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: [
             "docs/**/*.{ts,tsx}",
             "electron/**/*.{ts,tsx}",
             "src/**/*.{ts,tsx}",
