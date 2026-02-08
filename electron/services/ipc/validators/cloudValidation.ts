@@ -23,7 +23,10 @@ import {
     toValidationResult,
 } from "./utils/parameterValidation";
 import { requireRecordParamValue } from "./utils/recordValidation";
-import { collectStringSafetyErrors } from "./utils/stringValidation";
+import {
+    collectStringSafetyErrors,
+    requireStringParamValue,
+} from "./utils/stringValidation";
 
 /** Maximum byte budget accepted for cloud backup object keys. */
 const MAX_BACKUP_KEY_BYTES: number = 2048;
@@ -176,20 +179,15 @@ export const validateEncryptionPassphrasePayload: IpcParameterValidator =
         (candidate): ParameterValueValidationResult => {
             const errors: string[] = [];
 
-            const stringError = IpcValidators.requiredString(
+            const requiredString = requireStringParamValue(
                 candidate,
                 "passphrase"
             );
-            if (stringError) {
-                return toValidationResult(stringError);
+            if (requiredString.ok === false) {
+                return requiredString.error;
             }
 
-            if (typeof candidate !== "string") {
-                // Defensive: requiredString already enforces this.
-                return toValidationResult("passphrase must be a string");
-            }
-
-            const passphrase = candidate;
+            const passphrase = requiredString.value;
             errors.push(
                 ...collectStringSafetyErrors(passphrase, {
                     forbidControlChars: {
@@ -231,17 +229,14 @@ export function createBackupKeyValidator(
 ): IpcParameterValidator {
     return createParamValidator(1, [
         (value): ParameterValueValidationResult => {
-            const error = IpcValidators.requiredString(value, paramName);
-            if (error) {
-                return toValidationResult(error);
+            const requiredString = requireStringParamValue(value, paramName);
+            if (requiredString.ok === false) {
+                return requiredString.error;
             }
 
-            if (typeof value !== "string") {
-                // Defensive: requiredString already enforces this.
-                return toValidationResult(`${paramName} must be a string`);
-            }
-
-            const key = normalizePathSeparatorsToPosix(value).trim();
+            const key = normalizePathSeparatorsToPosix(
+                requiredString.value
+            ).trim();
 
             const safetyErrors = collectStringSafetyErrors(key, {
                 forbidControlChars: {

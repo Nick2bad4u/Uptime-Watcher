@@ -22,6 +22,10 @@ import {
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { createValidatedInvoker } from "../core/bridgeFactory";
+import {
+    acceptUnusedPreloadArguments,
+    createPreloadDomain,
+} from "../utils/preloadDomainFactory";
 
 /**
  * Interface defining the state sync domain API operations.
@@ -49,42 +53,64 @@ export interface StateSyncApiInterface extends StateSyncDomainBridge {
  *
  * @public
  */
-export const stateSyncApi: StateSyncApiInterface =
-    ((): StateSyncApiInterface => {
-        try {
-            return {
-                /**
-                 * Gets the current synchronization status
-                 *
-                 * @returns Promise resolving to current sync status information
-                 */
-                getSyncStatus: createValidatedInvoker(
-                    STATE_SYNC_CHANNELS.getSyncStatus,
-                    safeParseStateSyncStatusSummary,
-                    {
-                        domain: "stateSyncApi",
-                        guardName: "safeParseStateSyncStatusSummary",
-                    }
-                ),
+function createStateSyncApi(): StateSyncApiInterface {
+    try {
+        return {
+            /**
+             * Gets the current synchronization status
+             *
+             * @returns Promise resolving to current sync status information
+             */
+            getSyncStatus: createValidatedInvoker(
+                STATE_SYNC_CHANNELS.getSyncStatus,
+                safeParseStateSyncStatusSummary,
+                {
+                    domain: "stateSyncApi",
+                    guardName: "safeParseStateSyncStatusSummary",
+                }
+            ),
 
-                /**
-                 * Requests a full synchronization of all data
-                 *
-                 * @returns Promise resolving to synchronized site data
-                 */
-                requestFullSync: createValidatedInvoker(
-                    STATE_SYNC_CHANNELS.requestFullSync,
-                    safeParseStateSyncFullSyncResult,
-                    {
-                        domain: "stateSyncApi",
-                        guardName: "safeParseStateSyncFullSyncResult",
-                    }
-                ),
-            } as const;
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+            /**
+             * Requests a full synchronization of all data
+             *
+             * @returns Promise resolving to synchronized site data
+             */
+            requestFullSync: createValidatedInvoker(
+                STATE_SYNC_CHANNELS.requestFullSync,
+                safeParseStateSyncFullSyncResult,
+                {
+                    domain: "stateSyncApi",
+                    guardName: "safeParseStateSyncFullSyncResult",
+                }
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+}
+
+const createStateSyncApiFallback = (
+    unavailableError: Error
+): StateSyncApiInterface => ({
+        getSyncStatus: (
+            ...args: Parameters<StateSyncApiInterface["getSyncStatus"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        requestFullSync: (
+            ...args: Parameters<StateSyncApiInterface["requestFullSync"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+    } as const);
+
+export const stateSyncApi: StateSyncApiInterface = createPreloadDomain({
+    create: createStateSyncApi,
+    createFallback: createStateSyncApiFallback,
+    domain: "stateSyncApi",
+});
 
 /**
  * Type alias for the state sync domain preload surface.

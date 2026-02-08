@@ -1,22 +1,11 @@
 import type { Monitor, Site } from "@shared/types";
-import type { ApplicationError } from "@shared/utils/errorHandling";
-import type { UnknownRecord } from "type-fest";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { MonitorManager } from "../managers/MonitorManager";
 import type { SiteManager } from "../managers/SiteManager";
+import type { ContextualErrorFactory } from "../orchestrator/utils/contextualErrorFactory";
 
 import { logger } from "../utils/logger";
-
-interface ContextualErrorInput {
-    readonly cause: unknown;
-    readonly code: string;
-    readonly details?: UnknownRecord;
-    readonly message: string;
-    readonly operation: string;
-}
-
-type ContextualErrorFactory = (input: ContextualErrorInput) => ApplicationError;
 
 /**
  * Dependencies required to orchestrate site lifecycle operations.

@@ -17,7 +17,6 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { isEnrichedMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
 
 import type { ListenerAttachmentState } from "../baseTypes";
-import type { SitesTelemetryPayload } from "./operationHelpers";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
 
 import { logger } from "../../../services/logger";
@@ -27,6 +26,10 @@ import {
     type StatusUpdateListenerDescriptor,
 } from "./statusUpdateListeners";
 import { mergeMonitorStatusChange } from "./statusUpdateMerge";
+import {
+    buildMonitoringLifecycleTelemetry,
+    buildStatusUpdatePayload,
+} from "./statusUpdatePayload";
 
 /**
  * Configuration options for status update handler operations.
@@ -231,28 +234,12 @@ export class StatusUpdateManager {
 
             // Call optional update callback
             if (this.onUpdate && updatedSite) {
-                const statusUpdate: StatusUpdate = {
-                    monitor: event.monitor,
-                    monitorId: event.monitorId,
-                    site: updatedSite,
-                    siteIdentifier: event.siteIdentifier,
-                    status: event.status,
-                    timestamp: new Date(event.timestamp).toISOString(),
-                };
-
-                if (event.details !== undefined) {
-                    statusUpdate.details = event.details;
-                }
-
-                if (event.previousStatus !== undefined) {
-                    statusUpdate.previousStatus = event.previousStatus;
-                }
-
-                if (event.responseTime !== undefined) {
-                    statusUpdate.responseTime = event.responseTime;
-                }
-
-                this.onUpdate(statusUpdate);
+                this.onUpdate(
+                    buildStatusUpdatePayload({
+                        event,
+                        site: updatedSite,
+                    })
+                );
             }
 
             if (isDevelopment()) {
@@ -541,29 +528,10 @@ export class StatusUpdateManager {
             | RendererEventPayloadMap["monitoring:started"]
             | RendererEventPayloadMap["monitoring:stopped"]
     ): void {
-        const monitorCountValue = event.monitorCount;
-        const siteCountValue = event.siteCount;
-        const timestampValue = event["timestamp"];
-        const { activeMonitors } = event;
-        const { reason } = event;
-
-        const monitorCount =
-            typeof monitorCountValue === "number"
-                ? monitorCountValue
-                : undefined;
-        const siteCount =
-            typeof siteCountValue === "number" ? siteCountValue : undefined;
-        const timestamp =
-            typeof timestampValue === "number" ? timestampValue : undefined;
-
-        const logPayload = {
+        const logPayload = buildMonitoringLifecycleTelemetry({
+            event,
             phase,
-            ...(timestamp === undefined ? {} : { timestamp }),
-            ...(monitorCount === undefined ? {} : { monitorCount }),
-            ...(siteCount === undefined ? {} : { siteCount }),
-            ...(typeof activeMonitors === "number" ? { activeMonitors } : {}),
-            ...(typeof reason === "string" ? { reason } : {}),
-        } satisfies SitesTelemetryPayload;
+        });
 
         logger.debug("Received monitoring lifecycle event", logPayload);
     }

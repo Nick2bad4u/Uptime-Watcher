@@ -25,6 +25,10 @@ import {
     safeParseBooleanResult,
     safeParseStringResult,
 } from "../core/bridgeFactory";
+import {
+    acceptUnusedPreloadArguments,
+    createPreloadDomain,
+} from "../utils/preloadDomainFactory";
 
 /**
  * Interface defining the data domain API operations.
@@ -73,7 +77,7 @@ export interface DataApiInterface extends DataDomainBridge {
  *
  * @public
  */
-export const dataApi: DataApiInterface = ((): DataApiInterface => {
+function createDataApi(): DataApiInterface {
     try {
         return {
             /**
@@ -144,7 +148,42 @@ export const dataApi: DataApiInterface = ((): DataApiInterface => {
     } catch (error) {
         throw ensureError(error);
     }
-})();
+}
+
+const createDataApiFallback = (unavailableError: Error): DataApiInterface => ({
+        downloadSqliteBackup: (
+            ...args: Parameters<DataApiInterface["downloadSqliteBackup"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        exportData: (...args: Parameters<DataApiInterface["exportData"]>) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        importData: (...args: Parameters<DataApiInterface["importData"]>) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        restoreSqliteBackup: (
+            ...args: Parameters<DataApiInterface["restoreSqliteBackup"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        saveSqliteBackup: (
+            ...args: Parameters<DataApiInterface["saveSqliteBackup"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+    } as const);
+
+export const dataApi: DataApiInterface = createPreloadDomain({
+    create: createDataApi,
+    createFallback: createDataApiFallback,
+    domain: "dataApi",
+});
 
 /**
  * Type alias for the data domain preload bridge.

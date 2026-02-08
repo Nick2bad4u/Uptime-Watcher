@@ -10,6 +10,10 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { logger } from "../../../utils/logger";
+import {
+    createStateSyncStatusSummary,
+    normalizeStateSyncStatusSummary,
+} from "../internal/stateSyncStatusSummary";
 import { createStandardizedIpcRegistrar } from "../utils";
 import { StateSyncHandlerValidators } from "../validators/stateSync";
 
@@ -57,20 +61,22 @@ export function registerStateSyncHandlers({
                 siteCount: responseSites.length,
             });
 
-            setStateSyncStatus({
+            const summary = createStateSyncStatusSummary({
                 lastSyncAt: timestamp,
                 siteCount: responseSites.length,
                 source: STATE_SYNC_SOURCE.DATABASE,
                 synchronized: true,
             });
 
+            setStateSyncStatus(summary);
+
             return {
                 completedAt: timestamp,
                 revision,
-                siteCount: responseSites.length,
+                siteCount: summary.siteCount,
                 sites: responseSites,
-                source: STATE_SYNC_SOURCE.DATABASE,
-                synchronized: true,
+                source: summary.source,
+                synchronized: summary.synchronized,
             } satisfies StateSyncFullSyncResult;
         },
         StateSyncHandlerValidators.requestFullSync
@@ -81,40 +87,10 @@ export function registerStateSyncHandlers({
         () => {
             const currentStatus = getStateSyncStatus();
             const cachedSiteCount = uptimeOrchestrator.getCachedSiteCount();
-            const hasTrustedDatabaseSummary =
-                currentStatus.synchronized &&
-                currentStatus.source === STATE_SYNC_SOURCE.DATABASE;
-
-            // Normalize missing timestamps to an explicit null for consistency
-            // with renderer expectations and serialization.
-            const lastSyncAt = currentStatus.lastSyncAt ?? null;
-
-            const normalizedCachedSiteCount = Number.isFinite(cachedSiteCount)
-                ? cachedSiteCount
-                : 0;
-
-            const normalizedSiteCount =
-                typeof currentStatus.siteCount === "number" &&
-                Number.isFinite(currentStatus.siteCount)
-                    ? currentStatus.siteCount
-                    : normalizedCachedSiteCount;
-
-            const summary: StateSyncStatusSummary = hasTrustedDatabaseSummary
-                ? {
-                      lastSyncAt,
-                      siteCount: normalizedSiteCount,
-                      source: STATE_SYNC_SOURCE.DATABASE,
-                      synchronized: true,
-                  }
-                : {
-                      lastSyncAt,
-                      siteCount: Math.max(
-                          normalizedCachedSiteCount,
-                          normalizedSiteCount
-                      ),
-                      source: STATE_SYNC_SOURCE.CACHE,
-                      synchronized: false,
-                  };
+            const summary = normalizeStateSyncStatusSummary({
+                cachedSiteCount,
+                currentStatus,
+            });
 
             setStateSyncStatus(summary);
             return summary;

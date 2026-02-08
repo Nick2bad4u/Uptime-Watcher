@@ -17,23 +17,17 @@
 
 import type {
     CacheInvalidatedEventData,
-    CacheInvalidationReason,
-    CacheInvalidationType,
     HistoryLimitUpdatedEventData,
     MonitorCheckCompletedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
-    MonitoringControlReason,
     MonitorLifecycleEventData,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
-    SiteAddedSource,
     TestEventData,
-    UpdateStatus,
     UpdateStatusEventData,
 } from "@shared/types/events";
 import type { EventsDomainBridge } from "@shared/types/eventsBridge";
-import type { UnknownRecord } from "type-fest";
 
 import {
     RENDERER_EVENT_CHANNELS,
@@ -48,7 +42,6 @@ import {
     SITE_ADDED_SOURCES,
     UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import { validateSiteSnapshot } from "@shared/validation/guards";
 import {
     isEnrichedMonitorStatusChangedEventData,
@@ -56,6 +49,11 @@ import {
 } from "@shared/validation/monitorStatusEvents";
 
 import { createEventManager } from "../core/bridgeFactory";
+import {
+    createStringUnionGuard,
+    hasFiniteTimestamp,
+    isUnknownRecord,
+} from "../utils/eventsGuardHelpers";
 import {
     buildPayloadPreview,
     preloadDiagnosticsLogger,
@@ -76,27 +74,9 @@ const RENDERER_EVENT_CHANNEL_VALUES = Object.values(
     RENDERER_EVENT_CHANNELS
 ) as readonly RendererEventChannel[];
 
-const RENDERER_EVENT_CHANNEL_SET: ReadonlySet<string> = new Set(
+const isRendererEventChannel = createStringUnionGuard(
     RENDERER_EVENT_CHANNEL_VALUES
 );
-
-const CACHE_INVALIDATION_REASON_SET: ReadonlySet<string> = new Set(
-    CACHE_INVALIDATION_REASON_VALUES
-);
-
-const CACHE_INVALIDATION_TYPE_SET: ReadonlySet<string> = new Set(
-    CACHE_INVALIDATION_TYPE_VALUES
-);
-
-const MONITORING_CONTROL_REASON_SET: ReadonlySet<string> = new Set(
-    MONITORING_CONTROL_REASON_VALUES
-);
-
-const UPDATE_STATUS_SET: ReadonlySet<string> = new Set(UPDATE_STATUS_VALUES);
-
-function isRendererEventChannel(value: unknown): value is RendererEventChannel {
-    return typeof value === "string" && RENDERER_EVENT_CHANNEL_SET.has(value);
-}
 
 type SiteAddedEventDataPayload = RendererEventPayload<
     typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
@@ -123,34 +103,24 @@ type StateSyncEventDataPayload = RendererEventPayload<
     typeof RENDERER_EVENT_CHANNELS.STATE_SYNC
 >;
 
-const isCacheInvalidationReason = (
-    value: unknown
-): value is CacheInvalidationReason =>
-    typeof value === "string" && CACHE_INVALIDATION_REASON_SET.has(value);
+const isCacheInvalidationReason = createStringUnionGuard(
+    CACHE_INVALIDATION_REASON_VALUES
+);
 
-const isCacheInvalidationType = (
-    value: unknown
-): value is CacheInvalidationType =>
-    typeof value === "string" && CACHE_INVALIDATION_TYPE_SET.has(value);
+const isCacheInvalidationType = createStringUnionGuard(
+    CACHE_INVALIDATION_TYPE_VALUES
+);
 
-const isMonitoringControlReason = (
-    value: unknown
-): value is MonitoringControlReason =>
-    typeof value === "string" && MONITORING_CONTROL_REASON_SET.has(value);
+const isMonitoringControlReason = createStringUnionGuard(
+    MONITORING_CONTROL_REASON_VALUES
+);
 
 const isMonitorCheckType = (
     value: unknown
 ): value is MonitorCheckCompletedEventData["checkType"] =>
     value === "manual" || value === "scheduled";
 
-const isUpdateStatus = (value: unknown): value is UpdateStatus =>
-    typeof value === "string" && UPDATE_STATUS_SET.has(value);
-
-const isUnknownRecord = (value: unknown): value is UnknownRecord =>
-    isSharedRecord(value);
-
-const hasFiniteTimestamp = (value: unknown): value is number =>
-    typeof value === "number" && Number.isFinite(value);
+const isUpdateStatus = createStringUnionGuard(UPDATE_STATUS_VALUES);
 
 const isCacheInvalidatedEventDataPayload = (
     payload: unknown
@@ -364,11 +334,7 @@ const isHistoryLimitUpdatedEventDataPayload = (
     return true;
 };
 
-const isSiteAddedSource = (value: unknown): value is SiteAddedSource =>
-    typeof value === "string" &&
-    SITE_ADDED_SOURCES.some(
-        (source): source is SiteAddedSource => source === value
-    );
+const isSiteAddedSource = createStringUnionGuard(SITE_ADDED_SOURCES);
 
 const isSiteAddedEventDataPayload = (
     payload: unknown

@@ -7,10 +7,10 @@ import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 import { logger } from "../../services/logger";
 import { NotificationPreferenceService } from "../../services/NotificationPreferenceService";
 import {
-    mapStatusUpdateToAlert,
     MAX_ALERT_QUEUE_LENGTH,
     useAlertStore,
 } from "../../stores/alerts/useAlertStore";
+import { mapStatusUpdateToAlert } from "../../stores/alerts/utils/alertPayload";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 
 const audioContextRef: { current: AudioContext | null } = {

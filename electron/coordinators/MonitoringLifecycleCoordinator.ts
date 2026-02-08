@@ -18,6 +18,12 @@ import type {
 import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 import {
+    buildIsMonitoringActiveResponse,
+    buildRestartMonitoringResponse,
+    buildStartMonitoringResponse,
+    buildStopMonitoringResponse,
+} from "./utils/monitoringResponses";
+import {
     collectMonitorsToResume,
     resumeMonitoringCandidates,
 } from "./utils/persistentMonitoringResumption";
@@ -160,7 +166,7 @@ export class MonitoringLifecycleCoordinator {
             if (kind === "start") {
                 await this.emitTyped(
                     "internal:site:start-monitoring-response",
-                    this.buildStartMonitoringResponse(
+                    buildStartMonitoringResponse(
                         monitorId
                             ? { identifier, monitorId, success }
                             : { identifier, success }
@@ -169,7 +175,7 @@ export class MonitoringLifecycleCoordinator {
             } else {
                 await this.emitTyped(
                     "internal:site:stop-monitoring-response",
-                    this.buildStopMonitoringResponse(
+                    buildStopMonitoringResponse(
                         monitorId
                             ? { identifier, monitorId, success }
                             : { identifier, success }
@@ -186,7 +192,7 @@ export class MonitoringLifecycleCoordinator {
             if (kind === "start") {
                 await this.emitTyped(
                     "internal:site:start-monitoring-response",
-                    this.buildStartMonitoringResponse(
+                    buildStartMonitoringResponse(
                         monitorId
                             ? { identifier, monitorId, success: false }
                             : { identifier, success: false }
@@ -195,7 +201,7 @@ export class MonitoringLifecycleCoordinator {
             } else {
                 await this.emitTyped(
                     "internal:site:stop-monitoring-response",
-                    this.buildStopMonitoringResponse(
+                    buildStopMonitoringResponse(
                         monitorId
                             ? { identifier, monitorId, success: false }
                             : { identifier, success: false }
@@ -211,48 +217,6 @@ export class MonitoringLifecycleCoordinator {
         this.monitorManager = dependencies.monitorManager;
         this.siteManager = dependencies.siteManager;
         this.emitTyped = dependencies.emitTyped;
-    }
-
-    private buildStartMonitoringResponse(args: {
-        identifier: string;
-        monitorId?: string;
-        success: boolean;
-    }): UptimeEvents["internal:site:start-monitoring-response"] {
-        return {
-            identifier: args.identifier,
-            operation: "start-monitoring-response",
-            success: args.success,
-            timestamp: Date.now(),
-            ...(args.monitorId ? { monitorId: args.monitorId } : {}),
-        };
-    }
-
-    private buildStopMonitoringResponse(args: {
-        identifier: string;
-        monitorId?: string;
-        success: boolean;
-    }): UptimeEvents["internal:site:stop-monitoring-response"] {
-        return {
-            identifier: args.identifier,
-            operation: "stop-monitoring-response",
-            success: args.success,
-            timestamp: Date.now(),
-            ...(args.monitorId ? { monitorId: args.monitorId } : {}),
-        };
-    }
-
-    private buildRestartMonitoringResponse(args: {
-        identifier: string;
-        monitorId: string;
-        success: boolean;
-    }): UptimeEvents["internal:site:restart-monitoring-response"] {
-        return {
-            identifier: args.identifier,
-            monitorId: args.monitorId,
-            operation: "restart-monitoring-response",
-            success: args.success,
-            timestamp: Date.now(),
-        };
     }
 
     /** Event handler for monitoring start requests. */
@@ -315,13 +279,11 @@ export class MonitoringLifecycleCoordinator {
                         );
                     await this.emitTyped(
                         "internal:site:is-monitoring-active-response",
-                        {
+                        buildIsMonitoringActiveResponse({
                             identifier: data.identifier,
                             isActive,
                             monitorId: data.monitorId,
-                            operation: "is-monitoring-active-response",
-                            timestamp: Date.now(),
-                        }
+                        })
                     );
                 } catch (error) {
                     logger.error(
@@ -330,13 +292,11 @@ export class MonitoringLifecycleCoordinator {
                     );
                     await this.emitTyped(
                         "internal:site:is-monitoring-active-response",
-                        {
+                        buildIsMonitoringActiveResponse({
                             identifier: data.identifier,
                             isActive: false,
                             monitorId: data.monitorId,
-                            operation: "is-monitoring-active-response",
-                            timestamp: Date.now(),
-                        }
+                        })
                     );
                 }
             },
@@ -368,7 +328,7 @@ export class MonitoringLifecycleCoordinator {
                         );
                     await this.emitTyped(
                         "internal:site:restart-monitoring-response",
-                        this.buildRestartMonitoringResponse({
+                        buildRestartMonitoringResponse({
                             identifier: data.identifier,
                             monitorId: data.monitor.id,
                             success,
@@ -381,7 +341,7 @@ export class MonitoringLifecycleCoordinator {
                     );
                     await this.emitTyped(
                         "internal:site:restart-monitoring-response",
-                        this.buildRestartMonitoringResponse({
+                        buildRestartMonitoringResponse({
                             identifier: data.identifier,
                             monitorId: data.monitor.id,
                             success: false,

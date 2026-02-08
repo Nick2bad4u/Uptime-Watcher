@@ -20,6 +20,10 @@ import {
     createValidatedInvoker,
     safeParseBooleanResult,
 } from "../core/bridgeFactory";
+import {
+    acceptUnusedPreloadArguments,
+    createPreloadDomain,
+} from "../utils/preloadDomainFactory";
 
 /**
  * Type alias defining the system domain API operations.
@@ -33,7 +37,7 @@ export type SystemApiInterface = SystemDomainBridge;
  *
  * @public
  */
-export const systemApi: SystemApiInterface = ((): SystemApiInterface => {
+function createSystemApi(): SystemApiInterface {
     try {
         return {
             /**
@@ -88,7 +92,36 @@ export const systemApi: SystemApiInterface = ((): SystemApiInterface => {
     } catch (error) {
         throw ensureError(error);
     }
-})();
+}
+
+const createSystemApiFallback = (
+    unavailableError: Error
+): SystemApiInterface => ({
+        openExternal: (
+            ...args: Parameters<SystemApiInterface["openExternal"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        quitAndInstall: (
+            ...args: Parameters<SystemApiInterface["quitAndInstall"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        writeClipboardText: (
+            ...args: Parameters<SystemApiInterface["writeClipboardText"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+    } as const);
+
+export const systemApi: SystemApiInterface = createPreloadDomain({
+    create: createSystemApi,
+    createFallback: createSystemApiFallback,
+    domain: "systemApi",
+});
 
 /**
  * Public system API surface exposed via the preload bridge.

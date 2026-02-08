@@ -1,6 +1,8 @@
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
+import { IpcValidators } from "../IpcValidators";
+
 /**
  * Rules for validating string safety constraints.
  *
@@ -43,4 +45,30 @@ export function collectStringSafetyErrors(
     }
 
     return errors;
+}
+
+/**
+ * Result returned by {@link requireStringParamValue}.
+ */
+export type StringParamValueResult =
+    | { readonly error: readonly string[]; readonly ok: false }
+    | { readonly ok: true; readonly value: string };
+
+/**
+ * Ensures an IPC parameter is a string and returns the normalized value.
+ */
+export function requireStringParamValue(
+    value: unknown,
+    paramName: string
+): StringParamValueResult {
+    const requiredError = IpcValidators.requiredString(value, paramName);
+    if (requiredError) {
+        return { error: [requiredError], ok: false };
+    }
+
+    if (typeof value !== "string") {
+        return { error: [`${paramName} must be a string`], ok: false };
+    }
+
+    return { ok: true, value };
 }

@@ -18,9 +18,9 @@ import {
 
 import {
     MAX_ALERT_QUEUE_LENGTH,
-    mapStatusUpdateToAlert,
     useAlertStore,
 } from "../../../stores/alerts/useAlertStore";
+import { mapStatusUpdateToAlert } from "../../../stores/alerts/utils/alertPayload";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const resetAlertStore = (): void => {

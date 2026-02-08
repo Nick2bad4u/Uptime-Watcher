@@ -1,7 +1,9 @@
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 
-import { IpcValidators } from "../IpcValidators";
-import { collectStringSafetyErrors } from "./stringValidation";
+import {
+    collectStringSafetyErrors,
+    requireStringParamValue,
+} from "./stringValidation";
 
 /**
  * Options for restore buffer validation.
@@ -76,17 +78,12 @@ export function validateRestoreFileNameCandidate(
 ): string[] {
     const paramName = options.paramName ?? "fileName";
 
-    const requiredError = IpcValidators.requiredString(candidate, paramName);
-    if (requiredError) {
-        return [requiredError];
+    const requiredString = requireStringParamValue(candidate, paramName);
+    if (requiredString.ok === false) {
+        return [...requiredString.error];
     }
 
-    if (typeof candidate !== "string") {
-        // Defensive: requiredString already enforces this.
-        return [`${paramName} must be a string`];
-    }
-
-    const rawFileName = candidate;
+    const rawFileName = requiredString.value;
     const fileName = rawFileName.trim();
     if (fileName.length === 0) {
         return [`${paramName} must not be blank`];

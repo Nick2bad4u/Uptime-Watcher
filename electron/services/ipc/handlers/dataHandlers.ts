@@ -16,16 +16,15 @@ import * as path from "node:path";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { validateDatabaseBackupPayload } from "../../database/utils/backup/databaseBackup";
+import {
+    buildPlaywrightBackupPath,
+    ensureSqliteFileExtension,
+} from "../internal/sqliteBackupPath";
 import { createStandardizedIpcRegistrar, toClonedArrayBuffer } from "../utils";
 import {
     DataHandlerResultValidators,
     DataHandlerValidators,
 } from "../validators/data";
-
-function ensureSqliteFileExtension(rawPath: string): string {
-    const ext = path.extname(rawPath);
-    return ext.length > 0 ? rawPath : `${rawPath}.sqlite`;
-}
 
 /**
  * Dependencies required for registering data IPC handlers.
@@ -74,16 +73,14 @@ export function registerDataHandlers({
             const defaultPath = path.join(downloadsDir, suggestedFileName);
 
             const isPlaywrightAutomation =
-                readProcessEnv("PLAYWRIGHT_TEST")?.toLowerCase() === "true";
+                readProcessEnv("PLAYWRIGHT_TEST")?.toLowerCase() === "true" ||
+                readProcessEnv("HEADLESS")?.toLowerCase() === "true";
 
             if (isPlaywrightAutomation) {
-                const automationDir = path.join(
-                    app.getPath("userData"),
-                    "playwright-backups"
-                );
-                const automationPath = ensureSqliteFileExtension(
-                    path.join(automationDir, suggestedFileName)
-                );
+                const automationPath = buildPlaywrightBackupPath({
+                    baseDirectory: app.getPath("userData"),
+                    fileName: suggestedFileName,
+                });
 
                 const metadata =
                     await uptimeOrchestrator.saveBackupToPath(automationPath);

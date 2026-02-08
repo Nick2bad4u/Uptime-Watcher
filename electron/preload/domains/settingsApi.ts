@@ -20,6 +20,10 @@ import {
     createVoidInvoker,
     safeParseNonNegativeIntResult,
 } from "../core/bridgeFactory";
+import {
+    acceptUnusedPreloadArguments,
+    createPreloadDomain,
+} from "../utils/preloadDomainFactory";
 
 /**
  * Interface defining the settings domain API operations.
@@ -54,7 +58,7 @@ export interface SettingsApiInterface extends SettingsDomainBridge {
  *
  * @public
  */
-export const settingsApi: SettingsApiInterface = ((): SettingsApiInterface => {
+function createSettingsApi(): SettingsApiInterface {
     try {
         return {
             /**
@@ -97,7 +101,36 @@ export const settingsApi: SettingsApiInterface = ((): SettingsApiInterface => {
     } catch (error) {
         throw ensureError(error);
     }
-})();
+}
+
+const createSettingsApiFallback = (
+    unavailableError: Error
+): SettingsApiInterface => ({
+        getHistoryLimit: (
+            ...args: Parameters<SettingsApiInterface["getHistoryLimit"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        resetSettings: (
+            ...args: Parameters<SettingsApiInterface["resetSettings"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        updateHistoryLimit: (
+            ...args: Parameters<SettingsApiInterface["updateHistoryLimit"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+    } as const);
+
+export const settingsApi: SettingsApiInterface = createPreloadDomain({
+    create: createSettingsApi,
+    createFallback: createSettingsApiFallback,
+    domain: "settingsApi",
+});
 
 /**
  * Type alias for the settings domain preload bridge.

@@ -1,11 +1,5 @@
 import type { IpcInvokeChannel } from "@shared/types/ipc";
-import type {
-    SiteIdentifierSnapshot,
-    StateSyncSource,
-    StateSyncStatusSummary,
-} from "@shared/types/stateSync";
 
-import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { ipcMain } from "electron";
@@ -28,10 +22,7 @@ import { registerSettingsHandlers } from "./handlers/settingsHandlers";
 import { registerSiteHandlers } from "./handlers/siteHandlers";
 import { registerStateSyncHandlers } from "./handlers/stateSyncHandlers";
 import { registerSystemHandlers } from "./handlers/systemHandlers";
-import {
-    type NormalizedStateSyncStatusEvent,
-    normalizeStateSyncPayload,
-} from "./internal/stateSyncStatusNormalization";
+import { StateSyncStatusTracker } from "./internal/stateSyncStatusTracker";
 
 
 /**
@@ -46,9 +37,7 @@ export class IpcService {
 
     private readonly uptimeOrchestrator: UptimeOrchestrator;
 
-    private stateSyncStatus: StateSyncStatusSummary;
-
-    private knownSiteIdentifiers = new Set<string>();
+    private readonly stateSyncStatusTracker: StateSyncStatusTracker;
 
     private stateSyncListenerRegistered = false;
 
@@ -57,18 +46,7 @@ export class IpcService {
     private readonly cloudService: CloudService;
 
     private readonly handleStateSyncStatusUpdate = (data: unknown): void => {
-        const normalized = normalizeStateSyncPayload(data);
-        if (!normalized) {
-            logger.warn(
-                "[IpcService] Ignoring malformed sites:state-synchronized payload",
-                {
-                    payloadType: Array.isArray(data) ? "array" : typeof data,
-                }
-            );
-            return;
-        }
-
-        this.updateStateSyncStatusFromEvent(normalized);
+        this.stateSyncStatusTracker.handleStatusEvent(data);
     };
 
     public constructor(
@@ -81,12 +59,7 @@ export class IpcService {
         this.autoUpdaterService = autoUpdaterService;
         this.notificationService = notificationService;
         this.cloudService = cloudService;
-        this.stateSyncStatus = {
-            lastSyncAt: null,
-            siteCount: 0,
-            source: STATE_SYNC_SOURCE.CACHE,
-            synchronized: false,
-        } satisfies StateSyncStatusSummary;
+        this.stateSyncStatusTracker = new StateSyncStatusTracker(logger);
     }
 
     public cleanup(): void {
@@ -107,13 +80,7 @@ export class IpcService {
             suppressErrors: true,
         });
 
-        this.knownSiteIdentifiers = new Set();
-        this.stateSyncStatus = {
-            lastSyncAt: null,
-            siteCount: 0,
-            source: STATE_SYNC_SOURCE.CACHE,
-            synchronized: false,
-        } satisfies StateSyncStatusSummary;
+        this.stateSyncStatusTracker.reset();
         this.stateSyncListenerRegistered = false;
     }
 
@@ -158,10 +125,10 @@ export class IpcService {
         });
 
         registerStateSyncHandlers({
-            getStateSyncStatus: () => this.stateSyncStatus,
+            getStateSyncStatus: () => this.stateSyncStatusTracker.getStatus(),
             registeredHandlers: this.registeredIpcHandlers,
             setStateSyncStatus: (summary) => {
-                this.stateSyncStatus = summary;
+                this.stateSyncStatusTracker.setStatus(summary);
             },
             uptimeOrchestrator: this.uptimeOrchestrator,
         });
@@ -190,67 +157,4 @@ export class IpcService {
         this.stateSyncListenerRegistered = true;
     }
 
-    private updateStateSyncStatus(
-        sites: readonly SiteIdentifierSnapshot[],
-        source: StateSyncSource,
-        timestamp: number
-    ): void {
-        this.stateSyncStatus = {
-            lastSyncAt: timestamp,
-            siteCount: sites.length,
-            source,
-            synchronized: true,
-        } satisfies StateSyncStatusSummary;
-    }
-
-    private updateStateSyncStatusFromEvent(
-        event: NormalizedStateSyncStatusEvent
-    ): void {
-        const { action, source, timestamp } = event;
-
-        if (action === STATE_SYNC_ACTION.BULK_SYNC) {
-            const { siteCount, sites, truncated } = event;
-
-            if (truncated === true) {
-                this.knownSiteIdentifiers = new Set();
-                this.stateSyncStatus = {
-                    lastSyncAt: timestamp,
-                    siteCount,
-                    source,
-                    synchronized: false,
-                } satisfies StateSyncStatusSummary;
-                return;
-            }
-
-            this.knownSiteIdentifiers = new Set(
-                sites.map((site) => site.identifier)
-            );
-            this.updateStateSyncStatus(sites, source, timestamp);
-            return;
-        }
-
-        // Update/delete are delta-only.
-        const { delta } = event;
-
-        const { addedSites, removedSiteIdentifiers, updatedSites } = delta;
-
-        for (const removedSiteIdentifier of removedSiteIdentifiers) {
-            this.knownSiteIdentifiers.delete(removedSiteIdentifier);
-        }
-
-        for (const site of addedSites) {
-            this.knownSiteIdentifiers.add(site.identifier);
-        }
-
-        for (const site of updatedSites) {
-            this.knownSiteIdentifiers.add(site.identifier);
-        }
-
-        this.stateSyncStatus = {
-            lastSyncAt: timestamp,
-            siteCount: this.knownSiteIdentifiers.size,
-            source,
-            synchronized: true,
-        } satisfies StateSyncStatusSummary;
-    }
 }

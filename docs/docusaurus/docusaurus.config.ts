@@ -317,6 +317,15 @@ const config: Config = {
                 pages: {
                     editUrl:
                         "https://github.com/Nick2bad4u/Uptime-Watcher/edit/main/docs/docusaurus/src/pages/",
+                    exclude: [
+                        // Declarations (often generated next to CSS modules)
+                        // must never become routable pages.
+                        "**/*.d.ts",
+                        "**/*.d.tsx",
+                        "**/__tests__/**",
+                        "**/*.test.{js,jsx,ts,tsx}",
+                        "**/*.spec.{js,jsx,ts,tsx}",
+                    ],
                     include: ["**/*.{js,jsx,ts,tsx,md,mdx}"],
                     mdxPageComponent: "@theme/MDXPage",
                     path: "src/pages",

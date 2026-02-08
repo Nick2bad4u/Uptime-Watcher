@@ -84,7 +84,6 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
-import type { ApplicationError } from "@shared/utils/errorHandling";
 
 import {
     STATE_SYNC_ACTION,
@@ -118,10 +117,17 @@ import {
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
 import { UptimeOrchestratorSubscriptions } from "./orchestrator/UptimeOrchestratorSubscriptions";
-import { createContextualApplicationError } from "./orchestrator/utils/createContextualApplicationError";
+import {
+    type ContextualErrorFactory,
+    createContextualErrorFactory,
+} from "./orchestrator/utils/contextualErrorFactory";
 import {
     buildMonitorScopedOperationContext,
 } from "./orchestrator/utils/monitorScope";
+import {
+    createRunWithContext,
+    type RunWithContext,
+} from "./orchestrator/utils/runWithContext";
 import {
     createEmitSystemError,
     createEmitUptimeEvent,
@@ -202,28 +208,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     private initializationPromise: Promise<void> | undefined;
 
-    /**
-     * Executes an operation and normalizes thrown errors via
-     * {@link ApplicationError} with contextual metadata.
-     */
-    private async runWithContext<T>(
-        operation: () => Promise<T>,
-        options: {
-            code: string;
-            details?: Record<string, unknown>;
-            message: string;
-            operation: string;
-        }
-    ): Promise<T> {
-        try {
-            return await operation();
-        } catch (error) {
-            throw this.createContextualError({
-                ...options,
-                cause: error,
-            });
-        }
-    }
+    /** Factory for creating contextual {@link ApplicationError} instances. */
+    private readonly createContextualError: ContextualErrorFactory;
+
+    /** Helper for executing async operations with contextual error wrapping. */
+    private readonly runWithContext: RunWithContext;
 
     /**
      * Adds a new site and sets up monitoring for it. Uses transaction-like
@@ -533,35 +522,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Shuts down the orchestrator and removes all event listeners. Ensures
-     * proper cleanup to prevent memory leaks.
-     *
-     * @returns Promise that resolves when shutdown is complete.
-     */
-    public async shutdown(): Promise<void> {
-        try {
-            logger.info("[UptimeOrchestrator] Starting shutdown...");
-
-            this.subscriptions.unregister();
-
-            // Clear all middleware
-            this.clearMiddleware();
-
-            // Add an await for async compliance
-            await Promise.resolve();
-
-            logger.info("[UptimeOrchestrator] Shutdown completed successfully");
-        } catch (error) {
-            throw this.createContextualError({
-                cause: error,
-                code: "ORCHESTRATOR_SHUTDOWN_FAILED",
-                message: "Failed to shut down orchestrator",
-                operation: "orchestrator.shutdown",
-            });
-        }
-    }
-
-    /**
      * Removes a monitor from a site and stops its monitoring. Uses a two-phase
      * commit pattern to ensure atomicity.
      *
@@ -795,6 +755,35 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
+     * Shuts down the orchestrator and removes all event listeners. Ensures
+     * proper cleanup to prevent memory leaks.
+     *
+     * @returns Promise that resolves when shutdown is complete.
+     */
+    public async shutdown(): Promise<void> {
+        try {
+            logger.info("[UptimeOrchestrator] Starting shutdown...");
+
+            this.subscriptions.unregister();
+
+            // Clear all middleware
+            this.clearMiddleware();
+
+            // Async boundary required by lint rules (async + await).
+            await Promise.resolve();
+
+            logger.info("[UptimeOrchestrator] Shutdown completed successfully");
+        } catch (error) {
+            throw this.createContextualError({
+                cause: error,
+                code: "ORCHESTRATOR_SHUTDOWN_FAILED",
+                message: "Failed to shut down orchestrator",
+                operation: "orchestrator.shutdown",
+            });
+        }
+    }
+
+    /**
      * Retrieves the current number of cached sites without touching the
      * database.
      *
@@ -809,23 +798,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         return this.siteManager.getSitesFromCache().length;
     }
 
-    /**
-     * Build an {@link ApplicationError} with standardized logging context.
-     */
-    private createContextualError(options: {
-        cause: unknown;
-        code: string;
-        details?: Record<string, unknown>;
-        message: string;
-        operation: string;
-    }): ApplicationError {
-        return createContextualApplicationError({
-            ...options,
-            diagnosticsLogger,
-            diagnosticsPrefix: "[UptimeOrchestrator]",
-            logger,
-        });
-    }
 
     // Named event handlers for database events
 
@@ -891,6 +863,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.monitorManager = dependencies.monitorManager;
         this.siteManager = dependencies.siteManager;
 
+        this.createContextualError = createContextualErrorFactory({
+            diagnosticsLogger,
+            diagnosticsPrefix: "[UptimeOrchestrator]",
+            logger,
+        });
+
+        this.runWithContext = createRunWithContext(
+            this.createContextualError
+        );
+
         const emitTyped = createEmitUptimeEvent(this);
         const emitSystemError = createEmitSystemError(this);
         this.historyLimitCoordinator = new HistoryLimitCoordinator({
@@ -899,7 +881,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         });
 
         this.siteLifecycleCoordinator = new SiteLifecycleCoordinator({
-            createContextualError: this.createContextualError.bind(this),
+            createContextualError: this.createContextualError,
             emitSystemError,
             monitorManager: this.monitorManager,
             siteManager: this.siteManager,

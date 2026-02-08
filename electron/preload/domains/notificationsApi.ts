@@ -15,6 +15,10 @@ import { NOTIFICATION_CHANNELS } from "@shared/types/preload";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { createVoidInvoker } from "../core/bridgeFactory";
+import {
+    acceptUnusedPreloadArguments,
+    createPreloadDomain,
+} from "../utils/preloadDomainFactory";
 
 /**
  * Renderer-facing notification API exposed via the preload bridge.
@@ -46,18 +50,42 @@ export interface NotificationsApiInterface {
  *
  * @public
  */
-export const notificationsApi: NotificationsApiInterface =
-    ((): NotificationsApiInterface => {
-        try {
-            return {
-                notifyAppEvent: createVoidInvoker(
-                    NOTIFICATION_CHANNELS.notifyAppEvent
-                ),
-                updatePreferences: createVoidInvoker(
-                    NOTIFICATION_CHANNELS.updatePreferences
-                ),
-            } as const;
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+function createNotificationsApi(): NotificationsApiInterface {
+    try {
+        return {
+            notifyAppEvent: createVoidInvoker(
+                NOTIFICATION_CHANNELS.notifyAppEvent
+            ),
+            updatePreferences: createVoidInvoker(
+                NOTIFICATION_CHANNELS.updatePreferences
+            ),
+        } as const;
+    } catch (error) {
+        throw ensureError(error);
+    }
+}
+
+const createNotificationsApiFallback = (
+    unavailableError: Error
+): NotificationsApiInterface => ({
+        notifyAppEvent: (
+            ...args: Parameters<NotificationsApiInterface["notifyAppEvent"]>
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+        updatePreferences: (
+            ...args: Parameters<
+                NotificationsApiInterface["updatePreferences"]
+            >
+        ) => {
+            acceptUnusedPreloadArguments(...args);
+            return Promise.reject(unavailableError);
+        },
+    } as const);
+
+export const notificationsApi: NotificationsApiInterface = createPreloadDomain({
+    create: createNotificationsApi,
+    createFallback: createNotificationsApiFallback,
+    domain: "notificationsApi",
+});
