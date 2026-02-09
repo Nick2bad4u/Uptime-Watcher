@@ -8,11 +8,20 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[4077b52](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4077b52c4633678237f6707a2564c1a74eda2f9a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...4077b52c4633678237f6707a2564c1a74eda2f9a))
+[2987d9f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2987d9fb89ace4c9858ecb53c26c18b2ea57086b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...2987d9fb89ace4c9858ecb53c26c18b2ea57086b))
 
 
 ### ✨ Features
+
+- ✨ [feat] Enhance ESLint configuration and add new linting rules
+ - 🛠️ [fix] Update plugin configurations to include new test file patterns for Vitest
+ - 🎨 [style] Improve readability of ESLint config by adding emoji to region headers
+ - 📝 [docs] Centralize drift-guard rules in the internal plugin's preset to avoid config drift
+ - 🔧 [build] Change package.json to set the project as private
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2987d9f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2987d9fb89ace4c9858ecb53c26c18b2ea57086b)
+
 
 - ✨ [feat] Adds security-focused lint rules
 
@@ -764,6 +773,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 
 ### 🧹 Chores
+
+- Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
+
 
 - Update changelogs for v21.9.0 [skip ci] [`(7bae946)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bae946d612f6da022553c060d732db93223866f)
 
