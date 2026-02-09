@@ -4,6 +4,118 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.1.0] - 2026-02-09
+
+
+[[c2b963e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c2b963e269c1dacb73e4dab1e2c13f27af437d1f)...
+[a731437](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a731437a8c70bd7fe5f89cc3383d2b21ed2738a3)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c2b963e269c1dacb73e4dab1e2c13f27af437d1f...a731437a8c70bd7fe5f89cc3383d2b21ed2738a3))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance ESLint configuration and add new linting rules
+ - 🛠️ [fix] Update plugin configurations to include new test file patterns for Vitest
+ - 🎨 [style] Improve readability of ESLint config by adding emoji to region headers
+ - 📝 [docs] Centralize drift-guard rules in the internal plugin's preset to avoid config drift
+ - 🔧 [build] Change package.json to set the project as private
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2987d9f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2987d9fb89ace4c9858ecb53c26c18b2ea57086b)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Update Dependabot configuration to ignore problematic packages
+ - Ignore "form-data", "qs", and "tough-cookie" to prevent repeated failures in Dependabot runs.
+
+👷 [ci] Enhance Flatpak build workflow for better resource management
+ - Add steps to free disk space before builds and prune devDependencies to reduce size.
+
+📝 [docs] Update TruffleHog configuration to reduce noise
+ - Only fail the job for VERIFIED secrets to minimize false positives.
+
+🎨 [style] Refactor code for better readability and maintainability
+ - Adjust formatting in multiple files for consistent style, including function signatures and comments.
+
+🧪 [test] Improve test reliability for Date error handling
+ - Use a fixed UTC time to avoid flaky assertions in CI environments.
+
+⚡ [perf] Optimize ThemeManager performance tests
+ - Adjust time budget for CI runners to account for variability in execution time.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3f39611)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f396116d81c6786e965c39305f0692407ddc67c)
+
+
+
+### 🧹 Chores
+
+- *(release)* V22.1.0 [skip ci] [`(a731437)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a731437a8c70bd7fe5f89cc3383d2b21ed2738a3)
+
+
+- Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update Docusaurus configuration and blog posts
+ - ✨ Add truncate markers to blog posts for better content management
+ - 🔧 Modify Docusaurus config to include a custom truncate marker
+ - 🎨 Adjust sidebar settings for improved navigation experience
+ - 🛠️ Fix CSS grid definitions to comply with stylelint rules
+ - 📝 Update package.json scripts for linting actions
+ - 🎨 Enhance Storybook configuration with static directory and service worker URL resolution
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(205d1ff)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/205d1ff74a2c351d5219c39af97a5a60deaa1269)
+
+
+- 🔧 [build] Refactor labeler configuration and scripts
+
+ - Update labeler.yml to use array syntax for changed-files patterns
+ - Modify workflow labeler to use pull_request_target for better security
+ - Remove unnecessary checkout step in workflow
+ - Change linting commands in package.json to use a new script for actionlint
+ - Add new script for linting action workflows with customizable options
+ - Improve run-electron.sh for better variable handling and error messages
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e73685e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e73685e70854e914a5a6e5f704315160c89c4158)
+
+
+- 🔧 [build] Update dependencies and configurations
+ - 📦 [dependency] Update axios `^1.13.5`
+ - 📦 Update type-fest from `^5.4.3` to `^5.4.4`
+ - 📦 Upgrade @types/node from `^25.2.1` to `^25.2.2`
+ - 📦 Upgrade putout from `^41.19.0` to `^41.20.0`
+ - 📦 Update stylelint-config-recess-order from `^7.6.0` to `^7.6.1`
+ - 📦 Upgrade stylelint-plugin-defensive-css from `^2.3.0` to `^2.4.0`
+ - 📦 Update typedoc-plugin-dt-links from `^2.0.40` to `^2.0.41`
+
+🎨 [style] Refactor CSS grid layouts for improved readability
+ - 🆕 Add named grid lines to AddSiteForm for better structure
+ - 🆕 Update StatusAlertToaster to use named grid lines for clarity
+ - 🆕 Refactor DashboardOverview to include named grid lines for responsiveness
+ - 🆕 Enhance SiteCompactCard with named grid lines for layout clarity
+ - 🆕 Update SiteTableView to use named grid lines for better organization
+ - 🆕 Refactor Header component to include named grid lines for layout
+ - 🆕 Update AppSidebar to use named grid lines for improved structure
+ - 🆕 Enhance Settings component with named grid lines for clarity
+ - 🆕 Refactor SiteDetails header and history styles to use named grid lines
+ - 🆕 Update index.css to replace `vb` with `dvb` for block size consistency
+ - 🆕 Refactor cards.css to include named grid lines for better layout
+ - 🆕 Update layout.css to use named grid lines for improved readability
+
+🧹 [chore] Clean up stylelint configuration
+ - 🔧 Remove deprecated rules and adjust severity levels for defensive CSS
+ - 🔧 Update defensive CSS rules to improve code quality and maintainability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9d9f94a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d9f94a2e67d67fb791a6f43062bdd3f2e24a831)
+
+
+
+
+
+
 ## [22.0.0] - 2026-02-08
 
 

@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[4077b52](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4077b52c4633678237f6707a2564c1a74eda2f9a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...4077b52c4633678237f6707a2564c1a74eda2f9a))
+[3f39611](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f396116d81c6786e965c39305f0692407ddc67c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...3f396116d81c6786e965c39305f0692407ddc67c))
 
 
 ### ✨ Features
@@ -504,6 +504,27 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9ea2
 
 
 ### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Update Dependabot configuration to ignore problematic packages
+ - Ignore "form-data", "qs", and "tough-cookie" to prevent repeated failures in Dependabot runs.
+
+👷 [ci] Enhance Flatpak build workflow for better resource management
+ - Add steps to free disk space before builds and prune devDependencies to reduce size.
+
+📝 [docs] Update TruffleHog configuration to reduce noise
+ - Only fail the job for VERIFIED secrets to minimize false positives.
+
+🎨 [style] Refactor code for better readability and maintainability
+ - Adjust formatting in multiple files for consistent style, including function signatures and comments.
+
+🧪 [test] Improve test reliability for Date error handling
+ - Use a fixed UTC time to avoid flaky assertions in CI environments.
+
+⚡ [perf] Optimize ThemeManager performance tests
+ - Adjust time budget for CI runners to account for variability in execution time.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3f39611)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f396116d81c6786e965c39305f0692407ddc67c)
+
 
 - 🛠️ [fix] Adds IPC result checks
 
@@ -1817,6 +1838,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
+
 
 - Update changelogs for v21.9.0 [skip ci] [`(7bae946)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bae946d612f6da022553c060d732db93223866f)
 
