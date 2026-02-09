@@ -3131,12 +3131,12 @@ html {
 
 /* Dynamic text selection highlight */
 ::selection {
-    background: linear-gradient(
-        45deg,
-        var(--ifm-color-primary),
-        var(--ifm-color-primary-light)
-    );
-    color: color-mix(in srgb, #27e34f 90%, #ffffff);
+    /*
+     * Note: browsers generally do NOT support gradients on ::selection.
+     * Use a solid color so the rule actually applies.
+     */
+    background-color: rgb(var(--ifm-color-primary-rgb), 0.35);
+    color: #0b0f0b;
     text-shadow: 0 1px 3px rgb(0 0 0 / 30%);
 }
 
