@@ -149,10 +149,8 @@
     display: grid;
     align-items: center;
     gap: 4rem;
-    grid-template-columns:
-        [hero-media] 1fr
-        [hero-text] 1fr
-        [hero-end];
+    /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
+    grid-template-columns: 1fr 1fr;
 }
 
 .heroText {
@@ -846,8 +844,8 @@
     display: grid;
     margin: 0 auto;
     gap: 2rem;
-    /* prettier-ignore */
-    grid-template-columns: [status-grid-start] repeat(auto-fit, [status-grid-col] minmax(300px, 1fr)) [status-grid-end];
+    /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     max-inline-size: 1000px;
 }
 
@@ -1075,10 +1073,8 @@
     display: grid;
     align-items: center;
     gap: 4rem;
-    grid-template-columns:
-        [tech-info] 1fr
-        [tech-code] 1fr
-        [tech-end];
+    /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
+    grid-template-columns: 1fr 1fr;
     /* Prevent content from expanding beyond container */
     max-inline-size: 100%;
     min-inline-size: 0;
@@ -1454,7 +1450,8 @@
 @media screen and (width <= 1200px) {
     .heroContent {
         gap: 3rem;
-        grid-template-columns: [hero-stack] 1fr [hero-end];
+        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
+        grid-template-columns: 1fr;
         text-align: center;
     }
 
@@ -1474,11 +1471,13 @@
 
     .techContent {
         gap: 3rem;
-        grid-template-columns: [tech-stack] 1fr [tech-end];
+        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
+        grid-template-columns: 1fr;
     }
 
     .statusGrid {
-        grid-template-columns: [status-grid-stack] 1fr [status-grid-end];
+        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
+        grid-template-columns: 1fr;
     }
 }
 

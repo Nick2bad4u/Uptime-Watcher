@@ -294,6 +294,8 @@ const config: Config = {
                     postsPerPage: 10,
                     routeBasePath: "blog", // URL: /Uptime-Watcher/blog/
                     showReadingTime: true,
+                    truncateMarker:
+                        /<!--\s*truncate\s*-->|\{\/\*\s*truncate\s*\*\/\}/u,
                 },
                 debug: true,
                 docs: {
@@ -310,7 +312,7 @@ const config: Config = {
                     routeBasePath: "docs",
                     showLastUpdateAuthor: true,
                     showLastUpdateTime: true,
-                    sidebarCollapsed: true,
+                    sidebarCollapsed: false,
                     sidebarCollapsible: true,
                     sidebarPath: "./sidebars.ts",
                 },
@@ -422,10 +424,6 @@ const config: Config = {
                 {
                     items: [
                         {
-                            label: "🛠️ Development Guide",
-                            to: "docs/category/-guides--package-docs",
-                        },
-                        {
                             label: "🏗️ Architecture",
                             to: "/docs/documents/Architecture",
                         },
@@ -434,9 +432,8 @@ const config: Config = {
                             label: "🧪 ESLint Config",
                         },
                         {
-                            label: "📚 Storybook",
-                            to: "/storybook/",
-                        },
+                            href: "https://nick2bad4u.github.io/Uptime-Watcher/storybook/",
+                            label: "📚 Storybook",                        },
                         {
                             label: "📝 TSDoc Standards",
                             to: "/docs/category/-tsdoc-documentation",

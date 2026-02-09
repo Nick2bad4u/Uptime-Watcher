@@ -2971,8 +2971,8 @@ article,
     .responsive-grid {
         display: grid;
         gap: 2rem;
-        /* prettier-ignore */
-        grid-template-columns: [responsive-grid-start] repeat(auto-fit, [responsive-grid-col] minmax(300px, 1fr)) [responsive-grid-end];
+        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
 }
 

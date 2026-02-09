@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Run actionlint for workflow files, excluding Build.yml by default to avoid hangs.
- * Pass --include-build to lint all workflows (including Build.yml).
+ * Run actionlint for workflow files, excluding Build.yml by default to avoid
+ * hangs. Pass --include-build to lint all workflows (including Build.yml).
  *
  * Defaults:
+ *
  * - Disable shellcheck/pyflakes integrations unless explicitly provided.
  * - Enable color output unless -no-color is provided.
  * - Use config/linting/ActionLintConfig.yaml unless -config-file is provided.
@@ -65,13 +66,13 @@ for (let index = 0; index < rawArgs.length; index += 1) {
 const hasFlag = (flag) => userArgs.includes(flag);
 /** @param {string[]} flags */
 const hasAnyFlag = (flags) => flags.some((flag) => hasFlag(flag));
-const useDefaultFiles = fileArgs.length === 0 &&
-    !hasAnyFlag(["-version", "-init-config"]);
+const useDefaultFiles =
+    fileArgs.length === 0 && !hasAnyFlag(["-version", "-init-config"]);
 
 if (!hasFlag("-config-file")) {
     userArgs.push(
         "-config-file",
-        path.join("config", "linting", "ActionLintConfig.yaml"),
+        path.join("config", "linting", "ActionLintConfig.yaml")
     );
 }
 
@@ -113,11 +114,9 @@ if (useDefaultFiles && targetFiles.length === 0) {
     process.exit(1);
 }
 
-const result = spawnSync(
-    "actionlint",
-    [...userArgs, ...targetFiles],
-    { stdio: "inherit" },
-);
+const result = spawnSync("actionlint", [...userArgs, ...targetFiles], {
+    stdio: "inherit",
+});
 
 if (result.error) {
     console.error("Failed to run actionlint:", result.error);

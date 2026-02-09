@@ -142,6 +142,14 @@ const initializeElectronMocks = (): void => {
     installElectronAPIMock();
 };
 
+const resolveMswServiceWorkerUrl = (): string => {
+    if (typeof window === "undefined") {
+        return "mockServiceWorker.js";
+    }
+
+    return new URL("mockServiceWorker.js", window.location.href).toString();
+};
+
 const STORYBOOK_VIEWPORTS = {
     ...INITIAL_VIEWPORTS,
     desktop1440: {
@@ -209,6 +217,9 @@ const withApplicationProviders: Decorator = (storyFn, context) => {
 const mswInitializeOptions: Parameters<typeof initialize>[0] = {
     onUnhandledRequest: "bypass",
     quiet: true,
+    serviceWorker: {
+        url: resolveMswServiceWorkerUrl(),
+    },
 };
 
 // `@storybook/addon-vitest` imports this file in the Vitest (Node) process to
