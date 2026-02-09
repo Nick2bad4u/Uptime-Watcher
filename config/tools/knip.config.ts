@@ -35,7 +35,6 @@ const knipConfig: KnipConfig = {
         "shared/types/themeConfig.ts",
     ],
     ignoreBinaries: [
-        "actionlint",
         "deploy",
         "detect-secrets",
         "docusaurus",
@@ -53,6 +52,7 @@ const knipConfig: KnipConfig = {
         "rimraf",
         "scorecard-check",
         "serve",
+        "shellcheck",
         "sloc",
         "ts-node",
         "tsg",

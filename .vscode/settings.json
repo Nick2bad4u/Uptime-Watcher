@@ -90,7 +90,9 @@
         "vue-ts",
         "tailwindcss"
     ],
-    "eslint.workingDirectories": ["."],
+    "eslint.workingDirectories": [
+        "."
+    ],
     "files.exclude": {
         "**/.cache/**": true,
         "**/.husky/**": true,
@@ -112,6 +114,31 @@
         "**/reports/**": true,
         "**/todo.md": false
     },
+    "files.readonlyExclude": {
+        "**/docs/docusaurus/docs/index.md": true
+    },
+    "files.readonlyInclude": {
+        "**/.cache/**": true,
+        "**/.docusaurus/**": true,
+        "**/.nyc_output/**": true,
+        "**/.stryker-tmp/**": true,
+        "**/coverage/**": true,
+        "**/dist-bench/**": true,
+        "**/dist-scripts-test/**": true,
+        "**/dist-scripts/**": true,
+        "**/dist/**": true,
+        "**/docs/docusaurus/.docusaurus/**": true,
+        "**/docs/docusaurus/build/**": true,
+        "**/docs/docusaurus/docs/**": true,
+        "**/node_modules/**": true,
+        "**/playwright/reports/**": true,
+        "**/playwright/test-results/**": true,
+        "**/release/**": true,
+        "**/report/**": true,
+        "**/reports/**": true,
+        "**/storybook-static/**": true,
+        "**/temp/**": true
+    },
     "files.watcherExclude": {
         "**/.cache/**": true,
         "**/.husky/**": true,
@@ -129,9 +156,13 @@
         "**/docs/docusaurus/node_modules/**": true,
         "**/html/**": true,
         "**/node_modules/**": true,
+        "**/playwright/reports/**": true,
+        "**/playwright/test-results/**": true,
         "**/release/**": true,
         "**/report/**": true,
-        "**/reports/**": true
+        "**/reports/**": true,
+        "**/storybook-static/**": true,
+        "**/temp/**": true
     },
     "markdownlint.config": {
         "extends": ".remarkrc.mjs"
@@ -160,9 +191,13 @@
         "**/docs/docusaurus/node_modules/**": true,
         "**/html/**": true,
         "**/node_modules/**": true,
+        "**/playwright/reports/**": true,
+        "**/playwright/test-results/**": true,
         "**/release/**": true,
         "**/report/**": true,
-        "**/reports/**": true
+        "**/reports/**": true,
+        "**/storybook-static/**": true,
+        "**/temp/**": true
     },
     "sonarlint.connectedMode.project": {
         "connectionId": "nick2bad4u",

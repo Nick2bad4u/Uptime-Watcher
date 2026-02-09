@@ -1,4 +1,4 @@
-/* stylelint-disable scales/font-sizes, scales/line-heights, keyframes-name-pattern -- Docusaurus CSS patterns */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, plugin/use-logical-properties-and-values, plugin/use-logical-units, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion, defensive-css/require-named-grid-lines -- Docusaurus CSS breaks these features */
 
 .features {
     display: flex;
@@ -142,7 +142,7 @@
         flex: 1;
         align-items: flex-start;
         margin: 0;
-        line-height: 1.6;
+        line-height: 1.625;
     }
 
     /* Staggered animation for each card */
@@ -268,7 +268,7 @@
             flex: 1;
             align-items: flex-start;
             margin: 0;
-            line-height: 1.6;
+            line-height: 1.625;
         }
 
         /* Staggered animation for each card */
@@ -316,8 +316,8 @@
     margin: 0 auto;
     color: #a0a0a0;
     font-family: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, monospace;
-    font-size: 1.2rem;
-    line-height: 1.6;
+    font-size: 1.25rem;
+    line-height: 1.625;
     max-inline-size: 600px;
 }
 
@@ -345,7 +345,7 @@
 
     .featuresSubtitle {
         padding: 0 1rem;
-        font-size: 1.1rem;
+        font-size: 1.125rem;
     }
 
     .featureIcon {
