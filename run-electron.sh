@@ -8,13 +8,13 @@ set -e
 APP_DIR="/app/dist-electron"
 ELECTRON_BIN="/app/bin/electron"
 
-if [ -x "$ELECTRON_BIN" ]; then
-    exec "$ELECTRON_BIN" "$APP_DIR/main.js" "$@"
+if [ -x "${ELECTRON_BIN}" ]; then
+    exec "${ELECTRON_BIN}" "${APP_DIR}/main.js" "$@"
 fi
 
-if [ -x "$PWD/node_modules/electron/dist/electron" ]; then
-    exec "$PWD/node_modules/electron/dist/electron" "$APP_DIR/main.js" "$@"
+if [ -x "${PWD}/node_modules/electron/dist/electron" ]; then
+    exec "${PWD}/node_modules/electron/dist/electron" "${APP_DIR}/main.js" "$@"
 fi
 
-echo "Error: Electron binary not found. Expected $ELECTRON_BIN or node_modules/electron/dist/electron"
+echo "Error: Electron binary not found. Expected ${ELECTRON_BIN} or node_modules/electron/dist/electron"
 exit 1

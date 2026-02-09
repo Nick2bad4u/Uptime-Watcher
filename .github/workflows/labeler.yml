@@ -1,8 +1,9 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: "Pull Request Labeler"
 
 on:
-    pull_request:
-        types: [opened, edited, synchronize]
+    pull_request_target:
+        types: [opened, edited, reopened, synchronize]
 
 permissions:
     contents: read
@@ -12,9 +13,6 @@ jobs:
     label:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout
-              uses: actions/checkout@v6.0.2
-
             - name: Label Pull Request
               uses: actions/labeler@v6
               with:

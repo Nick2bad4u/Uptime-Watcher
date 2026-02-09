@@ -2,16 +2,18 @@
 
 "CI/CD":
     - changed-files:
-          - any-glob-to-any-file: ".github/workflows/**"
-          - any-glob-to-any-file: ".github/actions/**"
-          - any-glob-to-any-file: "*.yml"
-          - any-glob-to-any-file: "*.yaml"
+          - any-glob-to-any-file:
+                - ".github/workflows/**"
+                - ".github/actions/**"
+                - "**/*.yml"
+                - "**/*.yaml"
 
 backend:
     - changed-files:
-          - any-glob-to-any-file: "electron/**/*"
-          - any-glob-to-any-file: "server/**/*"
-          - any-glob-to-any-file: "api/**/*"
+          - any-glob-to-any-file:
+                - "electron/**/*"
+                - "server/**/*"
+                - "api/**/*"
 
 "breaking change":
     - body:
@@ -24,18 +26,19 @@ backend:
 
 bug:
     - body:
-          - pattern: "(?i)\b(fix|fixes|bug|error|issue)\b"
+          - pattern: "(?i)\\b(fix|fixes|bug|error|issue)\\b"
     - title:
-          - pattern: "(?i)\b(fix|bug|hotfix|patch)\b"
+          - pattern: "(?i)\\b(fix|bug|hotfix|patch)\\b"
 
 build:
     - changed-files:
-          - any-glob-to-any-file: "build/**/*"
-          - any-glob-to-any-file: "dist/**/*"
-          - any-glob-to-any-file: "webpack*"
-          - any-glob-to-any-file: "rollup*"
-          - any-glob-to-any-file: "esbuild*"
-          - any-glob-to-any-file: "vite*"
+          - any-glob-to-any-file:
+                - "build/**/*"
+                - "dist/**/*"
+                - "webpack*"
+                - "rollup*"
+                - "esbuild*"
+                - "vite*"
     - title:
           - pattern: "(?i)build"
           - pattern: "(?i)bundle"
@@ -43,23 +46,25 @@ build:
 
 configuration:
     - changed-files:
-          - any-glob-to-any-file: "*.config.{js,ts,json}"
-          - any-glob-to-any-file: "*.json"
-          - any-glob-to-any-file: "*.yml"
-          - any-glob-to-any-file: "*.yaml"
-          - any-glob-to-any-file: ".eslint*"
-          - any-glob-to-any-file: ".prettier*"
-          - any-glob-to-any-file: "tsconfig*.json"
-          - any-glob-to-any-file: "vite.config.*"
-          - any-glob-to-any-file: "vitest.config.*"
+          - any-glob-to-any-file:
+                - "*.config.{js,ts,json}"
+                - "*.json"
+                - "*.yml"
+                - "*.yaml"
+                - ".eslint*"
+                - ".prettier*"
+                - "tsconfig*.json"
+                - "vite.config.*"
+                - "vitest.config.*"
 
 dependencies:
     - changed-files:
-          - any-glob-to-any-file: "package.json"
-          - any-glob-to-any-file: "package-lock.json"
-          - any-glob-to-any-file: "yarn.lock"
-          - any-glob-to-any-file: "pnpm-lock.yaml"
-          - any-glob-to-any-file: "**/package.json"
+          - any-glob-to-any-file:
+                - "package.json"
+                - "package-lock.json"
+                - "yarn.lock"
+                - "pnpm-lock.yaml"
+                - "**/package.json"
 
 documentation:
     - body:
@@ -67,9 +72,10 @@ documentation:
           - pattern: "(?i)readme"
           - pattern: "(?i)docs"
     - changed-files:
-          - any-glob-to-any-file: "**/*.md"
-          - any-glob-to-any-file: "docs/**/*"
-          - any-glob-to-any-file: "README*"
+          - any-glob-to-any-file:
+                - "**/*.md"
+                - "docs/**/*"
+                - "README*"
     - title:
           - pattern: "(?i)docs"
           - pattern: "(?i)documentation"
@@ -89,9 +95,10 @@ enhancement:
 
 frontend:
     - changed-files:
-          - any-glob-to-any-file: "src/**/*.{tsx,jsx,ts,js}"
-          - any-glob-to-any-file: "src/components/**/*"
-          - any-glob-to-any-file: "src/pages/**/*"
+          - any-glob-to-any-file:
+                - "src/**/*.{tsx,jsx,ts,js}"
+                - "src/components/**/*"
+                - "src/pages/**/*"
 
 "good first issue":
     - body:
@@ -162,11 +169,12 @@ style:
 
 testing:
     - changed-files:
-          - any-glob-to-any-file: "**/*.test.{js,ts,tsx}"
-          - any-glob-to-any-file: "**/*.spec.{js,ts,tsx}"
-          - any-glob-to-any-file: "tests/**/*"
-          - any-glob-to-any-file: "test/**/*"
-          - any-glob-to-any-file: "__tests__/**/*"
+          - any-glob-to-any-file:
+                - "**/*.test.{js,ts,tsx}"
+                - "**/*.spec.{js,ts,tsx}"
+                - "tests/**/*"
+                - "test/**/*"
+                - "__tests__/**/*"
     - title:
           - pattern: "(?i)test"
           - pattern: "(?i)tests"
