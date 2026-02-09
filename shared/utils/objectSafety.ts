@@ -86,7 +86,7 @@ export function safeObjectAccess<T>(
  * Safely iterate over object entries with type safety and error handling.
  *
  * @param obj - Object to iterate over (can be unknown)
- * @param callback - Function to call for each entry
+ * @param visitor - Function to call for each entry
  * @param context - Optional context for error logging
  *
  * @returns Void

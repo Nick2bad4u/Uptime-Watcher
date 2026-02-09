@@ -4510,16 +4510,28 @@ html {
     }
 
     /* Hide non-essential navbar items on mobile to prevent cramming */
-    .navbar__items--right .navbar__item:not(.persistent) {
+    .navbar__inner .navbar__items--right .navbar__item:not(.persistent) {
         display: none !important;
     }
 
     /* Keep only essential items visible - search and theme toggle */
-    .navbar__items--right .navbar__item.persistent,
-    .navbar__items--right .colorModeToggle_DEke,
-    .navbar__items--right .navbarSearchContainer_Bca1,
-    .navbar__items--right [class*="searchBox"] {
+    .navbar__inner .navbar__items--right .navbar__item.persistent,
+    .navbar__inner .navbar__items--right [class*="colorModeToggle"],
+    .navbar__inner .navbar__items--right .navbar__search,
+    .navbar__inner .navbar__items--right [class*="searchBox"],
+    .navbar__inner .navbar__items--right [class*="DocSearch"] {
         display: flex !important;
+    }
+
+    /* Mobile search input should look like an input, not a black pill */
+    .navbar__inner .navbar__search input,
+    .navbar__inner .navbar__search-input {
+        backdrop-filter: none !important;
+        background: var(--ifm-background-surface-color) !important;
+        border-radius: var(--ifm-global-radius) !important;
+        border-color: var(--ifm-color-emphasis-300) !important;
+        box-shadow: none !important;
+        color: var(--ifm-font-color-base) !important;
     }
 
     /* When navbar sidebar is shown, ensure proper layering */
@@ -4614,20 +4626,20 @@ html {
     }
 
     /* Force hide non-essential navbar items - prevent reappearing when search becomes icon */
-    .navbar__items--right .navbar__item:not(.persistent) {
+    .navbar__inner .navbar__items--right .navbar__item:not(.persistent) {
         display: none !important;
         visibility: hidden !important;
     }
 
     /* Only allow search and theme toggle - even when search is icon-only */
-    .navbar__items--right .navbar__item.persistent {
+    .navbar__inner .navbar__items--right .navbar__item.persistent {
         display: none !important; /* Force hide even persistent items */
     }
 
-    .navbar__items--right .colorModeToggle_DEke,
-    .navbar__items--right .navbarSearchContainer_Bca1,
-    .navbar__items--right [class*="searchBox"],
-    .navbar__items--right [class*="DocSearch"] {
+    .navbar__inner .navbar__items--right [class*="colorModeToggle"],
+    .navbar__inner .navbar__items--right .navbar__search,
+    .navbar__inner .navbar__items--right [class*="searchBox"],
+    .navbar__inner .navbar__items--right [class*="DocSearch"] {
         display: flex !important;
         visibility: visible !important;
     }
@@ -4646,7 +4658,8 @@ html {
 /* Extra small screens - prevent any navbar cramming */
 @media (width <= 480px) {
     /* Absolutely ensure GitHub and Download links never show */
-    .navbar__items--right
+    .navbar__inner
+        .navbar__items--right
         .navbar__item:not([class*="searchBox"]):not([class*="DocSearch"]):not(
             [class*="colorModeToggle"]
         ) {
@@ -4660,7 +4673,7 @@ html {
     }
 
     /* Ensure search doesn't get too cramped */
-    .navbar__items--right {
+    .navbar__inner .navbar__items--right {
         gap: 0.25rem;
     }
 }

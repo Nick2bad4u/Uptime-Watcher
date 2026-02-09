@@ -390,7 +390,7 @@ export class TypedEventBus<
      * Executes middleware in registration order. If any middleware throws an
      * error, the chain is aborted and the error is propagated to the caller.
      *
-     * @param eventName - Name of the event being processed.
+    * @param event - Name of the event being processed.
      * @param data - Event data payload.
      * @param correlationId - Unique ID for tracking this event emission.
      *

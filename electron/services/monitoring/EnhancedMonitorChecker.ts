@@ -442,8 +442,7 @@ export class EnhancedMonitorChecker {
     /**
      * Execute the actual monitor check operation.
      *
-     * @param monitor - Monitor to check
-     * @param operationId - Operation correlation ID
+     * @param context - Correlated monitor check context.
      *
      * @returns Monitor check result with correlation
      */

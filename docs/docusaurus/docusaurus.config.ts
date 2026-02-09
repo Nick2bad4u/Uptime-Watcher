@@ -65,22 +65,22 @@ const pwaMaskIconColor = "#71B041";
 const config: Config = {
     // Set the /<baseUrl>/ pathname under which your site is served
     baseUrl,
+    baseUrlIssueBanner: true,
     clientModules: [modernEnhancementsClientModule],
-
     deploymentBranch: "gh-pages",
-
     favicon: "img/favicon.ico",
+
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: futureConfig,
     i18n: {
         defaultLocale: "en",
         locales: ["en"],
     },
-
     markdown: {
         anchors: {
             maintainCase: true,
         },
+        emoji: true,
         format: "detect",
         hooks: {
             onBrokenMarkdownImages: "warn",
@@ -93,11 +93,13 @@ const config: Config = {
         },
         mermaid: true,
     },
+
+    noIndex: false,
     onBrokenAnchors: "warn",
     onBrokenLinks: "warn",
+    onBrokenMarkdownLinks: "warn",
     onDuplicateRoutes: "warn",
     organizationName: "Nick2bad4u",
-
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
     // This uses our custom typedoc.config.json configuration for better docs
     plugins: [
@@ -268,6 +270,7 @@ const config: Config = {
         //     },
         // ],
     ],
+
     presets: [
         [
             "classic",
@@ -377,9 +380,9 @@ const config: Config = {
         ],
     ],
     projectName: "Uptime-Watcher",
-
     tagline:
         "Cross-platform desktop application for monitoring website uptime and server availability",
+
     themeConfig: {
         announcementBar: {
             backgroundColor: "#2E2A33",
@@ -613,8 +616,9 @@ const config: Config = {
             },
         ],
     ],
-
     title: "Uptime Watcher",
+
+    titleDelimiter: "|",
 
     trailingSlash: false,
 
