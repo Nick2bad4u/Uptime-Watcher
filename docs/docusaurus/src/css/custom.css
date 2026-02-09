@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, plugin/use-logical-properties-and-values, plugin/use-logical-units, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion -- Docusaurus CSS patterns provide explicit reduced-motion fallbacks */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, plugin/use-logical-properties-and-values, plugin/use-logical-units, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion, defensive-css/require-named-grid-lines -- Docusaurus CSS breaks these features */
 
 /**
  * Global CSS overrides for Docusaurus documentation site.
@@ -2246,7 +2246,12 @@ h3 {
     overflow: visible;
 }
 
-[class*="collapseSidebarButtonIcon_kv0_"] > g {
+/*
+ * Docusaurus uses CSS modules for this icon, so the full class name is hashed.
+ * Never target the hash segment (it changes between builds). Match the stable
+ * substring instead.
+ */
+[class*="collapseSidebarButtonIcon"] > g {
     fill: #ffffff;
     stroke: var(--ifm-color-primary-darkest);
 }
@@ -2796,13 +2801,13 @@ article,
         background: var(--glass-backdrop);
         box-shadow: var(--shadow-glow);
         transition: none;
+    }
 
-        & h2,
-        & h3 {
-            background: var(--gradient-primary);
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    .content-card h2,
+    .content-card h3 {
+        background: var(--gradient-primary);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 }
 
@@ -2818,13 +2823,13 @@ article,
     background: var(--glass-backdrop);
     box-shadow: var(--shadow-glow);
     transition: all 0.3s var(--animation-smooth);
+}
 
-    & h2,
-    & h3 {
-        background: var(--gradient-primary);
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
+.content-card h2,
+.content-card h3 {
+    background: var(--gradient-primary);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 /* -------------------------------------------------- */
@@ -2837,65 +2842,9 @@ article,
         position: relative;
         cursor: pointer;
         transition: none;
-
-        @media (prefers-reduced-motion: reduce) {
-            &::before {
-                position: absolute;
-                z-index: -1;
-                border-radius: inherit;
-                background: var(--gradient-accent);
-                content: "";
-                inset-block: 0;
-                inset-inline: 0;
-                opacity: 0;
-                transition: none;
-            }
-        }
-
-        &::before {
-            position: absolute;
-            z-index: -1;
-            border-radius: inherit;
-            background: var(--gradient-accent);
-            content: "";
-            inset-block: 0;
-            inset-inline: 0;
-            opacity: 0;
-            transition: opacity 0.3s var(--animation-smooth);
-        }
-
-        &:hover,
-        &:focus {
-            box-shadow: var(--shadow-elevated);
-            transform: translateY(-3px);
-
-            &::before {
-                opacity: 0.1;
-            }
-        }
-    }
-}
-
-.interactive-hover {
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s var(--animation-smooth);
-
-    @media (prefers-reduced-motion: reduce) {
-        &::before {
-            position: absolute;
-            z-index: -1;
-            border-radius: inherit;
-            background: var(--gradient-accent);
-            content: "";
-            inset-block: 0;
-            inset-inline: 0;
-            opacity: 0;
-            transition: none;
-        }
     }
 
-    &::before {
+    .interactive-hover::before {
         position: absolute;
         z-index: -1;
         border-radius: inherit;
@@ -2904,18 +2853,48 @@ article,
         inset-block: 0;
         inset-inline: 0;
         opacity: 0;
-        transition: opacity 0.3s var(--animation-smooth);
+        transition: none;
     }
 
-    &:hover,
-    &:focus {
+    .interactive-hover:hover,
+    .interactive-hover:focus {
         box-shadow: var(--shadow-elevated);
         transform: translateY(-3px);
-
-        &::before {
-            opacity: 0.1;
-        }
     }
+
+    .interactive-hover:hover::before,
+    .interactive-hover:focus::before {
+        opacity: 0.1;
+    }
+}
+
+.interactive-hover {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s var(--animation-smooth);
+}
+
+.interactive-hover::before {
+    position: absolute;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--gradient-accent);
+    content: "";
+    inset-block: 0;
+    inset-inline: 0;
+    opacity: 0;
+    transition: opacity 0.3s var(--animation-smooth);
+}
+
+.interactive-hover:hover,
+.interactive-hover:focus {
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-3px);
+}
+
+.interactive-hover:hover::before,
+.interactive-hover:focus::before {
+    opacity: 0.1;
 }
 
 /* -------------------------------------------------- */
@@ -2933,25 +2912,9 @@ article,
             #f0f0f0 75%
         );
         background-size: 200px 100%;
-
-        [data-theme="dark"] & {
-            background: linear-gradient(
-                90deg,
-                #2a2a2a 25%,
-                #3a3a3a 50%,
-                #2a2a2a 75%
-            );
-            background-size: 200px 100%;
-        }
     }
-}
 
-.loading-shimmer {
-    animation: shimmer 1.5s infinite;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200px 100%;
-
-    [data-theme="dark"] & {
+    [data-theme="dark"] .loading-shimmer {
         background: linear-gradient(
             90deg,
             #2a2a2a 25%,
@@ -2962,16 +2925,26 @@ article,
     }
 }
 
+.loading-shimmer {
+    animation: shimmer 1.5s infinite;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+}
+
+[data-theme="dark"] .loading-shimmer {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+    background-size: 200px 100%;
+}
+
 /* -------------------------------------------------- */
 
-/* 🎯 Container Queries (Modern Responsive Design)    */
+/* 🎯 Responsive Grid (Media Query)                   */
 
 /* -------------------------------------------------- */
-@container (min-width: 768px) {
+@media (width >= 768px) {
     .responsive-grid {
         display: grid;
         gap: 2rem;
-        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
 }
@@ -3005,10 +2978,10 @@ article,
 .theme-doc-sidebar-container {
     backdrop-filter: blur(10px);
     background: rgb(255 255 255 / 5%);
+}
 
-    [data-theme="dark"] & {
-        background: rgb(0 0 0 / 10%);
-    }
+[data-theme="dark"] .theme-doc-sidebar-container {
+    background: rgb(0 0 0 / 10%);
 }
 
 /* -------------------------------------------------- */
@@ -3158,12 +3131,12 @@ html {
 
 /* Dynamic text selection highlight */
 ::selection {
-    background: linear-gradient(
-        45deg,
-        var(--ifm-color-primary),
-        var(--ifm-color-primary-light)
-    );
-    color: color-mix(in srgb, #27e34f 90%, #ffffff);
+    /*
+     * Note: browsers generally do NOT support gradients on ::selection.
+     * Use a solid color so the rule actually applies.
+     */
+    background-color: rgb(var(--ifm-color-primary-rgb), 0.35);
+    color: #0b0f0b;
     text-shadow: 0 1px 3px rgb(0 0 0 / 30%);
 }
 

@@ -34,7 +34,11 @@ const futureConfig = {
         : {}),
     v4: {
         [removeHeadAttrFlagKey]: true,
-        useCssCascadeLayers: true,
+        // NOTE: Enabling cascade layers currently breaks our production CSS output
+        // (CssMinimizer parsing errors -> large chunks of CSS dropped), which
+        // makes many Infima (--ifm-*) variables undefined across the site.
+        // Re-enable only after verifying the build output CSS is valid.
+        useCssCascadeLayers: false,
     },
 } satisfies Config["future"];
 
@@ -312,7 +316,7 @@ const config: Config = {
                     routeBasePath: "docs",
                     showLastUpdateAuthor: true,
                     showLastUpdateTime: true,
-                    sidebarCollapsed: false,
+                    sidebarCollapsed: true,
                     sidebarCollapsible: true,
                     sidebarPath: "./sidebars.ts",
                 },

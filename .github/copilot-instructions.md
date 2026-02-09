@@ -79,6 +79,9 @@ applyTo: "**"
 - If you are getting truncated output from any command, you should redirect the command to a file and read it using proper tools.
 - Track multi-step tasks in a to-do list, using the todo tool or the `TODO.md` file in the repo root. Always write detailed descriptions of each TODO item so that anyone can understand the task and its context.
 - Use the todo list to break larger tasks into granular, actionable steps. Err on the side of more detailed subtasks for complex changes, but keep the list proportional to the scope of the work.
+- When finishing a task or request, review everything from the lens of code quality, maintainability, readability, and adherence to best practices. If you identify any issues or areas for improvement, address them before finalizing the task.
+- Always prioritize code quality, maintainability, readability, and adherence to best practices over speed or convenience. Never cut corners or take shortcuts that would compromise these principles.
+- Sometimes you may need to take other steps that aren't explicitly requests (running tests, checking for type errors, etc) in order to ensure the quality of your work. Always take these steps when needed, even if they aren't explicitly requested.
 
   </coding>
 

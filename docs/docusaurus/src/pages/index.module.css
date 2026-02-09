@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable declaration-no-important, keyframes-name-pattern, scales/font-sizes, scales/line-heights, time-min-milliseconds, plugin/no-low-performance-animation-properties -- Docusaurus CSS patterns */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, plugin/use-logical-properties-and-values, plugin/use-logical-units, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion, defensive-css/require-named-grid-lines, scales/font-sizes -- Docusaurus CSS breaks these features */
 
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules
@@ -149,7 +149,6 @@
     display: grid;
     align-items: center;
     gap: 4rem;
-    /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
     grid-template-columns: 1fr 1fr;
 }
 
@@ -165,7 +164,7 @@
     font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 3rem;
     font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.125;
     margin-block-end: 1.5rem;
     text-shadow: 2px 2px 4px rgb(0 0 0 / 25%);
 
@@ -175,7 +174,7 @@
 .heroSubtitle {
     color: #cccccc;
     font-size: 1.2rem;
-    line-height: 1.6;
+    line-height: 1.625;
     margin-block-end: 2rem;
     opacity: 0.9;
 }
@@ -755,7 +754,7 @@
     padding: 1.5rem;
     font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 0.9rem;
-    line-height: 1.6;
+    line-height: 1.625;
 }
 
 .terminalLine,
@@ -844,7 +843,6 @@
     display: grid;
     margin: 0 auto;
     gap: 2rem;
-    /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     max-inline-size: 1000px;
 }
@@ -1056,7 +1054,7 @@
     margin: 0;
     color: #cccccc;
     font-style: italic;
-    line-height: 1.6;
+    line-height: 1.625;
 }
 
 /* Tech Section */
@@ -1073,7 +1071,6 @@
     display: grid;
     align-items: center;
     gap: 4rem;
-    /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
     grid-template-columns: 1fr 1fr;
     /* Prevent content from expanding beyond container */
     max-inline-size: 100%;
@@ -1089,7 +1086,7 @@
 .techInfo p {
     color: #cccccc;
     font-size: 1.1rem;
-    line-height: 1.6;
+    line-height: 1.625;
     margin-block-end: 2rem;
 }
 
@@ -1450,7 +1447,6 @@
 @media screen and (width <= 1200px) {
     .heroContent {
         gap: 3rem;
-        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
         grid-template-columns: 1fr;
         text-align: center;
     }
@@ -1471,12 +1467,10 @@
 
     .techContent {
         gap: 3rem;
-        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
         grid-template-columns: 1fr;
     }
 
     .statusGrid {
-        /* stylelint-disable-next-line defensive-css/require-named-grid-lines */
         grid-template-columns: 1fr;
     }
 }
@@ -1938,7 +1932,7 @@
     font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 3rem;
     font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.125;
     margin-block-end: 1.5rem;
     text-shadow: 1px 2px 4px rgb(0 0 0 / 20%);
 }
@@ -1946,7 +1940,7 @@
 [data-theme="light"] .heroSubtitle {
     color: #000000;
     font-size: 1.2rem;
-    line-height: 1.6;
+    line-height: 1.625;
     margin-block-end: 2rem;
     opacity: 0.9;
 }

@@ -83,7 +83,6 @@ const config: StorybookConfig = {
         ...(isTestMode() ? ["@storybook/addon-vitest" as const] : []),
         "msw-storybook-addon",
     ],
-    staticDirs: ["../public"],
     docs: {
         // 👇 See the table below for the list of supported options
         defaultName: "Documentation",
@@ -92,6 +91,7 @@ const config: StorybookConfig = {
         name: "@storybook/react-vite",
         options: {},
     },
+    staticDirs: ["../public"],
     stories: ["./stories/**/*.stories.tsx"],
     viteFinal: (existingConfig, options) => {
         // We deploy Storybook under a sub-path of the GitHub Pages site

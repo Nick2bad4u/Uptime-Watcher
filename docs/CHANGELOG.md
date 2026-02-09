@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[142b425](https://github.com/Nick2bad4u/Uptime-Watcher/commit/142b42503ec2c715eea6e85aae3cf91c1bca4865)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...142b42503ec2c715eea6e85aae3cf91c1bca4865))
+[205d1ff](https://github.com/Nick2bad4u/Uptime-Watcher/commit/205d1ff74a2c351d5219c39af97a5a60deaa1269)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...205d1ff74a2c351d5219c39af97a5a60deaa1269))
 
 
 ### ✨ Features
@@ -986,6 +986,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
+
+
 - Update changelogs for v21.9.0 [skip ci] [`(7bae946)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bae946d612f6da022553c060d732db93223866f)
 
 
@@ -1041,6 +1044,47 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update Docusaurus configuration and blog posts
+ - ✨ Add truncate markers to blog posts for better content management
+ - 🔧 Modify Docusaurus config to include a custom truncate marker
+ - 🎨 Adjust sidebar settings for improved navigation experience
+ - 🛠️ Fix CSS grid definitions to comply with stylelint rules
+ - 📝 Update package.json scripts for linting actions
+ - 🎨 Enhance Storybook configuration with static directory and service worker URL resolution
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(205d1ff)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/205d1ff74a2c351d5219c39af97a5a60deaa1269)
+
+
+- 🔧 [build] Update dependencies and configurations
+ - 📦 [dependency] Update axios `^1.13.5`
+ - 📦 Update type-fest from `^5.4.3` to `^5.4.4`
+ - 📦 Upgrade @types/node from `^25.2.1` to `^25.2.2`
+ - 📦 Upgrade putout from `^41.19.0` to `^41.20.0`
+ - 📦 Update stylelint-config-recess-order from `^7.6.0` to `^7.6.1`
+ - 📦 Upgrade stylelint-plugin-defensive-css from `^2.3.0` to `^2.4.0`
+ - 📦 Update typedoc-plugin-dt-links from `^2.0.40` to `^2.0.41`
+
+🎨 [style] Refactor CSS grid layouts for improved readability
+ - 🆕 Add named grid lines to AddSiteForm for better structure
+ - 🆕 Update StatusAlertToaster to use named grid lines for clarity
+ - 🆕 Refactor DashboardOverview to include named grid lines for responsiveness
+ - 🆕 Enhance SiteCompactCard with named grid lines for layout clarity
+ - 🆕 Update SiteTableView to use named grid lines for better organization
+ - 🆕 Refactor Header component to include named grid lines for layout
+ - 🆕 Update AppSidebar to use named grid lines for improved structure
+ - 🆕 Enhance Settings component with named grid lines for clarity
+ - 🆕 Refactor SiteDetails header and history styles to use named grid lines
+ - 🆕 Update index.css to replace `vb` with `dvb` for block size consistency
+ - 🆕 Refactor cards.css to include named grid lines for better layout
+ - 🆕 Update layout.css to use named grid lines for improved readability
+
+🧹 [chore] Clean up stylelint configuration
+ - 🔧 Remove deprecated rules and adjust severity levels for defensive CSS
+ - 🔧 Update defensive CSS rules to improve code quality and maintainability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9d9f94a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d9f94a2e67d67fb791a6f43062bdd3f2e24a831)
+
 
 - 🔧 [build] Update dependencies and tools versions
 

@@ -278,7 +278,10 @@ const config = defineConfig({
              * standards.
              */
             // Docusaurus documentation files
-            files: ["docs/docusaurus/**/*.{css,scss}"],
+            files: [
+                "**/docs/docusaurus/**/*.{css,scss}",
+                "**/docs/docusaurus/**/*.module.{css,scss}",
+            ],
             rules: {
                 // Relax accessibility rules for documentation UI elements
                 "a11y/content-property-no-static-value": null,
@@ -288,8 +291,30 @@ const config = defineConfig({
                 // flag false positives due to the complex selector duplication.
                 // Disable it for docs to avoid noisy warnings.
                 "a11y/media-prefers-reduced-motion": null,
+                "csstools/use-nesting": null,
+                "declaration-block-no-redundant-longhand-properties": null,
+                "declaration-no-important": null,
+                // Docusaurus + Infima use patterns that do not benefit from (and
+                // sometimes regress under) our stricter app-level rules.
+                //
+                // In particular, named grid lines are a net-negative for docs
+                // because Prettier/formatting + upstream CSS assumptions can
+                // produce subtle layout regressions.
+                "defensive-css/require-named-grid-lines": null,
+                "keyframes-name-pattern": null,
+                "no-descending-specificity": null,
+                "no-duplicate-selectors": null,
+                "order/properties-order": null,
+                "plugin/no-low-performance-animation-properties": null,
                 "plugin/stylelint-group-selectors": null,
+                "plugin/use-logical-properties-and-values": null,
+                "plugin/use-logical-units": null,
+                "scales/font-sizes": null,
+                "scales/line-heights": null,
                 "scss/declaration-property-value-no-unknown": null,
+                "selector-max-specificity": null,
+                "selector-not-notation": null,
+                "time-min-milliseconds": null,
             },
         },
         {
