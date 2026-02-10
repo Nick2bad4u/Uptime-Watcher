@@ -7,14 +7,15 @@ last_reviewed: "2026-02-09"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "sqlite"
-  - "database"
-  - "schema"
-  - "mermaid"
+ - "uptime-watcher"
+ - "sqlite"
+ - "database"
+ - "schema"
+ - "mermaid"
 slug: "/data-models"
 sidebar_label: "🗄️ Data Models"
 ---
+
 # Data Models & Database Schema
 
 These diagrams describe the shape of the local SQLite database and the major relationships between core tables.

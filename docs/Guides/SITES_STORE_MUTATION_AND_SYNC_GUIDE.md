@@ -7,18 +7,19 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "sites"
-  - "stores"
-  - "monitoring"
-  - "state-sync"
-  - "ipc"
+ - "uptime-watcher"
+ - "sites"
+ - "stores"
+ - "monitoring"
+ - "state-sync"
+ - "ipc"
 topics:
-  - "renderer"
-  - "monitoring"
-  - "state-sync"
+ - "renderer"
+ - "monitoring"
+ - "state-sync"
 status: "active"
 ---
+
 # Sites Store Mutation and Sync Guide
 
 This guide captures the **canonical approach** for mutating site data from the

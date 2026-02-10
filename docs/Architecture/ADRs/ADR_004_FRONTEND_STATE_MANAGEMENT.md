@@ -7,13 +7,14 @@ last_reviewed: "2025-12-23"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "zustand"
-  - "state-management"
-  - "frontend"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "zustand"
+ - "state-management"
+ - "frontend"
 ---
+
 # ADR-004: Frontend State Management with Zustand
 
 ## Table of Contents

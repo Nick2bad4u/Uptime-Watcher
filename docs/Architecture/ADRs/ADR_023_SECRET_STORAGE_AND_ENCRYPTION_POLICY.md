@@ -7,17 +7,18 @@ last_reviewed: "2026-01-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "security"
-  - "cloud"
-  - "secrets"
-  - "encryption"
-  - "safeStorage"
-  - "dropbox"
-  - "google-drive"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "security"
+ - "cloud"
+ - "secrets"
+ - "encryption"
+ - "safeStorage"
+ - "dropbox"
+ - "google-drive"
 ---
+
 # ADR-023: Secret Storage and Encryption Policy
 
 ## Status

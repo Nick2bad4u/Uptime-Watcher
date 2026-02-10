@@ -7,14 +7,15 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "database"
-  - "sqlite"
-  - "migrations"
-  - "backups"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "database"
+ - "sqlite"
+ - "migrations"
+ - "backups"
 ---
+
 # ADR-028: Database Schema Versioning and Migrations
 
 ## Status

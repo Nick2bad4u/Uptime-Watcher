@@ -7,13 +7,14 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "style-guide"
-  - "markdown"
+ - "uptime-watcher"
+ - "documentation"
+ - "style-guide"
+ - "markdown"
 topics:
-  - "documentation"
+ - "documentation"
 ---
+
 # Documentation Style Guide
 
 ## Table of Contents

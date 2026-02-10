@@ -7,15 +7,16 @@ last_reviewed: "2026-01-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "sync"
-  - "backup"
-  - "cloud"
-  - "oauth"
-  - "security"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "sync"
+ - "backup"
+ - "cloud"
+ - "oauth"
+ - "security"
 ---
+
 # ADR-015: Cloud Sync and Remote Backup Providers
 
 ## Table of Contents

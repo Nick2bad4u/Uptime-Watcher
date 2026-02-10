@@ -7,12 +7,13 @@ last_reviewed: "2026-02-01"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "monitoring"
-  - "monitor-types"
-  - "implementation"
-  - "guide"
+ - "uptime-watcher"
+ - "monitoring"
+ - "monitor-types"
+ - "implementation"
+ - "guide"
 ---
+
 # Uptime Monitoring System - New Monitor Type Implementation Guide
 
 ## Table of Contents

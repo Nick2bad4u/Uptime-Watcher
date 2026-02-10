@@ -7,15 +7,16 @@ last_reviewed: "2026-02-09"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "electron"
-  - "react"
-  - "ipc"
-  - "mermaid"
+ - "uptime-watcher"
+ - "architecture"
+ - "electron"
+ - "react"
+ - "ipc"
+ - "mermaid"
 slug: "/system-architecture"
 sidebar_label: "🏗️ System Architecture"
 ---
+
 # System Architecture Overview
 
 This page provides a comprehensive view of the Uptime Watcher system architecture using interactive Mermaid diagrams.

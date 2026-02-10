@@ -7,12 +7,13 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "cache"
-  - "configuration"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "cache"
+ - "configuration"
 ---
+
 # ADR-006: Standardized Cache Configuration
 
 ## Table of Contents

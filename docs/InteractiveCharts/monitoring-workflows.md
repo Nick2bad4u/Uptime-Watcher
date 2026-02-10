@@ -7,13 +7,14 @@ last_reviewed: "2026-02-09"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "monitoring"
-  - "workflows"
-  - "mermaid"
+ - "uptime-watcher"
+ - "monitoring"
+ - "workflows"
+ - "mermaid"
 slug: "/monitoring-workflows"
 sidebar_label: "🔄 Monitoring Workflows"
 ---
+
 # Monitoring Workflows
 
 This page focuses on the monitoring lifecycle and the cross-process synchronization model.

@@ -7,11 +7,12 @@ last_reviewed: "2026-02-09"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "mermaid"
-  - "architecture"
+ - "uptime-watcher"
+ - "documentation"
+ - "mermaid"
+ - "architecture"
 ---
+
 # Interactive Architecture Charts
 
 This section contains the Mermaid diagrams used on the documentation site.

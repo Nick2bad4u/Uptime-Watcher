@@ -7,13 +7,14 @@ last_reviewed: "2026-02-01"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "ipc"
-  - "electron"
-  - "communication"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "ipc"
+ - "electron"
+ - "communication"
 ---
+
 # ADR-005: IPC Communication Protocol
 
 ## Table of Contents

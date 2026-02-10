@@ -7,13 +7,14 @@ last_reviewed: "2026-02-09"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "performance"
-  - "benchmarks"
-  - "mermaid"
+ - "uptime-watcher"
+ - "performance"
+ - "benchmarks"
+ - "mermaid"
 slug: "/performance-metrics"
 sidebar_label: "📊 Performance Metrics"
 ---
+
 # Performance Metrics
 
 This page highlights where performance costs show up in Uptime Watcher and which subsystems tend to dominate resource usage.

@@ -7,12 +7,13 @@ last_reviewed: "2026-02-04"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "template"
-  - "repository"
-  - "database"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "repository"
+ - "database"
 ---
+
 # Repository Template
 
 ## Table of Contents
@@ -149,7 +150,11 @@ export class ExampleRepository {
   * @param data - The entity data to create.
   */
  public createInternal(db: Database, data: ExampleRow): void {
-  db.run(EXAMPLE_QUERIES.INSERT, [data.id, data.name, data.createdAt]);
+  db.run(EXAMPLE_QUERIES.INSERT, [
+   data.id,
+   data.name,
+   data.createdAt,
+  ]);
   logger.debug(`[ExampleRepository] Created entity: ${data.id}`);
  }
 
@@ -393,7 +398,11 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([record.id, record.name, record.createdAt]);
+    stmt.run([
+     record.id,
+     record.name,
+     record.createdAt,
+    ]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} entity records (internal)`

@@ -7,12 +7,13 @@ last_reviewed: "2025-12-23"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "storybook"
-  - "vitest"
-  - "playwright"
-  - "testing"
+ - "uptime-watcher"
+ - "storybook"
+ - "vitest"
+ - "playwright"
+ - "testing"
 ---
+
 # Storybook Vitest Component Testing
 
 ## Table of Contents

@@ -7,14 +7,15 @@ last_reviewed: "2026-02-09"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "deployment"
-  - "ci"
-  - "release"
-  - "mermaid"
+ - "uptime-watcher"
+ - "deployment"
+ - "ci"
+ - "release"
+ - "mermaid"
 slug: "/deployment-infrastructure"
 sidebar_label: "🚀 Deployment & Infrastructure"
 ---
+
 # Deployment & Infrastructure
 
 This page documents the _documentation site’s_ high-level deployment model (GitHub Pages) and how the desktop app is distributed.

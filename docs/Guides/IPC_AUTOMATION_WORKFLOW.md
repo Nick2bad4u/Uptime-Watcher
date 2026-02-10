@@ -7,12 +7,13 @@ last_reviewed: "2025-12-17"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "ipc"
-  - "automation"
-  - "codegen"
-  - "ci"
+ - "uptime-watcher"
+ - "ipc"
+ - "automation"
+ - "codegen"
+ - "ci"
 ---
+
 # IPC Automation Workflow
 
 > **Last updated**: 2025-10-26 \

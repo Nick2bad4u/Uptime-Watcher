@@ -7,13 +7,14 @@ last_reviewed: "2026-01-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "validation"
-  - "zod"
-  - "type-safety"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "validation"
+ - "zod"
+ - "type-safety"
 ---
+
 # ADR-009: Layered Validation Strategy with Zod
 
 ## Table of Contents

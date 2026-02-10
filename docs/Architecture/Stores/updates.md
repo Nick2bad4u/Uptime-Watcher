@@ -7,10 +7,11 @@ last_reviewed: "2026-02-01"
 doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
-  - "stores"
-  - "updates"
-  - "ui"
+ - "stores"
+ - "updates"
+ - "ui"
 ---
+
 # Updates store
 
 ## Purpose

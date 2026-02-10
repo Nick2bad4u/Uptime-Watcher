@@ -1,6 +1,5 @@
 # @deprecated
 
-
 <!-- prettier-ignore-start -->
 |    |    |
 | -- | -- |

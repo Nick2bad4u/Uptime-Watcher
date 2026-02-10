@@ -7,11 +7,12 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "playwright"
-  - "electron"
-  - "uptime-watcher"
+ - "testing"
+ - "playwright"
+ - "electron"
+ - "uptime-watcher"
 ---
+
 # 🎭 Playwright Testing Guide for Uptime-Watcher
 
 ## Table of Contents

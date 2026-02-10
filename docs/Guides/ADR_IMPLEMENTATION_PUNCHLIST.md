@@ -7,16 +7,17 @@ last_reviewed: "2025-12-17"
 doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
-  - "architecture"
-  - "adr"
-  - "planning"
-  - "roadmap"
-  - "cloud"
-  - "sync"
-  - "diagnostics"
-  - "maintenance"
-  - "integrations"
+ - "architecture"
+ - "adr"
+ - "planning"
+ - "roadmap"
+ - "cloud"
+ - "sync"
+ - "diagnostics"
+ - "maintenance"
+ - "integrations"
 ---
+
 # ADR implementation punch list
 
 This document is a **consolidated checklist** of work that is still outstanding

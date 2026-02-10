@@ -1,6 +1,5 @@
 # @sealed
 
-
 <!-- prettier-ignore-start -->
 |    |    |
 | -- | -- |

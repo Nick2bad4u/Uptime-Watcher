@@ -7,12 +7,13 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "devtools"
-  - "snippets"
-  - "testing"
-  - "sites"
+ - "uptime-watcher"
+ - "devtools"
+ - "snippets"
+ - "testing"
+ - "sites"
 ---
+
 # Chrome DevTools Snippets for Testing
 
 ## Table of Contents

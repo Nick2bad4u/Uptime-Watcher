@@ -7,12 +7,13 @@ last_reviewed: "2026-01-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "zustand"
-  - "state-management"
-  - "patterns"
-  - "stores"
+ - "uptime-watcher"
+ - "zustand"
+ - "state-management"
+ - "patterns"
+ - "stores"
 ---
+
 # Zustand Store Pattern Decision Guide
 
 ## Table of Contents

@@ -7,11 +7,12 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "coverage"
-  - "vitest"
-  - "uptime-watcher"
+ - "testing"
+ - "coverage"
+ - "vitest"
+ - "uptime-watcher"
 ---
+
 # Zero coverage audit workflow
 
 Older test files occasionally survive refactors and end up exercising no executable code. The `test:zero-coverage` helper runs each Vitest file in isolation with coverage enabled, highlights the ones that never touch instrumented source lines, and leaves the final deletion decision to humans.

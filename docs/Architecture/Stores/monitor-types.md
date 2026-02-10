@@ -7,9 +7,10 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
-  - "stores"
-  - "monitoring"
+ - "stores"
+ - "monitoring"
 ---
+
 # Monitor types store
 
 ## Purpose

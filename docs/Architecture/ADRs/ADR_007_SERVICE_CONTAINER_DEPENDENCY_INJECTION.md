@@ -7,13 +7,14 @@ last_reviewed: "2025-12-17"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "dependency-injection"
-  - "service-container"
-  - "electron"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "dependency-injection"
+ - "service-container"
+ - "electron"
 ---
+
 # ADR-007: Service Container and Dependency Injection Pattern
 
 ## Table of Contents

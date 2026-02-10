@@ -7,13 +7,14 @@ last_reviewed: "2026-01-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "events"
-  - "typed-event-bus"
-  - "ipc"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "events"
+ - "typed-event-bus"
+ - "ipc"
 ---
+
 # ADR-002: Event-Driven Architecture with TypedEventBus
 
 ## Table of Contents

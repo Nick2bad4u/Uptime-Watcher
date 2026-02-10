@@ -7,12 +7,13 @@ last_reviewed: "2026-01-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "testing"
-  - "vitest"
-  - "coverage"
-  - "ci"
+ - "uptime-watcher"
+ - "testing"
+ - "vitest"
+ - "coverage"
+ - "ci"
 ---
+
 # Testing and Coverage Setup
 
 ## Table of Contents

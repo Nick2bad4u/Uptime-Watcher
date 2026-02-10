@@ -7,12 +7,13 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "renderer"
-  - "ipc"
-  - "integration"
-  - "events"
+ - "uptime-watcher"
+ - "renderer"
+ - "ipc"
+ - "integration"
+ - "events"
 ---
+
 # Renderer Integration Guide
 
 ## Table of Contents

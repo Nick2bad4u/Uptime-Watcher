@@ -7,16 +7,17 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "cloud"
-  - "sync"
-  - "backups"
-  - "dropbox"
-  - "google-drive"
-  - "migration"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "cloud"
+ - "sync"
+ - "backups"
+ - "dropbox"
+ - "google-drive"
+ - "migration"
 ---
+
 # ADR-024: Cloud Provider Switching and Migration Policy
 
 ## Status

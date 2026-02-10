@@ -7,16 +7,17 @@ last_reviewed: "2025-12-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "cloud"
-  - "sync"
-  - "backups"
-  - "architecture"
-  - "ipc"
-  - "zod"
-  - "oauth"
-  - "pkce"
-  - "providers"
+ - "cloud"
+ - "sync"
+ - "backups"
+ - "architecture"
+ - "ipc"
+ - "zod"
+ - "oauth"
+ - "pkce"
+ - "providers"
 ---
+
 # Cloud Provider Implementation Guide
 
 This guide explains how to add a new cloud provider (e.g. Google Drive) to Uptime Watcher.

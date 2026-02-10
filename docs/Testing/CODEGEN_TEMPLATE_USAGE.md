@@ -7,11 +7,12 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "playwright"
-  - "codegen"
-  - "uptime-watcher"
+ - "testing"
+ - "playwright"
+ - "codegen"
+ - "uptime-watcher"
 ---
+
 # 🎭 **Using the Codegen Template with Recorded Tests**
 
 ## **🚀 Quick Start (Recommended)**

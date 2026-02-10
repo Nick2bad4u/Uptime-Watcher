@@ -7,12 +7,13 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "styling"
-  - "layout"
-  - "ui"
-  - "css"
+ - "uptime-watcher"
+ - "styling"
+ - "layout"
+ - "ui"
+ - "css"
 ---
+
 # Style & Layout Guide
 
 This guide documents the shared styling primitives that keep the renderer consistent. Follow these practices whenever you add screens, modals, or high-level layout primitives.

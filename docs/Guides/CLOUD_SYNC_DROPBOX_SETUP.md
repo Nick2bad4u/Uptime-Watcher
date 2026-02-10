@@ -7,11 +7,12 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "cloud"
-  - "sync"
-  - "backups"
-  - "dropbox"
+ - "cloud"
+ - "sync"
+ - "backups"
+ - "dropbox"
 ---
+
 # Dropbox Cloud Sync Setup
 
 This app uses **Dropbox OAuth 2.0 Authorization Code + PKCE** with a **loopback redirect** (system browser, no embedded webview, no backend server).

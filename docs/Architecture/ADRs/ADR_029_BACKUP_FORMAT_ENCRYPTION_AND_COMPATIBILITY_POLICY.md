@@ -7,16 +7,17 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "database"
-  - "sqlite"
-  - "backups"
-  - "cloud"
-  - "encryption"
-  - "compatibility"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "database"
+ - "sqlite"
+ - "backups"
+ - "cloud"
+ - "encryption"
+ - "compatibility"
 ---
+
 # ADR-029: Backup Format, Encryption, and Compatibility Policy
 
 ## Status

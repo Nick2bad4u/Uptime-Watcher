@@ -7,14 +7,15 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "template"
-  - "ipc"
-  - "diagnostics"
-  - "validation"
-  - "privacy"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "ipc"
+ - "diagnostics"
+ - "validation"
+ - "privacy"
 ---
+
 # IPC Diagnostics Handler Template
 
 ## Table of Contents

@@ -7,14 +7,15 @@ last_reviewed: "2026-02-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "sync"
-  - "conflict-resolution"
-  - "offline-first"
-  - "sqlite"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "sync"
+ - "conflict-resolution"
+ - "offline-first"
+ - "sqlite"
 ---
+
 # ADR-016: Multi-Device Sync Data Model
 
 ## Table of Contents
@@ -139,8 +140,7 @@ Migration rules:
 
 V1 uses a deterministic merge strategy:
 
-- **Last-write-wins per field** using the {@link CloudSyncWriteKey} ordering.
-- **Last-write-wins per field** using the {@link import("@shared/types/cloudSync").CloudSyncWriteKey} ordering.
+- **Last-write-wins per field** using the `CloudSyncWriteKey` ordering.
   In practice this is `(timestamp, deviceId, opId)`.
 - This ensures determinism even when multiple devices write concurrently or
   remote objects are listed/applied in different orders.

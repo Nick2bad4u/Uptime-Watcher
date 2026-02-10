@@ -1,6 +1,5 @@
 # @example
 
-
 <!-- prettier-ignore-start -->
 |    |    |
 | -- | -- |

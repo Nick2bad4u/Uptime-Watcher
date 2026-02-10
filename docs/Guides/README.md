@@ -7,11 +7,12 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "guides"
-  - "documentation"
-  - "index"
+ - "uptime-watcher"
+ - "guides"
+ - "documentation"
+ - "index"
 ---
+
 # Guides documentation
 
 This directory contains comprehensive guides for developers, contributors, and users of the Uptime Watcher application.

@@ -7,17 +7,18 @@ last_reviewed: "2026-01-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "cloud"
-  - "sync"
-  - "backup"
-  - "ui"
-  - "oauth"
-  - "dropbox"
-  - "google-drive"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "cloud"
+ - "sync"
+ - "backup"
+ - "ui"
+ - "oauth"
+ - "dropbox"
+ - "google-drive"
 ---
+
 # ADR-021: Cloud Provider Selection and Settings UI
 
 ## Table of Contents

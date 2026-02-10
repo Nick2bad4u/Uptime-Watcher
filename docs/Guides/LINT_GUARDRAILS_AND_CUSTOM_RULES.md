@@ -7,12 +7,13 @@ last_reviewed: "2026-02-01"
 doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
-  - "linting"
-  - "eslint"
-  - "architecture"
-  - "guardrails"
-  - "ai-agent"
+ - "linting"
+ - "eslint"
+ - "architecture"
+ - "guardrails"
+ - "ai-agent"
 ---
+
 # Lint guardrails and custom ESLint rules
 
 ## Table of Contents
@@ -54,55 +55,55 @@ import { SITES_CHANNELS } from "@shared/types/preload";
 
 ## Where the rules live
 
-* Plugin implementation: `config/linting/plugins/uptime-watcher.mjs`
-* Shared contract interface guard: `uptime-watcher/no-redeclare-shared-contract-interfaces` (implemented in the plugin)
-* Configuration: `eslint.config.mjs`
+- Plugin implementation: `config/linting/plugins/uptime-watcher.mjs`
+- Shared contract interface guard: `uptime-watcher/no-redeclare-shared-contract-interfaces` (implemented in the plugin)
+- Configuration: `eslint.config.mjs`
 
 ## Current custom rule inventory (enforced)
 
 The following `uptime-watcher/*` rules currently exist and are enabled in
 `eslint.config.mjs` (file-glob scoped):
 
-* IPC + boundary guardrails
-  * `uptime-watcher/electron-no-direct-ipc-handle`
-  * `uptime-watcher/electron-no-direct-ipc-handler-wrappers`
-  * `uptime-watcher/electron-no-direct-ipc-main-import`
-  * `uptime-watcher/electron-no-inline-ipc-channel-literal`
-  * `uptime-watcher/electron-no-inline-ipc-channel-type-argument`
-  * `uptime-watcher/electron-preload-no-direct-ipc-renderer-usage`
-  * `uptime-watcher/electron-preload-no-inline-ipc-channel-constant`
-  * `uptime-watcher/no-inline-ipc-channel-type-literals`
-  * `uptime-watcher/electron-ipc-handler-require-validator`
-  * `uptime-watcher/renderer-no-electron-import`
-  * `uptime-watcher/renderer-no-ipc-renderer-usage`
-  * `uptime-watcher/renderer-no-direct-preload-bridge`
-  * `uptime-watcher/renderer-no-preload-bridge-writes`
-  * `uptime-watcher/renderer-no-direct-networking`
-  * `uptime-watcher/renderer-no-direct-electron-log`
-  * `uptime-watcher/renderer-no-direct-bridge-readiness`
-  * `uptime-watcher/renderer-no-browser-dialogs`
-  * `uptime-watcher/renderer-no-window-open`
-  * `uptime-watcher/renderer-no-import-internal-service-utils`
+- IPC + boundary guardrails
+  - `uptime-watcher/electron-no-direct-ipc-handle`
+  - `uptime-watcher/electron-no-direct-ipc-handler-wrappers`
+  - `uptime-watcher/electron-no-direct-ipc-main-import`
+  - `uptime-watcher/electron-no-inline-ipc-channel-literal`
+  - `uptime-watcher/electron-no-inline-ipc-channel-type-argument`
+  - `uptime-watcher/electron-preload-no-direct-ipc-renderer-usage`
+  - `uptime-watcher/electron-preload-no-inline-ipc-channel-constant`
+  - `uptime-watcher/no-inline-ipc-channel-type-literals`
+  - `uptime-watcher/electron-ipc-handler-require-validator`
+  - `uptime-watcher/renderer-no-electron-import`
+  - `uptime-watcher/renderer-no-ipc-renderer-usage`
+  - `uptime-watcher/renderer-no-direct-preload-bridge`
+  - `uptime-watcher/renderer-no-preload-bridge-writes`
+  - `uptime-watcher/renderer-no-direct-networking`
+  - `uptime-watcher/renderer-no-direct-electron-log`
+  - `uptime-watcher/renderer-no-direct-bridge-readiness`
+  - `uptime-watcher/renderer-no-browser-dialogs`
+  - `uptime-watcher/renderer-no-window-open`
+  - `uptime-watcher/renderer-no-import-internal-service-utils`
 
-* Layer isolation + import conventions
-  * `uptime-watcher/shared-no-outside-imports`
-  * `uptime-watcher/prefer-shared-alias`
-  * `uptime-watcher/prefer-app-alias`
+- Layer isolation + import conventions
+  - `uptime-watcher/shared-no-outside-imports`
+  - `uptime-watcher/prefer-shared-alias`
+  - `uptime-watcher/prefer-app-alias`
 
-* Anti-duplication helpers
-  * `uptime-watcher/no-local-record-guards`
-  * `uptime-watcher/no-local-error-normalizers`
-  * `uptime-watcher/no-deprecated-exports`
-  * `uptime-watcher/no-redeclare-shared-contract-interfaces`
-  * `uptime-watcher/electron-no-local-string-safety-helpers`
-  * `uptime-watcher/electron-no-ad-hoc-error-code-suffix`
-  * `uptime-watcher/electron-sync-no-local-ascii-digits`
-  * `uptime-watcher/electron-cloud-providers-drift-guards`
-  * `uptime-watcher/shared-types-no-local-is-plain-object`
-  * `uptime-watcher/preload-no-local-is-plain-object`
+- Anti-duplication helpers
+  - `uptime-watcher/no-local-record-guards`
+  - `uptime-watcher/no-local-error-normalizers`
+  - `uptime-watcher/no-deprecated-exports`
+  - `uptime-watcher/no-redeclare-shared-contract-interfaces`
+  - `uptime-watcher/electron-no-local-string-safety-helpers`
+  - `uptime-watcher/electron-no-ad-hoc-error-code-suffix`
+  - `uptime-watcher/electron-sync-no-local-ascii-digits`
+  - `uptime-watcher/electron-cloud-providers-drift-guards`
+  - `uptime-watcher/shared-types-no-local-is-plain-object`
+  - `uptime-watcher/preload-no-local-is-plain-object`
 
-* Test stability helpers
-  * `uptime-watcher/test-no-mock-return-value-constructors`
+- Test stability helpers
+  - `uptime-watcher/test-no-mock-return-value-constructors`
 
 ### Vitest constructor mocks
 
@@ -112,22 +113,22 @@ arrow function).
 
 Prefer the shared helper:
 
-* `@shared/test/helpers/vitestConstructors`
-  * `mockConstructableReturnValue(mock, value)`
-  * `mockConstructableReturnValueOnce(mock, value)`
-  * `createMockConstructor(factory)`
+- `@shared/test/helpers/vitestConstructors`
+  - `mockConstructableReturnValue(mock, value)`
+  - `mockConstructableReturnValueOnce(mock, value)`
+  - `createMockConstructor(factory)`
 
-* Logging / docs guardrails
-  * `uptime-watcher/electron-no-console`
-  * `uptime-watcher/tsdoc-no-console-example`
-  * `uptime-watcher/logger-no-error-in-context`
+- Logging / docs guardrails
+  - `uptime-watcher/electron-no-console`
+  - `uptime-watcher/tsdoc-no-console-example`
+  - `uptime-watcher/logger-no-error-in-context`
 
-* Project-specific safety
-  * `uptime-watcher/electron-prefer-read-process-env`
-  * `uptime-watcher/no-onedrive`
+- Project-specific safety
+  - `uptime-watcher/electron-prefer-read-process-env`
+  - `uptime-watcher/no-onedrive`
 
-* Monitor config consistency
-  * `uptime-watcher/monitor-fallback-consistency`
+- Monitor config consistency
+  - `uptime-watcher/monitor-fallback-consistency`
 
 ## How to interpret failures
 
@@ -170,9 +171,9 @@ constants.
 
 Examples that are not allowed:
 
-* `Extract<IpcInvokeChannel, "update-notification-preferences">`
-* `"add-site" satisfies IpcInvokeChannel`
-* `"add-site" as IpcInvokeChannel`
+- `Extract<IpcInvokeChannel, "update-notification-preferences">`
+- `"add-site" satisfies IpcInvokeChannel`
+- `"add-site" as IpcInvokeChannel`
 
 **Fix:** reference the canonical channel constant and let types infer:
 
@@ -191,8 +192,8 @@ error-handling, telemetry, and return typing are centralized.
 
 Related guardrails you will typically see alongside this:
 
-* `uptime-watcher/renderer-no-direct-bridge-readiness`
-* `uptime-watcher/renderer-no-preload-bridge-writes`
+- `uptime-watcher/renderer-no-direct-bridge-readiness`
+- `uptime-watcher/renderer-no-preload-bridge-writes`
 
 ### `uptime-watcher/renderer-no-window-open`
 
@@ -250,17 +251,17 @@ logger.error("Something failed", ensureError(error), { operation: "..." });
 
 Uptime Watcher enforces schema/type correctness primarily via:
 
-* TypeScript strict type-checking (`npm run type-check:all`)
-* Zod linting helpers (e.g. `eslint-plugin-zod` and `eslint-plugin-import-zod`)
+- TypeScript strict type-checking (`npm run type-check:all`)
+- Zod linting helpers (e.g. `eslint-plugin-zod` and `eslint-plugin-import-zod`)
 
 At the moment there is **no** `uptime-watcher/*` rule that specifically enforces
 `schema satisfies type` patterns. If we want stronger enforcement for future
 development (especially AI-assisted edits), a good candidate custom rule would
 be:
 
-* `uptime-watcher/require-zod-schema-satisfies` (future work)
-  * flag Zod schema declarations that are not constrained to a TS contract
-  * flag IPC validators/schemas that are declared but never used at boundaries
+- `uptime-watcher/require-zod-schema-satisfies` (future work)
+  - flag Zod schema declarations that are not constrained to a TS contract
+  - flag IPC validators/schemas that are declared but never used at boundaries
 
 ## Candidate additions (recommended)
 
@@ -273,36 +274,36 @@ Below are candidates that have historically prevented real AI-agent drift.
 ### Candidate `uptime-watcher/*` custom rules
 
 1. **`uptime-watcher/require-ensure-error-in-catch`**
-   * **Goal:** stop `catch (error) { logger.error(error.message) }` when `error`
+   - **Goal:** stop `catch (error) { logger.error(error.message) }` when `error`
      is `unknown`.
-   * **Fix:** require `ensureError(error)` before accessing `.message` or
+   - **Fix:** require `ensureError(error)` before accessing `.message` or
      passing caught values into loggers/toasts.
-   * **Notes:** this complements `@typescript-eslint/use-unknown-in-catch-callback-variable`.
+   - **Notes:** this complements `@typescript-eslint/use-unknown-in-catch-callback-variable`.
 
 2. **`uptime-watcher/no-settings-key-string-literals`**
-   * **Goal:** avoid settings-key drift (`"cloud.provider"` vs
+   - **Goal:** avoid settings-key drift (`"cloud.provider"` vs
      `"cloud.providers"`, etc.).
-   * **Fix:** require settings keys to come from a centralized constant module.
-   * **Notes:** this is powerful but can be noisy; roll out incrementally.
+   - **Fix:** require settings keys to come from a centralized constant module.
+   - **Notes:** this is powerful but can be noisy; roll out incrementally.
 
 3. **`uptime-watcher/store-actions-require-finally-reset`**
-   * **Goal:** prevent “busy flag stuck true” regressions in Zustand stores.
-   * **Fix:** when a store action sets `isX: true`, enforce it resets in a
+   - **Goal:** prevent “busy flag stuck true” regressions in Zustand stores.
+   - **Fix:** when a store action sets `isX: true`, enforce it resets in a
      `finally` block.
-   * **Notes:** only feasible if we standardize action patterns strongly.
+   - **Notes:** only feasible if we standardize action patterns strongly.
 
 ### Candidate config tightening (existing plugins)
 
 These are usually easier than writing custom rules.
 
-* **Raise `canonical/no-re-export`** from `warn` → `error` for production code
+- **Raise `canonical/no-re-export`** from `warn` → `error` for production code
   (keep allowances for module boundaries if needed).
-* **Raise `@typescript-eslint/no-explicit-any`** from `warn` → `error` outside
+- **Raise `@typescript-eslint/no-explicit-any`** from `warn` → `error` outside
   tests/benchmarks/scripts.
-* Enable `eslint-plugin-no-hardcoded-strings` *selectively* for new UI modules
+- Enable `eslint-plugin-no-hardcoded-strings` _selectively_ for new UI modules
   (or at least for user-facing copy in settings pages), if you decide to start
   centralizing copy/strings.
-* Consider enabling a “task-comment hygiene” rule (either a small custom rule
+- Consider enabling a “task-comment hygiene” rule (either a small custom rule
   or a third-party one) that requires task comments to include an issue/ADR
   reference.
 
@@ -325,7 +326,7 @@ Almost never for architecture rules.
 
 If you believe a disable is warranted:
 
-1. explain *why* the canonical helper is not usable
+1. explain _why_ the canonical helper is not usable
 2. keep the scope to a single line
 3. create a follow-up issue to remove it
 
@@ -338,7 +339,7 @@ In addition to `uptime-watcher/*`, the ESLint config enforces a small number of
 high-signal guardrails across `src/`, `electron/`, and `shared/` (excluding all
 test folders and `*.test.*` / `*.spec.*` files):
 
-* `canonical/no-re-export`: **error**
-  * Prevents “helpful” re-export layers that become accidental barrel modules.
-* `@typescript-eslint/no-explicit-any`: **error**
-  * Keeps runtime code strongly typed; tests remain flexible.
+- `canonical/no-re-export`: **error**
+  - Prevents “helpful” re-export layers that become accidental barrel modules.
+- `@typescript-eslint/no-explicit-any`: **error**
+  - Keeps runtime code strongly typed; tests remain flexible.

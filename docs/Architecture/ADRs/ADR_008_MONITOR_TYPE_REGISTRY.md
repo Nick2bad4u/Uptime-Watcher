@@ -7,13 +7,14 @@ last_reviewed: "2026-02-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "monitor-types"
-  - "plugin-architecture"
-  - "extensibility"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "monitor-types"
+ - "plugin-architecture"
+ - "extensibility"
 ---
+
 # ADR-008: Monitor Type Registry and Plugin Architecture
 
 ## Table of Contents
@@ -173,10 +174,10 @@ graph TB
 Each monitor type provides a comprehensive configuration object.
 
 > **Scope note:** In the current implementation, the shared contract exposed to
-> the renderer is {@link import("@shared/types/monitorTypes").MonitorTypeConfig}.
+> the renderer is `MonitorTypeConfig`.
 > The Electron main-process registry extends that contract with main-only
 > concerns (service factories and Zod schemas) via
-> {@link import("@electron/services/monitoring/MonitorTypeRegistry.types").BaseMonitorConfig}.
+> `BaseMonitorConfig`.
 
 ```typescript
 export interface BaseMonitorConfig {

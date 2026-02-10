@@ -7,12 +7,13 @@ last_reviewed: "2026-02-04"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "environment"
-  - "setup"
-  - "development"
-  - "configuration"
+ - "uptime-watcher"
+ - "environment"
+ - "setup"
+ - "development"
+ - "configuration"
 ---
+
 # 🛠️ Environment Setup Guide
 
 ## Table of Contents

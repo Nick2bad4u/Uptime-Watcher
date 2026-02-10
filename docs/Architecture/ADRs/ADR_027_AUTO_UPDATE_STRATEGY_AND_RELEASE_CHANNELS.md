@@ -7,15 +7,16 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "updates"
-  - "electron"
-  - "github-releases"
-  - "squirrel"
-  - "nsis"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "updates"
+ - "electron"
+ - "github-releases"
+ - "squirrel"
+ - "nsis"
 ---
+
 # ADR-027: Auto-Update Strategy and Release Channels
 
 ## Status

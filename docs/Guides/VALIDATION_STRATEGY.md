@@ -7,12 +7,13 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "validation"
-  - "ipc"
-  - "managers"
-  - "repositories"
+ - "uptime-watcher"
+ - "validation"
+ - "ipc"
+ - "managers"
+ - "repositories"
 ---
+
 # Validation Strategy
 
 The application enforces data quality through a layered validation pipeline. Each layer owns a well-defined set of responsibilities so that validation code stays maintainable, testable, and consistent across domains.

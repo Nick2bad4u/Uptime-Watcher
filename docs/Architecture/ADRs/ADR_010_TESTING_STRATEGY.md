@@ -7,14 +7,15 @@ last_reviewed: "2025-12-23"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "testing"
-  - "vitest"
-  - "playwright"
-  - "storybook"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "testing"
+ - "vitest"
+ - "playwright"
+ - "storybook"
 ---
+
 # ADR-010: Multi-Configuration Testing Strategy
 
 ## Table of Contents

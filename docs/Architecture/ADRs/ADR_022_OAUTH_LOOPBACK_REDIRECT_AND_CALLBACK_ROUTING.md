@@ -7,16 +7,17 @@ last_reviewed: "2026-01-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "oauth"
-  - "pkce"
-  - "security"
-  - "cloud"
-  - "dropbox"
-  - "google-drive"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "oauth"
+ - "pkce"
+ - "security"
+ - "cloud"
+ - "dropbox"
+ - "google-drive"
 ---
+
 # ADR-022: OAuth Loopback Redirect and Callback Routing
 
 ## Status

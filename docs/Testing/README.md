@@ -7,11 +7,12 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "testing"
-  - "vitest"
-  - "playwright"
+ - "uptime-watcher"
+ - "testing"
+ - "vitest"
+ - "playwright"
 ---
+
 # Testing documentation
 
 This directory contains comprehensive testing guides, best practices, and methodology documentation for the Uptime Watcher application.

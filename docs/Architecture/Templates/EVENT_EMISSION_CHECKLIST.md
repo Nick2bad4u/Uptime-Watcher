@@ -7,14 +7,15 @@ last_reviewed: "2026-01-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "template"
-  - "events"
-  - "ipc"
-  - "typed-event-bus"
-  - "renderer"
+ - "uptime-watcher"
+ - "architecture"
+ - "template"
+ - "events"
+ - "ipc"
+ - "typed-event-bus"
+ - "renderer"
 ---
+
 # Event Emission Checklist
 
 ## Table of Contents

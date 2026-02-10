@@ -1,6 +1,5 @@
 # @eventProperty
 
-
 <!-- prettier-ignore-start -->
 |    |    |
 | -- | -- |

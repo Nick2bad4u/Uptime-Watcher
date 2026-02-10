@@ -7,12 +7,13 @@ last_reviewed: "2026-01-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "stores"
-  - "settings"
-  - "history-limit"
-  - "configuration"
+ - "uptime-watcher"
+ - "stores"
+ - "settings"
+ - "history-limit"
+ - "configuration"
 ---
+
 # Settings Store and History Limits
 
 This page documents the renderer settings store and, in particular, the

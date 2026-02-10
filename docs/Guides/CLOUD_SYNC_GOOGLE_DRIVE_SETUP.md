@@ -7,13 +7,14 @@ last_reviewed: "2026-01-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "cloud"
-  - "sync"
-  - "backups"
-  - "google-drive"
-  - "oauth"
-  - "pkce"
+ - "cloud"
+ - "sync"
+ - "backups"
+ - "google-drive"
+ - "oauth"
+ - "pkce"
 ---
+
 # Google Drive Cloud Sync Setup
 
 This document explains how to configure Google OAuth credentials so Uptime Watcher can use **Google Drive** as a first-class cloud provider.

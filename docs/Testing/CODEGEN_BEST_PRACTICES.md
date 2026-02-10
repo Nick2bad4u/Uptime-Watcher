@@ -7,11 +7,12 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "playwright"
-  - "codegen"
-  - "uptime-watcher"
+ - "testing"
+ - "playwright"
+ - "codegen"
+ - "uptime-watcher"
 ---
+
 # Playwright Codegen Best Practices
 
 This guide explains how to improve Playwright codegen output to align with our lint standards.

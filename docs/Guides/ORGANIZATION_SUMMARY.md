@@ -7,11 +7,12 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "organization"
-  - "archive"
+ - "uptime-watcher"
+ - "documentation"
+ - "organization"
+ - "archive"
 ---
+
 # 📁 Documentation Organization Summary
 
 > **Clean Slate**: The docs folder has been reorganized to focus on current, actionable documentation while preserving historical materials in an archive.

@@ -7,14 +7,15 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "notifications"
-  - "alerting"
-  - "throttling"
-  - "reliability"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "notifications"
+ - "alerting"
+ - "throttling"
+ - "reliability"
 ---
+
 # ADR-012: Notifications and Alerting Policy
 
 ## Table of Contents

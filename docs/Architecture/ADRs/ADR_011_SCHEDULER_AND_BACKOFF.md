@@ -7,14 +7,15 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "scheduler"
-  - "backoff"
-  - "monitoring"
-  - "timeouts"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "scheduler"
+ - "backoff"
+ - "monitoring"
+ - "timeouts"
 ---
+
 # ADR-011: Scheduler and Backoff Strategy
 
 ## Table of Contents

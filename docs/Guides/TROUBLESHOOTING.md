@@ -7,12 +7,13 @@ last_reviewed: "2026-02-05"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "troubleshooting"
-  - "debugging"
-  - "database"
-  - "performance"
+ - "uptime-watcher"
+ - "troubleshooting"
+ - "debugging"
+ - "database"
+ - "performance"
 ---
+
 # 🔧 Troubleshooting Guide
 
 ## Table of Contents

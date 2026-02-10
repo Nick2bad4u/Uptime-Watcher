@@ -7,15 +7,16 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "configuration"
-  - "settings"
-  - "zustand"
-  - "sqlite"
-  - "electron"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "configuration"
+ - "settings"
+ - "zustand"
+ - "sqlite"
+ - "electron"
 ---
+
 # ADR-030: App Configuration and Settings Persistence Model
 
 ## Status

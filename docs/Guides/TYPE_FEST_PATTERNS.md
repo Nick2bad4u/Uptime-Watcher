@@ -7,12 +7,13 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "type-fest"
-  - "typescript"
-  - "types"
-  - "patterns"
+ - "uptime-watcher"
+ - "type-fest"
+ - "typescript"
+ - "types"
+ - "patterns"
 ---
+
 # Type-fest Integration Patterns
 
 This document provides comprehensive patterns for integrating type-fest utilities consistently across the Uptime-Watcher codebase. These patterns ensure type safety, better developer experience, and maintainable code.

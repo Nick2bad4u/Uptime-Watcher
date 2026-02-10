@@ -7,11 +7,12 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "patterns"
-  - "guidelines"
+ - "uptime-watcher"
+ - "architecture"
+ - "patterns"
+ - "guidelines"
 ---
+
 # Development Patterns Guide
 
 This guide documents the established architectural patterns used throughout the Uptime-Watcher application. Following these patterns ensures consistency, maintainability, predictable behavior, and production-grade quality across the codebase.

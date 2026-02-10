@@ -7,11 +7,12 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "testing"
-  - "vitest"
-  - "tooling"
-  - "uptime-watcher"
+ - "testing"
+ - "vitest"
+ - "tooling"
+ - "uptime-watcher"
 ---
+
 # Test Scripts Verbosity Guide
 
 This document explains the different verbosity levels available for running tests in the Uptime Watcher project.

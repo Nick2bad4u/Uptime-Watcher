@@ -7,13 +7,14 @@ last_reviewed: "2025-12-30"
 doc_category: "guide"
 author: "GitHub Copilot"
 tags:
-  - "architecture"
-  - "validation"
-  - "zod"
-  - "ipc"
-  - "electron"
-  - "renderer"
+ - "architecture"
+ - "validation"
+ - "zod"
+ - "ipc"
+ - "electron"
+ - "renderer"
 ---
+
 # Boundary Validation Strategy
 
 ## Intent

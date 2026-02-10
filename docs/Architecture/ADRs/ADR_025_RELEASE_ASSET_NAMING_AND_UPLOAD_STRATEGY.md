@@ -7,16 +7,17 @@ last_reviewed: "2025-12-23"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "releases"
-  - "github-actions"
-  - "ci"
-  - "electron-builder"
-  - "squirrel"
-  - "windows"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "releases"
+ - "github-actions"
+ - "ci"
+ - "electron-builder"
+ - "squirrel"
+ - "windows"
 ---
+
 # ADR-025: Release Asset Naming and Upload Strategy
 
 ## Status

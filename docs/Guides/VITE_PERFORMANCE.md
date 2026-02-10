@@ -7,12 +7,13 @@ last_reviewed: "2026-01-31"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "vite"
-  - "performance"
-  - "profiling"
-  - "optimization"
+ - "uptime-watcher"
+ - "vite"
+ - "performance"
+ - "profiling"
+ - "optimization"
 ---
+
 # Vite Performance Profiling and Optimization Guide
 
 ## Table of Contents

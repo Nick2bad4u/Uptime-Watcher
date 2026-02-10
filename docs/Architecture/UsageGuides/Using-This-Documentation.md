@@ -7,11 +7,12 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "documentation"
-  - "onboarding"
+ - "uptime-watcher"
+ - "architecture"
+ - "documentation"
+ - "onboarding"
 ---
+
 # Using This Documentation
 
 This guide describes how to navigate the architecture knowledge base effectively and locate the material relevant to your work.

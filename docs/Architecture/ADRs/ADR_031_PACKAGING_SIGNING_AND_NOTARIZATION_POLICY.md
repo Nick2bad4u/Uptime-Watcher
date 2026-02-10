@@ -7,18 +7,19 @@ last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "architecture"
-  - "adr"
-  - "releases"
-  - "packaging"
-  - "electron-builder"
-  - "signing"
-  - "notarization"
-  - "windows"
-  - "macos"
-  - "linux"
+ - "uptime-watcher"
+ - "architecture"
+ - "adr"
+ - "releases"
+ - "packaging"
+ - "electron-builder"
+ - "signing"
+ - "notarization"
+ - "windows"
+ - "macos"
+ - "linux"
 ---
+
 # ADR-031: Packaging, Signing, and Notarization Policy
 
 ## Status
