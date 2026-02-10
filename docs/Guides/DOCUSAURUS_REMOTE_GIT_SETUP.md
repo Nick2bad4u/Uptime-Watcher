@@ -1,20 +1,19 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Documentation Style Guide"
+doc_title: "Documentation Style Guide"
 summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
 created: "2025-11-23"
-last_reviewed: "2025-11-23"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "documentation"
- - "docusaurus"
- - "markdown"
+  - "uptime-watcher"
+  - "documentation"
+  - "docusaurus"
+  - "markdown"
 topics:
- - "documentation"
+  - "documentation"
 ---
-
 # Git Subtree Setup Instructions
 
 ## What's been done:

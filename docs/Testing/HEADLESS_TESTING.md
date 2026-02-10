@@ -1,18 +1,17 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Headless Electron Testing"
+doc_title: "Headless Electron Testing"
 summary: "Explains how Uptime Watcher simulates headless Electron testing via environment flags and window visibility controls, and how Playwright integrates with this mode."
 created: "2025-11-21"
-last_reviewed: "2025-11-06"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "testing"
- - "electron"
- - "playwright"
- - "uptime-watcher"
+  - "testing"
+  - "electron"
+  - "playwright"
+  - "uptime-watcher"
 ---
-
 # Headless Electron Testing
 
 This document explains how headless mode works for Electron testing in this project.

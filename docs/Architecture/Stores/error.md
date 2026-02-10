@@ -1,17 +1,16 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Error store"
+doc_title: "Error store"
 summary: "Reference for the renderer ErrorStore used for consistent error/loading reporting across stores and services."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
-category: "guide"
+last_reviewed: "2025-12-23"
+doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
- - stores
- - error-handling
- - observability
+  - "stores"
+  - "error-handling"
+  - "observability"
 ---
-
 # Error store
 
 ## Purpose

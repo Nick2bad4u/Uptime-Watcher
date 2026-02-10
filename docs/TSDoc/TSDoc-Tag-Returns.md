@@ -1,6 +1,5 @@
----
-title: "@returns"
----
+# @returns
+
 
 <!-- prettier-ignore-start -->
 |    |    |

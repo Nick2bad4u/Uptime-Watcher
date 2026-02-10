@@ -1,6 +1,5 @@
----
-title: "@inheritDoc"
----
+# @inheritDoc
+
 
 <!-- prettier-ignore-start -->
 |    |    |

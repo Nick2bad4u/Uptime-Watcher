@@ -1,22 +1,21 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-032: Support and Diagnostics Data Policy"
+doc_title: "ADR-032: Support and Diagnostics Data Policy"
 summary: "Defines what data can be collected for support/diagnostics, what must be excluded (secrets/PII), and the consent model for exporting diagnostic bundles."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "support"
- - "diagnostics"
- - "privacy"
- - "logging"
- - "security"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "support"
+  - "diagnostics"
+  - "privacy"
+  - "logging"
+  - "security"
 ---
-
 # ADR-032: Support and Diagnostics Data Policy
 
 ## Status

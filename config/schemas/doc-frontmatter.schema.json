@@ -2,7 +2,7 @@
     "$id": "https://uptime-watcher.dev/schemas/doc-frontmatter.schema.json",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "additionalProperties": false,
-    "description": "Schema for YAML front-matter used in Uptime Watcher Markdown guides (e.g. docs/Guides/*.md).",
+    "description": "Schema for YAML front-matter used in Uptime Watcher Markdown guides (e.g. docs/Guides/*.md). NOTE: This schema intentionally avoids TypeDoc-reserved keys (title/category/group) because TypeDoc's external-documents frontmatter handling can change output routing when those keys are present.",
     "properties": {
         "$schema": {
             "description": "Optional JSON Schema reference used by editors to validate front matter.",
@@ -23,14 +23,24 @@
             "minLength": 1,
             "type": "string"
         },
-        "category": {
-            "description": "Coarse document type; currently always 'guide' for docs/Guides/*.md.",
-            "enum": ["guide"],
-            "type": "string"
-        },
         "created": {
             "description": "Date the document was originally created (YYYY-MM-DD), usually from git log.",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+        },
+        "doc_category": {
+            "description": "Coarse document type; currently always 'guide' for docs/Guides/*.md. Named 'doc_category' to avoid TypeDoc frontmatter routing side-effects.",
+            "enum": ["guide"],
+            "type": "string"
+        },
+        "doc_group": {
+            "description": "Optional grouping label for internal tooling. Named 'doc_group' to avoid TypeDoc frontmatter routing side-effects.",
+            "minLength": 1,
+            "type": "string"
+        },
+        "doc_title": {
+            "description": "Human-friendly document title (usually matches the H1). Named 'doc_title' to avoid TypeDoc frontmatter routing side-effects.",
+            "minLength": 1,
             "type": "string"
         },
         "last_reviewed": {
@@ -67,11 +77,6 @@
             "type": "array",
             "uniqueItems": true
         },
-        "title": {
-            "description": "Human-friendly document title (usually matches the H1).",
-            "minLength": 1,
-            "type": "string"
-        },
         "topics": {
             "description": "Optional higher-level areas (e.g. monitoring, architecture).",
             "items": {
@@ -84,12 +89,13 @@
     },
     "required": [
         "author",
-        "category",
         "created",
+        "doc_category",
+        "doc_title",
         "last_reviewed",
         "summary",
         "tags",
-        "title"
+        "schema"
     ],
     "title": "Uptime Watcher Documentation Front Matter",
     "type": "object"

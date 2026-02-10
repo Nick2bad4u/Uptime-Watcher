@@ -1,6 +1,5 @@
----
-title: "@typeParam"
----
+# @typeParam
+
 
 <!-- prettier-ignore-start -->
 |    |    |

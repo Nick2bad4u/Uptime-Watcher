@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-017: External Alert Integrations (Webhooks)"
+doc_title: "ADR-017: External Alert Integrations (Webhooks)"
 summary: "Adds opt-in outbound alert delivery via providers like Slack/Discord webhooks while preserving privacy, validation, and throttling guarantees."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "notifications"
- - "integrations"
- - "webhooks"
- - "security"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "notifications"
+  - "integrations"
+  - "webhooks"
+  - "security"
 ---
-
 # ADR-017: External Alert Integrations (Webhooks)
 
 ## Table of Contents

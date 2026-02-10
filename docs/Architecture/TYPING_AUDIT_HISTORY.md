@@ -1,28 +1,25 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Typing Audit History"
-summary: >-
- Consolidated record of the Electron, renderer, Zustand, and repo-wide typing
- audits produced during the 2025 refactor, including the comprehensive file
- review tracker for future AI/context use.
+doc_title: "Typing Audit History"
+summary: ">-"
 created: "2025-12-01"
-last_reviewed: "2026-01-08"
-category: "guide"
+last_reviewed: "2026-02-01"
+doc_category: "guide"
 author: "AI Pair"
 tags:
- - "typing"
- - "audit"
- - "architecture"
- - "history"
+  - "typing"
+  - "audit"
+  - "architecture"
+  - "history"
 ---
-
 # Typing Audit History
 
-This historical document aggregates every typing-related audit and tracker we
-produced during the November–December 2025 hardening effort. Each section
-retains the original findings, scope, and recommended actions so future
-contributors (human or AI) can quickly regain the necessary context without
-opening multiple standalone files.
+## Table of Contents
+
+1. [1. Electron Platform Audits](#1-electron-platform-audits)
+2. [2. Renderer Audits](#2-renderer-audits)
+3. [3. Zustand Store Typing Audit (2025-11-28)](#3-zustand-store-typing-audit-2025-11-28)
+4. [4. Repo-Wide File Review Tracker (2025-12-01)](#4-repo-wide-file-review-tracker-2025-12-01)
 
 ## 1. Electron Platform Audits
 
@@ -37,13 +34,13 @@ typed-row work (roadmap items 29–31) does not miss hidden edge cases.
 
 #### Status (Database Audit, 2025-11-28)
 
-- Row interfaces (`MonitorRow`, `SiteRow`, `HistoryRow`, `SettingsRow`) live in
+* Row interfaces (`MonitorRow`, `SiteRow`, `HistoryRow`, `SettingsRow`) live in
   `shared/types/database.ts` with documentation, branded identifiers, and runtime
   validators.
-- Typed query helpers in `electron/services/database/utils/typedQueries.ts`
+* Typed query helpers in `electron/services/database/utils/typedQueries.ts`
   expose narrowed accessors (`queryMonitorRow`, `queryHistoryRows`, etc.).
-- Core repositories now consume typed rows, eliminating `UnknownRecord` returns.
-- Repository + helper tests (e.g.,
+* Core repositories now consume typed rows, eliminating `UnknownRecord` returns.
+* Repository + helper tests (e.g.,
   `electron/test/services/database/utils/typedQueries.test.ts`) enforce the new
   inference paths.
 
@@ -79,13 +76,13 @@ surface inside `electron/events/**/*` so tasks 26–27 could be scoped precisely
 
 #### Findings (Events Audit)
 
-- `eventTypes.ts` still exposes `{ [key: string]: unknown }` metadata bags and
+* `eventTypes.ts` still exposes `{ [key: string]: unknown }` metadata bags and
   lacks discriminated unions for lifecycle payloads.
-- `TypedEventBus.ts` allowed primitive payloads, returned `unknown` from
+* `TypedEventBus.ts` allowed primitive payloads, returned `unknown` from
   `createEnhancedData`, and gave middleware no typed metadata.
-- `ScopedSubscriptionManager` duplicated listener types and skipped the string
+* `ScopedSubscriptionManager` duplicated listener types and skipped the string
   constraint enforced by `TypedEventBus`.
-- Middleware typing (after roadmap item 27) now respects the refined generics—no
+* Middleware typing (after roadmap item 27) now respects the refined generics—no
   outstanding issues remain there.
 
 #### Usage Hotspots & Next Steps (Events Audit)
@@ -114,10 +111,10 @@ the remaining `UnknownRecord` placeholders with branded contracts.
 
 #### Recommendations (Operational Hooks Audit)
 
-- Introduce discriminated context unions and branded metadata per operation
+* Introduce discriminated context unions and branded metadata per operation
   kind.
-- Thread `TResult` through payloads and lifecycle events.
-- Make hook configs generic over `{ Context, Metadata, Result }` and ensure
+* Thread `TResult` through payloads and lifecycle events.
+* Make hook configs generic over `{ Context, Metadata, Result }` and ensure
   strategy callbacks share those generics.
 
 ## 2. Renderer Audits
@@ -142,10 +139,10 @@ payloads (`string`, `Record<string, unknown>`, etc.) rather than shared types.
 
 #### Recommendations (Renderer Hooks Audit)
 
-- Replace every ad-hoc monitor type string with the shared `MonitorType`
+* Replace every ad-hoc monitor type string with the shared `MonitorType`
   literal union (or a tagged subtype).
-- Surface explicit "unknown type" states instead of returning empty arrays.
-- Thread typed identifiers through Zustand selectors and helper hooks so the UI
+* Surface explicit "unknown type" states instead of returning empty arrays.
+* Thread typed identifiers through Zustand selectors and helper hooks so the UI
   can no longer dispatch invalid `(siteIdentifier, monitorId)` tuples.
 
 ### 2.2 Renderer Types Typing Audit (2025-11-28)
@@ -355,7 +352,7 @@ the rationale for its modifications.
 | src/test/components/SiteDetails/SiteDetails.modal-behavior.test.tsx        | Reviewed | Analytics fixtures now populate percentileMetrics, ensuring overrides remain consistent.                                                                   |
 | src/test/events/event-system.comprehensive-fuzzing.test.ts                 | Reviewed | Fuzz tests now use UptimeEventName type instead of casting to keyof UptimeEvents.                                                                          |
 | src/test/events/events.comprehensive-fuzzing.test.ts                       | Reviewed | Renderer-focused fuzz tests now rely on UptimeEventName typing instead of manual casts.                                                                    |
-| src/test/hooks/site/useSiteDetails.branch-coverage-new\.test.ts            | Reviewed | Analytics mocks now include percentileMetrics and validation stubs provide metadata/warnings to match new result type.                                     |
+| src/test/hooks/site/useSiteDetails.branch-coverage-new.test.ts            | Reviewed | Analytics mocks now include percentileMetrics and validation stubs provide metadata/warnings to match new result type.                                     |
 | src/test/hooks/site/useSiteDetails.branch-coverage.test.ts                 | Reviewed | Validation mocks now include metadata/warnings arrays to satisfy new result contract.                                                                      |
 | src/test/hooks/site/useSiteDetails.test.ts                                 | Reviewed | Validation mocks now return metadata/warnings arrays, aligning with new result type.                                                                       |
 | src/test/ipc/ipc.comprehensive-fuzzing.test.ts                             | Reviewed | Fuzz suite now uses typed IpcInvokeChannel helpers, richer arbitraries, and realistic site/monitor payloads.                                               |
@@ -380,7 +377,7 @@ the rationale for its modifications.
 | src/utils/status.ts                                                        | Reviewed | Added branded StatusIdentifier type and updated createStatusIdentifier to return Tagged CamelCase string.                                                  |
 | tests/strictTests/electron/utils/database/databaseInitializer.test.ts      | Reviewed | Strict tests now assert serialized error payloads and use UptimeEventName type for channel assertions.                                                     |
 
----
+***
 
 Maintaining this single historical record should keep future audits and AI
 assistants grounded in the decisions already made during the 2025 refactor.

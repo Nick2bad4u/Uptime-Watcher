@@ -1,18 +1,17 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Guides Documentation"
+doc_title: "Guides Documentation"
 summary: "Overview of the docs/Guides directory, its structure, and how to navigate and contribute to Uptime Watcher guides."
 created: "2025-09-18"
-last_reviewed: "2025-12-14"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "guides"
- - "documentation"
- - "index"
+  - "uptime-watcher"
+  - "guides"
+  - "documentation"
+  - "index"
 ---
-
 # Guides documentation
 
 This directory contains comprehensive guides for developers, contributors, and users of the Uptime Watcher application.

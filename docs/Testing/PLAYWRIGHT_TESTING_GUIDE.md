@@ -1,18 +1,17 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Playwright Testing Guide for Uptime-Watcher"
+doc_title: "Playwright Testing Guide for Uptime-Watcher"
 summary: "Configuration, workflows, and troubleshooting tips for running Playwright tests against the Uptime Watcher Electron application."
 created: "2025-11-21"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "testing"
- - "playwright"
- - "electron"
- - "uptime-watcher"
+  - "testing"
+  - "playwright"
+  - "electron"
+  - "uptime-watcher"
 ---
-
 # 🎭 Playwright Testing Guide for Uptime-Watcher
 
 ## Table of Contents

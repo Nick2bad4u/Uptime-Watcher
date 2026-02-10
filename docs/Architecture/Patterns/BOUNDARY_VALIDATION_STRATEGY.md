@@ -1,20 +1,19 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Boundary Validation Strategy"
+doc_title: "Boundary Validation Strategy"
 summary: "Standard pattern for parsing, validating, and transporting untrusted data across IPC and persistence boundaries."
 created: "2025-12-29"
 last_reviewed: "2025-12-30"
-category: "guide"
+doc_category: "guide"
 author: "GitHub Copilot"
 tags:
- - "architecture"
- - "validation"
- - "zod"
- - "ipc"
- - "electron"
- - "renderer"
+  - "architecture"
+  - "validation"
+  - "zod"
+  - "ipc"
+  - "electron"
+  - "renderer"
 ---
-
 # Boundary Validation Strategy
 
 ## Intent

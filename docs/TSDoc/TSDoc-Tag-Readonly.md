@@ -1,6 +1,5 @@
----
-title: "@readonly"
----
+# @readonly
+
 
 <!-- prettier-ignore-start -->
 |    |    |

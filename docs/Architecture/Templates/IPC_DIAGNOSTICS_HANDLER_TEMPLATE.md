@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "IPC Diagnostics Handler Template"
+doc_title: "IPC Diagnostics Handler Template"
 summary: "Pattern for diagnostics/report IPC handlers with validation, redaction, and typed responses."
 created: "2025-12-04"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "template"
- - "ipc"
- - "diagnostics"
- - "validation"
- - "privacy"
+  - "uptime-watcher"
+  - "architecture"
+  - "template"
+  - "ipc"
+  - "diagnostics"
+  - "validation"
+  - "privacy"
 ---
-
 # IPC Diagnostics Handler Template
 
 ## Table of Contents

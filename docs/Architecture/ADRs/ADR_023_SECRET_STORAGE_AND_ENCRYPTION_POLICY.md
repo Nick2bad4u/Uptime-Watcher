@@ -1,24 +1,23 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-023: Secret Storage and Encryption Policy"
+doc_title: "ADR-023: Secret Storage and Encryption Policy"
 summary: "Defines how the app stores OAuth tokens and other secrets for cloud providers, including encryption-at-rest expectations, safe fallbacks, and logging redaction rules."
 created: "2025-12-15"
 last_reviewed: "2026-01-11"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "security"
- - "cloud"
- - "secrets"
- - "encryption"
- - "safeStorage"
- - "dropbox"
- - "google-drive"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "security"
+  - "cloud"
+  - "secrets"
+  - "encryption"
+  - "safeStorage"
+  - "dropbox"
+  - "google-drive"
 ---
-
 # ADR-023: Secret Storage and Encryption Policy
 
 ## Status

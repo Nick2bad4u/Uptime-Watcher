@@ -1,20 +1,19 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Architecture Documentation Index"
+doc_title: "Architecture Documentation Index"
 summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2026-02-02"
-category: "guide"
+last_reviewed: "2026-02-03"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "patterns"
- - "templates"
- - "standards"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "patterns"
+  - "templates"
+  - "standards"
 ---
-
 # Architecture Documentation Index
 
 ## Table of Contents

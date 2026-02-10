@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "UI Feature Development Guide"
+doc_title: "UI Feature Development Guide"
 summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
 created: "2025-08-02"
-last_reviewed: "2026-01-26"
-category: "guide"
+last_reviewed: "2026-02-05"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "ui"
- - "react"
- - "zustand"
- - "development"
+  - "uptime-watcher"
+  - "ui"
+  - "react"
+  - "zustand"
+  - "development"
 ---
-
 # UI Feature Development Guide
 
 This document provides comprehensive guidelines for adding and modifying UI features in the Uptime Watcher application, based on lessons learned from implementing the site monitoring functionality and modal improvements.

@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-020: Support Diagnostics Bundle Export"
+doc_title: "ADR-020: Support Diagnostics Bundle Export"
 summary: "Defines a privacy-preserving diagnostics bundle export (logs + sanitized config + optional snapshots) for support and troubleshooting workflows."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "diagnostics"
- - "support"
- - "privacy"
- - "export"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "diagnostics"
+  - "support"
+  - "privacy"
+  - "export"
 ---
-
 # ADR-020: Support Diagnostics Bundle Export
 
 ## Table of Contents

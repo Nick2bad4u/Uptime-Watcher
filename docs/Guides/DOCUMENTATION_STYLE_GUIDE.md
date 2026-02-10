@@ -1,20 +1,19 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Documentation Style Guide"
+doc_title: "Documentation Style Guide"
 summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
 created: "2025-09-18"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "documentation"
- - "style-guide"
- - "markdown"
+  - "uptime-watcher"
+  - "documentation"
+  - "style-guide"
+  - "markdown"
 topics:
- - "documentation"
+  - "documentation"
 ---
-
 # Documentation Style Guide
 
 ## Table of Contents
@@ -40,11 +39,11 @@ Each file should start with:
 ```yaml
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Human-friendly document title"
+doc_title: "Human-friendly document title"
 summary: "One-line description used in indexes and search."
 created: "YYYY-MM-DD" # usually taken from `git log --diff-filter=A`
 last_reviewed: "YYYY-MM-DD" # last date the content was reviewed/updated
-category: "guide" # coarse type; currently always "guide" for Guides
+doc_category: "guide" # coarse type; currently always "guide" for Guides
 author: "GitHub username or name"
 tags:
  - "keyword-one"
@@ -56,7 +55,7 @@ Notes:
 
 - **schema**: Always points to `../../config/schemas/doc-frontmatter.schema.json` for files directly under `docs/Guides/` and `docs/Architecture/`. For files in subdirectories (for example, `docs/Architecture/ADRs/*`), adjust the relative path accordingly (for example, `../../../config/schemas/doc-frontmatter.schema.json`).
 
-- **title**: Matches the main H1 where practical but does not need to include emojis or decorative prefixes.
+- **doc\_title**: Matches the main H1 where practical but does not need to include emojis or decorative prefixes.
 
 - **summary**: Single sentence, kept short enough to show in an index or hover tooltip.
 
@@ -68,7 +67,7 @@ Notes:
 
 - **last\_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
 
-- **category**: For now, this is simply `"guide"` for all files under `docs/Guides/` and `docs/Architecture/**`. If we introduce other doc types later (for example, `"adr"`, `"reference"`), this can be extended.
+- **doc\_category**: For now, this is simply `"guide"` for all files under `docs/Guides/` and `docs/Architecture/**`. If we introduce other doc types later (for example, `"adr"`, `"reference"`), this can be extended.
 
 - **author**: Use a consistent handle (for example, `"Nick2bad4u"`). Multiple authors are fine but uncommon.
 

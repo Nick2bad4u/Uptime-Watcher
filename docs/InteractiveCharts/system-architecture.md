@@ -1,10 +1,10 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "System Architecture Overview"
+doc_title: "System Architecture Overview"
 summary: "High-level architecture diagrams and key component interactions."
 created: "2026-02-09"
 last_reviewed: "2026-02-09"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
   - "uptime-watcher"
@@ -13,10 +13,9 @@ tags:
   - "react"
   - "ipc"
   - "mermaid"
-slug: /system-architecture
+slug: "/system-architecture"
 sidebar_label: "🏗️ System Architecture"
 ---
-
 # System Architecture Overview
 
 This page provides a comprehensive view of the Uptime Watcher system architecture using interactive Mermaid diagrams.

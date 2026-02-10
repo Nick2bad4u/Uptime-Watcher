@@ -1,6 +1,5 @@
----
-title: "@label"
----
+# @label
+
 
 <!-- prettier-ignore-start -->
 |    |    |

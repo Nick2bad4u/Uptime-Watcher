@@ -1,23 +1,22 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-029: Backup Format, Encryption, and Compatibility Policy"
+doc_title: "ADR-029: Backup Format, Encryption, and Compatibility Policy"
 summary: "Defines the on-disk and cloud backup artifact format expectations, how encryption is versioned, and what compatibility guarantees the app provides across versions."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "database"
- - "sqlite"
- - "backups"
- - "cloud"
- - "encryption"
- - "compatibility"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "database"
+  - "sqlite"
+  - "backups"
+  - "cloud"
+  - "encryption"
+  - "compatibility"
 ---
-
 # ADR-029: Backup Format, Encryption, and Compatibility Policy
 
 ## Status

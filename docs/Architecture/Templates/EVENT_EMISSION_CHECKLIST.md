@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Event Emission Checklist"
+doc_title: "Event Emission Checklist"
 summary: "Checklist for defining and emitting typed events across main/renderer aligned with RendererEventPayloadMap."
 created: "2025-12-04"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2026-01-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "template"
- - "events"
- - "ipc"
- - "typed-event-bus"
- - "renderer"
+  - "uptime-watcher"
+  - "architecture"
+  - "template"
+  - "events"
+  - "ipc"
+  - "typed-event-bus"
+  - "renderer"
 ---
-
 # Event Emission Checklist
 
 ## Table of Contents

@@ -1,22 +1,21 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-030: App Configuration and Settings Persistence Model"
+doc_title: "ADR-030: App Configuration and Settings Persistence Model"
 summary: "Defines where configuration and user settings live (process env, renderer localStorage, and SQLite), which source is authoritative, and how to add new settings safely."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "configuration"
- - "settings"
- - "zustand"
- - "sqlite"
- - "electron"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "configuration"
+  - "settings"
+  - "zustand"
+  - "sqlite"
+  - "electron"
 ---
-
 # ADR-030: App Configuration and Settings Persistence Model
 
 ## Status

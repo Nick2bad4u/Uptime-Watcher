@@ -1,18 +1,17 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Playwright Codegen Best Practices"
+doc_title: "Playwright Codegen Best Practices"
 summary: "How to post-process and improve Playwright codegen output so generated tests comply with this project's linting and structural standards."
 created: "2025-11-21"
-last_reviewed: "2025-11-06"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "testing"
- - "playwright"
- - "codegen"
- - "uptime-watcher"
+  - "testing"
+  - "playwright"
+  - "codegen"
+  - "uptime-watcher"
 ---
-
 # Playwright Codegen Best Practices
 
 This guide explains how to improve Playwright codegen output to align with our lint standards.

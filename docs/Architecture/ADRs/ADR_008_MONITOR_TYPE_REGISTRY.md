@@ -1,20 +1,19 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-008: Monitor Type Registry and Plugin Architecture"
+doc_title: "ADR-008: Monitor Type Registry and Plugin Architecture"
 summary: "Establishes an extensible plugin-based system for registering monitor types with dynamic validation schemas, UI configuration, service factories, and version tagging (for future migration support)."
 created: "2025-11-25"
-last_reviewed: "2026-01-11"
-category: "guide"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "monitor-types"
- - "plugin-architecture"
- - "extensibility"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "monitor-types"
+  - "plugin-architecture"
+  - "extensibility"
 ---
-
 # ADR-008: Monitor Type Registry and Plugin Architecture
 
 ## Table of Contents

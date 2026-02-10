@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Technology Evolution Guide"
+doc_title: "Technology Evolution Guide"
 summary: "Chronological guide to Uptime Watcher's architectural evolution, migrations, and key technical decisions."
 created: "2025-08-05"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2026-01-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "evolution"
- - "migrations"
- - "history"
+  - "uptime-watcher"
+  - "architecture"
+  - "evolution"
+  - "migrations"
+  - "history"
 ---
-
 # 🔄 Technology Evolution Guide
 
 > **Migration History**: Understanding how Uptime Watcher evolved to its current sophisticated architecture.

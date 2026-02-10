@@ -1,17 +1,16 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Updates store"
+doc_title: "Updates store"
 summary: "Reference for the renderer store managing app update availability and user-triggered update actions."
 created: "2025-12-12"
 last_reviewed: "2026-02-01"
-category: "guide"
+doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
- - stores
- - updates
- - ui
+  - "stores"
+  - "updates"
+  - "ui"
 ---
-
 # Updates store
 
 ## Purpose

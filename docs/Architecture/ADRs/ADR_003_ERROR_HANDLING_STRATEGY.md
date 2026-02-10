@@ -1,19 +1,18 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-003: Comprehensive Error Handling Strategy"
+doc_title: "ADR-003: Comprehensive Error Handling Strategy"
 summary: "Establishes a comprehensive multi-layer error handling strategy with shared utilities, store-safe patterns, and production-grade resilience."
 created: "2025-08-05"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "error-handling"
- - "resilience"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "error-handling"
+  - "resilience"
 ---
-
 # ADR-003: Comprehensive Error Handling Strategy
 
 ## Table of Contents

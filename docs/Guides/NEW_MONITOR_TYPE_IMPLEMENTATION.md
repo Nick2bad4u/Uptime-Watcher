@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "New Monitor Type Implementation Guide"
+doc_title: "New Monitor Type Implementation Guide"
 summary: "End-to-end guide for implementing a new monitor type in the Uptime Monitoring System."
 created: "2025-08-01"
 last_reviewed: "2026-02-01"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "monitoring"
- - "monitor-types"
- - "implementation"
- - "guide"
+  - "uptime-watcher"
+  - "monitoring"
+  - "monitor-types"
+  - "implementation"
+  - "guide"
 ---
-
 # Uptime Monitoring System - New Monitor Type Implementation Guide
 
 ## Table of Contents

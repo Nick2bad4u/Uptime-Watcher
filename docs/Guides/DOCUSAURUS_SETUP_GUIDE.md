@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Docusaurus Documentation Setup Guide"
+doc_title: "Docusaurus Documentation Setup Guide"
 summary: "Setup and architecture of the Docusaurus + TypeDoc documentation site for Uptime Watcher."
 created: "2025-08-22"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "docusaurus"
- - "typedoc"
- - "documentation"
- - "github-pages"
+  - "uptime-watcher"
+  - "docusaurus"
+  - "typedoc"
+  - "documentation"
+  - "github-pages"
 ---
-
 # Docusaurus Documentation Setup Guide
 
 ## Table of Contents

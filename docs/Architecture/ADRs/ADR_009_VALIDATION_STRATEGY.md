@@ -1,20 +1,19 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-009: Layered Validation Strategy with Zod"
+doc_title: "ADR-009: Layered Validation Strategy with Zod"
 summary: "Establishes a multi-layered validation architecture using Zod schemas for IPC boundaries, business rules in managers, and persistence constraints in repositories."
 created: "2025-11-25"
 last_reviewed: "2026-01-11"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "validation"
- - "zod"
- - "type-safety"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "validation"
+  - "zod"
+  - "type-safety"
 ---
-
 # ADR-009: Layered Validation Strategy with Zod
 
 ## Table of Contents

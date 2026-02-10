@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-018: Maintenance Windows and Scheduled Silencing"
+doc_title: "ADR-018: Maintenance Windows and Scheduled Silencing"
 summary: "Defines scheduled silence/maintenance windows that can pause monitoring checks and/or suppress notifications while preserving correctness and observability."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "monitoring"
- - "scheduler"
- - "maintenance"
- - "notifications"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "monitoring"
+  - "scheduler"
+  - "maintenance"
+  - "notifications"
 ---
-
 # ADR-018: Maintenance Windows and Scheduled Silencing
 
 ## Table of Contents

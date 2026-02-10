@@ -1,6 +1,5 @@
----
-title: "@public"
----
+# @public
+
 
 <!-- prettier-ignore-start -->
 |    |    |

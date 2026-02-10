@@ -1,20 +1,19 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-005: IPC Communication Protocol"
+doc_title: "ADR-005: IPC Communication Protocol"
 summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation, error handling, and static guard rails."
 created: "2025-08-05"
-last_reviewed: "2026-01-08"
-category: "guide"
+last_reviewed: "2026-02-01"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "ipc"
- - "electron"
- - "communication"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "ipc"
+  - "electron"
+  - "communication"
 ---
-
 # ADR-005: IPC Communication Protocol
 
 ## Table of Contents

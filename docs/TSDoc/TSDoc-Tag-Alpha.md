@@ -1,6 +1,5 @@
----
-title: "@alpha"
----
+# @alpha
+
 
 <!-- prettier-ignore-start -->
 |    |    |

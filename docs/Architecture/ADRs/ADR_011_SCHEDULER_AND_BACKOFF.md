@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-011: Scheduler and Backoff Strategy"
+doc_title: "ADR-011: Scheduler and Backoff Strategy"
 summary: "Defines monitor scheduling cadence, jitter/backoff, timeout defaults, and integration of manual checks with the scheduler."
 created: "2025-12-04"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "scheduler"
- - "backoff"
- - "monitoring"
- - "timeouts"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "scheduler"
+  - "backoff"
+  - "monitoring"
+  - "timeouts"
 ---
-
 # ADR-011: Scheduler and Backoff Strategy
 
 ## Table of Contents

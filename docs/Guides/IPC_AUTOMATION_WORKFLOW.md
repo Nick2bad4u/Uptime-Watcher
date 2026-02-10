@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "IPC Automation Workflow"
+doc_title: "IPC Automation Workflow"
 summary: "Workflow for generating, validating, and documenting IPC channels and preload bridges from shared TypeScript schemas."
 created: "2025-10-26"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2025-12-17"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "ipc"
- - "automation"
- - "codegen"
- - "ci"
+  - "uptime-watcher"
+  - "ipc"
+  - "automation"
+  - "codegen"
+  - "ci"
 ---
-
 # IPC Automation Workflow
 
 > **Last updated**: 2025-10-26 \

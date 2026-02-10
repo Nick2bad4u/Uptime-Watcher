@@ -1,6 +1,5 @@
----
-title: "@eventProperty"
----
+# @eventProperty
+
 
 <!-- prettier-ignore-start -->
 |    |    |

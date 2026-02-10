@@ -1,20 +1,19 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-007: Service Container and Dependency Injection Pattern"
+doc_title: "ADR-007: Service Container and Dependency Injection Pattern"
 summary: "Establishes a centralized dependency injection container for managing service lifecycles, initialization order, and inter-service communication in the Electron main process."
 created: "2025-11-25"
-last_reviewed: "2025-11-25"
-category: "guide"
+last_reviewed: "2025-12-17"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "dependency-injection"
- - "service-container"
- - "electron"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "dependency-injection"
+  - "service-container"
+  - "electron"
 ---
-
 # ADR-007: Service Container and Dependency Injection Pattern
 
 ## Table of Contents

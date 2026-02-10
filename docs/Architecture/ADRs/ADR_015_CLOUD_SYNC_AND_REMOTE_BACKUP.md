@@ -1,22 +1,21 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-015: Cloud Sync and Remote Backup Providers"
+doc_title: "ADR-015: Cloud Sync and Remote Backup Providers"
 summary: "Defines an opt-in cloud sync + remote backup architecture using provider-backed storage (Dropbox/Google Drive/Filesystem), secure auth, validated payloads, and a roadmap for WebDAV."
 created: "2025-12-12"
 last_reviewed: "2026-01-11"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "sync"
- - "backup"
- - "cloud"
- - "oauth"
- - "security"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "sync"
+  - "backup"
+  - "cloud"
+  - "oauth"
+  - "security"
 ---
-
 # ADR-015: Cloud Sync and Remote Backup Providers
 
 ## Table of Contents

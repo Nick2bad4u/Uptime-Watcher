@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-016: Multi-Device Sync Data Model"
+doc_title: "ADR-016: Multi-Device Sync Data Model"
 summary: "Defines the canonical sync model, conflict detection/merge rules, and payload boundaries for true multi-device sync without syncing raw SQLite files."
 created: "2025-12-12"
-last_reviewed: "2026-01-11"
-category: "guide"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "sync"
- - "conflict-resolution"
- - "offline-first"
- - "sqlite"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "sync"
+  - "conflict-resolution"
+  - "offline-first"
+  - "sqlite"
 ---
-
 # ADR-016: Multi-Device Sync Data Model
 
 ## Table of Contents

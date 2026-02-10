@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-010: Multi-Configuration Testing Strategy"
+doc_title: "ADR-010: Multi-Configuration Testing Strategy"
 summary: "Establishes a comprehensive testing architecture with separate Vitest configurations for frontend, backend, and shared code, plus Storybook component testing and Playwright E2E testing."
 created: "2025-11-25"
-last_reviewed: "2025-12-04"
-category: "guide"
+last_reviewed: "2025-12-23"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "testing"
- - "vitest"
- - "playwright"
- - "storybook"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "testing"
+  - "vitest"
+  - "playwright"
+  - "storybook"
 ---
-
 # ADR-010: Multi-Configuration Testing Strategy
 
 ## Table of Contents

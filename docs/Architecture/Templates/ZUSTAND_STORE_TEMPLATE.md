@@ -1,19 +1,18 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Zustand Store Template"
+doc_title: "Zustand Store Template"
 summary: "Provides templates for creating new Zustand stores using direct-create and modular composition patterns in the frontend."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "template"
- - "zustand"
- - "state-management"
+  - "uptime-watcher"
+  - "architecture"
+  - "template"
+  - "zustand"
+  - "state-management"
 ---
-
 # Zustand Store Template
 
 ## Table of Contents

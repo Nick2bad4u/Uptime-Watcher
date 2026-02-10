@@ -1,19 +1,18 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Settings Store and History Limits"
+doc_title: "Settings Store and History Limits"
 summary: "Overview of the settings store, history limit semantics, and how renderer consumers should interpret unlimited retention."
 created: "2025-12-10"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2026-01-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "stores"
- - "settings"
- - "history-limit"
- - "configuration"
+  - "uptime-watcher"
+  - "stores"
+  - "settings"
+  - "history-limit"
+  - "configuration"
 ---
-
 # Settings Store and History Limits
 
 This page documents the renderer settings store and, in particular, the

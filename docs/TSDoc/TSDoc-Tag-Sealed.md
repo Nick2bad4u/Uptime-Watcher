@@ -1,6 +1,5 @@
----
-title: "@sealed"
----
+# @sealed
+
 
 <!-- prettier-ignore-start -->
 |    |    |

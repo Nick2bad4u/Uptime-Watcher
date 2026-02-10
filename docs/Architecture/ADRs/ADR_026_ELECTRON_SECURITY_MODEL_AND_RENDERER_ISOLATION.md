@@ -1,22 +1,21 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-026: Electron Security Model and Renderer Isolation"
+doc_title: "ADR-026: Electron Security Model and Renderer Isolation"
 summary: "Defines the Electron security posture: renderer isolation via preload bridge, webPreferences hardening, navigation restrictions, and safe external link handling."
 created: "2025-12-15"
 last_reviewed: "2026-01-11"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "electron"
- - "security"
- - "preload"
- - "ipc"
- - "csp"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "electron"
+  - "security"
+  - "preload"
+  - "ipc"
+  - "csp"
 ---
-
 # ADR-026: Electron Security Model and Renderer Isolation
 
 ## Status

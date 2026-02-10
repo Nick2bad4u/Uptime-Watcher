@@ -205,14 +205,15 @@ function serializeFrontmatter(frontmatter) {
     // Ensure consistent order of fields
     const fieldOrder = [
         "schema",
-        "title",
+        "doc_title",
         "summary",
         "created",
         "last_reviewed",
-        "category",
+        "doc_category",
         "author",
         "tags",
         "topics",
+        "doc_group",
         "difficulty",
         "version",
     ];

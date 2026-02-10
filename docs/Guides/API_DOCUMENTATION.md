@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "API & IPC Documentation"
+doc_title: "API & IPC Documentation"
 summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
 created: "2025-09-22"
-last_reviewed: "2026-01-11"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "ipc"
- - "api"
- - "electron"
- - "events"
+  - "uptime-watcher"
+  - "ipc"
+  - "api"
+  - "electron"
+  - "events"
 ---
-
 # 📡 API & IPC Documentation
 
 ## Table of Contents

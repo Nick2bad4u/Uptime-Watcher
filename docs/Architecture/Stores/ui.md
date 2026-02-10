@@ -1,16 +1,15 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "UI store"
+doc_title: "UI store"
 summary: "Reference for renderer UI-only state: sidebar, panels, view prefs, and other non-domain UI toggles."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
- - stores
- - ui
+  - "stores"
+  - "ui"
 ---
-
 # UI store
 
 ## Purpose

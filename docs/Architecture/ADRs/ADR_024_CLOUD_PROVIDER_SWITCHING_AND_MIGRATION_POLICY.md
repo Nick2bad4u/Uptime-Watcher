@@ -1,23 +1,22 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-024: Cloud Provider Switching and Migration Policy"
+doc_title: "ADR-024: Cloud Provider Switching and Migration Policy"
 summary: "Defines the policy for switching between cloud providers (Dropbox/Google Drive), including single-provider constraints, remote cleanup expectations, and migration tooling boundaries."
 created: "2025-12-15"
 last_reviewed: "2025-12-16"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "cloud"
- - "sync"
- - "backups"
- - "dropbox"
- - "google-drive"
- - "migration"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "cloud"
+  - "sync"
+  - "backups"
+  - "dropbox"
+  - "google-drive"
+  - "migration"
 ---
-
 # ADR-024: Cloud Provider Switching and Migration Policy
 
 ## Status

@@ -1,19 +1,18 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Repository Template"
+doc_title: "Repository Template"
 summary: "Provides a template for implementing repository classes with the dual-method pattern, transaction safety, and operational hooks."
 created: "2025-08-05"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2026-02-04"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "template"
- - "repository"
- - "database"
+  - "uptime-watcher"
+  - "architecture"
+  - "template"
+  - "repository"
+  - "database"
 ---
-
 # Repository Template
 
 ## Table of Contents

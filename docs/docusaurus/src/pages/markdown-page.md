@@ -1,10 +1,10 @@
 ---
 schema: "../../../../config/schemas/doc-frontmatter.schema.json"
-title: "Markdown page example"
+doc_title: "Markdown page example"
 summary: "Example markdown-only page used within the Docusaurus site."
 created: "2025-11-15"
 last_reviewed: "2025-11-17"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
  - "uptime-watcher"

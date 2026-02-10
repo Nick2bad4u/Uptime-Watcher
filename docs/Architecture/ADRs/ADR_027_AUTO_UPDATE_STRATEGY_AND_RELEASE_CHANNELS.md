@@ -1,22 +1,21 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-027: Auto-Update Strategy and Release Channels"
+doc_title: "ADR-027: Auto-Update Strategy and Release Channels"
 summary: "Documents the auto-update implementation in Electron main, the update feed expectations, and how GitHub Releases artifacts map to update channels."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "updates"
- - "electron"
- - "github-releases"
- - "squirrel"
- - "nsis"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "updates"
+  - "electron"
+  - "github-releases"
+  - "squirrel"
+  - "nsis"
 ---
-
 # ADR-027: Auto-Update Strategy and Release Channels
 
 ## Status

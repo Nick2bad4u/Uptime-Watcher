@@ -1,23 +1,22 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-022: OAuth Loopback Redirect and Callback Routing"
+doc_title: "ADR-022: OAuth Loopback Redirect and Callback Routing"
 summary: "Standardizes OAuth 2.0 + PKCE loopback redirect behavior for cloud providers, including redirect URI strategy and callback validation."
 created: "2025-12-15"
 last_reviewed: "2026-01-11"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "oauth"
- - "pkce"
- - "security"
- - "cloud"
- - "dropbox"
- - "google-drive"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "oauth"
+  - "pkce"
+  - "security"
+  - "cloud"
+  - "dropbox"
+  - "google-drive"
 ---
-
 # ADR-022: OAuth Loopback Redirect and Callback Routing
 
 ## Status

@@ -1,18 +1,17 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Dropbox Cloud Sync Setup"
+doc_title: "Dropbox Cloud Sync Setup"
 summary: "How to configure the Dropbox OAuth app and use Dropbox Cloud Sync in Uptime Watcher (PKCE + loopback redirect, no backend server)."
-created: 2025-12-14
-last_reviewed: 2025-12-14
-category: "guide"
+created: "2025-12-14"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - cloud
- - sync
- - backups
- - dropbox
+  - "cloud"
+  - "sync"
+  - "backups"
+  - "dropbox"
 ---
-
 # Dropbox Cloud Sync Setup
 
 This app uses **Dropbox OAuth 2.0 Authorization Code + PKCE** with a **loopback redirect** (system browser, no embedded webview, no backend server).

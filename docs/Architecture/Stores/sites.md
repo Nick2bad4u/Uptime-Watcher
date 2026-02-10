@@ -1,19 +1,18 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Sites Store and State Sync"
+doc_title: "Sites Store and State Sync"
 summary: "Overview of the sites store, status update handling, and state synchronization pipeline between Electron main, preload, and the renderer."
 created: "2025-12-07"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2026-01-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "stores"
- - "sites"
- - "state-sync"
- - "architecture"
+  - "uptime-watcher"
+  - "stores"
+  - "sites"
+  - "state-sync"
+  - "architecture"
 ---
-
 # Sites Store and State Sync
 
 This page provides a focused architecture reference for the renderer sites store

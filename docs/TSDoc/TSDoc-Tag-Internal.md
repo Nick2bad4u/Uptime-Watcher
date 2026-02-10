@@ -1,6 +1,5 @@
----
-title: "@internal"
----
+# @internal
+
 
 <!-- prettier-ignore-start -->
 |    |    |

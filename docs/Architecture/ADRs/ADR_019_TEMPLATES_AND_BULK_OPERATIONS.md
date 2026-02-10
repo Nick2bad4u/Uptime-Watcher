@@ -1,22 +1,21 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-019: Templates and Bulk Operations"
+doc_title: "ADR-019: Templates and Bulk Operations"
 summary: "Defines portable, versioned templates for sites/monitors and bulk-edit/import workflows with validation and preview."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "templates"
- - "import"
- - "export"
- - "bulk"
- - "validation"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "templates"
+  - "import"
+  - "export"
+  - "bulk"
+  - "validation"
 ---
-
 # ADR-019: Templates and Bulk Operations
 
 ## Table of Contents

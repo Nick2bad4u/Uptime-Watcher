@@ -1,6 +1,5 @@
----
-title: "@deprecated"
----
+# @deprecated
+
 
 <!-- prettier-ignore-start -->
 |    |    |

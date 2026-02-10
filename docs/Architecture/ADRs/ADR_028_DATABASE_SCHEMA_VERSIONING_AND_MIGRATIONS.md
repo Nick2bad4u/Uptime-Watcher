@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-028: Database Schema Versioning and Migrations"
+doc_title: "ADR-028: Database Schema Versioning and Migrations"
 summary: "Defines how the SQLite database schema is versioned and migrated, including idempotent schema creation, upgrade paths, and backup compatibility expectations."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "database"
- - "sqlite"
- - "migrations"
- - "backups"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "database"
+  - "sqlite"
+  - "migrations"
+  - "backups"
 ---
-
 # ADR-028: Database Schema Versioning and Migrations
 
 ## Status

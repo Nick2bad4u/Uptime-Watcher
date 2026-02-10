@@ -1,10 +1,10 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Deployment & Infrastructure"
+doc_title: "Deployment & Infrastructure"
 summary: "Deployment architecture diagrams and release pipeline overview."
 created: "2026-02-09"
 last_reviewed: "2026-02-09"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
   - "uptime-watcher"
@@ -12,10 +12,9 @@ tags:
   - "ci"
   - "release"
   - "mermaid"
-slug: /deployment-infrastructure
+slug: "/deployment-infrastructure"
 sidebar_label: "🚀 Deployment & Infrastructure"
 ---
-
 # Deployment & Infrastructure
 
 This page documents the _documentation site’s_ high-level deployment model (GitHub Pages) and how the desktop app is distributed.

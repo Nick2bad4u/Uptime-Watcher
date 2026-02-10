@@ -1,19 +1,18 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Initialization & Data Import Orchestration"
+doc_title: "Initialization & Data Import Orchestration"
 summary: "Describes how DatabaseManager, UptimeOrchestrator, and the React App coordinate startup, transaction-completed events, data imports, and site lifecycle synchronization."
 created: "2025-11-23"
-last_reviewed: "2025-11-23"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "initialization"
- - "data-import"
- - "site-lifecycle"
+  - "uptime-watcher"
+  - "architecture"
+  - "initialization"
+  - "data-import"
+  - "site-lifecycle"
 ---
-
 # Initialization & Data Import Orchestration
 
 This guide documents how the **Electron main process** and **React renderer** coordinate:

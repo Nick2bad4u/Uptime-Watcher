@@ -1,23 +1,22 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR implementation punch list"
+doc_title: "ADR implementation punch list"
 summary: "A living checklist of remaining work explicitly called out by the project ADRs (Proposed ADRs + accepted ADR follow-ups)."
 created: "2025-12-16"
-last_reviewed: "2025-12-16"
-category: "guide"
+last_reviewed: "2025-12-17"
+doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
- - "architecture"
- - "adr"
- - "planning"
- - "roadmap"
- - "cloud"
- - "sync"
- - "diagnostics"
- - "maintenance"
- - "integrations"
+  - "architecture"
+  - "adr"
+  - "planning"
+  - "roadmap"
+  - "cloud"
+  - "sync"
+  - "diagnostics"
+  - "maintenance"
+  - "integrations"
 ---
-
 # ADR implementation punch list
 
 This document is a **consolidated checklist** of work that is still outstanding

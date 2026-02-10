@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Error Handling Guide"
+doc_title: "Error Handling Guide"
 summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2026-01-08"
-category: "guide"
+last_reviewed: "2026-01-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "error-handling"
- - "zustand"
- - "validation"
- - "testing"
+  - "uptime-watcher"
+  - "error-handling"
+  - "zustand"
+  - "validation"
+  - "testing"
 ---
-
 # Error Handling Guide
 
 ## Overview

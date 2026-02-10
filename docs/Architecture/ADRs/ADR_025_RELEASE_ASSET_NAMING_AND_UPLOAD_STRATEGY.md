@@ -1,23 +1,22 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-025: Release Asset Naming and Upload Strategy"
+doc_title: "ADR-025: Release Asset Naming and Upload Strategy"
 summary: "Documents release artifact naming invariants and CI upload rules for GitHub Releases (including Squirrel/RELEASES/nupkg collisions and basename uniqueness)."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-23"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "releases"
- - "github-actions"
- - "ci"
- - "electron-builder"
- - "squirrel"
- - "windows"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "releases"
+  - "github-actions"
+  - "ci"
+  - "electron-builder"
+  - "squirrel"
+  - "windows"
 ---
-
 # ADR-025: Release Asset Naming and Upload Strategy
 
 ## Status

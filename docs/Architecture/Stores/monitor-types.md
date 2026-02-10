@@ -1,16 +1,15 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Monitor types store"
+doc_title: "Monitor types store"
 summary: "Reference for the renderer store that caches monitor type configs and formatting helpers."
 created: "2025-12-12"
-last_reviewed: "2025-12-12"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Uptime Watcher Team"
 tags:
- - stores
- - monitoring
+  - "stores"
+  - "monitoring"
 ---
-
 # Monitor types store
 
 ## Purpose

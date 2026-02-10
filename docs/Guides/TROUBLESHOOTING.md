@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Troubleshooting Guide"
+doc_title: "Troubleshooting Guide"
 summary: "Troubleshooting guide for common development, database, event system, error handling, build, and runtime issues in Uptime Watcher."
 created: "2025-08-05"
-last_reviewed: "2025-12-04"
-category: "guide"
+last_reviewed: "2026-02-05"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "troubleshooting"
- - "debugging"
- - "database"
- - "performance"
+  - "uptime-watcher"
+  - "troubleshooting"
+  - "debugging"
+  - "database"
+  - "performance"
 ---
-
 # 🔧 Troubleshooting Guide
 
 ## Table of Contents

@@ -1,20 +1,19 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-002: Event-Driven Architecture with TypedEventBus"
+doc_title: "ADR-002: Event-Driven Architecture with TypedEventBus"
 summary: "Defines an event-driven architecture using a TypedEventBus for decoupled, type-safe communication across backend and frontend."
 created: "2025-08-05"
 last_reviewed: "2026-01-11"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "events"
- - "typed-event-bus"
- - "ipc"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "events"
+  - "typed-event-bus"
+  - "ipc"
 ---
-
 # ADR-002: Event-Driven Architecture with TypedEventBus
 
 ## Table of Contents

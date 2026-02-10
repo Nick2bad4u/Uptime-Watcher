@@ -1,18 +1,17 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "Development Patterns Guide"
+doc_title: "Development Patterns Guide"
 summary: "Documents the core architectural and development patterns used across Uptime Watcher, including repositories, events, state, IPC, and testing."
 created: "2025-08-05"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2026-01-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "patterns"
- - "guidelines"
+  - "uptime-watcher"
+  - "architecture"
+  - "patterns"
+  - "guidelines"
 ---
-
 # Development Patterns Guide
 
 This guide documents the established architectural patterns used throughout the Uptime-Watcher application. Following these patterns ensures consistency, maintainability, predictable behavior, and production-grade quality across the codebase.

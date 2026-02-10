@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-014: Logging, Telemetry, and Diagnostics"
+doc_title: "ADR-014: Logging, Telemetry, and Diagnostics"
 summary: "Standardizes log levels/fields, correlation IDs, diagnostics IPC flows, and privacy/redaction bounds."
 created: "2025-12-04"
-last_reviewed: "2025-12-11"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "logging"
- - "telemetry"
- - "diagnostics"
- - "privacy"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "logging"
+  - "telemetry"
+  - "diagnostics"
+  - "privacy"
 ---
-
 # ADR-014: Logging, Telemetry, and Diagnostics
 
 ## Table of Contents

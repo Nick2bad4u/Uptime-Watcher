@@ -1,6 +1,5 @@
----
-title: "@decorator"
----
+# @decorator
+
 
 <!-- prettier-ignore-start -->
 |    |    |

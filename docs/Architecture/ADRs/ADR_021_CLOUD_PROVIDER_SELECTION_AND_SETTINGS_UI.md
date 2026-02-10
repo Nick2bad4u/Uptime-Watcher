@@ -1,24 +1,23 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-021: Cloud Provider Selection and Settings UI"
+doc_title: "ADR-021: Cloud Provider Selection and Settings UI"
 summary: "Defines a provider-tabbed Cloud settings UX, enforces a single active provider at a time, and documents a roadmap for future providers (e.g. WebDAV)."
 created: "2025-12-15"
 last_reviewed: "2026-01-11"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "cloud"
- - "sync"
- - "backup"
- - "ui"
- - "oauth"
- - "dropbox"
- - "google-drive"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "cloud"
+  - "sync"
+  - "backup"
+  - "ui"
+  - "oauth"
+  - "dropbox"
+  - "google-drive"
 ---
-
 # ADR-021: Cloud Provider Selection and Settings UI
 
 ## Table of Contents

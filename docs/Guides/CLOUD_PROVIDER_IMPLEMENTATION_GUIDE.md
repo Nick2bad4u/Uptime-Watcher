@@ -1,23 +1,22 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Cloud Provider Implementation Guide"
+doc_title: "Cloud Provider Implementation Guide"
 summary: "Developer guide for adding new Cloud Sync / Remote Backup providers (e.g. Google Drive) safely and consistently."
-created: 2025-12-15
-last_reviewed: 2025-12-30
-category: "guide"
+created: "2025-12-15"
+last_reviewed: "2025-12-31"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - cloud
- - sync
- - backups
- - architecture
- - ipc
- - zod
- - oauth
- - pkce
- - providers
+  - "cloud"
+  - "sync"
+  - "backups"
+  - "architecture"
+  - "ipc"
+  - "zod"
+  - "oauth"
+  - "pkce"
+  - "providers"
 ---
-
 # Cloud Provider Implementation Guide
 
 This guide explains how to add a new cloud provider (e.g. Google Drive) to Uptime Watcher.

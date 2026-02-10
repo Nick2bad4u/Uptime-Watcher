@@ -1,20 +1,19 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Google Drive Cloud Sync Setup"
+doc_title: "Google Drive Cloud Sync Setup"
 summary: "Setup guide for using Google Drive as a first-class Cloud Sync provider (OAuth 2.0 + PKCE + loopback redirect, no backend server)."
-created: 2025-12-15
-last_reviewed: 2025-12-16
-category: "guide"
+created: "2025-12-15"
+last_reviewed: "2026-01-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - cloud
- - sync
- - backups
- - google-drive
- - oauth
- - pkce
+  - "cloud"
+  - "sync"
+  - "backups"
+  - "google-drive"
+  - "oauth"
+  - "pkce"
 ---
-
 # Google Drive Cloud Sync Setup
 
 This document explains how to configure Google OAuth credentials so Uptime Watcher can use **Google Drive** as a first-class cloud provider.

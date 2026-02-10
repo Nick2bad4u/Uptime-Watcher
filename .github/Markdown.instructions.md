@@ -27,6 +27,6 @@ Follow these guidelines for formatting and structuring your markdown content:
 
 -   **Front Matter**: Use `---` to delimit YAML front matter when a file needs metadata.
     -   In general markdown files (e.g. `README.md` at the repo root), choose fields that are useful to readers and tooling.
-    -   For documentation pages under `docs/**`, follow the schema in `config/schemas/doc-frontmatter.schema.json` and keep fields (such as `title`, `summary`, `category`, and `tags`) valid per that schema. Use `scripts/validate-doc-frontmatter.mjs` and the `docs:validate:frontmatter` / `docs:check` scripts to verify correctness.
+    -   For documentation pages under `docs/**`, follow the schema in `config/schemas/doc-frontmatter.schema.json` and keep fields (such as `doc_title`, `summary`, `doc_category`, and `tags`) valid per that schema. (We intentionally avoid TypeDoc-reserved keys like `title`/`category`/`group` in this repo's docs frontmatter.) Use `scripts/validate-doc-frontmatter.mjs` and the `docs:validate:frontmatter` / `docs:check` scripts to verify correctness.
 -   **Metadata**: Ensure that metadata is accurate and up to date. When a document uses front matter, update date or version fields when content meaningfully changes.
 -   **Tooling alignment**: The repository enforces Markdown style via Remark (`.remarkrc.mjs`). Run `npm run remark:check` (or `npm run docs:check` for doc bundles) before committing to catch lint issues.

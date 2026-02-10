@@ -1,6 +1,5 @@
----
-title: "@link"
----
+# @link
+
 
 <!-- prettier-ignore-start -->
 |    |    |

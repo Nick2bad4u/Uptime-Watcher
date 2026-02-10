@@ -96,8 +96,6 @@ const config: Config = {
 
     noIndex: false,
     onBrokenAnchors: "warn",
-    onBrokenLinks: "warn",
-    onBrokenMarkdownLinks: "warn",
     onDuplicateRoutes: "warn",
     organizationName: "Nick2bad4u",
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)

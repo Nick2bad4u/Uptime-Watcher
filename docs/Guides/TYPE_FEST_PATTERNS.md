@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Type-fest Integration Patterns"
+doc_title: "Type-fest Integration Patterns"
 summary: "Patterns and best practices for integrating type-fest utilities across the Uptime Watcher codebase."
 created: "2025-08-28"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "type-fest"
- - "typescript"
- - "types"
- - "patterns"
+  - "uptime-watcher"
+  - "type-fest"
+  - "typescript"
+  - "types"
+  - "patterns"
 ---
-
 # Type-fest Integration Patterns
 
 This document provides comprehensive patterns for integrating type-fest utilities consistently across the Uptime-Watcher codebase. These patterns ensure type safety, better developer experience, and maintainable code.

@@ -1,20 +1,19 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Monitoring Workflows"
+doc_title: "Monitoring Workflows"
 summary: "Monitoring lifecycle, decision trees, and data synchronization flows."
 created: "2026-02-09"
 last_reviewed: "2026-02-09"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
   - "uptime-watcher"
   - "monitoring"
   - "workflows"
   - "mermaid"
-slug: /monitoring-workflows
+slug: "/monitoring-workflows"
 sidebar_label: "🔄 Monitoring Workflows"
 ---
-
 # Monitoring Workflows
 
 This page focuses on the monitoring lifecycle and the cross-process synchronization model.

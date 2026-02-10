@@ -1,25 +1,24 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-031: Packaging, Signing, and Notarization Policy"
+doc_title: "ADR-031: Packaging, Signing, and Notarization Policy"
 summary: "Documents how Uptime Watcher is packaged for Windows/macOS/Linux, what is officially supported, and the current signing/notarization posture."
 created: "2025-12-15"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "releases"
- - "packaging"
- - "electron-builder"
- - "signing"
- - "notarization"
- - "windows"
- - "macos"
- - "linux"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "releases"
+  - "packaging"
+  - "electron-builder"
+  - "signing"
+  - "notarization"
+  - "windows"
+  - "macos"
+  - "linux"
 ---
-
 # ADR-031: Packaging, Signing, and Notarization Policy
 
 ## Status

@@ -1,19 +1,18 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Zustand Store Pattern Decision Guide"
+doc_title: "Zustand Store Pattern Decision Guide"
 summary: "Decision guide for choosing between direct create and modular composition patterns for Zustand stores in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2025-11-17"
-category: "guide"
+last_reviewed: "2026-01-10"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "zustand"
- - "state-management"
- - "patterns"
- - "stores"
+  - "uptime-watcher"
+  - "zustand"
+  - "state-management"
+  - "patterns"
+  - "stores"
 ---
-
 # Zustand Store Pattern Decision Guide
 
 ## Table of Contents

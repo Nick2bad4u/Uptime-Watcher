@@ -12,8 +12,8 @@
  * Schema engine. Instead, it enforces:
  *
  * - Presence of a front-matter block at the top of each file
- * - Required fields: `author`, `category`, `created`, `last_reviewed`, `summary`,
- *   `tags`, `title`
+ * - Required fields: `schema`, `author`, `doc_category`, `doc_title`, `created`,
+ *   `last_reviewed`, `summary`, `tags`
  * - Allowed keys only (no deprecated/unknown fields)
  * - Basic type and format checks (arrays vs strings, date formats, enums)
  * - `schema` value points at the doc-frontmatter schema file.

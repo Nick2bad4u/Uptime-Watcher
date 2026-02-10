@@ -1,21 +1,20 @@
 ---
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
-title: "ADR-012: Notifications and Alerting Policy"
+doc_title: "ADR-012: Notifications and Alerting Policy"
 summary: "Defines desktop/sound notification rules, throttling, suppression, and reliability expectations for outage/restore signals."
 created: "2025-12-04"
-last_reviewed: "2025-12-15"
-category: "guide"
+last_reviewed: "2025-12-16"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "architecture"
- - "adr"
- - "notifications"
- - "alerting"
- - "throttling"
- - "reliability"
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "notifications"
+  - "alerting"
+  - "throttling"
+  - "reliability"
 ---
-
 # ADR-012: Notifications and Alerting Policy
 
 ## Table of Contents

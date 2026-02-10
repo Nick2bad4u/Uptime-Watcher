@@ -1,10 +1,10 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-title: "Data Models & Database Schema"
+doc_title: "Data Models & Database Schema"
 summary: "Entity relationship diagram and monitor configuration schema overview."
 created: "2026-02-09"
 last_reviewed: "2026-02-09"
-category: "guide"
+doc_category: "guide"
 author: "Nick2bad4u"
 tags:
   - "uptime-watcher"
@@ -12,10 +12,9 @@ tags:
   - "database"
   - "schema"
   - "mermaid"
-slug: /data-models
+slug: "/data-models"
 sidebar_label: "🗄️ Data Models"
 ---
-
 # Data Models & Database Schema
 
 These diagrams describe the shape of the local SQLite database and the major relationships between core tables.
