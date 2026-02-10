@@ -100,7 +100,7 @@
         "@includeCode"
     ],
     "interfacePropertiesFormat": "list",
-    "json": "./typedoc.json",
+    "json": "docs/typedoc.json",
     "mergeReadme": true,
     "prettierConfigFile": "../../.prettierrc",
     "sanitizeComments": false,

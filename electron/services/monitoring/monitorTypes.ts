@@ -37,7 +37,7 @@ const baseMonitorTypeSet: ReadonlySet<string> = new Set(BASE_MONITOR_TYPES);
  *
  * @returns Array containing only the built-in base monitor types
  *
- * @see {@link MonitorTypeRegistry.getAllTypes} for complete type list including dynamic types
+ * @see {@link electron/services/monitoring/MonitorTypeRegistry#getRegisteredMonitorTypes | getRegisteredMonitorTypes} for complete type list including dynamic types
  */
 export function getBaseMonitorTypes(): MonitorType[] {
     return Array.from(BASE_MONITOR_TYPES);
@@ -63,7 +63,7 @@ export function getBaseMonitorTypes(): MonitorType[] {
  *
  * @returns True if the type is a known base monitor type
  *
- * @see {@link MonitorTypeRegistry.isValidType} for complete type checking
+ * @see {@link electron/services/monitoring/MonitorTypeRegistry#isValidMonitorType | isValidMonitorType} for complete type checking
  */
 export function isBaseMonitorType(type: string): type is MonitorType {
     return baseMonitorTypeSet.has(type);

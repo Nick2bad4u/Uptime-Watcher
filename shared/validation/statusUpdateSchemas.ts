@@ -103,7 +103,7 @@ export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
     createStatusUpdateSchema();
 
 // NOTE: Some downstream consumers (e.g. preload bridges) rely on `safeParse`
-// returning the shared {@link StatusUpdate} interface. With `--isolatedDeclarations`
+// returning the shared `StatusUpdate` interface. With `--isolatedDeclarations`
 // and strict settings, Zod's inferred output type for complex discriminated
 // monitor/site unions can become noisy (e.g. optionalizing required fields).
 // The runtime schema is the source of truth; we cast the type for ergonomic,

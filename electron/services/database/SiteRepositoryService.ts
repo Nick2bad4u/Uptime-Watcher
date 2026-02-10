@@ -242,7 +242,7 @@ export class SiteRepositoryService {
      * @returns Promise resolving to the complete site object or `undefined`
      *   when not found.
      *
-     * @throws {@link SiteLoadingError} When the database query fails.
+     * @throws - When the database query fails.
      */
     public async getSiteFromDatabase(
         identifier: string

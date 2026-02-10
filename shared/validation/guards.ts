@@ -35,7 +35,7 @@ const siteUpdateSchema: z.ZodType<SiteUpdate> = siteSchema
  *
  * @param value - Payload returned from an external boundary (e.g. IPC).
  *
- * @returns The Zod {@link SafeParseReturnType} describing validation success
+ * @returns The Zod {@link https://zod.dev/?id=safeparse | SafeParseReturnType} describing validation success
  *   and, when successful, the inferred {@link Site} instance.
  */
 export type SiteSnapshotParseResult = ReturnType<typeof siteSchema.safeParse>;
@@ -54,7 +54,7 @@ export const validateSiteUpdate = (value: unknown): SiteUpdateParseResult =>
     siteUpdateSchema.safeParse(value);
 
 /**
- * Validates an unknown payload against the canonical {@link StatusUpdate}
+ * Validates an unknown payload against the canonical {@link shared/types#StatusUpdate | StatusUpdate}
  * schema.
  */
 export type StatusUpdateParseResult = ReturnType<
@@ -71,7 +71,7 @@ const siteSnapshotsSchema: z.ZodType<Site[]> = siteSchema.array();
  *
  * @remarks
  * This mirrors the return shape of other guards in this module by returning the
- * Zod {@link SafeParseReturnType}. Consumers that need per-index diagnostics can
+ * Zod {@link https://zod.dev/?id=safeparse | SafeParseReturnType}. Consumers that need per-index diagnostics can
  * derive indices from `result.error.issues[*].path[0]`.
  */
 export type SiteSnapshotsParseResult = ReturnType<

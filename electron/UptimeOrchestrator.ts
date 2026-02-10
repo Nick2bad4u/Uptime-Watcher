@@ -209,8 +209,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private initializationPromise: Promise<void> | undefined;
 
     /**
-    * Factory for creating contextual errors via
-    * {@link electron/utils/errors/contextualErrorFactory#ContextualErrorFactory}.
+     * Factory for creating contextual errors via {@link ContextualErrorFactory}.
      */
     private readonly createContextualError: ContextualErrorFactory;
 

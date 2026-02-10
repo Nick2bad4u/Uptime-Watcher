@@ -50,7 +50,7 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * propagation.
  *
  * On success, resolves to a {@link MonitorCheckResult} with status `"up"` and the measured response time. On failure,
- * throws a {@link electron/services/monitoring/utils/portErrorHandling#PortCheckError} containing the error
+ * throws a {@link PortCheckError} containing the error
  * message and response time for use in retry or error handling logic.
  *
  * @example
@@ -78,14 +78,14 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * @returns A promise that resolves to a {@link MonitorCheckResult} containing
  *   port details, response time, and status.
  *
- * @throws {@link PortCheckError} Thrown if the port is not reachable within the
+ * @throws - Thrown if the port is not reachable within the
  *   timeout, with response time included for diagnostics and retry logic.
  *
  * @public
  *
  * @see {@link MonitorCheckResult}
  * @see {@link PortCheckError}
- * @throws {@link electron/services/monitoring/utils/portErrorHandling#PortCheckError} When port check fails
+ * @throws - When port check fails
  */
 export async function performSinglePortCheck(
     host: string,

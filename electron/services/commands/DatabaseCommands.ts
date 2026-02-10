@@ -432,7 +432,7 @@ export class DownloadBackupCommand extends DatabaseCommand<DatabaseBackupResult>
  * @remarks
  * This command exists to support backup workflows that should not load the
  * entire backup into memory (e.g. large databases). The command delegates to
- * {@link DataBackupService.saveDatabaseBackupToPath}.
+ * `DataBackupService#saveDatabaseBackupToPath`.
  */
 export class SaveBackupToPathCommand extends DatabaseCommand<DatabaseBackupMetadata> {
     private readonly targetPath: string;

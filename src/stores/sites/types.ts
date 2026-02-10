@@ -86,7 +86,7 @@ export interface SitesActions
  * Sites store state interface for managing site data.
  *
  * @remarks
- * Re-exports the canonical state shape defined by {@link src/stores/sites/useSitesState#useSitesState} so the
+ * Re-exports the canonical state shape defined by {@link SitesStateShape | SitesState} so the
  * store, actions, and modules share the exact same structure.
  */
 export type SitesState = SitesStateShape;
