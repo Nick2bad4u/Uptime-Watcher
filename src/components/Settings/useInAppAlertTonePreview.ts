@@ -1,5 +1,5 @@
 /**
- * In-app alert tone preview helpers for {@link Settings}.
+ * In-app alert tone preview helpers for {@link src/components/Settings/Settings#Settings}.
  *
  * @remarks
  * Extracted from `Settings.tsx` to keep the component lean. This hook owns the

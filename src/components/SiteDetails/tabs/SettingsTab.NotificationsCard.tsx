@@ -27,7 +27,7 @@ export interface SettingsTabNotificationsCardProperties {
 }
 
 /**
- * Renders the “Notifications” section of {@link SettingsTab}.
+ * Renders the “Notifications” section of {@link src/components/SiteDetails/tabs/SettingsTab#SettingsTab}.
  */
 export const SettingsTabNotificationsCard = ({
     isLoading,

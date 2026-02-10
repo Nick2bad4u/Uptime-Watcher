@@ -47,7 +47,7 @@ export interface MonitoringLifecycleCoordinatorDependencies {
  *
  * @remarks
  * Encapsulates monitoring-specific logic formerly implemented inside
- * {@link UptimeOrchestrator}, keeping the orchestrator focused on wiring and
+ * {@link electron/UptimeOrchestrator#UptimeOrchestrator}, keeping the orchestrator focused on wiring and
  * delegation while this coordinator owns the concrete behaviours.
  */
 export class MonitoringLifecycleCoordinator {
@@ -99,7 +99,7 @@ export class MonitoringLifecycleCoordinator {
      * restart.
      *
      * @remarks
-     * This logic is moved verbatim from {@link UptimeOrchestrator} to avoid
+    * This logic is moved verbatim from {@link electron/UptimeOrchestrator#UptimeOrchestrator} to avoid
      * behavioural changes.
      */
     public async resumePersistentMonitoring(): Promise<void> {

@@ -1,5 +1,6 @@
 /**
- * Scheduled-check execution for {@link EnhancedMonitorChecker}.
+ * Scheduled-check execution for
+ * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}.
  *
  * @remarks
  * Scheduled checks are correlation-aware and should be skipped when a monitor

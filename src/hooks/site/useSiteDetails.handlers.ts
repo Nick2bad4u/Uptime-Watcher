@@ -1,5 +1,5 @@
 /**
- * Handler hooks for {@link useSiteDetails}.
+ * Handler hooks for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @remarks
  * Split out of the main hook to keep the core hook readable and to satisfy the
@@ -42,7 +42,7 @@ import {
 } from "./useSiteDetails.utils";
 
 /**
- * Selection handlers for {@link useSiteDetails}.
+ * Selection handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */
@@ -76,7 +76,7 @@ export function useSiteDetailsSelectionHandlers(
 }
 
 /**
- * Remove-site / remove-monitor handlers for {@link useSiteDetails}.
+ * Remove-site / remove-monitor handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */
@@ -136,7 +136,7 @@ export function useSiteDetailsRemovalHandlers(
 }
 
 /**
- * Monitoring handlers for {@link useSiteDetails}.
+ * Monitoring handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */
@@ -282,7 +282,7 @@ export function useSiteDetailsMonitoringHandlers(
 }
 
 /**
- * Settings edit/save handlers for {@link useSiteDetails}.
+ * Settings edit/save handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */
@@ -475,7 +475,7 @@ export function useSiteDetailsSettingsHandlers(
 }
 
 /**
- * Site-name save handler for {@link useSiteDetails}.
+ * Site-name save handler for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */

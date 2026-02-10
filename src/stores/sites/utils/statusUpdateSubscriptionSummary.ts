@@ -3,7 +3,8 @@ import type { StatusUpdateManager } from "./statusUpdateHandler";
 
 /**
  * Default listener count used for diagnostics when the underlying
- * {@link StatusUpdateManager} implementation is mocked or unavailable.
+ * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}
+ * implementation is mocked or unavailable.
  */
 export const FALLBACK_EXPECTED_LISTENERS = 4;
 
@@ -11,7 +12,7 @@ export const FALLBACK_EXPECTED_LISTENERS = 4;
  * Resolve the expected listener count for status update subscriptions.
  *
  * @remarks
- * Tests frequently mock {@link StatusUpdateManager}, which can strip static
+ * Tests frequently mock {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}, which can strip static
  * fields (e.g. `EXPECTED_LISTENER_COUNT`). This helper keeps diagnostics stable
  * by falling back to a hard-coded default.
  */

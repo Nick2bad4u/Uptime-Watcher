@@ -3,7 +3,8 @@
  */
 
 /**
- * Setters needed to build the {@link DynamicMonitorFields} onChange map.
+ * Setters needed to build the {@link src/components/AddSiteForm/DynamicMonitorFields#DynamicMonitorFields}
+ * onChange map.
  */
 export interface DynamicFieldChangeSetterBag {
     readonly setBaselineUrl: (value: string) => void;
@@ -39,7 +40,8 @@ const toStringSetter =
     };
 
 /**
- * Creates the `onChange` handler map expected by {@link DynamicMonitorFields}.
+ * Creates the `onChange` handler map expected by
+ * {@link src/components/AddSiteForm/DynamicMonitorFields#DynamicMonitorFields}.
  */
 export function createDynamicFieldChangeHandlers(
     setters: DynamicFieldChangeSetterBag

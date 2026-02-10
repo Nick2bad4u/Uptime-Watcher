@@ -3,7 +3,7 @@
  *
  * @remarks
  * `ServiceContainer` wires manager event buses (DatabaseManager,
- * MonitorManager, SiteManager) into the main {@link UptimeOrchestrator}. This
+ * MonitorManager, SiteManager) into the main {@link electron/UptimeOrchestrator#UptimeOrchestrator}. This
  * file extracts the forwarding and metadata-cleanup logic so the container
  * remains focused on dependency construction and lifecycle orchestration.
  */

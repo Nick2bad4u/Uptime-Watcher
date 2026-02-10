@@ -23,7 +23,7 @@ interface SiteSettingsNumberFieldProps {
 }
 
 /**
- * Shared numeric setting field for {@link SettingsTab}.
+ * Shared numeric setting field for {@link src/components/SiteDetails/tabs/SettingsTab#SettingsTab}.
  */
 export const SiteSettingsNumberField = ({
     errorText,

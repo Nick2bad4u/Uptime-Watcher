@@ -1,10 +1,6 @@
 /**
  * Centralized dependency injection container for all Electron services.
  *
- * @remarks
- * Provides a unified mechanism for managing service dependencies and their
- * lifecycle, ensuring correct initialization order and singleton management.
- *
  * Services are categorized as:
  *
  * - Core Services: Infrastructure (Database, IPC)
@@ -202,9 +198,11 @@ export class ServiceContainer {
      */
     private monitorManager?: MonitorManager;
 
-    /**
-     * Singleton instance of {@link MonitorOperationRegistry}.
-     */
+     /**
+    * Singleton instance of {@link MonitorOperationRegistry}.
+      *
+      * @internal
+      */
     private monitorOperationRegistry?: MonitorOperationRegistry;
 
     /**
@@ -239,7 +237,7 @@ export class ServiceContainer {
     private settingsRepository?: SettingsRepository;
 
     /**
-     * Singleton instance of {@link SiteManager}.
+    * Singleton instance of {@link SiteManager}.
      *
      * @internal
      */
@@ -253,7 +251,7 @@ export class ServiceContainer {
     private siteRepository?: SiteRepository;
 
     /**
-     * Singleton instance of {@link UptimeOrchestrator}.
+    * Singleton instance of {@link UptimeOrchestrator}.
      *
      * @internal
      */
@@ -284,15 +282,19 @@ export class ServiceContainer {
     }
 
     /**
-     * Retrieves the existing service container instance without creating a new
-     * one.
+     * Retrieves the existing service container instance without creating a new one.
+     *
+     * @remarks
+     * Prefer this in code paths that must not create services implicitly.
+     *
+     * @returns The existing instance, or `undefined` if not initialized.
      */
-    public static getExistingInstance(): ServiceContainer | undefined {
+    public static getExisting(): ServiceContainer | undefined {
         return ServiceContainer.instance;
     }
 
     /**
-     * Resets the singleton instance for test isolation.
+     * Reset the singleton instance (tests only).
      */
     public static resetForTesting(): void {
         ServiceContainer.instance = undefined;
@@ -378,15 +380,15 @@ export class ServiceContainer {
         return this.cloudSyncScheduler;
     }
 
-    /**
-     * Gets or creates the {@link MonitorOperationRegistry} singleton instance.
-     *
-     * @remarks
-     * Lazily initializes the registry if it does not exist. Debug logging
-     * tracks creation when enabled.
-     *
-     * @returns The singleton {@link MonitorOperationRegistry} instance.
-     */
+        /**
+         * Gets or creates the {@link MonitorOperationRegistry} singleton instance.
+         *
+         * @remarks
+         * Lazily initializes the registry if it does not exist. Debug logging tracks
+         * creation when enabled.
+         *
+         * @returns The singleton {@link MonitorOperationRegistry} instance.
+         */
     private getMonitorOperationRegistry(): MonitorOperationRegistry {
         if (!this.monitorOperationRegistry) {
             this.monitorOperationRegistry = new MonitorOperationRegistry();
@@ -633,7 +635,7 @@ export class ServiceContainer {
     }
 
     /**
-     * Gets the {@link SyncEngine} singleton.
+    * Gets the {@link SyncEngine} singleton.
      */
     public getSyncEngine(): SyncEngine {
         if (!this.syncEngine) {
@@ -651,15 +653,15 @@ export class ServiceContainer {
     }
 
     /**
-     * Gets the {@link MonitorManager} singleton.
+    * Gets the {@link MonitorManager} singleton.
      *
      * @remarks
      * Instantiates with repositories, event bus, and dependency injection.
      * Forwards important events to the main orchestrator.
      *
-     * @returns The {@link MonitorManager} instance.
+    * @returns The {@link MonitorManager} instance.
      *
-     * @throws Error if {@link SiteManager} is not initialized when required.
+    * @throws Error if {@link SiteManager} is not initialized when required.
      */
     public getMonitorManager(): MonitorManager {
         if (!this.monitorManager) {
@@ -772,13 +774,13 @@ export class ServiceContainer {
     }
 
     /**
-     * Gets the {@link SiteManager} singleton.
+    * Gets the {@link SiteManager} singleton.
      *
      * @remarks
      * Instantiates with repositories, event bus, and monitoring operations.
      * Forwards important events to the main orchestrator.
      *
-     * @returns The {@link SiteManager} instance.
+    * @returns The {@link SiteManager} instance.
      *
      * @throws Error if setting the history limit fails.
      */
@@ -833,12 +835,12 @@ export class ServiceContainer {
     }
 
     /**
-     * Gets the {@link UptimeOrchestrator} singleton.
+    * Gets the {@link UptimeOrchestrator} singleton.
      *
      * @remarks
      * Instantiates with injected manager dependencies.
      *
-     * @returns The {@link UptimeOrchestrator} instance.
+    * @returns The {@link UptimeOrchestrator} instance.
      */
     public getUptimeOrchestrator(): UptimeOrchestrator {
         if (!this.uptimeOrchestrator) {

@@ -11,7 +11,9 @@ import type { StandardizedCache } from "../utils/cache/StandardizedCache";
  * Input for {@link createSitesCacheGetter}.
  */
 export interface CreateSitesCacheGetterInput {
-    /** Returns the already-constructed {@link SiteManager} instance (if any). */
+    /**
+    * Returns the already-constructed {@link electron/managers/SiteManager#SiteManager} instance (if any).
+     */
     getSiteManager: () => SiteManager | undefined;
 }
 

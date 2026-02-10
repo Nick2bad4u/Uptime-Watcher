@@ -4,9 +4,9 @@
  *
  * @remarks
  * Listens for `internal:database:history-limit-updated` events emitted by the
- * {@link DatabaseManager}, tracks the previous limit for telemetry, and forwards
+ * {@link electron/managers/DatabaseManager#DatabaseManager}, tracks the previous limit for telemetry, and forwards
  * sanitized updates to frontend consumers via `settings:history-limit-updated`.
- * This helper keeps {@link UptimeOrchestrator} focused on high level manager
+ * This helper keeps {@link electron/UptimeOrchestrator#UptimeOrchestrator} focused on high level manager
  * orchestration while avoiding duplication of history-limit bookkeeping.
  */
 

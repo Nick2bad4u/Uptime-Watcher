@@ -30,7 +30,8 @@ export interface ToggleGroupProperties<TValue extends string> {
 }
 
 /**
- * Generic radio-like toggle group used by {@link SiteListLayoutSelector}.
+ * Generic radio-like toggle group used by
+ * {@link src/components/Dashboard/SiteList/SiteListLayoutSelector#SiteListLayoutSelector}.
  *
  * @remarks
  * This component exists to avoid duplicating the same Tooltip + button mapping

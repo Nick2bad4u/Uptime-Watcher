@@ -1,5 +1,5 @@
 /**
- * Internal payload helpers used by {@link TypedEventBus}.
+ * Internal payload helpers used by {@link electron/events/TypedEventBus#TypedEventBus}.
  *
  * @remarks
  * This module centralizes cloning and metadata-carrier logic so the main event

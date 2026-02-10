@@ -25,7 +25,7 @@
  *
  * @public
  *
- * @see {@link MonitorStatusUpdateService} for status update safety
+ * @see {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService} for status update safety
  * @see {@link OperationTimeoutManager} for timeout management
  */
 
@@ -178,8 +178,8 @@ export interface EnhancedMonitorCheckConfig extends EnhancedMonitoringDependenci
  *
  * @public
  *
- * @see {@link MonitorOperationRegistry} for operation correlation details
- * @see {@link MonitorStatusUpdateService} for status update safety mechanisms
+ * @see {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry} for operation correlation details
+ * @see {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService} for status update safety mechanisms
  * @see {@link OperationTimeoutManager} for timeout and cleanup management
  * @see {@link EnhancedMonitorCheckConfig} for configuration requirements
  */
@@ -290,9 +290,9 @@ export class EnhancedMonitorChecker {
      *
      * @public
      *
-     * @see {@link MonitorOperationRegistry.initiateCheck} for operation registration
+    * @see {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry.initiateCheck} for operation registration
      * @see {@link OperationTimeoutManager.scheduleTimeout} for timeout management
-     * @see {@link MonitorStatusUpdateService.updateMonitorStatus} for status update
+    * @see {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService.updateMonitorStatus} for status update
      *   safety
      */
     public async checkMonitor(

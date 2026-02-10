@@ -1,5 +1,5 @@
 /**
- * Internal helpers for {@link SyncEngine}.
+ * Internal helpers for {@link electron/services/sync/SyncEngine#SyncEngine}.
  *
  * @remarks
  * This module intentionally centralizes the “pure” cloud-sync state

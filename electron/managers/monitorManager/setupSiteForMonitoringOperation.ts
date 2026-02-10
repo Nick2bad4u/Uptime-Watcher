@@ -2,7 +2,7 @@
  * Site setup helpers.
  *
  * @remarks
- * Extracted from {@link MonitorManager}.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager}.
  *
  * @packageDocumentation
  */

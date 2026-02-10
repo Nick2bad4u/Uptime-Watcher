@@ -89,10 +89,10 @@
         },
         "electron": {
             "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
+            "Electron.CrossProcessExports.safeStorage": "https://www.electronjs.org/docs/latest/api/safe-storage",
             "Menu": "https://www.electronjs.org/docs/latest/api/menu",
             "Notification": "https://www.electronjs.org/docs/latest/api/notification",
             "Tray": "https://www.electronjs.org/docs/latest/api/tray",
-            "Electron.CrossProcessExports.safeStorage": "https://www.electronjs.org/docs/latest/api/safe-storage",
             "app": "https://www.electronjs.org/docs/latest/api/app",
             "dialog": "https://www.electronjs.org/docs/latest/api/dialog",
             "ipcMain": "https://www.electronjs.org/docs/latest/api/ipc-main",

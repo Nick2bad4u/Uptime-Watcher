@@ -102,7 +102,7 @@ export interface SettingsControllerState {
 }
 
 /**
- * Extracted controller hook for {@link Settings}.
+ * Extracted controller hook for {@link src/components/Settings/Settings#Settings}.
  *
  * @remarks
  * This keeps the Settings view component mostly declarative by containing the

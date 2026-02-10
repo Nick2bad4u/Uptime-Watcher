@@ -1,5 +1,5 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, plugin/use-logical-properties-and-values, plugin/use-logical-units, declaration-block-no-redundant-longhand-properties, order/properties-order, no-duplicate-selectors, no-descending-specificity, selector-max-specificity, selector-not-notation, csstools/use-nesting, a11y/media-prefers-reduced-motion, defensive-css/require-named-grid-lines, scales/font-sizes -- Docusaurus CSS breaks these features */
+/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, defensive-css/require-named-grid-lines, scales/font-sizes -- Docusaurus CSS breaks these features */
 
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules
@@ -1837,9 +1837,9 @@
     *,
     *::before,
     *::after {
-        animation-duration: 0.01ms !important;
+        animation-duration: 100ms !important;
         animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+        transition-duration: 100ms !important;
     }
 }
 

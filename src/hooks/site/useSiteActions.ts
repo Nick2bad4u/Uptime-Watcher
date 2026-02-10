@@ -106,7 +106,7 @@ export interface SiteActionsResult {
  *
  * @public
  *
- * @see {@link useSitesStore} for data access.
+ * @see {@link src/stores/sites/useSitesStore#useSitesStore} for data access.
  * @see {@link useUIStore} for selection updates.
  */
 export function useSiteActions(

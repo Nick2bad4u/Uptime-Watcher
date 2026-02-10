@@ -63,7 +63,7 @@ import {
 } from "./MonitorManagerEnhancedLifecycle";
 
 /**
- * Dependency contract consumed by {@link MonitorManager}.
+ * Dependency contract consumed by {@link electron/managers/MonitorManager#MonitorManager}.
  *
  * @remarks
  * Supplies repositories, cache accessors, and services required for monitor

@@ -141,7 +141,7 @@ Migration rules:
 V1 uses a deterministic merge strategy:
 
 - **Last-write-wins per field** using the {@link CloudSyncWriteKey} ordering.
-- **Last-write-wins per field** using the `CloudSyncWriteKey` ordering.
+- **Last-write-wins per field** using the {@link import("@shared/types/cloudSync").CloudSyncWriteKey} ordering.
   In practice this is `(timestamp, deviceId, opId)`.
 - This ensures determinism even when multiple devices write concurrently or
   remote objects are listed/applied in different orders.

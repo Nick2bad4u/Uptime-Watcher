@@ -1,5 +1,6 @@
 /**
- * Strategy-registry initialization for {@link EnhancedMonitorChecker}.
+ * Strategy-registry initialization for
+ * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}.
  *
  * @remarks
  * We keep `servicesByType` as a stable, mutable map so tests can override
@@ -32,7 +33,7 @@ const getServiceOrThrow = (
 
 /**
  * Creates the shared service-map and strategy registry used by
- * {@link EnhancedMonitorChecker}.
+ * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}.
  *
  * @param args - Builder arguments.
  */

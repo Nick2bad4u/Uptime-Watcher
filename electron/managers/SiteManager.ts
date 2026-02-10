@@ -465,8 +465,8 @@ export class SiteManager {
      * - `internal:site:removed` (for each removed site)
      * - `sites:state-synchronized` delete deltas (for each removed site)
      *
-     * The {@link SiteLifecycleCoordinator} relies on this for the
-     * `UptimeOrchestrator.deleteAllSites()` workflow.
+    * The {@link electron/coordinators/SiteLifecycleCoordinator#SiteLifecycleCoordinator} relies on this
+     * for the `UptimeOrchestrator.deleteAllSites()` workflow.
      *
      * @returns The number of deleted sites.
      */

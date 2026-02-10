@@ -14,7 +14,9 @@ import type { UptimeEvents } from "../events/eventTypes";
 import type { EnhancedEventPayload, EventKey } from "../events/TypedEventBus";
 
 /**
- * Represents a service that optionally exposes an {@link initialize} method.
+ * Represents a service that optionally exposes an
+ * {@link PossiblyInitializableService.initialize | initialize}
+ * method.
  */
 export interface PossiblyInitializableService {
     /** Optional initializer invoked during container bootstrap. */
@@ -22,7 +24,9 @@ export interface PossiblyInitializableService {
 }
 
 /**
- * Type guard that determines if a service exposes an {@link initialize} method.
+ * Type guard that determines if a service exposes an
+ * {@link PossiblyInitializableService.initialize | initialize}
+ * method.
  */
 export function hasInitializeMethod(
     value: unknown
@@ -55,7 +59,7 @@ export type ForwardablePayloadBase<EventName extends EventKey<UptimeEvents>> =
  *
  * @remarks
  * This is the normalized form that may (or may not) include `_meta` and
- * `_originalMeta` properties attached by {@link TypedEventBus}.
+ * `_originalMeta` properties attached by {@link electron/events/TypedEventBus#TypedEventBus}.
  */
 export type ForwardableEventPayload<EventName extends EventKey<UptimeEvents>> =
     ForwardablePayloadBase<EventName> & {

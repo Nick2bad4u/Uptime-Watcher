@@ -2,7 +2,7 @@
  * Adapter helpers for supplying typed `emitTyped` functions to coordinators.
  *
  * @remarks
- * The orchestrator owns the concrete {@link TypedEventBus} instance, while many
+ * The orchestrator owns the concrete {@link electron/events/TypedEventBus#TypedEventBus} instance, while many
  * coordinators depend on a narrow `emitTyped` callback. Centralizing these
  * adapters avoids repeating inline arrow functions in constructors and keeps
  * type parameters intact.

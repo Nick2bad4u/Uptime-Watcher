@@ -26,7 +26,7 @@ export interface UptimeOrchestratorSubscriptionsOptions {
 
 /**
  * Registers and unregisters all event-bus subscriptions used by
- * {@link UptimeOrchestrator}.
+ * {@link electron/UptimeOrchestrator#UptimeOrchestrator}.
  *
  * @remarks
  * This exists solely to keep `UptimeOrchestrator.ts` focused on orchestration

@@ -188,7 +188,7 @@ export interface SiteSyncDependencies {
  *
  * @remarks
  * The sites sync module keeps a lazily-initialized singleton
- * {@link StatusUpdateManager} instance. This helper exists to support
+ * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} instance. This helper exists to support
  * deterministic testing and to avoid leaked event subscriptions when modules
  * are reloaded in development.
  *

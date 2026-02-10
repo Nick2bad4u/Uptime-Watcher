@@ -75,7 +75,7 @@ export function resolveStatusUpdateDetails(args: {
 
 /**
  * Convert a raw monitor service check result into a stable payload for
- * {@link MonitorStatusUpdateService}.
+ * {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService}.
  */
 export function buildStatusUpdateMonitorCheckResult(args: {
     monitorId: string;

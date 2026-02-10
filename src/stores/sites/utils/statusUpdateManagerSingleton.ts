@@ -13,7 +13,7 @@ type StatusUpdateCallback = (update: StatusUpdate) => void;
  *
  * @remarks
  * The sites sync layer intentionally keeps a singleton
- * {@link StatusUpdateManager} to avoid duplicate event subscriptions across
+ * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} to avoid duplicate event subscriptions across
  * components.
  *
  * The callback can change between subscriptions (different components), so the
@@ -45,7 +45,10 @@ export function setStatusUpdateCallback(callback: StatusUpdateCallback): void {
     statusUpdateManagerSingleton.callback = callback;
 }
 
-/** Returns the active {@link StatusUpdateManager} instance (if initialized). */
+/**
+ * Returns the active {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} instance (if
+ * initialized).
+ */
 export function getStatusUpdateManagerInstance():
     | StatusUpdateManager
     | undefined {
@@ -59,7 +62,8 @@ export function unsubscribeStatusUpdateManager(): void {
 }
 
 /**
- * Ensures the singleton {@link StatusUpdateManager} exists and returns it.
+ * Ensures the singleton {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} exists and
+ * returns it.
  */
 export function ensureStatusUpdateManager(options: {
     readonly fullResyncSites: () => Promise<void>;

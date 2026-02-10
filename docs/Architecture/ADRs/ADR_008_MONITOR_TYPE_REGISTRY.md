@@ -174,10 +174,10 @@ graph TB
 Each monitor type provides a comprehensive configuration object.
 
 > **Scope note:** In the current implementation, the shared contract exposed to
-> the renderer is `MonitorTypeConfig` (`shared/types/monitorTypes.ts`).
+> the renderer is {@link import("@shared/types/monitorTypes").MonitorTypeConfig}.
 > The Electron main-process registry extends that contract with main-only
-> concerns (service factories and Zod schemas) via `BaseMonitorConfig` in
-> `electron/services/monitoring/MonitorTypeRegistry.ts`.
+> concerns (service factories and Zod schemas) via
+> {@link import("@electron/services/monitoring/MonitorTypeRegistry.types").BaseMonitorConfig}.
 
 ```typescript
 export interface BaseMonitorConfig {

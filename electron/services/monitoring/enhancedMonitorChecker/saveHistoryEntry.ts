@@ -9,7 +9,7 @@ import type { HistoryPruneState } from "./historyPruningState";
  * Persists a monitor history entry and prunes when needed.
  *
  * @remarks
- * Extracted from {@link EnhancedMonitorChecker} to keep the checker focused on
+ * Extracted from {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker} to keep the checker focused on
  * orchestration.
  */
 export async function saveMonitorHistoryEntry(args: {

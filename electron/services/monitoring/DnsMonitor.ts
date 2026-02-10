@@ -517,7 +517,7 @@ export class DnsMonitor implements IMonitorService {
      * @throws {@link Error} When monitor validation fails (wrong type or
      *   missing hostname)
      *
-     * @see {@link validateMonitorHost} - Host validation utility
+    * @see {@link electron/services/monitoring/shared/monitorServiceHelpers#validateMonitorHost} - Host validation utility
      * @see {@link createMonitorConfig} - Config normalization utility
      * @see {@link performDnsCheckWithRetry} - Core DNS functionality
      */

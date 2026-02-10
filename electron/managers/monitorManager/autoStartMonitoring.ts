@@ -2,7 +2,7 @@
  * Auto-start policy helpers for monitor scheduling.
  *
  * @remarks
- * Extracted from {@link MonitorManager} to keep the manager focused on lifecycle
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep the manager focused on lifecycle
  * orchestration.
  *
  * @packageDocumentation

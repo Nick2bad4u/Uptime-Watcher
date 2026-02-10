@@ -1,5 +1,5 @@
 /**
- * UI store slice for {@link useSiteDetails}.
+ * UI store slice for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @remarks
  * Extracted to keep the main hook focused on derived state and domain
@@ -44,7 +44,7 @@ const selectSiteDetailsUiStoreSlice = (
 });
 
 /**
- * Reads the UI store slice used by {@link useSiteDetails}.
+ * Reads the UI store slice used by {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  */
 export function useSiteDetailsUiStore(): {
     readonly activeSiteDetailsTab: SiteDetailsTab;

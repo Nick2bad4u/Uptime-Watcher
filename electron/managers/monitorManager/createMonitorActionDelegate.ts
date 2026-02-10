@@ -2,7 +2,7 @@
  * Recursion-safe monitor action delegate.
  *
  * @remarks
- * Extracted from {@link MonitorManager} to keep the manager focused on
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep the manager focused on
  * orchestration.
  */
 

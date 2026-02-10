@@ -70,10 +70,10 @@
  * await orchestrator.startMonitoring();
  * ```
  *
- * @see {@link DatabaseManager} for database operations and repository pattern
- * @see {@link SiteManager} for site management and caching
- * @see {@link MonitorManager} for monitoring operations and scheduling
- * @see {@link TypedEventBus} for event system implementation
+ * @see {@link electron/managers/DatabaseManager#DatabaseManager} for database operations and repository pattern
+ * @see {@link electron/managers/SiteManager#SiteManager} for site management and caching
+ * @see {@link electron/managers/MonitorManager#MonitorManager} for monitoring operations and scheduling
+ * @see {@link electron/events/TypedEventBus#TypedEventBus} for event system implementation
  */
 
 /* eslint max-lines: ["error", { "max": 2100 }] -- Main orchestrator module */
@@ -208,7 +208,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     private initializationPromise: Promise<void> | undefined;
 
-    /** Factory for creating contextual {@link ApplicationError} instances. */
+    /**
+    * Factory for creating contextual errors via
+    * {@link electron/utils/errors/contextualErrorFactory#ContextualErrorFactory}.
+     */
     private readonly createContextualError: ContextualErrorFactory;
 
     /** Helper for executing async operations with contextual error wrapping. */
@@ -440,7 +443,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Emits a sanitized site state synchronization event.
      *
      * @remarks
-     * Delegates to {@link SiteManager.emitSitesStateSynchronized} while
+    * Delegates to {@link electron/managers/SiteManager#SiteManager.emitSitesStateSynchronized} while
      * preserving orchestrator-level error context. Returns the cloned site
      * snapshot that was dispatched with the event for downstream consumers
      * (e.g., IPC handlers).
@@ -788,7 +791,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * database.
      *
      * @remarks
-     * Leverages the {@link SiteManager} in-memory cache to avoid redundant
+    * Leverages the {@link electron/managers/SiteManager#SiteManager} in-memory cache to avoid redundant
      * round-trips through the repository layer when only aggregate metadata is
      * required (for example, sync status calls).
      *

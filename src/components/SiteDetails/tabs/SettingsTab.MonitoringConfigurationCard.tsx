@@ -72,7 +72,8 @@ function getMaxDurationVariant(
 }
 
 /**
- * Renders the “Monitoring Configuration” section of {@link SettingsTab}.
+ * Renders the “Monitoring Configuration” section of
+ * {@link src/components/SiteDetails/tabs/SettingsTab#SettingsTab}.
  */
 export const SettingsTabMonitoringConfigurationCard = ({
     handleIntervalChange,

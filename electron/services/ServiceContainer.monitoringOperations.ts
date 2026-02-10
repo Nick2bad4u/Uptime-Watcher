@@ -1,6 +1,6 @@
 /**
  * Helper factory for creating the {@link IMonitoringOperations} adapter used by
- * {@link SiteManager}.
+ * {@link electron/managers/SiteManager#SiteManager}.
  *
  * @remarks
  * `ServiceContainer` must wire `SiteManager` to `MonitorManager` without
@@ -33,7 +33,8 @@ export interface CreateMonitoringOperationsInput {
 }
 
 /**
- * Creates the monitoring operations adapter passed into {@link SiteManager}.
+ * Creates the monitoring operations adapter passed into
+ * {@link electron/managers/SiteManager#SiteManager}.
  */
 export function createMonitoringOperations(
     input: CreateMonitoringOperationsInput

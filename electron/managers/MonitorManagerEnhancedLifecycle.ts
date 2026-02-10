@@ -1,5 +1,5 @@
 /**
- * Shared monitoring lifecycle helpers consumed by {@link MonitorManager}.
+ * Shared monitoring lifecycle helpers consumed by {@link electron/managers/MonitorManager#MonitorManager}.
  *
  * @remarks
  * These helpers encapsulate the enhanced monitoring orchestration logic so the
@@ -46,7 +46,8 @@ export interface EnhancedLifecycleConfig {
 }
 
 /**
- * Hooks supplied by {@link MonitorManager} to integrate helper flow results.
+ * Hooks supplied by {@link electron/managers/MonitorManager#MonitorManager} to integrate helper flow
+ * results.
  */
 export interface EnhancedLifecycleHost {
     /** Applies a state transition to a monitor instance. */

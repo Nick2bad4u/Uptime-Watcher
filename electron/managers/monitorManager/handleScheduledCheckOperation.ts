@@ -1,5 +1,5 @@
 /**
- * Scheduled check handler for {@link MonitorManager}.
+ * Scheduled check handler for {@link electron/managers/MonitorManager#MonitorManager}.
  *
  * @remarks
  * Extracted to keep `MonitorManager.ts` focused on lifecycle orchestration.

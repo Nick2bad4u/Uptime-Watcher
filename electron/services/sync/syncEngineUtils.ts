@@ -3,7 +3,7 @@
  *
  * @remarks
  * This module intentionally holds low-level helpers (validation + bounded
- * concurrency) used by {@link SyncEngine}.
+ * concurrency) used by {@link electron/services/sync/SyncEngine#SyncEngine}.
  */
 
 import { hasAsciiControlCharacters as sharedHasAsciiControlCharacters } from "@shared/utils/stringSafety";

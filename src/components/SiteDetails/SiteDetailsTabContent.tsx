@@ -2,7 +2,7 @@
  * SiteDetails tab content rendering.
  *
  * @remarks
- * Extracted from {@link SiteDetails} to keep the parent component focused on
+ * Extracted from {@link src/components/SiteDetails/SiteDetails#SiteDetails} to keep the parent component focused on
  * modal layout, navigation, and orchestration.
  */
 

@@ -28,7 +28,8 @@ export interface SettingsTabSiteInformationCardProperties {
 }
 
 /**
- * Renders the “Site Information” section of {@link SettingsTab}.
+ * Renders the “Site Information” section of
+ * {@link src/components/SiteDetails/tabs/SettingsTab#SettingsTab}.
  */
 export const SettingsTabSiteInformationCard = ({
     displayIdentifier,

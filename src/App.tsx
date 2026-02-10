@@ -104,7 +104,7 @@ import { useTheme } from "./theme/useTheme";
  * component API may change as we refine the architecture.
  *
  * @see {@link useTheme} for theme management
- * @see {@link useSitesStore} for site state management
+ * @see {@link src/stores/sites/useSitesStore#useSitesStore} for site state management
  */
 export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Error store

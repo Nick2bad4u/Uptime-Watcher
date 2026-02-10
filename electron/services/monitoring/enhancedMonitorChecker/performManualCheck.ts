@@ -1,5 +1,6 @@
 /**
- * Manual-check execution for {@link EnhancedMonitorChecker}.
+ * Manual-check execution for
+ * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}.
  *
  * @remarks
  * Manual checks intentionally bypass operation correlation, but they can race

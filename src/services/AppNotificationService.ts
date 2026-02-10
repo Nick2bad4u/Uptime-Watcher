@@ -6,9 +6,9 @@
  * Backup actions) where the user expects immediate feedback even if the app is
  * minimized.
  *
- * It is intentionally separate from {@link NotificationPreferenceService}:
- * preferences control whether notifications are enabled; this service only
- * requests dispatch.
+ * It is intentionally separate from
+ * {@link src/services/NotificationPreferenceService#NotificationPreferenceService}:
+ * preferences control whether notifications are enabled; this service only requests dispatch.
  *
  * @packageDocumentation
  */

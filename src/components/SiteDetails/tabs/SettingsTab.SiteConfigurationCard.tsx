@@ -44,7 +44,8 @@ export interface SettingsTabSiteConfigurationCardProperties {
 }
 
 /**
- * Renders the “Site Configuration” section of {@link SettingsTab}.
+ * Renders the “Site Configuration” section of
+ * {@link src/components/SiteDetails/tabs/SettingsTab#SettingsTab}.
  */
 export const SettingsTabSiteConfigurationCard = ({
     displayIdentifier,

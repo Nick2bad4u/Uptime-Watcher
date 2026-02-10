@@ -4,7 +4,7 @@ import { AppIcons } from "../../../utils/icons";
 
 /**
  * Status used for the provider connection indicator in
- * {@link CloudProviderSetupPanel}.
+ * {@link src/components/Settings/cloud/CloudProviderSetupPanel#CloudProviderSetupPanel}.
  */
 export type CloudProviderSetupPanelConnectionSiteStatus =
     | "down"
@@ -12,7 +12,8 @@ export type CloudProviderSetupPanelConnectionSiteStatus =
     | "up";
 
 /**
- * Supported tabs inside {@link CloudProviderSetupPanel}.
+ * Supported tabs inside
+ * {@link src/components/Settings/cloud/CloudProviderSetupPanel#CloudProviderSetupPanel}.
  */
 export type CloudProviderSetupPanelTabKey =
     | "dropbox"
@@ -32,7 +33,7 @@ export interface CloudProviderSetupPanelTabDefinition {
 }
 
 /**
- * Tab definitions for {@link CloudProviderSetupPanel}.
+ * Tab definitions for {@link src/components/Settings/cloud/CloudProviderSetupPanel#CloudProviderSetupPanel}.
  */
 export const CLOUD_PROVIDER_SETUP_PANEL_TABS: readonly CloudProviderSetupPanelTabDefinition[] =
     [

@@ -1,5 +1,6 @@
 /**
- * Monitor start/stop helpers for {@link EnhancedMonitorChecker}.
+ * Monitor start/stop helpers for
+ * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}.
  *
  * @remarks
  * Extracted from `EnhancedMonitorChecker.ts` to keep the checker focused on

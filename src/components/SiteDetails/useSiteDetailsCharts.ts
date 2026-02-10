@@ -1,5 +1,5 @@
 /**
- * Chart wiring for {@link SiteDetails}.
+ * Chart wiring for {@link src/components/SiteDetails/SiteDetails#SiteDetails}.
  *
  * @remarks
  * The SiteDetails view builds multiple Chart.js datasets and option objects
@@ -31,9 +31,9 @@ interface StatusDistribution {
 }
 
 /**
- * Builds chart configuration objects used by {@link SiteDetails}.
+ * Builds chart configuration objects used by {@link src/components/SiteDetails/SiteDetails#SiteDetails}.
  *
- * @param analytics - Analytics computed by {@link useSiteAnalytics}.
+ * @param analytics - Analytics computed by {@link src/hooks/site/useSiteAnalytics#useSiteAnalytics}.
  * @param currentTheme - Current application theme.
  *
  * @returns Memoized chart options and datasets.

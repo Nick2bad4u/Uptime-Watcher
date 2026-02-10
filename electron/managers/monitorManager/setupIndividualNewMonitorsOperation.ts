@@ -2,7 +2,7 @@
  * Per-monitor setup helpers for newly added monitors.
  *
  * @remarks
- * Extracted from {@link MonitorManager}.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager}.
  *
  * @packageDocumentation
  */

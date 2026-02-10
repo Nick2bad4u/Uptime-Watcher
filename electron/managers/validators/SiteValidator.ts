@@ -40,7 +40,7 @@ import { MonitorValidator } from "./MonitorValidator";
  * @remarks
  * Focused on site-level validation concerns including identifier validation and
  * monitor array validation. Delegates monitor validation to
- * {@link MonitorValidator} for comprehensive monitor checks.
+ * {@link electron/managers/validators/MonitorValidator#MonitorValidator} for comprehensive monitor checks.
  *
  * @example
  *
@@ -71,7 +71,7 @@ export class SiteValidator {
      * Create a new SiteValidator instance.
      *
      * @remarks
-     * Instantiates a {@link MonitorValidator} for monitor validation delegation.
+    * Instantiates a {@link electron/managers/validators/MonitorValidator#MonitorValidator} for monitor validation delegation.
      */
     public constructor() {
         this.monitorValidator = new MonitorValidator();
@@ -108,7 +108,7 @@ export class SiteValidator {
      *
      * @remarks
      * Performs identifier and monitor array validation, delegating monitor
-     * validation to {@link MonitorValidator}.
+    * validation to {@link electron/managers/validators/MonitorValidator#MonitorValidator}.
      *
      * @example
      *
@@ -180,7 +180,7 @@ export class SiteValidator {
      *
      * @remarks
      * Checks that monitors is an array and delegates individual monitor
-     * validation to {@link MonitorValidator}. Returns error messages for invalid
+    * validation to {@link electron/managers/validators/MonitorValidator#MonitorValidator}. Returns error messages for invalid
      * monitors, or an empty array if all are valid.
      *
      * @example

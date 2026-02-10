@@ -1,5 +1,5 @@
 /**
- * Helper operations for {@link useSiteDetails}.
+ * Helper operations for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @remarks
  * These helpers exist primarily to keep the main hook implementation readable

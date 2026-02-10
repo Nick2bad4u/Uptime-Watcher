@@ -22,7 +22,7 @@ export interface UptimeOrchestratorEventHandlersOptions {
 }
 
 /**
- * Centralizes the bound event-handler functions for {@link UptimeOrchestrator}.
+ * Centralizes the bound event-handler functions for {@link electron/UptimeOrchestrator#UptimeOrchestrator}.
  *
  * @remarks
  * Keeping these handlers out of the orchestrator class reduces file size and
