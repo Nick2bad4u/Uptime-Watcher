@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[9d9f94a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d9f94a2e67d67fb791a6f43062bdd3f2e24a831)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...9d9f94a2e67d67fb791a6f43062bdd3f2e24a831))
+[c0b67e5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0b67e5b8f35f330e854e7d9679c19c0401369ed)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...c0b67e5b8f35f330e854e7d9679c19c0401369ed))
 
 
 ### ✨ Features
@@ -913,6 +913,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e251
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Clarifies container access
+
+🚜 [refactor] Renames the existing-instance accessor to discourage implicit initialization
+ - Emphasizes explicit usage in non-bootstrapping paths
+📝 [docs] Improves API reference linking and narrative guidance
+ - Reduces broken cross-module links and clarifies utility/error notes
+🎨 [style] Simplifies documentation lint suppression rules
+ - Keeps lint configuration aligned with supported checks
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c0b67e5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0b67e5b8f35f330e854e7d9679c19c0401369ed)
+
 
 - 🚜 [refactor] Centralizes validation helpers
 
@@ -1821,6 +1833,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v22.1.0 [skip ci] [`(18ddf69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)
+
 
 - Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
 

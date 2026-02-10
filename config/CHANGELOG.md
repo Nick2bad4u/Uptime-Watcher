@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[2987d9f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2987d9fb89ace4c9858ecb53c26c18b2ea57086b)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...2987d9fb89ace4c9858ecb53c26c18b2ea57086b))
+[d474de2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d474de2b8cdffb3f85b2e62cc04f70f0d5466685)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...d474de2b8cdffb3f85b2e62cc04f70f0d5466685))
 
 
 ### ✨ Features
@@ -618,6 +618,16 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Updates doc front matter metadata
+
+📝 [docs] Replaces reserved front‑matter fields with doc‑specific metadata across docs and guidance to avoid TypeDoc routing side effects, plus refreshes review dates. 🧭
+🧹 [chore] Tightens front‑matter schema, validation rules, and serialization order to require the schema reference and new doc metadata fields. ✅
+📝 [docs] Normalizes formatting, list styles, and navigation aids while trimming front‑matter from TSDoc tag pages. 📚
+🔧 [build] Expands TypeDoc markdown generation options and adjusts link validation and Docusaurus warning behavior for docs builds. 🧰
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d474de2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d474de2b8cdffb3f85b2e62cc04f70f0d5466685)
+
+
 - 📝 [docs] Enhance documentation across multiple scripts
  - ✨ Improved JSDoc comments for clarity and consistency in `enhance-test-metadata.mjs`, `extract-test-names.mjs`, `find-empty-dirs.mjs`, `find-shared-imports.mjs`, `fix-test-quotes.mjs`, `maintain-docs.mjs`, `migrate-to-mts-simple.mjs`, `sort-frontmatter-all.mjs`, `sort-frontmatter.mjs`, `transform-test.mjs`, `validate-doc-frontmatter.mjs`, `validate-performance-config.mjs`, `verify-eslint-inspector.mjs`, and `test-remark.mjs`.
  - 🛠️ Fixed quote issues in test descriptions in `ErrorBoundary.comprehensive.test.tsx`.
@@ -774,6 +784,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 ### 🧹 Chores
 
+- Update changelogs for v22.1.0 [skip ci] [`(18ddf69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)
+
+
 - Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
 
 
@@ -822,6 +835,39 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 📦 Upgrade @storybook/addon-a11y from ^10.2.7 to ^10.2.8 for improved accessibility features.
+ - 📦 Upgrade @storybook/addon-docs, @storybook/addon-links, @storybook/addon-themes, @storybook/addon-vitest, @storybook/builder-vite, @storybook/react, and @storybook/react-vite from ^10.2.7 to ^10.2.8 for consistency and new features.
+ - 📦 Upgrade @stylistic/eslint-plugin from ^5.7.1 to ^5.8.0 for enhanced linting capabilities.
+ - 📦 Upgrade @typescript-eslint/eslint-plugin, @typescript-eslint/parser, and @typescript-eslint/types from ^8.54.0 to ^8.55.0 for better TypeScript support.
+ - 📦 Upgrade @vitejs/plugin-react from ^5.1.3 to ^5.1.4 for improved React integration.
+ - 📦 Upgrade @vitest/eslint-plugin from ^1.6.6 to ^1.6.7 for updated linting rules.
+ - 📦 Upgrade eslint-plugin-css from ^0.11.1 to ^0.12.0 for better CSS linting.
+ - 📦 Upgrade eslint-plugin-jsonc from ^2.21.0 to ^2.21.1 for JSONC support improvements.
+ - 📦 Upgrade eslint-plugin-react-hooks-addons from ^0.5.0 to ^0.5.1 for additional hooks linting rules.
+ - 📦 Upgrade eslint-plugin-storybook from ^10.2.7 to ^10.2.8 for Storybook linting updates.
+ - 📦 Upgrade eslint-plugin-unused-imports from ^4.3.0 to ^4.4.1 for better unused import detection.
+ - 📦 Upgrade eslint-plugin-zod from ^3.0.2 to ^3.1.0 for enhanced Zod support.
+ - 📦 Upgrade putout from ^41.20.0 to ^41.20.1 for bug fixes and improvements.
+ - 📦 Upgrade storybook from ^10.2.7 to ^10.2.8 for the latest features and fixes.
+ - 📦 Upgrade typescript-eslint from ^8.54.0 to ^8.55.0 for improved TypeScript linting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(244a289)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/244a289388e59158c2ba7ff8f2158f1989f48f42)
+
+
+- 🔧 [build] Update configurations and styles across multiple files
+ - 📝 Update BeastMode agent tools order for improved clarity
+ - 📝 Enhance Copilot instructions to prioritize code quality and maintainability
+ - 🎨 Refactor VSCode settings for better organization and readability
+ - 🛠️ Modify Knip config to include 'shellcheck' in ignore binaries
+ - 🎨 Adjust Docusaurus config to disable CSS cascade layers due to production issues
+ - 🎨 Update CSS styles for improved consistency in line heights and font sizes
+ - 🎨 Refine stylelint configuration to accommodate Docusaurus patterns and reduce false positives
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eab5fda)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eab5fdabd164f354c58874885171e74c30c1d245)
+
 
 - 🔧 [build] Update linting configuration and package details
  - 🛠️ [fix] Add ESLint and related plugins to exceptions in .npmpackagejsonlintrc.json

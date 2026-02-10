@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[3f39611](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f396116d81c6786e965c39305f0692407ddc67c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...3f396116d81c6786e965c39305f0692407ddc67c))
+[4df23d4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4df23d45cdcc22906fce11d62940330ce3cb095f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...4df23d45cdcc22906fce11d62940330ce3cb095f))
 
 
 ### ✨ Features
@@ -895,6 +895,35 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5063
 
 ### 🚜 Refactor
 
+- 🚜 [refactor] Update service container retrieval method in hot reload logic
+ - Changed `ServiceContainer.getExistingInstance()` to `ServiceContainer.getExisting()` for improved clarity and consistency in the hot reload process.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4df23d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4df23d45cdcc22906fce11d62940330ce3cb095f)
+
+
+- 🚜 [refactor] Enhance OAuth URL validation and external URL handling
+ - 🛠️ Update `validateOAuthAuthorizeUrl` to use policy-based validation with HTTPS requirement
+ - 🔧 Introduce `validateExternalOpenUrlCandidateWithPolicy` for stricter URL validation
+ - 📝 Refactor `WindowService` to utilize new external URL validation methods
+ - 🚜 Move monitor signature creation logic to `monitorPersistenceUtils`
+ - 🧪 Add strict tests for external URL validation and opening behavior
+ - 🧹 Clean up unused code and improve error handling in `SiteWriterService`
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85452fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/85452fc395a3f621466021283022dd8c0027d283)
+
+
+- 🚜 [refactor] Clarifies container access
+
+🚜 [refactor] Renames the existing-instance accessor to discourage implicit initialization
+ - Emphasizes explicit usage in non-bootstrapping paths
+📝 [docs] Improves API reference linking and narrative guidance
+ - Reduces broken cross-module links and clarifies utility/error notes
+🎨 [style] Simplifies documentation lint suppression rules
+ - Keeps lint configuration aligned with supported checks
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c0b67e5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0b67e5b8f35f330e854e7d9679c19c0401369ed)
+
+
 - 🚜 [refactor] Centralizes validation helpers
 
 🚜 [refactor] Extracts shared validation utilities to reduce duplication
@@ -1597,6 +1626,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Add interactive chart docs
+
+📝 [docs] Adds chart-focused markdown guides with Mermaid visuals and updated ADR phrasing
+ - Replaces MDX pages with TypeDoc-ingested chart docs for site inclusion
+🔧 [build] Updates documentation site config, sidebar entries, and doc inputs
+ - Enables extra markdown handling and links chart pages in navigation
+🎨 [style] Refines mobile navbar selectors and search input styling
+🧹 [chore] Tightens inline documentation comment wording
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d77227b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d77227b76ec8024b0e90611643d644a41753fa7a)
+
+
 - 📝 [docs] Enhance documentation across multiple scripts
  - ✨ Improved JSDoc comments for clarity and consistency in `enhance-test-metadata.mjs`, `extract-test-names.mjs`, `find-empty-dirs.mjs`, `find-shared-imports.mjs`, `fix-test-quotes.mjs`, `maintain-docs.mjs`, `migrate-to-mts-simple.mjs`, `sort-frontmatter-all.mjs`, `sort-frontmatter.mjs`, `transform-test.mjs`, `validate-doc-frontmatter.mjs`, `validate-performance-config.mjs`, `verify-eslint-inspector.mjs`, and `test-remark.mjs`.
  - 🛠️ Fixed quote issues in test descriptions in `ErrorBoundary.comprehensive.test.tsx`.
@@ -1838,6 +1879,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v22.1.0 [skip ci] [`(18ddf69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)
+
 
 - Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
 

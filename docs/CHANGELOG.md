@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[205d1ff](https://github.com/Nick2bad4u/Uptime-Watcher/commit/205d1ff74a2c351d5219c39af97a5a60deaa1269)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...205d1ff74a2c351d5219c39af97a5a60deaa1269))
+[d474de2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d474de2b8cdffb3f85b2e62cc04f70f0d5466685)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...d474de2b8cdffb3f85b2e62cc04f70f0d5466685))
 
 
 ### ✨ Features
@@ -423,6 +423,25 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(16d9
 
 ### 🚜 Refactor
 
+- 🚜 [refactor] Simplify stylelint disable comments in styles.module.css
+ - Removed multiple stylelint disable rules to streamline CSS linting
+ - Retained only the necessary rule for keyframes-name-pattern due to Docusaurus CSS constraints
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5e9c1e6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e9c1e6073763a9659ca9df6ea47d73c8dced590)
+
+
+- 🚜 [refactor] Clarifies container access
+
+🚜 [refactor] Renames the existing-instance accessor to discourage implicit initialization
+ - Emphasizes explicit usage in non-bootstrapping paths
+📝 [docs] Improves API reference linking and narrative guidance
+ - Reduces broken cross-module links and clarifies utility/error notes
+🎨 [style] Simplifies documentation lint suppression rules
+ - Keeps lint configuration aligned with supported checks
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c0b67e5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0b67e5b8f35f330e854e7d9679c19c0401369ed)
+
+
 - 🚜 [refactor] Improves orchestration helpers
 
 🚜 [refactor] Extracts orchestration, event, IPC, and monitoring utilities to centralize error contexts, payload cloning, resumption flows, and handler execution for steadier runtime behavior
@@ -792,6 +811,28 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Updates doc front matter metadata
+
+📝 [docs] Replaces reserved front‑matter fields with doc‑specific metadata across docs and guidance to avoid TypeDoc routing side effects, plus refreshes review dates. 🧭
+🧹 [chore] Tightens front‑matter schema, validation rules, and serialization order to require the schema reference and new doc metadata fields. ✅
+📝 [docs] Normalizes formatting, list styles, and navigation aids while trimming front‑matter from TSDoc tag pages. 📚
+🔧 [build] Expands TypeDoc markdown generation options and adjusts link validation and Docusaurus warning behavior for docs builds. 🧰
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d474de2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d474de2b8cdffb3f85b2e62cc04f70f0d5466685)
+
+
+- 📝 [docs] Add interactive chart docs
+
+📝 [docs] Adds chart-focused markdown guides with Mermaid visuals and updated ADR phrasing
+ - Replaces MDX pages with TypeDoc-ingested chart docs for site inclusion
+🔧 [build] Updates documentation site config, sidebar entries, and doc inputs
+ - Enables extra markdown handling and links chart pages in navigation
+🎨 [style] Refines mobile navbar selectors and search input styling
+🧹 [chore] Tightens inline documentation comment wording
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d77227b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d77227b76ec8024b0e90611643d644a41753fa7a)
+
+
 - 📝 [docs] Add .gitleaksignore to suppress known false positives
  - Introduced a new .gitleaksignore file to manage false positive entries from gitleaks scans
  - Included fingerprints for various sensitive tokens and keys to prevent unnecessary alerts
@@ -869,6 +910,13 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aa7f
 
 
 ### 🎨 Styling
+
+- 🎨 [style] Update dynamic text selection highlight in custom.css
+ - Change background from gradient to solid color for better browser support
+ - Adjust text color for improved readability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ce9bf67)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ce9bf67cdd8e1e598c566834d445da22e8de8464)
+
 
 - 🎨 [style] Improves docs motion and sidebar UX
 
@@ -986,6 +1034,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v22.1.0 [skip ci] [`(18ddf69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)
+
+
 - Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
 
 
@@ -1044,6 +1095,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update configurations and styles across multiple files
+ - 📝 Update BeastMode agent tools order for improved clarity
+ - 📝 Enhance Copilot instructions to prioritize code quality and maintainability
+ - 🎨 Refactor VSCode settings for better organization and readability
+ - 🛠️ Modify Knip config to include 'shellcheck' in ignore binaries
+ - 🎨 Adjust Docusaurus config to disable CSS cascade layers due to production issues
+ - 🎨 Update CSS styles for improved consistency in line heights and font sizes
+ - 🎨 Refine stylelint configuration to accommodate Docusaurus patterns and reduce false positives
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eab5fda)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eab5fdabd164f354c58874885171e74c30c1d245)
+
 
 - 🔧 [build] Update Docusaurus configuration and blog posts
  - ✨ Add truncate markers to blog posts for better content management

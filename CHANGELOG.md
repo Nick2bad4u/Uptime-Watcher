@@ -4,6 +4,187 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.5.0] - 2026-02-10
+
+
+[[244a289](https://github.com/Nick2bad4u/Uptime-Watcher/commit/244a289388e59158c2ba7ff8f2158f1989f48f42)...
+[5d94bb6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5d94bb6c928e37990bfbb23ed0636a7b68fa5de6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/244a289388e59158c2ba7ff8f2158f1989f48f42...5d94bb6c928e37990bfbb23ed0636a7b68fa5de6))
+
+
+### 📝 Documentation
+
+- 📝 [docs] Updates doc front matter metadata
+
+📝 [docs] Replaces reserved front‑matter fields with doc‑specific metadata across docs and guidance to avoid TypeDoc routing side effects, plus refreshes review dates. 🧭
+🧹 [chore] Tightens front‑matter schema, validation rules, and serialization order to require the schema reference and new doc metadata fields. ✅
+📝 [docs] Normalizes formatting, list styles, and navigation aids while trimming front‑matter from TSDoc tag pages. 📚
+🔧 [build] Expands TypeDoc markdown generation options and adjusts link validation and Docusaurus warning behavior for docs builds. 🧰
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d474de2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d474de2b8cdffb3f85b2e62cc04f70f0d5466685)
+
+
+
+### 🧹 Chores
+
+- *(release)* V22.5.0 [skip ci] [`(5d94bb6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5d94bb6c928e37990bfbb23ed0636a7b68fa5de6)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 📦 Upgrade @storybook/addon-a11y from ^10.2.7 to ^10.2.8 for improved accessibility features.
+ - 📦 Upgrade @storybook/addon-docs, @storybook/addon-links, @storybook/addon-themes, @storybook/addon-vitest, @storybook/builder-vite, @storybook/react, and @storybook/react-vite from ^10.2.7 to ^10.2.8 for consistency and new features.
+ - 📦 Upgrade @stylistic/eslint-plugin from ^5.7.1 to ^5.8.0 for enhanced linting capabilities.
+ - 📦 Upgrade @typescript-eslint/eslint-plugin, @typescript-eslint/parser, and @typescript-eslint/types from ^8.54.0 to ^8.55.0 for better TypeScript support.
+ - 📦 Upgrade @vitejs/plugin-react from ^5.1.3 to ^5.1.4 for improved React integration.
+ - 📦 Upgrade @vitest/eslint-plugin from ^1.6.6 to ^1.6.7 for updated linting rules.
+ - 📦 Upgrade eslint-plugin-css from ^0.11.1 to ^0.12.0 for better CSS linting.
+ - 📦 Upgrade eslint-plugin-jsonc from ^2.21.0 to ^2.21.1 for JSONC support improvements.
+ - 📦 Upgrade eslint-plugin-react-hooks-addons from ^0.5.0 to ^0.5.1 for additional hooks linting rules.
+ - 📦 Upgrade eslint-plugin-storybook from ^10.2.7 to ^10.2.8 for Storybook linting updates.
+ - 📦 Upgrade eslint-plugin-unused-imports from ^4.3.0 to ^4.4.1 for better unused import detection.
+ - 📦 Upgrade eslint-plugin-zod from ^3.0.2 to ^3.1.0 for enhanced Zod support.
+ - 📦 Upgrade putout from ^41.20.0 to ^41.20.1 for bug fixes and improvements.
+ - 📦 Upgrade storybook from ^10.2.7 to ^10.2.8 for the latest features and fixes.
+ - 📦 Upgrade typescript-eslint from ^8.54.0 to ^8.55.0 for improved TypeScript linting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(244a289)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/244a289388e59158c2ba7ff8f2158f1989f48f42)
+
+
+
+
+
+
+## [22.4.0] - 2026-02-10
+
+
+[[192faaf](https://github.com/Nick2bad4u/Uptime-Watcher/commit/192faafe5787074a9fce4682061b48aa50168d4b)...
+[8c350a1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8c350a175ae93b638246f0975a094d0665584e15)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/192faafe5787074a9fce4682061b48aa50168d4b...8c350a175ae93b638246f0975a094d0665584e15))
+
+
+### 🧹 Chores
+
+- *(release)* V22.4.0 [skip ci] [`(8c350a1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8c350a175ae93b638246f0975a094d0665584e15)
+
+
+
+
+
+
+## [22.3.0] - 2026-02-10
+
+
+[[00f7159](https://github.com/Nick2bad4u/Uptime-Watcher/commit/00f7159e88f0ca9e42a5e23754fed14b9305b4c4)...
+[7ad1b56](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ad1b56cb4afa22af9c0851cd4041f490c3b2676)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/00f7159e88f0ca9e42a5e23754fed14b9305b4c4...7ad1b56cb4afa22af9c0851cd4041f490c3b2676))
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Update service container retrieval method in hot reload logic
+ - Changed `ServiceContainer.getExistingInstance()` to `ServiceContainer.getExisting()` for improved clarity and consistency in the hot reload process.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4df23d4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4df23d45cdcc22906fce11d62940330ce3cb095f)
+
+
+- 🚜 [refactor] Enhance OAuth URL validation and external URL handling
+ - 🛠️ Update `validateOAuthAuthorizeUrl` to use policy-based validation with HTTPS requirement
+ - 🔧 Introduce `validateExternalOpenUrlCandidateWithPolicy` for stricter URL validation
+ - 📝 Refactor `WindowService` to utilize new external URL validation methods
+ - 🚜 Move monitor signature creation logic to `monitorPersistenceUtils`
+ - 🧪 Add strict tests for external URL validation and opening behavior
+ - 🧹 Clean up unused code and improve error handling in `SiteWriterService`
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85452fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/85452fc395a3f621466021283022dd8c0027d283)
+
+
+
+### 🧹 Chores
+
+- *(release)* V22.3.0 [skip ci] [`(7ad1b56)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7ad1b56cb4afa22af9c0851cd4041f490c3b2676)
+
+
+
+
+
+
+## [22.2.0] - 2026-02-10
+
+
+[[18ddf69](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)...
+[7a22dfd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7a22dfddce6d442f4715d8b2d118a1cd2cfac0d6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/18ddf6999178930c99bef4ef63638a4234a4f423...7a22dfddce6d442f4715d8b2d118a1cd2cfac0d6))
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Remove 'memory' tool from BeastMode agent configuration
+ - Updated tools list to enhance clarity and focus on essential functionalities
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(906db31)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/906db31e521ef4bb971a80858d330f2dc50bec15)
+
+
+- 🚜 [refactor] Simplify stylelint disable comments in styles.module.css
+ - Removed multiple stylelint disable rules to streamline CSS linting
+ - Retained only the necessary rule for keyframes-name-pattern due to Docusaurus CSS constraints
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5e9c1e6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5e9c1e6073763a9659ca9df6ea47d73c8dced590)
+
+
+- 🚜 [refactor] Clarifies container access
+
+🚜 [refactor] Renames the existing-instance accessor to discourage implicit initialization
+ - Emphasizes explicit usage in non-bootstrapping paths
+📝 [docs] Improves API reference linking and narrative guidance
+ - Reduces broken cross-module links and clarifies utility/error notes
+🎨 [style] Simplifies documentation lint suppression rules
+ - Keeps lint configuration aligned with supported checks
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c0b67e5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0b67e5b8f35f330e854e7d9679c19c0401369ed)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Add interactive chart docs
+
+📝 [docs] Adds chart-focused markdown guides with Mermaid visuals and updated ADR phrasing
+ - Replaces MDX pages with TypeDoc-ingested chart docs for site inclusion
+🔧 [build] Updates documentation site config, sidebar entries, and doc inputs
+ - Enables extra markdown handling and links chart pages in navigation
+🎨 [style] Refines mobile navbar selectors and search input styling
+🧹 [chore] Tightens inline documentation comment wording
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d77227b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d77227b76ec8024b0e90611643d644a41753fa7a)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Update dynamic text selection highlight in custom.css
+ - Change background from gradient to solid color for better browser support
+ - Adjust text color for improved readability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ce9bf67)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ce9bf67cdd8e1e598c566834d445da22e8de8464)
+
+
+
+### 🧹 Chores
+
+- *(release)* V22.2.0 [skip ci] [`(7a22dfd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7a22dfddce6d442f4715d8b2d118a1cd2cfac0d6)
+
+
+- Update changelogs for v22.1.0 [skip ci] [`(18ddf69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)
+
+
+
+
+
+
 ## [22.1.0] - 2026-02-09
 
 
@@ -58,6 +239,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3f39
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update configurations and styles across multiple files
+ - 📝 Update BeastMode agent tools order for improved clarity
+ - 📝 Enhance Copilot instructions to prioritize code quality and maintainability
+ - 🎨 Refactor VSCode settings for better organization and readability
+ - 🛠️ Modify Knip config to include 'shellcheck' in ignore binaries
+ - 🎨 Adjust Docusaurus config to disable CSS cascade layers due to production issues
+ - 🎨 Update CSS styles for improved consistency in line heights and font sizes
+ - 🎨 Refine stylelint configuration to accommodate Docusaurus patterns and reduce false positives
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eab5fda)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eab5fdabd164f354c58874885171e74c30c1d245)
+
 
 - 🔧 [build] Update Docusaurus configuration and blog posts
  - ✨ Add truncate markers to blog posts for better content management
