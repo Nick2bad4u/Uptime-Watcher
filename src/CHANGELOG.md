@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[c0b67e5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0b67e5b8f35f330e854e7d9679c19c0401369ed)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...c0b67e5b8f35f330e854e7d9679c19c0401369ed))
+[6613553](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66135530b7edbc1e5a22f380fe197c2fd91e8dc5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...66135530b7edbc1e5a22f380fe197c2fd91e8dc5))
 
 
 ### ✨ Features
@@ -1616,6 +1616,20 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Update documentation and TypeDoc configuration
+ - 📄 Add new hierarchy documentation in `docs/docusaurus/docs/hierarchy.md` detailing component and service structures.
+ - 📄 Update `.gitignore` to exclude `docs/docusaurus/docs/typedoc.json`.
+ - 🔧 Modify `typedoc-plugin-markdown.json` to reference `docs/typedoc.json` for JSON output.
+ - ✨ Introduce a new TypeDoc plugin `hash-to-bang-links.mjs` to convert `#` links to `!` links for better internal linking.
+ - 🔧 Enhance `typedoc.config.json` and `typedoc.local.config.json` with new settings for better documentation generation, including block tags, custom themes, and navigation options.
+ - 🛠️ Fix references in `UptimeOrchestrator.ts`, `SiteLifecycleCoordinator.ts`, and other files to improve link accuracy in documentation.
+ - 🛠️ Update error handling documentation in `oauthAuthorizeUrl.ts`, `DatabaseCommands.ts`, and `SiteRepositoryService.ts` for clarity.
+ - 🛠️ Refactor validation guard documentation in `guards.ts` and `statusUpdateSchemas.ts` to improve readability and accuracy.
+ - 🛠️ Adjust site state documentation in `types.ts` and `statusUpdateSnapshot.ts` to ensure consistency with shared types.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6613553)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66135530b7edbc1e5a22f380fe197c2fd91e8dc5)
+
+
 - 📝 [docs] Enhance documentation across multiple scripts
  - ✨ Improved JSDoc comments for clarity and consistency in `enhance-test-metadata.mjs`, `extract-test-names.mjs`, `find-empty-dirs.mjs`, `find-shared-imports.mjs`, `fix-test-quotes.mjs`, `maintain-docs.mjs`, `migrate-to-mts-simple.mjs`, `sort-frontmatter-all.mjs`, `sort-frontmatter.mjs`, `transform-test.mjs`, `validate-doc-frontmatter.mjs`, `validate-performance-config.mjs`, `verify-eslint-inspector.mjs`, and `test-remark.mjs`.
  - 🛠️ Fixed quote issues in test descriptions in `ErrorBoundary.comprehensive.test.tsx`.
@@ -1833,6 +1847,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v22.5.0 [skip ci] [`(5abecd9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5abecd999280d9024d95365d1350719b474b06e2)
+
 
 - Update changelogs for v22.1.0 [skip ci] [`(18ddf69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)
 

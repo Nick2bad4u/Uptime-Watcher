@@ -4,6 +4,43 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.6.0] - 2026-02-10
+
+
+[[5abecd9](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5abecd999280d9024d95365d1350719b474b06e2)...
+[7e78607](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e786079a6cc4a54e2566ab3e0d4c9df060fa603)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/5abecd999280d9024d95365d1350719b474b06e2...7e786079a6cc4a54e2566ab3e0d4c9df060fa603))
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update documentation and TypeDoc configuration
+ - 📄 Add new hierarchy documentation in `docs/docusaurus/docs/hierarchy.md` detailing component and service structures.
+ - 📄 Update `.gitignore` to exclude `docs/docusaurus/docs/typedoc.json`.
+ - 🔧 Modify `typedoc-plugin-markdown.json` to reference `docs/typedoc.json` for JSON output.
+ - ✨ Introduce a new TypeDoc plugin `hash-to-bang-links.mjs` to convert `#` links to `!` links for better internal linking.
+ - 🔧 Enhance `typedoc.config.json` and `typedoc.local.config.json` with new settings for better documentation generation, including block tags, custom themes, and navigation options.
+ - 🛠️ Fix references in `UptimeOrchestrator.ts`, `SiteLifecycleCoordinator.ts`, and other files to improve link accuracy in documentation.
+ - 🛠️ Update error handling documentation in `oauthAuthorizeUrl.ts`, `DatabaseCommands.ts`, and `SiteRepositoryService.ts` for clarity.
+ - 🛠️ Refactor validation guard documentation in `guards.ts` and `statusUpdateSchemas.ts` to improve readability and accuracy.
+ - 🛠️ Adjust site state documentation in `types.ts` and `statusUpdateSnapshot.ts` to ensure consistency with shared types.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6613553)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66135530b7edbc1e5a22f380fe197c2fd91e8dc5)
+
+
+
+### 🧹 Chores
+
+- *(release)* V22.6.0 [skip ci] [`(7e78607)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e786079a6cc4a54e2566ab3e0d4c9df060fa603)
+
+
+- Update changelogs for v22.5.0 [skip ci] [`(5abecd9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5abecd999280d9024d95365d1350719b474b06e2)
+
+
+
+
+
+
 ## [22.5.0] - 2026-02-10
 
 
@@ -13,6 +50,24 @@ All notable changes to this project will be documented in this file.
 
 
 ### 📝 Documentation
+
+- 📝 [docs] Update documentation for various guides and TSDoc tags
+
+ - 📝 Update tags in multiple guide documents to maintain consistent formatting
+   - Adjusted tags in `NEW_MONITOR_TYPE_IMPLEMENTATION.md`, `ORGANIZATION_SUMMARY.md`, `README.md`, `RENDERER_INTEGRATION_GUIDE.md`, `SITES_STORE_MUTATION_AND_SYNC_GUIDE.md`, `STORYBOOK_VITEST_COMPONENT_TESTING.md`, `STYLE_LAYOUT_GUIDE.md`, `TECHNOLOGY_EVOLUTION.md`, `TESTING.md`, `TESTING_METHODOLOGY_REACT_COMPONENTS.md`, `TOOLS_AND_COMMANDS_GUIDE.md`, `TROUBLESHOOTING.md`, `TYPE_FEST_PATTERNS.md`, `UI_FEATURE_DEVELOPMENT_GUIDE.md`, `VALIDATION_STRATEGY.md`, `VITE_PERFORMANCE.md`, `ZUSTAND_STORE_PATTERN_GUIDE.md`, `README.md`, and others.
+ - 📝 Update interactive charts documentation to ensure tags are consistent
+   - Modified tags in `README.md`, `data-models.md`, `deployment-infrastructure.md`, `monitoring-workflows.md`, `performance-metrics.md`, `system-architecture.md`.
+ - 📝 Clean up TSDoc tag documentation by removing unnecessary whitespace
+   - Adjusted formatting in `TSDoc-Tag-Alpha.md`, `TSDoc-Tag-Beta.md`, `TSDoc-Tag-Decorator.md`, `TSDoc-Tag-Deprecated.md`, `TSDoc-Tag-Eventproperty.md`, `TSDoc-Tag-Example.md`, `TSDoc-Tag-Experimental.md`, `TSDoc-Tag-Inheritdoc.md`, `TSDoc-Tag-Internal.md`, `TSDoc-Tag-Label.md`, `TSDoc-Tag-Link.md`, `TSDoc-Tag-Override.md`, `TSDoc-Tag-Packagedocumentation.md`, `TSDoc-Tag-Param.md`, `TSDoc-Tag-Privateremarks.md`, `TSDoc-Tag-Public.md`, `TSDoc-Tag-Readonly.md`, `TSDoc-Tag-Remarks.md`, `TSDoc-Tag-Returns.md`, `TSDoc-Tag-Sealed.md`, `TSDoc-Tag-See.md`, `TSDoc-Tag-Throws.md`, `TSDoc-Tag-Typeparam.md`, `TSDoc-Tag-Virtual.md`, `TSDoc-Tag-defaultValue.md`.
+ - 📝 Update testing documentation to ensure tags are consistent
+   - Modified tags in `CODEGEN_BEST_PRACTICES.md`, `CODEGEN_TEMPLATE_USAGE.md`, `FAST_CHECK_FUZZING_GUIDE.md`, `HEADLESS_TESTING.md`, `PLAYWRIGHT_CODEGEN_GUIDE.md`, `PLAYWRIGHT_TESTING_GUIDE.md`, `README.md`, `TEST_VERBOSITY_GUIDE.md`, `ZERO_COVERAGE_AUDIT.md`.
+ - 🧹 [chore] Clean up sidebar configuration by removing unused TSDoc tags
+   - Removed references to TSDoc tags in `sidebars.ts` to streamline documentation navigation.
+ - 🛠️ [fix] Update local config for TypeDoc to include new global references
+   - Added reference for `__global.Window.electronAPI` in `typedoc.local.config.json`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(335ecaa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/335ecaac52d80b53716438e0873cc64c79d40ca9)
+
 
 - 📝 [docs] Updates doc front matter metadata
 
