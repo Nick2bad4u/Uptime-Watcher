@@ -397,7 +397,7 @@ if (isDev()) {
         // Proceed with hot reload
         isReloadInProgress = true;
 
-        const container = ServiceContainer.getExistingInstance();
+        const container = ServiceContainer.getExisting();
         if (!container) {
             logger.debug(
                 "[Main] Hot reload skipped - service container not initialized"
