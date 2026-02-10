@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[5459f43](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...5459f4360d890467685cbbca77640ee80d0f1180))
+[d77227b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d77227b76ec8024b0e90611643d644a41753fa7a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...d77227b76ec8024b0e90611643d644a41753fa7a))
 
 
 ### ✨ Features
@@ -1161,6 +1161,18 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Add interactive chart docs
+
+📝 [docs] Adds chart-focused markdown guides with Mermaid visuals and updated ADR phrasing
+ - Replaces MDX pages with TypeDoc-ingested chart docs for site inclusion
+🔧 [build] Updates documentation site config, sidebar entries, and doc inputs
+ - Enables extra markdown handling and links chart pages in navigation
+🎨 [style] Refines mobile navbar selectors and search input styling
+🧹 [chore] Tightens inline documentation comment wording
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d77227b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d77227b76ec8024b0e90611643d644a41753fa7a)
+
+
 - 📝 [docs] Update architecture docs and linting
 
 🚜 [refactor] Standardize internal Zod schema naming and validation
@@ -1337,6 +1349,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v22.1.0 [skip ci] [`(18ddf69)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18ddf6999178930c99bef4ef63638a4234a4f423)
+
 
 - Update changelogs for v22.0.0 [skip ci] [`(5459f43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5459f4360d890467685cbbca77640ee80d0f1180)
 
