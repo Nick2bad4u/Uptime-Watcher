@@ -13,6 +13,7 @@ import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
 import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
 import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
+import type { DatabaseCommandContext } from "../../../services/commands/databaseCommandContext";
 import { logger as backendLogger } from "../../../utils/logger";
 
 import {
@@ -23,7 +24,6 @@ import {
     ImportDataCommand,
     RestoreBackupCommand,
     LoadSitesCommand,
-    type DatabaseCommandContext,
     type IDatabaseCommand,
 } from "../../../services/commands/DatabaseCommands";
 

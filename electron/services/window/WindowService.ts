@@ -35,10 +35,8 @@
 
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
-import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { withRetry } from "@shared/utils/retry";
-import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     BrowserWindow,
@@ -52,7 +50,7 @@ import { fileURLToPath } from "node:url";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
-import { openExternalOrThrow } from "../shell/openExternalUtils";
+import { tryOpenExternalValidated } from "../shell/validatedExternalOpen";
 import {
     getProductionDistDirectory,
     isPathWithinDirectory,
@@ -220,44 +218,36 @@ export class WindowService {
         targetUrl: string,
         context: string
     ): Promise<void> {
-        const validation = validateExternalOpenUrlCandidate(targetUrl);
+        const result = await tryOpenExternalValidated({
+            failureMessagePrefix:
+                "[WindowService] Failed to open external navigation",
+            url: targetUrl,
+        });
 
-        const safeUrlForLogging =
-            validation.safeUrlForLogging.length > 0
-                ? validation.safeUrlForLogging
-                : "[redacted]";
+        if (result.outcome === "opened") {
+            return;
+        }
 
-        if ("reason" in validation) {
+        if (result.outcome === "blocked") {
             logger.warn("[WindowService] Blocked external navigation", {
                 context,
-                reason: validation.reason,
-                url: safeUrlForLogging,
+                reason: result.reason,
+                url: result.safeUrlForLogging,
             });
             return;
         }
 
-        try {
-            await openExternalOrThrow({
-                failureMessagePrefix:
-                    "[WindowService] Failed to open external navigation",
-                normalizedUrl: validation.normalizedUrl,
-                safeUrlForLogging,
-            });
-        } catch (error: unknown) {
-            const resolved = ensureError(error);
-            const code = tryGetErrorCode(
-                (resolved as { cause?: unknown }).cause ?? resolved
-            );
+        // Remaining outcome: "open-failed".
+        logger.warn("[WindowService] Failed to open external navigation", {
+            context,
+            errorName: result.errorName,
+            url: result.safeUrlForLogging,
+            ...(typeof result.errorCode === "string" &&
+            result.errorCode.length > 0
+                ? { errorCode: result.errorCode }
+                : {}),
+        });
 
-            logger.warn("[WindowService] Failed to open external navigation", {
-                context,
-                errorName: resolved.name,
-                url: safeUrlForLogging,
-                ...(typeof code === "string" && code.length > 0
-                    ? { errorCode: code }
-                    : {}),
-            });
-        }
     }
 
     /**

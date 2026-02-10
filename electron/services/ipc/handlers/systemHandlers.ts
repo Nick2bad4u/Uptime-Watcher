@@ -3,12 +3,9 @@ import type {
     IpcInvokeChannelParams,
 } from "@shared/types/ipc";
 
-import {
-    getElectronErrorCodeSuffix,
-    openExternalOrThrow,
-} from "@electron/services/shell/openExternalUtils";
+import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
+import { openExternalValidatedOrThrow } from "@electron/services/shell/validatedExternalOpen";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
-import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { clipboard } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
@@ -38,21 +35,10 @@ export function registerSystemHandlers({
         async (
             url: IpcInvokeChannelParams<typeof SYSTEM_CHANNELS.openExternal>[0]
         ): Promise<boolean> => {
-            const validation = validateExternalOpenUrlCandidate(url);
-
-            if ("reason" in validation) {
-                const { reason, safeUrlForLogging } = validation;
-                throw new TypeError(
-                    `Rejected unsafe openExternal URL: ${safeUrlForLogging} (reason ${reason})`
-                );
-            }
-
-            const { normalizedUrl, safeUrlForLogging } = validation;
-
-            await openExternalOrThrow({
+            await openExternalValidatedOrThrow({
                 failureMessagePrefix: "Failed to open external URL",
-                normalizedUrl,
-                safeUrlForLogging,
+                rejectionVerbPhrase: "Rejected unsafe openExternal",
+                url,
             });
 
             return true;

@@ -36,6 +36,12 @@ import type {
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 import { logger as backendLogger } from "../../utils/logger";
+import {
+    type DatabaseCommandContext,
+    isImportContext,
+    isRestoreContext,
+    resolveDatabaseCommandContext,
+} from "./databaseCommandContext";
 
 /**
  * Base interface for all database commands.
@@ -107,74 +113,6 @@ export interface IDatabaseCommand<TResult = void> {
  *
  * @public
  */
-export interface DatabaseCommandContext {
-    cache: StandardizedCache<Site>;
-    configurationManager?: ConfigurationManager | undefined;
-    eventEmitter: TypedEventBus<UptimeEvents>;
-    serviceFactory: DatabaseServiceFactory;
-    updateHistoryLimit?: ((limit: number) => Promise<void>) | undefined;
-}
-
-function isDatabaseCommandContext(
-    value: unknown
-): value is DatabaseCommandContext {
-    if (value === null || typeof value !== "object") {
-        return false;
-    }
-
-    return (
-        "serviceFactory" in value && "eventEmitter" in value && "cache" in value
-    );
-}
-
-function resolveDatabaseCommandContext(
-    value: DatabaseCommandContext | DatabaseServiceFactory,
-    eventEmitter?: TypedEventBus<UptimeEvents>,
-    cache?: StandardizedCache<Site>
-): DatabaseCommandContext {
-    if (isDatabaseCommandContext(value)) {
-        return value;
-    }
-
-    if (!eventEmitter || !cache) {
-        throw new TypeError(
-            "DatabaseCommand requires eventEmitter and cache when a context object is not provided."
-        );
-    }
-
-    return {
-        cache,
-        eventEmitter,
-        serviceFactory: value,
-    };
-}
-
-function isImportContext(
-    value: unknown
-): value is DatabaseCommandContext & { data: string } {
-    if (!isDatabaseCommandContext(value)) {
-        return false;
-    }
-
-    const data: unknown = Reflect.get(value, "data");
-    return typeof data === "string";
-}
-
-function isRestoreContext(
-    value: unknown
-): value is DatabaseCommandContext & { payload: DatabaseRestorePayload } {
-    if (!isDatabaseCommandContext(value)) {
-        return false;
-    }
-
-    const payload: unknown = Reflect.get(value, "payload");
-    if (payload === null || typeof payload !== "object") {
-        return false;
-    }
-
-    return Buffer.isBuffer(Reflect.get(payload, "buffer"));
-}
-
 /**
  * Base class for database commands executed by the
  * {@link DatabaseCommandExecutor}.
@@ -330,15 +268,30 @@ export class DatabaseCommandExecutor {
             );
         }
 
+        // Track the command while it is in-flight so a rollback failure can be
+        // retried via `rollbackAll()`. We remove it from history once it
+        // either:
+        // - completes successfully, or
+        // - is rolled back successfully after a failure.
+        this.executedCommands.push(command as IDatabaseCommand<unknown>);
+
         try {
-            this.executedCommands.push(command as IDatabaseCommand<unknown>);
             return await command.execute();
         } catch (error) {
             // Attempt rollback on failure
             try {
                 await command.rollback();
+
+                // Rollback succeeded, so we should not attempt to rollback the
+                // same command again via `rollbackAll()`.
+                const last = this.executedCommands.at(-1);
+                if (last === command) {
+                    this.executedCommands.pop();
+                }
             } catch (rollbackError) {
-                // Log rollback failure but don't mask original error
+                // Log rollback failure but don't mask original error.
+                // Intentionally keep the failed command in history so callers
+                // may attempt a full rollback via `rollbackAll()`.
                 backendLogger.error(
                     "Rollback failed for database command",
                     rollbackError,
@@ -388,7 +341,8 @@ export class DatabaseCommandExecutor {
         this.executedCommands.length = 0;
 
         if (errors.length > 0) {
-            throw new Error(
+            throw new AggregateError(
+                errors,
                 `Rollback errors: ${errors.map((e) => e.message).join(", ")}`
             );
         }

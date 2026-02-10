@@ -34,6 +34,10 @@ import {
 } from "../monitoring/createMonitorConfig";
 import { SiteNotFoundError } from "./interfaces";
 import { deleteSiteWithAdapters } from "./siteDeletion";
+import {
+    buildMonitorUpdateData,
+    createMonitorSignature,
+} from "./siteWriterService/monitorPersistenceUtils";
 import { createSiteMonitorTransactionAdapters } from "./transactionAdapters";
 
 /**
@@ -529,7 +533,7 @@ export class SiteWriterService {
         // Create a comparison set of original monitors for detecting new
         // monitors without IDs
         const originalMonitorSignatures = new Set(
-            originalMonitors.map((m) => this.createMonitorSignature(m))
+            originalMonitors.map((m) => createMonitorSignature(m))
         );
 
         for (const monitor of updatedMonitors) {
@@ -539,7 +543,7 @@ export class SiteWriterService {
             } else if (!monitor.id) {
                 // Monitor without ID - check if it's genuinely new by
                 // comparing signature
-                const monitorSignature = this.createMonitorSignature(monitor);
+                const monitorSignature = createMonitorSignature(monitor);
                 if (!originalMonitorSignatures.has(monitorSignature)) {
                     // New monitor without ID - use empty string as placeholder
                     newMonitorIds.push("");
@@ -548,44 +552,6 @@ export class SiteWriterService {
         }
 
         return newMonitorIds;
-    }
-
-    /**
-     * Build the update data for a monitor, preserving existing state.
-     */
-    private buildMonitorUpdateData(
-        newMonitor: Monitor,
-        existingMonitor: Monitor
-    ): Partial<Monitor> {
-        const updateData: Partial<Monitor> = {
-            checkInterval: newMonitor.checkInterval,
-            monitoring: existingMonitor.monitoring,
-            retryAttempts: newMonitor.retryAttempts,
-            status: existingMonitor.status,
-            timeout: newMonitor.timeout,
-            type: newMonitor.type,
-        };
-
-        // Only update optional fields if they are defined
-        if (newMonitor.host !== undefined) {
-            updateData.host = newMonitor.host;
-        }
-        if (newMonitor.port !== undefined) {
-            updateData.port = newMonitor.port;
-        }
-        if (newMonitor.url !== undefined) {
-            updateData.url = newMonitor.url;
-        }
-
-        // DNS-specific fields for DNS monitor support
-        if (newMonitor.recordType !== undefined) {
-            updateData.recordType = newMonitor.recordType;
-        }
-        if (newMonitor.expectedValue !== undefined) {
-            updateData.expectedValue = newMonitor.expectedValue;
-        }
-
-        return updateData;
     }
 
     private normalizeMonitorsForPersistence(
@@ -732,30 +698,6 @@ export class SiteWriterService {
     }
 
     /**
-     * Create a unique signature for a monitor based on its configuration.
-     *
-     * @remarks
-     * Used to detect new monitors that don't have IDs yet. The signature
-     * includes all configuration properties that make a monitor unique,
-     * excluding runtime properties like status, lastChecked, and responseTime.
-     *
-     * @param monitor - The monitor to create a signature for
-     *
-     * @returns A string signature representing the monitor's configuration
-     */
-    private createMonitorSignature(monitor: Site["monitors"][0]): string {
-        return [
-            `type:${monitor.type}`,
-            `host:${monitor.host ?? ""}`,
-            `port:${monitor.port ?? ""}`,
-            `url:${monitor.url ?? ""}`,
-            `checkInterval:${monitor.checkInterval}`,
-            `timeout:${monitor.timeout}`,
-            `retryAttempts:${monitor.retryAttempts}`,
-        ].join("|");
-    }
-
-    /**
      * Create a new monitor in the database.
      */
     private createNewMonitor(
@@ -885,10 +827,7 @@ export class SiteWriterService {
             return;
         }
 
-        const updateData = this.buildMonitorUpdateData(
-            newMonitor,
-            existingMonitor
-        );
+        const updateData = buildMonitorUpdateData(newMonitor, existingMonitor);
         monitorTx.update(newMonitor.id, updateData);
         this.logger.debug(
             `Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`

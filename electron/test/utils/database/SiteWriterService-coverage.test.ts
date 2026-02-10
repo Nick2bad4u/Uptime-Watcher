@@ -21,6 +21,7 @@ import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
 import { SiteWriterService } from "../../../services/database/SiteWriterService";
+import { createMonitorSignature } from "../../../services/database/siteWriterService/monitorPersistenceUtils";
 import { SiteNotFoundError } from "../../../services/database/interfaces";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
@@ -1406,9 +1407,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 history: [],
             };
 
-            const signature = (siteWriterService as any).createMonitorSignature(
-                monitor
-            );
+            const signature = createMonitorSignature(monitor);
 
             expect(signature).toContain("type:port");
             expect(signature).toContain("host:example.com");
@@ -1444,9 +1443,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 history: [],
             };
 
-            const signature = (siteWriterService as any).createMonitorSignature(
-                monitor
-            );
+            const signature = createMonitorSignature(monitor);
 
             expect(signature).toContain("host:");
             expect(signature).toContain("port:");
