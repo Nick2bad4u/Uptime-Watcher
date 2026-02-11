@@ -250,7 +250,7 @@ describe("Monitoring System Performance Benchmarks", () => {
         });
 
         bench("operation validation - concurrent operations", () => {
-            const operations = [];
+            const operations: string[] = [];
             for (let i = 0; i < 1000; i++) {
                 operations.push(registry.initiateCheck(`monitor-${i}`));
             }
@@ -382,7 +382,7 @@ describe("Monitoring System Performance Benchmarks", () => {
         });
 
         bench("bulk operation initiation and completion", () => {
-            const operations = [];
+            const operations: string[] = [];
 
             // Initiate many operations
             for (let i = 0; i < 1000; i++) {
@@ -421,7 +421,7 @@ describe("Monitoring System Performance Benchmarks", () => {
         });
 
         bench("operation cancellation under load", () => {
-            const operations = [];
+            const operations: string[] = [];
 
             // Create many operations
             for (let i = 0; i < 1000; i++) {
@@ -449,7 +449,7 @@ describe("Monitoring System Performance Benchmarks", () => {
 
             // Simulate high operation turnover
             for (let cycle = 0; cycle < 10; cycle++) {
-                const operations = [];
+                const operations: string[] = [];
 
                 // Create many operations
                 for (let i = 0; i < 1000; i++) {

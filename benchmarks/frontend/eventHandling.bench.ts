@@ -648,7 +648,7 @@ describe("React Event Handling Performance", () => {
 
         // Dispatch events that will bubble through the hierarchy
         for (let i = 0; i < 100; i++) {
-            const deepestElement = elements.at(-1);
+            const deepestElement = elements.at(-1)!;
             eventSystem.dispatchEvent(deepestElement, "click", {
                 bubbles: true,
                 cancelable: true,

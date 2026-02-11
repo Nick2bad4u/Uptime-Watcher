@@ -23,6 +23,15 @@ import {
     hasProperties,
 } from "../../shared/utils/typeGuards";
 
+import type { Jsonifiable } from "type-fest";
+
+/**
+ * Benchmarks intentionally feed invalid/unsafe values into json helpers.
+ * This helper makes that intent explicit while keeping the benchmark compiling
+ * under strict null checks.
+ */
+const unsafeJsonifiable = (value: unknown): Jsonifiable => value as Jsonifiable;
+
 describe("Shared Error Handling and Safety Performance", () => {
     // Test data for safety and error handling benchmarks
     const validJsonStrings = [
@@ -74,7 +83,11 @@ describe("Shared Error Handling and Safety Performance", () => {
     // JSON safety benchmarks
     bench("safeJsonStringifyWithFallback - valid objects", () => {
         for (const obj of testObjects) {
-            safeJsonStringifyWithFallback(obj, "fallback", 3);
+            safeJsonStringifyWithFallback(
+                unsafeJsonifiable(obj),
+                "fallback",
+                3
+            );
         }
     });
 
@@ -99,7 +112,11 @@ describe("Shared Error Handling and Safety Performance", () => {
         complexObjects[2].circular = complexObjects[2];
 
         for (const obj of complexObjects) {
-            safeJsonStringifyWithFallback(obj, "fallback", 3);
+            safeJsonStringifyWithFallback(
+                unsafeJsonifiable(obj),
+                "fallback",
+                3
+            );
         }
     });
 
@@ -430,7 +447,11 @@ describe("Shared Error Handling and Safety Performance", () => {
             isObject(value);
             isArray(value);
             isRecord(value);
-            safeJsonStringifyWithFallback(value, "fallback", 3);
+            safeJsonStringifyWithFallback(
+                unsafeJsonifiable(value),
+                "fallback",
+                3
+            );
         }
     });
 });

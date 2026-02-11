@@ -343,7 +343,7 @@ describe("Site Repository Performance", () => {
         "Concurrent site operations simulation",
         async () => {
             // Simulate concurrent operations using Promise.all
-            const operations = [];
+            const operations: Promise<unknown>[] = [];
 
             for (let i = 0; i < 20; i++) {
                 if (i % 3 === 0) {

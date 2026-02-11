@@ -53,6 +53,10 @@
         "**/*.spec.*"
     ],
     "extends": "./tsconfig.typedoc.json",
+    "files": [
+        "typedoc-plugins/prefixDocLinksCore.mjs",
+        "typedoc-plugins/hashToBangLinksCore.mjs"
+    ],
     "include": [
         "**/*.cjs",
         "**/*.css",
@@ -65,6 +69,8 @@
         "**/*.scss",
         "**/*.ts",
         "**/*.tsx",
+        "typedoc-plugins/prefixDocLinksCore.mjs",
+        "typedoc-plugins/hashToBangLinksCore.mjs",
         "docusaurus.config.ts",
         "sidebars.ts",
         "src/**/*",

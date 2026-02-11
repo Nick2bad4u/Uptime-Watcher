@@ -677,11 +677,12 @@ describe("Updater Service Benchmarks", () => {
 
         const installationStats = Object.values(installationGroups).map(
             (progressList) => {
-                const lastProgress = progressList.at(-1);
+                const firstProgress = progressList[0]!;
+                const lastProgress = progressList.at(-1)!;
                 const success =
                     !lastProgress.error && lastProgress.progress >= 0.95;
                 const totalDuration =
-                    lastProgress.currentTime - progressList[0].startTime;
+                    lastProgress.currentTime - firstProgress.startTime;
                 const phases = Array.from(
                     new Set(progressList.map((p) => p.phase))
                 );

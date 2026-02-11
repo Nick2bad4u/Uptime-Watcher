@@ -59,10 +59,6 @@ graph TD
       StorybookPlugins["storybookTest plugin\n+ React compiler"]
     end
 
-    subgraph StorybookRunner["Storybook Runner\n(scripts/run-storybook-tests.mjs)"]
-      RunnerSuites["Playwright-driven story runner"]
-    end
-
     subgraph Playwright["Playwright E2E & UI\n(playwright.config.ts)"]
       GlobalSetup["global-setup.ts\nbuild:electron-main + HEADLESS"]
       GlobalTeardown["global-teardown.ts\nkill lingering electron"]
@@ -79,19 +75,16 @@ graph TD
 
     testAll -->|runs| VitestFront
     testAll -->|runs| VitestStorybook
-    testAll -->|runs| StorybookRunner
 
     testAllCoverage -->|collects| VitestFront
     testAllCoverage -->|collects| VitestElectron
     testAllCoverage -->|collects| VitestShared
     testAllCoverage -->|collects| VitestStorybook
-    testAllCoverage -->|collects| StorybookRunner
 
     testAllDetailed -->|verbose reports| VitestFront
     testAllDetailed -->|verbose reports| VitestElectron
     testAllDetailed -->|verbose reports| VitestShared
     testAllDetailed -->|verbose reports| VitestStorybook
-    testAllDetailed -->|verbose reports| StorybookRunner
 
     testPlaywright --> Playwright
     fuzz --> SharedDir
@@ -111,8 +104,6 @@ graph TD
     VitestStorybook --> StorybookDir
     VitestStorybook --> StorybookPlugins
 
-    StorybookRunner --> RunnerSuites
-
     Playwright --> GlobalSetup
     Playwright --> PWTests
     Playwright --> ElectronHelpers
@@ -129,12 +120,11 @@ graph TD
     classDef type fill:#15803d,stroke:#166534,color:#f0fdf4
 
     class testAll,testAllCoverage,testAllDetailed,testPlaywright,fuzz cli
-    class VitestFront,VitestElectron,VitestShared,VitestStorybook,StorybookRunner,Playwright vitest
+    class VitestFront,VitestElectron,VitestShared,VitestStorybook,Playwright vitest
     class FrontDir,FrontSetup,FrontEnv setup
     class ElectronDir,ElectronSetup,ElectronEnv setup
     class SharedDir,SharedSetup,SharedFc setup
     class StorybookDir,StorybookPlugins setup
-    class RunnerSuites setup
     class GlobalSetup,GlobalTeardown,ElectronHelpers,PWTests setup
     class tsFrontend,tsElectron,tsShared,tsPlaywright,TsDeps,TsDeps2,TsDeps3,TsDeps4 type
 ```

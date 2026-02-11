@@ -1,7 +1,7 @@
 // @ts-check
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- This file intentionally uses JSDoc types that trigger TSDoc warnings in this repo; disable the rule for the whole file.
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, tsdoc/syntax -- This file is a runtime TypeDoc renderer plugin loaded by Node; adding JSDoc type syntax triggers TSDoc brace warnings in this repo. */
-// @ts-check
+
 /**
  * @fileoverview
  * TypeDoc plugin which rewrites a repo-specific `path#Export` convention into
@@ -23,97 +23,11 @@
 
 import { Converter } from "typedoc";
 
-/**
- * @typedef {import('typedoc').Comment} Comment
- * @typedef {import('typedoc').CommentDisplayPart} CommentDisplayPart
- */
+import { convertHashLinksToBangLinksInComment } from "./hashToBangLinksCore.mjs";
 
-/**
- * @param {string} moduleSource
- */
-function isUrlLike(moduleSource) {
-    // Cheap and safe heuristic: enough to avoid rewriting `https://...#...` anchors.
-    return moduleSource.includes("://");
-}
-
-/**
- * Determines whether a `#` in a link target is likely being used as a module/export separator
- * (repo convention) rather than as a TypeDoc declaration-reference instance member separator.
- *
- * @param {string} moduleSource
- */
-function isModuleSourceLike(moduleSource) {
-    return (
-        moduleSource.includes("/") ||
-        moduleSource.includes("\\") ||
-        moduleSource.startsWith("@") ||
-        moduleSource.includes("-") ||
-        // Supports things like `node:fs` or other specifiers.
-        moduleSource.includes(":")
-    );
-}
-
-/**
- * Rewrites `module#path` -> `module!path` for module-source-like references.
- * Preserves whitespace and any `| label` suffix.
- *
- * @param {string} inlineTagText The inline-tag payload stored by TypeDoc.
- */
-function convertHashLinksToBangLinksInInlineTagText(inlineTagText) {
-    const pipeIndex = inlineTagText.indexOf("|");
-    const beforePipe = pipeIndex === -1 ? inlineTagText : inlineTagText.slice(0, pipeIndex);
-
-    const trimmed = beforePipe.trim();
-    const hashIndex = trimmed.indexOf("#");
-    if (hashIndex === -1) return inlineTagText;
-
-    const moduleSource = trimmed.slice(0, hashIndex);
-    if (isUrlLike(moduleSource)) return inlineTagText;
-    if (!isModuleSourceLike(moduleSource)) return inlineTagText;
-
-    const afterHash = trimmed.slice(hashIndex + 1);
-    if (!afterHash) return inlineTagText;
-
-    const rewrittenCore = `${moduleSource}!${afterHash}`;
-
-    const trimmedStart = beforePipe.trimStart();
-    const leadingWs = beforePipe.slice(0, beforePipe.length - trimmedStart.length);
-
-    const trimmedEnd = beforePipe.trimEnd();
-    const trailingWs = beforePipe.slice(trimmedEnd.length);
-
-    const rebuiltBeforePipe = `${leadingWs}${rewrittenCore}${trailingWs}`;
-    return pipeIndex === -1
-        ? rebuiltBeforePipe
-        : `${rebuiltBeforePipe}${inlineTagText.slice(pipeIndex)}`;
-}
-
-/**
- * @param {CommentDisplayPart[]} parts
- */
-function convertHashLinksToBangLinksInParts(parts) {
-    for (const part of parts) {
-        if (part.kind === "inline-tag" && (part.tag === "@link" || part.tag === "@linkcode" || part.tag === "@linkplain")) {
-            const rewritten = convertHashLinksToBangLinksInInlineTagText(part.text);
-            if (rewritten !== part.text) {
-                part.text = rewritten;
-                // Ensure TypeDoc re-resolves this link based on updated text.
-                delete part.target;
-                delete part.tsLinkText;
-            }
-        }
-    }
-}
-
-/**
- * @param {Comment} comment
- */
-function convertHashLinksToBangLinksInComment(comment) {
-    convertHashLinksToBangLinksInParts(comment.summary);
-    for (const tag of comment.blockTags) {
-        convertHashLinksToBangLinksInParts(tag.content);
-    }
-}
+// TypeDoc's built-in LinkResolverPlugin runs at priority -300. This plugin must
+// run before it, so our priority must be > -300.
+const RUN_BEFORE_LINK_RESOLVER_PRIORITY = 50;
 
 /**
  * TypeDoc plugin entrypoint.
@@ -126,12 +40,21 @@ export function load(app) {
         Converter.EVENT_RESOLVE_END,
         (context) => {
             const { project } = context;
-            for (const reflection of Object.values(project.reflections)) {
-                if (reflection.comment) {
-                    convertHashLinksToBangLinksInComment(reflection.comment);
+            const { reflections } = project;
+            /** @type {Record<string, import('typedoc').Reflection>} */
+            const reflectionMap = reflections;
+            // Avoid Object.values allocation on large projects.
+            for (const reflectionId in reflectionMap) {
+                if (Object.hasOwn(reflectionMap, reflectionId)) {
+                    const reflection = /** @type {import('typedoc').Reflection} */ (
+                        reflectionMap[reflectionId]
+                    );
+                    if (reflection.comment) {
+                        convertHashLinksToBangLinksInComment(reflection.comment);
+                    }
                 }
             }
         },
-        50
+        RUN_BEFORE_LINK_RESOLVER_PRIORITY
     );
 }

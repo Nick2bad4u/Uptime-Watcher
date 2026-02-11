@@ -574,7 +574,8 @@ describe("Database Transaction Management Benchmarks", () => {
                 }
                 case "victim-selection": {
                     // Least important transaction becomes victim
-                    victimTransaction = involvedTransactions.at(-1);
+                    victimTransaction =
+                        involvedTransactions.at(-1) ?? involvedTransactions[0]!;
                     break;
                 }
                 case "priority-based": {

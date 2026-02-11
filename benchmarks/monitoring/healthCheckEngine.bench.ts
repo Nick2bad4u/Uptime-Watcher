@@ -149,7 +149,7 @@ describe("Enhanced Monitor Checker Performance", () => {
         }
 
         vi.mocked(mockMonitorRepository.findByIdentifier).mockImplementation(
-            async (monitorId: string) => monitorById.get(monitorId) ?? null
+            async (monitorId: string) => monitorById.get(monitorId)
         );
 
         vi.mocked(mockMonitorRepository.update).mockImplementation(
@@ -231,7 +231,7 @@ describe("Enhanced Monitor Checker Performance", () => {
     bench(
         "bulk monitor health checks (10 monitors)",
         async () => {
-            const checkPromises = [];
+            const checkPromises: Promise<unknown>[] = [];
             for (let i = 0; i < 5; i++) {
                 const site = testSites[i];
                 for (const monitor of site.monitors) {

@@ -38,7 +38,6 @@
         "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.js.tsbuildinfo"
     },
     "exclude": [
-        "../../storybook/test-runner-jest.config.js",
         "../../electron/**/*.test.ts",
         "../../electron/**/*.test.tsx",
         "../../**/docs/docusaurus",

@@ -433,7 +433,6 @@ export default defineConfig([
             "playwright/reports/**",
             "playwright/test-results/**",
             "public/mockServiceWorker.js",
-            "storybook/test-runner-jest.config.js",
             "temp/**",
             ".temp/**",
         ],
@@ -9428,6 +9427,7 @@ export default defineConfig([
                         "vite.config.ts",
                         "vite.playwright-coverage.config.ts",
                         "vitest.config.ts",
+                        "vitest.docsTooling.config.ts",
                         "vitest.linting.config.ts",
                         "vitest.shared.config.ts",
                         "vitest.storybook.config.ts",
@@ -10277,8 +10277,6 @@ export default defineConfig([
         files: [
             "scripts/**/*.{js,cjs,mjs}",
             "storybook/**/*.{js,cjs,mjs}",
-            "test-remark.mjs",
-            "test-runner-jest.config.js",
         ],
         languageOptions: {
             globals: {

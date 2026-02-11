@@ -15,12 +15,18 @@
         "noUnusedParameters": false,
         "outDir": "../../.cache/builds/test/bench",
         "paths": {
-            "@app/*": ["src/*"],
-            "@electron/*": ["electron/*"],
-            "@shared/*": ["shared/*"]
+            "@app/*": [
+                "src/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
         },
         "rootDir": "../..",
-        "strictNullChecks": false,
+        "strictNullChecks": true,
         "strictPropertyInitialization": false,
         "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.bench.tsbuildinfo",
         "useUnknownInCatchVariables": false
@@ -30,6 +36,14 @@
         "dist",
         "dist-*",
         "coverage",
+        "../../**/*.test.*",
+        "../../**/*.spec.*",
+        "../../**/*.playwright.*",
+        "../../src/test/**",
+        "../../shared/test/**",
+        "../../electron/test/**",
+        "../../tests/**",
+        "../../playwright/**",
         "**/*.d.ts",
         "**/*.js",
         "**/*.mjs"

@@ -50,6 +50,7 @@
         "stylelint.config.mjs",
         "tailwind.config.mjs",
         "../../vitest.config.ts",
+        "../../vitest.docsTooling.config.ts",
         "vitest.config.ts",
         "vitest.electron.config.ts",
         "../../vitest.electron.config.ts",

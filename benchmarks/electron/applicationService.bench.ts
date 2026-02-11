@@ -922,11 +922,18 @@ describe("Application Service Benchmarks", () => {
         const averageMonitoringOverhead =
             stateSnapshots.reduce((sum, s) => sum + s.monitoringOverhead, 0) /
             stateSnapshots.length;
+
+        const firstSnapshot = stateSnapshots[0];
+        const lastSnapshot = stateSnapshots.at(-1);
+        if (!firstSnapshot || !lastSnapshot) {
+            return;
+        }
+
         const memoryTrend =
-            stateSnapshots.at(-1).state.memoryUsage.rss -
-            stateSnapshots[0].state.memoryUsage.rss;
+            lastSnapshot.state.memoryUsage.rss -
+            firstSnapshot.state.memoryUsage.rss;
         const cpuTrend =
-            stateSnapshots.at(-1).state.cpuUsage.percentCPUUsage -
-            stateSnapshots[0].state.cpuUsage.percentCPUUsage;
+            lastSnapshot.state.cpuUsage.percentCPUUsage -
+            firstSnapshot.state.cpuUsage.percentCPUUsage;
     });
 });
