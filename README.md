@@ -3,7 +3,7 @@
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
   <img src="https://img.shields.io/badge/version-19.1.0-blue.svg" alt="Version">
 </a>
-<a href="LICENSE">
+<a href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
 </a>
 <a href="https://www.electronjs.org/">
@@ -47,7 +47,7 @@
 <comment> Application screenshots will be added here once available </comment></div>
 
 <div align="center">
-  <img src="./assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot" width="50%">
+  <img src="https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/main/assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot" width="50%">
 </div>
 
 ## What is Uptime Watcher?
@@ -219,7 +219,7 @@ npm run dist
 | <strong>npm</strong>     | 11.6.4+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
 
-\> <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER_QUICK_START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
+> **💡 Tip**: Check out the [Developer Quick Start Guide](./docs/Guides/DEVELOPER_QUICK_START.md) for detailed setup instructions and architecture overview.
 
 </div>
 
@@ -239,7 +239,7 @@ npm run docs:check-links # Validates documentation cross-links
 
 For practical guidance on configuring monitors and writing tests, see our comprehensive testing documentation:
 
-- [Testing Documentation](./docs/Testing/) - Includes fuzzing coverage, Playwright guides, and testing best practices
+- [Testing Documentation](./docs/Testing/TESTING_HOME.md) - Includes fuzzing coverage, Playwright guides, and testing best practices
 
 ### Fuzzing and property-based tests
 
@@ -373,11 +373,11 @@ We welcome contributions from the community! Here's how you can help:
 
 ## 📄 License
 
-<div align="center"><a href="LICENSE">
+<div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License badge.">
 </a>
 
-<strong>This project is released under the <a href="LICENSE">Unlicense</a> - Public Domain</strong>
+<strong>This project is released under the <a href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE">Unlicense</a> - Public Domain</strong>
 
 <em>You are free to use, modify, and distribute this software for any purpose, commercial or non-commercial, without any restrictions. Credit is appreciated but not required.</em></div>
 

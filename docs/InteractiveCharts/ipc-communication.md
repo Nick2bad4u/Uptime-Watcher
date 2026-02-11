@@ -1,16 +1,21 @@
 ---
-title: IPC Communication Architecture
-description: Inter-Process Communication patterns and data flow in Uptime Watcher
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+doc_title: "IPC Communication Architecture"
+summary: "Mermaid diagrams describing request/response IPC, event broadcast, and the runtime type-safety layers used in Uptime Watcher."
+created: "2026-02-10"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
+author: "Nick2bad4u"
+tags:
+ - "uptime-watcher"
+ - "architecture"
+ - "electron"
+ - "ipc"
+ - "security"
+ - "mermaid"
+slug: "/ipc-communication"
+sidebar_label: "🔌 IPC Communication"
 ---
-
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
-import Mermaid from '@theme/Mermaid';
-
-export default function IpcCommunication() {
-    return (
-        <div className="container margin-vert--lg">
-            <div className="row">
-                <div className="col">
 
 # IPC Communication Architecture
 
@@ -20,7 +25,8 @@ This page details the Inter-Process Communication (IPC) architecture that enable
 
 The following diagram shows the complete IPC communication stack from renderer to main process:
 
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     subgraph Renderer["Renderer Process (React)"]
         Component[React Components]
         Store[Zustand Stores]
@@ -86,13 +92,15 @@ The following diagram shows the complete IPC communication stack from renderer t
     class Component,Store,Services,ElectronAPI renderer
     class ContextBridge,IPCRendererOn,IPCRendererInvoke,IPCRendererSend,Guards preload
     class IPCMain,IPCService,Orchestrator,Managers,EventBus main
-    class RendererBridge,WebContents,EventListeners broadcast`} />
+    class RendererBridge,WebContents,EventListeners broadcast
+```
 
 ## IPC Channel Registry
 
 This diagram shows the standardized IPC channel registration and handler mapping:
 
-<Mermaid value={`classDiagram
+```mermaid
+classDiagram
     class IpcService {
         +registerStandardizedIpcHandler(channel, handler)
         +registerHandler(channel, handler)
@@ -154,13 +162,15 @@ This diagram shows the standardized IPC channel registration and handler mapping
     StandardizedIpcHandler <|.. MonitoringChannel
     StandardizedIpcHandler <|.. MonitorTypesChannel
     StandardizedIpcHandler <|.. SettingsChannel
-    IpcService --> EventsChannel`} />
+    IpcService --> EventsChannel
+```
 
 ## Request-Response Pattern
 
 This sequence diagram illustrates a typical IPC request-response cycle:
 
-<Mermaid value={`sequenceDiagram
+```mermaid
+sequenceDiagram
     autonumber
     participant UI as React Component
     participant Service as SiteService
@@ -200,13 +210,15 @@ This sequence diagram illustrates a typical IPC request-response cycle:
     IPC->>Preload: ipcRenderer.on("site:added")
     Preload->>API: dispatch event
     API->>Service: event listener
-    Service->>UI: reactive update`} />
+    Service->>UI: reactive update
+```
 
 ## Type Safety Layers
 
 This diagram shows the multiple layers of type safety in IPC communication:
 
-<Mermaid value={`flowchart TD
+```mermaid
+flowchart TD
     subgraph TypeDefinition["Type Definition (TypeScript)"]
         SharedTypes[Shared Types\n@shared/types]
         IPCTypes[IPC Channel Types\n@shared/types/ipc]
@@ -270,16 +282,18 @@ This diagram shows the multiple layers of type safety in IPC communication:
     class TSC,Strict,NoAny compile
     class Zod,TypeGuards,Guards runtime
     class Serialization,Deserialization,StructuredClone ipc
-    class ValidationErrors,SerializationErrors,Recovery error`} />
+    class ValidationErrors,SerializationErrors,Recovery error
+```
 
 ## Event Broadcasting Architecture
 
 This diagram shows how events are broadcast from main to all renderer windows:
 
-<Mermaid value={`graph LR
+```mermaid
+graph LR
     subgraph MainProcess["Main Process"]
         EventEmitter[Event Emitter]
-        EventBus[TypedEventBus<UptimeEvents>]
+        EventBus[TypedEventBus&lt;UptimeEvents&gt;]
         RendererBridge[RendererEventBridge]
     end
 
@@ -316,13 +330,15 @@ This diagram shows how events are broadcast from main to all renderer windows:
 
     class EventEmitter,EventBus,RendererBridge main
     class Window1,Window2,Window3 window
-    class Handler1,Handler2,Handler3,Store1,Store2,Store3 handler`} />
+    class Handler1,Handler2,Handler3,Store1,Store2,Store3 handler
+```
 
 ## IPC Security Model
 
 This diagram illustrates the security boundaries and validation in IPC:
 
-<Mermaid value={`flowchart TB
+```mermaid
+flowchart TB
     subgraph Untrusted["Untrusted Zone (Renderer)"]
         UserInput[User Input]
         RendererCode[Renderer Code]
@@ -375,15 +391,9 @@ This diagram illustrates the security boundaries and validation in IPC:
     class UserInput,RendererCode,ThirdPartyLibs untrusted
     class ContextBridge,AllowList,TypeValidation boundary
     class IPCHandlers,BusinessLogic,SystemAccess trusted
-    class Sanitization,SchemaValidation,RateLimiting,Logging protection`} />
+    class Sanitization,SchemaValidation,RateLimiting,Logging protection
+```
 
 ---
 
 The IPC architecture ensures type-safe, secure communication between processes while maintaining high performance and developer ergonomics through strong TypeScript typing and runtime validation.
-
-                </div>
-            </div>
-        </div>
-    );
-
-}

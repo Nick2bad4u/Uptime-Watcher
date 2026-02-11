@@ -1,3 +1,7 @@
+// @ts-check
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- This file intentionally uses JSDoc types that trigger TSDoc warnings in this repo; disable the rule for the whole file.
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, tsdoc/syntax -- This file is a runtime TypeDoc renderer plugin loaded by Node; adding JSDoc type syntax triggers TSDoc brace warnings in this repo. */
+// @ts-check
 /**
  * @fileoverview
  * TypeDoc plugin which rewrites a repo-specific `path#Export` convention into
@@ -123,7 +127,7 @@ export function load(app) {
         (context) => {
             const { project } = context;
             for (const reflection of Object.values(project.reflections)) {
-                if (reflection?.comment) {
+                if (reflection.comment) {
                     convertHashLinksToBangLinksInComment(reflection.comment);
                 }
             }

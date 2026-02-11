@@ -16,7 +16,7 @@ plugin for ESLint
 
 👉 **To see how your comments would be rendered** by a compatible
 documentation tool, try pasting your `/** */` comment into the [TSDoc
-Playground](/play)!
+Playground](https://tsdoc.org/play/)!
 
 👉 **Implementing a tool that needs to parse doc comments?** The
 [@microsoft/tsdoc](https://www.npmjs.com/package/@microsoft/tsdoc)

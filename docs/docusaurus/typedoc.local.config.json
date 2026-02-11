@@ -670,7 +670,8 @@
     "out": "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs",
     "placeInternalsInOwningModule": true,
     "plugin": [
-        "./typedoc-plugins/hash-to-bang-links.mjs",
+        "./typedoc-plugins/hashToBangLinks.mjs",
+        "./typedoc-plugins/prefixDocLinks.mjs",
         "typedoc-plugin-remark",
         "typedoc-plugin-missing-exports",
         "typedoc-plugin-replace-text",
@@ -690,6 +691,7 @@
         "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Architecture/**/*.md",
         "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Guides/**/*.md",
         "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/InteractiveCharts/**/*.md",
+        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/Testing/**/*.md",
         "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/TSDoc/**/*.md",
         "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/README.md"
     ],

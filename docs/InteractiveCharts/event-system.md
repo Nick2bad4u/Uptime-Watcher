@@ -1,26 +1,31 @@
 ---
-title: Event System Architecture
-description: TypeScript event bus and event-driven architecture in Uptime Watcher
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+doc_title: "Event System Architecture"
+summary: "Interactive Mermaid diagrams describing the TypedEventBus and event flow across the main/renderer boundary."
+created: "2026-02-10"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
+author: "Nick2bad4u"
+tags:
+ - "uptime-watcher"
+ - "architecture"
+ - "events"
+ - "ipc"
+ - "mermaid"
+slug: "/event-system"
+sidebar_label: "📣 Event System"
 ---
-
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
-import Mermaid from '@theme/Mermaid';
-
-export default function EventSystem() {
-    return (
-        <div className="container margin-vert--lg">
-            <div className="row">
-                <div className="col">
 
 # Event System Architecture
 
-This page documents the event-driven architecture and TypedEventBus that powers real-time communication throughout Uptime Watcher.
+This page documents the event-driven architecture and `TypedEventBus` that powers real-time communication throughout Uptime Watcher.
 
 ## Event System Overview
 
 The following diagram shows the event system architecture:
 
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     subgraph Emitters["Event Emitters"]
         MonitorMgr[Monitor Manager]
         SiteMgr[Site Manager]
@@ -29,7 +34,7 @@ The following diagram shows the event system architecture:
         NotifySvc[Notification Service]
     end
 
-    subgraph EventBus["TypedEventBus<UptimeEvents>"]
+    subgraph EventBus["TypedEventBus&lt;UptimeEvents&gt;"]
         Registry[Event Registry]
         Handlers[Handler Registry]
         Middleware[Event Middleware]
@@ -81,13 +86,15 @@ The following diagram shows the event system architecture:
     class MonitorMgr,SiteMgr,ConfigMgr,UpdateSvc,NotifySvc emitter
     class Registry,Handlers,Middleware,Queue bus
     class AppSvc,RendererBridge,TelemetrySvc,HistorySvc,CacheSvc subscriber
-    class EventsAPI,Listeners,Stores,UI renderer`} />
+    class EventsAPI,Listeners,Stores,UI renderer
+```
 
 ## Event Type Hierarchy
 
 Renderer event contracts are defined in `RendererEventPayloadMap` (see `shared/types/events.ts`). This diagram mirrors the current channels and payload groupings.
 
-<Mermaid value={`classDiagram
+```mermaid
+classDiagram
     class RendererEventPayloadMap {
         <<interface>>
         +"cache:invalidated": CacheInvalidatedEventData
@@ -169,13 +176,15 @@ Renderer event contracts are defined in `RendererEventPayloadMap` (see `shared/t
     RendererEventPayloadMap --> SiteRemovedEventData
     RendererEventPayloadMap --> HistoryLimitUpdatedEventData
     RendererEventPayloadMap --> UpdateStatusEventData
-    TypedEventBus --> RendererEventPayloadMap`} />
+    TypedEventBus --> RendererEventPayloadMap
+```
 
 ## Event Flow Sequence
 
 This sequence diagram shows a complete event flow from emission to UI update:
 
-<Mermaid value={`sequenceDiagram
+```mermaid
+sequenceDiagram
     autonumber
     participant Monitor as Monitor Check
     participant Checker as EnhancedMonitorChecker
@@ -215,13 +224,15 @@ This sequence diagram shows a complete event flow from emission to UI update:
     Store->>Store: update state
     Store->>UI: trigger re-render
 
-    Note over UI: UI reflects new status`} />
+    Note over UI: UI reflects new status
+```
 
 ## Event Middleware Pipeline
 
 This diagram shows the event middleware processing pipeline:
 
-<Mermaid value={`flowchart LR
+```mermaid
+flowchart LR
     Emit[Event Emitted] --> Validate[Validation Middleware]
     Validate --> Transform[Transform Middleware]
     Transform --> Log[Logging Middleware]
@@ -248,13 +259,15 @@ This diagram shows the event middleware processing pipeline:
 
     class Validate,Transform,Log,Security,Rate,Telemetry middleware
     class Handler,Success,Complete handler
-    class Drop,ErrorHandler,Queue error`} />
+    class Drop,ErrorHandler,Queue error
+```
 
 ## Event Subscription Patterns
 
 This diagram shows different event subscription patterns:
 
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     subgraph OneTime["One-Time Subscription (once)"]
         Once1[Subscribe with once()]
         Once2[Event Fired]
@@ -292,13 +305,15 @@ This diagram shows different event subscription patterns:
 
     classDef pattern fill:#3b82f6,stroke:#1e40af,color:#ffffff
 
-    class Once1,Once2,Once3,Once4,Per1,Per2,Per3,Per4,Per5,Cond1,Cond2,Cond3,Cond4,Cond5,Wild1,Wild2,Wild3 pattern`} />
+    class Once1,Once2,Once3,Once4,Per1,Per2,Per3,Per4,Per5,Cond1,Cond2,Cond3,Cond4,Cond5,Wild1,Wild2,Wild3 pattern
+```
 
 ## Event Broadcasting to Multiple Windows
 
 This diagram shows how events are broadcast to all renderer windows:
 
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     subgraph MainProcess["Main Process"]
         EventEmitter[Event Source]
         EventBus[TypedEventBus]
@@ -340,13 +355,15 @@ This diagram shows how events are broadcast to all renderer windows:
 
     class EventEmitter,EventBus,RendererBridge,WindowManager main
     class MainWin,SettingsWin,DetailsWin window
-    class MainHandler,SettingsHandler,DetailsHandler,MainStore,SettingsStore,DetailsStore handler`} />
+    class MainHandler,SettingsHandler,DetailsHandler,MainStore,SettingsStore,DetailsStore handler
+```
 
 ## Event Performance Optimization
 
 This diagram shows event system performance optimizations:
 
-<Mermaid value={`flowchart TB
+```mermaid
+flowchart TB
     Event[Event Emitted] --> Debounce{Should Debounce?}
 
     Debounce -->|Yes| DebounceLo[Debounce Logic]
@@ -390,13 +407,15 @@ This diagram shows event system performance optimizations:
 
     class DebounceLo,CollectEvents,Batch,ThrottleLo,RateLimit,Immediate,Queue,Background,Scheduler,ParallelExec,Sequential optimization
     class Debounce,Throttle,Priority,Parallel decision
-    class Process,Handlers,Await,Next,Complete execution`} />
+    class Process,Handlers,Await,Next,Complete execution
+```
 
 ## Event Error Handling
 
 This diagram shows how event errors are handled:
 
-<Mermaid value={`sequenceDiagram
+```mermaid
+sequenceDiagram
     autonumber
     participant Emitter as Event Emitter
     participant Bus as Event Bus
@@ -434,15 +453,9 @@ This diagram shows how event errors are handled:
     Handler3-->>Bus: success
     Bus-->>Emitter: all handlers complete
 
-    Note over Bus,ErrorHandler: Errors in handlers don't stop other handlers`} />
+    Note over Bus,ErrorHandler: Errors in handlers don't stop other handlers
+```
 
 ---
 
 The event system provides a robust, typed, and performant event-driven architecture that enables loose coupling and real-time updates across all application components.
-
-                </div>
-            </div>
-        </div>
-    );
-
-}

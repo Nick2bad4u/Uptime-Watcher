@@ -976,7 +976,7 @@ By following these patterns and practices, developers can ensure robust error ha
 - [Zustand Store Pattern Guide](./ZUSTAND_STORE_PATTERN_GUIDE.md) - Store composition and error isolation
 - [Testing Guide](./TESTING.md) - Error scenario testing approaches
 - [Troubleshooting Guide](./TROUBLESHOOTING.md) - Error debugging and resolution
-- [Architecture ADRs](../Architecture/ADRs/) - Error handling strategy decisions
+- [Architecture ADRs](../Architecture/ADRs/README.md) - Error handling strategy decisions
 
 ## 🎯 Quick Reference
 

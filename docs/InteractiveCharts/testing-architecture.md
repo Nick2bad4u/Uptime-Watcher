@@ -1,29 +1,36 @@
 ---
-title: Testing Architecture & Quality Gates
-description: Deep dive into automated testing pipelines for Uptime Watcher
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+doc_title: "Testing Architecture & Quality Gates"
+summary: "Diagrams mapping the Vitest, Storybook, fast-check, fuzzing, and Playwright quality gate pipelines."
+created: "2026-02-10"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
+author: "Nick2bad4u"
+tags:
+ - "uptime-watcher"
+ - "testing"
+ - "vitest"
+ - "playwright"
+ - "fast-check"
+ - "storybook"
+ - "mermaid"
+slug: "/testing-architecture"
+sidebar_label: "🧪 Testing Architecture"
 ---
-
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
-import Mermaid from '@theme/Mermaid';
-
-export default function TestingArchitecture() {
-  return (
-    <div className="container margin-vert--lg">
-      <div className="row">
-        <div className="col">
 
 # Testing Architecture & Quality Gates
 
-This document maps every automated test surface in Uptime Watcher—unit, integration, property-based, fuzzing, Storybook component and runner suites, and Playwright E2E—in one place. Each diagram references the actual configs and directories so contributors can trace where data flows and how coverage gates are enforced.
+This document maps every automated test surface in Uptime Watcher—unit, integration, property-based, fuzzing, Storybook component and runner suites, and Playwright E2E—in one place.
+
+Each diagram references the actual configs and directories so contributors can trace where data flows and how coverage gates are enforced.
 
 ## Test Suite Topology
 
-The first diagram connects the NPM scripts, Vitest projects, Storybook runner, and Playwright projects to the code they exercise. Nodes use the same naming found in `package.json` and the dedicated Vitest configs (`vitest.config.ts`, `vitest.electron.config.ts`, `vitest.shared.config.ts`, `vitest.storybook.config.ts`).
-
-<Mermaid value={`graph TD
+```mermaid
+graph TD
     subgraph CLI["npm scripts (package.json)"]
-      testAll["npm run test:all\n(renderer + storybook + storybook:runner)"]
-      testAllCoverage["npm run test:all:coverage\n(renderer + electron + shared + storybook + storybook:runner)"]
+      testAll["npm run test:all\n(renderer + storybook + story runner)"]
+      testAllCoverage["npm run test:all:coverage\n(renderer + electron + shared + storybook + story runner)"]
       testAllDetailed["npm run test:all:detailed"]
       testPlaywright["npm run test:playwright (alias test:e2e)"]
       fuzz["npm run fuzz"]
@@ -130,14 +137,14 @@ The first diagram connects the NPM scripts, Vitest projects, Storybook runner, a
     class RunnerSuites setup
     class GlobalSetup,GlobalTeardown,ElectronHelpers,PWTests setup
     class tsFrontend,tsElectron,tsShared,tsPlaywright,TsDeps,TsDeps2,TsDeps3,TsDeps4 type
-
-`} />
+```
 
 ## Property & Fuzz Validation Pipelines
 
-Shared and Electron tests use `@fast-check/vitest` (see `shared/test/setup.ts`, `electron/test/setup.ts`, `src/test/dom-setup.ts`) to hammer the Zod schemas, monitor factories, and error-handling routines. The diagram outlines how arbitraries feed into validators and what invariants each suite asserts.
+Shared and Electron tests use `@fast-check/vitest` to hammer the Zod schemas, monitor factories, and error-handling routines.
 
-<Mermaid value={`flowchart LR
+```mermaid
+flowchart LR
     Arbitraries["Custom fast-check arbitraries\n(shared/test/schemas.property.test.ts)"] -->|generate Site & Monitor payloads| Validators["Zod schemas\nshared/validation/schemas.ts"]
     Validators -->|validated objects| Sanitizers["validateSiteData / validateMonitorData"]
     Sanitizers -->|round-trip clones| Invariants["Assertions: status enum, intervals, history shape"]
@@ -167,14 +174,14 @@ Shared and Electron tests use `@fast-check/vitest` (see `shared/test/setup.ts`, 
     class Arbitraries stage
     class ErrorFuzz,SiteStatusFuzz,ConversionFuzz fuzz
     class Validators,Sanitizers,Invariants,DerivedStats,CoreUtils,LoggerGuards,EnhancedCheckerProp,MonitorRegistryProp,ElectronMocks,EventBusChecks util
-
-`} />
+```
 
 ## Playwright & Electron End-to-End Flow
 
-Playwright projects exercise the packaged Electron app. Global setup builds the main process, fixtures launch Electron via `_electron.launch`, and each project records artefacts (`playwright/test-results`, `playwright/reports/html-report`). The sequence diagram captures the control flow for a typical E2E run.
+Playwright projects exercise the packaged Electron app.
 
-<Mermaid value={`sequenceDiagram
+```mermaid
+sequenceDiagram
     autonumber
     participant CLI as npm run test:e2e
     participant PW as Playwright Runner
@@ -197,36 +204,9 @@ Playwright projects exercise the packaged Electron app. Global setup builds the 
     Test->>App: orchestrate UI (selectors, IPC via preload)
     Test->>Report: capture screenshot/video on failure
     PW->>Report: write trace.zip + results.json/xml
-    PW->>globalTeardown: kill residual electron (taskkill/pkill)
+    PW->>globalTeardown: kill residual electron
     globalTeardown-->>PW: cleanup complete
 
     Note over Fixture,App: HEADLESS=true ensures WindowService skips show()
     Note over Test,Report: Traces stored in playwright/test-results + html-report
-
-`} />
-
-## Coverage & Quality Gates
-
-- **Front-end Vitest**: 90% line/function thresholds enforced by default reporter (`vitest.config.ts`). DOM helpers and `useSite*` hooks are covered through component tests such as `src/test/App.comprehensive.test.tsx`.
-- **Electron Vitest**: `vitest.electron.config.ts` enforces 90%+ coverage with mocked Electron APIs and ensures `UptimeOrchestrator` event propagation is verified (`electron/test/UptimeOrchestrator.test.ts`).
-- **Shared Utilities**: Property-based and fuzz suites under `shared/test` guard serialization, schema validation, and error handling (`jsonSafety.property.test.ts`, `errorHandling.fuzz.test.ts`).
-- **Storybook Vitest**: `vitest.storybook.config.ts` uses `@storybook/addon-vitest` so Storybook stories are regression tested alongside UI snapshots.
-- **Playwright**: Projects in `playwright/tests` span main-process boot, renderer workflows, accessibility, and UI regression. Traces/snapshots are retained for first retry or failure as configured in `playwright.config.ts`.
-
-## Running the Matrix
-
-Common commands:
-
-- `npm run test:all` — Runs frontend, Electron, shared, and Storybook suites without coverage noise.
-- `npm run test:all:coverage` — Same as above but produces HTML/LCOV reports per suite (`coverage/frontend`, `coverage/electron`, `coverage/shared`, `coverage/storybook`).
-- `npm run test:e2e` — Executes the Playwright matrix with single worker + Electron HEADLESS mode.
-- `npm run fuzz` — Filters Vitest to any test name containing `fuzz` or `fuzzing`, ideal for quick property regression sweeps.
-
-By following the diagrams and commands above, contributors can reason about where to place new tests, how existing suites interact, and which quality gates will guard their changes.
-
-        </div>
-      </div>
-    </div>
-
-);
-}
+```

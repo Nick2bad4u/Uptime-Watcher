@@ -163,8 +163,8 @@ Relevant historical context and lessons learned:
 **Follow Up**:
 
 - [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interface reference
-- [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
-- [Architecture/Templates/](../Architecture/Templates/) - Code templates
+- [Architecture/ADRs/README.md](../Architecture/ADRs/README.md) - Design decisions
+- [Architecture/Templates/README.md](../Architecture/Templates/README.md) - Code templates
 
 ### 👨‍💻 New Developers
 

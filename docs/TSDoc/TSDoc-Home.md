@@ -32,7 +32,7 @@ library is an easy way to ensure that your tool is 100% compatible with
 the standard.
 
 👋 **\*Give it a try!** The
-`<a target="_blank" href="/play">`{=html}TSDoc Playground`</a>`{=html}
+`<a target="_blank" rel="noopener noreferrer" href="https://tsdoc.org/play/">`{=html}TSDoc Playground`</a>`{=html}
 provides an interactive demo of the parser!\*
 
 ## Why do we need TSDoc?

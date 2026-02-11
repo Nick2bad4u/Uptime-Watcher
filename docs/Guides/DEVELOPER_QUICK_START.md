@@ -427,18 +427,18 @@ npm run electron -- --log-debug
 
 ### Architecture Understanding
 
-- [`docs/Architecture/ADRs/`](../Architecture/ADRs/) - Architectural decisions
-- [`docs/Architecture/Patterns/`](../Architecture/Patterns/) - Development patterns
+- [`docs/Architecture/ADRs/README.md`](../Architecture/ADRs/README.md) - Architectural decisions
+- [`docs/Architecture/Patterns/README.md`](../Architecture/Patterns/README.md) - Development patterns
 
 ### Implementation Guides
 
 - [`docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`](./NEW_MONITOR_TYPE_IMPLEMENTATION.md)
 - [`docs/Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md`](./UI_FEATURE_DEVELOPMENT_GUIDE.md)
-- [`docs/Architecture/Templates/`](../Architecture/Templates/) - Code templates
+- [`docs/Architecture/Templates/README.md`](../Architecture/Templates/README.md) - Code templates
 
 ### Code Standards
 
-- [`docs/TSDoc/`](../TSDoc/) - TSDoc documentation standards
+- [`docs/TSDoc/README.md`](../TSDoc/README.md) - TSDoc documentation standards
 
 ## 🎯 Next Steps
 
@@ -451,7 +451,7 @@ npm run electron -- --log-debug
 ### For AI Assistants
 
 1. **Patterns**: Reference [`docs/Architecture/`](../Architecture/) for coding patterns
-2. **Examples**: Use templates in [`docs/Architecture/Templates/`](../Architecture/Templates/)
+2. **Examples**: Use templates in [`docs/Architecture/Templates/README.md`](../Architecture/Templates/README.md)
 
 ---
 

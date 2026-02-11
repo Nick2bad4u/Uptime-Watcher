@@ -33,10 +33,18 @@
         "noEmit": false,
         "outDir": "../../.cache/builds/docusaurus/typedoc",
         "paths": {
-            "@app/*": ["../../src/*"],
-            "@assets/*": ["../../assets/*"],
-            "@electron/*": ["../../electron/*"],
-            "@shared/*": ["../../shared/*"]
+            "@app/*": [
+                "../../src/*"
+            ],
+            "@assets/*": [
+                "../../assets/*"
+            ],
+            "@electron/*": [
+                "../../electron/*"
+            ],
+            "@shared/*": [
+                "../../shared/*"
+            ]
         },
         "resolveJsonModule": true,
         "skipLibCheck": true,
@@ -44,7 +52,9 @@
         "strict": true,
         "target": "ESNext",
         "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.docusaurus.typedoc.tsbuildinfo",
-        "types": ["vite/client"]
+        "types": [
+            "vite/client"
+        ]
     },
     "exclude": [
         "../../node_modules/**",
@@ -100,13 +110,16 @@
         "../../src/**/*.tsx",
         "../../src/**/*.js",
         "../../src/**/*.jsx",
+        "../../src/**/*.mjs",
         "../../electron/**/*.ts",
         "../../electron/**/*.tsx",
         "../../electron/**/*.js",
         "../../electron/**/*.jsx",
+        "../../electron/**/*.mjs",
         "../../shared/**/*.ts",
         "../../shared/**/*.tsx",
         "../../shared/**/*.js",
-        "../../shared/**/*.jsx"
+        "../../shared/**/*.jsx",
+        "../../shared/**/*.mjs"
     ]
 }

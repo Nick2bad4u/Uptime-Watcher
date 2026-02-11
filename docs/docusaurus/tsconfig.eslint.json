@@ -26,9 +26,15 @@
         "noEmit": false,
         "outDir": "../../.cache/builds/docusaurus/eslint",
         "paths": {
-            "@docusaurus/*": ["./.docusaurus/docusaurus/*"],
-            "@site/*": ["./*"],
-            "@theme/*": ["./.docusaurus/theme/*"]
+            "@docusaurus/*": [
+                "./.docusaurus/docusaurus/*"
+            ],
+            "@site/*": [
+                "./*"
+            ],
+            "@theme/*": [
+                "./.docusaurus/theme/*"
+            ]
         },
         "resolveJsonModule": true,
         "skipLibCheck": true,
@@ -48,18 +54,21 @@
     ],
     "extends": "./tsconfig.typedoc.json",
     "include": [
-        "**/*.ts",
-        "**/*.tsx",
+        "**/*.cjs",
+        "**/*.css",
         "**/*.js",
         "**/*.jsx",
-        "src/**/*",
-        "static/**/*",
-        "sidebars.ts",
-        "docusaurus.config.ts",
-        "**/*.css",
-        "**/*.scss",
         "**/*.md",
         "**/*.mdx",
-        "**/*.mjs"
+        "**/*.mjs",
+        "**/*.mts",
+        "**/*.scss",
+        "**/*.ts",
+        "**/*.tsx",
+        "docusaurus.config.ts",
+        "sidebars.ts",
+        "src/**/*",
+        "static/**/*",
+        "typedoc-plugins/**/*"
     ]
 }

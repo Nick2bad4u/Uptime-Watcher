@@ -1,26 +1,29 @@
 ---
-title: Error Handling & Recovery
-description: Error handling strategies and recovery mechanisms in Uptime Watcher
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+doc_title: "Error Handling & Recovery"
+summary: "Diagrams describing error detection, classification, recovery, retry strategies, and telemetry pipelines."
+created: "2026-02-10"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
+author: "Nick2bad4u"
+tags:
+ - "uptime-watcher"
+ - "architecture"
+ - "errors"
+ - "reliability"
+ - "mermaid"
+slug: "/error-handling"
+sidebar_label: "🧯 Error Handling"
 ---
-
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
-import Mermaid from '@theme/Mermaid';
-
-export default function ErrorHandling() {
-    return (
-        <div className="container margin-vert--lg">
-            <div className="row">
-                <div className="col">
 
 # Error Handling & Recovery
 
-This page documents the comprehensive error handling and recovery strategies implemented throughout Uptime Watcher.
+This page documents the error handling and recovery strategies implemented throughout Uptime Watcher.
 
 ## Error Handling Architecture
 
-The following diagram shows the layered error handling architecture:
-
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     subgraph ErrorSources["Error Sources"]
         UserInput[User Input Errors]
         NetworkErrors[Network Errors]
@@ -98,13 +101,13 @@ The following diagram shows the layered error handling architecture:
     class Validation,TryCatch,PromiseRejection,ErrorBoundary,GlobalHandler detect
     class Normalize,Classify,Enrich,Transform process
     class Log,Notify,Report,Telemetry respond
-    class Retry,Fallback,Graceful,FullSync,Restart recover`} />
+    class Retry,Fallback,Graceful,FullSync,Restart recover
+```
 
 ## Error Classification Hierarchy
 
-This diagram shows how errors are classified and routed:
-
-<Mermaid value={`classDiagram
+```mermaid
+classDiagram
     class BaseError {
         <<abstract>>
         +name: string
@@ -173,13 +176,13 @@ This diagram shows how errors are classified and routed:
         +report(error: BaseError): void
     }
 
-    ErrorHandler --> BaseError`} />
+    ErrorHandler --> BaseError
+```
 
 ## Error Recovery Flow
 
-This flowchart shows the error recovery decision tree:
-
-<Mermaid value={`flowchart TD
+```mermaid
+flowchart TD
     Error[Error Detected] --> Capture[Capture Error Context]
     Capture --> Normalize[Normalize Error]
     Normalize --> Classify{Classify Error Type}
@@ -263,13 +266,13 @@ This flowchart shows the error recovery decision tree:
     class Error,ShowUser,ShowNetworkError,ShowDBError,ShowIPCError,ShowSystemError,ShowGenericError,ShowConstraintError errorNode
     class Classify,CheckRetryable,CheckSuccess,CheckMaxRetries,CheckConstraint,CheckRecoverable,RecoverSuccess,CheckPayload,CheckCritical decision
     class ExponentialBackoff,Retry,RetryDB,FullSync,InvalidateCache,RequestSync,RehydrateStore,Recovered,ScheduleRetry recovery
-    class Capture,Normalize,LogIPC,LogMonitor,LogState,LogSystem,LogUnknown,Telemetry,Report log`} />
+    class Capture,Normalize,LogIPC,LogMonitor,LogState,LogSystem,LogUnknown,Telemetry,Report log
+```
 
 ## Retry Strategy with Exponential Backoff
 
-This diagram shows the retry mechanism with exponential backoff:
-
-<Mermaid value={`sequenceDiagram
+```mermaid
+sequenceDiagram
     autonumber
     participant Operation as Failed Operation
     participant Retry as Retry Handler
@@ -315,13 +318,13 @@ This diagram shows the retry mechanism with exponential backoff:
                 Retry->>User: show error notification
             end
         end
-    end`} />
+    end
+```
 
 ## Error Boundary Component Tree
 
-This diagram shows React Error Boundary placement:
-
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     App[App Root] --> RootBoundary[Root Error Boundary]
 
     RootBoundary --> Theme[Theme Provider]
@@ -357,13 +360,13 @@ This diagram shows React Error Boundary placement:
 
     class RootBoundary,MainBoundary,SiteListBoundary,ModalBoundary,TabBoundary boundary
     class App,Theme,Layout,Header,Footer,Dashboard,SiteCards,AddSite,Settings,Details,Overview,History,Analytics component
-    class FallbackUI,ErrorDisplay,EmptyState,ModalError,TabError fallback`} />
+    class FallbackUI,ErrorDisplay,EmptyState,ModalError,TabError fallback
+```
 
 ## Error Logging and Telemetry
 
-This diagram shows the error logging and telemetry pipeline:
-
-<Mermaid value={`flowchart LR
+```mermaid
+flowchart LR
     subgraph Sources["Error Sources"]
         Renderer[Renderer Errors]
         Main[Main Process Errors]
@@ -425,15 +428,5 @@ This diagram shows the error logging and telemetry pipeline:
     class Normalize,Enrich,Sanitize,Format process
     class ErrorLog,ErrorStore,Console storage
     class Patterns,Frequency,Severity analysis
-    class Alert,Recovery,Report action`} />
-
----
-
-The error handling system ensures robust operation through comprehensive error detection, classification, recovery strategies, and user-friendly error messaging across all application layers.
-
-                </div>
-            </div>
-        </div>
-    );
-
-}
+    class Alert,Recovery,Report action
+```

@@ -44,9 +44,15 @@
         "noUnusedParameters": true,
         "outDir": "../../.cache/builds/docusaurus/site",
         "paths": {
-            "@docusaurus/*": ["./.docusaurus/docusaurus/*"],
-            "@site/*": ["./*"],
-            "@theme/*": ["./.docusaurus/theme/*"]
+            "@docusaurus/*": [
+                "./.docusaurus/docusaurus/*"
+            ],
+            "@site/*": [
+                "./*"
+            ],
+            "@theme/*": [
+                "./.docusaurus/theme/*"
+            ]
         },
         "pretty": true,
         "resolveJsonModule": true,
@@ -78,14 +84,19 @@
     "extends": "@docusaurus/tsconfig",
     "files": [],
     "include": [
-        "**/*.ts",
-        "**/*.tsx",
+        "**/*.cjs",
+        "**/*.cts",
+        "**/*.d.ts",
         "**/*.js",
         "**/*.jsx",
-        "**/*.d.ts",
+        "**/*.mjs",
+        "**/*.mts",
+        "**/*.ts",
+        "**/*.tsx",
+        "docusaurus.config.ts",
+        "sidebars.ts",
         "src/**/*",
         "static/**/*",
-        "sidebars.ts",
-        "docusaurus.config.ts"
+        "typedoc-plugins/**/*"
     ]
 }

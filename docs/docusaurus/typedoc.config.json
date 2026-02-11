@@ -688,7 +688,8 @@
     "out": "docs",
     "placeInternalsInOwningModule": true,
     "plugin": [
-        "./typedoc-plugins/hash-to-bang-links.mjs",
+        "./typedoc-plugins/hashToBangLinks.mjs",
+        "./typedoc-plugins/prefixDocLinks.mjs",
         "typedoc-plugin-remark",
         "typedoc-plugin-missing-exports",
         "typedoc-plugin-replace-text",
@@ -708,6 +709,7 @@
         "../../docs/Architecture/**/*.md",
         "../../docs/Guides/**/*.md",
         "../../docs/InteractiveCharts/**/*.md",
+        "../../docs/Testing/**/*.md",
         "../../docs/TSDoc/**/*.md",
         "../../README.md"
     ],

@@ -1,26 +1,37 @@
 ---
-title: Engineering Tooling Pipelines
-description: Diagrams for linting, type-checking, documentation, and site builds
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+doc_title: "Engineering Tooling Pipelines"
+summary: "Diagrams for linting, type-checking, docs generation, and Docusaurus build pipelines."
+created: "2026-02-10"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
+author: "Nick2bad4u"
+tags:
+ - "uptime-watcher"
+ - "tooling"
+ - "linting"
+ - "typescript"
+ - "docusaurus"
+ - "typedoc"
+ - "mermaid"
+slug: "/engineering-tooling"
+sidebar_label: "🧰 Engineering Tooling"
 ---
-
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
-import Mermaid from '@theme/Mermaid';
-
-export default function EngineeringTooling() {
-  return (
-        <div className="container margin-vert--lg">
-            <div className="row">
-                <div className="col">
 
 # Engineering Tooling Pipelines
 
-Each section below breaks down a major developer workflow using Mermaid diagrams that mirror the real scripts and configuration in this repository. Treat these as living maps when you need to understand how linting, typing, documentation, or the Docusaurus site are wired together.
+Each section below breaks down a major developer workflow using Mermaid diagrams that mirror the real scripts and configuration in this repository.
+
+Treat these as living maps when you need to understand how linting, typing, documentation, or the Docusaurus site are wired together.
 
 ## Linting & Formatting Stack
 
-This topology shows how `package.json` scripts fan out into ESLint, Stylelint, Prettier, Remark, and auxiliary analyzers (madge, commitlint, actionlint, cognitive complexity, dependency hygiene). Caches and config files are included so you can jump straight to the right file when something fails locally or in CI.
+This topology shows how `package.json` scripts fan out into ESLint, Stylelint, Prettier, Remark, and auxiliary analyzers (Madge, commitlint, actionlint, cognitive complexity, dependency hygiene).
 
-<Mermaid value={`graph TD
+Caches and config files are included so you can jump straight to the right file when something fails locally or in CI.
+
+```mermaid
+graph TD
     subgraph CLI["npm scripts (package.json)"]
         lint["npm run lint"]
         lintAll["npm run lint:all"]
@@ -49,7 +60,7 @@ This topology shows how `package.json` scripts fan out into ESLint, Stylelint, P
     subgraph Stylelint["Stylelint runner"]
         StylelintRunner["stylelint --cache --cache-location .cache/stylelintcache"]
         StylelintConfig["stylelint.config.mjs"]
-        StylelintConfig["stylelint.config.mjs"]
+        StylelintDocsIgnore["docs/docusaurus/.stylelintignore"]
         StylelintCache[".cache/stylelintcache"]
     end
 
@@ -88,7 +99,8 @@ This topology shows how `package.json` scripts fan out into ESLint, Stylelint, P
     lintPrettierFix --> PrettierRunner
 
     lintCSS --> StylelintRunner
-    lintCSSDocs --> StylelintDocsConfig
+    lintCSSDocs --> StylelintDocsIgnore
+    StylelintDocsIgnore --> StylelintRunner
 
     lintRemark --> RemarkRunner
     lintRemarkFix --> RemarkRunner
@@ -104,7 +116,6 @@ This topology shows how `package.json` scripts fan out into ESLint, Stylelint, P
     ESLintRunner --> ESLintCache
     StylelintRunner --> StylelintConfig
     StylelintRunner --> StylelintCache
-    StylelintDocsConfig --> StylelintRunner
     PrettierRunner --> PrettierConfig
     PrettierRunner --> PrettierCache
     RemarkRunner --> RemarkConfig
@@ -115,13 +126,13 @@ This topology shows how `package.json` scripts fan out into ESLint, Stylelint, P
 
     class lint,lintAll,lintCI,lintQuick,lintPrettier,lintPrettierFix,lintCSS,lintCSSDocs,lintRemark,lintRemarkFix,lintMadge,lintAction,lintCommit,lintComplexity,lintKnip,lintDepcheck cli
     class ESLintRunner,StylelintRunner,PrettierRunner,RemarkRunner,Madge,Actionlint,Commitlint,Complexity,Knip,Depcheck,Yamllint,Grype runner
-    class ESLintConfig,ESLintCache,StylelintConfig,StylelintDocsConfig,StylelintCache,PrettierConfig,PrettierCache,RemarkConfig config
+    class ESLintConfig,ESLintCache,StylelintConfig,StylelintDocsIgnore,StylelintCache,PrettierConfig,PrettierCache,RemarkConfig config
+```
 
-` } />
+## Type-checking Topology
 
-With these diagrams you can quickly trace the exact scripts and configuration files responsible for quality gates, documentation output, and the Docusaurus website lifecycle. Keep them handy when extending tooling or triaging CI issues.
-
-<Mermaid value={`graph TD
+```mermaid
+graph TD
     subgraph Scripts["Type-check scripts"]
         checkTypes["npm run check-types"]
         checkAll["npm run check:all"]
@@ -181,14 +192,14 @@ With these diagrams you can quickly trace the exact scripts and configuration fi
     class checkTypes,checkAll,checkAllAll,checkPlaywright script
     class tsApp,tsElectron,tsShared,tsTestFrontend,tsTestElectron,tsTestShared,tsBenchmarks,tsConfigs,tsPlaywright,tsStorybook tsconfig
     class dtsOut,tsbuildInfo,diagnostics artifact
-
-`} />
+```
 
 ## Documentation & Content Toolchain
 
-Uptime Watcher’s documentation stack combines Markdown/MDX linting, TypeDoc API extraction, and manual content in `docs/docusaurus/src`. The diagram highlights how Remark, Prettier, and TypeDoc coordinate.
+Uptime Watcher’s documentation stack combines Markdown/MDX linting, TypeDoc API extraction, and manual content in `docs/docusaurus/src`.
 
-<Mermaid value={`flowchart LR
+```mermaid
+flowchart LR
     DocsSrc["docs/ + docs/docusaurus/src/pages"] --> RemarkLint
     Guides["docs/Guides/**"] --> RemarkLint
     TSDoc["docs/TSDoc/**"] --> RemarkLint
@@ -204,7 +215,7 @@ Uptime Watcher’s documentation stack combines Markdown/MDX linting, TypeDoc AP
     TypedocCmd --> TypedocConfig
     TypedocCmd --> TypedocTSConfig
     TypedocConfig --> TypedocPlugins
-    TypedocCmd --> ApiMarkdown["docs/docusaurus/docs/api/**"]
+    TypedocCmd --> ApiMarkdown["docs/docusaurus/docs/**"]
 
     PrettierDocs --> DocsReviewed["Formatted MD/MDX"]
     ApiMarkdown --> DocsReviewed
@@ -214,49 +225,50 @@ Uptime Watcher’s documentation stack combines Markdown/MDX linting, TypeDoc AP
 
     class DocsSrc,Guides,TSDoc,ApiMarkdown content
     class RemarkLint,PrettierDocs,TypedocCmd,TypedocConfig,TypedocTSConfig,TypedocPlugins,DocsReviewed tooling
-
-`} />
+```
 
 ## Docusaurus Site Architecture
 
-The following diagram maps the Docusaurus site located in `docs/docusaurus`. It shows how the core config, theme customisations, plugins, and static assets plug together.
+The following diagram maps the Docusaurus site located in `docs/docusaurus`.
 
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     DocusaurusRoot["docs/docusaurus"]
     DocusaurusRoot --> ConfigTS["docusaurus.config.ts"]
     DocusaurusRoot --> Sidebars["sidebars.ts"]
     DocusaurusRoot --> ThemeOverrides["src/theme/**"]
-    DocusaurusRoot --> LiveCode["plugins: @docusaurus/theme-live-codeblock"]
-    DocusaurusRoot --> MermaidPlugin["plugins: @docusaurus/theme-mermaid"]
-    DocusaurusRoot --> ZoomPlugin["plugins: docusaurus-plugin-image-zoom"]
-        DocusaurusRoot --> LLMSPlugin["plugins: docusaurus-plugin-llms"]
+    DocusaurusRoot --> LiveCode["theme: live-codeblock"]
+    DocusaurusRoot --> MermaidPlugin["theme: mermaid"]
+    DocusaurusRoot --> ZoomPlugin["plugin: image-zoom"]
+    DocusaurusRoot --> LLMSPlugin["plugin: llms"]
     DocusaurusRoot --> ClientModules["src/js/modernEnhancements.ts"]
 
     ConfigTS --> Deployment["deploymentBranch = gh-pages"]
     ConfigTS --> BaseUrl["baseUrl = /Uptime-Watcher/"]
-    ConfigTS --> MarkdownPipeline["markdown: mermaid + anchors + mdx1Compat"]
-    ConfigTS --> FutureFlags["future.experimental_faster"]
+    ConfigTS --> MarkdownPipeline["markdown: mermaid + anchors + hooks"]
+    ConfigTS --> FutureFlags["future.v4 + experimental_faster"]
     ConfigTS --> ThemeConfig["classic preset theme, navbar, footer"]
 
     ThemeOverrides --> CodeBlocks["prism themes"]
-    ThemeOverrides --> CustomPages["custom MDX pages"]
+    ThemeOverrides --> CustomPages["custom theme pages"]
 
-    staticAssets["docs/docusaurus/static/**"] --> BuildArtifacts["build output"]
+    StaticAssets["docs/docusaurus/static/**"] --> BuildArtifacts["build output"]
 
     classDef root fill:#0ea5e9,stroke:#0369a1,color:#ffffff
     classDef config fill:#1f2937,stroke:#111827,color:#f1f5f9
     classDef plugin fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
-        class DocusaurusRoot root
-        class ConfigTS,Sidebars,ThemeOverrides,Deployment,BaseUrl,MarkdownPipeline,FutureFlags,ThemeConfig,CodeBlocks,CustomPages,ClientModules,staticAssets config
-        class LiveCode,MermaidPlugin,ZoomPlugin,LLMSPlugin,BuildArtifacts plugin
 
-`} />
+    class DocusaurusRoot root
+    class ConfigTS,Sidebars,ThemeOverrides,Deployment,BaseUrl,MarkdownPipeline,FutureFlags,ThemeConfig,CodeBlocks,CustomPages,ClientModules,StaticAssets config
+    class LiveCode,MermaidPlugin,ZoomPlugin,LLMSPlugin,BuildArtifacts plugin
+```
 
 ## Docusaurus Build & TypeDoc Pipeline
 
-`npm run docs:build` chains TypeDoc generation, ESLint inspector export, and the Docusaurus build. The sequence diagram shows the order of operations and where artefacts land.
+`npm run docs:build` chains TypeDoc generation, ESLint inspector export, and the Docusaurus build.
 
-<Mermaid value={`sequenceDiagram
+```mermaid
+sequenceDiagram
     autonumber
     participant Dev as Developer CLI
     participant Scripts as npm scripts
@@ -266,25 +278,23 @@ The following diagram maps the Docusaurus site located in `docs/docusaurus`. It 
     participant Output as Artifacts
 
     Dev->>Scripts: npm run docs:build
-    Scripts->>TypeDoc: cd docs/docusaurus && typedoc --options typedoc.config.json
-    TypeDoc->>Output: docs/docusaurus/docs/api/** (Markdown)
+    Scripts->>TypeDoc: typedoc (generate docs)
+    TypeDoc->>Output: docs/docusaurus/docs/**
     TypeDoc-->>Scripts: exit 0
     Scripts->>Inspector: npm run build:eslint-inspector
     Inspector->>Output: docs/docusaurus/static/eslint-inspector/**
     Inspector-->>Scripts: exit 0
-    Scripts->>Docusaurus: cd docs/docusaurus && npx docusaurus build
+    Scripts->>Docusaurus: docusaurus build
     Docusaurus->>Output: build/ (static site)
-    Docusaurus-->>Dev: Build summary + sitemap
+    Docusaurus-->>Dev: build summary + sitemap
+```
 
-    Note over TypeDoc,Docusaurus: Build steps reuse HEADLESS env when running on CI
+## Quality Gate Orchestrator
 
-`} />
+Beyond linting/type-checking, `npm run quality` is the umbrella command CI uses to assert code health.
 
-## Quality Gate Orchestrator (Bonus)
-
-Beyond linting/type-checking, `npm run quality` is the umbrella command CI uses to assert code health. It fans out to linting, testing, dependency hygiene, and broken link checks. Use this map when debugging a failing pipeline run.
-
-<Mermaid value={`graph LR
+```mermaid
+graph LR
     quality["npm run quality"] --> lintAll
     quality --> testAllCoverage["npm run test:all:coverage"]
     quality --> docusaurusCheck["npm run docusaurus:broken-links"]
@@ -302,7 +312,7 @@ Beyond linting/type-checking, `npm run quality` is the umbrella command CI uses 
     testAllCoverage --> storybookCov["vitest --config vitest.storybook.config.ts --coverage"]
 
     docusaurusCheck --> typedocRefresh["npm run docs:typedoc"]
-    docusaurusCheck --> docusaurusBuildCheck["npx docusaurus check"]
+    docusaurusCheck --> docusaurusBuildCheck["docusaurus check"]
 
     depScan --> grypeScan["grype ."]
     depScan --> depcheckScan["depcheck"]
@@ -313,16 +323,4 @@ Beyond linting/type-checking, `npm run quality` is the umbrella command CI uses 
     class quality gate
     class lintAll,testAllCoverage,docusaurusCheck,depScan gate
     class lint,lintRemark,lintMadge,typeCheckAll,knip,frontendCov,electronCov,sharedCov,storybookCov,typedocRefresh,docusaurusBuildCheck,grypeScan,depcheckScan child
-
-`} />
-
----
-
-With these diagrams you can quickly trace the exact scripts and configuration files responsible for quality gates, documentation output, and the Docusaurus website lifecycle. Keep them handy when extending tooling or triaging CI issues.
-
-                </div>
-            </div>
-        </div>
-
-);
-}
+```

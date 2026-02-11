@@ -779,6 +779,7 @@ coverage-results.json
 report/
 
 # Docusaurus documentation
+!docs/docusaurus/static/manifest.json
 docs/docusaurus/docs/_media
 **/docs/docusaurus/docs/_media
 docs/docusaurus/docs/assets
@@ -855,3 +856,4 @@ docs/docusaurus/docs/documents/
 # Generated Storybook static output embedded into the docs site.
 docs/docusaurus/static/storybook/
 docs/docusaurus/docs/typedoc.json
+docs/docusaurus/docs/hierarchy.md

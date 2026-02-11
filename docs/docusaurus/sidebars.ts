@@ -131,6 +131,36 @@ const sidebars: SidebarsConfig = {
                     type: "doc",
                 },
                 {
+                    id: "documents/docs/InteractiveCharts/event-system",
+                    label: "📣 Event System",
+                    type: "doc",
+                },
+                {
+                    id: "documents/docs/InteractiveCharts/ipc-communication",
+                    label: "🔌 IPC Communication",
+                    type: "doc",
+                },
+                {
+                    id: "documents/docs/InteractiveCharts/service-container",
+                    label: "🧩 Service Container",
+                    type: "doc",
+                },
+                {
+                    id: "documents/docs/InteractiveCharts/error-handling",
+                    label: "🧯 Error Handling",
+                    type: "doc",
+                },
+                {
+                    id: "documents/docs/InteractiveCharts/testing-architecture",
+                    label: "🧪 Testing Architecture",
+                    type: "doc",
+                },
+                {
+                    id: "documents/docs/InteractiveCharts/engineering-tooling",
+                    label: "🧰 Engineering Tooling",
+                    type: "doc",
+                },
+                {
                     id: "documents/docs/InteractiveCharts/README",
                     label: "📎 Charts Index",
                     type: "doc",

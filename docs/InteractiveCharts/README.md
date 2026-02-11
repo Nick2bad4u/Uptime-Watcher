@@ -18,3 +18,22 @@ tags:
 This section contains the Mermaid diagrams used on the documentation site.
 
 These pages are authored in the repository under `docs/InteractiveCharts/` and are **copied into the Docusaurus docs output** via the TypeDoc `projectDocuments` pipeline, so they appear alongside the generated API docs.
+
+## Charts included
+
+- [🏗️ System Architecture](./system-architecture.md)
+- [🔄 Monitoring Workflows](./monitoring-workflows.md)
+- [🗄️ Data Models](./data-models.md)
+- [🚀 Deployment & Infrastructure](./deployment-infrastructure.md)
+- [📊 Performance Metrics](./performance-metrics.md)
+- [📣 Event System](./event-system.md)
+- [🔌 IPC Communication](./ipc-communication.md)
+- [🧩 Service Container](./service-container.md)
+- [🧯 Error Handling](./error-handling.md)
+- [🧪 Testing Architecture](./testing-architecture.md)
+- [🧰 Engineering Tooling](./engineering-tooling.md)
+
+## Notes
+
+- Mermaid-heavy MDX pages that used to live under `docs/docusaurus/src/pages/` were migrated here so the diagrams have a single source of truth and can be included in the docs sidebar.
+- If you add a new chart, prefer authoring it as a `.md` file with fenced `mermaid` blocks in this folder.

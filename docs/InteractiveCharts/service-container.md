@@ -1,16 +1,20 @@
 ---
-title: Service Container & Dependency Injection
-description: Dependency injection and service lifecycle management in Uptime Watcher
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+doc_title: "Service Container & Dependency Injection"
+summary: "Diagrams describing the service container architecture, lifecycle, and dependency resolution patterns."
+created: "2026-02-10"
+last_reviewed: "2026-02-10"
+doc_category: "guide"
+author: "Nick2bad4u"
+tags:
+ - "uptime-watcher"
+ - "architecture"
+ - "dependency-injection"
+ - "electron"
+ - "mermaid"
+slug: "/service-container"
+sidebar_label: "🧩 Service Container"
 ---
-
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Mermaid component consumed by MDX JSX */}
-import Mermaid from '@theme/Mermaid';
-
-export default function ServiceContainer() {
-    return (
-        <div className="container margin-vert--lg">
-            <div className="row">
-                <div className="col">
 
 # Service Container & Dependency Injection
 
@@ -18,9 +22,8 @@ This page documents the service container architecture and dependency injection 
 
 ## Service Container Architecture
 
-The following diagram shows the service container structure:
-
-<Mermaid value={`graph TB
+```mermaid
+graph TB
     subgraph ServiceContainer["ServiceContainer"]
         Registry[Service Registry]
         Factory[Service Factory]
@@ -78,13 +81,13 @@ The following diagram shows the service container structure:
     class DatabaseSvc,ConfigSvc,LoggerSvc,EventBusSvc core
     class SiteMgr,MonitorMgr,HistoryMgr,NotificationMgr domain
     class IPCSvc,WindowSvc,UpdateSvc,TelemetrySvc infra
-    class AppSvc,Orchestrator app`} />
+    class AppSvc,Orchestrator app
+```
 
 ## Service Lifecycle
 
-This state diagram shows the service lifecycle:
-
-<Mermaid value={`stateDiagram-v2
+```mermaid
+stateDiagram-v2
     [*] --> Registered : Register Service
 
     Registered --> Resolving : First Request
@@ -112,13 +115,13 @@ This state diagram shows the service lifecycle:
     Instantiating --> Error : Instantiation Error
     Initializing --> Error : Initialization Error
 
-    Error --> [*] : Fatal Error`} />
+    Error --> [*] : Fatal Error
+```
 
 ## Dependency Resolution
 
-This flowchart shows how dependencies are resolved:
-
-<Mermaid value={`flowchart TD
+```mermaid
+flowchart TD
     Request[Service Requested] --> Check{Service Cached?}
 
     Check -->|Yes| Return[Return Cached Instance]
@@ -154,13 +157,13 @@ This flowchart shows how dependencies are resolved:
 
     class Request,Resolve,GetDeps,AddCached,ResolveDep,RecursiveResolve,AllDepsResolved,Instantiate,Initialize,Cache,Return process
     class Check,DepLoop,CheckDep,CheckCircular decision
-    class CircularError error`} />
+    class CircularError error
+```
 
 ## Service Registration Patterns
 
-This diagram shows different service registration patterns:
-
-<Mermaid value={`classDiagram
+```mermaid
+classDiagram
     class ServiceContainer {
         +registerSingleton(token, factory)
         +registerTransient(token, factory)
@@ -230,13 +233,13 @@ This diagram shows different service registration patterns:
     SingletonService --|> DatabaseService
     SingletonService --|> Logger
     TransientService --|> MonitorChecker
-    ScopedService --|> RequestScope`} />
+    ScopedService --|> RequestScope
+```
 
 ## Dependency Injection Example
 
-This sequence diagram shows a typical DI scenario:
-
-<Mermaid value={`sequenceDiagram
+```mermaid
+sequenceDiagram
     autonumber
     participant App as Application
     participant Container as ServiceContainer
@@ -276,13 +279,13 @@ This sequence diagram shows a typical DI scenario:
     SiteMgr-->>Container: initialized
     Container->>Container: cache instance
 
-    Container-->>App: SiteManager instance`} />
+    Container-->>App: SiteManager instance
+```
 
 ## Service Graph Visualization
 
-This diagram shows the complete service dependency graph:
-
-<Mermaid value={`graph LR
+```mermaid
+graph LR
     subgraph Foundation["Foundation Layer"]
         Logger[Logger Service]
         Config[Configuration Service]
@@ -359,13 +362,13 @@ This diagram shows the complete service dependency graph:
     class DB,Cache,Repo data
     class SiteMgr,MonitorMgr,HistoryMgr,StatusSvc domain
     class Orchestrator,AppSvc app
-    class IPC,Window,Notify,Update infra`} />
+    class IPC,Window,Notify,Update infra
+```
 
 ## Service Disposal Chain
 
-This diagram shows the service disposal process:
-
-<Mermaid value={`flowchart TD
+```mermaid
+flowchart TD
     Shutdown[Application Shutdown] --> Container[ServiceContainer.dispose]
 
     Container --> TopologicalSort[Topological Sort\nby Dependencies]
@@ -401,15 +404,5 @@ This diagram shows the service disposal process:
     class Shutdown,Container,TopologicalSort,ReverseOrder,GetService,CallDispose,Await,RemoveRef,ClearCache,ClearRegistry process
     class Loop,CheckDisposable,CheckError decision
     class Complete,End complete
-    class LogError error`} />
-
----
-
-The service container provides a robust dependency injection system that manages service lifecycles, resolves dependencies automatically, and ensures clean initialization and disposal of all services.
-
-                </div>
-            </div>
-        </div>
-    );
-
-}
+    class LogError error
+```
