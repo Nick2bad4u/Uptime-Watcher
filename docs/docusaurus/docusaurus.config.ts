@@ -96,6 +96,8 @@ const config: Config = {
 
     noIndex: false,
     onBrokenAnchors: "warn",
+    onBrokenLinks: "warn",
+    onBrokenMarkdownLinks: "warn",
     onDuplicateRoutes: "warn",
     organizationName: "Nick2bad4u",
     // TypeDoc documentation is generated via standalone TypeDoc (npm run docs:typedoc)
@@ -403,7 +405,7 @@ const config: Config = {
             versionPersistence: "localStorage",
         },
         footer: {
-            copyright: `© ${new Date().getFullYear()} Nick2bad4u. 💻 Website Built and Powered by 🦖 Docusaurus.`,
+            copyright: `© ${new Date().getFullYear()} Nick2bad4u. 💻 Website Built and Powered by 🦖 Docusaurus. Last Updated: ${new Date().toLocaleDateString()}`,
             links: [
                 {
                     items: [
@@ -604,12 +606,24 @@ const config: Config = {
                 blogRouteBasePath: "blog",
                 docsDir: "docs",
                 docsRouteBasePath: "docs",
+                explicitSearchResultPath: false,
+                forceIgnoreNoIndex: true,
+                fuzzyMatchingDistance: 1,
                 hashed: true,
+                hideSearchBarWithNoSearchContext: false,
+                highlightSearchTermsOnTargetPage: true,
                 indexBlog: true,
                 indexDocs: true,
                 indexPages: false,
                 language: ["en"],
+                removeDefaultStemmer: true,
                 removeDefaultStopWordFilter: false,
+                searchBarPosition: "right",
+                searchBarShortcut: true,
+                searchBarShortcutHint: true,
+                searchBarShortcutKeymap: "ctrl+k",
+                searchResultContextMaxLength: 96,
+                searchResultLimits: 8,
                 useAllContextsWithNoSearchContext: false,
             },
         ],

@@ -7,11 +7,13 @@ on:
     push:
         branches: ["main"]
         paths:
+            - ".github/workflows/backup-docusaurus.yml"
+            - ".github/workflows/deploy-docusaurus.yml"
             - "docs/docusaurus/**"
+            - "docs/docusaurus/docusaurus.config.ts"
             - "electron/**"
             - "shared/**"
             - "src/**"
-            - ".github/workflows/deploy-docusaurus.yml"
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
