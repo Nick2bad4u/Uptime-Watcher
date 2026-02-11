@@ -22,7 +22,7 @@ import { prefixBareMarkdownFileLinksInMarkdown } from "./prefixDocLinksCore.mjs"
 /**
  * Renderer hook: runs after a page has been rendered.
  *
- * @param {import('typedoc').PageEvent} page
+ * @param {import("typedoc").PageEvent} page
  */
 function onPageEnd(page) {
     if (typeof page.contents !== "string") {
@@ -40,7 +40,7 @@ function onPageEnd(page) {
 /**
  * TypeDoc plugin entrypoint.
  *
- * @param {import('typedoc').Application} app
+ * @param {import("typedoc").Application} app
  */
 export function load(app) {
     app.renderer.on(PageEvent.END, onPageEnd);

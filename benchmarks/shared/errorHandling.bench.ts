@@ -26,9 +26,9 @@ import {
 import type { Jsonifiable } from "type-fest";
 
 /**
- * Benchmarks intentionally feed invalid/unsafe values into json helpers.
- * This helper makes that intent explicit while keeping the benchmark compiling
- * under strict null checks.
+ * Benchmarks intentionally feed invalid/unsafe values into json helpers. This
+ * helper makes that intent explicit while keeping the benchmark compiling under
+ * strict null checks.
  */
 const unsafeJsonifiable = (value: unknown): Jsonifiable => value as Jsonifiable;
 

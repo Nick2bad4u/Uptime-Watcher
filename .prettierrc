@@ -74,32 +74,6 @@
             }
         },
         {
-            "files": "eslint.config.mjs",
-            "options": {
-                "useTabs": false,
-                "jsdocCapitalizeDescription": true,
-                "jsdocCommentLineStrategy": "keep",
-                "jsdocDescriptionTag": false,
-                "jsdocDescriptionWithDot": false,
-                "jsdocKeepUnParseAbleExampleIndent": true,
-                "jsdocLineWrappingStyle": "greedy",
-                "jsdocPreferCodeFences": true,
-                "jsdocPrintWidth": 80,
-                "jsdocSeparateReturnsFromParam": true,
-                "jsdocSeparateTagGroups": true,
-                "jsdocSpaces": 1,
-                "jsdocVerticalAlignment": false,
-                "multilineArraysWrapThreshold": 1,
-                "plugins": [
-                    "prettier-plugin-multiline-arrays",
-                    "prettier-plugin-jsdoc",
-                    "prettier-plugin-jsdoc-type",
-                    "prettier-plugin-tailwindcss",
-                    "prettier-plugin-merge"
-                ]
-            }
-        },
-        {
             "files": "*.user.css",
             "options": {
                 "useTabs": false,

@@ -13,15 +13,17 @@ if [ -n "${SCRIPT_DIR_OVERRIDE}" ]; then
 else
     SCRIPT_PATH=$0
     case ${SCRIPT_PATH} in
-        */*)
-            ;;
+        */*) ;;
         *)
             # If invoked via PATH, $0 may not be a path; resolve it.
-            SCRIPT_PATH=$(command -v "${SCRIPT_PATH}" 2>/dev/null || printf '%s' "${SCRIPT_PATH}")
+            SCRIPT_PATH=$(command -v "${SCRIPT_PATH}" 2> /dev/null || printf '%s' "${SCRIPT_PATH}")
             ;;
     esac
 
-    SCRIPT_DIR=$(unset CDPATH; cd "$(dirname "${SCRIPT_PATH}")" && pwd)
+    SCRIPT_DIR=$(
+        unset CDPATH
+        cd "$(dirname "${SCRIPT_PATH}")" && pwd
+    )
 fi
 
 # Prefer the Flatpak build output directory when running inside the sandbox.

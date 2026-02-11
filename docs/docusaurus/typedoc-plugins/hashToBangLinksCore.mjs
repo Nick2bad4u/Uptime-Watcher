@@ -3,8 +3,9 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, tsdoc/syntax -- This is runtime code used by a TypeDoc plugin; we use JSDoc for typing without introducing TSDoc parsing issues. */
 
 /**
- * @typedef {import('typedoc').Comment} Comment
- * @typedef {import('typedoc').CommentDisplayPart} CommentDisplayPart
+ * @typedef {import("typedoc").Comment} Comment
+ *
+ * @typedef {import("typedoc").CommentDisplayPart} CommentDisplayPart
  */
 
 /** @type {ReadonlySet<string>} */
@@ -37,7 +38,10 @@ function isUrlLike(moduleSource) {
 
     // Windows drive letter followed by `:` (e.g. `C:`) with a path segment is
     // not a URL.
-    if (/^[A-Za-z]$/u.test(scheme) && /[\\/]/u.test(moduleSource.slice(firstColon + 1))) {
+    if (
+        /^[A-Za-z]$/u.test(scheme) &&
+        /[\\/]/u.test(moduleSource.slice(firstColon + 1))
+    ) {
         return false;
     }
 
@@ -49,8 +53,9 @@ function isUrlLike(moduleSource) {
 }
 
 /**
- * Determines whether a `#` in a link target is likely being used as a module/export separator
- * (repo convention) rather than as a TypeDoc declaration-reference instance member separator.
+ * Determines whether a `#` in a link target is likely being used as a
+ * module/export separator (repo convention) rather than as a TypeDoc
+ * declaration-reference instance member separator.
  *
  * @param {string} moduleSource
  */
@@ -77,12 +82,18 @@ export function convertHashLinksToBangLinksInInlineTagText(inlineTagText) {
         pipeIndex === -1 ? inlineTagText : inlineTagText.slice(0, pipeIndex);
 
     const trimmedStart = beforePipe.trimStart();
-    const leadingWs = beforePipe.slice(0, beforePipe.length - trimmedStart.length);
+    const leadingWs = beforePipe.slice(
+        0,
+        beforePipe.length - trimmedStart.length
+    );
 
     const trimmedEnd = beforePipe.trimEnd();
     const trailingWs = beforePipe.slice(trimmedEnd.length);
 
-    const trimmed = beforePipe.slice(leadingWs.length, beforePipe.length - trailingWs.length);
+    const trimmed = beforePipe.slice(
+        leadingWs.length,
+        beforePipe.length - trailingWs.length
+    );
 
     const hashIndex = trimmed.indexOf("#");
     if (hashIndex === -1) {
@@ -121,7 +132,9 @@ export function convertHashLinksToBangLinksInParts(parts) {
                 part.tag === "@linkcode" ||
                 part.tag === "@linkplain")
         ) {
-            const rewritten = convertHashLinksToBangLinksInInlineTagText(part.text);
+            const rewritten = convertHashLinksToBangLinksInInlineTagText(
+                part.text
+            );
             if (rewritten !== part.text) {
                 part.text = rewritten;
                 // Ensure TypeDoc re-resolves this link based on updated text.

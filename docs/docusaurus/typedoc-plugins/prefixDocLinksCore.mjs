@@ -5,7 +5,7 @@
 const SCHEME_RE = /^[a-zA-Z][a-zA-Z+.-]*:/u;
 
 /**
- * @typedef {{ marker: '`' | '~', length: number }} FenceState
+ * @typedef {{ marker: "`" | "~"; length: number }} FenceState
  */
 
 /**
@@ -94,7 +94,8 @@ function prefixIfBareRelativeMarkdownFile(url) {
     const beforeHash = hashIndex === -1 ? trimmed : trimmed.slice(0, hashIndex);
 
     const queryIndex = beforeHash.indexOf("?");
-    const pathname = queryIndex === -1 ? beforeHash : beforeHash.slice(0, queryIndex);
+    const pathname =
+        queryIndex === -1 ? beforeHash : beforeHash.slice(0, queryIndex);
 
     // Only touch markdown-file links.
     if (!(pathname.endsWith(".md") || pathname.endsWith(".mdx"))) {
@@ -112,7 +113,8 @@ function prefixIfBareRelativeMarkdownFile(url) {
  *
  * @param {string} input
  * @param {number} startIndex
- * @returns {number} index of the closing `)`, or -1 if not found
+ *
+ * @returns {number} Index of the closing `)`, or -1 if not found
  */
 function findInlineLinkClosingParen(input, startIndex) {
     let depth = 0;
@@ -122,31 +124,31 @@ function findInlineLinkClosingParen(input, startIndex) {
         const ch = input.charAt(i);
 
         switch (ch) {
-        case "(": {
-            depth += 1;
-            i += 1;
+            case "(": {
+                depth += 1;
+                i += 1;
 
-        break;
-        }
-        case ")": {
-            if (depth === 0) {
-                return i;
+                break;
             }
+            case ")": {
+                if (depth === 0) {
+                    return i;
+                }
 
-            depth -= 1;
-            i += 1;
+                depth -= 1;
+                i += 1;
 
-        break;
-        }
-        case "\\": {
-            // Skip escaped character (including escaped parens).
-            i += 2;
+                break;
+            }
+            case "\\": {
+                // Skip escaped character (including escaped parens).
+                i += 2;
 
-        break;
-        }
-        default: {
-            i += 1;
-        }
+                break;
+            }
+            default: {
+                i += 1;
+            }
         }
     }
 
@@ -157,11 +159,13 @@ function findInlineLinkClosingParen(input, startIndex) {
  * Splits a Markdown inline link payload into destination + remainder.
  *
  * The payload is the text inside `(...)` for an inline link.
+ *
  * - Destination may be `<...>` or a raw destination.
  * - Remainder (if any) includes the title and its leading whitespace.
  *
  * @param {string} payload
- * @returns {{ destination: string, remainder: string }}
+ *
+ * @returns {{ destination: string; remainder: string }}
  */
 function splitInlineLinkDestination(payload) {
     const core = payload.trim();
@@ -198,34 +202,34 @@ function splitInlineLinkDestination(payload) {
         const ch = core.charAt(i);
 
         switch (ch) {
-        case "(": {
-            depth += 1;
-            i += 1;
+            case "(": {
+                depth += 1;
+                i += 1;
 
-        break;
-        }
-        case ")": {
-            if (depth > 0) {
-                depth -= 1;
+                break;
             }
-            i += 1;
+            case ")": {
+                if (depth > 0) {
+                    depth -= 1;
+                }
+                i += 1;
 
-        break;
-        }
-        case "\\": {
-            i += 2;
+                break;
+            }
+            case "\\": {
+                i += 2;
 
-        break;
-        }
-        default: { if (depth === 0 && /\s/u.test(ch)) {
-            return {
-                destination: core.slice(0, i),
-                remainder: core.slice(i),
-            };
-        }
-            i += 1;
-        }
-
+                break;
+            }
+            default: {
+                if (depth === 0 && /\s/u.test(ch)) {
+                    return {
+                        destination: core.slice(0, i),
+                        remainder: core.slice(i),
+                    };
+                }
+                i += 1;
+            }
         }
     }
 
@@ -356,6 +360,7 @@ function prefixInlineMarkdownLinksInLine(line) {
  * inside fenced code blocks and inline code spans.
  *
  * @param {string} input
+ *
  * @returns {string}
  */
 export function prefixBareMarkdownFileLinksInMarkdown(input) {
@@ -372,11 +377,12 @@ export function prefixBareMarkdownFileLinksInMarkdown(input) {
             const [matchText] = fenceMatch;
             const run = matchText.trimStart();
             const { groups } = fenceMatch;
-            const typedGroups = /** @type {undefined | { marker: (string | undefined) }} */ (
-                groups
-            );
+            const typedGroups =
+                /** @type {undefined | { marker: string | undefined }} */ (
+                    groups
+                );
             const markerChar = typedGroups?.marker ?? run.charAt(0);
-            /** @type {'`' | '~'} */
+            /** @type {"`" | "~"} */
             let marker = "~";
             if (markerChar === "`") {
                 marker = "`";

@@ -7,47 +7,66 @@ import {
 
 describe(convertHashLinksToBangLinksInInlineTagText, () => {
     it("rewrites module#Export to module!Export", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("src/foo#Bar"))
-            .toBe("src/foo!Bar");
+        expect(convertHashLinksToBangLinksInInlineTagText("src/foo#Bar")).toBe(
+            "src/foo!Bar"
+        );
     });
 
     it("preserves a | label suffix", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("src/foo#Bar | Label"))
-            .toBe("src/foo!Bar | Label");
+        expect(
+            convertHashLinksToBangLinksInInlineTagText("src/foo#Bar | Label")
+        ).toBe("src/foo!Bar | Label");
     });
 
     it("preserves leading/trailing whitespace around the core", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("   src/foo#Bar   | Label"))
-            .toBe("   src/foo!Bar   | Label");
+        expect(
+            convertHashLinksToBangLinksInInlineTagText(
+                "   src/foo#Bar   | Label"
+            )
+        ).toBe("   src/foo!Bar   | Label");
     });
 
     it("does not rewrite URL fragments", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("https://example.com/a#b"))
-            .toBe("https://example.com/a#b");
+        expect(
+            convertHashLinksToBangLinksInInlineTagText(
+                "https://example.com/a#b"
+            )
+        ).toBe("https://example.com/a#b");
     });
 
     it("does not rewrite non-:// URL-like schemes", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("mailto:me@example.com#x"))
-            .toBe("mailto:me@example.com#x");
-        expect(convertHashLinksToBangLinksInInlineTagText("data:text/plain#x"))
-            .toBe("data:text/plain#x");
-        expect(convertHashLinksToBangLinksInInlineTagText("urn:example:animal:ferret:nose#x"))
-            .toBe("urn:example:animal:ferret:nose#x");
+        expect(
+            convertHashLinksToBangLinksInInlineTagText(
+                "mailto:me@example.com#x"
+            )
+        ).toBe("mailto:me@example.com#x");
+        expect(
+            convertHashLinksToBangLinksInInlineTagText("data:text/plain#x")
+        ).toBe("data:text/plain#x");
+        expect(
+            convertHashLinksToBangLinksInInlineTagText(
+                "urn:example:animal:ferret:nose#x"
+            )
+        ).toBe("urn:example:animal:ferret:nose#x");
     });
 
     it("does not rewrite non-module-looking references", () => {
         // A plain identifier `Foo#bar` is likely intended as TypeDoc instance-member navigation.
-        expect(convertHashLinksToBangLinksInInlineTagText("Foo#bar")).toBe("Foo#bar");
+        expect(convertHashLinksToBangLinksInInlineTagText("Foo#bar")).toBe(
+            "Foo#bar"
+        );
     });
 
     it("rewrites node: specifiers", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("node:fs#promises"))
-            .toBe("node:fs!promises");
+        expect(
+            convertHashLinksToBangLinksInInlineTagText("node:fs#promises")
+        ).toBe("node:fs!promises");
     });
 
     it("does not rewrite when the # has no right-hand side", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("src/foo#"))
-            .toBe("src/foo#");
+        expect(convertHashLinksToBangLinksInInlineTagText("src/foo#")).toBe(
+            "src/foo#"
+        );
     });
 });
 

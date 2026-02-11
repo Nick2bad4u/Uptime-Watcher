@@ -306,6 +306,7 @@ const uptimeWatcherRepoConfigs =
  * extremely large logs when output is redirected to a file.
  *
  * Supported values:
+ *
  * - (unset) / "on": enable progress and show file names
  * - "nofile": enable progress but hide file names
  * - "off" / "0" / "false": disable progress
@@ -1279,18 +1280,18 @@ export default defineConfig([
             ...json.configs.recommended.rules,
             // NOTE: Keeping node-dependencies scoped to package.json avoids perf + parser issues.
             "node-dependencies/absolute-version": [
-                    "error",
-                    "never", // Or always
+                "error",
+                "never", // Or always
             ],
             // Can be noisy depending on how transitive deps declare engines.
             "node-dependencies/compat-engines": "off",
             "node-dependencies/no-deprecated": [
-                    "error",
-                    {
-                            // User-request: you'll uninstall these; keep lint green in the meantime.
-                            allows: [],
-                            devDependencies: true,
-                    },
+                "error",
+                {
+                    // User-request: you'll uninstall these; keep lint green in the meantime.
+                    allows: [],
+                    devDependencies: true,
+                },
             ],
             "node-dependencies/no-dupe-deps": "error",
             "node-dependencies/no-restricted-deps": "off",
@@ -1318,9 +1319,11 @@ export default defineConfig([
             "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
             "package-json/require-engines": "warn",
-            "package-json/require-exports": [ "error", {
-                    "ignorePrivate": true
-                }
+            "package-json/require-exports": [
+                "error",
+                {
+                    ignorePrivate: true,
+                },
             ],
             "package-json/require-files": "off",
             "package-json/require-homepage": "warn",
@@ -1333,20 +1336,25 @@ export default defineConfig([
             "package-json/require-scripts": "warn",
             "package-json/require-sideEffects": "off",
             // Not needed for Electron applications and Breaks Docusaurus
-            "package-json/require-type": [ "error", {
-                    "ignorePrivate": true
-                }
+            "package-json/require-type": [
+                "error",
+                {
+                    ignorePrivate: true,
+                },
             ],
-            "package-json/require-types": [ "error", {
-                    "ignorePrivate": true
-                }
+            "package-json/require-types": [
+                "error",
+                {
+                    ignorePrivate: true,
+                },
             ],
             "package-json/require-version": "warn",
             "package-json/restrict-dependency-ranges": "warn",
             "package-json/restrict-private-properties": "off",
             // This repo intentionally uses stable camelCase script names.
             "package-json/scripts-name-casing": "warn",
-                "package-json/sort-collections": [ "warn",
+            "package-json/sort-collections": [
+                "warn",
                 [
                     "config",
                     "dependencies",
@@ -1356,7 +1364,7 @@ export default defineConfig([
                     // "overrides",
                     "peerDependencies",
                     "peerDependenciesMeta",
-                    "scripts"
+                    "scripts",
                 ],
             ],
             "package-json/specify-peers-locally": "warn",
@@ -1511,10 +1519,7 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/*.css"],
-        ignores: [
-            "docs/**",
-            "**/test/**",
-        ],
+        ignores: ["docs/**", "**/test/**"],
         language: "css/css",
         languageOptions: {
             tolerant: true,
@@ -1542,10 +1547,7 @@ export default defineConfig([
     // MARK: JSONC (jsonc/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [
-            "**/*.jsonc",
-            ".vscode/*.json",
-        ],
+        files: ["**/*.jsonc", ".vscode/*.json"],
         ignores: [],
         name: "JSONC - **/*.JSONC",
         // ═══════════════════════════════════════════════════════════════════════════════
@@ -2384,10 +2386,7 @@ export default defineConfig([
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
             "@typescript-eslint/restrict-plus-operands": "warn",
             "@typescript-eslint/restrict-template-expressions": "warn",
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
             "@typescript-eslint/strict-boolean-expressions": "off",
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
@@ -2457,25 +2456,16 @@ export default defineConfig([
                             from: "stores",
                         },
                         {
-                            allow: [
-                                "types",
-                                "constants",
-                            ],
+                            allow: ["types", "constants"],
                             from: "theme",
                         },
                         { allow: ["types"], from: "types" },
                         {
-                            allow: [
-                                "types",
-                                "constants",
-                            ],
+                            allow: ["types", "constants"],
                             from: "utils",
                         },
                         {
-                            allow: [
-                                "app",
-                                "styles",
-                            ],
+                            allow: ["app", "styles"],
                             from: "main",
                         },
                         { allow: [], from: "styles" },
@@ -2575,25 +2565,16 @@ export default defineConfig([
             "consistent-return": "warn",
             "css/no-invalid-properties": "off",
             "css/selector-complexity": "off",
-            curly: [
-                "error",
-                "all",
-            ],
+            curly: ["error", "all"],
             "depend/ban-dependencies": [
                 "warn",
                 {
-                    allowed: [
-                        "eslint-plugin-react",
-                        "axios",
-                    ],
+                    allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
-            eqeqeq: [
-                "error",
-                "always",
-            ],
+            eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -2964,13 +2945,10 @@ export default defineConfig([
             "react-dom/no-void-elements-with-children": "warn",
             "react-dom/prefer-namespace-import": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
-            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
-            "react-hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
+            "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             "react-hooks/fbt": "warn",
@@ -3079,10 +3057,7 @@ export default defineConfig([
             "sonarjs/arguments-usage": "warn",
             "sonarjs/array-constructor": "warn",
             "sonarjs/aws-iam-all-resources-accessible": "warn",
-            "sonarjs/cognitive-complexity": [
-                "warn",
-                30,
-            ],
+            "sonarjs/cognitive-complexity": ["warn", 30],
             "sonarjs/comment-regex": "warn",
             "sonarjs/declarations-in-global-scope": "off",
             "sonarjs/elseif-without-else": "off", // Conflicts with no-else-return rule
@@ -3908,10 +3883,7 @@ export default defineConfig([
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
             "@typescript-eslint/restrict-plus-operands": "warn",
             "@typescript-eslint/restrict-template-expressions": "warn",
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
             "@typescript-eslint/strict-boolean-expressions": "off",
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
@@ -4015,25 +3987,16 @@ export default defineConfig([
             // Core quality rules
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "consistent-return": "warn",
-            curly: [
-                "error",
-                "all",
-            ],
+            curly: ["error", "all"],
             "depend/ban-dependencies": [
                 "warn",
                 {
-                    allowed: [
-                        "eslint-plugin-react",
-                        "axios",
-                    ],
+                    allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
-            eqeqeq: [
-                "error",
-                "always",
-            ],
+            eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -4437,13 +4400,10 @@ export default defineConfig([
             "react-form-fields/styled-no-only-value-prop": "error",
             "react-hook-form/no-use-watch": "error",
             "react-hooks-addons/no-unused-deps": "warn",
-            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
-            "react-hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
+            "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             // React Hooks
@@ -4649,10 +4609,7 @@ export default defineConfig([
             // formatting rules that used to live in eslint-plugin-react.
             // We keep the react/* versions explicitly disabled to ensure we are
             // not depending on unmaintained stylistic rules.
-            "react/jsx-boolean-value": [
-                "warn",
-                "never",
-            ],
+            "react/jsx-boolean-value": ["warn", "never"],
             "react/jsx-child-element-spacing": "off",
             "react/jsx-closing-bracket-location": "off",
             "react/jsx-closing-tag-location": "off",
@@ -4667,18 +4624,12 @@ export default defineConfig([
                 },
             ], // Enforce .tsx for JSX files
             "react/jsx-first-prop-new-line": "off",
-            "react/jsx-fragments": [
-                "warn",
-                "syntax",
-            ],
+            "react/jsx-fragments": ["warn", "syntax"],
             "react/jsx-handler-names": "warn", // Enforce consistent handler names
             "react/jsx-indent": "off",
             "react/jsx-indent-props": "off",
             "react/jsx-key": "error",
-            "react/jsx-max-depth": [
-                "warn",
-                { max: 7 },
-            ], // Warn on deeply nested JSX to encourage component extraction
+            "react/jsx-max-depth": ["warn", { max: 7 }], // Warn on deeply nested JSX to encourage component extraction
             "react/jsx-max-props-per-line": "off",
             "react/jsx-newline": "off",
             "react/jsx-no-bind": "warn", // Allow inline functions for development speed
@@ -4782,10 +4733,7 @@ export default defineConfig([
             "sonarjs/arguments-usage": "warn",
             "sonarjs/array-constructor": "warn",
             "sonarjs/aws-iam-all-resources-accessible": "warn",
-            "sonarjs/cognitive-complexity": [
-                "warn",
-                30,
-            ],
+            "sonarjs/cognitive-complexity": ["warn", 30],
             "sonarjs/comment-regex": "warn",
             "sonarjs/declarations-in-global-scope": "off",
             "sonarjs/elseif-without-else": "off",
@@ -5089,10 +5037,7 @@ export default defineConfig([
                 },
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
-                project: [
-                    "tsconfig.electron.json",
-                    "tsconfig.shared.json",
-                ],
+                project: ["tsconfig.electron.json", "tsconfig.shared.json"],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
                 warnOnUnsupportedTypeScriptVersion: true,
@@ -5582,10 +5527,7 @@ export default defineConfig([
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
             "@typescript-eslint/restrict-plus-operands": "warn",
             "@typescript-eslint/restrict-template-expressions": "warn",
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
             "@typescript-eslint/strict-boolean-expressions": "off",
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
@@ -5617,10 +5559,7 @@ export default defineConfig([
                             from: "types",
                         },
                         {
-                            allow: [
-                                "constants",
-                                "types",
-                            ],
+                            allow: ["constants", "types"],
                             from: "utils",
                         },
                         {
@@ -5776,25 +5715,16 @@ export default defineConfig([
             // Core quality rules
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "consistent-return": "warn",
-            curly: [
-                "error",
-                "all",
-            ],
+            curly: ["error", "all"],
             "depend/ban-dependencies": [
                 "warn",
                 {
-                    allowed: [
-                        "eslint-plugin-react",
-                        "axios",
-                    ],
+                    allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
-            eqeqeq: [
-                "error",
-                "always",
-            ],
+            eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -6170,13 +6100,10 @@ export default defineConfig([
             "react-dom/no-void-elements-with-children": "warn",
             "react-dom/prefer-namespace-import": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
-            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
-            "react-hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
+            "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             "react-hooks/fbt": "warn",
@@ -6262,10 +6189,7 @@ export default defineConfig([
             "sonarjs/arguments-usage": "warn",
             "sonarjs/array-constructor": "warn",
             "sonarjs/aws-iam-all-resources-accessible": "warn",
-            "sonarjs/cognitive-complexity": [
-                "warn",
-                30,
-            ],
+            "sonarjs/cognitive-complexity": ["warn", 30],
             "sonarjs/comment-regex": "warn",
             "sonarjs/declarations-in-global-scope": "off",
             "sonarjs/elseif-without-else": "off",
@@ -7083,10 +7007,7 @@ export default defineConfig([
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
             "@typescript-eslint/restrict-plus-operands": "warn",
             "@typescript-eslint/restrict-template-expressions": "warn",
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
             "@typescript-eslint/strict-boolean-expressions": "off",
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
@@ -7118,10 +7039,7 @@ export default defineConfig([
                             from: "types",
                         },
                         {
-                            allow: [
-                                "constants",
-                                "types",
-                            ],
+                            allow: ["constants", "types"],
                             from: "utils",
                         },
                         {
@@ -7218,25 +7136,16 @@ export default defineConfig([
             // Core quality rules
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "consistent-return": "warn",
-            curly: [
-                "error",
-                "all",
-            ],
+            curly: ["error", "all"],
             "depend/ban-dependencies": [
                 "warn",
                 {
-                    allowed: [
-                        "eslint-plugin-react",
-                        "axios",
-                    ],
+                    allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
-            eqeqeq: [
-                "error",
-                "always",
-            ],
+            eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
             "eslint-plugin-toplevel/no-toplevel-let": "error",
             "eslint-plugin-toplevel/no-toplevel-side-effect": "off",
@@ -7640,13 +7549,10 @@ export default defineConfig([
             "react-form-fields/styled-no-only-value-prop": "error",
             "react-hook-form/no-use-watch": "error",
             "react-hooks-addons/no-unused-deps": "warn",
-            "react-hooks-extra/ensure-use-callback-has-non-empty-deps":
-                "off",
-            "react-hooks-extra/ensure-use-memo-has-non-empty-deps":
-                "off",
+            "react-hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
+            "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
-            "react-hooks-extra/no-direct-set-state-in-use-effect":
-                "warn",
+            "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
             "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             // React Hooks
@@ -7852,10 +7758,7 @@ export default defineConfig([
             // formatting rules that used to live in eslint-plugin-react.
             // We keep the react/* versions explicitly disabled to ensure we are
             // not depending on unmaintained stylistic rules.
-            "react/jsx-boolean-value": [
-                "warn",
-                "never",
-            ],
+            "react/jsx-boolean-value": ["warn", "never"],
             "react/jsx-child-element-spacing": "off",
             "react/jsx-closing-bracket-location": "off",
             "react/jsx-closing-tag-location": "off",
@@ -7870,18 +7773,12 @@ export default defineConfig([
                 },
             ], // Enforce .tsx for JSX files
             "react/jsx-first-prop-new-line": "off",
-            "react/jsx-fragments": [
-                "warn",
-                "syntax",
-            ],
+            "react/jsx-fragments": ["warn", "syntax"],
             "react/jsx-handler-names": "warn", // Enforce consistent handler names
             "react/jsx-indent": "off",
             "react/jsx-indent-props": "off",
             "react/jsx-key": "error",
-            "react/jsx-max-depth": [
-                "warn",
-                { max: 7 },
-            ], // Warn on deeply nested JSX to encourage component extraction
+            "react/jsx-max-depth": ["warn", { max: 7 }], // Warn on deeply nested JSX to encourage component extraction
             "react/jsx-max-props-per-line": "off",
             "react/jsx-newline": "off",
             "react/jsx-no-bind": "warn", // Allow inline functions for development speed
@@ -7985,10 +7882,7 @@ export default defineConfig([
             "sonarjs/arguments-usage": "warn",
             "sonarjs/array-constructor": "warn",
             "sonarjs/aws-iam-all-resources-accessible": "warn",
-            "sonarjs/cognitive-complexity": [
-                "warn",
-                30,
-            ],
+            "sonarjs/cognitive-complexity": ["warn", 30],
             "sonarjs/comment-regex": "warn",
             "sonarjs/declarations-in-global-scope": "off",
             "sonarjs/elseif-without-else": "off",
@@ -9583,10 +9477,7 @@ export default defineConfig([
             // Backend-specific type safety
             "@typescript-eslint/prefer-readonly": "warn", // Prefer readonly for service class properties
             "@typescript-eslint/require-await": "error", // Functions marked async must use await
-            "@typescript-eslint/return-await": [
-                "error",
-                "in-try-catch",
-            ], // Proper await handling in try-catch
+            "@typescript-eslint/return-await": ["error", "in-try-catch"], // Proper await handling in try-catch
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "boundaries/element-types": ["off"],
             // Architecture boundaries for Electron
@@ -9616,10 +9507,7 @@ export default defineConfig([
             "depend/ban-dependencies": [
                 "warn",
                 {
-                    allowed: [
-                        "eslint-plugin-react",
-                        "axios",
-                    ],
+                    allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
             "dot-notation": "off",
@@ -9886,10 +9774,7 @@ export default defineConfig([
             "sonarjs/arguments-usage": "warn",
             "sonarjs/array-constructor": "warn",
             "sonarjs/aws-iam-all-resources-accessible": "warn",
-            "sonarjs/cognitive-complexity": [
-                "warn",
-                30,
-            ],
+            "sonarjs/cognitive-complexity": ["warn", 30],
             "sonarjs/comment-regex": "warn",
             "sonarjs/declarations-in-global-scope": "off",
             "sonarjs/elseif-without-else": "off",
@@ -10042,9 +9927,7 @@ export default defineConfig([
     // MARK: Scripts
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [
-            "scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}"
-        ],
+        files: ["scripts/**/*.{ts,tsx,cts,mts,mjs,js,jsx,cjs}"],
         ignores: [
             "scripts/coverage/**/*",
             "scripts/dist/**/*",
@@ -10274,10 +10157,7 @@ export default defineConfig([
     // MARK: JS JsDoc
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [
-            "scripts/**/*.{js,cjs,mjs}",
-            "storybook/**/*.{js,cjs,mjs}",
-        ],
+        files: ["scripts/**/*.{js,cjs,mjs}", "storybook/**/*.{js,cjs,mjs}"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -10475,10 +10355,7 @@ export default defineConfig([
             "depend/ban-dependencies": [
                 "warn",
                 {
-                    allowed: [
-                        "eslint-plugin-react",
-                        "axios",
-                    ],
+                    allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
             "dot-notation": "off",
@@ -10517,10 +10394,7 @@ export default defineConfig([
             "sonarjs/arguments-usage": "warn",
             "sonarjs/array-constructor": "warn",
             "sonarjs/aws-iam-all-resources-accessible": "warn",
-            "sonarjs/cognitive-complexity": [
-                "warn",
-                30,
-            ],
+            "sonarjs/cognitive-complexity": ["warn", 30],
             "sonarjs/comment-regex": "warn",
             "sonarjs/declarations-in-global-scope": "off",
             "sonarjs/elseif-without-else": "off",
@@ -10697,14 +10571,8 @@ export default defineConfig([
             "no-magic-numbers": "off", // Test data may have magic numbers
             // Enhanced Playwright-specific rules
             "playwright/expect-expect": "error",
-            "playwright/max-expects": [
-                "error",
-                { max: 10 },
-            ],
-            "playwright/max-nested-describe": [
-                "error",
-                { max: 4 },
-            ],
+            "playwright/max-expects": ["error", { max: 10 }],
+            "playwright/max-nested-describe": ["error", { max: 4 }],
             "playwright/missing-playwright-await": "error",
             "playwright/no-commented-out-tests": "warn",
             // Conditional logic in tests is usually an indication that a test is attempting to cover too much, and not testing the logic it intends to. Each branch of code executing within a conditional statement will usually be better served by a test devoted to it.
@@ -10723,10 +10591,7 @@ export default defineConfig([
             "playwright/no-raw-locators": [
                 "error",
                 {
-                    allowed: [
-                        "iframe",
-                        "[aria-busy='false']",
-                    ],
+                    allowed: ["iframe", "[aria-busy='false']"],
                 },
             ],
             "playwright/no-restricted-locators": "off", // Disabling - restricting locators is often unnecessary
@@ -10766,10 +10631,7 @@ export default defineConfig([
                 node: true,
                 typescript: {
                     alwaysTryTypes: true,
-                    project: [
-                        "./tsconfig.json",
-                        "./playwright.config.ts",
-                    ],
+                    project: ["./tsconfig.json", "./playwright.config.ts"],
                 },
             },
             playwright: {
@@ -10950,10 +10812,7 @@ export default defineConfig([
         },
     },
     {
-        files: [
-            "vitest*.config.ts",
-            "config/testing/vitest*.config.ts",
-        ],
+        files: ["vitest*.config.ts", "config/testing/vitest*.config.ts"],
         name: "Vitest Config Overrides - *.config.ts",
         rules: {
             // Vite/Vitest config types still include `any`/loose augmentation in
@@ -11017,10 +10876,7 @@ export default defineConfig([
         },
     },
     {
-        files: [
-            "**/package.json",
-            "**/package-lock.json",
-        ],
+        files: ["**/package.json", "**/package-lock.json"],
         name: "JSON: Files - Disables",
         rules: {
             "json/sort-keys": "off",
@@ -11051,10 +10907,7 @@ export default defineConfig([
                 "error",
                 "always",
                 {
-                    exceptions: [
-                        "-",
-                        "+",
-                    ],
+                    exceptions: ["-", "+"],
                 },
             ],
         },

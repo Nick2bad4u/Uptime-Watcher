@@ -67,6 +67,13 @@ web_modules/
 # TypeScript cache
 *.tsbuildinfo
 
+# TypeScript declaration files are not style sources.
+# Stylelint can encounter these when linting folders (e.g. docs/), and parsing
+# them as CSS results in false-positive CssSyntaxError failures.
+**/*.d.ts
+**/*.d.mts
+**/*.d.cts
+
 # Optional npm cache directory
 .npm
 
