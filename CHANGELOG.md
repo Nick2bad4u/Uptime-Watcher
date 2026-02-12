@@ -4,6 +4,108 @@
 
 All notable changes to this project will be documented in this file.
 
+## [23.0.0] - 2026-02-12
+
+
+[[695fdf0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/695fdf0af7152494dfa0a356903f286abb33c104)...
+[89f8eaf](https://github.com/Nick2bad4u/Uptime-Watcher/commit/89f8eaf9a003911b411cce53b5eac61869ca7a66)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/695fdf0af7152494dfa0a356903f286abb33c104...89f8eaf9a003911b411cce53b5eac61869ca7a66))
+
+
+### 🧹 Chores
+
+- *(release)* V23.0.0 [skip ci] [`(89f8eaf)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/89f8eaf9a003911b411cce53b5eac61869ca7a66)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and configuration
+
+ - 📦 Update `@biomejs/biome` from `^2.3.14` to `^2.3.15` in `package.json` and `package-lock.json`
+ - 🔄 Update `prettier-plugin-multiline-arrays` from `^4.1.3` to `^4.1.4` in `package.json` and `package-lock.json`
+ - 🔄 Update `wait-on` from `^9.0.3` to `^9.0.4` in `package.json` and `package-lock.json`
+ - 🔄 Update `joi` from `^18.0.1` to `^18.0.2` in `package-lock.json`
+ - 🔄 Update `@hapi/tlds` from `1.1.3` to `1.1.5` in `package-lock.json`
+ - 🔄 Update `lodash` from `^4.17.21` to `^4.17.23` in `package-lock.json`
+ - 🔄 Update `diff` from `^8.0.2` to `^8.0.3` in `package-lock.json`
+ - 🔄 Update `type-fest` from `^5.3.1` to `^5.4.4` in `package-lock.json`
+ - 🔄 Update `@augment-vir` packages to version `31.59.3` in `package-lock.json`
+ - 🛠️ Change compression setting in `electron-builder.config.ts` from `maximum` to `normal` for faster CI builds
+ - 🧹 Clean up `electron-builder.config.ts` by removing unnecessary target formats for builds
+ - 📝 Update `.gitignore` to include `docs/typedoc.json` and `docs/typedoc.json` for generated files
+ - 📝 Update `.gitleaks.toml` to add an allowlist for generated TypeDoc JSON output
+ - 📝 Update `.secretlintignore` to include `docs/typedoc.json` for ignored files
+ - 🔄 Refactor `triggerBlobDownload` and `triggerArrayBufferDownload` functions in `browserFileDownload.ts` to improve argument order
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(695fdf0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/695fdf0af7152494dfa0a356903f286abb33c104)
+
+
+
+
+
+
+## [22.9.0] - 2026-02-12
+
+
+[[440dae5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/440dae5a895ef5cd12d77c52754da1c5ea2593be)...
+[b10c83b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b10c83bdce6ef26116034a087cc04351d158d029)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/440dae5a895ef5cd12d77c52754da1c5ea2593be...b10c83bdce6ef26116034a087cc04351d158d029))
+
+
+### ✨ Features
+
+- ✨ [feat] Implement browser-side file download helpers
+ - Introduce `FileDownloadDomAttachmentError` for handling DOM attachment failures
+ - Add `BrowserDownloadWarnLogger` interface for optional warning logging
+ - Create `withObjectUrl` function for managing object URL lifecycle
+ - Implement `clickDownloadAnchor` to programmatically trigger downloads
+ - Add `triggerBlobDownload` for initiating downloads from Blob objects
+ - Include `triggerArrayBufferDownload` for handling ArrayBuffer downloads
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(440dae5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/440dae5a895ef5cd12d77c52754da1c5ea2593be)
+
+
+
+### 🧹 Chores
+
+- *(release)* V22.9.0 [skip ci] [`(b10c83b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b10c83bdce6ef26116034a087cc04351d158d029)
+
+
+
+
+
+
+## [22.8.0] - 2026-02-12
+
+
+[[dcbf3b1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dcbf3b100f54156299c8233c9cce28f8908eeea2)...
+[c725dcb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c725dcb707b2374a863cdb481d379ed9b21f5b0a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/dcbf3b100f54156299c8233c9cce28f8908eeea2...c725dcb707b2374a863cdb481d379ed9b21f5b0a))
+
+
+### 🧹 Chores
+
+- *(release)* V22.8.0 [skip ci] [`(c725dcb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c725dcb707b2374a863cdb481d379ed9b21f5b0a)
+
+
+- Update changelogs for v22.7.0 [skip ci] [`(dcbf3b1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dcbf3b100f54156299c8233c9cce28f8908eeea2)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update Flatpak build process and Docusaurus configuration
+ - 🛠️ Modify npm prune command to handle legacy peer dependencies during Flatpak packaging
+ - 🧹 Remove disableVersioning option from Docusaurus docs configuration for improved version management
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(177e4dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/177e4dcd63bc0795bd7e5ad6548c856d580fc042)
+
+
+
+
+
+
 ## [22.7.0] - 2026-02-12
 
 
@@ -109,6 +211,41 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e84b
  - Refines ignore patterns and type-check script flow
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3533363)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3533363c0522ab9503fc50e9c83e2ec497e4efbc)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improve documentation formatting in various components
+ - 📝 Update comments in `CloudProviderSetupPanel.model.ts` for better readability
+ - 📝 Enhance comments in `useInAppAlertTonePreview.ts` for clarity
+ - 📝 Refine comments in `useSettingsChangeHandlers.ts` for consistency
+ - 📝 Adjust comments in `useSettingsController.tsx` for improved formatting
+ - 📝 Modify comments in `SiteDetailsTabContent.tsx` for better structure
+ - 📝 Revise comments in `SettingsTab.DangerZoneCard.tsx` for clarity
+ - 📝 Update comments in `SettingsTab.NotificationsCard.tsx` for consistency
+ - 📝 Improve comments in `SiteSettingsFieldLabel.tsx` for better readability
+ - 📝 Refine comments in `SiteSettingsNumberField.tsx` for clarity
+ - 📝 Enhance comments in `useAddSiteForm.ts` for better structure
+ - 📝 Update comments in `useSiteDetailsCharts.ts` for improved clarity
+ - 📝 Revise comments in `useSiteDetails.handlers.ts` for consistency
+ - 📝 Adjust comments in `useSiteDetails.sitesStore.ts` for better readability
+ - 📝 Improve comments in `useSiteDetails.uiStore.ts` for clarity
+ - 📝 Refine comments in `useBackendFocusSync.ts` for consistency
+ - 📝 Update comments in `AppNotificationService.ts` for better structure
+ - 📝 Enhance comments in `useAlertStore.ts` for clarity
+ - 📝 Revise comments in `types.ts` for improved readability
+ - 📝 Adjust comments in `fileDownload.ts` for better formatting
+ - 📝 Improve comments in `statusUpdateListeners.ts` for clarity
+ - 📝 Refine comments in `statusUpdateManagerSingleton.ts` for consistency
+ - 📝 Update comments in `statusUpdateSnapshot.ts` for better structure
+ - 📝 Enhance comments in `statusUpdateSubscriptionSummary.ts` for clarity
+ - 📝 Revise comments in `updates/types.ts` for improved readability
+ - 📝 Adjust comments in `typeUtils.ts` for better formatting
+ - 📝 Update test file `validatedExternalOpen.test.ts` for improved readability
+ - 🎨 Refactor `vite.config.ts` for better organization and clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f303d26)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f303d26ce4a2e68cf41684e611404661e5bb9983)
 
 
 

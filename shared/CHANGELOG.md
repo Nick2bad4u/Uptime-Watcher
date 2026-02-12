@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[18c9096](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18c9096745c386ccc7c31b8a4c850a46f816a5a6)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...18c9096745c386ccc7c31b8a4c850a46f816a5a6))
+[df83ed7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df83ed7bc6057b4d77c67bfb1279d75de5ec943b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...df83ed7bc6057b4d77c67bfb1279d75de5ec943b))
 
 
 ### ✨ Features
@@ -1222,6 +1222,38 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(588c
 
 ### 🎨 Styling
 
+- 🎨 [style] Improve documentation formatting in various components
+ - 📝 Update comments in `CloudProviderSetupPanel.model.ts` for better readability
+ - 📝 Enhance comments in `useInAppAlertTonePreview.ts` for clarity
+ - 📝 Refine comments in `useSettingsChangeHandlers.ts` for consistency
+ - 📝 Adjust comments in `useSettingsController.tsx` for improved formatting
+ - 📝 Modify comments in `SiteDetailsTabContent.tsx` for better structure
+ - 📝 Revise comments in `SettingsTab.DangerZoneCard.tsx` for clarity
+ - 📝 Update comments in `SettingsTab.NotificationsCard.tsx` for consistency
+ - 📝 Improve comments in `SiteSettingsFieldLabel.tsx` for better readability
+ - 📝 Refine comments in `SiteSettingsNumberField.tsx` for clarity
+ - 📝 Enhance comments in `useAddSiteForm.ts` for better structure
+ - 📝 Update comments in `useSiteDetailsCharts.ts` for improved clarity
+ - 📝 Revise comments in `useSiteDetails.handlers.ts` for consistency
+ - 📝 Adjust comments in `useSiteDetails.sitesStore.ts` for better readability
+ - 📝 Improve comments in `useSiteDetails.uiStore.ts` for clarity
+ - 📝 Refine comments in `useBackendFocusSync.ts` for consistency
+ - 📝 Update comments in `AppNotificationService.ts` for better structure
+ - 📝 Enhance comments in `useAlertStore.ts` for clarity
+ - 📝 Revise comments in `types.ts` for improved readability
+ - 📝 Adjust comments in `fileDownload.ts` for better formatting
+ - 📝 Improve comments in `statusUpdateListeners.ts` for clarity
+ - 📝 Refine comments in `statusUpdateManagerSingleton.ts` for consistency
+ - 📝 Update comments in `statusUpdateSnapshot.ts` for better structure
+ - 📝 Enhance comments in `statusUpdateSubscriptionSummary.ts` for clarity
+ - 📝 Revise comments in `updates/types.ts` for improved readability
+ - 📝 Adjust comments in `typeUtils.ts` for better formatting
+ - 📝 Update test file `validatedExternalOpen.test.ts` for improved readability
+ - 🎨 Refactor `vite.config.ts` for better organization and clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f303d26)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f303d26ce4a2e68cf41684e611404661e5bb9983)
+
+
 - 🎨 [style] Refactor import statements for consistency and readability
  - Standardized import statements across multiple test files to a single line format for better readability.
  - Adjusted spacing and indentation in various test files to enhance code clarity.
@@ -1363,6 +1395,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🧹 Chores
+
+- Update changelogs for v22.7.0 [skip ci] [`(dcbf3b1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dcbf3b100f54156299c8233c9cce28f8908eeea2)
+
 
 - Update changelogs for v22.6.0 [skip ci] [`(b3f7370)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b3f73701742a9e00395ca9501e4495ca0da5b91b)
 
