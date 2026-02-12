@@ -322,7 +322,7 @@ jobs:
               if: runner.os == 'Windows'
               shell: pwsh
               run: |
-                  $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.7z','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak','*.tar.xz','*.tar.gz','*.tar.bz2')
+                  $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak')
                   $files = @()
                   foreach ($pattern in $patterns) {
                     $files += Get-ChildItem -Path release -Recurse -Include $pattern -ErrorAction SilentlyContinue
@@ -339,7 +339,7 @@ jobs:
               if: runner.os == 'Linux'
               shell: bash
               run: |
-                  find release -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find release -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(sha512sum "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
@@ -350,7 +350,7 @@ jobs:
               if: runner.os == 'macOS'
               shell: bash
               run: |
-                  find release -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find release -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(shasum -a 512 "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
@@ -469,7 +469,7 @@ jobs:
               if: runner.os == 'Windows'
               shell: pwsh
               run: |
-                  $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.7z','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak','*.tar.xz','*.tar.gz','*.tar.bz2')
+                  $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak')
                   $files = @()
                   foreach ($pattern in $patterns) {
                     $files += Get-ChildItem -Path artifacts -Recurse -Include $pattern -ErrorAction SilentlyContinue
@@ -489,7 +489,7 @@ jobs:
                     echo "ERROR: ./artifacts directory does not exist."
                     exit 1
                   fi
-                  find artifacts -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(sha512sum "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
@@ -499,7 +499,7 @@ jobs:
               if: runner.os == 'macOS'
               shell: bash
               run: |
-                  find artifacts -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(shasum -a 512 "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
@@ -795,7 +795,7 @@ jobs:
               if: runner.os == 'Windows'
               shell: pwsh
               run: |
-                  $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.7z','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak','*.tar.xz','*.tar.gz','*.tar.bz2')
+                  $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak')
                   $files = @()
                   foreach ($pattern in $patterns) {
                     $files += Get-ChildItem -Path artifacts -Recurse -Include $pattern -ErrorAction SilentlyContinue
@@ -811,7 +811,7 @@ jobs:
               if: runner.os == 'Linux'
               shell: bash
               run: |
-                  find artifacts -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(sha512sum "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
@@ -821,7 +821,7 @@ jobs:
               if: runner.os == 'macOS'
               shell: bash
               run: |
-                  find artifacts -type f \( -name '*.exe' -o -name '*.7z' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' -o -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.tar.bz2' \) | sort | while read -r file; do
+                  find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(shasum -a 512 "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
@@ -954,43 +954,22 @@ jobs:
                       |----------|--------------|------------------|---------------|
                       | Windows  | x64          | Installer EXE    | [Uptime-Watcher-nsis-x64-${{ needs.bump-version.outputs.new_version }}.exe](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-nsis-x64-${{ needs.bump-version.outputs.new_version }}.exe) |
                       | Windows  | x64          | Installer Web    | [Uptime-Watcher-nsis-web-x64-${{ needs.bump-version.outputs.new_version }}.exe](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-nsis-web-x64-${{ needs.bump-version.outputs.new_version }}.exe) |
-                      | Windows  | x64          | Installer 7z     | [Uptime-Watcher-${{ needs.bump-version.outputs.new_version }}-x64.nsis.7z](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-${{ needs.bump-version.outputs.new_version }}-x64.nsis.7z) |
                       | Windows  | x64          | MSI              | [Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.msi](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.msi) |
-                      | Windows  | x64          | MSI 7z           | [Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.7z](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.7z) |
-                      | Windows  | x64          | MSI TAR.BZ2      | [Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.tar.bz2](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.tar.bz2) |
-                      | Windows  | x64          | MSI TAR.GZ       | [Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.tar.gz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.tar.gz) |
-                      | Windows  | x64          | MSI TAR.XZ       | [Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.tar.xz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.tar.xz) |
-                      | Windows  | x64          | MSI ZIP          | [Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.zip](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-x64-${{ needs.bump-version.outputs.new_version }}.zip) |
                       | Windows  | x64          | Portable         | [Uptime-Watcher-portable-x64-${{ needs.bump-version.outputs.new_version }}.exe](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-portable-x64-${{ needs.bump-version.outputs.new_version }}.exe) |
                       | Windows  | ia32 / win32 | Installer EXE    | [Uptime-Watcher-nsis-ia32-${{ needs.bump-version.outputs.new_version }}.exe](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-nsis-ia32-${{ needs.bump-version.outputs.new_version }}.exe) |
                       | Windows  | ia32 / win32 | Installer Web    | [Uptime-Watcher-nsis-web-ia32-${{ needs.bump-version.outputs.new_version }}.exe](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-nsis-web-ia32-${{ needs.bump-version.outputs.new_version }}.exe) |
-                      | Windows  | ia32 / win32 | Installer 7z     | [Uptime-Watcher-${{ needs.bump-version.outputs.new_version }}-ia32.nsis.7z](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-${{ needs.bump-version.outputs.new_version }}-ia32.nsis.7z) |
                       | Windows  | ia32 / win32 | MSI              | [Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.msi](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.msi) |
-                      | Windows  | ia32 / win32 | MSI 7z           | [Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.7z](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.7z) |
-                      | Windows  | ia32 / win32 | MSI TAR.BZ2      | [Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.tar.bz2](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.tar.bz2) |
-                      | Windows  | ia32 / win32 | MSI TAR.GZ       | [Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.tar.gz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.tar.gz) |
-                      | Windows  | ia32 / win32 | MSI TAR.XZ       | [Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.tar.xz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.tar.xz) |
-                      | Windows  | ia32 / win32 | MSI ZIP          | [Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.zip](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-msi-ia32-${{ needs.bump-version.outputs.new_version }}.zip) |
                       | Windows  | ia32 / win32 | Portable         | [Uptime-Watcher-portable-ia32-${{ needs.bump-version.outputs.new_version }}.exe](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-portable-ia32-${{ needs.bump-version.outputs.new_version }}.exe) |
 
                       | Mac      | Builds       | Format           | Download Link |
                       |----------|--------------|------------------|---------------|
                       | macOS    | x64          | DMG              | [Uptime-Watcher-dmg-x64-${{ needs.bump-version.outputs.new_version }}.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-dmg-x64-${{ needs.bump-version.outputs.new_version }}.dmg) |
                       | macOS    | x64          | PKG              | [Uptime-Watcher-pkg-x64-${{ needs.bump-version.outputs.new_version }}.pkg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-pkg-x64-${{ needs.bump-version.outputs.new_version }}.pkg) |
-                      | macOS    | x64          | TAR.BZ2          | [Uptime-Watcher-darwin-${{ needs.bump-version.outputs.new_version }}.tar.bz2](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-${{ needs.bump-version.outputs.new_version }}.tar.bz2) |
-                      | macOS    | x64          | TAR.GZ           | [Uptime-Watcher-darwin-${{ needs.bump-version.outputs.new_version }}.tar.gz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-${{ needs.bump-version.outputs.new_version }}.tar.gz) |
-                      | macOS    | x64          | TAR.XZ           | [Uptime-Watcher-darwin-${{ needs.bump-version.outputs.new_version }}.tar.xz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-${{ needs.bump-version.outputs.new_version }}.tar.xz) |
                       | macOS    | universal    | DMG              | [Uptime-Watcher-dmg-universal-${{ needs.bump-version.outputs.new_version }}.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-dmg-universal-${{ needs.bump-version.outputs.new_version }}.dmg) |
                       | macOS    | universal    | PKG              | [Uptime-Watcher-pkg-universal-${{ needs.bump-version.outputs.new_version }}.pkg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-pkg-universal-${{ needs.bump-version.outputs.new_version }}.pkg) |
-                      | macOS    | universal    | TAR.BZ2          | [Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.tar.bz2](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.tar.bz2) |
-                      | macOS    | universal    | TAR.GZ           | [Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.tar.gz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.tar.gz) |
-                      | macOS    | universal    | TAR.XZ           | [Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.tar.xz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.tar.xz) |
                       | macOS    | universal    | ZIP              | [Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.zip](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.zip) |
                       | macOS    | arm64        | DMG              | [Uptime-Watcher-dmg-arm64-${{ needs.bump-version.outputs.new_version }}.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-dmg-arm64-${{ needs.bump-version.outputs.new_version }}.dmg) |
                       | macOS    | arm64        | PKG              | [Uptime-Watcher-pkg-arm64-${{ needs.bump-version.outputs.new_version }}.pkg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-pkg-arm64-${{ needs.bump-version.outputs.new_version }}.pkg) |
-                      | macOS    | arm64        | TAR.BZ2          | [Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.tar.bz2](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.tar.bz2) |
-                      | macOS    | arm64        | TAR.GZ           | [Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.tar.gz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.tar.gz) |
-                      | macOS    | arm64        | TAR.XZ           | [Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.tar.xz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.tar.xz) |
                       | macOS    | arm64        | ZIP              | [Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.zip](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-arm64-${{ needs.bump-version.outputs.new_version }}.zip) |
 
                       <sub> - Most Mac users should download the "DMG" or "PKG" versions  </sub>
@@ -1002,14 +981,9 @@ jobs:
                       | Linux    | x64          | RPM              | [Uptime-Watcher-rpm-x86_64-${{ needs.bump-version.outputs.new_version }}.rpm](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-rpm-x86_64-${{ needs.bump-version.outputs.new_version }}.rpm) |
                       | Linux    | x64          | PACMAN           | [Uptime-Watcher-pacman-x64-${{ needs.bump-version.outputs.new_version }}.pacman](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-pacman-x64-${{ needs.bump-version.outputs.new_version }}.pacman) |
                       | Linux    | x64          | SNAP             | [Uptime-Watcher-snap-amd64-${{ needs.bump-version.outputs.new_version }}.snap](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-snap-amd64-${{ needs.bump-version.outputs.new_version }}.snap) |
-                      | Linux    | x64          | TAR.BZ2          | [Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.tar.bz2](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.tar.bz2) |
-                      | Linux    | x64          | TAR.GZ           | [Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.tar.gz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.tar.gz) |
-                      | Linux    | x64          | TAR.XZ           | [Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.tar.xz](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.tar.xz) |
-                      | Linux    | x64          | ZIP              | [Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.zip](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-linux-${{ needs.bump-version.outputs.new_version }}.zip) |
                       | Linux    | x64          | APK (Alpine)     | [Uptime-Watcher-apk-x64-${{ needs.bump-version.outputs.new_version }}.apk](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-apk-x64-${{ needs.bump-version.outputs.new_version }}.apk) |
                       | Linux    | x64          | FreeBSD          | [Uptime-Watcher-freebsd-x64-${{ needs.bump-version.outputs.new_version }}.freebsd](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-freebsd-x64-${{ needs.bump-version.outputs.new_version }}.freebsd) |
                       | Linux    | x64          | Flatpak          | [Uptime-Watcher-v${{ needs.bump-version.outputs.new_version }}.flatpak](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-v${{ needs.bump-version.outputs.new_version }}.flatpak) |
-                      | Linux    | x64          | Flatpak ZIP      | [Uptime-Watcher-v${{ needs.bump-version.outputs.new_version }}.flatpak.zip](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-v${{ needs.bump-version.outputs.new_version }}.flatpak.zip) |
 
                       <sub> - Most Linux users should download the "AppImage", "DEB", "FlatPak" or "RPM" versions  </sub>
 

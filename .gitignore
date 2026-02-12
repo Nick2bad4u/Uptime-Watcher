@@ -794,6 +794,7 @@ docs/docusaurus/docs/electron
 docs/docusaurus/docs/index.md
 docs/docusaurus/docs/modules.md
 docs/docusaurus/docs/src
+docs/typedoc.json
 docs/docusaurus/docs/typedoc.json
 docs/docusaurus/docs/typedoc-sidebar.cjs
 docs/docusaurus/docs/_media

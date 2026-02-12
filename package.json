@@ -735,7 +735,7 @@
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.18.2",
         "@arthurgeron/eslint-plugin-react-usememo": "^3.0.0",
-        "@biomejs/biome": "^2.3.14",
+        "@biomejs/biome": "^2.3.15",
         "@codecov/vite-plugin": "^1.9.1",
         "@commitlint/cli": "^20.4.1",
         "@commitlint/config-conventional": "^20.4.1",
@@ -1082,7 +1082,7 @@
         "prettier-plugin-jsdoc": "^1.8.0",
         "prettier-plugin-jsdoc-type": "^0.2.0",
         "prettier-plugin-merge": "^0.9.0",
-        "prettier-plugin-multiline-arrays": "^4.1.3",
+        "prettier-plugin-multiline-arrays": "^4.1.4",
         "prettier-plugin-packagejson": "^3.0.0",
         "prettier-plugin-properties": "^0.3.1",
         "prettier-plugin-sh": "^0.18.0",
@@ -1257,7 +1257,7 @@
         "vitest": "^4.0.18",
         "vitest-environment-browser": "npm:@vitest/browser@^4.0.18",
         "vitest-sonar-reporter": "^3.0.0",
-        "wait-on": "^9.0.3",
+        "wait-on": "^9.0.4",
         "yaml": "^2.8.2",
         "yaml-eslint-parser": "^2.0.0",
         "zod-fast-check": "^0.10.1"
@@ -1309,14 +1309,9 @@
             "target": [
                 "nsis",
                 "nsis-web",
-                "zip",
-                "7z",
                 "portable",
                 "squirrel",
-                "msi",
-                "tar.xz",
-                "tar.gz",
-                "tar.bz2"
+                "msi"
             ],
             "legalTrademarks": "Uptime Watcher",
             "requestedExecutionLevel": "asInvoker"
@@ -1380,10 +1375,7 @@
             "target": [
                 "dmg",
                 "zip",
-                "pkg",
-                "tar.xz",
-                "tar.gz",
-                "tar.bz2"
+                "pkg"
             ],
             "category": "public.app-category.productivity",
             "hardenedRuntime": true,
@@ -1399,11 +1391,7 @@
                 "snap",
                 "freebsd",
                 "pacman",
-                "apk",
-                "zip",
-                "tar.xz",
-                "tar.gz",
-                "tar.bz2"
+                "apk"
             ],
             "category": "Utility",
             "synopsis": "A cross-platform Electron app to monitor website uptime status",

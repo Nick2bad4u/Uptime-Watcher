@@ -23,8 +23,8 @@ const config: Configuration = {
     artifactName: `Uptime-Watcher-\${platform}-\${arch}-\${version}.\${ext}`,
     asar: true,
     buildDependenciesFromSource: false,
-    // Smaller installers at the cost of slower build time.
-    compression: "maximum",
+    // Prefer faster packaging in CI; artifact size increase is acceptable.
+    compression: "normal",
     copyright: "Copyright © 2025 Nick2bad4u",
     deb: {
         artifactName: `Uptime-Watcher-deb-\${arch}-\${version}.\${ext}`,
@@ -93,10 +93,6 @@ const config: Configuration = {
             "freebsd",
             "pacman",
             "apk",
-            "zip",
-            "tar.xz",
-            "tar.gz",
-            "tar.bz2",
         ],
     },
     mac: {
@@ -108,9 +104,6 @@ const config: Configuration = {
             "dmg",
             "zip",
             "pkg",
-            "tar.xz",
-            "tar.gz",
-            "tar.bz2",
         ],
         x64ArchFiles:
             "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**",
@@ -172,14 +165,9 @@ const config: Configuration = {
         target: [
             "nsis",
             "nsis-web",
-            "zip",
-            "7z",
             "portable",
             "squirrel",
             "msi",
-            "tar.xz",
-            "tar.gz",
-            "tar.bz2",
         ],
     },
 };

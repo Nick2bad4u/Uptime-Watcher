@@ -24,6 +24,13 @@ title     = "Uptime Watcher - Enhanced Secret Detection Configuration"
     # - Fragment newline calculation optimization
     # - Enhanced allowlist processing
 
+# Global allowlists for generated artifacts and known-safe files.
+[[allowlists]]
+    description = "Ignore generated TypeDoc JSON output"
+    paths = [
+        '''^docs/typedoc\.json$''',
+    ]
+
 # Custom rules for project-specific patterns
 [[rules]]
     id = "electron-config-secrets"

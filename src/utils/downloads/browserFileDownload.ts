@@ -96,12 +96,12 @@ export function clickDownloadAnchor(args: {
  * Creates and triggers a file download from a Blob.
  */
 export function triggerBlobDownload(args: {
+    attachToDom: boolean;
     blob: Blob;
     fileName: string;
-    attachToDom: boolean;
     warnLogger?: BrowserDownloadWarnLogger | undefined;
 }): void {
-    const { blob, fileName, attachToDom, warnLogger } = args;
+    const { attachToDom, blob, fileName, warnLogger } = args;
 
     withObjectUrl(blob, (objectURL) => {
         const anchor = createDownloadAnchor(objectURL, fileName);
@@ -113,14 +113,14 @@ export function triggerBlobDownload(args: {
  * Creates and triggers a file download from an {@link ArrayBuffer}.
  */
 export function triggerArrayBufferDownload(args: {
+    attachToDom: boolean;
     buffer: ArrayBuffer;
     fileName: string;
     mimeType: string;
-    attachToDom: boolean;
     warnLogger?: BrowserDownloadWarnLogger | undefined;
 }): void {
-    const { buffer, fileName, mimeType, attachToDom, warnLogger } = args;
+    const { attachToDom, buffer, fileName, mimeType, warnLogger } = args;
     const blob = new Blob([buffer], { type: mimeType });
 
-    triggerBlobDownload({ blob, fileName, attachToDom, warnLogger });
+    triggerBlobDownload({ attachToDom, blob, fileName, warnLogger });
 }
