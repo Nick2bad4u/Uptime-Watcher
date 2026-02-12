@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[35b8953](https://github.com/Nick2bad4u/Uptime-Watcher/commit/35b89533d83952817887cb0e1b0e164e31c9ffa6)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...35b89533d83952817887cb0e1b0e164e31c9ffa6))
+[18c9096](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18c9096745c386ccc7c31b8a4c850a46f816a5a6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...18c9096745c386ccc7c31b8a4c850a46f816a5a6))
 
 
 ### ✨ Features
@@ -298,6 +298,19 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85d4
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Modularize Markdown link prefixing logic
+ - 🛠️ [fix] Extract link prefixing logic into `prefixDocLinksCore.mjs` for better maintainability
+ - 📝 [docs] Add TypeScript declarations for `prefixDocLinksCore.mjs` in `prefixDocLinksCore.d.mts`
+ - 🔧 [build] Update `prefixDocLinks.mjs` to utilize the new core functions for prefixing links
+ - 🧪 [test] Implement unit tests for `prefixBareMarkdownFileLinksInMarkdown` to ensure correct link prefixing behavior
+ - 🧪 [test] Add tests for `convertHashLinksToBangLinksInInlineTagText` and `convertHashLinksToBangLinksInParts` to validate link transformations
+ - 🧹 [chore] Remove deprecated scripts and configurations related to Storybook test runner
+ - 🧹 [chore] Clean up `run-electron.sh` for improved error handling and directory resolution
+ - 🧹 [chore] Update ESLint and Vitest configurations to streamline testing processes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fbf9600)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fbf9600198e7cf2828f258bed52a9520cf1cd8d3)
+
 
 - 🚜 [refactor] Centralizes validation helpers
 
@@ -802,6 +815,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(814e
 
 ### 🧹 Chores
 
+- Update changelogs for v22.6.0 [skip ci] [`(b3f7370)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b3f73701742a9e00395ca9501e4495ca0da5b91b)
+
+
 - Update changelogs for v22.5.0 [skip ci] [`(5abecd9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5abecd999280d9024d95365d1350719b474b06e2)
 
 
@@ -856,6 +872,16 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update configuration and ignore files for Docusaurus
+
+ - 📝 Update .secretlintignore to exclude additional Docusaurus documentation files
+ - 🔧 Modify knip.config.ts to include new TypeDoc plugin paths for dependency analysis
+ - 🎨 Adjust eslint.config.mjs to disable exception-handling rules for Docusaurus TypeDoc plugins
+ - 🧪 Refactor string conversion tests to use BigInt syntax for consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(18c9096)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18c9096745c386ccc7c31b8a4c850a46f816a5a6)
+
 
 - 🔧 [build] Update dependencies in package.json
 

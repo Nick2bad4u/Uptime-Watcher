@@ -4,6 +4,172 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.7.0] - 2026-02-12
+
+
+[[b3f7370](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b3f73701742a9e00395ca9501e4495ca0da5b91b)...
+[8fcc61d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8fcc61d9872c07c3ede8374d22810be93ede9994)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b3f73701742a9e00395ca9501e4495ca0da5b91b...8fcc61d9872c07c3ede8374d22810be93ede9994))
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Modularize Markdown link prefixing logic
+ - 🛠️ [fix] Extract link prefixing logic into `prefixDocLinksCore.mjs` for better maintainability
+ - 📝 [docs] Add TypeScript declarations for `prefixDocLinksCore.mjs` in `prefixDocLinksCore.d.mts`
+ - 🔧 [build] Update `prefixDocLinks.mjs` to utilize the new core functions for prefixing links
+ - 🧪 [test] Implement unit tests for `prefixBareMarkdownFileLinksInMarkdown` to ensure correct link prefixing behavior
+ - 🧪 [test] Add tests for `convertHashLinksToBangLinksInInlineTagText` and `convertHashLinksToBangLinksInParts` to validate link transformations
+ - 🧹 [chore] Remove deprecated scripts and configurations related to Storybook test runner
+ - 🧹 [chore] Clean up `run-electron.sh` for improved error handling and directory resolution
+ - 🧹 [chore] Update ESLint and Vitest configurations to streamline testing processes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fbf9600)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fbf9600198e7cf2828f258bed52a9520cf1cd8d3)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update multiple ADRs with revisions and enhancements
+
+ - 📝 [docs] ADR-023: Secret Storage and Encryption Policy
+   - Updated last reviewed date to 2026-02-11
+   - Added OS-backed secure storage details for Windows, macOS, and Linux
+   - Enhanced fallback behavior for unavailable encryption
+   - Introduced corruption handling for decrypted secrets
+   - Expanded logging policy to include OAuth redirect URIs and authorization URLs
+
+ - 📝 [docs] ADR-024: Cloud Provider Switching and Migration Policy
+   - Updated last reviewed date to 2026-02-11
+   - Clarified explicit user action required for provider switching
+   - Added implementation constraints to prevent partial state during provider switch
+   - Introduced recommended manual migration path for cloud providers
+   - Documented integrity and rollback properties for provider switching
+
+ - 📝 [docs] ADR-025: Release Asset Naming and Upload Strategy
+   - Updated last reviewed date to 2026-02-11
+   - Added supply chain hygiene as a decision driver
+   - Specified basename uniqueness requirements for various asset types
+   - Normalized Squirrel Windows collisions and CI upload processes
+   - Introduced SBOM asset requirements for production releases
+
+ - 📝 [docs] ADR-026: Electron Security Model and Renderer Isolation
+   - Updated last reviewed date to 2026-02-11
+   - Added new security defaults for BrowserWindow configuration
+   - Enhanced IPC security with payload validation and handler registration rules
+
+ - 📝 [docs] ADR-027: Auto-Update Strategy and Release Channels
+   - Updated last reviewed date to 2026-02-11
+   - Documented integrity metadata requirements for update feeds
+   - Introduced staged rollout policy for stable releases
+   - Mandated signature verification requirements for production auto-updates
+
+ - 📝 [docs] ADR-028: Database Schema Versioning and Migrations
+   - Updated last reviewed date to 2026-02-12
+   - Clarified schema versioning using SQLite PRAGMA user_version
+   - Detailed initialization process for schema creation and upgrades
+   - Specified transactional integrity guarantees for schema operations
+
+ - 📝 [docs] ADR-029: Backup Format, Encryption, and Compatibility Policy
+   - Updated last reviewed date to 2026-02-12
+   - Defined backup payload format and metadata requirements
+   - Introduced encryption format versioning and compatibility guarantees
+
+ - 📝 [docs] ADR-030: App Configuration and Settings Persistence Model
+   - Updated last reviewed date to 2026-02-12
+   - Clarified configuration sources and persistence strategies
+   - Documented synced settings conflict resolution and schema expectations
+
+ - 📝 [docs] ADR-031: Packaging, Signing, and Notarization Policy
+   - Updated last reviewed date to 2026-02-12
+   - Mandated signing and notarization for official releases
+   - Specified minimum requirements for Windows and macOS artifacts
+
+ - 📝 [docs] ADR-032: Support and Diagnostics Data Policy
+   - Updated last reviewed date to 2026-02-12
+   - Defined data classes for support bundle exports
+   - Established hard exclusions and redaction policies for sensitive data
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e84b30e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e84b30ed608560bfa35f08c30c2a5660a8099a27)
+
+
+- 📝 [docs] Improves docs structure and links
+
+📝 [docs] Adds new architecture/testing entry points and chart index
+ - Updates guides and blog references to align with new doc routes and assets
+
+📝 [docs] Migrates interactive diagrams to Markdown with frontmatter
+ - Removes MDX wrappers to keep diagrams in a single docs pipeline
+
+🛠️ [fix] Improves docs generation to reduce broken links
+ - Adds link-prefixing logic and expands generated content coverage
+ - Enhances site navigation, metadata, and footer branding
+
+🧹 [chore] Updates docs tooling settings and scripts
+ - Refines ignore patterns and type-check script flow
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3533363)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3533363c0522ab9503fc50e9c83e2ec497e4efbc)
+
+
+
+### 🧹 Chores
+
+- *(release)* V22.7.0 [skip ci] [`(8fcc61d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8fcc61d9872c07c3ede8374d22810be93ede9994)
+
+
+- Update changelogs for v22.6.0 [skip ci] [`(b3f7370)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b3f73701742a9e00395ca9501e4495ca0da5b91b)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update configuration and ignore files for Docusaurus
+
+ - 📝 Update .secretlintignore to exclude additional Docusaurus documentation files
+ - 🔧 Modify knip.config.ts to include new TypeDoc plugin paths for dependency analysis
+ - 🎨 Adjust eslint.config.mjs to disable exception-handling rules for Docusaurus TypeDoc plugins
+ - 🧪 Refactor string conversion tests to use BigInt syntax for consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(18c9096)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18c9096745c386ccc7c31b8a4c850a46f816a5a6)
+
+
+- 🔧 [build] Update dependencies in package.json
+ - Updated "@eslint/json" from "^1.0.0" to "^1.0.1" for improved functionality.
+ - Updated "@types/node" from "^25.2.2" to "^25.2.3" for better type definitions.
+ - Updated "@types/react" from "^19.2.13" to "^19.2.14" for enhanced type support.
+ - Updated "electron" from "^40.2.1" to "^40.4.0" for bug fixes and performance improvements.
+ - Updated "eslint-plugin-antfu" from "^3.2.0" to "^3.2.1" for minor updates.
+ - Updated "eslint-plugin-better-tailwindcss" from "^4.1.1" to "^4.2.0" for new features.
+ - Updated "eslint-plugin-no-secrets" from "^2.2.1" to "^2.2.2" for security enhancements.
+ - Updated "eslint-plugin-unicorn" from "^62.0.0" to "^63.0.0" for new rules and improvements.
+ - Updated "msw" from "^2.12.9" to "^2.12.10" for bug fixes.
+ - Updated "stylelint" from "^17.1.1" to "^17.2.0" for better linting capabilities.
+ - Updated "vite-tsconfig-paths" from "^6.1.0" to "^6.1.1" for improved path resolution.
+ - Updated "packageManager" from "npm@11.9.0" to "npm@11.10.0" for the latest features.
+
+🧪 [test] Enhance test readability and maintainability
+ - Refactored tests in `hashToBangLinksCore.test.ts` for improved readability.
+ - Updated test assertions to use consistent formatting for better clarity.
+ - Refactored tests in `prefixDocLinksCore.test.ts` for enhanced readability.
+ - Updated test assertions to maintain consistent formatting and improve clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f6ff553)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f6ff553c150f5cfec4fe046ecab2d2b56cfbaa1b)
+
+
+- 🔧 [build] Update Docusaurus workflows and configuration
+
+ - 🛠️ [fix] Adjust backup workflow to trigger on changes to backup and deploy YAML files
+ - 🛠️ [fix] Modify deploy workflow to trigger on changes to backup and deploy YAML files
+ - 📝 [docs] Enhance Docusaurus configuration with improved link handling and search options
+ - 📝 [docs] Update copyright footer to include last updated date
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(72458f1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/72458f1f9b99c5867837b9569bd0c644d8a237ee)
+
+
+
+
+
+
 ## [22.6.0] - 2026-02-10
 
 

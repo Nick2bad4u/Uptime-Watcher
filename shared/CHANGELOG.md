@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[6613553](https://github.com/Nick2bad4u/Uptime-Watcher/commit/66135530b7edbc1e5a22f380fe197c2fd91e8dc5)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...66135530b7edbc1e5a22f380fe197c2fd91e8dc5))
+[18c9096](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18c9096745c386ccc7c31b8a4c850a46f816a5a6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...18c9096745c386ccc7c31b8a4c850a46f816a5a6))
 
 
 ### ✨ Features
@@ -1364,6 +1364,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v22.6.0 [skip ci] [`(b3f7370)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b3f73701742a9e00395ca9501e4495ca0da5b91b)
+
+
 - Update changelogs for v22.5.0 [skip ci] [`(5abecd9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5abecd999280d9024d95365d1350719b474b06e2)
 
 
@@ -1408,6 +1411,16 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update configuration and ignore files for Docusaurus
+
+ - 📝 Update .secretlintignore to exclude additional Docusaurus documentation files
+ - 🔧 Modify knip.config.ts to include new TypeDoc plugin paths for dependency analysis
+ - 🎨 Adjust eslint.config.mjs to disable exception-handling rules for Docusaurus TypeDoc plugins
+ - 🧪 Refactor string conversion tests to use BigInt syntax for consistency
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(18c9096)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/18c9096745c386ccc7c31b8a4c850a46f816a5a6)
+
 
 - 🔧 [build] Harden IPC bridge & optimize UI stores
 
