@@ -3252,6 +3252,18 @@ export default defineConfig([
             },
         },
     },
+    {
+        files: ["docs/docusaurus/typedoc-plugins/**/*.{js,mjs,ts,mts,cts}"],
+        name: "Docusaurus TypeDoc plugins - disable exception-handling rules (broken .mjs resolver)",
+        rules: {
+            // eslint-plugin-exception-handling currently attempts to resolve relative `.mjs` imports
+            // by appending another `.mjs`, producing paths like `./hashToBangLinksCore.mjs.mjs`.
+            // That crashes linting with ENOENT on these TypeDoc runtime plugins.
+            "ex/might-throw": "off",
+            "ex/no-unhandled": "off",
+            "ex/use-error-cause": "off",
+        },
+    },
     // #endregion
     // #region 🎨 Docusaurus CSS
     // ═══════════════════════════════════════════════════════════════════════════════

@@ -143,13 +143,13 @@ Redaction must be tested with unit tests using representative payload samples.
 Implemented redaction rules (today):
 
 - `normalizeLogValue()` redacts:
-
   - URL username/password
   - query params such as `access_token`, `refresh_token`, `code`, `state`,
     `passphrase`, etc.
   - Authorization header token material (`Bearer ...`, `Basic ...`)
   - structured metadata keys like `authorization`, `token`, `refresh_token`,
     `cookie`, `set-cookie`, etc.
+
 - Structured logging context hashes `siteIdentifier` and `monitorId` so routine
   logs can correlate events without emitting raw identifiers.
 
@@ -199,7 +199,6 @@ bridge drift (this is not a user-exported support bundle):
 
 - IPC handler: `electron/services/ipc/handlers/diagnosticsHandlers.ts`
 - Payload preview and metadata are sanitized and size-limited.
-
   - Metadata cap: 2048 UTF-8 bytes
   - Payload preview cap: 4096 UTF-8 bytes
 

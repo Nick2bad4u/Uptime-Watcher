@@ -178,7 +178,7 @@ describe("String Conversion - Complete Coverage", () => {
 
             // Test different bigint values
             expect(safeStringify(0n)).toBe("0");
-            expect(safeStringify(BigInt(-123))).toBe("-123");
+            expect(safeStringify((-123n))).toBe("-123");
             expect(safeStringify(999_999_999_999_999_999n)).toBe(
                 "999999999999999999"
             );

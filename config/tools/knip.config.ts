@@ -30,6 +30,12 @@ const knipConfig: KnipConfig = {
         "electron/services/ipc/validators/utils/diagnosticsValidation.ts",
         "electron/services/ipc/validators/utils/guardReportValidation.ts",
         "electron/services/ipc/validators/utils/siteValidation.ts",
+        "docs/docusaurus/typedoc-plugins/hashToBangLinks.mjs",
+        "docs/docusaurus/typedoc-plugins/hashToBangLinksCore.mjs",
+        "docs/docusaurus/typedoc-plugins/prefixDocLinks.mjs",
+        "docs/docusaurus/typedoc-plugins/prefixDocLinksCore.mjs",
+        "docs/docusaurus/typedoc-plugins/hashToBangLinksCore.d.mts",
+        "docs/docusaurus/typedoc-plugins/prefixDocLinksCore.d.mts",
         "scripts/**",
         "shared/types/monitorTypes.ts",
         "shared/types/themeConfig.ts",
@@ -138,7 +144,7 @@ const knipConfig: KnipConfig = {
         interface: true,
         type: true,
     },
-    ignoreUnresolved: ["@easyops-cn/docusaurus-theme-docusaurus-search-local"],
+    ignoreUnresolved: [ "@easyops-cn/docusaurus-theme-docusaurus-search-local" ],
     includeEntryExports: true,
     project: [],
     rules: {
@@ -163,7 +169,7 @@ const knipConfig: KnipConfig = {
             project: [],
         },
         electron: {
-            entry: ["electron/main.ts", "electron/preload.ts"],
+            entry: [ "electron/main.ts", "electron/preload.ts" ],
             project: [
                 "!electron/**/*.spec.{js,ts,tsx,jsx,mts,cjs,cts,mjs}",
                 "!electron/**/*.test.{js,ts,tsx,jsx,mts,cjs,cts,mjs}",
@@ -171,7 +177,7 @@ const knipConfig: KnipConfig = {
             ],
         },
         shared: {
-            entry: ["shared/index.ts"],
+            entry: [ "shared/index.ts" ],
             project: [
                 "!shared/**/*.spec.ts",
                 "!shared/**/*.test.ts",
@@ -179,7 +185,7 @@ const knipConfig: KnipConfig = {
             ],
         },
         src: {
-            entry: ["src/main.tsx"],
+            entry: [ "src/main.tsx" ],
             project: [
                 "!src/**/*.spec.{js,ts,tsx,jsx,mts,cjs,cts,mjs}",
                 "!src/**/*.test.{js,ts,tsx,jsx,mts,cjs,cts,mjs}",
