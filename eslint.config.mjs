@@ -10901,6 +10901,11 @@ export default defineConfig([
             "jsonc/array-bracket-newline": "off",
         },
     },
+    // #endregion
+    // #region 📐 @Stylistic Overrides
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: @Stylistic Overrides
+    // ═══════════════════════════════════════════════════════════════════════════════
     // NOTE: uptime-watcher drift-guard rules are enabled (and scoped) by the
     // internal plugin's `configs.repo` preset (`...uptimeWatcherRepoConfigs`).
     // Keep them centralized there to avoid config drift.
@@ -10913,6 +10918,7 @@ export default defineConfig([
         rules: {
             "@stylistic/curly-newline": "off",
             "@stylistic/exp-list-style": "off",
+            "@stylistic/exp-jsx-props-style": "off",
             "@stylistic/line-comment-position": "off",
             "@stylistic/multiline-comment-style": "off",
             "@stylistic/spaced-comment": [
