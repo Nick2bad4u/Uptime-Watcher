@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-016: Multi-Device Sync Data Model"
 summary: "Defines the canonical sync model, conflict detection/merge rules, and payload boundaries for true multi-device sync without syncing raw SQLite files."
 created: "2025-12-12"
-last_reviewed: "2026-02-10"
+last_reviewed: "2026-02-12"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -97,11 +97,18 @@ Entities must have stable IDs across devices.
 
 In the current implementation:
 
-- `Site.identifier` is a generated UUID and the UI prevents editing it.
-- `Monitor.id` is a generated UUID.
+- `Site.identifier` is generated (UUID-like) at creation time.
+- `Monitor.id` is generated (UUID-like) at creation time.
 
-This effectively satisfies the immutability requirement without introducing a
-separate site ID field.
+The application treats these IDs as immutable primary keys. Renaming a site or
+monitor is implemented by updating the `name` field, not by changing the
+identifier.
+
+Notes:
+
+- The add-site UI generates an identifier by default, but we do not rely on a
+  centralized "registry". The uniqueness requirement is enforced by local
+  validation and by treating identifier collisions as data corruption.
 
 ### 4) Tombstones
 
@@ -138,18 +145,34 @@ Migration rules:
 
 ### Strategy
 
-V1 uses a deterministic merge strategy:
+V1 uses a deterministic state merge strategy (CRDT-like in outcome, but not a
+general-purpose CRDT framework):
 
 - **Last-write-wins per field** using the `CloudSyncWriteKey` ordering.
-  In practice this is `(timestamp, deviceId, opId)`.
+  In practice this is:
+  1. higher `timestamp` wins
+  2. tie-breaker: lexicographically higher `deviceId` wins
+  3. tie-breaker (same device): higher `opId` wins
 - This ensures determinism even when multiple devices write concurrently or
   remote objects are listed/applied in different orders.
 
+Implementation detail:
+
+- Operations are sorted deterministically before application.
+- If two operations share the exact same write key (not expected in healthy
+  clients), additional tie-breakers ensure the merge remains deterministic and
+  idempotent.
+
 ### Special cases
 
-- **Array fields** (e.g. muted site identifiers): treat as set union with removals tracked as tombstones.
-- **Monitor history** (if synced): merge by timestamp and then cap to history limit.
-- **Settings**: last-write-wins.
+- Arrays are treated as ordinary JSON values and are replaced by LWW when they
+  are stored as fields.
+- Settings are stored as per-key fields and follow LWW at the field level.
+- Monitor history is not part of the sync domain in V1.
+
+If we add true set/OR-Set semantics later (for example, for muting lists), it
+must be implemented explicitly at the domain layer (typed operations), not by
+assuming generic array union semantics.
 
 ### User-visible conflict surfacing
 
@@ -162,6 +185,19 @@ Conflict surfacing is deferred for the MVP.
 
 The merge logic converges deterministically, but does not yet persist a
 first-class conflict log for renderer display.
+
+### Delete semantics (tombstones) and resurrection
+
+Deletes are expressed via tombstones and follow deterministic ordering rules:
+
+- A `delete-entity` operation is applied if its write key is newer than the
+  latest known write for that entity (any field write or prior deletion).
+- A `set-field` operation is ignored if the entity has a newer deletion
+  tombstone.
+- A `set-field` operation with a write key newer than the tombstone
+  resurrects the entity (clears `deleted`) and then applies the field write.
+
+This design makes merges order-independent and idempotent.
 
 ## Consequences
 
@@ -210,6 +246,23 @@ The reset action is only enabled once the preview has been fetched.
 This provides a safety net when remote deletion is best-effort (e.g. network
 errors), ensuring old plaintext operation logs do not resurface after a reset.
 
+### Device identity (deviceId)
+
+Device identity is intentionally local and does not require enrollment.
+
+- Each device generates and persists a `deviceId` under the settings key
+  `cloud.sync.deviceId`.
+- If the stored value is missing or invalid, the sync engine generates a new
+  `crypto.randomUUID()` value and persists it.
+- `deviceId` is not a user identifier and must not be repurposed for analytics
+  or licensing.
+- A device is "enrolled" in a provider folder implicitly by having provider
+  credentials and writing operations under `sync/`.
+
+If a user wants to force a new device identity, they can clear local app data
+or disconnect/reconnect the provider (or we can add an explicit "regenerate
+deviceId" maintenance action in the Cloud settings).
+
 Store integration:
 
 - Renderer stores emit “domain mutations” through a single service boundary.
@@ -235,4 +288,5 @@ History syncing:
 
 ## Review
 
-- Next review: 2026-03-01 or before enabling encryption of sync artifacts.
+- Next review: 2026-03-01 or before switching sync artifact encryption to be
+  enabled by default.

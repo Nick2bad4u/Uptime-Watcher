@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-003: Comprehensive Error Handling Strategy"
 summary: "Establishes a comprehensive multi-layer error handling strategy with shared utilities, store-safe patterns, and production-grade resilience."
 created: "2025-08-05"
-last_reviewed: "2026-01-31"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -32,7 +32,7 @@ tags:
 
 ## Status
 
-**Accepted** - Implemented across all layers with production-grade resilience and monitoring
+**Accepted** - Implemented across all layers with standardized error normalization, user-facing messaging, structured logging context, and targeted retry/backoff for selected operations.
 
 ## Context
 
@@ -83,16 +83,43 @@ const utilityResult = await withUtilityErrorHandling(
 );
 ```
 
-### 2. Production-Grade Operational Hooks
+### 2. Typed Errors and User-Facing Messaging
+
+We standardize on **typed errors** internally, but we only surface **sanitized** user-facing messaging to the UI.
+
+- Use `ApplicationError` (`shared/utils/errorHandling.ts`) for domain and operational failures where we want:
+  - stable machine-readable codes,
+  - safe user messaging, and
+  - rich internal details for logs/diagnostics.
+
+- Use `ensureError()` / `convertError()` to normalize `unknown` throws into `Error` instances.
+
+- Convert internal errors to UI-safe strings/details using `getUserFacingErrorDetail()` (`shared/utils/userFacingErrors.ts`) backed by the `ERROR_CATALOG`.
+
+- Never leak secrets or raw backend stack traces to the renderer. IPC responses must return a safe message and correlation id so the user can report the failure.
+
+- Example:
+
+  ```typescript
+  import { ApplicationError } from "@shared/utils/errorHandling";
+
+  throw new ApplicationError("DATABASE_WRITE_FAILED", {
+          operation: "site-delete",
+          // Extra details for logs/diagnostics (must be safe/redacted)
+          details: { identifier },
+  });
+  ```
+
+### 3. Production-Grade Operational Hooks
 
 All database operations use `withDatabaseOperation()` which provides:
 
-- **Exponential backoff retry logic** with jitter
-- **Event emission** for operation lifecycle and monitoring
+- **Configurable retry logic** with exponential/linear backoff (deterministic by default; jitter can be added explicitly if needed)
+- **Optional lifecycle event emission** when an event emitter is provided
 - **Consistent error handling** across all database operations
 - **Performance monitoring** and comprehensive logging
 - **Correlation tracking** for distributed debugging
-- **Circuit breaker pattern** for failing operations
+- **No circuit breaker is implemented today** (see “Future improvements” notes below)
 
   ```typescript
   return withDatabaseOperation(
@@ -101,21 +128,27 @@ All database operations use `withDatabaseOperation()` which provides:
   );
   ```
 
-### 3. Frontend Store Error Protection
+### 4. Frontend Store Error Protection
 
 Frontend stores implement safe error handling to prevent UI crashes:
 
 ```typescript
-function safeStoreOperation(storeOperation: () => void, operationName: string) {
- try {
-  storeOperation();
- } catch (error) {
-  console.warn("Store operation failed for:", operationName, error);
- }
-}
+import { withErrorHandling } from "@shared/utils/errorHandling";
+
+import { SettingsService } from "@app/services/SettingsService";
+import { createStoreErrorHandler } from "@app/stores/utils/storeErrorHandling";
+
+await withErrorHandling(
+ async () => {
+  const historyLimit = await SettingsService.getHistoryLimit();
+  // ...update store state...
+  return historyLimit;
+ },
+ createStoreErrorHandler("settings", "getHistoryLimit")
+);
 ```
 
-#### 3.1 Store Error Handling Contexts
+#### 4.1 Store Error Handling Contexts
 
 Asynchronous store actions that call renderer services use the shared
 `withErrorHandling()` utility together with an `ErrorHandlingFrontendStore`
@@ -217,7 +250,7 @@ There are two supported patterns for constructing this context:
   while centralizing shared mechanisms in `@shared/utils/errorHandling` and
   `src/stores/utils/storeErrorHandling.ts`.
 
-### 4. Error Preservation Principle
+### 5. Error Preservation Principle
 
 All error handling utilities preserve original errors:
 
@@ -225,6 +258,15 @@ All error handling utilities preserve original errors:
 - **Error types** are preserved
 - **Error properties** remain intact
 - **Re-throwing** after logging/handling
+
+### 6. IPC Error Normalization and Sanitization
+
+Electron IPC is a major trust boundary. We standardize IPC error behavior to ensure the renderer receives a **safe** error message and a **correlation id**, without leaking internal details.
+
+- Main-process handlers should be registered via `registerStandardizedIpcHandler` (`electron/services/ipc/utils.ts`).
+- Requests should be validated (typically via Zod) before executing service logic.
+- All responses use the shared `IpcResponse<T>` envelope and include response metadata (including correlation id).
+- Error messages returned to the renderer are derived via `getUserFacingErrorDetail()` and/or `createErrorResponse()`; raw stack traces remain in main-process logs only.
 
 ## Error Handling Layers
 
@@ -255,13 +297,13 @@ graph TB
         WithErrorHandling["withErrorHandling"]
         WithDatabaseOp["withDatabaseOperation"]
         WithUtilityError["withUtilityErrorHandling"]
-        SafeStoreOp["safeStoreOperation"]
+        StoreErrorHandler["createStoreErrorHandler"]
     end
 
     subgraph "Monitoring & Observability"
         Correlation["Correlation IDs"]
         Events["Error Events"]
-        Metrics["Performance Metrics"]
+        Timings["Operation Timings"]
         Logging["Structured Logging"]
     end
 
@@ -283,10 +325,10 @@ graph TB
     WithErrorHandling --> Events
     WithDatabaseOp --> Events
     WithUtilityError --> Events
-    SafeStoreOp --> Logging
+    StoreErrorHandler --> Logging
 
     Events --> Correlation
-    Events --> Metrics
+    Events --> Timings
     Events --> Logging
 
     classDef frontend fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
@@ -296,7 +338,7 @@ graph TB
 
     class UI,Store,Components,ErrorBoundary frontend
     class Services,Repositories,Database,EventBus backend
-    class WithErrorHandling,WithDatabaseOp,WithUtilityError,SafeStoreOp utility
+    class WithErrorHandling,WithDatabaseOp,WithUtilityError,StoreErrorHandler utility
     class Correlation,Events,Metrics,Logging monitoring
 ```
 
@@ -485,6 +527,8 @@ flowchart TD
 
 ### Error Event Flow and Correlation Tracking
 
+The following diagram is **illustrative**. In the current codebase, lifecycle/error events are emitted only when the emitting code explicitly chooses to do so (for example by passing a backend event emitter into operational hooks). Correlation IDs are always available in `TypedEventBus` metadata (`_meta.correlationId`) and standardized IPC responses (see ADR-005).
+
 ```mermaid
 sequenceDiagram
     participant UI as Frontend UI
@@ -553,12 +597,14 @@ sequenceDiagram
 ### Event-Driven Error Tracking
 
 ```typescript
-// Automatic error event emission
-await eventBus.emitTyped("database:error", {
- operation: "query",
- error: error.message,
- correlationId: generateId(),
- timestamp: Date.now(),
+import { ensureError } from "@shared/utils/errorHandling";
+
+// Recommended: emit internal error events for significant failures (not for high-frequency noise)
+await eventBus.emitTyped("system:error", {
+    error: ensureError(rawError),
+    context: "database:executeTransaction",
+    severity: "high",
+    timestamp: Date.now(),
 });
 ```
 
@@ -596,71 +642,34 @@ useEffect(() => {
 
 ### Race Condition Protection
 
-```mermaid
-stateDiagram-v2
-    [*] --> OperationInitiated : Start Operation
+Race-condition prevention is not “free” and is not solved by correlation IDs alone.
+We use a mix of **atomicity**, **cancellation**, and **idempotency**:
 
-    OperationInitiated --> OperationRegistered : Register with operationId
-    OperationRegistered --> OperationInProgress : Begin Async Work
-
-    OperationInProgress --> ValidationCheck : Operation Completes
-    OperationInProgress --> OperationCancelled : Race Condition Detected
-    OperationInProgress --> OperationFailed : Operation Error
-
-    ValidationCheck --> OperationValid : Operation Still Active
-    ValidationCheck --> OperationInvalid : Operation Superseded
-
-    OperationValid --> StateUpdate : Update Application State
-    OperationInvalid --> OperationCancelled : Discard Results
-
-    StateUpdate --> OperationCompleted : Success
-    OperationFailed --> ErrorHandling : Handle Error
-    OperationCancelled --> CleanupResources : Cleanup
-
-    ErrorHandling --> CleanupResources : After Error Processing
-    OperationCompleted --> CleanupResources : After Success
-
-    CleanupResources --> [*] : Operation Finalized
-
-    note right of ValidationCheck
-        Correlation ID validation prevents
-        race conditions and stale updates
-    end note
-
-    note right of ErrorHandling
-        Errors preserve context and
-        emit events for monitoring
-    end note
-```
+- **Backend (main)**: rely on SQLite transactions + SAVEPOINTs for atomicity.
+- **Long-running work**: accept an `AbortSignal` and stop retry delays/attempts early when aborted (`withOperationalHooks` supports abort-driven cancellation).
+- **Frontend (renderer)**: when multiple concurrent actions can supersede each other, stores should use a local request token/version (or abort the previous request) before applying results.
 
 ### Correlation ID Tracking
 
-All operations include correlation IDs for distributed tracing:
+Correlation IDs are still crucial for observability, but they are primarily used for **tracing** rather than correctness.
 
-```typescript
-const correlationId = generateCorrelationId();
-await this.eventBus.emitTyped("operation:started", {
- operationId,
- correlationId,
- timestamp: Date.now(),
-});
-```
+- `TypedEventBus` enriches emitted payloads with `_meta.correlationId`.
 
-### Production Monitoring Integration
+- Standardized IPC handlers include correlation ids in response envelopes so the UI can surface/report an incident without exposing raw stack traces.
 
-Operations include comprehensive metrics for observability:
+- Example:
 
-```typescript
-const startTime = performance.now();
-try {
- const result = await operation();
- metrics.recordSuccess(operationName, performance.now() - startTime);
- return result;
-} catch (error) {
- metrics.recordFailure(operationName, error.constructor.name);
- throw error;
-}
-```
+  ```typescript
+  eventBus.onTyped("system:error", (data) => {
+          const correlationId = data._meta?.correlationId;
+          logger.error("System error", { correlationId, data });
+  });
+  ```
+
+### Structured Logging and Redaction
+
+- Use `withLogContext` / `normalizeLogValue` (`shared/utils/loggingContext.ts`) to attach structured context and redact secrets.
+- Electron main logging (`electron/utils/logger.ts`) normalizes structured context so sensitive values (tokens, passwords, API keys) are masked.
 
 ## Consequences
 
@@ -672,8 +681,8 @@ try {
 - **Comprehensive monitoring** - Error tracking, metrics, and observability
 - **Improved maintainability** - Consistent error handling patterns across all layers
 - **Memory safety** - Proper resource cleanup and leak prevention
-- **Race condition immunity** - Operation correlation prevents state corruption
-- **Production readiness** - Circuit breakers and retry mechanisms
+- **Operational resilience** - Standardized retry/backoff for selected operations (database + long-running tasks)
+- **User-facing safety** - Error catalog + sanitization prevents leaking internal details to the UI
 
 ### Negative
 
@@ -692,9 +701,9 @@ try {
 
 ### Concurrency Safety
 
-- **Operation correlation**: Prevents race conditions in async operations
-- **State validation**: Operations validate state before making changes
-- **Atomic operations**: Critical sections use proper synchronization
+- **Atomic operations**: Critical sections use proper synchronization (transactions, SAVEPOINTs)
+- **Cancellation support**: Long-running operations should accept `AbortSignal` where appropriate
+- **Idempotent retries**: Retry only operations that are safe to repeat (or are internally idempotent)
 
 ### Production Monitoring
 
@@ -726,22 +735,17 @@ try {
 ### 2. Use Appropriate Error Handling Level
 
 - **Utilities**: `withUtilityErrorHandling(operation, operationName, fallbackValue, shouldThrow)` for shared and backend helpers that need simple fallback behavior. When `shouldThrow` is `false`, you **must** provide a `fallbackValue`; the helper will return this value on failure instead of rethrowing. When `shouldThrow` is `true`, any provided `fallbackValue` is ignored and the wrapped error is rethrown after being logged via `console.error`.
-- **Database**: `withDatabaseOperation()` for repository and transactional
-  operations.
-- **Frontend stores**: `withErrorHandling()` together with
-  `createStoreErrorHandler()` for Zustand stores so errors and loading state
-  flow through `useErrorStore`.
-- **Frontend UI events**: `withAsyncErrorHandling()` /
-  `withSyncErrorHandling()` (see `src/utils/fallbacks.ts`) for simple React
-  handlers that only need logging and a local fallback.
-- **Backend services and IPC handlers**: `withErrorHandling()` with
-  `{ logger, operationName }` for service methods and IPC handlers.
+- **Database**: `withDatabaseOperation()` for repository and transactional operations.
+- **Frontend stores**: `withErrorHandling()` together with `createStoreErrorHandler()` for Zustand stores so errors and loading state flow through `useErrorStore`.
+- **Frontend UI events**: `withAsyncErrorHandling()` / `withSyncErrorHandling()` (see `src/utils/fallbacks.ts`) for simple React handlers that only need logging and a local fallback.
+- **Backend services**: `withErrorHandling()` with `{ logger, operationName }` for service methods that need standardized logging + rethrow behavior.
+- **IPC handlers (main process)**: `registerStandardizedIpcHandler()` (plus payload validation helpers) so the renderer always receives an `IpcResponse` envelope with a safe message and correlation metadata.
 
 See the "Helper selection matrix" section in
 `docs/Guides/ERROR_HANDLING_GUIDE.md` for concrete examples and additional
 scenarios.
 
-### 4. Error Handling Patterns Quick Reference
+### 3. Error Handling Patterns Quick Reference
 
 The following table summarizes which helper to use in common scenarios:
 
@@ -749,13 +753,19 @@ The following table summarizes which helper to use in common scenarios:
 | -------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- |
 | Zustand store async action (renderer)        | `withErrorHandling` + `createStoreErrorHandler`      | Manages loading + error state via `useErrorStore`.                |
 | Backend service or IPC handler               | `withErrorHandling` with `{ logger, operationName }` | Logs failures, rethrows original error.                           |
+| IPC handler registration (main)              | `registerStandardizedIpcHandler`                     | Normalizes errors, returns `IpcResponse`, includes metadata.      |
 | Database / long-running repository operation | `withDatabaseOperation` / `withOperationalHooks`     | Adds retry, backoff, and optional event emission.                 |
 | Small shared utility with fallback behaviour | `withUtilityErrorHandling`                           | Provide `fallbackValue` when `shouldThrow` is `false`.            |
 | UI-only event handlers in React components   | `withAsyncErrorHandling` / `withSyncErrorHandling`   | For lightweight logging + local fallback without touching stores. |
 
-### 3. Emit Events for Failures
+### 4. Emit Events for Failures
 
-All significant operations should emit failure events for monitoring.
+Only significant, user-impacting failures should emit error events (to avoid telemetry noise). When emitting, prefer:
+
+- `system:error` for cross-cutting failures that should be visible to diagnostics, and
+- structured logging with redaction for everything else.
+
+Avoid emitting raw error strings over IPC; IPC should return a safe message (via the error catalog) and correlation metadata.
 
 ## Compliance
 
@@ -764,12 +774,14 @@ All layers implement this error handling strategy:
 - Repository operations use `withDatabaseOperation()`
 - Frontend operations use `withErrorHandling()` with stores
 - Utilities provide fallback mechanisms
-- Services emit error events
+- Services may emit error events when a failure is significant/user-impacting
 
 ### Current Implementation Audit (2025-11-04)
 
 - Reviewed `shared/utils/errorHandling.ts` to confirm `withErrorHandling`, `withUtilityErrorHandling`, and `ensureError` remain the shared entry points consumed across renderer and Electron tests.
 - Validated `electron/utils/operationalHooks.ts` still wraps database and long-running operations with retry backoff and structured logging.
+- Verified `electron/services/ipc/utils.ts` normalizes IPC failures into `IpcResponse` envelopes using `getUserFacingErrorDetail()`.
+- Confirmed structured logging context + redaction is provided by `shared/utils/loggingContext.ts` and applied in `electron/utils/logger.ts`.
 - Confirmed renderer cleanup helpers in `src/services/utils/cleanupHandlers.ts` propagate bridge failures through the documented error-handling flow, aligning with the @remarks guidance above.
 
 ## Related ADRs

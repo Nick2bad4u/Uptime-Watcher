@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-022: OAuth Loopback Redirect and Callback Routing"
 summary: "Standardizes OAuth 2.0 + PKCE loopback redirect behavior for cloud providers, including redirect URI strategy and callback validation."
 created: "2025-12-15"
-last_reviewed: "2026-01-11"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -59,17 +59,37 @@ However, the _exact_ redirect URI shape (host + optional path) is provider-depen
 
 This keeps the operational simplicity of a stable port while allowing providers to follow their best-practice redirect shapes.
 
+Notes:
+
+- Production uses a stable port. Tests may request an ephemeral port (`port=0`).
+- When `port=0`, the loopback server must use an IP redirect host
+  (`127.0.0.1` or `[::1]`).
+
 ### 2) Loopback server binding + callback validation
 
 Loopback redirect servers must:
 
-- bind only to loopback interfaces:
-  - `127.0.0.1` (IPv4)
-  - `::1` (IPv6)
-- reject callbacks from non-loopback origins
-- require `code` and `state`
+- bind only to loopback interfaces (`127.0.0.1` and `::1`)
+- accept only `GET` requests
+- validate the callback path exactly
+- require `code` and `state` query parameters
 - validate `state` exactly
-- enforce a short timeout (e.g. 2 minutes)
+- treat provider error callbacks as failures (`error` / `error_description`)
+- enforce a short timeout
+
+The loopback callback response page must:
+
+- include `Cache-Control: no-store`
+- include a restrictive `Content-Security-Policy` (`default-src 'none'`)
+- use `Referrer-Policy: no-referrer`
+
+These headers reduce accidental disclosure when users copy/paste content or
+when browser history is inspected.
+
+Redirect host safety:
+
+- Redirect host values are interpolated into `redirect_uri`.
+- The implementation rejects non-loopback redirect hosts.
 
 ### 3) Concurrency model
 
@@ -84,9 +104,44 @@ This aligns with ADR-021 (“one provider at a time”) and avoids port-binding 
 - Google Drive reference implementation:
   - `electron/services/cloud/providers/googleDrive/GoogleDriveAuthFlow.ts`
   - `electron/services/cloud/oauth/LoopbackOAuthServer.ts`
+- PKCE helper:
+  - `electron/services/cloud/oauth/pkce.ts`
+- Authorization URL validation (system browser):
+  - `electron/services/cloud/providers/oauthAuthorizeUrl.ts`
 
 > **Implementation note:** `LoopbackOAuthServer` supports both fixed-path and
 > pathless redirects (via `redirectPath`). Google Drive uses the pathless mode.
+
+### PKCE requirements
+
+All OAuth authorization-code flows must use PKCE:
+
+- `code_challenge_method` is `S256`.
+- `code_verifier` is generated using cryptographically strong randomness.
+- `code_verifier` is kept in-memory only for the duration of the connect flow.
+- `code_verifier` is never logged and is never persisted.
+
+Dropbox:
+
+- Uses the Dropbox SDK's PKCE support.
+
+Google:
+
+- Explicitly generates the PKCE pair (`createPkcePair()`) and sends
+  `code_challenge`/`code_challenge_method`.
+- Sends `code_verifier` in the token exchange request.
+
+### System browser hardening
+
+OAuth authorization URLs must be opened in the system browser.
+
+Before opening the URL, Electron main validates it:
+
+- scheme must be `https`
+- host must match an allow-list for the provider
+- credentials in the URL (user:pass@) are rejected
+
+This prevents opening an attacker-controlled authorization URL.
 
 ## Alternatives considered
 

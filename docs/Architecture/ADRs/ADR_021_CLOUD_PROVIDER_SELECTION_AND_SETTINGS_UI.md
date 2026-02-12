@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-021: Cloud Provider Selection and Settings UI"
 summary: "Defines a provider-tabbed Cloud settings UX, enforces a single active provider at a time, and documents a roadmap for future providers (e.g. WebDAV)."
 created: "2025-12-15"
-last_reviewed: "2026-01-11"
+last_reviewed: "2026-02-12"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -78,6 +78,27 @@ Tabs act as an information architecture boundary: provider-specific setup lives 
 Uptime Watcher enforces **a single configured provider** for Cloud Sync / Remote Backups.
 
 When a provider is configured, other provider tabs remain visible, but setup actions are disabled with an explicit callout.
+
+### 3) Runtime validation is owned by Electron main
+
+The renderer must not attempt to “validate” provider configurations by
+duplicating business rules.
+
+Rules:
+
+- All configuration requests are validated in Electron main using shared
+  contracts (ADR-009).
+- Provider setup is considered successful only after main verifies the
+  configuration is usable.
+- On verification failure, main must roll back any partial configuration so
+  the Settings UI does not get stuck in a confusing state.
+
+Examples (current implementation):
+
+- Filesystem provider base directory is validated and canonicalized in main
+  before being persisted.
+- OAuth providers verify connectivity immediately after storing tokens; if the
+  verification fails, main restores the previous provider configuration.
 
 ## UX / Information architecture
 
@@ -161,15 +182,30 @@ A plausible path (not committed):
 
 Key renderer modules:
 
-- Provider setup UI: `src/components/Settings/SettingsSections.tsx` (Cloud section)
-- Wiring and dialogs: `src/components/Settings/CloudSettingsSection.tsx`
+- Cloud settings entry: `src/components/Settings/CloudSettingsSection.tsx`
+- Provider tabs + setup panels:
+  - `src/components/Settings/cloud/CloudProviderSetupPanel.tsx`
+  - `src/components/Settings/cloud/CloudProviderSetupPanel.*.tsx`
 - Cloud store (toasts + OS notifications): `src/stores/cloud/useCloudStore.ts`
 
 Key main-process modules:
 
 - Orchestration: `electron/services/cloud/CloudService.ts`
+- Provider configuration + validation: `electron/services/cloud/CloudService.providerOperations.ts`
 - Provider: `electron/services/cloud/providers/dropbox/*`
 - Provider: `electron/services/cloud/providers/googleDrive/*`
+- Provider: `electron/services/cloud/providers/FilesystemCloudStorageProvider.ts`
+- Provider resolution: `electron/services/cloud/internal/resolveCloudProviderOrNull.ts`
+
+Renderer-facing validation posture:
+
+- The renderer treats `CloudStatusSummary` as the source of truth.
+- UI must handle the three distinct states:
+  - not configured
+  - configured but not connected (for example, auth revoked or offline)
+  - connected
+- Do not infer “connected” based on which tab is selected; only the status
+  summary determines readiness.
 
 ## Testing & validation
 

@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-026: Electron Security Model and Renderer Isolation"
 summary: "Defines the Electron security posture: renderer isolation via preload bridge, webPreferences hardening, navigation restrictions, and safe external link handling."
 created: "2025-12-15"
-last_reviewed: "2026-01-11"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -59,8 +59,14 @@ BrowserWindow webPreferences must enforce:
 - `contextIsolation: true`
 - `webSecurity: true`
 - `allowRunningInsecureContent: false`
+- `webviewTag: false`
+- `nodeIntegrationInSubFrames: false`
+- `nodeIntegrationInWorker: false`
 
 The app currently sets `sandbox: true` in the main window configuration.
+
+Additionally, the app denies permission requests by default (microphone,
+camera, notifications, screen capture, etc.) using session permission handlers.
 
 > Note: when the Chromium sandbox is enabled, the preload layer must remain
 > conservative about dependencies and should not rely on Node.js built-ins.
@@ -70,7 +76,9 @@ The app currently sets `sandbox: true` in the main window configuration.
 ### 3) Navigation and window-opening
 
 - The renderer must not be allowed to navigate to arbitrary external origins.
-- External links should open via the OS (`shell.openExternal`).
+- `window.open()` must not create new BrowserWindows.
+- External links open via the OS (`shell.openExternal`) only after URL
+  validation.
 
 If new windows are allowed (rare), the app must restrict them to known-safe routes/origins.
 
@@ -78,9 +86,23 @@ If new windows are allowed (rare), the app must restrict them to known-safe rout
 
 IPC must follow the standardized request/response handler model.
 
-- all payloads validated (Zod)
-- no ad-hoc channels
-- no renderer access to Node APIs
+- All payloads validated (Zod)
+- No ad-hoc channels
+- No renderer access to Node APIs
+
+Handler registration rules:
+
+- Use the standardized IPC registrar (`createStandardizedIpcRegistrar`).
+- Channels that accept parameters must provide a runtime validator.
+- Reject invocations that include unexpected parameters for no-param channels.
+- Correlation IDs are carried in the IPC envelope and must be treated as
+  untrusted input.
+
+External-open rules (IPC and navigation interception):
+
+- External URLs must be validated and logged only using safe-for-logging
+  variants.
+- OAuth authorization URLs must be HTTPS-only and allow-listed (see ADR-022).
 
 ## Implementation notes
 
@@ -88,10 +110,13 @@ IPC must follow the standardized request/response handler model.
   - `electron/services/window/WindowService.ts`
   - Production-only CSP/security headers are attached via
     `session.webRequest.onHeadersReceived` in `WindowService`.
+- External navigation validation:
+  - `electron/services/shell/validatedExternalOpen.ts`
 - App entry and lifecycle:
   - `electron/main.ts`
 - IPC protocols:
   - ADR-005 and shared channel maps
+  - `electron/services/ipc/utils.ts` (standard registrar + validation enforcement)
 
 ## Consequences
 

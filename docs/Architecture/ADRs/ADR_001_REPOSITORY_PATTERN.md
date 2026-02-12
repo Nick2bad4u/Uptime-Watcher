@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-001: Repository Pattern for Database Access"
 summary: "Establishes a repository pattern for all database access with transaction safety, caching, and event-driven hooks."
 created: "2025-08-05"
-last_reviewed: "2026-01-31"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -28,7 +28,7 @@ tags:
 
 ## Status
 
-**Accepted** - Implemented across all database operations with comprehensive transaction safety and race condition prevention
+**Accepted** - Implemented across all database operations with standardized transaction boundaries, typed queries/mappers, and consistent retry + observability hooks.
 
 ## Context
 
@@ -72,15 +72,21 @@ stateDiagram-v2
 
 ### 1. Dual Method Pattern
 
-- **Public async methods** that create transactions (`deleteAll()`)
-- **Internal sync methods** for use within existing transactions (`deleteAllInternal()`)
+- **Public async methods** that own their transaction boundary (`deleteAll()`)
+- **Internal methods** that accept an active `Database` handle and execute synchronously (`deleteAllInternal(db)`)
+
+> **Repository evolution note:** Some newer flows use a _transaction adapter_ object (a small interface that exposes the internal sync operations) to avoid passing `db` across multiple call sites. The contract is the same: **public methods create the transaction boundary; internal methods run within it**.
 
 ### 2. Enhanced Transaction Safety
 
-- All mutations wrapped in `DatabaseService.executeTransaction()`
-- All operations use `withDatabaseOperation()` for retry logic and event emission
-- **Synchronous database operations** (node-sqlite3-wasm) eliminate race conditions
-- **Atomic cache updates** prevent inconsistent state during concurrent access
+- All mutations wrapped in `DatabaseService.executeTransaction()` (including nested-transaction isolation via SQLite `SAVEPOINT` when already in a transaction).
+- Mutating repository entrypoints wrap the transactional operation with `withDatabaseOperation()` for standardized retry/backoff + structured logging.
+- **Important correctness nuance:** node-sqlite3-wasm exposes _synchronous_ SQLite calls, which avoids multi-threaded statement interleaving, but it does **not** magically remove application-level race conditions. Correctness still depends on:
+  - keeping multi-step writes inside a single transaction boundary, and
+  - using idempotent writes (e.g. `INSERT OR IGNORE`, `INSERT OR REPLACE`) or explicit uniqueness constraints where appropriate.
+- Cache updates (when present) must be applied **after** a successful transaction commit (or treated as an invalidation-only cache) so the renderer never observes partial state.
+
+> **Observability note:** `withDatabaseOperation()` only emits lifecycle events when an event emitter is explicitly provided. Most repositories use it primarily for retry + logging; services that need telemetry can pass the shared backend event emitter.
 
 ### 3. Consistent Structure
 
@@ -88,8 +94,7 @@ stateDiagram-v2
 
 ````typescript
 
-import { Database } from "node-sqlite3-wasm";
-import type { Logger } from "@shared/utils/logger/interfaces";
+import type { Database } from "node-sqlite3-wasm";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";
 import type { DatabaseService } from "@electron/services/database/DatabaseService";
 
@@ -101,7 +106,8 @@ import type { DatabaseService } from "@electron/services/database/DatabaseServic
  *   This repository follows the dual method pattern with public async methods
  *   that create transactions and internal sync methods for use within existing
  *   transaction contexts. All database operations are wrapped with proper error
- *   handling and event emission.
+ *   handling. Lifecycle event emission is optional and enabled only when an
+ *   event emitter is passed to {@link withDatabaseOperation}.
  *
  * @example
  *  ```typescript
@@ -185,7 +191,7 @@ export class ExampleRepository {
    return;
   }
 
-  return withDatabaseOperation(
+    return withDatabaseOperation(
    async () =>
     this.databaseService.executeTransaction((db) => {
      this.bulkInsertInternal(db, records);
@@ -264,10 +270,13 @@ export class ExampleRepository {
   * @public
   */
  public async findAll(): Promise<ExampleRow[]> {
-  return withDatabaseOperation(() => {
-   const db = this.getDb();
-   return Promise.resolve(db.all(QUERIES.SELECT_ALL) as ExampleRow[]);
-  }, "ExampleRepository.findAll");
+    return withDatabaseOperation(
+     () => {
+        const db = this.getDb();
+        return Promise.resolve(db.all(QUERIES.SELECT_ALL) as ExampleRow[]);
+     },
+     "ExampleRepository.findAll"
+    );
  }
 
  /**
@@ -439,6 +448,24 @@ const QUERIES = {
 - Centralized query strings in constants object
 - Prevents SQL duplication and improves maintainability
 
+### 5. Package Boundaries and Dependency Rules
+
+- The SQLite driver (`node-sqlite3-wasm`) and all direct SQL execution live in **Electron main** only under `electron/services/database/**`.
+- The renderer (`src/**`) must never import or depend on database code. Renderer state changes happen via **IPC** (see ADR-005) and renderer events (see ADR-002).
+- Cross-process contracts (types, event payload shapes, IPC channel registries, Zod schemas/guards) live in **shared** (`shared/**`).
+- `shared/**` must remain environment-agnostic: it must not import Electron modules or Node-only APIs.
+
+### 6. Testing Abstractions and Required Coverage
+
+- Repository tests are **integration-first** (Vitest) and should exercise the real SQLite driver wherever practical.
+- Transaction semantics must be covered, including:
+  - commit vs rollback,
+  - nested transactions (SAVEPOINT),
+  - retries on transient `SQLITE_BUSY` / `SQLITE_LOCKED` (handled by `DatabaseService.executeTransaction`).
+- Property-based tests (fast-check) are recommended for:
+  - mapper round-trips (row <-> domain conversions),
+  - idempotent operations (repeating writes yields stable results).
+
 ## Consequences
 
 ### Positive
@@ -462,15 +489,15 @@ const QUERIES = {
 
 ### Race Condition Prevention
 
-- **Synchronous Operations**: node-sqlite3-wasm ensures all database operations complete synchronously
-- **Atomic Transactions**: BEGIN/COMMIT/ROLLBACK operations are atomic
-- **Cache Consistency**: Atomic cache replacement patterns prevent race conditions
+- **Synchronous Statements**: node-sqlite3-wasm executes statements synchronously, preventing concurrent statement execution on the same connection.
+- **Atomic Transactions**: BEGIN/COMMIT/ROLLBACK provide atomicity for multi-statement mutations.
+- **Concurrency correctness**: application-level correctness is enforced via transaction boundaries, idempotent writes, and explicit uniqueness constraints.
 
 ### Memory Management
 
 - **Proper Cleanup**: All repositories implement proper resource cleanup
 - **Event Listener Management**: Event emissions are handled asynchronously with proper error handling
-- **Connection Pooling**: Single database connection managed by DatabaseService singleton
+- **Connection management**: Single database connection managed by `DatabaseService` singleton.
 
 ## Compliance
 
@@ -485,7 +512,7 @@ All repository classes implement this pattern:
 
 - Verified `electron/services/database/SiteRepository.ts`, `MonitorRepository.ts`, `HistoryRepository.ts`, and `SettingsRepository.ts` all expose public async APIs that wrap `executeTransaction()` and delegate to `_Internal` helpers.
 - Confirmed `withDatabaseOperation` usage throughout the repositories to capture retries, logging, and event emission.
-- Checked `electron/utils/database/SiteRepositoryService.ts` to ensure cache swaps still happen only after successful commits, maintaining the atomic update guarantees described above.
+- Checked `electron/services/database/SiteRepositoryService.ts` to ensure cache swaps still happen only after successful commits, maintaining the atomic update guarantees described above.
 
 ## Related ADRs
 

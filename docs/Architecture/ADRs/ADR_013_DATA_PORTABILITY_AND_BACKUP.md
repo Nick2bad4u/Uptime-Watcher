@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-013: Data Portability & Backup/Restore"
 summary: "Documents export/import/backup guarantees, formats, integrity checks, and retention expectations for local SQLite backups."
 created: "2025-12-04"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-02-12"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -39,12 +39,27 @@ Users need reliable export/import and local backup/restore with clear integrity 
 
 ## Decision
 
-- **Formats**: SQLite DB backup plus optional JSON export for portability; include version metadata and checksum.
-- **Integrity**: Generate checksums for backup payloads; validate before restore; reject mismatched versions unless explicit migrate path exists.
-- **Retention**: Default retention guidance (e.g., keep last N backups) and user-controlled location; **no off-device upload by default**.
-  - Opt-in remote backup/sync is defined in ADR-015 and does not change the local backup guarantees in this ADR.
-- **Messaging**: Surface errors with actionable remediation; emit `database:backup-created` and diagnostics events for observability.
-- **Compatibility**: Define minimum/target schema versions; migrations must be idempotent and recorded.
+- **Formats**:
+  - **SQLite backup (primary)**: a full database snapshot stored as a `.sqlite` file (plaintext bytes starting with `SQLite format 3\0`).
+  - **JSON export/import (secondary)**: a **versioned** portability snapshot (`version: "1.0"`) intended for small-to-medium datasets and cross-app portability.
+  - **Encrypted backup artifacts (remote/off-device)**: `.sqlite.enc` files using an authenticated encryption envelope (AES-256-GCM + `UWENC001` magic header; see [Encrypted backup envelope](#encrypted-backup-envelope) and ADR-029).
+- **Integrity verification (required)**:
+  - **Size verification**: `metadata.sizeBytes` must match the actual byte length.
+  - **Checksum verification**: `metadata.checksum` is computed as SHA-256 of the **plaintext SQLite bytes** and must match.
+  - **Schema compatibility policy**:
+    - Backups whose `schemaVersion` is **newer** than the running application are rejected (fail closed).
+    - Older backups are accepted and migrated forward via the normal DB init/migration path.
+  - **SQLite structural validation**: the incoming database file must pass `PRAGMA quick_check` before being swapped into place.
+- **Encryption at rest (requirements)**:
+  - **Local backups** (`.sqlite`) are **plaintext** artifacts. When a user saves/copies them outside the app, they must be stored on an encrypted volume (e.g., BitLocker/FileVault/LUKS) or protected by equivalent OS/enterprise controls.
+  - **Any off-device backup** (cloud provider, shared drive, removable media, etc.) is considered higher-risk and must live in a storage system that provides **encryption at rest** (e.g., provider-managed encryption or equivalent enterprise controls). In addition, Uptime Watcher provides optional **client-side encryption** (passphrase-derived key + AES-256-GCM) for remote backups to reduce exposure in provider-compromise scenarios; when remote backup is enabled, we must strongly recommend enabling client-side encryption (ADR-015).
+  - Encrypted backups are treated as **untrusted inputs** until decrypted and validated; unknown encryption versions must fail closed.
+- **Data export policy (correctness + privacy)**:
+  - JSON export is a **logical** snapshot (sites/monitors/history/settings) and is **not** a byte-for-byte DB backup.
+  - JSON exports must not include secrets (OAuth tokens, derived encryption keys, refresh tokens, support bundles, etc.).
+  - JSON import must be schema-validated (shared Zod schemas) and apply defaults/normalization.
+- **No off-device upload by default**: local backup/export operations never upload data anywhere unless the user enables an opt-in provider flow (ADR-015).
+- **User messaging**: failures must be actionable and must not leak secrets (URLs/tokens/passphrases are redacted by shared logging utilities).
 
 ## Consequences
 
@@ -54,17 +69,66 @@ Users need reliable export/import and local backup/restore with clear integrity 
 
 ## Implementation
 
-- Embed `schemaVersion`, `appVersion`, `createdAt`, `checksum`, `retentionHintDays`, and `sizeBytes` in every backup metadata payload (propagated through IPC, preload, renderer stores, and UI). Renderer downloads now receive an `ArrayBuffer` plus the serialized metadata so retention guidance and schema version are always visible to the user.
-- Provide both `download-sqlite-backup` and `restore-sqlite-backup` flows with validation and progress events. The download handler validates checksum, size, and schema version before transferring to the renderer and exposes metadata for retention guidance.
-- The renderer restore button now reads a `.sqlite` file, streams it through the preload bridge, and displays success/error states along with the returned metadata so users can confirm what was restored.
-- On restore, run validation before overwriting the existing DB and capture a pre-restore snapshot on disk. **Restore entry points reuse `validateDatabaseBackupPayload` to reject corrupted or mismatched backups and rehydrate schema metadata by inspecting the uploaded file.**
-- Document manual recovery steps for corrupted backups and where the pre-restore snapshot is stored.
+### SQLite backup
+
+- Snapshot creation is performed in the main process via `DataBackupService`.
+- Backups are created as consistent snapshots using `VACUUM INTO` in a temp directory and then read/validated.
+- IPC flows include `download-sqlite-backup` (returns `{ buffer: ArrayBuffer, fileName, metadata }` when within the IPC budget), `save-sqlite-backup` (native save dialog + direct-to-disk write), and `restore-sqlite-backup` (restores an uploaded `ArrayBuffer` after integrity checks).
+
+### Encrypted backup envelope
+
+When client-side encryption is enabled for remote/off-device backups, backup
+payloads are stored as a `.sqlite.enc` file.
+
+Envelope format (V1) is:
+
+- Magic: ASCII `UWENC001`
+- Version byte: `1`
+- IV: 12 bytes
+- Auth tag: 16 bytes
+- Ciphertext: remaining bytes
+
+Algorithm:
+
+- AES-256-GCM
+- Key material is derived from a user passphrase (scrypt) and cached locally in
+  the main process secret store (see ADR-015 / ADR-023).
+
+Integrity relationship:
+
+- `metadata.checksum` and `metadata.sizeBytes` refer to the **plaintext** SQLite
+  backup bytes.
+- Encrypted bytes are validated by AES-GCM authentication during decryption, and
+  the resulting plaintext is then validated by checksum + SQLite integrity.
+
+### Restore lifecycle (validated swap)
+
+Restore is intentionally defensive because restore payloads are untrusted inputs:
+
+1. Detect payload format:
+   - If the payload begins with `UWENC001`, treat it as an encrypted artifact and
+     **decrypt it first** (cloud restore flow handles this in `CloudService`).
+   - Otherwise, treat it as a plaintext SQLite payload.
+2. Validate the (decrypted) payload header is a SQLite file (`SQLite format 3\0`).
+3. Write the SQLite bytes into a temp directory under a sanitized file name.
+4. Compute restore metadata by inspecting the file (`PRAGMA user_version`) and computing the SHA-256 checksum.
+5. Run `validateDatabaseBackupPayload` (size, checksum, schema policy).
+6. Run `PRAGMA quick_check` against the temp file to confirm structural integrity.
+7. Create a pre-restore on-disk snapshot (`pre-restore-<timestamp>.sqlite`) under `app.getPath("userData")`.
+8. Atomically swap the database file into place via `replaceDatabaseFile` (handles WAL/SHM/journal sidecars and performs rollback on failure).
+9. Reinitialize the database connection and apply migrations (normal DB startup path).
+
+### Observability
+
+- Successful restores emit `database:backup-restored` (and the internal command emits `internal:database:backup-restored`).
+- Failures emit `database:error` with a redacted, serialized error payload.
+- Backup creation is logged with structured fields; no dedicated `database:backup-created` event is emitted today.
 
 ## Testing & Validation
 
-- Integration tests for backup/restore with checksum validation and version mismatch handling.
-- Property tests for export/import round-trips on representative datasets.
-- Error-path tests for corrupted payloads and insufficient permissions.
+- Integration tests cover backup/restore integrity checks (checksum + `PRAGMA quick_check`), IPC budget enforcement, and rollback semantics.
+- Property tests cover export/import round-trips for JSON portability snapshots.
+- Error-path tests cover corrupted payloads, invalid SQLite headers, and filesystem permission failures.
 
 ## Related ADRs
 

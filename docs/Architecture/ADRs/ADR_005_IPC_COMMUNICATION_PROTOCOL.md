@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-005: IPC Communication Protocol"
 summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation, error handling, and static guard rails."
 created: "2025-08-05"
-last_reviewed: "2026-02-01"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -55,8 +55,9 @@ We will implement a **standardized IPC communication protocol** using Electron's
 graph TB
     subgraph "Renderer Process (Untrusted)"
         ReactApp[React Application]
-        ZustandStores[Zustand Stores]
         Components[UI Components]
+        ZustandStores[Zustand Stores]
+        RendererServices[Renderer Services\n(SiteService, SettingsService, ...)]
     end
 
     subgraph "Security Boundary"
@@ -82,8 +83,9 @@ graph TB
     end
 
     ReactApp --> ElectronAPI
-    ZustandStores --> ElectronAPI
-    Components --> ElectronAPI
+    Components --> ZustandStores
+    ZustandStores --> RendererServices
+    RendererServices --> ElectronAPI
 
     ElectronAPI --> ContextBridge
     ContextBridge --> PreloadScript
@@ -123,38 +125,29 @@ graph TB
 All IPC handlers are registered through a central `IpcService`:
 
 ```typescript
-export class IpcService {
- private registeredHandlers = new Set<string>();
+import type { IpcInvokeChannel } from "@shared/types/ipc";
 
- public initialize(dependencies: IpcServiceDependencies): void {
-  this.registerSitesHandlers(dependencies);
-  this.registerMonitoringHandlers(dependencies);
-  this.registerSettingsHandlers(dependencies);
-  // ... other domain handlers
+import { ipcMain } from "electron";
+
+import { registerSiteHandlers } from "./handlers/siteHandlers";
+
+export class IpcService {
+ private readonly registeredIpcHandlers = new Set<IpcInvokeChannel>();
+
+ public cleanup(): void {
+  for (const channel of this.registeredIpcHandlers) {
+   ipcMain.removeHandler(channel);
+  }
+  this.registeredIpcHandlers.clear();
  }
 
- private registerStandardizedIpcHandler<T, R>(
-  channel: string,
-  handler: (params: T) => Promise<R>,
-  validator?: (params: unknown) => params is T
- ): void {
-  if (this.registeredHandlers.has(channel)) {
-   throw new Error(`IPC handler already registered: ${channel}`);
-  }
-
-  ipcMain.handle(channel, async (_event, params: unknown) => {
-   try {
-    if (validator && !validator(params)) {
-     throw new Error(`Invalid parameters for ${channel}`);
-    }
-    return await handler(params as T);
-   } catch (error) {
-    logger.error(`IPC handler failed: ${channel}`, error);
-    throw error;
-   }
+ public setupHandlers(): void {
+  registerSiteHandlers({
+   registeredHandlers: this.registeredIpcHandlers,
+   uptimeOrchestrator: this.uptimeOrchestrator,
   });
 
-  this.registeredHandlers.add(channel);
+  // ... register other handler groups (monitoring, settings, state sync, etc.)
  }
 }
 ```
@@ -167,38 +160,55 @@ IPC handlers are organized by domain with consistent validation:
 
 ```typescript
 import { SITES_CHANNELS } from "@shared/types/preload";
-import { registerStandardizedIpcHandler } from "electron/services/ipc/utils";
-import { SiteHandlerValidators } from "electron/services/ipc/validators/sites";
+
+import { createStandardizedIpcRegistrar } from "../utils";
+import { SiteHandlerValidators } from "../validators/sites";
 
 private setupSiteHandlers(): void {
-    registerStandardizedIpcHandler(
-        SITES_CHANNELS.addSite,
-        async (...args: unknown[]) =>
-            this.uptimeOrchestrator.addSite(args[0] as Site),
-        SiteHandlerValidators.addSite,
-        this.registeredIpcHandlers
-    );
+ const register = createStandardizedIpcRegistrar(this.registeredIpcHandlers);
 
-    registerStandardizedIpcHandler(
-        SITES_CHANNELS.removeSite,
-        async (...args: unknown[]) =>
-            this.uptimeOrchestrator.removeSite(args[0] as string),
-        SiteHandlerValidators.removeSite,
-        this.registeredIpcHandlers
-    );
+ register(
+  SITES_CHANNELS.addSite,
+  async (site) => this.uptimeOrchestrator.addSite(site),
+  SiteHandlerValidators.addSite
+ );
 
-    registerStandardizedIpcHandler(
-        SITES_CHANNELS.getSites,
-        async () => this.uptimeOrchestrator.getSites(),
-        SiteHandlerValidators.getSites,
-        this.registeredIpcHandlers
-    );
+ register(
+  SITES_CHANNELS.removeSite,
+  async (identifier) => this.uptimeOrchestrator.removeSite(identifier),
+  SiteHandlerValidators.removeSite
+ );
 
-    // ...additional site/monitor operations, each wired through the same helper
+ register(
+  SITES_CHANNELS.getSites,
+  async () => this.uptimeOrchestrator.getSites(),
+  SiteHandlerValidators.getSites
+ );
 }
 ```
 
 Validators live under `electron/services/ipc/validators/*` (one module per IPC domain) and reuse shared helpers from `electron/services/ipc/validators/shared.ts`. Keeping validation logic centralized prevents drift between IPC contracts and renderer-side TypeScript definitions.
+
+### 2.1 Correlation IDs and Versioning
+
+Every IPC invoke call carries a generated **correlation ID**.
+
+- **Preload** appends an `IpcCorrelationEnvelope` to each invocation (`createTypedInvoker` / `createVoidInvoker` in `electron/preload/core/bridgeFactory.ts`).
+- **Main** extracts it with `extractIpcCorrelationContext` and includes it in the standardized `IpcResponse.metadata.correlationId`.
+
+This enables end-to-end tracing across renderer ➜ preload ➜ main logs without
+leaking sensitive payload data.
+
+IPC “versioning” is handled via the **single source of truth** contract files
+and generated artifacts:
+
+- Channel contracts: `shared/types/preload.ts` + `shared/types/ipc.ts`
+- Regeneration: `npm run generate:ipc`
+- Drift check: `npm run check:ipc` (also used by `npm run lint:ipc`)
+
+Because the renderer and main process ship as a single application bundle, we do
+not support long-lived multi-version negotiation. Breaking changes are made by
+updating the shared contract maps and regenerating the inventory.
 
 ### 3. Type-Safe Preload API
 
@@ -262,7 +272,7 @@ The script (`scripts/architecture-static-guards.mjs`) performs the following che
 
    Any other usage is flagged as a violation to prevent ad-hoc handlers that bypass validation, logging, or standardized response formatting.
 
-2. **No direct `ipcRenderer` imports in `src/**`** – Renderer code may not import `ipcRenderer`directly from the`electron` package (excluding tests). All renderer IPC goes through the typed preload bridge (`window.electronAPI`) and domain-specific renderer services (for example `SiteService`, `SettingsService`). This guarantees that:
+2. **No direct `ipcRenderer` imports in `src/**`** – Renderer code may not import `ipcRenderer` directly from the `electron` package (excluding tests). All renderer IPC goes through the typed preload bridge (`window.electronAPI`) and domain-specific renderer services (for example `SiteService`, `SettingsService`). This guarantees that:
    - Renderer code never crosses the security boundary directly.
    - All IPC calls benefit from the shared `IpcResponse` validation and error handling implemented in the preload layer.
 
@@ -326,47 +336,47 @@ custom `uptime-watcher/*` ESLint rules.
 
 ### 4. Event Forwarding Protocol
 
-Backend events are automatically forwarded to the frontend:
+Backend events are forwarded to the frontend via the dedicated event bridge.
 
-```typescript
-// In IpcService
-private async forwardEventToRenderer(eventName: string, data: unknown): Promise<void> {
-    if (this.webContents && !this.webContents.isDestroyed()) {
-        this.webContents.send(eventName, data);
-    }
-}
+**Key points:**
 
-// Events are forwarded automatically when emitted
-await this.eventBus.emitTyped('monitor:status-changed', eventData);
-// → Automatically sent to renderer via IPC
-```
+- Invoke-style IPC (`ipcMain.handle` / `ipcRenderer.invoke`) is for request/response.
+- Broadcast events are forwarded by `RendererEventBridge` and validated by the preload events domain before reaching renderer listeners.
+
+  ```typescript
+  // Main process: bridge typed events to renderers
+  // (see electron/services/events/RendererEventBridge.ts)
+  rendererEventBridge.sendToRenderers("state-sync-event", payload);
+
+  // Preload: validate + forward to renderer callbacks
+  // (see electron/preload/domains/eventsApi.ts)
+  eventsApi.onStateSyncEvent((event) => {
+   // Renderer store orchestration applies event or triggers full resync
+  });
+  ```
 
 ### 5. Validation and Error Handling
 
-All IPC operations include validation and consistent error handling:
+All IPC operations include validation and consistent error handling.
 
 ```typescript
-// Validation functions for each domain
-export function isSiteCreationData(data: unknown): data is SiteCreationData {
- return (
-  typeof data === "object" &&
-  data !== null &&
-  "name" in data &&
-  typeof (data as any).name === "string"
- );
-}
+import type { IpcParameterValidator } from "electron/services/ipc/types";
+import type { IpcResponse } from "@shared/types/ipc";
 
-// Error responses maintain consistent format
-try {
- const result = await handler(params);
- return { success: true, data: result };
-} catch (error) {
- logger.error(`IPC operation failed: ${channel}`, error);
- return {
-  success: false,
-  error: error instanceof Error ? error.message : "Unknown error",
- };
-}
+// Parameter validators return null on success, or a list of messages on failure.
+const validateSitePayload: IpcParameterValidator = (params) => {
+ // ... return null | string[]
+};
+
+// Main handlers are wrapped by registerStandardizedIpcHandler, which:
+// - validates parameters
+// - runs handler with timing diagnostics
+// - returns a standardized IpcResponse envelope
+const response: IpcResponse<unknown> = {
+ success: true,
+ data: result,
+ metadata: { correlationId, duration, handler },
+};
 ```
 
 ## Communication Patterns

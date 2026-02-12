@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-012: Notifications and Alerting Policy"
 summary: "Defines desktop/sound notification rules, throttling, suppression, and reliability expectations for outage/restore signals."
 created: "2025-12-04"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -44,6 +44,8 @@ tags:
 > - Per-monitor throttling and ordering are implemented in
 >   `NotificationService` using `lastStatus`, `lastNotifiedAt`, and
 >   `suppressionUntil`.
+> - User-initiated “app events” (e.g. backups) can request an OS notification
+>   via `notify-app-event` IPC and `NotificationService.notifyAppEvent()`.
 > - A `notification:sent` event is emitted on the main event bus whenever a
 >   system notification is dispatched, with correlationId and timestamp for
 >   diagnostics.
@@ -56,11 +58,29 @@ Outage and restore notifications must be reliable, non-noisy, and consistent wit
 
 ## Decision
 
-- **Channels**: Desktop notification + optional sound cue; both respect global enable/disable and per-site mute.
-- **Throttling/Suppression**: Debounce repeat-down events; cool-down window per monitor; coalesce identical status within window.
-- **Ordering**: Always emit outage before restore; deduplicate out-of-order restores; mark notifications with correlationId and event timestamp.
-- **Content**: Include site name, monitor type, status, last response metrics; keep payload minimal and PII-safe.
-- **User Preferences**: Persist notification settings; defaults favor on-device notifications with sounds off.
+- **Channels**:
+  - **System (OS) notifications**: Dispatched from the Electron main process via
+    `new Notification(...)`.
+  - **In-app alerts**: Rendered in the renderer UI and controlled separately by
+    renderer settings (these are not the same as OS notifications).
+  - **Sound**: OS notification sound is controlled by the main-process
+    `playSound` flag.
+- **User preference sync**: The renderer is the source of truth for user
+  settings. Preference updates flow renderer → IPC → main process and are
+  validated using shared Zod schemas.
+- **Deduplication and throttling**:
+  - **Per-site mute**: If a site identifier is muted, OS notifications for that
+    site are suppressed.
+  - **Per-monitor cooldown for DOWN**: repeated DOWN transitions are suppressed
+    until `suppressionUntil` (default 90s).
+  - **Restore gating**: if `restoreRequiresOutage` is enabled (default), an UP
+    notification is only emitted after a previously observed DOWN notification.
+- **Urgency**: DOWN notifications are emitted with OS urgency `critical`, UP
+  notifications use `normal`.
+- **Silencing rules (current)**: Only per-site mute is implemented. There is no
+  concept of “snooze until time”, quiet hours, or per-monitor silencing yet.
+- **PII safety**: Notification titles/bodies must not include secrets. Only
+  site identifiers/names and monitor metadata are allowed.
 
 ## Consequences
 
@@ -133,6 +153,9 @@ validated via `notificationPreferenceUpdateSchema` in
    participates in the standard IPC validation, logging, and lifecycle
    tracking.
 
+The same handler module also wires `notify-app-event`, which is reserved for
+user-initiated “app events” (for example, cloud backup completed).
+
 ### Per-monitor throttling and event emission
 
 - Per-monitor state: `lastStatus`, `lastNotifiedAt`, `suppressionUntil`.
@@ -140,10 +163,16 @@ validated via `notificationPreferenceUpdateSchema` in
   suppress duplicates within window.
 - Emit `notification:sent` with correlationId for diagnostics; log suppression
   events.
-- Integrate with scheduler backoff to avoid duplicate alerts during delayed
-  retries.
+- Scheduler/backoff integration is not currently implemented; future work may
+  incorporate scheduler telemetry for richer flapping semantics.
 - Align with the typed `UptimeEvents` contract and main-process event
   validation for notification-related diagnostics events.
+
+### Persistence
+
+Notification suppression state (`lastStatus` / cooldown) is currently held
+in-memory only. After app restart, suppression resets and the next DOWN
+transition may generate a new OS notification.
 
 ## Testing & Validation
 

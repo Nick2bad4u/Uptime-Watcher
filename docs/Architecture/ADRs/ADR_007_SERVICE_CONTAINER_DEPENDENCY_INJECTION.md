@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-007: Service Container and Dependency Injection Pattern"
 summary: "Establishes a centralized dependency injection container for managing service lifecycles, initialization order, and inter-service communication in the Electron main process."
 created: "2025-11-25"
-last_reviewed: "2025-12-17"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -56,6 +56,28 @@ Without centralized dependency management, the application would face:
 ## Decision
 
 We will implement a **centralized Service Container** pattern using lazy initialization and singleton management for all Electron main process services.
+
+This container is the Electron main-process **composition root** (a.k.a. assembly root): it wires object graphs and owns initialization order.
+
+### Non-goal: general-purpose Service Locator
+
+The `ServiceContainer` is intentionally a singleton, but it must **not** become a globally reachable dependency resolver.
+
+- ✅ **Allowed**: bootstrap and application-lifecycle modules (for example `electron/main.ts`, `electron/services/application/ApplicationService.ts`) obtain the container and request top-level services.
+- ✅ **Allowed**: tests that specifically verify container wiring may call `ServiceContainer.getInstance()`.
+- ❌ **Disallowed**: domain managers, repositories, monitor services, and utilities importing `ServiceContainer` to "grab" dependencies at call sites.
+
+If a component needs a dependency, it should receive it explicitly (constructor injection) and remain constructible in isolation.
+
+### Lifecycle model (current implementation)
+
+The current container implementation provides **process-lifetime singletons** with lazy instantiation:
+
+- Services are cached in private fields and created on first getter access.
+- `initialize()` is **idempotent** and safe to call multiple times; it reuses an internal initialization promise.
+- No scoped request/container-per-operation lifecycle exists in production code.
+
+Some dependencies are intentionally transient and created outside the container (for example per-monitor check execution objects); those should remain **factory-created** so they do not accumulate global state.
 
 ### Service Container Architecture Overview
 
@@ -393,9 +415,9 @@ sequenceDiagram
     participant SC as ServiceContainer
     participant DB as DatabaseService
     participant Repos as Repositories
-    participant Mgrs as Managers
     participant Orch as UptimeOrchestrator
     participant IPC as IpcService
+    participant Cloud as CloudSyncScheduler
 
     Main->>AppSvc: new ApplicationService()
     AppSvc->>SC: getInstance()
@@ -417,29 +439,16 @@ sequenceDiagram
     SC->>Repos: getSettingsRepository()
     SC->>Repos: getSiteRepository()
 
-    Note over SC,Mgrs: Phase 3: Domain Managers
-    SC->>SC: getDatabaseManager()
-    SC->>SC: Create DatabaseManagerEventBus
-    SC->>SC: setupEventForwarding(DatabaseManager)
-    SC->>Mgrs: DatabaseManager.initialize()
-
-    SC->>SC: getSiteManager()
-    SC->>SC: Create SiteManagerEventBus
-    SC->>SC: setupEventForwarding(SiteManager)
-    SC->>Mgrs: tryInitializeService(SiteManager)
-
-    SC->>SC: getMonitorManager()
-    SC->>SC: Create MonitorManagerEventBus
-    SC->>SC: setupEventForwarding(MonitorManager)
-    SC->>Mgrs: tryInitializeService(MonitorManager)
-
-    Note over SC,Orch: Phase 4: Coordination Layer
-    SC->>Orch: getUptimeOrchestrator()
-    SC->>Orch: initialize()
+    Note over SC,Orch: Phase 3: Coordination Layer
+    SC->>Orch: getUptimeOrchestrator().initialize()
+    Note over Orch: Orchestrator owns initialization of stateful managers
 
     Note over SC,IPC: Phase 5: IPC Layer
     SC->>IPC: getIpcService()
     SC->>IPC: setupHandlers()
+
+    Note over SC,Cloud: Phase 6: Background Services
+    SC->>Cloud: tryInitializeService(getCloudSyncScheduler())
 
     SC-->>AppSvc: All services initialized
     AppSvc-->>Main: Ready
@@ -560,6 +569,7 @@ private stripEventMetadata<EventName extends keyof UptimeEvents>(
 - **Initialization complexity**: Sequence must be carefully maintained
 - **Memory footprint**: All services persist for application lifetime
 - **Learning curve**: Developers must understand container patterns
+- **Service locator risk**: If imported broadly, the container becomes a Service Locator and degrades testability
 
 ### Neutral
 
@@ -567,6 +577,12 @@ private stripEventMetadata<EventName extends keyof UptimeEvents>(
 - **No runtime DI framework**: Custom implementation vs. external library
 
 ## Implementation Guidelines
+
+### 0. Keep container usage at the composition root
+
+- Prefer passing constructed services into long-lived objects.
+- Avoid reaching back into `ServiceContainer` after startup.
+- If you need a dependency in a class, add a constructor parameter.
 
 ### 1. Adding a New Service
 
@@ -597,6 +613,8 @@ MyNewService: this.myNewService,
 // 5. If service has initialize(), add to initialize() sequence
 await this.tryInitializeService(this.getMyNewService(), "MyNewService");
 ```
+
+When the new service will be consumed by other services, prefer injecting it via constructors rather than having those consumers call the container.
 
 ### 2. Adding Event Bus Forwarding
 
@@ -632,6 +650,15 @@ class SiteManager {
 ```
 
 ## Testing Considerations
+
+### Prefer direct construction for unit tests
+
+For unit tests, prefer constructing the class-under-test directly with fakes/stubs rather than going through `ServiceContainer`.
+
+Use `ServiceContainer.resetForTesting()` when:
+
+- the test is specifically verifying container wiring/initialization, or
+- the test is a main-process integration test that relies on the real bootstrap path.
 
 ### Test Isolation
 
@@ -686,13 +713,18 @@ All Electron main process services are managed through `ServiceContainer`:
 - ✅ `NotificationService`, `WindowService`, `AutoUpdaterService` - Feature services
 - ✅ `RendererEventBridge` - Event forwarding
 
-### Current Implementation Audit (2025-11-25)
+### Current Implementation Audit (2026-02-11)
 
-- Verified `electron/services/ServiceContainer.ts` implements singleton pattern with lazy initialization
-- Confirmed `initialize()` method follows documented phase sequence
-- Checked event forwarding setup for all three manager event buses
-- Validated `resetForTesting()` usage across test files for proper isolation
-- Reviewed `ApplicationService` integration for proper container lifecycle management
+- Verified `electron/services/ServiceContainer.ts` implements a singleton container with lazy getters.
+- Confirmed `initialize()` is idempotent and initializes services in this order:
+  1. `DatabaseService.initialize()`
+  2. `ConfigurationManager.initialize()` (if present)
+  3. Repository getters (construction)
+  4. `UptimeOrchestrator.initialize()` (managers are initialized by the orchestrator)
+  5. `IpcService.setupHandlers()`
+  6. `CloudSyncScheduler.initialize()` (best-effort background service)
+- Confirmed `ServiceContainer.getExisting()` is used in hot-reload paths to avoid implicit container creation.
+- Verified production imports of `ServiceContainer` are constrained to bootstrap/application-lifecycle modules.
 
 ## Related ADRs
 

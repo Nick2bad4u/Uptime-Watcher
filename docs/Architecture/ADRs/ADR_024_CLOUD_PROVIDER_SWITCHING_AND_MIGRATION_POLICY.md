@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-024: Cloud Provider Switching and Migration Policy"
 summary: "Defines the policy for switching between cloud providers (Dropbox/Google Drive), including single-provider constraints, remote cleanup expectations, and migration tooling boundaries."
 created: "2025-12-15"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -58,12 +58,24 @@ The Settings UI allows browsing other providers, but disables setup actions when
 
 ### 2) Switching providers is explicit
 
-To switch providers, the user must:
+Switching providers is an explicit user action initiated from Settings.
 
-1. Disconnect / clear current provider configuration.
-2. Configure and connect the new provider.
+The app does not automatically “carry” remote state across providers.
 
-The app does not automatically “carry” the remote state across providers.
+Implementation constraint:
+
+- A connect attempt for a new provider must not leave the app in a partially
+  switched state.
+- The previously configured provider must remain configured if the new connect
+  attempt fails.
+
+This is enforced by Electron main:
+
+- capture the previous provider settings + stored tokens
+- run the new provider OAuth flow
+- verify the new provider connection
+- only then commit the provider selection and clear the old provider secrets
+- on failure, restore the prior provider configuration
 
 ### 3) Remote cleanup is not automatic
 
@@ -90,6 +102,42 @@ Not provided by default:
 
 - provider-to-provider remote migration
 
+Recommended manual migration path (current capabilities):
+
+1. Ensure you have a recent local SQLite backup.
+2. Connect the new provider.
+3. Use sync maintenance tooling (preview + reset) to seed a clean remote sync
+   state from the current device when needed.
+4. Upload a fresh backup to the newly connected provider.
+
+This path avoids destructive remote deletes and makes failures recoverable.
+
+### Integrity and rollback properties
+
+Provider switching rollback (implemented):
+
+- Dropbox: provider configuration is committed only after OAuth + a
+  verification call succeeds. A verification failure restores previous tokens
+  and provider settings.
+- Google Drive: account label is fetched before persisting configuration; any
+  persistence failure restores the previous provider settings and tokens.
+
+Sync reset integrity (implemented):
+
+- Reset tooling is destructive and requires explicit user action.
+- Remote deletions are best-effort and conservative: only keys matching the
+  sync transport's strict schema are deleted.
+- `manifest.resetAt` is advanced so older remote operation objects are ignored
+  even if some deletions fail.
+- The remote encryption config is preserved.
+
+Backup encryption migration integrity (implemented):
+
+- Migrations refuse to overwrite an already migrated target backup object.
+- When `deleteSource` is requested, the source is deleted only after a
+  successful upload of the migrated backup.
+- Failures are recorded per-object so users can retry.
+
 A provider migration wizard may be introduced later if user demand warrants it.
 
 ## Consequences
@@ -104,3 +152,13 @@ A provider migration wizard may be introduced later if user demand warrants it.
 - ADR-016: Multi-Device Sync Model
 - ADR-021: Cloud Provider Selection and Settings UI
 - ADR-022: OAuth Loopback Redirect and Callback Routing
+
+## Implementation notes
+
+- Provider switching + rollback:
+  - `electron/services/cloud/CloudService.providerOperations.ts`
+- Sync reset preview/apply:
+  - `electron/services/cloud/migrations/syncResetPreview.ts`
+  - `electron/services/cloud/migrations/syncReset.ts`
+- Backup encryption migration:
+  - `electron/services/cloud/migrations/backupMigration.ts`

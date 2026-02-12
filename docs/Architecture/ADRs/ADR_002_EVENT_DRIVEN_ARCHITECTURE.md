@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-002: Event-Driven Architecture with TypedEventBus"
 summary: "Defines an event-driven architecture using a TypedEventBus for decoupled, type-safe communication across backend and frontend."
 created: "2025-08-05"
-last_reviewed: "2026-01-11"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -32,7 +32,7 @@ tags:
 
 ## Status
 
-**Accepted** - Core communication mechanism with advanced middleware and memory management
+**Accepted** - Core communication mechanism using `TypedEventBus` (main) plus a dedicated renderer event bridge over IPC.
 
 ## Context
 
@@ -68,6 +68,17 @@ sequenceDiagram
     IPC->>Renderer: Dispatch typed handler
     Renderer->>Renderer: Update store & surface UI changes
 ```
+
+#### Delivery guarantees (what we provide)
+
+- **In-process (Electron main)**: best-effort, **at-most-once** delivery to each listener.
+  - Listener errors are caught and logged, but **a throwing listener can prevent later listeners from running** (Node.js `EventEmitter` semantics).
+  - Middleware errors abort emission (the event is not emitted).
+- **Cross-process (main -> renderer)**: best-effort broadcast via `BrowserWindow.webContents.send`.
+  - No acknowledgement / retry protocol exists at the IPC level.
+  - If a window is destroyed, not yet created, or temporarily unresponsive, the event may be dropped.
+
+This architecture is optimized for **desktop UI responsiveness** and **local consistency** (SQLite as the source of truth), not for durable distributed messaging guarantees.
 
 ### 1. Enhanced Type Safety
 
@@ -148,7 +159,7 @@ eventBus.use(
 
 ### 5. Memory-Safe IPC Event Forwarding
 
-Events are automatically forwarded from backend to frontend with proper cleanup:
+Backend events are forwarded from the Electron main process to renderer windows via the renderer event bridge (`RendererEventBridge`) and exposed to the renderer via the preload events domain API (`electron/preload/domains/eventsApi.ts`). Renderer code subscribes through `src/services/EventsService.ts` and receives explicit cleanup functions.
 
 ```typescript
 // Backend emits event with automatic IPC forwarding
@@ -174,6 +185,8 @@ useEffect(() => {
   cleanup?.();
  };
 }, []);
+
+> **Important:** IPC event delivery is best-effort. Consumers must tolerate dropped events and be idempotent when duplicates occur.
 ```
 
 ### 6. Advanced Memory Management
@@ -182,6 +195,37 @@ useEffect(() => {
 - **Automatic cleanup**: All event listeners provide cleanup functions
 - **Middleware limits**: Configurable middleware chain size (default: 20)
 - **Event validation**: Type-safe event structures prevent runtime errors
+
+### 7. Idempotency and Ordering Requirements
+
+Because delivery is at-most-once in-process (and best-effort across IPC), consumers must be safe under **drops, duplicates, and reordering**.
+
+- Prefer **source-of-truth reads** (SQLite) over reconstructing state solely from event streams.
+- For renderer state synchronization (`state:sync`), use the existing `revision` field to ignore stale payloads and enforce monotonic ordering.
+- For UI updates driven by events, handlers must be idempotent (applying the same logical update twice yields the same result) and should fall back to refresh/read pathways when expected intermediate events are missing.
+
+### 8. Validation Boundary and “Dead-Letter” Handling
+
+This app does not use a traditional message-broker DLQ.
+
+Instead, we rely on **boundary validation + observable drops**:
+
+- **Preload payload guard failures** are dropped and logged with diagnostics (see `reportPreloadGuardFailure` in `electron/preload/domains/eventsApi.ts`).
+- **Renderer broadcast failures** (`webContents.send` throwing) are caught and logged by `electron/services/events/RendererEventBridge.ts`.
+
+Recommended future enhancement: maintain a bounded in-memory dead-letter ring buffer in the main process (optionally persisted into diagnostics bundles) with:
+
+- channel name
+- correlation id / metadata
+- payload preview (redacted)
+- failure reason
+- timestamp
+
+### 9. Schema Evolution and Versioning
+
+- Prefer additive changes (adding optional fields).
+- For breaking changes, introduce a new event channel or add an explicit `version` discriminant and support both versions during migration.
+- For large payload channels (notably `state:sync`), enforce payload size budgets and compaction (implemented in `RendererEventBridge.sendStateSyncEvent`).
 
 ## Architecture Flow
 
@@ -349,6 +393,8 @@ omitted here for brevity.
 - **Minimal performance overhead** - Event processing adds negligible latency
 - **Learning curve** - Developers need to understand event-driven patterns
 - **Debugging complexity** - Async event flows require correlation tracking
+- **Delivery semantics** - At-most-once / best-effort delivery requires consumers to tolerate drops/duplicates/reordering
+- **No durable DLQ** - Failures are observable and diagnosable, but not automatically retried
 
 ## Quality Assurance
 
@@ -360,9 +406,9 @@ omitted here for brevity.
 
 ### Error Handling
 
-- **Middleware isolation**: Errors in one middleware don't affect others
+- **Middleware semantics**: Middleware errors abort emission. Middleware must be conservative and avoid throwing on non-fatal conditions.
 - **Event validation**: Type-safe structures prevent runtime errors
-- **Error propagation**: Failed events don't crash the event bus
+- **Listener robustness**: Listener errors are caught/logged, but listeners should still catch locally to avoid preventing later listeners from running.
 
 ### Performance
 
@@ -396,10 +442,18 @@ eventBus.onTyped("domain:action", (data) => {
 ### IPC Integration
 
 ```typescript
-// Automatic forwarding in IpcService
-private async forwardEventToRenderer(eventName: string, data: unknown) {
-    this.webContents?.send(eventName, data);
-}
+import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
+import type { RendererEventPayload } from "@shared/ipc/rendererEvents";
+import type { RendererEventBridge } from "@electron/services/events/RendererEventBridge";
+
+declare const rendererEventBridge: RendererEventBridge;
+declare const payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.TEST_EVENT>;
+
+// Best-effort broadcast from Electron main to all renderer windows
+rendererEventBridge.sendToRenderers(
+ RENDERER_EVENT_CHANNELS.TEST_EVENT,
+ payload
+);
 ```
 
 ## Compliance
@@ -414,7 +468,7 @@ All communication follows this pattern:
 ### Current Implementation Audit (2025-11-04)
 
 - Inspected `electron/events/TypedEventBus.ts` to confirm middleware, correlation metadata, and type-safe emit/on helpers remain the single event backbone.
-- Verified `electron/services/ipc/utils.ts` uses `registerStandardizedIpcHandler` to forward events and rejects duplicate registrations, matching the standardized gateway described here.
+- Verified renderer broadcasts are centralized in `electron/services/events/RendererEventBridge.ts` (window iteration, error handling, and size budgeting for `state:sync`).
 - Checked `electron/preload/domains/eventsApi.ts` and `src/services/events/EventsService.ts` to ensure renderer subscriptions still traverse the preload bridge with validated cleanup handlers.
 
 ## Related ADRs

@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-009: Layered Validation Strategy with Zod"
 summary: "Establishes a multi-layered validation architecture using Zod schemas for IPC boundaries, business rules in managers, and persistence constraints in repositories."
 created: "2025-11-25"
-last_reviewed: "2026-01-11"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -69,8 +69,8 @@ We will implement a **Layered Validation Strategy** using Zod as the primary val
 graph TB
     subgraph "Renderer Process"
         UI["React Components"]
-        Forms["Form Hooks"]
-        ClientValidation["Client-Side Validation<br/>(React Hook Form)"]
+        Forms["Form State"]
+        ClientValidation["Client-Side Validation<br/>(shared Zod schemas + UX guards)"]
     end
 
     subgraph "IPC Boundary"
@@ -94,7 +94,7 @@ graph TB
 
     UI --> Forms
     Forms --> ClientValidation
-    ClientValidation -->|"Basic UX guards"| Preload
+    ClientValidation -->|"Basic UX + optional local Zod validation"| Preload
 
     Preload --> IpcHandlers
     IpcHandlers --> ZodSchemas
@@ -132,13 +132,13 @@ graph TB
 
 ### Layer Responsibility Matrix
 
-| Layer                   | Entry Points                                         | Responsibilities                                                                           | Tooling                               |
-| ----------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------- |
-| **UI/Renderer**         | React components, form hooks                         | Basic UX guards (required fields, formatting hints). Never trusts its own input.           | React Hook Form, client helpers       |
-| **IPC Boundary**        | `electron/preload`, `registerStandardizedIpcHandler` | Type and shape validation for IPC payloads. Rejects malformed input early.                 | Zod schemas, IPC validators           |
-| **Managers**            | `SiteManager`, `MonitorManager`, `DatabaseManager`   | Business rule validation: cross-entity invariants, referential checks, domain constraints. | Domain validators, `ApplicationError` |
-| **Repositories**        | `electron/services/database`                         | Persistence invariants: unique constraints, transactional safety, data normalization.      | SQLite constraints, transactions      |
-| **Background Services** | Monitoring scheduler, notifications                  | Runtime guardrails: invalid schedules, retry logic. Surfaces issues via structured errors. | Domain services, telemetry            |
+| Layer                   | Entry Points                                         | Responsibilities                                                                                                                   | Tooling                               |
+| ----------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| **UI/Renderer**         | React components, form state                         | Basic UX guards (required fields, formatting hints). Optional local schema checks for faster feedback. Never trusts its own input. | Shared Zod schemas, client helpers    |
+| **IPC Boundary**        | `electron/preload`, `registerStandardizedIpcHandler` | Type and shape validation for IPC payloads. Rejects malformed input early.                                                         | Zod schemas, IPC validators           |
+| **Managers**            | `SiteManager`, `MonitorManager`, `DatabaseManager`   | Business rule validation: cross-entity invariants, referential checks, domain constraints.                                         | Domain validators, `ApplicationError` |
+| **Repositories**        | `electron/services/database`                         | Persistence invariants: unique constraints, transactional safety, data normalization.                                              | SQLite constraints, transactions      |
+| **Background Services** | Monitoring scheduler, notifications                  | Runtime guardrails: invalid schedules, retry logic. Surfaces issues via structured errors.                                         | Domain services, telemetry            |
 
 ### Validation Flow
 
@@ -202,84 +202,47 @@ sequenceDiagram
 
 ### Shared Schema Organization
 
-All Zod schemas live in `shared/validation/schemas.ts` for cross-process consistency:
+Canonical Zod schemas are organized under `shared/validation/*` for cross-process consistency.
+
+- Monitor schemas + helpers: `shared/validation/monitorSchemas.ts`
+- Site schemas: `shared/validation/siteSchemas.ts`
+- Status update schemas: `shared/validation/statusUpdateSchemas.ts`
+- Reusable safe-parse guards: `shared/validation/guards.ts`
+
+The renderer may validate locally using shared schemas (for example via `src/utils/monitorValidation.ts`) and the main process must validate again at IPC and manager boundaries.
 
 ```typescript
-// shared/validation/schemas.ts
+// shared/validation/monitorSchemas.ts (excerpt)
 import * as z from "zod";
 
-// Base monitor schema shared by all monitor types
-export const baseMonitorSchema = z
- .object({
-  id: z.string().min(1, "Monitor ID is required"),
-  type: z.enum([
-   "http",
-   "http-header",
-   "http-keyword",
-   "http-json",
-   "http-status",
-   "http-latency",
-   "port",
-   "ping",
-   "dns",
-   "ssl",
-   "cdn-edge-consistency",
-   "replication",
-   "server-heartbeat",
-   "websocket-keepalive",
-  ]),
-  status: z.enum([
-   "up",
-   "down",
-   "degraded",
-   "pending",
-   "paused",
-  ]),
-  monitoring: z.boolean(),
-  checkInterval: z.number().min(5000).max(2592000000),
-  timeout: z.number().min(1000).max(300000),
-  retryAttempts: z.number().min(0).max(10),
-  responseTime: z.number().min(-1),
-  history: z.array(statusHistorySchema),
-  activeOperations: z.array(z.string()).optional(),
-  lastChecked: z.date().optional(),
- })
- .strict();
-
-// Type-specific schemas extend base
-export const httpMonitorSchema = baseMonitorSchema
- .extend({
-  type: z.literal("http"),
-  url: httpUrlSchema,
- })
- .strict();
-
-export const portMonitorSchema = baseMonitorSchema
- .extend({
-  type: z.literal("port"),
-  host: hostValidationSchema,
-  port: z.number().refine(isValidPort, "Must be valid port (1-65535)"),
- })
- .strict();
-
-// Discriminated union for all monitor types
 export const monitorSchema = z.discriminatedUnion("type", [
- httpMonitorSchema,
- httpHeaderMonitorSchema,
- httpKeywordMonitorSchema,
- // ... all monitor types
+ // httpMonitorSchema,
+ // portMonitorSchema,
+ // ...
 ]);
 
-// Site schema containing monitors
-export const siteSchema = z
- .object({
-  identifier: z.string().min(1).max(100),
-  name: z.string().min(1).max(200),
-  monitoring: z.boolean(),
-  monitors: z.array(monitorSchema).min(1),
- })
- .strict();
+export const monitorSchemas = {
+ // http: httpMonitorSchema,
+ // port: portMonitorSchema,
+ // ...
+} as const;
+
+export function validateMonitorData(type: string, data: unknown) {
+ // Returns a structured ValidationResult with success/errors/warnings.
+}
 ```
+
+### Internationalized error messaging
+
+Zod schema errors are currently formatted into human-readable strings (for example via `shared/utils/zodIssueFormatting.ts`). This is suitable for developer diagnostics and basic UX, but it is not a durable i18n strategy.
+
+For user-facing errors, prefer **structured errors** that can be localized:
+
+- Use stable error `code`s (for example `ApplicationError.code`) + structured `details`.
+- Avoid embedding localized English prose into the backend.
+- Localize in the renderer based on `code` and `details`.
+
+If we later localize Zod-derived errors, do it by returning structured issue data (path + issue kind) and mapping to translation keys in the renderer.
 
 ### Schema Composition Pattern
 
@@ -646,7 +609,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_monitors_site_id
 1. **Define Schema** (if new data structure)
 
    ```typescript
-   // shared/validation/schemas.ts
+    // shared/validation/<domain>Schemas.ts
    export const newDataSchema = z
     .object({
      field: z.string().min(1),
@@ -701,7 +664,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_monitors_site_id
 - [ ] Managers throw `ApplicationError` with remediation-friendly messages
 - [ ] Repositories never assume data is valid—transactions enforce integrity
 - [ ] Tests exist for new validation logic at each layer
-- [ ] Schemas updated in `shared/validation/schemas.ts`
+- [ ] Schemas updated under `shared/validation/*`
 
 ## Compliance
 
@@ -730,13 +693,13 @@ All data flows follow the layered validation strategy:
 - ✅ `validateMonitorData()` - Monitor validation with warnings
 - ✅ `validateMonitorField()` - Single field validation
 
-### Current Implementation Audit (2025-11-25)
+### Current Implementation Audit (2026-02-11)
 
-- Verified `shared/validation/schemas.ts` contains all monitor type schemas with strict mode
-- Confirmed per-domain parameter validators under `electron/services/ipc/validators/*` cover all handler groups
-- Checked `shared/validation/guards.ts` exposes typed validation helpers using schemas
-- Validated managers throw `ApplicationError` for business rule violations
-- Reviewed repository normalization patterns in `SiteRepository` and `MonitorRepository`
+- Verified monitor schemas and helpers live in `shared/validation/monitorSchemas.ts` (discriminated union + per-type schema map).
+- Verified site + status schemas live in `shared/validation/siteSchemas.ts` and `shared/validation/statusUpdateSchemas.ts`.
+- Confirmed reusable safe-parse guards are exposed from `shared/validation/guards.ts`.
+- Confirmed per-domain parameter validators under `electron/services/ipc/validators/*` cover handler groups.
+- Verified manager-layer validation uses shared Zod schemas plus business rules (for example `electron/managers/validators/MonitorValidator.ts`).
 
 ## Related ADRs
 

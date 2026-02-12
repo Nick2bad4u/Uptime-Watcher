@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-010: Multi-Configuration Testing Strategy"
 summary: "Establishes a comprehensive testing architecture with separate Vitest configurations for frontend, backend, and shared code, plus Storybook component testing and Playwright E2E testing."
 created: "2025-11-25"
-last_reviewed: "2025-12-23"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -23,15 +23,19 @@ tags:
 1. [Status](#status)
 2. [Context](#context)
 3. [Decision](#decision)
-4. [Test Configuration Architecture](#test-configuration-architecture)
-5. [Coverage Strategy](#coverage-strategy)
-6. [Mocking Strategy](#mocking-strategy)
-7. [Property-Based Testing](#property-based-testing)
-8. [E2E Testing](#e2e-testing)
-9. [Consequences](#consequences)
-10. [Implementation Guidelines](#implementation-guidelines)
-11. [Compliance](#compliance)
-12. [Related ADRs](#related-adrs)
+4. [Testing Pyramid and Responsibilities](#testing-pyramid-and-responsibilities)
+5. [Test Configuration Architecture](#test-configuration-architecture)
+6. [Coverage Strategy](#coverage-strategy)
+7. [Mocking Strategy](#mocking-strategy)
+8. [Property-Based Testing](#property-based-testing)
+9. [Component Testing (Storybook)](#component-testing-storybook)
+10. [E2E Testing](#e2e-testing)
+11. [Flake Management](#flake-management)
+12. [CI Gating](#ci-gating)
+13. [Consequences](#consequences)
+14. [Implementation Guidelines](#implementation-guidelines)
+15. [Compliance](#compliance)
+16. [Related ADRs](#related-adrs)
 
 ## Status
 
@@ -115,44 +119,60 @@ graph TB
 
 ### Configuration Matrix
 
-| Config                       | Environment | Coverage Dir          | Thresholds          | Setup File               |
-| ---------------------------- | ----------- | --------------------- | ------------------- | ------------------------ |
-| `vitest.config.ts`           | jsdom       | `coverage/`           | 90% all             | `src/test/setup.ts`      |
-| `vitest.electron.config.ts`  | node        | `coverage/electron/`  | 90% all             | `electron/test/setup.ts` |
-| `vitest.shared.config.ts`    | node        | `coverage/shared/`    | 95% lines/functions | `shared/test/setup.ts`   |
-| `vitest.storybook.config.ts` | browser     | `coverage/storybook/` | (disabled)          | Storybook config         |
+| Config                                           | Environment                       | Coverage Dir          | Thresholds                                            | Setup File                  |
+| ------------------------------------------------ | --------------------------------- | --------------------- | ----------------------------------------------------- | --------------------------- |
+| `vitest.config.ts` (Frontend project)            | jsdom                             | `coverage/`           | branches 77 / functions 92 / lines 93 / statements 89 | `src/test/setup.ts`         |
+| `vitest.electron.config.ts` (Electron project)   | node                              | `coverage/electron/`  | 90% all                                               | `electron/test/setup.ts`    |
+| `vitest.shared.config.ts` (Shared project)       | node                              | `coverage/shared/`    | branches 90 / functions 95 / lines 95 / statements 95 | `shared/test/setup.ts`      |
+| `vitest.storybook.config.ts` (Component project) | browser (Chromium via Playwright) | `coverage/storybook/` | no thresholds enforced (coverage still collected)     | `storybook/vitest.setup.ts` |
+
+Additional projects exist for specialized suites (e.g. `vitest.linting.config.ts`, `vitest.docsTooling.config.ts`) and are primarily used for internal tooling validation.
+
+## Testing Pyramid and Responsibilities
+
+Our test strategy follows a pragmatic pyramid. The goal is **fast feedback
+first**, with heavier tests reserved for integration boundaries and end-to-end
+flows.
+
+| Layer             | Primary tools                               | What we validate                                                                                          |
+| ----------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Static checks     | TypeScript, ESLint, Stylelint, docs checks  | Types, unsafe patterns, formatting, documentation correctness                                             |
+| Unit tests        | Vitest (node/jsdom)                         | Pure logic (parsers, utilities, small state reducers)                                                     |
+| Integration tests | Vitest (node/jsdom)                         | Cross-module behavior (repositories/services/managers), IPC contract validation, monitor execution wiring |
+| Component tests   | Storybook portable stories + Vitest browser | Visual/interactive component behavior in a real browser runtime                                           |
+| E2E tests         | Playwright (Electron + UI projects)         | Full user flows, real renderer behavior, real Chromium rendering                                          |
 
 ## Test Configuration Architecture
 
 ### Frontend Configuration (vitest.config.ts)
 
 ```typescript
-// Merges with vite.config.ts for React/DOM testing
+// Dedicated config primarily so editors (e.g. VS Code) can discover frontend
+// tests with the correct project name. Most settings are inherited from
+// vite.config.ts.
+import { defineConfig, mergeConfig } from "vitest/config";
+
+import viteConfig from "./vite.config";
+
 export default defineConfig((configEnv) =>
- mergeConfig(
-  viteConfig(configEnv),
-  defineConfig({
-   cacheDir: "./.cache/vitest/",
-   test: {
-    name: { color: "cyan", label: "Frontend" },
-    environment: "jsdom",
-    setupFiles: ["src/test/setup.ts"],
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
-    coverage: {
-     provider: "v8",
-     reportsDirectory: "./coverage",
-     thresholds: {
-      branches: 90,
-      functions: 90,
-      lines: 90,
-      statements: 90,
-     },
-    },
-   },
-  })
- )
+        mergeConfig(
+                viteConfig(configEnv),
+                defineConfig({
+                        cacheDir: "./.cache/vitest/",
+                        test: {
+                                name: { color: "cyan", label: "Frontend" },
+                        },
+                })
+        )
 );
 ```
+
+Notes:
+
+- The canonical frontend test settings (environment, includes, coverage, worker
+  limits, and `test.projects`) live in `vite.config.ts` under the `test` block.
+- Current frontend coverage thresholds are enforced there: branches 77 /
+  functions 92 / lines 93 / statements 89.
 
 <!-- remark-ignore-start -->
 
@@ -230,39 +250,31 @@ sequenceDiagram
     autonumber
     participant Dev as Developer
     participant NPM as npm scripts
-    participant Frontend as vitest.config.ts
-    participant Backend as vitest.electron.config.ts
-    participant Shared as vitest.shared.config.ts
-    participant Storybook as vitest.storybook.config.ts
+    participant Vitest as Vitest (multi-project)
+    participant Frontend as Frontend project
+    participant Backend as Electron project
+    participant Shared as Shared project
+    participant Storybook as Storybook project
     participant Playwright as playwright.config.ts
     participant Coverage as Coverage Reports
 
-    Dev->>NPM: npm run test:all
+    Dev->>NPM: npm run test
+    NPM->>Vitest: Run configured projects
 
-    par Frontend Tests
-        NPM->>Frontend: npm run test:frontend
-        Frontend->>Frontend: Load src/test/setup.ts
-        Frontend->>Frontend: Execute src/**/*.test.ts
-        Frontend->>Coverage: Write coverage/
-    and Backend Tests
-        NPM->>Backend: npm run test:electron
-        Backend->>Backend: Load electron/test/setup.ts
-        Backend->>Backend: Execute electron/**/*.test.ts
-        Backend->>Coverage: Write coverage/electron/
-    and Shared Tests
-        NPM->>Shared: npm run test:shared
-        Shared->>Shared: Load shared/test/setup.ts
-        Shared->>Shared: Execute shared/**/*.test.ts
-        Shared->>Coverage: Write coverage/shared/
-    end
+    Vitest->>Frontend: Execute src/**/*.{test,spec}.{ts,tsx}
+    Frontend->>Coverage: Write coverage/
 
-    NPM->>Storybook: npm run test:storybook
-    Storybook->>Storybook: Start Storybook server
-    Storybook->>Storybook: Execute *.stories.tsx tests
+    Vitest->>Backend: Execute electron/**/*.{test,spec}.ts
+    Backend->>Coverage: Write coverage/electron/
+
+    Vitest->>Shared: Execute shared/**/*.{test,spec}.{ts,tsx}
+    Shared->>Coverage: Write coverage/shared/
+
+    Vitest->>Storybook: Execute Storybook portable stories
     Storybook->>Coverage: Write coverage/storybook/
 
-    Dev->>NPM: npm run test:playwright
-    NPM->>Playwright: Execute E2E tests
+    Dev->>NPM: npm run test:playwright (optional)
+    NPM->>Playwright: Execute E2E projects
     Playwright->>Playwright: Launch Electron app
     Playwright->>Playwright: Run playwright/**/*.test.ts
 ```
@@ -321,12 +333,12 @@ flowchart TB
 
 ### Coverage Thresholds
 
-| Layer     | Lines      | Functions  | Branches   | Statements |
-| --------- | ---------- | ---------- | ---------- | ---------- |
-| Frontend  | 90%        | 90%        | 90%        | 90%        |
-| Backend   | 90%        | 90%        | 90%        | 90%        |
-| Shared    | 95%        | 95%        | 90%        | 95%        |
-| Storybook | (disabled) | (disabled) | (disabled) | (disabled) |
+| Layer     | Lines                               | Functions                           | Branches                            | Statements                          |
+| --------- | ----------------------------------- | ----------------------------------- | ----------------------------------- | ----------------------------------- |
+| Frontend  | 93%                                 | 92%                                 | 77%                                 | 89%                                 |
+| Backend   | 90%                                 | 90%                                 | 90%                                 | 90%                                 |
+| Shared    | 95%                                 | 95%                                 | 90%                                 | 95%                                 |
+| Storybook | (collected, no thresholds enforced) | (collected, no thresholds enforced) | (collected, no thresholds enforced) | (collected, no thresholds enforced) |
 
 ### Coverage Commands
 
@@ -343,103 +355,41 @@ npm run test:all:coverage       # All suites with coverage
 
 ## Mocking Strategy
 
-### ElectronAPI Mocking (Frontend)
+### Default global mocks
 
-The frontend setup provides comprehensive ElectronAPI mocking:
+- **Frontend (renderer) suites**: `src/test/setup.ts` imports `src/test/mock-setup.ts`, which installs a canonical typed `globalThis.electronAPI` and `window.electronAPI` mock.
+- **Electron (main-process) suites**: `electron/test/setup.ts` provides global module mocks for `electron` and `node-sqlite3-wasm` to keep backend tests deterministic and fast.
+
+### Per-test overrides (frontend)
+
+Prefer `src/test/utils/electronApiMock.ts` to override a small portion of the
+API surface without leaking changes into other tests:
 
 ```typescript
-// src/test/setup.ts
-const mockElectronAPI = {
- sites: {
-  addSite: vi.fn(),
-  getSites: vi.fn().mockResolvedValue([]),
-  removeSite: vi.fn(),
-  updateSite: vi.fn(),
- },
- monitoring: {
-  startMonitoring: vi.fn(),
-  stopMonitoring: vi.fn(),
-  checkSiteNow: vi.fn(),
- },
- events: {
-  onMonitorStatusChanged: vi.fn((callback) => {
-   // Return cleanup function
-   return vi.fn();
-  }),
-  onSiteAdded: vi.fn((callback) => vi.fn()),
-  onSiteRemoved: vi.fn((callback) => vi.fn()),
- },
- settings: {
-  getHistoryLimit: vi.fn().mockResolvedValue(100),
-  updateHistoryLimit: vi.fn(),
- },
- monitorTypes: {
-  getMonitorTypes: vi.fn().mockResolvedValue([]),
-  formatMonitorDetail: vi.fn(),
-  formatMonitorTitleSuffix: vi.fn(),
-  validateMonitorData: vi.fn(),
- },
- data: {
-  exportData: vi.fn(),
-  importData: vi.fn(),
- },
- system: {
-  openExternal: vi.fn(),
- },
-};
+import { vi } from "vitest";
 
-Object.defineProperty(window, "electronAPI", {
- value: mockElectronAPI,
- writable: true,
- configurable: true,
+// Example usage from a frontend test under src/test/...
+import { installElectronApiMock } from "./utils/electronApiMock";
+
+it("loads sites from the preload API", async () => {
+        const { restore } = installElectronApiMock({
+                sites: {
+                getSites: vi.fn(async () => []),
+                },
+        });
+
+        try {
+                // ...assertions...
+        } finally {
+                restore();
+        }
 });
 ```
 
-### Database Mocking (Backend)
+Notes:
 
-Backend tests mock the database layer:
-
-```typescript
-// electron/test/setup.ts
-vi.mock("../services/database/DatabaseService", () => ({
- DatabaseService: {
-  getInstance: vi.fn(() => ({
-   initialize: vi.fn(),
-   getDatabase: vi.fn(() => mockDatabase),
-   executeTransaction: vi.fn((callback) => callback(mockDatabase)),
-   close: vi.fn(),
-  })),
- },
-}));
-
-const mockDatabase = {
- run: vi.fn(),
- all: vi.fn().mockReturnValue([]),
- get: vi.fn(),
- prepare: vi.fn(() => ({
-  run: vi.fn(),
-  finalize: vi.fn(),
- })),
-};
-```
-
-### Mock Reset Pattern
-
-```typescript
-// Consistent mock reset in beforeEach
-beforeEach(() => {
- vi.clearAllMocks();
- vi.resetModules();
-
- // Reset specific mocks to default state
- mockElectronAPI.sites.getSites.mockResolvedValue([]);
- mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(100);
-});
-
-afterEach(() => {
- vi.restoreAllMocks();
-});
-```
+- Do not use `vi.resetModules()` as a default pattern. It is slow and often hides dependency/architecture problems.
+- Prefer `vi.clearAllMocks()` / `vi.restoreAllMocks()` plus explicit per-test overrides.
 
 ## Property-Based Testing
 
@@ -448,17 +398,34 @@ afterEach(() => {
 ```typescript
 // src/test/setup.ts
 import fc from "fast-check";
+import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
+
+const current = fc.readConfigureGlobal() ?? {};
+const baseNumRuns = (current as { numRuns?: number }).numRuns ?? 10;
+const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 fc.configureGlobal({
- numRuns: 10, // Base number of test runs
- verbose: 2, // Most verbose output
- endOnFailure: true, // Stop on first failure
- timeout: 3000, // Per-case timeout (ms)
- interruptAfterTimeLimit: 5 * 60 * 1000, // 5 minute cap
- maxSkipsPerRun: 100, // Tolerance for filters
- markInterruptAsFailure: true,
+    ...current,
+    ...fastCheckOverrides,
+
+    // Reporting / debugging helpers
+    verbose: 2,
+    includeErrorInReport: true,
+
+    // Failure and time limits
+    endOnFailure: true,
+    timeout: 3000,
+    interruptAfterTimeLimit: 5 * 60 * 1000,
+    markInterruptAsFailure: true,
+    skipAllAfterTimeLimit: 60 * 1000,
+
+    // Duplicate handling and skipping
+    maxSkipsPerRun: 100,
 });
 ```
+
+We prefer `@fast-check/vitest` for ergonomic property test integration where
+appropriate, while still allowing direct `fast-check` usage.
 
 ### Property-Based Test Example
 
@@ -486,52 +453,61 @@ describe("Site validation", () => {
 });
 ```
 
+## Component Testing (Storybook)
+
+Component tests are executed as **portable Storybook stories** in a real
+Chromium runtime (Vitest browser mode + Playwright provider). This gives us a
+middle layer between jsdom unit tests and full end-to-end tests.
+
+Key points:
+
+- Configuration: `vitest.storybook.config.ts`.
+- Runner: `@vitest/browser-playwright` (Chromium).
+- Parallelism is intentionally constrained (`maxWorkers: 1`, `fileParallelism: false`) to reduce flake and resource contention.
+- A small transform wrapper is applied so Storybook’s `vitestTransform` is used consistently on Windows.
+
+Relevant scripts:
+
+```bash
+npm run test:storybook
+npm run test:storybook:coverage
+```
+
 ## E2E Testing
 
 ### Playwright Configuration
 
 ```typescript
 // playwright.config.ts
+const isCI = Boolean(process.env.CI);
+const isAttachmentsEnabled = process.env.PLAYWRIGHT_ENABLE_ATTACHMENTS === "true";
+
 export default defineConfig({
- testDir: "./playwright/tests",
- outputDir: "playwright/test-results/",
+    testDir: "./playwright/tests",
+    outputDir: "playwright/test-results/",
+    globalSetup: "./playwright/fixtures/global-setup.ts",
+    globalTeardown: "./playwright/fixtures/global-teardown.ts",
 
- globalSetup: "./playwright/fixtures/global-setup.ts",
- globalTeardown: "./playwright/fixtures/global-teardown.ts",
+    forbidOnly: isCI,
+    retries: isCI ? 2 : 0,
 
- projects: [
-  {
-   name: "electron-main",
-   testMatch: "**/main-process.*.playwright.test.ts",
-   fullyParallel: false,
-  },
-  {
-   name: "electron-renderer",
-   testMatch: "**/renderer-process.*.playwright.test.ts",
-   fullyParallel: false,
-  },
-  {
-   name: "electron-e2e",
-   testMatch: "**/app-launch.*.playwright.test.ts",
-   fullyParallel: false,
-  },
-  {
-   name: "ui-tests",
-   testMatch: "**/ui-*.playwright.test.ts",
-   fullyParallel: false,
-  },
- ],
+    // Project set is built via helpers in playwright.config.ts (see
+    // createElectronProject/createUiProject).
+    projects: [
+        { name: "electron-main" },
+        { name: "electron-renderer" },
+        { name: "electron-e2e" },
+        { name: "ui-smoke" },
+        { name: "ui-regression" },
+    ],
 
- use: {
-  trace: "on-first-retry",
-  screenshot: "only-on-failure",
-  video: "retain-on-failure",
- },
-
- reporter: [
-  ["html", { outputFolder: "playwright/reports/html" }],
-  ["json", { outputFile: "playwright/reports/results.json" }],
- ],
+    use: {
+        // Attachments are gated by PLAYWRIGHT_ENABLE_ATTACHMENTS so local runs
+        // stay fast and CI only captures heavy diagnostics when enabled.
+        screenshot: isAttachmentsEnabled ? "only-on-failure" : "off",
+        trace: isAttachmentsEnabled ? "on-first-retry" : "off",
+        video: isAttachmentsEnabled ? "retain-on-failure" : "off",
+    },
 });
 ```
 
@@ -543,7 +519,8 @@ flowchart TB
         Main["electron-main<br/>Main process tests"]
         Renderer["electron-renderer<br/>Renderer tests"]
         E2E["electron-e2e<br/>App launch tests"]
-        UI["ui-tests<br/>UI integration tests"]
+        Smoke["ui-smoke<br/>UI smoke tests"]
+        Regression["ui-regression<br/>UI regression tests"]
     end
 
     subgraph "Test Fixtures"
@@ -563,30 +540,56 @@ flowchart TB
     GlobalSetup --> Main
     GlobalSetup --> Renderer
     GlobalSetup --> E2E
-    GlobalSetup --> UI
+    GlobalSetup --> Smoke
+    GlobalSetup --> Regression
 
     Main --> GlobalTeardown
     Renderer --> GlobalTeardown
     E2E --> GlobalTeardown
-    UI --> GlobalTeardown
+    Smoke --> GlobalTeardown
+    Regression --> GlobalTeardown
 
     ElectronApp --> Main
     Page --> Renderer
-    Page --> UI
+    Page --> Smoke
+    Page --> Regression
 
     E2E --> AppLaunch
-    UI --> Navigation
-    UI --> SiteManagement
-    UI --> MonitorTests
+    Smoke --> Navigation
+    Regression --> SiteManagement
+    Regression --> MonitorTests
 
     classDef project fill:#dbeafe,stroke:#2563eb,stroke-width:2px
     classDef fixture fill:#dcfce7,stroke:#16a34a,stroke-width:2px
     classDef category fill:#fef3c7,stroke:#d97706,stroke-width:2px
 
-    class Main,Renderer,E2E,UI project
+    class Main,Renderer,E2E,Smoke,Regression project
     class GlobalSetup,GlobalTeardown,ElectronApp,Page fixture
     class AppLaunch,Navigation,SiteManagement,MonitorTests category
 ```
+
+## Flake Management
+
+Flaky tests cost more than they save. Our strategy is to prevent flake first,
+then contain it when it slips in.
+
+- **Constrain parallelism where it matters**: Storybook browser tests run with `maxWorkers: 1` and `fileParallelism: false`.
+- **Prefer deterministic inputs**: seed randomness for property tests (fast-check prints seed/path on failure) and use fake timers where time is part of logic.
+- **Avoid real external dependencies**: no real network calls in unit/integration suites; use mocks/MSW or controlled fakes.
+- **Playwright containment**: CI retries are enabled (`retries: isCI ? 2 : 0`), heavy diagnostics are gated behind `PLAYWRIGHT_ENABLE_ATTACHMENTS`, and smoke vs regression is separated via the `ui-smoke` and `ui-regression` projects.
+
+## CI Gating
+
+CI is expected to gate on the same classes of failures developers see locally:
+
+- **Static checks**: `npm run lint:ci` (includes docs link checks and frontmatter validation).
+- **Type safety**: `npm run type-check:all`.
+- **Unit/integration/component**: `npm run test` (Vitest multi-project).
+- **E2E**: `npm run test:playwright`.
+
+Notes:
+
+- CI should run with a Node.js version compatible with the repo’s declared `engines.node`. If workflows drift, fix the workflow rather than loosening expectations in this ADR.
 
 ## Consequences
 

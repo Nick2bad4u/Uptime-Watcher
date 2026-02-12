@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-004: Frontend State Management with Zustand"
 summary: "Defines the frontend state management strategy using Zustand with modular composition and selective persistence."
 created: "2025-08-05"
-last_reviewed: "2025-12-23"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -23,13 +23,14 @@ tags:
 2. [Context](#context)
 3. [Decision](#decision)
 4. [Store Categories](#store-categories)
-5. [Integration with IPC](#integration-with-ipc)
-6. [Testing Patterns](#testing-patterns)
-7. [Consequences](#consequences)
-8. [Implementation Guidelines](#implementation-guidelines)
-9. [Compliance](#compliance)
-10. [Store Pattern Examples](#store-pattern-examples)
-11. [Related ADRs](#related-adrs)
+5. [State Update Patterns](#state-update-patterns)
+6. [Integration with IPC](#integration-with-ipc)
+7. [Testing Patterns](#testing-patterns)
+8. [Consequences](#consequences)
+9. [Implementation Guidelines](#implementation-guidelines)
+10. [Compliance](#compliance)
+11. [Store Pattern Examples](#store-pattern-examples)
+12. [Related ADRs](#related-adrs)
 
 ## Status
 
@@ -219,17 +220,92 @@ const performAction = async () => {
  }, createStoreErrorHandler("sites", "addSite"));
 };
 
+```
+
 **Guideline:** For most async store actions, prefer
 `withErrorHandling(..., createStoreErrorHandler(...))` (ADR-003). If the action
 needs extra side effects on failure (rollback, cross-slice coordination), use a
 documented inline `ErrorHandlingFrontendStore` context instead.
-```
+
+### 6. Local vs Global State Requirements
+
+We explicitly distinguish between **local component state** and **shared store
+state**.
+
+**Default: keep state local** (React `useState`, `useReducer`, component state)
+when the state is:
+
+- ephemeral (open/closed, hover, input drafts)
+- scoped to a single component subtree
+- not required after navigation, reload, or background updates
+
+**Promote state into a Zustand store** only when at least one is true:
+
+- multiple components/routes need the same state
+- state must persist (preferences/settings) via `persist`
+- state is driven by backend IPC (server-authoritative data)
+- state must survive component unmounts (e.g., long-running operation status)
+
+**Hard rule:** Domain stores must not call `window.electronAPI` directly.
+Renderer IPC happens through typed renderer services (e.g. `SiteService`,
+`StateSyncService`). The repository guard rails (`npm run lint:architecture`)
+enforce this layering.
+
+### 7. Server-State Synchronization (IPC-backed)
+
+In Uptime Watcher, “server state” is **Electron main-process state** exposed via
+request/response IPC and best-effort renderer broadcasts.
+
+- The main process is authoritative for persisted entities (sites, monitors, settings persisted to disk).
+- Renderer domain stores hold an in-memory projection used for rendering.
+- Projections must be able to **recover** if event delivery is missed (renderer restart, temporary overload, best-effort IPC semantics).
+
+**Required pattern:**
+
+- Provide a full snapshot IPC endpoint (e.g. `StateSyncService.requestFullSync()`)
+- Broadcast incremental deltas with a monotonically increasing `revision`
+- On malformed delta payloads or revision gaps, trigger a full resync
+
+This is implemented for sites using `StateSyncService` + `useSiteSync` and the
+sanitization helpers (`deriveSiteSnapshot`, `prepareSiteSyncSnapshot`,
+`hasSiteSyncChanges`). For the canonical pipeline, see
+`docs/Architecture/Stores/sites.md`.
+
+### 8. Normalization and Collections
+
+For collections that are mutated frequently or referenced from multiple places,
+stores should treat **stable identifiers** as the primary key and avoid
+duplicated, divergent copies of the same entity.
+
+Guidelines:
+
+- Prefer normalized shapes for large collections:
+  - `entities: Record<EntityId, Entity>`
+  - `ids: EntityId[]` (ordering)
+- Keep derived data out of state; compute it in selectors.
+- Validate and sanitize backend snapshots before updating store state.
+- Avoid “partial local reconstructions” of backend entities. Prefer applying authoritative snapshots returned by IPC calls.
+
+### 9. Signals and Fine-Grained Reactivity
+
+We do not currently ship a dedicated “signals” library.
+
+Our “signal-like” model is achieved through **selector-based subscriptions**:
+
+- Subscribe to minimal slices: `useStore((s) => s.someField)`
+- Use stable selectors and equality functions (e.g. `shallow`) to prevent rerender storms
+
+If we ever adopt signals, it must be:
+
+- driven by profiling data (not preference)
+- isolated to hot paths where selector subscriptions are insufficient
+- introduced as a single approved dependency (no ad-hoc mix of state libs)
 
 ## Store Categories
 
 ### Store Architecture and Component Relationships
 
-````mermaid
+```mermaid
 graph TB
     subgraph "React Components"
         SitesList["Sites List"]
@@ -307,7 +383,9 @@ graph TB
     class UpdatesStore,SettingsStore systemStore
     class IPC,LocalStorage,EventSystem external
     class StateActions,OperationsActions,SyncActions module
-```### 1. Domain Stores
+```
+
+### 1. Domain Stores
 
 Handle specific business domain state:
 
@@ -374,7 +452,9 @@ flowchart TD
     class UseDirect,UseModular pattern
     class DirectExamples,ModularExamples,WithPersist,WithoutPersist,AddLogging,AddTypes example
     class Implementation,Complete complete
-```### State Update Lifecycle
+```
+
+### State Update Lifecycle
 
 ```mermaid
 sequenceDiagram
@@ -435,7 +515,7 @@ sequenceDiagram
 
     Note over EventSystem: Events trigger other store updates
     EventSystem->>Store: Cross-store Updates
-````
+```
 
 ### 1. Immutable Updates
 
@@ -544,26 +624,23 @@ stateDiagram-v2
 
 ### Event-Driven Updates
 
-Stores listen to IPC events for backend state synchronization:
+Stores listen to IPC events for backend state synchronization.
+
+**Preferred:** wire this at the store/module layer (e.g. `useSiteSync`) so
+components do not implement ad-hoc subscription logic.
 
 ```typescript
-import { StateSyncService } from "@app/services/StateSyncService";
+import { useEffect } from "react";
+
+import { useSitesStore } from "@/stores/sites/useSitesStore";
 
 useEffect(() => {
- let unsubscribe: (() => void) | undefined;
-
- void (async () => {
-  unsubscribe = await StateSyncService.onStateSyncEvent((data) => {
-   if (data.type === "sites-updated") {
-    syncSitesFromBackend();
-   }
-  });
- })();
+ const unsubscribe = useSitesStore.getState().subscribeToSyncEvents();
 
  return () => {
-  unsubscribe?.();
+    unsubscribe();
  };
-}, [syncSitesFromBackend]);
+}, []);
 ```
 
 ### Optimistic Updates
@@ -590,7 +667,8 @@ deleteSite: async (identifier: string) => {
 
 ### Store Testing
 
-Stores are tested with renderHook from @testing-library:
+Prefer testing store modules/slices via dependency injection. Use `renderHook`
+only when the unit under test is a React hook.
 
 ```typescript
 describe("useSitesStore", () => {
@@ -699,9 +777,9 @@ All frontend state follows these patterns:
 
 ### Current Implementation Audit (2025-11-04)
 
-- Confirmed modular composition helpers in `src/stores/sites/modules/` remain the backbone of `useSitesStore`, with persistent slices configured via `persist` as documented.
-- Reviewed `src/stores/error/useErrorStore.ts`, `src/stores/updates/useUpdatesStore.ts`, and `src/stores/settings/useSettingsStore.ts` to verify continued use of the direct `create()` pattern with readonly state contracts.
-- Checked `src/stores/utils/storeErrorHandling.ts` and `logStoreAction.ts` to ensure action logging and error propagation still align with the guidance above.
+- Confirmed `useSitesStore` composes `createSitesStateActions`, `createSiteOperationsActions`, `createSiteMonitoringActions`, and `createSiteSyncActions` to keep domain logic isolated and testable.
+- Reviewed persisted stores (`useSettingsStore`, `useUIStore`) to ensure `partialize`/custom `merge` logic prevents hydration from violating invariants.
+- Verified state sync orchestration relies on `StateSyncService` and the shared sanitization helpers so the renderer can recover from missed events via full sync.
 
 ## Related ADRs
 

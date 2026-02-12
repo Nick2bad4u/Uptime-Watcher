@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-031: Packaging, Signing, and Notarization Policy"
 summary: "Documents how Uptime Watcher is packaged for Windows/macOS/Linux, what is officially supported, and the current signing/notarization posture."
 created: "2025-12-15"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-02-12"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -24,7 +24,7 @@ tags:
 
 ## Status
 
-✅ Accepted (packaging implemented; signing posture documented)
+✅ Accepted (packaging implemented; release signing + notarization mandated)
 
 ## Context
 
@@ -32,7 +32,8 @@ Uptime Watcher ships to multiple platforms.
 
 Packaging is produced via electron-builder and published as GitHub Release assets.
 
-Some platforms require code signing / notarization for a high-quality user experience.
+Some platforms _require_ code signing / notarization for a high-quality user
+experience and, in practice, for frictionless installation and updates.
 
 ## Decision drivers
 
@@ -49,11 +50,21 @@ Primary packaging configuration lives in:
 
 - `electron-builder.config.ts`
 
-Supported targets (current):
+Supported targets (current configuration)
+
+> Note: electron-builder can produce many installer/archive formats. For
+> support and QA purposes, we treat a smaller subset as “first-class” release
+> artifacts. Others may still be built and uploaded by CI for convenience.
 
 - Windows: NSIS, NSIS-web, MSI, ZIP/7z, portable, Squirrel, tar.\*
 - macOS: DMG, PKG, ZIP, tar.\*
 - Linux: AppImage, deb, rpm, snap, pacman, apk, zip, tar.\*
+
+First-class formats (policy):
+
+- Windows: NSIS + MSI
+- macOS: DMG
+- Linux: AppImage + deb
 
 ### 2) Release publishing via GitHub Actions
 
@@ -65,15 +76,73 @@ Asset naming and upload rules are governed by:
 
 ### 3) Code signing / notarization posture
 
-Current state:
+#### 3.1) Current implementation reality (as of this review)
 
-- CI builds are **not guaranteed to be signed/notarized** unless signing secrets are configured.
+- The repo config enables macOS hardened runtime (`hardenedRuntime: true`) and
+  Gatekeeper assessment (`gatekeeperAssess: true`).
+- `forceCodeSigning` is currently `false`.
+- The GitHub Actions build workflow does **not** currently configure signing or
+  notarization secrets.
+
+Cold hard truth: the current CI pipeline can produce unsigned/non-notarized
+artifacts. That is acceptable for developer/CI validation builds, but it is not
+acceptable for official releases consumed by end users.
+
+#### 3.2) Mandated posture for official releases
 
 Policy:
 
-- signing and notarization credentials must be stored as CI secrets
-- workflow changes that affect signing must be documented and reviewed
-- unsigned builds are allowed but should be considered a degraded UX
+- **Official release assets must be signed** (Windows) and **signed + notarized**
+  (macOS). Unsigned builds must not be published as “latest” for auto-update
+  consumption (see ADR-027).
+- Signing/notarization credentials must be stored as CI secrets (or managed
+  signing services) and must never be committed.
+- Workflow changes that affect signing/notarization must be documented and
+  reviewed.
+
+##### Windows (Authenticode + Windows App SDK mandate)
+
+Minimum requirements for any Windows artifact distributed to end users:
+
+- Authenticode-sign the primary executables (installer + shipped app binaries).
+- Use SHA-256 signatures and timestamping.
+
+Accepted approaches:
+
+- Traditional PFX/P12 certificate provided to CI (as a secret) and used via
+  `signtool.exe`.
+- Managed signing (recommended for long-term hardening), e.g. Azure Trusted
+  Signing / Key Vault-backed signing, with CI using OIDC.
+
+Windows App SDK mandate (packaging direction):
+
+- When distributing via enterprise policy / modern Windows install flows, the
+  app must ship an **MSIX** package (or App Installer) produced via a Windows
+  App SDK-compatible pipeline and signed with a trusted publisher identity.
+- Until MSIX packaging is implemented, NSIS/MSI remain supported, but they must
+  still be signed.
+
+##### macOS (Developer ID + Notary Service)
+
+Minimum requirements for any macOS artifact distributed to end users:
+
+- Code sign the `.app` bundle with a **Developer ID Application** certificate.
+- If distributing `.pkg` installers, sign them with a **Developer ID Installer**
+  certificate.
+- Notarize with Apple Notary Service and **staple** the notarization ticket.
+- Hardened runtime must remain enabled.
+
+Credential handling (modern, preferred):
+
+- Prefer App Store Connect API keys (not Apple ID + password) for notarization.
+- CI must use an ephemeral keychain and must remove certificates/keys at the end
+  of the job.
+
+##### Linux
+
+- Linux artifacts are not code-signed in the Electron sense.
+- Distribution-specific signing (e.g. deb/rpm repository signing, Flatpak
+  repository signing) may be applied depending on distribution channel.
 
 ### 4) Flatpak packaging
 

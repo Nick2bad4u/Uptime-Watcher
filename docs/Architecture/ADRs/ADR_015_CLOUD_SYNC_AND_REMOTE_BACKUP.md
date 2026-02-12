@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-015: Cloud Sync and Remote Backup Providers"
 summary: "Defines an opt-in cloud sync + remote backup architecture using provider-backed storage (Dropbox/Google Drive/Filesystem), secure auth, validated payloads, and a roadmap for WebDAV."
 created: "2025-12-12"
-last_reviewed: "2026-01-11"
+last_reviewed: "2026-02-12"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -38,7 +38,7 @@ tags:
 
 Accepted (implemented for Dropbox/Google Drive/Filesystem; WebDAV planned)
 
-> **Implementation status (as of 2026-01-11)**
+> **Implementation status (as of 2026-02-11)**
 >
 > - ✅ Provider-backed object store abstraction implemented via
 >   `electron/services/cloud/providers/CloudStorageProvider.types.ts`.
@@ -106,6 +106,59 @@ We will treat remote functionality as two related but distinct product capabilit
 2. **True sync**: synchronize _domain state_ (sites/monitors/settings) across devices using a mergeable model.
 
 Remote backup is optional and can exist without sync. True sync requires ADR-016.
+
+### 1.1 Offline-first behavior (required)
+
+Uptime Watcher is offline-first. Sync must never be required for core app usage.
+
+- All user actions apply to the local SQLite DB/settings immediately.
+- Cloud sync runs opportunistically (manual “sync now” + background polling).
+- When offline or when providers fail, the app continues operating locally; sync retries later with backoff.
+
+Implementation notes:
+
+- The sync engine derives a canonical local state snapshot and computes a diff
+  against the last stored baseline to emit per-device operations (ADR-016).
+- Operations are appended to a per-device, append-only log with a monotonic
+  `opId` stored in local settings. This allows safe retries and idempotent
+  processing.
+
+### 1.2 Remote conflict resolution and consistency guarantees
+
+Sync is **eventually consistent**, not strongly consistent.
+
+- Sync is implemented as an operation-log + snapshot model (ADR-016).
+- Conflict resolution is **last-write-wins (LWW)** at a per-field level using a deterministic write key ordering (`timestamp`, then `deviceId`, then `opId`).
+- Deletes win on ties (a delete applied after equal write keys will mark an entity deleted).
+
+Additional rules (required for determinism):
+
+- `opId` is monotonic per-device and persisted locally; devices must not reuse
+  op ids for the same `deviceId`.
+- Ties are broken lexicographically by `deviceId`, then by higher `opId`.
+- Timestamps use local wall-clock epoch ms. To reduce “clock behind” edge
+  cases after a remote reset, the engine ensures newly emitted objects use
+  `createdAt >= manifest.resetAt`.
+
+Guarantees we provide:
+
+- **Convergence**: given the same set of valid operations, all devices will compute the same merged state (deterministic ordering).
+- **Idempotency**: reprocessing the same remote objects is safe; compaction is best-effort and does not change the computed merged state.
+
+Manifest/indexing guarantee:
+
+- `manifest.json` is treated as a **best-effort index**, not the source of
+  truth. If it is missing, stale, or overwritten concurrently by another
+  device, the sync engine must still converge by listing remote objects under
+  `sync/` and applying valid operations/snapshots.
+
+Non-guarantees (important):
+
+- No linearizability or “read your writes” across devices until a sync cycle completes.
+- Concurrent edits to the same field may be lost (LWW means one wins).
+- Ordering depends on wall-clock timestamps; significant clock skew between devices can produce surprising winners (still deterministic).
+- Provider listing consistency may vary; sync cycles may temporarily miss new
+  objects and converge on a later run.
 
 ### 2) Provider abstraction
 
@@ -175,6 +228,14 @@ Default behavior:
 
 - Sync artifacts and backups are stored **unencrypted** (plaintext).
 
+Policy:
+
+- Because backups/sync artifacts may contain sensitive configuration (site URLs,
+  names, and monitor settings), the UI must recommend enabling passphrase
+  encryption when a remote provider is connected.
+- Encryption configuration in `manifest.json` is non-secret (salt + key-check
+  sentinel). The derived key is stored locally via the secret store.
+
 Optional passphrase mode:
 
 - A user may enable **passphrase-derived encryption**.
@@ -190,7 +251,7 @@ Optional passphrase mode:
 Notes:
 
 - Encryption is **per-provider folder**, not per-device.
-- Enabling encryption does not retroactively re-encrypt historical backups.
+- Enabling encryption does not automatically re-encrypt historical backups; a user-initiated migration operation exists (see §7.1).
 
 ### 7) Maintenance operations
 
@@ -336,8 +397,9 @@ Mitigations:
 ### Data classification
 
 - Site URLs and monitor configuration are treated as **sensitive**.
-- Backups and sync artifacts must be encrypted by default once the encryption
-  pipeline is available.
+- Backups and sync artifacts are treated as sensitive at rest. Client-side
+  encryption is available today and is recommended for remote providers; a
+  future release may switch the default encryption mode after the UX is mature.
 
 ## Consequences
 

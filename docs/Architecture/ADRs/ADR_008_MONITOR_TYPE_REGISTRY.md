@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-008: Monitor Type Registry and Plugin Architecture"
 summary: "Establishes an extensible plugin-based system for registering monitor types with dynamic validation schemas, UI configuration, service factories, and version tagging (for future migration support)."
 created: "2025-11-25"
-last_reviewed: "2026-02-10"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -64,11 +64,13 @@ This leads to:
 
 We will implement a **Plugin-Based Monitor Type Registry** that centralizes monitor type definitions with:
 
-1. **Single registration point** for each monitor type
+1. **Single registration point** for each monitor type (in Electron main)
 2. **Zod schema binding** for runtime validation
 3. **Dynamic field definitions** for UI form generation
 4. **Service factory pattern** for monitor instantiation
 5. **Version tagging** (reserved for future migration support)
+
+This registry is "plugin-based" in the sense that monitor types are defined as configuration objects registered at module-load time. It does **not** currently support third-party runtime plugin loading.
 
 ### Monitor Type Registry Overview
 
@@ -104,7 +106,7 @@ graph TB
     end
 
     subgraph "BaseMonitorConfig"
-        Type["type: string"]
+        Type["type: MonitorType"]
         DisplayName["displayName: string"]
         Description["description: string"]
         Fields["fields: MonitorFieldDefinition[]"]
@@ -295,8 +297,9 @@ sequenceDiagram
     participant Module as Monitor Module
     participant Registry as MonitorTypeRegistry
     participant Map as Internal Map
+    participant Handlers as monitorTypeHandlers
     participant IPC as IpcService
-    participant Renderer as MonitorTypesService
+    participant Renderer as MonitorTypesService (renderer)
     participant Store as useMonitorTypesStore
 
     Note over Module,Store: Application Startup - Registration Phase
@@ -310,24 +313,24 @@ sequenceDiagram
     Registry->>Map: monitorTypes.set("ping", config)
 
     Note over Module,Store: Runtime - Lookup Phase
-    IPC->>Registry: getAllMonitorTypeConfigs()
+    Renderer->>IPC: invoke MONITOR_TYPES_CHANNELS.getMonitorTypes
+    IPC->>Handlers: dispatch invoke handler
+    Handlers->>Registry: getAllMonitorTypeConfigs()
     Registry->>Map: Array.from(monitorTypes.values())
     Map-->>Registry: BaseMonitorConfig[]
-    Registry-->>IPC: [httpConfig, portConfig, pingConfig, ...]
-
-    IPC-->>Renderer: IPC Response (serialized configs)
+    Registry-->>Handlers: [httpConfig, portConfig, pingConfig, ...]
+    Handlers-->>IPC: MonitorTypeConfig[] (serialized)
+    IPC-->>Renderer: IPC Response
     Renderer->>Store: setMonitorTypes(configs)
 
     Note over Module,Store: Validation Phase
-    Renderer->>Registry: isValidMonitorType("http")
-    Registry->>Map: monitorTypes.has("http")
-    Map-->>Registry: true
-    Registry-->>Renderer: true
-
-    Renderer->>Registry: getMonitorTypeConfig("http")
-    Registry->>Map: monitorTypes.get("http")
-    Map-->>Registry: httpConfig
-    Registry-->>Renderer: { type, displayName, fields, validationSchema, ... }
+    Renderer->>Store: validateMonitorData(type, payload)
+    Store->>IPC: invoke MONITOR_TYPES_CHANNELS.validateMonitorData
+    IPC->>Handlers: dispatch invoke handler
+    Handlers->>Registry: getMonitorTypeConfig(type)
+    Handlers-->>IPC: ValidationResult
+    IPC-->>Store: ValidationResult
+    Store-->>Renderer: ValidationResult
 ```
 
 ### Service Factory Pattern
@@ -711,8 +714,8 @@ export async function getMonitorTypeConfig(
 3. **Register the Monitor Type**
 
    ```typescript
-   // electron/services/monitoring/MonitorTypeRegistry.ts
-   registerMonitorType({
+    // electron/services/monitoring/monitorTypeRegistry/registerNonHttpMonitorTypes.ts
+    registerMonitorType({
     type: "my-new-type",
     displayName: "My New Monitor",
     description: "Monitors something new",
@@ -733,37 +736,30 @@ export async function getMonitorTypeConfig(
      supportsResponseTime: true,
     },
    });
-
-   // Set version
-   versionManager.setVersion("my-new-type", "1.0.0");
    ```
 
 4. **Update TypeScript Types**
 
    ```typescript
    // shared/types.ts
-   export type MonitorType =
-    | "http"
-    | "port"
-    // ... existing types
-    | "my-new-type";
+     export const BASE_MONITOR_TYPES = [
+         // ... existing types
+         "my-new-type",
+     ] as const;
    ```
+
+5. Update the shared schema registry
+
+   - Add the schema to `shared/validation/monitorSchemas.ts`:
+     - define `myNewMonitorSchema`
+     - add it to the `monitorSchema` discriminated union
+     - add it to the `monitorSchemas` map
 
 ### Adding a Migration
 
-```typescript
-// Register migration for type evolution
-migrationRegistry.registerMigration("my-type", {
- fromVersion: "1.0.0",
- toVersion: "1.1.0",
- description: "Add new optional field with default",
- isBreaking: false,
- transform: async (data) => ({
-  ...data,
-  newField: data.newField ?? "default-value",
- }),
-});
-```
+Automatic monitor-configuration migrations are **not implemented**.
+
+If you introduce a breaking change, handle it explicitly in the import/upgrade path and bump the `version` string for the affected monitor type.
 
 ## Compliance
 
@@ -784,13 +780,14 @@ All monitor types are registered through `MonitorTypeRegistry`:
 - ✅ `server-heartbeat` - Heartbeat endpoint validation
 - ✅ `websocket-keepalive` - WebSocket keepalive monitoring
 
-### Current Implementation Audit (2025-11-25)
+### Current Implementation Audit (2026-02-11)
 
-- Verified `electron/services/monitoring/MonitorTypeRegistry.ts` contains all 14 monitor type registrations
-- Confirmed each registration includes `type`, `displayName`, `description`, `fields`, `validationSchema`, `serviceFactory`, and `version`
-- Checked `MigrationSystem.ts` provides `MigrationRegistry`, `MigrationOrchestrator`, and `VersionManager`
-- Validated IPC exposure via `IpcService.setupMonitorTypesHandlers()`
-- Reviewed frontend integration through `MonitorTypesService` and `useMonitorTypesStore`
+- Verified `electron/services/monitoring/MonitorTypeRegistry.ts` registers built-in monitor types at module load via:
+  - `registerHttpMonitorTypes(...)`
+  - `registerNonHttpMonitorTypes(...)`
+- Confirmed each registration includes `type`, `displayName`, `description`, `fields`, `validationSchema`, `serviceFactory`, and `version`.
+- Confirmed IPC exposure via `electron/services/ipc/handlers/monitorTypeHandlers.ts`, including serialization that strips non-IPC-safe properties (schemas/factories) before returning `MonitorTypeConfig[]`.
+- Reviewed frontend integration through `src/services/MonitorTypesService.ts` and `src/stores/monitor/useMonitorTypesStore.ts`.
 
 ## Related ADRs
 

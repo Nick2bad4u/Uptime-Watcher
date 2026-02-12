@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-006: Standardized Cache Configuration"
 summary: "Defines standardized cache configuration constants and patterns for managers and services to ensure consistent TTLs and limits."
 created: "2025-08-23"
-last_reviewed: "2025-12-16"
+last_reviewed: "2026-02-11"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -192,7 +192,48 @@ const sitesCache = new StandardizedCache<Site>({
 });
 ```
 
-### 5. TTL Reasoning
+### 5. Eviction, TTL, and TTI Semantics
+
+This ADR standardizes configuration values, but cache _semantics_ matter just as
+much as the numbers.
+
+#### TTL (time-to-live)
+
+- TTL is an **absolute age limit** from the time an entry is written.
+- TTL is enforced by comparing `Date.now()` with the entry timestamp (electron) / `timestamp` (renderer).
+- TTL is not refreshed on reads.
+
+#### TTI (time-to-idle)
+
+We do **not** implement true TTI (resetting expiry on access) in the standard
+caches today.
+
+- The renderer `TypedCache` tracks `lastAccessed` for eviction selection.
+- The electron `StandardizedCache` also tracks `lastAccessed`, but eviction is currently based on the entry creation timestamp.
+
+If a future feature genuinely requires TTI, it must be introduced deliberately
+(with tests) and documented as a semantic change, because it can keep rarely
+invalidated entries alive indefinitely.
+
+#### Max-size eviction
+
+When `maxSize` is reached, caches evict entries to stay memory-safe.
+
+- **Renderer (`src/utils/cache.ts`)**: evicts the entry with the oldest `lastAccessed` (LRU selection).
+- **Main (`electron/utils/cache/StandardizedCache.ts`)**: eviction currently selects the oldest entry by creation time (`timestamp`). This is effectively age/FIFO-based eviction rather than strict LRU.
+
+The difference matters for hot-path caches: if main-process caches need true
+LRU, update the implementation (and tests) before updating documentation.
+
+### 6. Invalidation and Cache Coherency
+
+TTL should not be treated as a correctness mechanism.
+
+- On writes (create/update/delete operations), prefer explicit invalidation or replacement with the authoritative persisted snapshot.
+- Use `StandardizedCache.onInvalidation(...)` when consumers need deterministic follow-up work (for example, clearing derived caches when a parent cache is cleared).
+- For renderer caches used for computed values, prefer short TTLs and clear on significant state transitions.
+
+### 7. TTL Reasoning
 
 Cache TTLs intentionally align with the freshness requirements of each domain so
 that frequently changing data (monitors, validation) expires quickly while
@@ -245,7 +286,7 @@ quadrantChart
 - **VALIDATION (5 minutes)**: Moderate expiration balancing accuracy with performance
 - **TEMPORARY (5 minutes)**: Short expiration for ephemeral operations
 
-### 6. Size Limit Reasoning
+### 8. Size Limit Reasoning
 
 - **SITES (500)**: Expected maximum of \~200-300 sites in typical deployments
 - **MONITORS (1000)**: Multiple monitors per site, higher volume expected
@@ -253,11 +294,12 @@ quadrantChart
 - **VALIDATION (200)**: Moderate cache for validation results
 - **TEMPORARY (1000)**: Large buffer for temporary operations
 
-### Current Implementation Audit (2025-11-04)
+### Current Implementation Audit (2026-02-11)
 
-- Confirmed centralized values in `shared/constants/cacheConfig.ts` match all TTL and size settings documented above.
-- Reviewed cache consumers in `electron/managers/SiteManager.ts`, `electron/managers/ConfigurationManager.ts`, and `electron/utils/database/serviceFactory.ts` to ensure they spread the shared configuration rather than hard-code limits.
-- Verified renderer utilities in `src/utils/cache.ts` continue to build typed caches by spreading `CACHE_CONFIG` and use `CACHE_NAMES` for temporary operations, preserving diagnostic naming consistency.
+- Confirmed centralized values in `shared/constants/cacheConfig.ts` match all TTL and size settings.
+- Verified main-process caching uses `electron/utils/cache/StandardizedCache.ts` (TTL via `expiresAt`, max-size eviction, stats/telemetry events, and invalidation hooks).
+- Verified renderer caching uses `src/utils/cache.ts` (`TypedCache` with TTL + LRU-by-`lastAccessed`, plus in-flight request dedupe via a `WeakMap`).
+- Verified `CACHE_NAMES` is used for consistent naming, especially for temporary operation caches.
 
 ## Consequences
 
