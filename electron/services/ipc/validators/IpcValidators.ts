@@ -1,8 +1,9 @@
-import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
-import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import {
+    validateExternalOpenUrlCandidate,
+    validateHttpUrlCandidate,
+} from "@shared/utils/urlSafety";
 import {
     isNonEmptyString,
-    isValidUrl,
 } from "@shared/validation/validatorUtils";
 
 /**
@@ -106,21 +107,18 @@ export const IpcValidators = {
             return `${paramName} must be a valid http(s) URL`;
         }
 
-        const byteLength = getUtfByteLength(value);
-        if (byteLength > MAX_IPC_URL_UTF_BYTES) {
-            return `${paramName} must not exceed ${MAX_IPC_URL_UTF_BYTES} bytes`;
-        }
+        const validation = validateHttpUrlCandidate(value, {
+            disallowAuth: true,
+            maxBytes: MAX_IPC_URL_UTF_BYTES,
+        });
 
-        if (/[\n\r]/u.test(value)) {
-            return `${paramName} must not contain newlines`;
-        }
 
-        if (
-            !isValidUrl(value, {
-                disallowAuth: true,
-            })
-        ) {
-            return `${paramName} must be a valid http(s) URL`;
+        if (validation.ok === false) {
+            if (validation.reason === "must be a non-empty string") {
+                return `${paramName} must be a valid http(s) URL`;
+            }
+
+            return `${paramName} ${validation.reason}`;
         }
 
         return null;

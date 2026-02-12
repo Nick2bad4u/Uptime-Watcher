@@ -25,12 +25,8 @@ import type {
 } from "./types";
 
 import { logger } from "../../utils/logger";
-import {
-    extractIpcCorrelationContext,
-} from "./internal/ipcCorrelationContext";
-import {
-    createSafeErrorMessage,
-} from "./internal/ipcErrorUtils";
+import { extractIpcCorrelationContext } from "./internal/ipcCorrelationContext";
+import { createSafeErrorMessage } from "./internal/ipcErrorUtils";
 import {
     executeIpcHandler,
     type HandlerExecutionResult,
@@ -87,7 +83,6 @@ interface IpcHandlerMetadata extends UnknownRecord {
     validationErrors?: readonly string[];
 }
 
-
 /**
  * Options for {@link withIpcHandler} / {@link withIpcHandlerValidation}.
  */
@@ -115,7 +110,6 @@ function assertChannelParams<TChannel extends IpcInvokeChannel>(
         );
     }
 }
-
 
 /**
  * Converts an {@link ArrayBufferView} into a standalone {@link ArrayBuffer}

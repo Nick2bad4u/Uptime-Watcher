@@ -2,8 +2,8 @@
  * Recursion-safe monitor action delegate.
  *
  * @remarks
- * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep the manager focused on
- * orchestration.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep
+ * the manager focused on orchestration.
  */
 
 import type { Logger } from "@shared/utils/logger/interfaces";

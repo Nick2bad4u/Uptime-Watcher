@@ -167,11 +167,10 @@ function createMonitorTypesApi(): MonitorTypesApiInterface {
 
 const createMonitorTypesApiFallback = (
     unavailableError: Error
-): MonitorTypesApiInterface => ({
+): MonitorTypesApiInterface =>
+    ({
         formatMonitorDetail: (
-            ...args: Parameters<
-                MonitorTypesApiInterface["formatMonitorDetail"]
-            >
+            ...args: Parameters<MonitorTypesApiInterface["formatMonitorDetail"]>
         ) => {
             acceptUnusedPreloadArguments(...args);
             return Promise.reject(unavailableError);
@@ -191,14 +190,12 @@ const createMonitorTypesApiFallback = (
             return Promise.reject(unavailableError);
         },
         validateMonitorData: (
-            ...args: Parameters<
-                MonitorTypesApiInterface["validateMonitorData"]
-            >
+            ...args: Parameters<MonitorTypesApiInterface["validateMonitorData"]>
         ) => {
             acceptUnusedPreloadArguments(...args);
             return Promise.reject(unavailableError);
         },
-    } as const);
+    }) as const;
 
 export const monitorTypesApi: MonitorTypesApiInterface = createPreloadDomain({
     create: createMonitorTypesApi,

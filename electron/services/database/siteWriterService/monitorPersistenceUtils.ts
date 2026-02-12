@@ -4,8 +4,8 @@ import type { Monitor } from "@shared/types";
  * Creates a stable signature representing a monitor's configuration.
  *
  * @remarks
- * Used for detecting newly-added monitors that do not yet have IDs.
- * Excludes runtime properties like status/lastChecked/responseTime.
+ * Used for detecting newly-added monitors that do not yet have IDs. Excludes
+ * runtime properties like status/lastChecked/responseTime.
  */
 export function createMonitorSignature(monitor: Monitor): string {
     return [

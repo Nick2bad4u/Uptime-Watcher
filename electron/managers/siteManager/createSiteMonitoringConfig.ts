@@ -8,7 +8,8 @@ import type { IMonitoringOperations } from "../SiteManager.types";
 import { logger } from "../../utils/logger";
 
 /**
- * Creates the monitoring configuration wrapper used by {@link electron/managers/SiteManager#SiteManager}.
+ * Creates the monitoring configuration wrapper used by
+ * {@link electron/managers/SiteManager#SiteManager}.
  *
  * @remarks
  * Extracted to keep `SiteManager.ts` smaller. This wrapper exists to provide a

@@ -91,7 +91,8 @@ function createStateSyncApi(): StateSyncApiInterface {
 
 const createStateSyncApiFallback = (
     unavailableError: Error
-): StateSyncApiInterface => ({
+): StateSyncApiInterface =>
+    ({
         getSyncStatus: (
             ...args: Parameters<StateSyncApiInterface["getSyncStatus"]>
         ) => {
@@ -104,7 +105,7 @@ const createStateSyncApiFallback = (
             acceptUnusedPreloadArguments(...args);
             return Promise.reject(unavailableError);
         },
-    } as const);
+    }) as const;
 
 export const stateSyncApi: StateSyncApiInterface = createPreloadDomain({
     create: createStateSyncApi,

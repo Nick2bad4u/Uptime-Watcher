@@ -94,9 +94,8 @@ function createSystemApi(): SystemApiInterface {
     }
 }
 
-const createSystemApiFallback = (
-    unavailableError: Error
-): SystemApiInterface => ({
+const createSystemApiFallback = (unavailableError: Error): SystemApiInterface =>
+    ({
         openExternal: (
             ...args: Parameters<SystemApiInterface["openExternal"]>
         ) => {
@@ -115,7 +114,7 @@ const createSystemApiFallback = (
             acceptUnusedPreloadArguments(...args);
             return Promise.reject(unavailableError);
         },
-    } as const);
+    }) as const;
 
 export const systemApi: SystemApiInterface = createPreloadDomain({
     create: createSystemApi,

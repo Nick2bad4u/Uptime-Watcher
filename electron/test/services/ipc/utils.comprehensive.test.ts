@@ -420,6 +420,31 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const result = IpcValidators.requiredUrl(123, "url");
                 expect(result).toBe("url must be a valid http(s) URL");
             });
+
+            it("should report error for URLs containing newlines", () => {
+                const result = IpcValidators.requiredUrl(
+                    "https://example.com\nInjected",
+                    "url"
+                );
+
+                expect(result).toBe("url must not contain newlines");
+            });
+
+            it("should report error for URLs containing control characters", () => {
+                const result = IpcValidators.requiredUrl(
+                    "https://example.com/\0oops",
+                    "url"
+                );
+
+                expect(result).toBe("url must not contain control characters");
+            });
+
+            it("should report error for URLs exceeding the byte limit", () => {
+                const longUrl = `https://example.com/${"x".repeat(40_000)}`;
+                const result = IpcValidators.requiredUrl(longUrl, "url");
+
+                expect(result).toBe("url must not exceed 32768 bytes");
+            });
         });
 
         describe("requiredObject validator", () => {

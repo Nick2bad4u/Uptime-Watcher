@@ -2,8 +2,8 @@
  * Monitor state persistence and event emission.
  *
  * @remarks
- * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep the manager focused on lifecycle
- * orchestration.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep
+ * the manager focused on lifecycle orchestration.
  *
  * This helper:
  *

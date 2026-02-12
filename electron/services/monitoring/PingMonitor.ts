@@ -2,13 +2,13 @@
  * Network connectivity monitoring service for host/endpoint reachability.
  *
  * @remarks
- * Despite the historical "Ping" naming, this monitor uses **native
- * TCP/DNS/HTTP connectivity checks** (via {@link performPingCheckWithRetry})
- * rather than ICMP ping. This keeps behaviour consistent across platforms and
- * avoids relying on privileged ICMP sockets or external system utilities.
+ * Despite the historical "Ping" naming, this monitor uses **native TCP/DNS/HTTP
+ * connectivity checks** (via {@link performPingCheckWithRetry}) rather than ICMP
+ * ping. This keeps behaviour consistent across platforms and avoids relying on
+ * privileged ICMP sockets or external system utilities.
  *
- * The check auto-detects URL targets (HTTP/HTTPS) vs host targets (TCP/DNS)
- * and applies retry/backoff behaviour through the operational hooks layer.
+ * The check auto-detects URL targets (HTTP/HTTPS) vs host targets (TCP/DNS) and
+ * applies retry/backoff behaviour through the operational hooks layer.
  *
  * @example
  *

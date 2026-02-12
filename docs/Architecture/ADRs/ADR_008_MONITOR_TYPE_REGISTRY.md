@@ -714,8 +714,8 @@ export async function getMonitorTypeConfig(
 3. **Register the Monitor Type**
 
    ```typescript
-    // electron/services/monitoring/monitorTypeRegistry/registerNonHttpMonitorTypes.ts
-    registerMonitorType({
+   // electron/services/monitoring/monitorTypeRegistry/registerNonHttpMonitorTypes.ts
+   registerMonitorType({
     type: "my-new-type",
     displayName: "My New Monitor",
     description: "Monitors something new",
@@ -742,14 +742,13 @@ export async function getMonitorTypeConfig(
 
    ```typescript
    // shared/types.ts
-     export const BASE_MONITOR_TYPES = [
-         // ... existing types
-         "my-new-type",
-     ] as const;
+   export const BASE_MONITOR_TYPES = [
+    // ... existing types
+    "my-new-type",
+   ] as const;
    ```
 
 5. Update the shared schema registry
-
    - Add the schema to `shared/validation/monitorSchemas.ts`:
      - define `myNewMonitorSchema`
      - add it to the `monitorSchema` discriminated union

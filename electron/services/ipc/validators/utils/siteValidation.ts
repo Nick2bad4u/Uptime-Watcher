@@ -9,24 +9,22 @@ import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import type { IpcParameterValidator } from "../../types";
 import type { ParameterValueValidationResult } from "./parameterValidation";
 
-import { IpcValidators } from "../IpcValidators";
 import {
     createParamValidator,
-    toValidationResult,
 } from "./parameterValidation";
 import { requireRecordParamValue } from "./recordValidation";
+import { requireStringParamValue } from "./stringValidation";
 
 const validateSiteIdentifierCandidate = (
     value: unknown,
     paramName: string
 ): ParameterValueValidationResult => {
-    if (typeof value !== "string") {
-        return toValidationResult(
-            IpcValidators.requiredString(value, paramName)
-        );
+    const requiredString = requireStringParamValue(value, paramName);
+    if (requiredString.ok === false) {
+        return requiredString.error;
     }
 
-    const parsed = siteIdentifierSchema.safeParse(value);
+    const parsed = siteIdentifierSchema.safeParse(requiredString.value);
     if (parsed.success) {
         return null;
     }
@@ -38,13 +36,12 @@ const validateMonitorIdCandidate = (
     value: unknown,
     paramName: string
 ): ParameterValueValidationResult => {
-    if (typeof value !== "string") {
-        return toValidationResult(
-            IpcValidators.requiredString(value, paramName)
-        );
+    const requiredString = requireStringParamValue(value, paramName);
+    if (requiredString.ok === false) {
+        return requiredString.error;
     }
 
-    const parsed = monitorIdSchema.safeParse(value);
+    const parsed = monitorIdSchema.safeParse(requiredString.value);
     return parsed.success ? null : formatZodIssues(parsed.error.issues);
 };
 

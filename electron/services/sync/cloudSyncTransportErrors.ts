@@ -9,8 +9,8 @@
  * @remarks
  * This is considered a data corruption / incompatibility signal.
  *
- * Callers (e.g. {@link electron/services/sync/SyncEngine#SyncEngine}) may choose to treat it as recoverable
- * by rebuilding remote state from operation logs.
+ * Callers (e.g. {@link electron/services/sync/SyncEngine#SyncEngine}) may choose
+ * to treat it as recoverable by rebuilding remote state from operation logs.
  */
 export class CloudSyncCorruptRemoteObjectError extends Error {
     /** Provider key of the corrupt object. */

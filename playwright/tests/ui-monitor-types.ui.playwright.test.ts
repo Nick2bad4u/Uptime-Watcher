@@ -194,7 +194,9 @@ const buildMonitorScenario = (
     // again via dynamic fields), which can trigger expensive validation and
     // re-render cycles mid-step and has proven flaky in headless Electron.
     const urlField = requiredFields.find((field) => field.name === "url");
-    const urlValue = urlField ? normalizeFieldValue(config, urlField) : undefined;
+    const urlValue = urlField
+        ? normalizeFieldValue(config, urlField)
+        : undefined;
 
     const dynamicFields: DynamicFieldInput[] = requiredFields
         .filter((field) => field.name !== "url")

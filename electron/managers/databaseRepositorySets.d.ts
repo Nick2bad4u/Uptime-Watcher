@@ -18,7 +18,8 @@ import type { SettingsRepository } from "../services/database/SettingsRepository
 import type { SiteRepository } from "../services/database/SiteRepository";
 
 /**
- * Repository set used by {@link electron/managers/DatabaseManager#DatabaseManager}.
+ * Repository set used by
+ * {@link electron/managers/DatabaseManager#DatabaseManager}.
  */
 export interface DatabaseManagerRepositories {
     /** The main database service. */

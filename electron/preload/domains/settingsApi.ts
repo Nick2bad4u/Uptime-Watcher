@@ -105,7 +105,8 @@ function createSettingsApi(): SettingsApiInterface {
 
 const createSettingsApiFallback = (
     unavailableError: Error
-): SettingsApiInterface => ({
+): SettingsApiInterface =>
+    ({
         getHistoryLimit: (
             ...args: Parameters<SettingsApiInterface["getHistoryLimit"]>
         ) => {
@@ -124,7 +125,7 @@ const createSettingsApiFallback = (
             acceptUnusedPreloadArguments(...args);
             return Promise.reject(unavailableError);
         },
-    } as const);
+    }) as const;
 
 export const settingsApi: SettingsApiInterface = createPreloadDomain({
     create: createSettingsApi,

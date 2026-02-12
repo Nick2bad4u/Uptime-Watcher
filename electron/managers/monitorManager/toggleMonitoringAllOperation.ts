@@ -2,8 +2,9 @@
  * Global monitoring toggle operations.
  *
  * @remarks
- * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to centralize the cross-site start/stop
- * orchestration, error shaping, and lifecycle event emission.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to
+ * centralize the cross-site start/stop orchestration, error shaping, and
+ * lifecycle event emission.
  *
  * @packageDocumentation
  */

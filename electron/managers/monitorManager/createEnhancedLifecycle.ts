@@ -1,5 +1,6 @@
 /**
- * Builders for {@link electron/managers/MonitorManager#MonitorManager} enhanced lifecycle inputs.
+ * Builders for {@link electron/managers/MonitorManager#MonitorManager} enhanced
+ * lifecycle inputs.
  *
  * @remarks
  * Extracted from `MonitorManager.ts` to reduce file size and keep object-shape

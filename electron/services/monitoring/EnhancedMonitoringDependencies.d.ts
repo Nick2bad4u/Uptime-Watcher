@@ -41,9 +41,10 @@ import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
  * - **Communication**: Event system for monitoring notifications
  * - **Configuration**: Dynamic settings and limits
  *
- * This interface is also used as a base type for {@link
- * electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorCheckConfig | EnhancedMonitorCheckConfig} (which
- * adds checker-only dependencies like timeout and status update services).
+ * This interface is also used as a base type for
+ * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorCheckConfig | EnhancedMonitorCheckConfig}
+ * (which adds checker-only dependencies like timeout and status update
+ * services).
  *
  * @example
  *

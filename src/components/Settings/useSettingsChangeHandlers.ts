@@ -1,5 +1,6 @@
 /**
- * Change application helpers for {@link src/components/Settings/Settings#Settings}.
+ * Change application helpers for
+ * {@link src/components/Settings/Settings#Settings}.
  *
  * @remarks
  * Extracted from `Settings.tsx` to keep the component focused on rendering and

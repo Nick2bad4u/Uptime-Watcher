@@ -12,8 +12,9 @@ import { logger } from "../../../services/logger";
  *
  * @remarks
  * This intentionally abstracts the subscription wiring away from
- * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} so the manager can focus on orchestration and
- * recovery while this module focuses on listener setup.
+ * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} so the
+ * manager can focus on orchestration and recovery while this module focuses on
+ * listener setup.
  */
 export interface StatusUpdateListenerDescriptor {
     /** Human-readable label used in diagnostics. */

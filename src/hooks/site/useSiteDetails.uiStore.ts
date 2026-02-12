@@ -44,7 +44,8 @@ const selectSiteDetailsUiStoreSlice = (
 });
 
 /**
- * Reads the UI store slice used by {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ * Reads the UI store slice used by
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  */
 export function useSiteDetailsUiStore(): {
     readonly activeSiteDetailsTab: SiteDetailsTab;

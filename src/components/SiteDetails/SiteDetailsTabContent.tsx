@@ -2,8 +2,9 @@
  * SiteDetails tab content rendering.
  *
  * @remarks
- * Extracted from {@link src/components/SiteDetails/SiteDetails#SiteDetails} to keep the parent component focused on
- * modal layout, navigation, and orchestration.
+ * Extracted from {@link src/components/SiteDetails/SiteDetails#SiteDetails} to
+ * keep the parent component focused on modal layout, navigation, and
+ * orchestration.
  */
 
 import type { Monitor, Site } from "@shared/types";

@@ -40,7 +40,6 @@ function withUrlField<TPayload extends object>(
     };
 }
 
-
 /**
  * Store actions interface for form submission operations.
  *
@@ -89,7 +88,6 @@ export type FormSubmitProperties = Simplify<
         }
 >;
 
-
 /**
  * Creates a monitor object based on the form data using the shared utility.
  * This ensures consistent monitor defaults and validation across the app.
@@ -109,7 +107,9 @@ function createMonitor(
     const urlCandidate = safeTrim(fields.url);
     const baseMonitor = createMonitorObject(
         monitorType,
-        urlCandidate.length > 0 ? withUrlField(formData, urlCandidate) : formData
+        urlCandidate.length > 0
+            ? withUrlField(formData, urlCandidate)
+            : formData
     );
 
     return {

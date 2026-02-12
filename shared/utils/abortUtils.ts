@@ -1,6 +1,24 @@
 import { createAbortError } from "@shared/utils/abortError";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
 
+import { calculateBackoffDelayMs } from "./backoff";
+
+const NOOP_TIMEOUT_REJECT: (reason: unknown) => void = () => {
+    // Replaced immediately when a timeout promise is created.
+};
+
+function tryUnrefTimer(timeoutId: unknown): void {
+    const record = ensureRecordLike(timeoutId);
+    if (!record) {
+        return;
+    }
+
+    const { unref } = record;
+    if (typeof unref === "function") {
+        Reflect.apply(unref, record, []);
+    }
+}
+
 /**
  * Configuration for building a composite {@link AbortSignal}.
  *
@@ -120,6 +138,10 @@ export function createCombinedAbortSignal(
             controller.abort(resolvedReason);
         }, timeout);
 
+        // In Node.js / Electron we do not want timeouts to keep the event loop
+        // alive by themselves.
+        tryUnrefTimer(timeoutId);
+
         controller.signal.addEventListener(
             "abort",
             () => {
@@ -209,18 +231,6 @@ export async function createAbortableOperation<T>(
         return await operation(signal);
     } finally {
         cleanup?.();
-    }
-}
-
-function tryUnrefTimer(timeoutId: unknown): void {
-    const record = ensureRecordLike(timeoutId);
-    if (!record) {
-        return;
-    }
-
-    const { unref } = record;
-    if (typeof unref === "function") {
-        Reflect.apply(unref, record, []);
     }
 }
 
@@ -396,7 +406,6 @@ export async function retryWithAbort<T>(
     } = options;
 
     let lastError: Error = new Error("No errors occurred");
-    let delay = initialDelay;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         // Check if operation was aborted
@@ -416,6 +425,16 @@ export async function retryWithAbort<T>(
                 break;
             }
 
+            const delay = Math.min(
+                calculateBackoffDelayMs({
+                    attemptIndex: attempt,
+                    initialDelayMs: initialDelay,
+                    multiplier: backoffMultiplier,
+                    strategy: "exponential",
+                }),
+                maxDelay
+            );
+
             // Wait with exponential backoff
             try {
                 // eslint-disable-next-line no-await-in-loop -- retry delay requires sequential awaits
@@ -423,7 +442,6 @@ export async function retryWithAbort<T>(
             } catch (sleepError) {
                 throw createAbortError({ cause: sleepError });
             }
-            delay = Math.min(delay * backoffMultiplier, maxDelay);
         }
     }
 
@@ -607,4 +625,83 @@ export async function raceWithAbort<T>(
 
         void resolveOperation();
     });
+}
+
+/**
+ * Options for {@link raceWithTimeout}.
+ *
+ * @public
+ */
+export interface RaceWithTimeoutOptions {
+    /** Optional abort signal to observe alongside the timeout. */
+    signal?: AbortSignal;
+    /** Optional message for the timeout rejection. */
+    timeoutMessage?: string;
+    /** Timeout window in milliseconds. Non-positive values disable the timeout. */
+    timeoutMs: number;
+    /** When true, attempt to `unref()` the timeout timer in Node.js/Electron. */
+    unrefTimer?: boolean;
+}
+
+/**
+ * Races an operation promise against a timeout (and optional {@link AbortSignal}).
+ *
+ * @remarks
+ * This helper is intended for APIs that do not support abort natively. Timeout
+ * rejections are regular `Error` instances (not abort errors) so callers can
+ * distinguish "timed out" from user cancellation when desired.
+ *
+ * When `unrefTimer` is enabled and the runtime exposes `unref()` on timer
+ * handles (Node.js/Electron), the timeout will not keep the event loop alive.
+ *
+ * @typeParam T - Resolved value of the underlying operation.
+ *
+ * @param operation - Promise to race.
+ * @param options - Timeout and optional abort configuration.
+ *
+ * @returns The first settled result between the operation, timeout, and abort.
+ *
+ * @throws `Error` when the timeout elapses.
+ * @throws `Error` when the abort signal triggers (via {@link raceWithAbort}).
+ *
+ * @public
+ */
+export async function raceWithTimeout<T>(
+    operation: Promise<T>,
+    options: RaceWithTimeoutOptions
+): Promise<T> {
+    const {
+        signal,
+        timeoutMessage,
+        timeoutMs,
+        unrefTimer = false,
+    } = options;
+
+    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+        return signal ? raceWithAbort(operation, signal) : operation;
+    }
+
+    let rejectTimeout: (reason: unknown) => void = NOOP_TIMEOUT_REJECT;
+    const timeoutPromise = new Promise<never>((_resolve, reject) => {
+        rejectTimeout = reject;
+    });
+
+    const timeoutId = setTimeout(() => {
+        rejectTimeout(
+            new Error(
+                timeoutMessage ?? `Operation timed out after ${timeoutMs}ms`
+            )
+        );
+    }, timeoutMs);
+
+    if (unrefTimer) {
+        tryUnrefTimer(timeoutId);
+    }
+
+    try {
+        const raced = Promise.race([operation, timeoutPromise]);
+        return signal ? await raceWithAbort(raced, signal) : await raced;
+    } finally {
+        clearTimeout(timeoutId);
+    }
 }

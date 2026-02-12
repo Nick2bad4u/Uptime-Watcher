@@ -95,13 +95,13 @@ export class GoogleDriveTokenManager {
         return this.refreshSingleFlight();
     }
 
-    private async refresh(
-        refreshToken: string
-    ): Promise<GoogleTokenResponse> {
+    private async refresh(refreshToken: string): Promise<GoogleTokenResponse> {
         try {
             return await requestGoogleOAuthToken({
                 clientId: this.clientId,
-                ...(this.clientSecret ? { clientSecret: this.clientSecret } : {}),
+                ...(this.clientSecret
+                    ? { clientSecret: this.clientSecret }
+                    : {}),
                 operationLabel: "refresh",
                 params: {
                     grant_type: "refresh_token",

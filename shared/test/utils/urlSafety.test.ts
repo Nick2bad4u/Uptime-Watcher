@@ -245,12 +245,16 @@ describe("urlSafety", () => {
         });
 
         it("rejects http(s) URLs containing CR/LF", () => {
-            const result = validateHttpUrlCandidate("https://example.com\nInjected");
+            const result = validateHttpUrlCandidate(
+                "https://example.com\nInjected"
+            );
             expect(result.ok).toBeFalsy();
         });
 
         it("rejects http(s) URLs containing ASCII control characters", () => {
-            const result = validateHttpUrlCandidate("https://example.com/\0oops");
+            const result = validateHttpUrlCandidate(
+                "https://example.com/\0oops"
+            );
             expect(result.ok).toBeFalsy();
         });
 

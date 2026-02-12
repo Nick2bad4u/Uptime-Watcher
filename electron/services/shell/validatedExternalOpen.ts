@@ -86,7 +86,7 @@ export type TryOpenExternalValidatedResult =
     | Readonly<{
           normalizedUrl: string;
           ok: true;
-                    outcome: "opened";
+          outcome: "opened";
           safeUrlForLogging: string;
       }>
     | Readonly<{
@@ -165,7 +165,8 @@ function createExternalOpenRejectionError(args: {
 }
 
 /**
- * Validates a candidate external-open URL and opens it via `shell.openExternal`.
+ * Validates a candidate external-open URL and opens it via
+ * `shell.openExternal`.
  *
  * @throws TypeError - When URL validation fails.
  */

@@ -27,9 +27,7 @@ import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { useInAppAlertTonePreview } from "./useInAppAlertTonePreview";
 import { useSettingsChangeHandlers } from "./useSettingsChangeHandlers";
 import { useSettingsModel } from "./useSettingsModel";
-import {
-    tryBuildSerializedDatabaseRestorePayloadFromFile,
-} from "./utils/sqliteRestorePayload";
+import { tryBuildSerializedDatabaseRestorePayloadFromFile } from "./utils/sqliteRestorePayload";
 import {
     clampNormalizedVolume,
     convertNormalizedVolumeToSliderPercent,
@@ -102,7 +100,8 @@ export interface SettingsControllerState {
 }
 
 /**
- * Extracted controller hook for {@link src/components/Settings/Settings#Settings}.
+ * Extracted controller hook for
+ * {@link src/components/Settings/Settings#Settings}.
  *
  * @remarks
  * This keeps the Settings view component mostly declarative by containing the

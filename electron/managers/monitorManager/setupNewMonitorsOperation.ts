@@ -2,8 +2,8 @@
  * New-monitor setup helpers.
  *
  * @remarks
- * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep the manager focused on
- * orchestration.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep
+ * the manager focused on orchestration.
  *
  * @packageDocumentation
  */

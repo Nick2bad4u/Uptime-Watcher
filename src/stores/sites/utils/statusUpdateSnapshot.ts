@@ -13,10 +13,12 @@ import {
  * update to the site store.
  *
  * @remarks
- * This payload is intentionally _not_ typed as {@link shared/types#StatusUpdate | StatusUpdate} because the
- * shared {@link shared/types#StatusUpdate | StatusUpdate} type intersects an index signature, which causes
- * strict TS configs (e.g. `noPropertyAccessFromIndexSignature`) and some lint
- * rules to fight normal property access.
+ * This payload is intentionally _not_ typed as
+ * {@link shared/types#StatusUpdate | StatusUpdate} because the shared
+ * {@link shared/types#StatusUpdate | StatusUpdate} type intersects an index
+ * signature, which causes strict TS configs (e.g.
+ * `noPropertyAccessFromIndexSignature`) and some lint rules to fight normal
+ * property access.
  */
 export interface StatusUpdateSnapshotPayload {
     /**

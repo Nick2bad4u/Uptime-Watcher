@@ -1,4 +1,5 @@
 import { logger } from "@electron/utils/logger";
+import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { withRetry } from "@shared/utils/retry";
 import { isRecord } from "@shared/utils/typeHelpers";
 import axios from "axios";
@@ -64,9 +65,14 @@ function computeBackoffDelayMs(args: {
     initialDelayMs: number;
     maxDelayMs: number;
 }): number {
-    const exponent = Math.max(0, args.attemptIndex);
-    const base = args.initialDelayMs * 2 ** exponent;
-    const capped = Math.min(args.maxDelayMs, base);
+    const capped = Math.min(
+        args.maxDelayMs,
+        calculateBackoffDelayMs({
+            attemptIndex: args.attemptIndex,
+            initialDelayMs: args.initialDelayMs,
+            strategy: "exponential",
+        })
+    );
     const jitterRange = Math.max(1, Math.round(capped * 0.1));
     return Math.max(1, capped + randomInt(-jitterRange, jitterRange + 1));
 }

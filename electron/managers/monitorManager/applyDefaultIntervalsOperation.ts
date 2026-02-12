@@ -2,8 +2,8 @@
  * Default interval remediation for monitors.
  *
  * @remarks
- * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep the main manager class focused
- * on lifecycle orchestration.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to keep
+ * the main manager class focused on lifecycle orchestration.
  *
  * @packageDocumentation
  */

@@ -39,7 +39,8 @@ export function createHostTitleSuffixResolver(args: {
 }): (monitor: Monitor) => string {
     return createMonitorTypeTitleSuffixResolver({
         monitorType: args.monitorType,
-        resolve: (monitor) => (typeof monitor.host === "string" ? monitor.host : ""),
+        resolve: (monitor) =>
+            typeof monitor.host === "string" ? monitor.host : "",
     });
 }
 
@@ -53,7 +54,8 @@ export function createHostPortTitleSuffixResolver(args: {
         monitorType: args.monitorType,
         resolve: (monitor) => {
             const host = typeof monitor.host === "string" ? monitor.host : "";
-            const port = typeof monitor.port === "number" ? monitor.port : undefined;
+            const port =
+                typeof monitor.port === "number" ? monitor.port : undefined;
 
             if (host.length === 0 || port === undefined) {
                 return "";
@@ -76,7 +78,9 @@ export function createRecordTypeHostTitleSuffixResolver(args: {
         resolve: (monitor) => {
             const host = typeof monitor.host === "string" ? monitor.host : "";
             const recordType =
-                typeof monitor.recordType === "string" ? monitor.recordType : "";
+                typeof monitor.recordType === "string"
+                    ? monitor.recordType
+                    : "";
 
             if (host.length === 0 || recordType.length === 0) {
                 return "";

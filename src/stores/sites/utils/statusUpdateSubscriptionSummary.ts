@@ -12,9 +12,10 @@ export const FALLBACK_EXPECTED_LISTENERS = 4;
  * Resolve the expected listener count for status update subscriptions.
  *
  * @remarks
- * Tests frequently mock {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}, which can strip static
- * fields (e.g. `EXPECTED_LISTENER_COUNT`). This helper keeps diagnostics stable
- * by falling back to a hard-coded default.
+ * Tests frequently mock
+ * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}, which
+ * can strip static fields (e.g. `EXPECTED_LISTENER_COUNT`). This helper keeps
+ * diagnostics stable by falling back to a hard-coded default.
  */
 export function resolveExpectedListenerCount(
     StatusUpdateManagerCtor: unknown

@@ -3,7 +3,8 @@
  */
 
 /**
- * Setters needed to build the {@link src/components/AddSiteForm/DynamicMonitorFields#DynamicMonitorFields}
+ * Setters needed to build the
+ * {@link src/components/AddSiteForm/DynamicMonitorFields#DynamicMonitorFields}
  * onChange map.
  */
 export interface DynamicFieldChangeSetterBag {

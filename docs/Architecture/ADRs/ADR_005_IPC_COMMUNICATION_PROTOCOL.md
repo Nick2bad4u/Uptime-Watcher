@@ -272,7 +272,7 @@ The script (`scripts/architecture-static-guards.mjs`) performs the following che
 
    Any other usage is flagged as a violation to prevent ad-hoc handlers that bypass validation, logging, or standardized response formatting.
 
-2. **No direct `ipcRenderer` imports in `src/**`** – Renderer code may not import `ipcRenderer` directly from the `electron` package (excluding tests). All renderer IPC goes through the typed preload bridge (`window.electronAPI`) and domain-specific renderer services (for example `SiteService`, `SettingsService`). This guarantees that:
+2. **No direct `ipcRenderer` imports in `src/**`** – Renderer code may not import `ipcRenderer`directly from the`electron` package (excluding tests). All renderer IPC goes through the typed preload bridge (`window.electronAPI`) and domain-specific renderer services (for example `SiteService`, `SettingsService`). This guarantees that:
    - Renderer code never crosses the security boundary directly.
    - All IPC calls benefit from the shared `IpcResponse` validation and error handling implemented in the preload layer.
 

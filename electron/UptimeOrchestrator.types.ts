@@ -2,7 +2,8 @@
 
 /** @internal Runtime marker to satisfy coverage for the pure type module. */
 /**
- * Supporting type definitions for {@link electron/UptimeOrchestrator#UptimeOrchestrator}.
+ * Supporting type definitions for
+ * {@link electron/UptimeOrchestrator#UptimeOrchestrator}.
  *
  * @remarks
  * Isolates complex interface declarations to keep the orchestrator module
@@ -88,7 +89,8 @@ export interface UpdateSitesCacheRequestData {
 }
 
 /**
- * Dependencies required to construct an {@link electron/UptimeOrchestrator#UptimeOrchestrator} instance.
+ * Dependencies required to construct an
+ * {@link electron/UptimeOrchestrator#UptimeOrchestrator} instance.
  */
 export interface UptimeOrchestratorDependencies {
     /** Database manager for data persistence operations. */

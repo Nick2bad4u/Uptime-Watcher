@@ -248,10 +248,12 @@ export class SiteLifecycleCoordinator {
      *
      * @remarks
      * Preserves the two-phase semantics previously implemented directly in
-    * {@link electron/UptimeOrchestrator#UptimeOrchestrator.deleteAllSites}: monitoring is stopped for all
-    * sites first, then the bulk deletion is executed via {@link electron/managers/SiteManager#SiteManager}.
-     * Any failure in either phase is wrapped in a contextual
-    * {@link shared/utils/errorHandling#ApplicationError | ApplicationError} so callers receive consistent telemetry.
+     * {@link electron/UptimeOrchestrator#UptimeOrchestrator.deleteAllSites}:
+     * monitoring is stopped for all sites first, then the bulk deletion is
+     * executed via {@link electron/managers/SiteManager#SiteManager}. Any
+     * failure in either phase is wrapped in a contextual
+     * {@link shared/utils/errorHandling#ApplicationError | ApplicationError} so
+     * callers receive consistent telemetry.
      *
      * The coordinator does not emit additional events; downstream consumers
      * continue to observe the same event stream as before the refactor.

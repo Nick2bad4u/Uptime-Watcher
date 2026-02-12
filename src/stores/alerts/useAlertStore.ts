@@ -11,7 +11,6 @@ import type { MonitorStatus } from "@shared/types";
 
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
-
 /** Maximum number of alerts retained in memory. */
 export const MAX_ALERT_QUEUE_LENGTH = 20;
 
@@ -144,8 +143,6 @@ export interface AlertStore {
 
 /** Convenience type exposing the Zustand store hook. */
 export type AlertStoreHook = UseBoundStore<StoreApi<AlertStore>>;
-
-
 
 /**
  * Creates the Zustand hook responsible for alert queue state.

@@ -175,6 +175,14 @@ export default defineConfig(({ command, mode }) => {
     const isBuild = command === "build";
     const wasmSourcePath = getWasmSourcePath();
 
+    // `vite-plugin-static-copy` can optionally set up chokidar watchers (via its
+    // `watch` option). During Vitest runs on Windows, those watchers may keep
+    // thousands of FILEHANDLEs open, preventing Vitest's Vite server from
+    // exiting cleanly.
+    //
+    // The app does not need static-copy watch behavior in `mode=test`.
+    const shouldWatchStaticCopy = isDev && !isTestMode;
+
     return {
         appType: "spa", // Required for Electron renderer process (SPA mode ensures correct routing and asset loading)
         base: "./", // Ensures relative asset paths for Electron
@@ -617,22 +625,28 @@ export default defineConfig(({ command, mode }) => {
                         },
                     },
                 ],
-                // Add file watching for development hot-reload
-                watch: {
-                    options: {
-                        awaitWriteFinish: {
-                            pollInterval: 100,
-                            stabilityThreshold: 500,
-                        },
-                        depth: 2,
-                        followSymlinks: true,
-                        // Watch options for chokidar
-                        ignoreInitial: true,
-                        persistent: true,
-                    },
-                    // Watch WASM files for changes during development
-                    reloadPageOnChange: false, // Don't reload entire page for WASM changes
-                },
+                // Add file watching for development hot-reload.
+                // IMPORTANT: do not enable in Vitest (`mode=test`) because it can
+                // leak FILEHANDLEs and keep the process alive.
+                ...(shouldWatchStaticCopy
+                    ? {
+                          watch: {
+                              options: {
+                                  awaitWriteFinish: {
+                                      pollInterval: 100,
+                                      stabilityThreshold: 500,
+                                  },
+                                  depth: 2,
+                                  followSymlinks: true,
+                                  // Watch options for chokidar
+                                  ignoreInitial: true,
+                                  persistent: true,
+                              },
+                              // Watch WASM files for changes during development
+                              reloadPageOnChange: false, // Don't reload entire page for WASM changes
+                          },
+                      }
+                    : {}),
             }),
             // Codecov bundle upload is build-only; exclude from `vite serve` to
             // reduce memory usage and startup time.
@@ -675,69 +689,79 @@ export default defineConfig(({ command, mode }) => {
                 ".json",
             ],
         },
-        server: {
-            hmr: {
-                overlay: true, // Show full-screen overlay on errors
-                port: 5174, // Use different port for HMR to avoid conflicts
-                protocol: "ws", // Use WebSocket for HMR
-            },
-            open: false, // Don't auto-open browser (Electron only)
-            port: 5173, // Dev server uses port 5173. This is intentionally different from preview port (6174) to prevent accidental overlap.
-            // Rationale: Separating dev and preview ports allows both environments to run concurrently without port conflicts, aiding development and testing.
-            strictPort: true, // Fail if port is taken (prevents silent port changes)
-            warmup: {
-                // Warm up frequently used files to improve initial loading performance
-                clientFiles: [
-                    // Main application entry points
-                    "./src/App.tsx",
-                    "./src/main.tsx",
+        // Vitest uses Vite under the hood. Our dev-server tuning (warmup,
+        // custom watch options, etc.) is valuable during `vite serve` but can
+        // dramatically increase the number of watched files/handles during
+        // `mode=test` on Windows, making shutdown flaky.
+        //
+        // In test mode we intentionally fall back to Vite defaults.
+        ...(isTestMode
+            ? {}
+            : {
+                  server: {
+                      hmr: {
+                          overlay: true, // Show full-screen overlay on errors
+                          port: 5174, // Use different port for HMR to avoid conflicts
+                          protocol: "ws", // Use WebSocket for HMR
+                      },
+                      open: false, // Don't auto-open browser (Electron only)
+                      port: 5173, // Dev server uses port 5173. This is intentionally different from preview port (6174) to prevent accidental overlap.
+                      // Rationale: Separating dev and preview ports allows both environments to run concurrently without port conflicts, aiding development and testing.
+                      strictPort: true, // Fail if port is taken (prevents silent port changes)
+                      warmup: {
+                          // Warm up frequently used files to improve initial loading performance
+                          clientFiles: [
+                              // Main application entry points
+                              "./src/App.tsx",
+                              "./src/main.tsx",
 
-                    // Core stores (used throughout the app)
-                    "./src/stores/sites/useSitesStore.ts",
-                    "./src/stores/settings/useSettingsStore.ts",
-                    "./src/stores/ui/useUiStore.ts",
-                    "./src/stores/error/useErrorStore.ts",
+                              // Core stores (used throughout the app)
+                              "./src/stores/sites/useSitesStore.ts",
+                              "./src/stores/settings/useSettingsStore.ts",
+                              "./src/stores/ui/useUiStore.ts",
+                              "./src/stores/error/useErrorStore.ts",
 
-                    // Common theme components (used everywhere)
-                    "./src/theme/components/ThemeProvider.tsx",
-                    "./src/theme/components/ThemedBox.tsx",
-                    "./src/theme/components/ThemedButton.tsx",
-                    "./src/theme/components/ThemedText.tsx",
-                    "./src/theme/useTheme.ts",
+                              // Common theme components (used everywhere)
+                              "./src/theme/components/ThemeProvider.tsx",
+                              "./src/theme/components/ThemedBox.tsx",
+                              "./src/theme/components/ThemedButton.tsx",
+                              "./src/theme/components/ThemedText.tsx",
+                              "./src/theme/useTheme.ts",
 
-                    // Heavy chart components (Chart.js is large)
-                    "./src/components/SiteDetails/charts/ResponseTimeChart.tsx",
-                    "./src/components/SiteDetails/charts/UptimeChart.tsx",
-                    "./src/components/SiteDetails/charts/StatusChart.tsx",
-                    "./src/components/common/HistoryChart.tsx",
+                              // Heavy chart components (Chart.js is large)
+                              "./src/components/SiteDetails/charts/ResponseTimeChart.tsx",
+                              "./src/components/SiteDetails/charts/UptimeChart.tsx",
+                              "./src/components/SiteDetails/charts/StatusChart.tsx",
+                              "./src/components/common/HistoryChart.tsx",
 
-                    // Frequently used components
-                    "./src/components/Dashboard/SiteList/SiteList.tsx",
-                    "./src/components/Header/Header.tsx",
-                    "./src/components/SiteDetails/SiteDetails.tsx",
+                              // Frequently used components
+                              "./src/components/Dashboard/SiteList/SiteList.tsx",
+                              "./src/components/Header/Header.tsx",
+                              "./src/components/SiteDetails/SiteDetails.tsx",
 
-                    // Chart utilities and configuration (used by all chart components)
-                    "./src/services/chartConfig.ts",
-                    "./src/utils/chartUtils.ts",
+                              // Chart utilities and configuration (used by all chart components)
+                              "./src/services/chartConfig.ts",
+                              "./src/utils/chartUtils.ts",
 
-                    // Shared types and utilities
-                    "./shared/types.ts",
-                    "./shared/utils/environment.ts",
-                ],
-            },
-            watch: {
-                awaitWriteFinish: {
-                    pollInterval: 100,
-                    stabilityThreshold: 500,
-                },
-                followSymlinks: true,
-                // Watch options for chokidar
-                ignoreInitial: true,
-                persistent: true,
-                // Watch WASM files for changes during development
-                useFsEvents: true, // Use native file system events for better performance
-            },
-        },
+                              // Shared types and utilities
+                              "./shared/types.ts",
+                              "./shared/utils/environment.ts",
+                          ],
+                      },
+                      watch: {
+                          awaitWriteFinish: {
+                              pollInterval: 100,
+                              stabilityThreshold: 500,
+                          },
+                          followSymlinks: true,
+                          // Watch options for chokidar
+                          ignoreInitial: true,
+                          persistent: true,
+                          // Watch WASM files for changes during development
+                          useFsEvents: true, // Use native file system events for better performance
+                      },
+                  },
+              }),
         test: {
             // Directory for storing Vitest test attachments (screenshots, logs, etc.) in a hidden cache folder.
             // This helps keep test artifacts organized and out of the main source tree.

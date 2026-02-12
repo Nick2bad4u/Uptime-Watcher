@@ -24,7 +24,8 @@ export interface SettingsTabDangerZoneCardProperties {
 }
 
 /**
- * Renders the “Danger Zone” section of {@link src/components/SiteDetails/tabs/SettingsTab#SettingsTab}.
+ * Renders the “Danger Zone” section of
+ * {@link src/components/SiteDetails/tabs/SettingsTab#SettingsTab}.
  */
 export const SettingsTabDangerZoneCard = ({
     isLoading,

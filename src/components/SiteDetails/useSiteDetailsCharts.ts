@@ -31,9 +31,11 @@ interface StatusDistribution {
 }
 
 /**
- * Builds chart configuration objects used by {@link src/components/SiteDetails/SiteDetails#SiteDetails}.
+ * Builds chart configuration objects used by
+ * {@link src/components/SiteDetails/SiteDetails#SiteDetails}.
  *
- * @param analytics - Analytics computed by {@link src/hooks/site/useSiteAnalytics#useSiteAnalytics}.
+ * @param analytics - Analytics computed by
+ *   {@link src/hooks/site/useSiteAnalytics#useSiteAnalytics}.
  * @param currentTheme - Current application theme.
  *
  * @returns Memoized chart options and datasets.

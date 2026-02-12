@@ -42,7 +42,7 @@ export interface MonitorRetryPlan {
  * Converts an "additional retries" value into a total attempt count.
  *
  * @remarks
- * Example: `additionalRetries = 3` -\> `totalAttempts = 4`.
+ * Example: `additionalRetries = 3` becomes `totalAttempts = 4`.
  */
 export function toTotalAttempts(additionalRetries: unknown): number {
     return normalizeAdditionalRetryAttempts(additionalRetries) + 1;
@@ -52,7 +52,7 @@ export function toTotalAttempts(additionalRetries: unknown): number {
  * Builds a normalized retry plan for monitor checks.
  *
  * @remarks
- * Example: `additionalRetries = 3` -\> `{ additionalRetries: 3, totalAttempts: 4 }`.
+ * Example: `additionalRetries = 3` becomes `{ additionalRetries: 3, totalAttempts: 4 }`.
  *
  * @public
  */

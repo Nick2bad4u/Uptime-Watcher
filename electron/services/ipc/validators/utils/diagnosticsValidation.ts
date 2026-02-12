@@ -1,7 +1,7 @@
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
-import { IpcValidators } from "../IpcValidators";
 import { requireRecordParamValue } from "./recordValidation";
+import { validateOptionalStringPayload } from "./stringPayloadValidation";
 
 /**
  * Options for validating payload preview data in diagnostics reports.
@@ -42,19 +42,11 @@ export function validateDiagnosticsPayloadPreview(
     options: DiagnosticsPayloadPreviewOptions
 ): string[] {
     const paramName = options.paramName ?? "payloadPreview";
-    const optionalError = IpcValidators.optionalString(value, paramName);
-    if (optionalError) {
-        return [optionalError];
-    }
-
-    if (
-        typeof value === "string" &&
-        getUtfByteLength(value) > options.maxBytes
-    ) {
-        return [`${paramName} exceeds ${options.maxBytes} bytes`];
-    }
-
-    return [];
+    return validateOptionalStringPayload(value, {
+        maxBytes: options.maxBytes,
+        maxBytesMessage: `${paramName} exceeds ${options.maxBytes} bytes`,
+        paramName,
+    });
 }
 
 /**

@@ -28,9 +28,7 @@ import type {
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
 import type { SitesTelemetryPayload } from "./utils/operationHelpers";
-import type {
-    StatusUpdateSubscriptionResult,
-} from "./utils/statusUpdateHandler";
+import type { StatusUpdateSubscriptionResult } from "./utils/statusUpdateHandler";
 
 import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
@@ -188,9 +186,9 @@ export interface SiteSyncDependencies {
  *
  * @remarks
  * The sites sync module keeps a lazily-initialized singleton
- * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} instance. This helper exists to support
- * deterministic testing and to avoid leaked event subscriptions when modules
- * are reloaded in development.
+ * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}
+ * instance. This helper exists to support deterministic testing and to avoid
+ * leaked event subscriptions when modules are reloaded in development.
  *
  * @internal
  */

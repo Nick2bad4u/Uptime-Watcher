@@ -19,7 +19,7 @@ export const noDeprecatedExportsRule = {
      * @param {{
      *     sourceCode?: any;
      *     getSourceCode?: () => any;
-    *     report: (descriptor: { messageId: string; node: any }) => void;
+     *     report: (descriptor: { messageId: string; node: any }) => void;
      * }} context
      */
     create(context) {
@@ -34,6 +34,7 @@ export const noDeprecatedExportsRule = {
          * Retrieves the closest JSDoc comment associated with a node.
          *
          * @param {any} node
+         *
          *   - Node to inspect.
          *
          * @returns {any}
@@ -81,8 +82,10 @@ export const noDeprecatedExportsRule = {
          * Reports when the inspected node carries a @deprecated tag.
          *
          * @param {import("estree").Node | null | undefined} targetNode
+         *
          *   - Node whose JSDoc should be analysed.
          * @param {import("estree").Node} reportNode
+         *
          *   - Node to attach the ESLint violation to.
          */
         function reportIfDeprecated(targetNode, reportNode) {

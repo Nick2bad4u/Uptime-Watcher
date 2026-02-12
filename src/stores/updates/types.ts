@@ -39,8 +39,9 @@ export interface UpdatesStore {
      *
      * @remarks
      * This is intentionally store-owned so application bootstrap code can
-    * subscribe via the domain store (rather than wiring {@link src/services/EventsService#EventsService}
-     * directly in the root component).
+     * subscribe via the domain store (rather than wiring
+     * {@link src/services/EventsService#EventsService} directly in the root
+     * component).
      *
      * The returned cleanup function is safe to call even if the async
      * subscription has not yet finished establishing.

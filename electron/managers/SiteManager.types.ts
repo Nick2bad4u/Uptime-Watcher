@@ -1,7 +1,8 @@
 /* V8 ignore start */
 
 /**
- * Site manager type contracts extracted from {@link electron/managers/SiteManager#SiteManager}.
+ * Site manager type contracts extracted from
+ * {@link electron/managers/SiteManager#SiteManager}.
  *
  * @remarks
  * `electron/managers/SiteManager.ts` is a very large module (CRUD + cache +
@@ -70,7 +71,8 @@ export interface IMonitoringOperations {
 }
 
 /**
- * Dependency injection configuration for {@link electron/managers/SiteManager#SiteManager}.
+ * Dependency injection configuration for
+ * {@link electron/managers/SiteManager#SiteManager}.
  */
 export interface SiteManagerDependencies {
     /** Configuration manager for business rules and validation. */

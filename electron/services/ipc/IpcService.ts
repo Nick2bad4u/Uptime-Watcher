@@ -24,7 +24,6 @@ import { registerStateSyncHandlers } from "./handlers/stateSyncHandlers";
 import { registerSystemHandlers } from "./handlers/systemHandlers";
 import { StateSyncStatusTracker } from "./internal/stateSyncStatusTracker";
 
-
 /**
  * Centralizes registration and lifecycle management of Electron IPC handlers.
  */
@@ -156,5 +155,4 @@ export class IpcService {
         );
         this.stateSyncListenerRegistered = true;
     }
-
 }

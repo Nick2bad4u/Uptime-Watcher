@@ -99,8 +99,8 @@ export class SiteLoadingError extends Error {
  * Custom error for import/export data operations.
  *
  * @remarks
- * Used by `DataImportExportService` to surface errors related to JSON
- * export, JSON import parsing, schema validation, and persistence workflows.
+ * Used by `DataImportExportService` to surface errors related to JSON export,
+ * JSON import parsing, schema validation, and persistence workflows.
  *
  * Unlike {@link SiteLoadingError}, this error does not apply a site-loading
  * specific prefix to the message.

@@ -447,7 +447,9 @@ import type { RendererEventPayload } from "@shared/ipc/rendererEvents";
 import type { RendererEventBridge } from "@electron/services/events/RendererEventBridge";
 
 declare const rendererEventBridge: RendererEventBridge;
-declare const payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.TEST_EVENT>;
+declare const payload: RendererEventPayload<
+ typeof RENDERER_EVENT_CHANNELS.TEST_EVENT
+>;
 
 // Best-effort broadcast from Electron main to all renderer windows
 rendererEventBridge.sendToRenderers(

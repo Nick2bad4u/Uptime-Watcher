@@ -155,15 +155,15 @@ import { defineConfig, mergeConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 
 export default defineConfig((configEnv) =>
-        mergeConfig(
-                viteConfig(configEnv),
-                defineConfig({
-                        cacheDir: "./.cache/vitest/",
-                        test: {
-                                name: { color: "cyan", label: "Frontend" },
-                        },
-                })
-        )
+ mergeConfig(
+  viteConfig(configEnv),
+  defineConfig({
+   cacheDir: "./.cache/vitest/",
+   test: {
+    name: { color: "cyan", label: "Frontend" },
+   },
+  })
+ )
 );
 ```
 
@@ -372,17 +372,17 @@ import { vi } from "vitest";
 import { installElectronApiMock } from "./utils/electronApiMock";
 
 it("loads sites from the preload API", async () => {
-        const { restore } = installElectronApiMock({
-                sites: {
-                getSites: vi.fn(async () => []),
-                },
-        });
+ const { restore } = installElectronApiMock({
+  sites: {
+   getSites: vi.fn(async () => []),
+  },
+ });
 
-        try {
-                // ...assertions...
-        } finally {
-                restore();
-        }
+ try {
+  // ...assertions...
+ } finally {
+  restore();
+ }
 });
 ```
 
@@ -405,22 +405,22 @@ const baseNumRuns = (current as { numRuns?: number }).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 fc.configureGlobal({
-    ...current,
-    ...fastCheckOverrides,
+ ...current,
+ ...fastCheckOverrides,
 
-    // Reporting / debugging helpers
-    verbose: 2,
-    includeErrorInReport: true,
+ // Reporting / debugging helpers
+ verbose: 2,
+ includeErrorInReport: true,
 
-    // Failure and time limits
-    endOnFailure: true,
-    timeout: 3000,
-    interruptAfterTimeLimit: 5 * 60 * 1000,
-    markInterruptAsFailure: true,
-    skipAllAfterTimeLimit: 60 * 1000,
+ // Failure and time limits
+ endOnFailure: true,
+ timeout: 3000,
+ interruptAfterTimeLimit: 5 * 60 * 1000,
+ markInterruptAsFailure: true,
+ skipAllAfterTimeLimit: 60 * 1000,
 
-    // Duplicate handling and skipping
-    maxSkipsPerRun: 100,
+ // Duplicate handling and skipping
+ maxSkipsPerRun: 100,
 });
 ```
 
@@ -480,34 +480,35 @@ npm run test:storybook:coverage
 ```typescript
 // playwright.config.ts
 const isCI = Boolean(process.env.CI);
-const isAttachmentsEnabled = process.env.PLAYWRIGHT_ENABLE_ATTACHMENTS === "true";
+const isAttachmentsEnabled =
+ process.env.PLAYWRIGHT_ENABLE_ATTACHMENTS === "true";
 
 export default defineConfig({
-    testDir: "./playwright/tests",
-    outputDir: "playwright/test-results/",
-    globalSetup: "./playwright/fixtures/global-setup.ts",
-    globalTeardown: "./playwright/fixtures/global-teardown.ts",
+ testDir: "./playwright/tests",
+ outputDir: "playwright/test-results/",
+ globalSetup: "./playwright/fixtures/global-setup.ts",
+ globalTeardown: "./playwright/fixtures/global-teardown.ts",
 
-    forbidOnly: isCI,
-    retries: isCI ? 2 : 0,
+ forbidOnly: isCI,
+ retries: isCI ? 2 : 0,
 
-    // Project set is built via helpers in playwright.config.ts (see
-    // createElectronProject/createUiProject).
-    projects: [
-        { name: "electron-main" },
-        { name: "electron-renderer" },
-        { name: "electron-e2e" },
-        { name: "ui-smoke" },
-        { name: "ui-regression" },
-    ],
+ // Project set is built via helpers in playwright.config.ts (see
+ // createElectronProject/createUiProject).
+ projects: [
+  { name: "electron-main" },
+  { name: "electron-renderer" },
+  { name: "electron-e2e" },
+  { name: "ui-smoke" },
+  { name: "ui-regression" },
+ ],
 
-    use: {
-        // Attachments are gated by PLAYWRIGHT_ENABLE_ATTACHMENTS so local runs
-        // stay fast and CI only captures heavy diagnostics when enabled.
-        screenshot: isAttachmentsEnabled ? "only-on-failure" : "off",
-        trace: isAttachmentsEnabled ? "on-first-retry" : "off",
-        video: isAttachmentsEnabled ? "retain-on-failure" : "off",
-    },
+ use: {
+  // Attachments are gated by PLAYWRIGHT_ENABLE_ATTACHMENTS so local runs
+  // stay fast and CI only captures heavy diagnostics when enabled.
+  screenshot: isAttachmentsEnabled ? "only-on-failure" : "off",
+  trace: isAttachmentsEnabled ? "on-first-retry" : "off",
+  video: isAttachmentsEnabled ? "retain-on-failure" : "off",
+ },
 });
 ```
 

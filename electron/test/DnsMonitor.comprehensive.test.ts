@@ -1,6 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Monitor } from "@shared/types";
 
+vi.mock("@shared/utils/abortUtils", async () => {
+    const actual = await vi.importActual<typeof import("@shared/utils/abortUtils")>(
+        "@shared/utils/abortUtils"
+    );
+
+    return {
+        ...actual,
+        sleepUnref: vi.fn().mockResolvedValue(undefined),
+    };
+});
+
 // Use a simpler mock approach
 vi.mock("node:dns/promises", () => ({
     resolve4: vi.fn(() => Promise.resolve(["192.168.1.1"])),
@@ -68,6 +79,9 @@ vi.mock("node:dns/promises", () => ({
 // Import after mocking
 import { DnsMonitor } from "../services/monitoring/DnsMonitor";
 
+import { sleepUnref } from "@shared/utils/abortUtils";
+import { resolve4 } from "node:dns/promises";
+
 function createTestMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {
         id: "test-dns",
@@ -102,22 +116,29 @@ describe(DnsMonitor, () => {
         expect(dnsMonitor).toBeInstanceOf(DnsMonitor);
     });
 
-    it("should check A record successfully - DEBUG", async ({
-        task,
-        annotate,
-    }) => {
+    it("retries transient DNS resolver failures", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: DnsMonitor", "component");
         await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
+        await annotate("Type: Reliability", "type");
 
-        const monitor = createTestMonitor({ recordType: "A" });
+        const resolve4Mock = vi.mocked(resolve4);
+        resolve4Mock
+            .mockRejectedValueOnce(new Error("temporary dns failure"))
+            .mockRejectedValueOnce(new Error("temporary dns failure"))
+            .mockResolvedValueOnce(["192.168.1.1"]);
+
+        const sleepUnrefMock = vi.mocked(sleepUnref);
+        sleepUnrefMock.mockClear();
+
+        const monitor = createTestMonitor({ recordType: "A", retryAttempts: 2 });
         const result = await dnsMonitor.check(monitor);
-        console.log("DEBUG - Status:", result.status);
-        console.log("DEBUG - Response time:", result.responseTime);
-        console.log("DEBUG - Error:", result.error);
-        console.log("DEBUG - Details:", result.details);
-        expect(result.status).toBe("up"); // Changed back to up since it's working!
+
+        expect(result.status).toBe("up");
+        expect(resolve4Mock).toHaveBeenCalledTimes(3);
+        expect(sleepUnrefMock).toHaveBeenCalledTimes(2);
+        // First retry delay should be the initial backoff delay.
+        expect(sleepUnrefMock).toHaveBeenNthCalledWith(1, 500, undefined);
     });
 
     it("should check A record successfully", async ({ task, annotate }) => {

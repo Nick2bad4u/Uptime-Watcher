@@ -1,6 +1,7 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { createCombinedAbortSignal } from "@shared/utils/abortUtils";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomInt } from "node:crypto";
@@ -332,24 +333,22 @@ export class MonitorScheduler {
             monitorId,
             siteIdentifier,
         });
-
-        const abortController = new AbortController();
         const timeoutMs = resolveMonitorBaseTimeoutMs();
-        const timeoutHandle = setTimeout(() => {
-            abortController.abort("Manual check timed out");
-        }, timeoutMs);
 
-        timeoutHandle.unref();
+        const signal = createCombinedAbortSignal({
+            reason: "Manual check timed out",
+            timeoutMs,
+        });
 
         try {
             await this.onCheckCallback(
                 siteIdentifier,
                 monitorId,
-                abortController.signal
+                signal
             );
         } catch (error) {
             const normalizedError = ensureError(error);
-            const logMethod = abortController.signal.aborted
+            const logMethod = signal.aborted
                 ? this.logger.warn
                 : this.logger.error;
 
@@ -358,8 +357,6 @@ export class MonitorScheduler {
                 `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
                 normalizedError
             );
-        } finally {
-            clearTimeout(timeoutHandle);
         }
     }
 

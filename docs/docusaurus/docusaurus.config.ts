@@ -306,7 +306,7 @@ const config: Config = {
                     showLastUpdateAuthor: true,
                     showLastUpdateTime: true,
                     showReadingTime: true,
-                    sortPosts:"descending",
+                    sortPosts: "descending",
                     truncateMarker:
                         /<!--\s*truncate\s*-->|\{\/\*\s*truncate\s*\*\/\}/u,
                 },
@@ -315,8 +315,7 @@ const config: Config = {
                     breadcrumbs: true,
                     disableVersioning: true,
                     editCurrentVersion: true,
-                    editUrl:
-                        "https://github.com/Nick2bad4u/Uptime-Watcher/",
+                    editUrl: "https://github.com/Nick2bad4u/Uptime-Watcher/",
                     exclude: [
                         "**/_*.{js,jsx,ts,tsx,md,mdx}",
                         "**/_*/**",

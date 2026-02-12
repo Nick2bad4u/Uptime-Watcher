@@ -13,77 +13,12 @@ import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import { logger } from "../../../services/logger";
+import {
+    FileDownloadDomAttachmentError,
+    triggerArrayBufferDownload,
+    triggerBlobDownload,
+} from "../../../utils/downloads/browserFileDownload";
 import { isPlaywrightAutomation } from "../../../utils/environment";
-
-class FileDownloadDomAttachmentError extends Error {
-    public constructor(message: string, options?: ErrorOptions) {
-        super(message, options);
-        this.name = "FileDownloadDomAttachmentError";
-    }
-}
-
-/**
- * Creates an object URL for the provided blob and guarantees cleanup.
- */
-function withObjectUrl(blob: Blob, run: (objectURL: string) => void): void {
-    const objectURL = URL.createObjectURL(blob);
-    try {
-        run(objectURL);
-    } finally {
-        URL.revokeObjectURL(objectURL);
-    }
-}
-
-function createDownloadAnchor(
-    objectURL: string,
-    fileName: string
-): HTMLAnchorElement {
-    const anchor = document.createElement("a");
-    anchor.href = objectURL;
-    anchor.download = fileName;
-    return anchor;
-}
-
-function clickDownloadAnchor(
-    anchor: HTMLAnchorElement,
-    attachToDom: boolean
-): void {
-    if (!attachToDom) {
-        anchor.click();
-        return;
-    }
-
-    anchor.style.display = "none";
-
-    const { body } = document;
-
-    try {
-        body.append(anchor);
-    } catch (error: unknown) {
-        throw new FileDownloadDomAttachmentError(
-            "Failed to attach download anchor to DOM",
-            { cause: error }
-        );
-    }
-
-    try {
-        anchor.click();
-    } catch (domError) {
-        const error =
-            domError instanceof Error
-                ? domError
-                : new Error(getUserFacingErrorDetail(domError));
-        logger.warn("DOM click failed, retrying direct click", error);
-        anchor.click();
-    } finally {
-        // Best-effort cleanup.
-        try {
-            anchor.remove();
-        } catch {
-            // Ignore cleanup errors.
-        }
-    }
-}
 
 /**
  * Options for downloading a file in the browser.
@@ -123,11 +58,16 @@ function createAndTriggerDownload(
     mimeType: string,
     attachToDom: boolean
 ): void {
-    const blob = new Blob([buffer], { type: mimeType });
-
-    withObjectUrl(blob, (objectURL) => {
-        const anchor = createDownloadAnchor(objectURL, fileName);
-        clickDownloadAnchor(anchor, attachToDom);
+    triggerArrayBufferDownload({
+        attachToDom,
+        buffer,
+        fileName,
+        mimeType,
+        warnLogger: {
+            warn: (message, error) => {
+                logger.warn(message, error);
+            },
+        },
     });
 }
 
@@ -393,28 +333,30 @@ export async function handleSQLiteBackupDownload(
         type: "application/x-sqlite3",
     });
 
-    withObjectUrl(blob, (objectURL) => {
-        const anchor = createDownloadAnchor(objectURL, normalizedFileName);
+    try {
+        triggerBlobDownload({
+            attachToDom: false,
+            blob,
+            fileName: normalizedFileName,
+            warnLogger: {
+                warn: (message, error) => {
+                    logger.warn(message, error);
+                },
+            },
+        });
+    } catch (clickError) {
+        const normalizedClickError =
+            clickError instanceof Error
+                ? clickError
+                : new Error(getUserFacingErrorDetail(clickError));
 
-        try {
-            clickDownloadAnchor(anchor, false);
-        } catch (clickError) {
-            const normalizedClickError =
-                clickError instanceof Error
-                    ? clickError
-                    : new Error(getUserFacingErrorDetail(clickError));
+        logger.error("Failed to trigger download click", normalizedClickError);
 
-            logger.error(
-                "Failed to trigger download click",
-                normalizedClickError
-            );
-
-            throw new Error(
-                `Download trigger failed: ${getUserFacingErrorDetail(clickError)}`,
-                { cause: clickError }
-            );
-        }
-    });
+        throw new Error(
+            `Download trigger failed: ${getUserFacingErrorDetail(clickError)}`,
+            { cause: clickError }
+        );
+    }
 
     return backupResult;
 }

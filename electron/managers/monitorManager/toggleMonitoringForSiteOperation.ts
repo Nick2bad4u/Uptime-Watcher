@@ -2,8 +2,8 @@
  * Per-site monitor toggle helper.
  *
  * @remarks
- * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to centralize event emission and keep
- * the manager focused on orchestration.
+ * Extracted from {@link electron/managers/MonitorManager#MonitorManager} to
+ * centralize event emission and keep the manager focused on orchestration.
  *
  * @packageDocumentation
  */

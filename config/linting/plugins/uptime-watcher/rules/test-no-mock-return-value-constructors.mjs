@@ -24,7 +24,7 @@ import { normalizePath } from "../_internal/path-utils.mjs";
 export const testNoMockReturnValueConstructorsRule = {
     /**
      * @param {{
-        *     getFilename: () => string;
+     *     getFilename: () => string;
      *     report: (arg0: {
      *         node: any;
      *         messageId: string;

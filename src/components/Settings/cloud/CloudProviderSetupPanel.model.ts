@@ -33,7 +33,8 @@ export interface CloudProviderSetupPanelTabDefinition {
 }
 
 /**
- * Tab definitions for {@link src/components/Settings/cloud/CloudProviderSetupPanel#CloudProviderSetupPanel}.
+ * Tab definitions for
+ * {@link src/components/Settings/cloud/CloudProviderSetupPanel#CloudProviderSetupPanel}.
  */
 export const CLOUD_PROVIDER_SETUP_PANEL_TABS: readonly CloudProviderSetupPanelTabDefinition[] =
     [

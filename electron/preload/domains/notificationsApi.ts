@@ -67,7 +67,8 @@ function createNotificationsApi(): NotificationsApiInterface {
 
 const createNotificationsApiFallback = (
     unavailableError: Error
-): NotificationsApiInterface => ({
+): NotificationsApiInterface =>
+    ({
         notifyAppEvent: (
             ...args: Parameters<NotificationsApiInterface["notifyAppEvent"]>
         ) => {
@@ -75,14 +76,12 @@ const createNotificationsApiFallback = (
             return Promise.reject(unavailableError);
         },
         updatePreferences: (
-            ...args: Parameters<
-                NotificationsApiInterface["updatePreferences"]
-            >
+            ...args: Parameters<NotificationsApiInterface["updatePreferences"]>
         ) => {
             acceptUnusedPreloadArguments(...args);
             return Promise.reject(unavailableError);
         },
-    } as const);
+    }) as const;
 
 export const notificationsApi: NotificationsApiInterface = createPreloadDomain({
     create: createNotificationsApi,

@@ -3,11 +3,12 @@
  * approach.
  *
  * @remarks
- * This validator is used by {@link electron/managers/SiteManager#SiteManager} and {@link electron/managers/ConfigurationManager#ConfigurationManager}
- * to validate monitor configurations before persistence or updates. It
- * delegates to the {@link MonitorTypeRegistry} for type-specific validation
- * using shared Zod schemas, ensuring consistency between frontend and backend
- * validation rules.
+ * This validator is used by {@link electron/managers/SiteManager#SiteManager}
+ * and {@link electron/managers/ConfigurationManager#ConfigurationManager} to
+ * validate monitor configurations before persistence or updates. It delegates
+ * to the {@link MonitorTypeRegistry} for type-specific validation using shared
+ * Zod schemas, ensuring consistency between frontend and backend validation
+ * rules.
  *
  * The validator performs comprehensive checks including:
  *
@@ -36,10 +37,11 @@ import {
  * schemas.
  *
  * @remarks
- * This class provides monitor validation logic for {@link electron/managers/SiteManager#SiteManager} and
- * {@link electron/managers/ConfigurationManager#ConfigurationManager}. It uses registry-driven validation and shared
- * Zod schemas to ensure consistency between frontend and backend validation
- * rules.
+ * This class provides monitor validation logic for
+ * {@link electron/managers/SiteManager#SiteManager} and
+ * {@link electron/managers/ConfigurationManager#ConfigurationManager}. It uses
+ * registry-driven validation and shared Zod schemas to ensure consistency
+ * between frontend and backend validation rules.
  *
  * @public
  */
@@ -118,7 +120,8 @@ export class MonitorValidator {
      * validation fails, or an empty array if valid.
      *
      * @privateRemarks
-    * This method is intended for internal use within {@link electron/managers/validators/MonitorValidator#MonitorValidator}.
+     * This method is intended for internal use within
+     * {@link electron/managers/validators/MonitorValidator#MonitorValidator}.
      *
      * @example
      *

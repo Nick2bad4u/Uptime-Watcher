@@ -76,7 +76,8 @@ export function useSiteDetailsSelectionHandlers(
 }
 
 /**
- * Remove-site / remove-monitor handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ * Remove-site / remove-monitor handlers for
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */
@@ -282,7 +283,8 @@ export function useSiteDetailsMonitoringHandlers(
 }
 
 /**
- * Settings edit/save handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ * Settings edit/save handlers for
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */
@@ -475,7 +477,8 @@ export function useSiteDetailsSettingsHandlers(
 }
 
 /**
- * Site-name save handler for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ * Site-name save handler for
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */

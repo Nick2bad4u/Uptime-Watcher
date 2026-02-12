@@ -17,7 +17,8 @@ import {
  *
  * Policy:
  *
- * - Must be a valid external-open URL per {@link validateExternalOpenUrlCandidateWithPolicy}
+ * - Must be a valid external-open URL per
+ *   {@link validateExternalOpenUrlCandidateWithPolicy}
  * - Must use `https:`
  *
  * @param args - Provider name and candidate URL.

@@ -64,9 +64,9 @@ import {
  * Absolute directory path for this module.
  *
  * @remarks
- * Do not use `import.meta.dirname` because bundlers may not preserve it.
- * Prefer deriving it from `import.meta.url`, which is robust in both Node ESM
- * and bundled builds.
+ * Do not use `import.meta.dirname` because bundlers may not preserve it. Prefer
+ * deriving it from `import.meta.url`, which is robust in both Node ESM and
+ * bundled builds.
  */
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
@@ -247,7 +247,6 @@ export class WindowService {
                 ? { errorCode: result.errorCode }
                 : {}),
         });
-
     }
 
     /**

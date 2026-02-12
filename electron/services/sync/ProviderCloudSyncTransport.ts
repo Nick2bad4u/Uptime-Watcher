@@ -26,14 +26,16 @@ import type { CloudSyncTransport } from "./CloudSyncTransport.types";
 import { logger } from "../../utils/logger";
 import { CloudSyncCorruptRemoteObjectError } from "./cloudSyncTransportErrors";
 import {
+    assertOpsObjectKey,
+    assertSnapshotKey,
+    assertValidSyncDeviceId,
+    isValidOpsObjectKey,
+} from "./providerKeyValidation";
+import { createSnapshotNonceHex } from "./snapshotKeyUtils";
+import {
     OPS_OBJECT_SUFFIX,
     parseOpsObjectFileNameMetadata,
 } from "./syncEngineKeyUtils";
-import {
-    getPersistedDeviceIdValidationError,
-    hasAsciiControlCharacters,
-    isAsciiDigits,
-} from "./syncEngineUtils";
 
 const MANIFEST_KEY = "manifest.json" as const;
 const OPS_PREFIX = "sync/devices" as const;
@@ -44,12 +46,6 @@ const DEFAULT_MAX_OPS_LINE_CHARS = 256_000;
 
 const DEFAULT_MAX_SNAPSHOT_BYTES = 25 * 1024 * 1024; // 25 MiB
 const DEFAULT_MAX_MANIFEST_BYTES = 256 * 1024; // 256 KiB
-
-/** Maximum byte budget accepted for provider object keys handled by sync. */
-const MAX_SYNC_KEY_BYTES = 2048;
-
-/** Minimum hex chars used for snapshot nonce suffix. */
-const SNAPSHOT_NONCE_HEX_CHARS = 32;
 
 function getMaxOpsObjectBytes(): number {
     return readNumberEnv(
@@ -142,191 +138,6 @@ function toNdjson(operations: readonly CloudSyncOperation[]): string {
     return `${operations.map((op) => JSON.stringify(op)).join("\n")}\n`;
 }
 
-function assertValidDeviceId(deviceId: string): void {
-    // Keep the historical TypeError for non-string values (even though call
-    // sites are typed as string).
-    if (typeof deviceId !== "string") {
-        throw new TypeError("deviceId must be a non-empty string");
-    }
-
-    const error = getPersistedDeviceIdValidationError(deviceId);
-    if (error !== null) {
-        throw new Error(error);
-    }
-}
-
-function assertSafeProviderKey(key: string): void {
-    if (typeof key !== "string" || key.trim().length === 0) {
-        throw new Error("Key must be a non-empty string");
-    }
-
-    if (Buffer.byteLength(key, "utf8") > MAX_SYNC_KEY_BYTES) {
-        throw new Error(`Invalid key: exceeds ${MAX_SYNC_KEY_BYTES} bytes`);
-    }
-
-    // Provider keys are always POSIX-style.
-    if (key.includes("\\")) {
-        throw new Error("Invalid key: backslashes are not allowed");
-    }
-
-    if (hasAsciiControlCharacters(key)) {
-        throw new Error("Invalid key: control characters are not allowed");
-    }
-
-    if (key.startsWith("/")) {
-        throw new Error("Invalid key: absolute keys are not allowed");
-    }
-
-    // Treat provider keys as logical identifiers, not OS paths or URLs.
-    if (key.includes("://")) {
-        throw new Error("Invalid key: URL-like keys are not allowed");
-    }
-
-    if (key.includes(":")) {
-        throw new Error("Invalid key: ':' tokens are not allowed");
-    }
-
-    const segments = key.split("/");
-    if (
-        segments.some(
-            (segment) =>
-                segment.length === 0 || segment === "." || segment === ".."
-        )
-    ) {
-        throw new Error("Invalid key: traversal segments are not allowed");
-    }
-}
-
-function assertOpsObjectKey(key: string): void {
-    assertSafeProviderKey(key);
-
-    const segments = key.split("/");
-    // Expected: sync/devices/<deviceId>/ops/<file>.ndjson
-    if (segments.length !== 5) {
-        throw new Error(
-            `Invalid sync operations object key (expected ${OPS_PREFIX}/<deviceId>/ops/<file>.ndjson): ${key}`
-        );
-    }
-
-    const [
-        syncSegment,
-        devicesSegment,
-        deviceIdSegment,
-        opsSegment,
-        fileName,
-    ] = segments;
-
-    if (
-        !syncSegment ||
-        !devicesSegment ||
-        !deviceIdSegment ||
-        !opsSegment ||
-        !fileName
-    ) {
-        throw new Error(
-            `Invalid sync operations object key (expected ${OPS_PREFIX}/<deviceId>/ops/<file>.ndjson): ${key}`
-        );
-    }
-
-    if (syncSegment !== "sync" || devicesSegment !== "devices") {
-        throw new Error(
-            `Invalid sync operations object key (expected ${OPS_PREFIX}/...): ${key}`
-        );
-    }
-
-    if (opsSegment !== "ops") {
-        throw new Error(
-            `Invalid sync operations object key (expected ops segment): ${key}`
-        );
-    }
-
-    assertValidDeviceId(deviceIdSegment);
-
-    const parsedFileName = parseOpsObjectFileNameMetadata(fileName);
-    if (!parsedFileName) {
-        throw new Error(
-            `Invalid sync operations object key (expected <createdAt>-<firstOpId>-<lastOpId>${OPS_OBJECT_SUFFIX}): ${key}`
-        );
-    }
-}
-
-function isValidOpsObjectKey(key: string): boolean {
-    try {
-        assertOpsObjectKey(key);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-function assertSnapshotKey(key: string): void {
-    assertSafeProviderKey(key);
-
-    const segments = key.split("/");
-    // Expected:
-    // - legacy: sync/snapshots/<schemaVersion>/<createdAt>.json
-    // - v2:     sync/snapshots/<schemaVersion>/<createdAt>-<nonceHex>.json
-    if (segments.length !== 4) {
-        throw new Error(`Invalid snapshot key: ${key}`);
-    }
-
-    const [
-        syncSegment,
-        snapshotsSegment,
-        schemaSegment,
-        fileName,
-    ] = segments;
-    if (syncSegment !== "sync" || snapshotsSegment !== "snapshots") {
-        throw new Error(`Invalid snapshot key: ${key}`);
-    }
-
-    const expectedSchemaSegment = String(CLOUD_SYNC_SCHEMA_VERSION);
-    if (schemaSegment !== expectedSchemaSegment) {
-        throw new Error(`Invalid snapshot key: ${key}`);
-    }
-
-    if (!fileName?.endsWith(".json")) {
-        throw new Error(`Invalid snapshot key: ${key}`);
-    }
-
-    const stem = fileName.slice(0, -".json".length);
-
-    const [
-        createdAtRaw,
-        nonceRaw,
-        ...rest
-    ] = stem.split("-");
-    if (!createdAtRaw || rest.length > 0) {
-        throw new Error(`Invalid snapshot key: ${key}`);
-    }
-
-    if (!isAsciiDigits(createdAtRaw)) {
-        throw new Error(`Invalid snapshot key: ${key}`);
-    }
-
-    if (nonceRaw !== undefined) {
-        const normalized = nonceRaw.toLowerCase();
-        if (normalized.length !== SNAPSHOT_NONCE_HEX_CHARS) {
-            throw new Error(`Invalid snapshot key: ${key}`);
-        }
-
-        // Keep this strict: the suffix is an internal nonce used for
-        // collision avoidance and should be ASCII hex.
-        for (const char of normalized) {
-            const codePoint = char.codePointAt(0);
-            if (codePoint === undefined) {
-                throw new Error(`Invalid snapshot key: ${key}`);
-            }
-
-            const isDigit = codePoint >= 48 && codePoint <= 57;
-            const isHexLower = codePoint >= 97 && codePoint <= 102;
-            if (!isDigit && !isHexLower) {
-                throw new Error(`Invalid snapshot key: ${key}`);
-            }
-        }
-    }
-}
-
 function parseNdjsonOperations(args: {
     key: string;
     maxLineChars: number;
@@ -414,15 +225,6 @@ function createEmptyManifest(): CloudSyncManifest {
     };
 }
 
-function createSnapshotNonceHex(): string {
-    if (typeof globalThis.crypto.randomUUID !== "function") {
-        throw new TypeError("crypto.randomUUID is unavailable");
-    }
-
-    // RandomUUID is RFC4122 (hex + dashes). Remove dashes to get 32 hex chars.
-    return globalThis.crypto.randomUUID().replaceAll("-", "");
-}
-
 function createSnapshotKey(createdAt: number): string {
     const nonceHex = createSnapshotNonceHex();
     return `${getSnapshotsPrefix()}/${createdAt}-${nonceHex}.json`;
@@ -505,7 +307,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             throw new Error("appendOperations requires at least one operation");
         }
 
-        assertValidDeviceId(deviceId);
+        assertValidSyncDeviceId(deviceId);
 
         const createdAtCandidate = createdAtEpochMs ?? Date.now();
         if (

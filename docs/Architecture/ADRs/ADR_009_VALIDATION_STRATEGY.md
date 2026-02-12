@@ -609,7 +609,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_monitors_site_id
 1. **Define Schema** (if new data structure)
 
    ```typescript
-    // shared/validation/<domain>Schemas.ts
+   // shared/validation/<domain>Schemas.ts
    export const newDataSchema = z
     .object({
      field: z.string().min(1),

@@ -38,9 +38,8 @@ describe("validatedExternalOpen", () => {
     });
 
     it("opens an allowed url via shell.openExternal", async () => {
-        const { openExternalValidatedOrThrow } = await import(
-            "@electron/services/shell/validatedExternalOpen"
-        );
+        const { openExternalValidatedOrThrow } =
+            await import("@electron/services/shell/validatedExternalOpen");
 
         await openExternalValidatedOrThrow({
             failureMessagePrefix: "Failed to open",
@@ -55,9 +54,8 @@ describe("validatedExternalOpen", () => {
     });
 
     it("returns a blocked outcome for disallowed urls", async () => {
-        const { tryOpenExternalValidated } = await import(
-            "@electron/services/shell/validatedExternalOpen"
-        );
+        const { tryOpenExternalValidated } =
+            await import("@electron/services/shell/validatedExternalOpen");
 
         const result = await tryOpenExternalValidated({
             failureMessagePrefix: "Failed to open",
@@ -78,9 +76,8 @@ describe("validatedExternalOpen", () => {
             Object.assign(new Error("boom"), { code: "EPERM" })
         );
 
-        const { tryOpenExternalValidated } = await import(
-            "@electron/services/shell/validatedExternalOpen"
-        );
+        const { tryOpenExternalValidated } =
+            await import("@electron/services/shell/validatedExternalOpen");
 
         const result = await tryOpenExternalValidated({
             failureMessagePrefix: "Failed to open",
@@ -93,7 +90,9 @@ describe("validatedExternalOpen", () => {
         }
 
         if (result.outcome !== "open-failed") {
-            throw new Error(`Expected open-failed outcome, got ${result.outcome}`);
+            throw new Error(
+                `Expected open-failed outcome, got ${result.outcome}`
+            );
         }
 
         expect(result.errorName).toBe("Error");

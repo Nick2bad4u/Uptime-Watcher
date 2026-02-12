@@ -150,7 +150,8 @@ function createDataApi(): DataApiInterface {
     }
 }
 
-const createDataApiFallback = (unavailableError: Error): DataApiInterface => ({
+const createDataApiFallback = (unavailableError: Error): DataApiInterface =>
+    ({
         downloadSqliteBackup: (
             ...args: Parameters<DataApiInterface["downloadSqliteBackup"]>
         ) => {
@@ -177,7 +178,7 @@ const createDataApiFallback = (unavailableError: Error): DataApiInterface => ({
             acceptUnusedPreloadArguments(...args);
             return Promise.reject(unavailableError);
         },
-    } as const);
+    }) as const;
 
 export const dataApi: DataApiInterface = createPreloadDomain({
     create: createDataApi,

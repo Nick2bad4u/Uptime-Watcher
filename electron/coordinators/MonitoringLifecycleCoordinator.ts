@@ -47,8 +47,9 @@ export interface MonitoringLifecycleCoordinatorDependencies {
  *
  * @remarks
  * Encapsulates monitoring-specific logic formerly implemented inside
- * {@link electron/UptimeOrchestrator#UptimeOrchestrator}, keeping the orchestrator focused on wiring and
- * delegation while this coordinator owns the concrete behaviours.
+ * {@link electron/UptimeOrchestrator#UptimeOrchestrator}, keeping the
+ * orchestrator focused on wiring and delegation while this coordinator owns the
+ * concrete behaviours.
  */
 export class MonitoringLifecycleCoordinator {
     private readonly monitorManager: MonitorManager;
@@ -99,7 +100,8 @@ export class MonitoringLifecycleCoordinator {
      * restart.
      *
      * @remarks
-    * This logic is moved verbatim from {@link electron/UptimeOrchestrator#UptimeOrchestrator} to avoid
+     * This logic is moved verbatim from
+     * {@link electron/UptimeOrchestrator#UptimeOrchestrator} to avoid
      * behavioural changes.
      */
     public async resumePersistentMonitoring(): Promise<void> {
@@ -108,8 +110,9 @@ export class MonitoringLifecycleCoordinator {
             const sites = this.siteManager.getSitesFromCache();
 
             const monitorsToResume = collectMonitorsToResume(sites);
-            const monitoringSiteCount = sites.filter((site) => site.monitoring)
-                .length;
+            const monitoringSiteCount = sites.filter(
+                (site) => site.monitoring
+            ).length;
 
             if (monitorsToResume.length === 0) {
                 logger.info(

@@ -62,6 +62,7 @@ import type { Tagged, UnknownRecord } from "type-fest";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { sleepUnref } from "@shared/utils/abortUtils";
+import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { ensureError } from "@shared/utils/errorHandling";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import * as z from "zod";
@@ -282,21 +283,6 @@ export interface OperationalHooksConfig<T = unknown> {
 }
 
 /**
- * Calculate retry delay based on attempt number and backoff strategy.
- */
-function calculateDelay(
-    attempt: number,
-    initialDelay: number,
-    backoff: "exponential" | "linear"
-): number {
-    if (backoff === "exponential") {
-        // Attempt is 0-based (attempt=0 means first retry after initial failure)
-        return initialDelay * 2 ** attempt;
-    }
-    return initialDelay * (attempt + 1);
-}
-
-/**
  * Generate a unique operation ID for tracking using crypto.randomUUID().
  */
 function generateOperationId(): OperationId {
@@ -505,7 +491,14 @@ async function handleRetry<T>(
         }
     }
 
-    const delay = calculateDelay(attempt, initialDelay, backoff);
+    // `attempt` is the 1-based attempt number that just failed.
+    // Convert to a 0-based retry index so the *first* retry uses the configured
+    // `initialDelay` (instead of doubling it).
+    const delay = calculateBackoffDelayMs({
+        attemptIndex: attempt - 1,
+        initialDelayMs: initialDelay,
+        strategy: backoff,
+    });
 
     if (signal?.aborted) {
         throw createAbortError();

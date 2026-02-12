@@ -6,7 +6,8 @@ import type { SitesStore } from "../../stores/sites/types";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 
 /**
- * Sites-store slice used by {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ * Sites-store slice used by
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */
@@ -29,13 +30,15 @@ export type SiteDetailsSitesStoreSlice = Pick<
 >;
 
 /**
- * Zustand selector wrapper for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ * Zustand selector wrapper for
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @remarks
  * Consolidates the many per-field `useSitesStore(useCallback(...))` selections
  * into a single `useShallow` selection to reduce boilerplate and file size.
  *
- * @returns The Zustand store slice required by {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ * @returns The Zustand store slice required by
+ *   {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
  */

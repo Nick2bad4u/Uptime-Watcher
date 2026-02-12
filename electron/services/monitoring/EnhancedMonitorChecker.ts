@@ -290,9 +290,9 @@ export class EnhancedMonitorChecker {
      *
      * @public
      *
-    * @see {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry.initiateCheck} for operation registration
+     * @see {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry.initiateCheck} for operation registration
      * @see {@link OperationTimeoutManager.scheduleTimeout} for timeout management
-    * @see {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService.updateMonitorStatus} for status update
+     * @see {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService.updateMonitorStatus} for status update
      *   safety
      */
     public async checkMonitor(

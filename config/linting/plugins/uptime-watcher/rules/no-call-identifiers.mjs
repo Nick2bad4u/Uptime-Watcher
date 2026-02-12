@@ -99,8 +99,7 @@ export const noCallIdentifiersRule = {
                         items: {
                             type: "object",
                             additionalProperties: false,
-                            description:
-                                "A single banned identifier entry.",
+                            description: "A single banned identifier entry.",
                             properties: {
                                 name: {
                                     type: "string",

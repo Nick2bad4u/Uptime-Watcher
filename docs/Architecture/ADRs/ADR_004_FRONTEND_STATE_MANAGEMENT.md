@@ -213,13 +213,15 @@ Stores integrate with the error handling system:
 import { SiteService } from "@app/services/SiteService";
 
 const performAction = async () => {
- await withErrorHandling(async () => {
-  const result = await SiteService.addSite(data);
-  addSite(result); // Update store state
-  return result;
- }, createStoreErrorHandler("sites", "addSite"));
+ await withErrorHandling(
+  async () => {
+   const result = await SiteService.addSite(data);
+   addSite(result); // Update store state
+   return result;
+  },
+  createStoreErrorHandler("sites", "addSite")
+ );
 };
-
 ```
 
 **Guideline:** For most async store actions, prefer
@@ -638,7 +640,7 @@ useEffect(() => {
  const unsubscribe = useSitesStore.getState().subscribeToSyncEvents();
 
  return () => {
-    unsubscribe();
+  unsubscribe();
  };
 }, []);
 ```

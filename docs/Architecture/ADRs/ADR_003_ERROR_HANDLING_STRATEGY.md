@@ -104,9 +104,9 @@ We standardize on **typed errors** internally, but we only surface **sanitized**
   import { ApplicationError } from "@shared/utils/errorHandling";
 
   throw new ApplicationError("DATABASE_WRITE_FAILED", {
-          operation: "site-delete",
-          // Extra details for logs/diagnostics (must be safe/redacted)
-          details: { identifier },
+   operation: "site-delete",
+   // Extra details for logs/diagnostics (must be safe/redacted)
+   details: { identifier },
   });
   ```
 
@@ -601,10 +601,10 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 // Recommended: emit internal error events for significant failures (not for high-frequency noise)
 await eventBus.emitTyped("system:error", {
-    error: ensureError(rawError),
-    context: "database:executeTransaction",
-    severity: "high",
-    timestamp: Date.now(),
+ error: ensureError(rawError),
+ context: "database:executeTransaction",
+ severity: "high",
+ timestamp: Date.now(),
 });
 ```
 
@@ -661,8 +661,8 @@ Correlation IDs are still crucial for observability, but they are primarily used
 
   ```typescript
   eventBus.onTyped("system:error", (data) => {
-          const correlationId = data._meta?.correlationId;
-          logger.error("System error", { correlationId, data });
+   const correlationId = data._meta?.correlationId;
+   logger.error("System error", { correlationId, data });
   });
   ```
 

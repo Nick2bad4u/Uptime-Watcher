@@ -531,7 +531,6 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         void handleUpdateAction();
     }, [handleUpdateAction]);
 
-
     return (
         <ErrorBoundary>
             <ThemeProvider>

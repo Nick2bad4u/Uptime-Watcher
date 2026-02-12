@@ -45,7 +45,8 @@ function isGitHubStats(data: unknown): data is GitHubStats {
         "watchers_count" in data &&
         typeof (data as { stargazers_count?: unknown }).stargazers_count ===
             "number" &&
-        typeof (data as { watchers_count?: unknown }).watchers_count === "number"
+        typeof (data as { watchers_count?: unknown }).watchers_count ===
+            "number"
     );
 }
 

@@ -54,9 +54,7 @@ import {
     type MonitorValidationFieldValues,
 } from "../../utils/monitorValidationFields";
 import { validateAddModeSelection } from "../AddSiteForm/utils/addModeValidation";
-import {
-    DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS,
-} from "./addSiteForm/addSiteFormDefaults";
+import { DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS } from "./addSiteForm/addSiteFormDefaults";
 import {
     resetFieldsForModeChange,
     resetFieldsForMonitorType,
@@ -276,8 +274,12 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
     const [baselineUrl, setBaselineUrl] = useState(
         DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.baselineUrl
     );
-    const [host, setHost] = useState(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.host);
-    const [port, setPort] = useState(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.port);
+    const [host, setHost] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.host
+    );
+    const [port, setPort] = useState(
+        DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.port
+    );
     const [recordType, setRecordType] = useState(
         DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.recordType
     );
@@ -435,30 +437,30 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
                 currentFieldNames,
                 currentValues: monitorFieldValues,
                 setters: {
-                setBaselineUrl,
-                setBodyKeyword,
-                setCertificateWarningDays,
-                setEdgeLocations,
-                setExpectedHeaderValue,
-                setExpectedJsonValue,
-                setExpectedStatusCode,
-                setExpectedValue,
-                setHeaderName,
-                setHeartbeatExpectedStatus,
-                setHeartbeatMaxDriftSeconds,
-                setHeartbeatStatusField,
-                setHeartbeatTimestampField,
-                setHost,
-                setJsonPath,
-                setMaxPongDelayMs,
-                setMaxReplicationLagSeconds,
-                setMaxResponseTimeMs,
-                setPort,
-                setPrimaryStatusUrl,
-                setRecordType,
-                setReplicaStatusUrl,
-                setReplicationTimestampField,
-                setUrl,
+                    setBaselineUrl,
+                    setBodyKeyword,
+                    setCertificateWarningDays,
+                    setEdgeLocations,
+                    setExpectedHeaderValue,
+                    setExpectedJsonValue,
+                    setExpectedStatusCode,
+                    setExpectedValue,
+                    setHeaderName,
+                    setHeartbeatExpectedStatus,
+                    setHeartbeatMaxDriftSeconds,
+                    setHeartbeatStatusField,
+                    setHeartbeatTimestampField,
+                    setHost,
+                    setJsonPath,
+                    setMaxPongDelayMs,
+                    setMaxReplicationLagSeconds,
+                    setMaxResponseTimeMs,
+                    setPort,
+                    setPrimaryStatusUrl,
+                    setRecordType,
+                    setReplicaStatusUrl,
+                    setReplicationTimestampField,
+                    setUrl,
                 },
             });
         },
@@ -510,41 +512,38 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         ]
     );
 
-    const isFormValid = useCallback(
-        () => {
-            if (
-                validateAddModeSelection({
-                    addMode,
-                    name,
-                    selectedExistingSite,
-                }).length > 0
-            ) {
-                return false;
-            }
+    const isFormValid = useCallback(() => {
+        if (
+            validateAddModeSelection({
+                addMode,
+                name,
+                selectedExistingSite,
+            }).length > 0
+        ) {
+            return false;
+        }
 
-            // Dynamic validation based on monitor type fields
-            const currentFields = getFields(monitorType);
-            const lookup: Record<string, string> = monitorFieldValues;
-            for (const field of currentFields) {
-                if (field.required) {
-                    const rawValue = lookup[field.name] ?? "";
-                    if (rawValue.trim().length === 0) {
-                        return false;
-                    }
+        // Dynamic validation based on monitor type fields
+        const currentFields = getFields(monitorType);
+        const lookup: Record<string, string> = monitorFieldValues;
+        for (const field of currentFields) {
+            if (field.required) {
+                const rawValue = lookup[field.name] ?? "";
+                if (rawValue.trim().length === 0) {
+                    return false;
                 }
             }
+        }
 
-            return true;
-        },
-        [
-            addMode,
-            getFields,
-            monitorFieldValues,
-            monitorType,
-            name,
-            selectedExistingSite,
-        ]
-    );
+        return true;
+    }, [
+        addMode,
+        getFields,
+        monitorFieldValues,
+        monitorType,
+        name,
+        selectedExistingSite,
+    ]);
 
     const resetForm = useCallback(() => {
         setBaselineUrl(DEFAULT_ADD_SITE_MONITOR_FIELD_INPUTS.baselineUrl);

@@ -2,8 +2,10 @@
  * Strategy execution and normalization for monitor checks.
  *
  * @remarks
- * Extracted from {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker} so the class can stay focused on
- * orchestration (correlation, timeouts, persistence, and event emission).
+ * Extracted from
+ * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}
+ * so the class can stay focused on orchestration (correlation, timeouts,
+ * persistence, and event emission).
  *
  * This helper is the canonical code path for executing monitor strategies and
  * coercing any invalid or thrown results into a stable

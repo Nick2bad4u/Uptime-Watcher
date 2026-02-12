@@ -163,7 +163,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
 
             expect(safeStringify(123n)).toBe("123");
             expect(safeStringify(0n)).toBe("0");
-            expect(safeStringify((-456n))).toBe("-456");
+            expect(safeStringify(-456n)).toBe("-456");
         });
 
         it("should document unreachable code paths", async ({

@@ -78,7 +78,8 @@ export function requireRecordParam(
  *
  * @remarks
  * This helper provides a compact alternative to the common `requireRecordParam`
- * + `isRequiredRecordError` pattern in IPC validators.
+ *
+ * - `isRequiredRecordError` pattern in IPC validators.
  *
  * @param value - Candidate record value.
  * @param paramName - Parameter name used in error messages.

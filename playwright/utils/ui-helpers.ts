@@ -39,9 +39,9 @@ const UI_STABILIZATION_DELAYS = {
  *
  * @remarks
  * Playwright's built-in "stable" actionability check can still fail when a
- * control is continuously animating (e.g. micro-layout shifts on Electron)
- * even though it becomes interactable shortly after. This helper reduces
- * flakiness by explicitly waiting for positional stability before clicking.
+ * control is continuously animating (e.g. micro-layout shifts on Electron) even
+ * though it becomes interactable shortly after. This helper reduces flakiness
+ * by explicitly waiting for positional stability before clicking.
  */
 async function waitForBoundingBoxToSettle(args: {
     locator: Locator;

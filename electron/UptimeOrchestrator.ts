@@ -121,9 +121,7 @@ import {
     type ContextualErrorFactory,
     createContextualErrorFactory,
 } from "./orchestrator/utils/contextualErrorFactory";
-import {
-    buildMonitorScopedOperationContext,
-} from "./orchestrator/utils/monitorScope";
+import { buildMonitorScopedOperationContext } from "./orchestrator/utils/monitorScope";
 import {
     createRunWithContext,
     type RunWithContext,
@@ -442,9 +440,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * Emits a sanitized site state synchronization event.
      *
      * @remarks
-    * Delegates to {@link electron/managers/SiteManager#SiteManager.emitSitesStateSynchronized} while
-     * preserving orchestrator-level error context. Returns the cloned site
-     * snapshot that was dispatched with the event for downstream consumers
+     * Delegates to
+     * {@link electron/managers/SiteManager#SiteManager.emitSitesStateSynchronized}
+     * while preserving orchestrator-level error context. Returns the cloned
+     * site snapshot that was dispatched with the event for downstream consumers
      * (e.g., IPC handlers).
      *
      * @param payload - Synchronization parameters controlling the emitted
@@ -790,16 +789,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * database.
      *
      * @remarks
-    * Leverages the {@link electron/managers/SiteManager#SiteManager} in-memory cache to avoid redundant
-     * round-trips through the repository layer when only aggregate metadata is
-     * required (for example, sync status calls).
+     * Leverages the {@link electron/managers/SiteManager#SiteManager} in-memory
+     * cache to avoid redundant round-trips through the repository layer when
+     * only aggregate metadata is required (for example, sync status calls).
      *
      * @returns The number of sites currently tracked in the cache.
      */
     public getCachedSiteCount(): number {
         return this.siteManager.getSitesFromCache().length;
     }
-
 
     // Named event handlers for database events
 
@@ -871,9 +869,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             logger,
         });
 
-        this.runWithContext = createRunWithContext(
-            this.createContextualError
-        );
+        this.runWithContext = createRunWithContext(this.createContextualError);
 
         const emitTyped = createEmitUptimeEvent(this);
         const emitSystemError = createEmitSystemError(this);

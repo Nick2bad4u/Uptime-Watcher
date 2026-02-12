@@ -8,7 +8,8 @@
  *
  * It is intentionally separate from
  * {@link src/services/NotificationPreferenceService#NotificationPreferenceService}:
- * preferences control whether notifications are enabled; this service only requests dispatch.
+ * preferences control whether notifications are enabled; this service only
+ * requests dispatch.
  *
  * @packageDocumentation
  */

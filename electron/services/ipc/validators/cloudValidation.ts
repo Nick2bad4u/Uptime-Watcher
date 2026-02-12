@@ -43,21 +43,15 @@ export const validateCloudFilesystemProviderConfig: IpcParameterValidator =
             }
 
             const { record } = recordResult;
-            const baseDirectoryError = IpcValidators.requiredString(
+            const requiredString = requireStringParamValue(
                 record["baseDirectory"],
                 "baseDirectory"
             );
-            if (baseDirectoryError) {
-                return toValidationResult(baseDirectoryError);
+            if (requiredString.ok === false) {
+                return requiredString.error;
             }
 
-            const baseDirectoryCandidate = record["baseDirectory"];
-            if (typeof baseDirectoryCandidate !== "string") {
-                // Defensive: requiredString already enforces this.
-                return toValidationResult("baseDirectory must be a string");
-            }
-
-            const baseDirectoryRaw = baseDirectoryCandidate;
+            const baseDirectoryRaw = requiredString.value;
             const issues = validateFilesystemBaseDirectoryCandidate(
                 baseDirectoryRaw,
                 { maxBytes: MAX_FILESYSTEM_BASE_DIRECTORY_BYTES }

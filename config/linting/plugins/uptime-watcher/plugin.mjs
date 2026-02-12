@@ -240,8 +240,8 @@ function errorRulesFor(ruleNames) {
  *
  * @remarks
  * This plugin is repo-oriented, but we still expose a conventional
- * `recommended` preset. Keep it conservative and broadly applicable.
- * For the full monorepo guardrails, prefer `configs.repo`.
+ * `recommended` preset. Keep it conservative and broadly applicable. For the
+ * full monorepo guardrails, prefer `configs.repo`.
  */
 const recommendedRuleNames = /** @type {const} */ ([
     "no-regexp-v-flag",

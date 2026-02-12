@@ -45,8 +45,8 @@ export interface SnapshotSyncCoordinatorDependencies {
  *
  * @remarks
  * Extracts state-sync and cache orchestration logic from
- * {@link electron/UptimeOrchestrator#UptimeOrchestrator} while preserving existing runtime behaviour and
- * typed event contracts.
+ * {@link electron/UptimeOrchestrator#UptimeOrchestrator} while preserving
+ * existing runtime behaviour and typed event contracts.
  */
 export class SnapshotSyncCoordinator {
     private readonly siteManager: SiteManager;
@@ -95,7 +95,7 @@ export class SnapshotSyncCoordinator {
 
     /**
      * Emits a sanitized site state synchronization event via
-    * {@link electron/managers/SiteManager#SiteManager}.
+     * {@link electron/managers/SiteManager#SiteManager}.
      */
     public async emitSitesStateSynchronized(payload: {
         action: StateSyncAction;
@@ -111,7 +111,8 @@ export class SnapshotSyncCoordinator {
      * Handles the update sites cache request asynchronously.
      *
      * @remarks
-    * Extracted from {@link electron/UptimeOrchestrator#UptimeOrchestrator} without behavioural changes.
+     * Extracted from {@link electron/UptimeOrchestrator#UptimeOrchestrator}
+     * without behavioural changes.
      */
     private async handleUpdateSitesCacheRequest(
         data: UpdateSitesCacheRequestData

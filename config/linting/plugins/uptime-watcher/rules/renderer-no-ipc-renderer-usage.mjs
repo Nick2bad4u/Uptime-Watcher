@@ -32,7 +32,7 @@ export const rendererNoIpcRendererUsageRule = {
      *     sourceCode?: any;
      *     report: (descriptor: {
      *         messageId: string;
-        *         node: any;
+     *         node: any;
      *         data?: Record<string, unknown>;
      *     }) => void;
      * }} context

@@ -44,8 +44,9 @@
 
 import type { MonitorType, Site } from "@shared/types";
 
-import { sleepUnref } from "@shared/utils/abortUtils";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { raceWithTimeout } from "@shared/utils/abortUtils";
+import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     resolve4,
@@ -69,367 +70,29 @@ import type {
     MonitorServiceConfig,
 } from "./types";
 
-import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
+import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF  } from "../../constants";
+import { withOperationalHooks } from "../../utils/operationalHooks";
+import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
+    validateMonitorHost,
 } from "./shared/monitorServiceHelpers";
+import { parseDnsResolutionResult } from "./utils/dnsRecordParsing";
 
-interface ParsedDnsRecords {
-    actualValues: string[];
-    details: string;
-    hasRecords: boolean;
-    skipExpectedValueCheck: boolean;
+class DnsAttemptFailedError extends Error {
+    public readonly details: string;
+
+    public constructor(details: string, message: string, options?: { cause?: unknown }) {
+        super(message, options);
+        this.name = "DnsAttemptFailedError";
+        this.details = details;
+    }
 }
 
-const isString = (value: unknown): value is string => typeof value === "string";
-
-const pickNumber = (
-    primary: unknown,
-    fallback: unknown
-): number | undefined => {
-    if (typeof primary === "number") {
-        return primary;
-    }
-
-    if (typeof fallback === "number") {
-        return fallback;
-    }
-
-    return undefined;
-};
-
-const parseAddressRecords = (
-    result: unknown,
-    recordType: string
-): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: `No ${recordType} records found`,
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const actualValues = result.filter(isString);
-    return {
-        actualValues,
-        details: `${recordType} records: ${actualValues.join(", ")}`,
-        hasRecords: actualValues.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseAnyRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: "No ANY records found",
-            hasRecords: false,
-            skipExpectedValueCheck: true,
-        };
-    }
-
-    const anyRecords = result.filter(isRecord);
-    return {
-        actualValues: anyRecords.map((record) => JSON.stringify(record)),
-        details: `ANY records (${anyRecords.length} items)`,
-        // Preserve legacy behavior: ANY success is based on the raw array size.
-        hasRecords: result.length > 0,
-        skipExpectedValueCheck: true,
-    };
-};
-
-const parseCaaRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: "No CAA records found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const caaRecords = result.filter(isRecord);
-    const actualValues = caaRecords.flatMap((record) => {
-        const { iodef, issue } = record;
-        if (typeof issue === "string") {
-            return [issue];
-        }
-        if (typeof iodef === "string") {
-            return [iodef];
-        }
-        return [];
-    });
-
-    return {
-        actualValues,
-        details: `CAA records: ${caaRecords.length}`,
-        hasRecords: actualValues.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseCnameRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result) || result.length === 0) {
-        return {
-            actualValues: [],
-            details: "No CNAME records found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const actualValues = result.filter(isString);
-    return {
-        actualValues,
-        details:
-            actualValues.length > 0
-                ? `CNAME record: ${actualValues[0]}`
-                : "No CNAME records found",
-        hasRecords: actualValues.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseMxRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: "No MX records found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const mxRecords = result.filter(isRecord).flatMap((record) => {
-        const { exchange, priority } = record;
-        if (
-            typeof exchange === "string" &&
-            typeof priority === "number" &&
-            Number.isFinite(priority)
-        ) {
-            return [{ exchange, priority }];
-        }
-        return [];
-    });
-
-    const formattedRecords = mxRecords
-        .map((record) => `${record.priority} ${record.exchange}`)
-        .join(", ");
-
-    const actualValues = mxRecords.map((record) => record.exchange);
-    return {
-        actualValues,
-        details: `MX records: ${formattedRecords}`,
-        hasRecords: actualValues.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseNaptrRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: "No NAPTR records found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const naptr = result.filter(isRecord).flatMap((record) => {
-        const { flags, regexp, replacement, service } = record;
-        if (
-            typeof flags === "string" &&
-            typeof regexp === "string" &&
-            typeof replacement === "string" &&
-            typeof service === "string"
-        ) {
-            return [{ flags, regexp, replacement, service }];
-        }
-        return [];
-    });
-
-    const actualValues = naptr.map((record) => record.replacement);
-    return {
-        actualValues,
-        details: `NAPTR records: ${naptr
-            .map(
-                (record) =>
-                    `${record.flags} ${record.service} ${record.replacement}`
-            )
-            .join(", ")}`,
-        hasRecords: actualValues.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseSoaRecord = (result: unknown): ParsedDnsRecords => {
-    if (!isRecord(result)) {
-        return {
-            actualValues: [],
-            details: "No SOA record found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const { hostmaster, nsname, serial } = result;
-    if (
-        typeof hostmaster !== "string" ||
-        typeof nsname !== "string" ||
-        typeof serial !== "number" ||
-        !Number.isFinite(serial)
-    ) {
-        return {
-            actualValues: [],
-            details: "No SOA record found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const actualValues = [nsname, hostmaster];
-    return {
-        actualValues,
-        details: `SOA: ${nsname} ${hostmaster} (serial ${serial})`,
-        hasRecords: true,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseSrvRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: "No SRV records found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const srvRecords = result.filter(isRecord).flatMap((record) => {
-        const { name, port, priority, weight } = record;
-        if (
-            typeof name === "string" &&
-            typeof port === "number" &&
-            Number.isFinite(port) &&
-            typeof priority === "number" &&
-            Number.isFinite(priority) &&
-            typeof weight === "number" &&
-            Number.isFinite(weight)
-        ) {
-            return [{ name, port, priority, weight }];
-        }
-        return [];
-    });
-
-    const formattedRecords = srvRecords
-        .map(
-            (record) =>
-                `${record.priority} ${record.weight} ${record.port} ${record.name}`
-        )
-        .join(", ");
-
-    const actualValues = srvRecords.map((record) => record.name);
-    return {
-        actualValues,
-        details: `SRV records: ${formattedRecords}`,
-        hasRecords: actualValues.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseTlsaRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: "No TLSA records found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const tlsa = result.filter(isRecord).flatMap((record) => {
-        const { certUsage, match, matchingType, selector, usage } = record;
-
-        const resolvedCertUsage = pickNumber(certUsage, usage);
-        const resolvedMatch = pickNumber(match, matchingType);
-        if (
-            typeof resolvedCertUsage === "number" &&
-            typeof resolvedMatch === "number" &&
-            typeof selector === "number"
-        ) {
-            return [
-                {
-                    certUsage: resolvedCertUsage,
-                    match: resolvedMatch,
-                    selector,
-                },
-            ];
-        }
-        return [];
-    });
-
-    const actualValues = tlsa.map(
-        (record) => `${record.certUsage}:${record.selector}:${record.match}`
-    );
-
-    return {
-        actualValues,
-        details: `TLSA records: ${tlsa.length}`,
-        hasRecords: actualValues.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseTxtRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result)) {
-        return {
-            actualValues: [],
-            details: "No TXT records found",
-            hasRecords: false,
-            skipExpectedValueCheck: false,
-        };
-    }
-
-    const txtRecords = result.filter((entry): entry is unknown[] =>
-        Array.isArray(entry)
-    );
-    const flatRecords = txtRecords.flatMap((entry) => entry.filter(isString));
-    return {
-        actualValues: flatRecords,
-        details: `TXT records: ${flatRecords.join(", ")}`,
-        hasRecords: flatRecords.length > 0,
-        skipExpectedValueCheck: false,
-    };
-};
-
-const parseUnknownRecords = (recordType: string): ParsedDnsRecords => ({
-    actualValues: [],
-    details: `Unknown record type: ${recordType}`,
-    hasRecords: false,
-    skipExpectedValueCheck: false,
-});
-
-const DNS_RECORD_PARSERS: Readonly<
-    Record<string, (result: unknown, recordType: string) => ParsedDnsRecords>
-> = {
-    A: parseAddressRecords,
-    AAAA: parseAddressRecords,
-    ANY: (result) => parseAnyRecords(result),
-    CAA: (result) => parseCaaRecords(result),
-    CNAME: (result) => parseCnameRecords(result),
-    MX: (result) => parseMxRecords(result),
-    NAPTR: (result) => parseNaptrRecords(result),
-    NS: (result) => parseAddressRecords(result, "NS"),
-    PTR: (result) => parseAddressRecords(result, "PTR"),
-    SOA: (result) => parseSoaRecord(result),
-    SRV: (result) => parseSrvRecords(result),
-    TLSA: (result) => parseTlsaRecords(result),
-    TXT: (result) => parseTxtRecords(result),
-} as const;
+function isDnsAttemptFailedError(error: unknown): error is DnsAttemptFailedError {
+    return error instanceof DnsAttemptFailedError;
+}
 
 /**
  * Service for performing DNS monitoring checks.
@@ -517,12 +180,13 @@ export class DnsMonitor implements IMonitorService {
      * @throws {@link Error} When monitor validation fails (wrong type or
      *   missing hostname)
      *
-    * @see {@link electron/services/monitoring/shared/monitorServiceHelpers#validateMonitorHost} - Host validation utility
+     * @see {@link electron/services/monitoring/shared/monitorServiceHelpers#validateMonitorHost} - Host validation utility
      * @see {@link createMonitorConfig} - Config normalization utility
      * @see {@link performDnsCheckWithRetry} - Core DNS functionality
      */
     public async check(
-        monitor: Site["monitors"][0]
+        monitor: Site["monitors"][0],
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         if (monitor.type !== "dns") {
             throw new Error(
@@ -530,18 +194,28 @@ export class DnsMonitor implements IMonitorService {
             );
         }
 
-        // Validate host field (DNS monitors use host like other monitor types)
-        if (!monitor.host || typeof monitor.host !== "string") {
+        const hostError = validateMonitorHost(monitor);
+        if (hostError) {
+            return createMonitorErrorResult(hostError, 0);
+        }
+
+        // Host is guaranteed to be valid at this point due to validation above
+        if (!monitor.host) {
             return createMonitorErrorResult("Monitor missing valid host", 0);
         }
 
+        const host = monitor.host.trim();
+
         // Validate recordType field
-        if (!monitor.recordType || typeof monitor.recordType !== "string") {
+        const recordTypeRaw = monitor.recordType;
+        if (typeof recordTypeRaw !== "string" || recordTypeRaw.trim().length === 0) {
             return createMonitorErrorResult(
                 "Monitor missing valid recordType",
                 0
             );
         }
+
+        const recordType = recordTypeRaw.trim();
 
         // Use type-safe utility functions to extract configuration
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
@@ -549,11 +223,12 @@ export class DnsMonitor implements IMonitorService {
         });
 
         return this.performDnsCheckWithRetry(
-            monitor.host,
-            monitor.recordType,
+            host,
+            recordType,
             monitor.expectedValue,
             timeout,
-            retryAttempts
+            retryAttempts,
+            signal
         );
     }
 
@@ -580,48 +255,80 @@ export class DnsMonitor implements IMonitorService {
         recordType: string,
         expectedValue: string | undefined,
         timeout: number,
-        retryAttempts: number
+        retryAttempts: number,
+        signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         const startTime = performance.now();
+        const { additionalRetries, totalAttempts } = createMonitorRetryPlan(retryAttempts);
 
-        // Use a different approach to avoid await-in-loop
-        const attemptDnsCheck = async (
-            attemptNumber: number
-        ): Promise<MonitorCheckResult> => {
-            try {
-                const result = await this.performSingleDnsCheck(
-                    host,
-                    recordType,
-                    expectedValue,
-                    timeout
-                );
+        const resolver = this.getDnsResolver(recordType);
+        if (!resolver) {
+            const responseTime = performance.now() - startTime;
+            return {
+                details: `Unsupported record type: ${recordType}`,
+                error: `Record type ${recordType} is not supported`,
+                responseTime: Math.round(responseTime),
+                status: "down",
+            };
+        }
 
-                const responseTime = performance.now() - startTime;
-                return {
-                    details: result.details ?? "DNS resolution completed",
-                    error: result.error ?? "",
-                    responseTime: Math.round(responseTime),
-                    status: result.success ? "up" : "down",
-                };
-            } catch (error) {
-                // If we have retries left, wait and try again
-                if (attemptNumber < retryAttempts) {
-                    await sleepUnref(2 ** attemptNumber * 1000);
-                    return attemptDnsCheck(attemptNumber + 1);
+        try {
+            const details = await withOperationalHooks(
+                async () =>
+                    this.performSingleDnsCheck(
+                        host,
+                        resolver,
+                        recordType,
+                        expectedValue,
+                        timeout,
+                        signal
+                    ),
+                {
+                    failureLogLevel: "warn",
+                    initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
+                    maxRetries: totalAttempts,
+                    // Keep operation name stable to prevent log/event
+                    // cardinality explosions.
+                    operationName: "dns-resolution-check",
+                    ...(signal ? { signal } : {}),
                 }
+            );
 
-                // Final attempt failed
-                const responseTime = performance.now() - startTime;
+            const responseTime = performance.now() - startTime;
+            return {
+                details,
+                error: "",
+                responseTime: Math.round(responseTime),
+                status: "up",
+            };
+        } catch (error) {
+            const normalizedError = ensureError(error);
+
+            if (isAbortError(normalizedError)) {
                 return {
-                    details: "DNS resolution failed after retries",
-                    error: getUserFacingErrorDetail(error),
-                    responseTime: Math.round(responseTime),
+                    details: "Error",
+                    error: "Request canceled",
+                    responseTime: 0,
                     status: "down",
                 };
             }
-        };
 
-        return attemptDnsCheck(0);
+            let resolvedDetails = `DNS resolution failed after ${additionalRetries} retries`;
+
+            if (isDnsAttemptFailedError(normalizedError)) {
+                resolvedDetails = normalizedError.details;
+            } else if (normalizedError.message.includes("timeout")) {
+                resolvedDetails = normalizedError.message;
+            }
+
+            const responseTime = performance.now() - startTime;
+            return {
+                details: resolvedDetails,
+                error: getUserFacingErrorDetail(normalizedError),
+                responseTime: Math.round(responseTime),
+                status: "down",
+            };
+        }
     }
 
     /**
@@ -642,48 +349,37 @@ export class DnsMonitor implements IMonitorService {
      */
     private async performSingleDnsCheck(
         host: string,
+        resolver: (host: string) => Promise<unknown>,
         recordType: string,
         expectedValue: string | undefined,
-        timeout: number
-    ): Promise<{ details?: string; error?: string; success: boolean }> {
-        // Create timeout promise with cleanup capability
-        let timeoutId: NodeJS.Timeout | undefined = undefined;
-        const timeoutPromise = new Promise<never>((_resolve, reject) => {
-            timeoutId = setTimeout(() => {
-                reject(new Error(`DNS resolution timeout after ${timeout}ms`));
-            }, timeout);
+        timeout: number,
+        signal?: AbortSignal
+    ): Promise<string> {
+        if (signal?.aborted) {
+            throw createAbortError({ cause: Reflect.get(signal, "reason") });
+        }
+
+        const result = await raceWithTimeout(resolver(host), {
+            timeoutMessage: `DNS resolution timeout after ${timeout}ms`,
+            timeoutMs: timeout,
+            unrefTimer: true,
+            ...(signal ? { signal } : {}),
         });
 
-        try {
-            // Select appropriate DNS resolution method based on record type
-            const resolvePromise = this.getDnsResolver(host, recordType);
+        const formatted = this.formatDnsResult(
+            result,
+            recordType,
+            expectedValue
+        );
 
-            if (!resolvePromise) {
-                return {
-                    details: `Unsupported record type: ${recordType}`,
-                    error: `Record type ${recordType} is not supported`,
-                    success: false,
-                };
-            }
-
-            // Race between DNS resolution and timeout
-            const result = await Promise.race([resolvePromise, timeoutPromise]);
-
-            // Clear timeout since operation completed successfully
-            clearTimeout(timeoutId);
-
-            // Format result based on record type and check expected value
-            return this.formatDnsResult(result, recordType, expectedValue);
-        } catch (error) {
-            // Clear timeout in case of error
-            clearTimeout(timeoutId);
-
-            return {
-                details: `DNS resolution failed for ${recordType} record`,
-                error: getUserFacingErrorDetail(error),
-                success: false,
-            };
+        if (formatted.success) {
+            return formatted.details;
         }
+
+        throw new DnsAttemptFailedError(
+            formatted.details,
+            `DNS record verification failed for ${recordType}`
+        );
     }
 
     /**
@@ -778,48 +474,47 @@ export class DnsMonitor implements IMonitorService {
      * @returns Promise for DNS resolution or null if unsupported
      */
     private getDnsResolver(
-        host: string,
         recordType: string
-    ): null | Promise<unknown> {
+    ): ((host: string) => Promise<unknown>) | null {
         switch (recordType.toUpperCase()) {
             case "A": {
-                return resolve4(host);
+                return (hostValue) => resolve4(hostValue);
             }
             case "AAAA": {
-                return resolve6(host);
+                return (hostValue) => resolve6(hostValue);
             }
             case "ANY": {
-                return resolveAny(host);
+                return (hostValue) => resolveAny(hostValue);
             }
             case "CAA": {
-                return resolveCaa(host);
+                return (hostValue) => resolveCaa(hostValue);
             }
             case "CNAME": {
-                return resolveCname(host);
+                return (hostValue) => resolveCname(hostValue);
             }
             case "MX": {
-                return resolveMx(host);
+                return (hostValue) => resolveMx(hostValue);
             }
             case "NAPTR": {
-                return resolveNaptr(host);
+                return (hostValue) => resolveNaptr(hostValue);
             }
             case "NS": {
-                return resolveNs(host);
+                return (hostValue) => resolveNs(hostValue);
             }
             case "PTR": {
-                return resolvePtr(host);
+                return (hostValue) => resolvePtr(hostValue);
             }
             case "SOA": {
-                return resolveSoa(host);
+                return (hostValue) => resolveSoa(hostValue);
             }
             case "SRV": {
-                return resolveSrv(host);
+                return (hostValue) => resolveSrv(hostValue);
             }
             case "TLSA": {
-                return resolveTlsa(host);
+                return (hostValue) => resolveTlsa(hostValue);
             }
             case "TXT": {
-                return resolveTxt(host);
+                return (hostValue) => resolveTxt(hostValue);
             }
             default: {
                 return null;
@@ -846,13 +541,9 @@ export class DnsMonitor implements IMonitorService {
         result: unknown,
         recordType: string,
         expectedValue?: string
-    ): { details?: string; error?: string; success: boolean } {
+    ): { details: string; success: boolean } {
         try {
-            const recordTypeUpper = recordType.toUpperCase();
-            const parser = DNS_RECORD_PARSERS[recordTypeUpper];
-            const parsed = parser
-                ? parser(result, recordType)
-                : parseUnknownRecords(recordType);
+            const parsed = parseDnsResolutionResult(result, recordType);
 
             const {
                 actualValues,
@@ -888,10 +579,9 @@ export class DnsMonitor implements IMonitorService {
                 details,
                 success: success && hasRecords,
             };
-        } catch (error) {
+        } catch {
             return {
                 details: "Failed to format DNS result",
-                error: getUserFacingErrorDetail(error),
                 success: false,
             };
         }

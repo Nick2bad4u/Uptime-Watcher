@@ -21,7 +21,8 @@ import { AppIcons } from "../../../utils/icons";
 import { ToggleGroup } from "./SiteListToggleGroup";
 
 /**
- * Properties for {@link src/components/Dashboard/SiteList/SiteListLayoutSelector#SiteListLayoutSelector}.
+ * Properties for
+ * {@link src/components/Dashboard/SiteList/SiteListLayoutSelector#SiteListLayoutSelector}.
  */
 export interface SiteListLayoutSelectorProperties {
     /** Active presentation for large cards. */

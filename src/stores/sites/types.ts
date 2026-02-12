@@ -32,8 +32,9 @@ import type { SitesState as SitesStateShape } from "./useSitesState";
  *
  * @remarks
  * These method signatures are shared between the store contract and the
- * monitoring action factory ({@link src/stores/sites/useSiteMonitoring#createSiteMonitoringActions}). Keeping the
- * contract in one place prevents drift.
+ * monitoring action factory
+ * ({@link src/stores/sites/useSiteMonitoring#createSiteMonitoringActions}).
+ * Keeping the contract in one place prevents drift.
  */
 export type SiteMonitoringActions = BaseSiteMonitoring;
 
@@ -86,8 +87,9 @@ export interface SitesActions
  * Sites store state interface for managing site data.
  *
  * @remarks
- * Re-exports the canonical state shape defined by {@link SitesStateShape | SitesState} so the
- * store, actions, and modules share the exact same structure.
+ * Re-exports the canonical state shape defined by
+ * {@link SitesStateShape | SitesState} so the store, actions, and modules share
+ * the exact same structure.
  */
 export type SitesState = SitesStateShape;
 

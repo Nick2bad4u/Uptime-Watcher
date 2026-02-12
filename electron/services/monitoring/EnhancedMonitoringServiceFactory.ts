@@ -19,12 +19,12 @@
  *
  * **Service Components Created:**
  *
- * - {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker} - Core monitoring
- * logic with operation
- *   correlation - {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry} -
- *   Operation tracking and race condition prevention -
- *   {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService} - Safe concurrent
- *   status updates
+ * - {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}
+ *   - Core monitoring logic with operation correlation -
+ *   {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry}
+ *   - Operation tracking and race condition prevention -
+ *   {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService}
+ *   - Safe concurrent status updates
  * - {@link OperationTimeoutManager} - Timeout management and resource cleanup
  *
  * @example
@@ -68,13 +68,14 @@ import { OperationTimeoutManager } from "./OperationTimeoutManager";
  *
  * **Service Architecture:**
  *
- * - **Core Engine**: {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}
- * provides the main monitoring
- *   logic - **Operation Tracking**:
- *   {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry} prevents race
- *   conditions - **Status Management**:
- *   {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService} ensures safe
- *   concurrent updates - **Resource Management**: {@link OperationTimeoutManager} handles timeouts and cleanup
+ * - **Core Engine**:
+ *   {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}
+ *   provides the main monitoring logic - **Operation Tracking**:
+ *   {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry}
+ *   prevents race conditions - **Status Management**:
+ *   {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService}
+ *   ensures safe concurrent updates - **Resource Management**:
+ *   {@link OperationTimeoutManager} handles timeouts and cleanup
  *
  * **Usage Pattern:** All services in this bundle are designed to work together.
  * The checker service is the primary interface for consumers, while the other

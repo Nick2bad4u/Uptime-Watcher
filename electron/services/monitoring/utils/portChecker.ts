@@ -49,9 +49,10 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * within repository or service layers that handle orchestration and event
  * propagation.
  *
- * On success, resolves to a {@link MonitorCheckResult} with status `"up"` and the measured response time. On failure,
- * throws a {@link PortCheckError} containing the error
- * message and response time for use in retry or error handling logic.
+ * On success, resolves to a {@link MonitorCheckResult} with status `"up"` and
+ * the measured response time. On failure, throws a {@link PortCheckError}
+ * containing the error message and response time for use in retry or error
+ * handling logic.
  *
  * @example
  *
@@ -78,14 +79,14 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * @returns A promise that resolves to a {@link MonitorCheckResult} containing
  *   port details, response time, and status.
  *
- * @throws - Thrown if the port is not reachable within the
- *   timeout, with response time included for diagnostics and retry logic.
+ * @throws - Thrown if the port is not reachable within the timeout, with
+ *   response time included for diagnostics and retry logic.
+ * @throws - When port check fails
  *
  * @public
  *
  * @see {@link MonitorCheckResult}
  * @see {@link PortCheckError}
- * @throws - When port check fails
  */
 export async function performSinglePortCheck(
     host: string,

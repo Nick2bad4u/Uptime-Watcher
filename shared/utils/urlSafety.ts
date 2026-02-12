@@ -14,6 +14,8 @@ import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import validator from "validator";
 
+import { validateUrlStringCandidate } from "./urlCandidateValidation";
+
 /** Maximum accepted UTF-8 byte budget for user-supplied external-open URLs. */
 const MAX_EXTERNAL_OPEN_URL_BYTES = 4096;
 
@@ -151,10 +153,11 @@ export function getSafeUrlForLogging(rawUrl: string): string {
  *
  * This is primarily used at IPC trust boundaries to ensure consistent
  * enforcement of:
- * - trimming and empty-string handling
+ *
+ * - Trimming and empty-string handling
  * - UTF-8 byte budgets (defense-in-depth against oversized payloads)
- * - newline/control-character rejection (CRLF injection protection)
- * - validator.js URL semantics via {@link isValidUrl}
+ * - Newline/control-character rejection (CRLF injection protection)
+ * - Validator.js URL semantics via {@link isValidUrl}
  */
 export function validateHttpUrlCandidate(
     rawUrl: unknown,
@@ -172,58 +175,21 @@ export function validateHttpUrlCandidate(
     const maxBytes = options?.maxBytes ?? MAX_EXTERNAL_OPEN_URL_BYTES;
     const disallowAuth = options?.disallowAuth ?? true;
 
-    let safeUrlForLogging = FALLBACK_SAFE_URL_FOR_LOGGING;
+    const primitiveValidation = validateUrlStringCandidate(rawUrl, {
+        fallbackSafeUrlForLogging: FALLBACK_SAFE_URL_FOR_LOGGING,
+        maxBytes,
+        toSafeUrlForLogging: getSafeUrlForLogging,
+    });
 
-    if (typeof rawUrl !== "string") {
-        return {
-            ok: false,
-            reason: "must be a string",
-            safeUrlForLogging,
-        };
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
+    if (primitiveValidation.ok === false) {
+        return primitiveValidation;
     }
 
-    const normalizedUrl = rawUrl.trim();
-
-    if (
-        normalizedUrl.length > 0 &&
-        getUtfByteLength(normalizedUrl) <= maxBytes &&
-        !/[\n\r]/u.test(normalizedUrl) &&
-        !hasAsciiControlCharacters(normalizedUrl)
-    ) {
-        safeUrlForLogging = getSafeUrlForLogging(normalizedUrl);
-    }
-
-    if (normalizedUrl.length === 0) {
-        return {
-            ok: false,
-            reason: "must be a non-empty string",
-            safeUrlForLogging,
-        };
-    }
-
-    if (getUtfByteLength(normalizedUrl) > maxBytes) {
-        return {
-            ok: false,
-            reason: `must not exceed ${maxBytes} bytes`,
-            safeUrlForLogging,
-        };
-    }
-
-    if (/[\n\r]/u.test(normalizedUrl)) {
-        return {
-            ok: false,
-            reason: "must not contain newlines",
-            safeUrlForLogging,
-        };
-    }
-
-    if (hasAsciiControlCharacters(normalizedUrl)) {
-        return {
-            ok: false,
-            reason: "must not contain control characters",
-            safeUrlForLogging,
-        };
-    }
+    const {
+        normalizedUrl,
+        safeUrlForLogging,
+    } = primitiveValidation;
 
     if (
         !isValidUrl(normalizedUrl, {
@@ -505,58 +471,19 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
 export function validateExternalOpenUrlCandidate(
     rawUrl: unknown
 ): ExternalOpenUrlValidationResult {
-    let safeUrlForLogging = FALLBACK_SAFE_URL_FOR_LOGGING;
+    const primitiveValidation = validateUrlStringCandidate(rawUrl, {
+        fallbackSafeUrlForLogging: FALLBACK_SAFE_URL_FOR_LOGGING,
+        maxBytes: MAX_EXTERNAL_OPEN_URL_BYTES,
+        toSafeUrlForLogging: getSafeUrlForLogging,
+    });
 
-    if (typeof rawUrl !== "string") {
-        return {
-            ok: false,
-            reason: "must be a string",
-            safeUrlForLogging,
-        };
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
+    if (primitiveValidation.ok === false) {
+        return primitiveValidation;
     }
 
-    let normalizedUrl = rawUrl.trim();
-
-    if (
-        normalizedUrl.length > 0 &&
-        getUtfByteLength(normalizedUrl) <= MAX_EXTERNAL_OPEN_URL_BYTES &&
-        !/[\n\r]/u.test(normalizedUrl) &&
-        !hasAsciiControlCharacters(normalizedUrl)
-    ) {
-        safeUrlForLogging = getSafeUrlForLogging(normalizedUrl);
-    }
-
-    if (normalizedUrl.length === 0) {
-        return {
-            ok: false,
-            reason: "must be a non-empty string",
-            safeUrlForLogging,
-        };
-    }
-
-    if (getUtfByteLength(normalizedUrl) > MAX_EXTERNAL_OPEN_URL_BYTES) {
-        return {
-            ok: false,
-            reason: `must not exceed ${MAX_EXTERNAL_OPEN_URL_BYTES} bytes`,
-            safeUrlForLogging,
-        };
-    }
-
-    if (/[\n\r]/u.test(normalizedUrl)) {
-        return {
-            ok: false,
-            reason: "must not contain newlines",
-            safeUrlForLogging,
-        };
-    }
-
-    if (hasAsciiControlCharacters(normalizedUrl)) {
-        return {
-            ok: false,
-            reason: "must not contain control characters",
-            safeUrlForLogging,
-        };
-    }
+    let { normalizedUrl } = primitiveValidation;
+    const { safeUrlForLogging } = primitiveValidation;
 
     if (!isAllowedExternalOpenUrl(normalizedUrl)) {
         return {
@@ -766,26 +693,17 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
  * @returns A safe URL string, or null when the input should not be sent.
  */
 export function tryGetSafeThirdPartyHttpUrl(rawUrl: string): null | string {
-    if (typeof rawUrl !== "string") {
+    const primitiveValidation = validateUrlStringCandidate(rawUrl, {
+        fallbackSafeUrlForLogging: FALLBACK_SAFE_URL_FOR_LOGGING,
+        maxBytes: MAX_EXTERNAL_OPEN_URL_BYTES,
+        toSafeUrlForLogging: getSafeUrlForLogging,
+    });
+
+    if (!primitiveValidation.ok) {
         return null;
     }
 
-    const normalized = rawUrl.trim();
-    if (normalized.length === 0) {
-        return null;
-    }
-
-    if (getUtfByteLength(normalized) > MAX_EXTERNAL_OPEN_URL_BYTES) {
-        return null;
-    }
-
-    if (/[\n\r]/u.test(normalized)) {
-        return null;
-    }
-
-    if (hasAsciiControlCharacters(normalized)) {
-        return null;
-    }
+    const { normalizedUrl: normalized } = primitiveValidation;
 
     const parsed = ((): null | URL => {
         try {

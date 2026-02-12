@@ -74,9 +74,7 @@ import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { fireAndForget } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 import { createSiteMonitoringConfig } from "./siteManager/createSiteMonitoringConfig";
-import {
-    getSiteSnapshotForMutation as getSiteSnapshotForMutationHelper,
-} from "./siteManager/getSiteSnapshotForMutation";
+import { getSiteSnapshotForMutation as getSiteSnapshotForMutationHelper } from "./siteManager/getSiteSnapshotForMutation";
 import { loadSiteInBackground } from "./siteManager/loadSiteInBackground";
 import {
     emitSiteAddedAndStateSynchronized as emitSiteAddedAndStateSynchronizedHelper,
@@ -465,8 +463,9 @@ export class SiteManager {
      * - `internal:site:removed` (for each removed site)
      * - `sites:state-synchronized` delete deltas (for each removed site)
      *
-    * The {@link electron/coordinators/SiteLifecycleCoordinator#SiteLifecycleCoordinator} relies on this
-     * for the `UptimeOrchestrator.deleteAllSites()` workflow.
+     * The
+     * {@link electron/coordinators/SiteLifecycleCoordinator#SiteLifecycleCoordinator}
+     * relies on this for the `UptimeOrchestrator.deleteAllSites()` workflow.
      *
      * @returns The number of deleted sites.
      */
