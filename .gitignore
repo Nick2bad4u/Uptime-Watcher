@@ -761,99 +761,99 @@ $RECYCLE.BIN/
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
+# AI tools
+.agentic-tools*
+.gemini/
+.jscpd/
+repomix-output.xml
+_ZENTASKS
+
 # Build output directories
-release/
-# Node modules
-node_modules/
-node_modules_backup/
-# Electron build output directories
 dist/
 **/dist/
 dist/test/
 **/dist/test/
-# HTML Build output directories
-html/
-
-# Coverage directories
-coverage-results.json
-report/
-
-# Docusaurus documentation
-!docs/docusaurus/static/manifest.json
-docs/docusaurus/docs/_media
-**/docs/docusaurus/docs/_media
-docs/docusaurus/docs/assets
-**/docs/docusaurus/docs/assets
-docs/docusaurus/docs/documents
-**/docs/docusaurus/docs/documents
-docs/docusaurus/docs/electron
-**/docs/docusaurus/docs/electron
-docs/docusaurus/docs/shared
-**/docs/docusaurus/docs/shared
-docs/docusaurus/docs/src
-**/docs/docusaurus/docs/src
-docs/docusaurus/build
-**/docs/docusaurus/build
-docs/docusaurus/.docusaurus
-**/docs/docusaurus/.docusaurus
-
-# AI tools
-.agentic-tools*
-_ZENTASKS
-repomix-output.xml
-
-# Allow custom OhMyPosh theme
-!.vscode/OhMyPosh-Atomic-Custom.json
-
-# Instructions for Copilot
-.github/instructions/
-.stryker-tmp/
-reports/stryker-incremental.json
-stryker_prompts_by_mutator/
-stryker-issues.json
-.eslint-config-inspector/
-docs/docusaurus/static/eslint-inspector/
-eslint-inspector-local-test/
-docs/docusaurus/docs/typedoc-sidebar.cjs
-docs/docusaurus/docs/.nojekyll
-docs/docusaurus/docs/coverage.svg
-docs/docusaurus/docs/index.md
-docs/docusaurus/docs/modules.md
-playwright-report/
-test-results/
-!.vscode/mcp.json
-
-# Playwright
-/playwright-report/
-/playwright/test-results/
-/playwright/reports/
-/blob-report/
-/playwright/.cache/
-docs/docusaurus/stylelintcache
-.npmrc
 dist-bench/
 dist-configs/
 dist-playwright/
-.vscode/mcp.json
+html/
+release/
 
+# Coverage directories
+coverage-results.json
+
+# Docusaurus
+!docs/docusaurus/static/manifest.json
+docs/docusaurus/.docusaurus
+docs/docusaurus/build
+docs/docusaurus/docs/.nojekyll
+docs/docusaurus/docs/assets
+docs/docusaurus/docs/coverage.svg
+docs/docusaurus/docs/documents
+docs/docusaurus/docs/electron
+docs/docusaurus/docs/index.md
+docs/docusaurus/docs/modules.md
+docs/docusaurus/docs/src
+docs/docusaurus/docs/typedoc.json
+docs/docusaurus/docs/typedoc-sidebar.cjs
+docs/docusaurus/docs/_media
+docs/docusaurus/static/eslint-inspector/
+docs/docusaurus/static/storybook/
+docs/docusaurus/stylelintcache
+**/docs/docusaurus/.docusaurus
+**/docs/docusaurus/build
+**/docs/docusaurus/docs/_media
+**/docs/docusaurus/docs/assets
+**/docs/docusaurus/docs/documents
+**/docs/docusaurus/docs/electron
+**/docs/docusaurus/docs/shared
+**/docs/docusaurus/docs/src
+
+# Downloads
+!downloads/
+!src/utils/downloads/
+!src/utils/downloads/**
+
+# Linting & Code inspection
+.eslint-config-inspector/
+
+# Node modules
+node_modules/
+node_modules_backup/
+
+# NPM
+.npmrc
+
+# OhMyPosh
+!.vscode/OhMyPosh-Atomic-Custom.json
+
+# Playwright
+/blob-report/
+/playwright-report/
+/playwright/.cache/
+/playwright/reports/
+/playwright/test-results/
+playwright-report/
+test-results/
+
+# Stryker
+.stryker-tmp/
+stryker-issues.json
+stryker_prompts_by_mutator/
+
+# Storybook
 *storybook.log
 storybook-static
-TODO.md
-temp/
-codeql-agent-results/
-
-.gemini/
-gha-creds-*.json
-assets/prettier-plugin-multiline-arrays/
-.jscpd/
-reports/
 storybook/stories/__screenshots__/
 
-# Docusaurus (repo-specific) generated outputs
-docs/docusaurus/build/
-docs/docusaurus/docs/documents/
+# Temp & Reports
+.github/instructions/
+assets/prettier-plugin-multiline-arrays/
+codeql-agent-results/
+gha-creds-*.json
+reports/
+TODO.md
+temp/
 
-# Generated Storybook static output embedded into the docs site.
-docs/docusaurus/static/storybook/
-docs/docusaurus/docs/typedoc.json
-docs/docusaurus/docs/hierarchy.md
+# VS Code
+!.vscode/mcp.json
