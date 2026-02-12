@@ -313,7 +313,6 @@ const config: Config = {
                 debug: true,
                 docs: {
                     breadcrumbs: true,
-                    disableVersioning: true,
                     editCurrentVersion: true,
                     editUrl: "https://github.com/Nick2bad4u/Uptime-Watcher/",
                     exclude: [

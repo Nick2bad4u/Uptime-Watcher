@@ -126,7 +126,12 @@ jobs:
             - name: Prune devDependencies (reduce Flatpak size)
               run: |
                   echo "Pruning devDependencies to reduce node_modules footprint..."
-                  npm prune --omit=dev
+                  # npm v11 re-checks peer graphs during prune. Our Storybook 10
+                  # stack currently includes a legacy addon with Storybook 8 peer
+                  # ranges, so strict peer resolution can fail even though we are
+                  # explicitly omitting devDependencies for Flatpak packaging.
+                  # Use legacy-peer-deps only for this packaging prune step.
+                  npm prune --omit=dev --legacy-peer-deps --no-audit --no-fund
                   echo "Disk usage after prune:"
                   df -h
 
