@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { extractMonitorValueAtPath } from "../../../../services/monitoring/shared/monitorPathTraversal";
 
-describe("extractMonitorValueAtPath", () => {
+describe(extractMonitorValueAtPath, () => {
     it("resolves dot-separated paths", () => {
         const payload = {
             details: {
