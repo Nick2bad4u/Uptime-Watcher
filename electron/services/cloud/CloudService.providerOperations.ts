@@ -28,6 +28,11 @@ import {
     DEFAULT_GOOGLE_DRIVE_CLIENT_ID,
     resolveGoogleDriveOAuthConfig,
 } from "./internal/googleOAuthConfig";
+import {
+    captureProviderConnectionState,
+    restoreProviderConnectionState,
+} from "./internal/providerConnectionState";
+import { deleteProviderSecretsBestEffort } from "./internal/providerSecretCleanup";
 
 /**
  * Disconnects from the configured provider and clears persisted config.
@@ -72,9 +77,15 @@ export async function disconnect(
         await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "");
         await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_SALT, "");
 
-        await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-        await ctx.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
-        await ctx.secretStore.deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY);
+        await deleteProviderSecretsBestEffort({
+            operationLabel: "disconnect",
+            secretKeys: [
+                SETTINGS_KEY_DROPBOX_TOKENS,
+                SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                SECRET_KEY_ENCRYPTION_DERIVED_KEY,
+            ],
+            secretStore: ctx.secretStore,
+        });
 
         logger.info("[CloudService] Disconnected cloud provider");
         return ctx.buildStatusSummary();
@@ -178,8 +189,14 @@ export async function configureFilesystemProvider(
         // Switching to the filesystem provider means OAuth-based providers are
         // no longer configured. Clear any stored OAuth secrets so we don't
         // retain unused credentials on disk.
-        await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-        await ctx.secretStore.deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS);
+        await deleteProviderSecretsBestEffort({
+            operationLabel: "configureFilesystemProvider",
+            secretKeys: [
+                SETTINGS_KEY_DROPBOX_TOKENS,
+                SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+            ],
+            secretStore: ctx.secretStore,
+        });
         await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
 
         logger.info("[CloudService] Configured filesystem provider", {
@@ -197,14 +214,10 @@ export async function connectDropbox(
     ctx: CloudServiceOperationContext
 ): Promise<CloudStatusSummary> {
     return ctx.runCloudOperation("connectDropbox", async () => {
-        const previousProvider =
-            (await ctx.settings.get(SETTINGS_KEY_PROVIDER)) ?? "";
-        const previousFilesystemBaseDirectory =
-            (await ctx.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ??
-            "";
-        const previousStoredTokens = await ctx.secretStore.getSecret(
-            SETTINGS_KEY_DROPBOX_TOKENS
-        );
+        const previousState = await captureProviderConnectionState({
+            ctx,
+            tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
+        });
 
         const {
             DropboxAuthFlow,
@@ -237,20 +250,11 @@ export async function connectDropbox(
             // This must restore the previous provider settings rather than
             // blindly clearing them. Otherwise a failed attempt to connect a
             // new provider would disconnect the previously configured one.
-            if (previousStoredTokens) {
-                await ctx.secretStore.setSecret(
-                    SETTINGS_KEY_DROPBOX_TOKENS,
-                    previousStoredTokens
-                );
-            } else {
-                await ctx.secretStore.deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS);
-            }
-
-            await ctx.settings.set(SETTINGS_KEY_PROVIDER, previousProvider);
-            await ctx.settings.set(
-                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-                previousFilesystemBaseDirectory
-            );
+            await restoreProviderConnectionState({
+                ctx,
+                snapshot: previousState,
+                tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
+            });
 
             const resolved = ensureError(error);
             throw new Error(
@@ -265,9 +269,11 @@ export async function connectDropbox(
         await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
 
         // Clear Google Drive secrets after a successful provider switch.
-        await ctx.secretStore
-            .deleteSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS)
-            .catch(() => {});
+        await deleteProviderSecretsBestEffort({
+            operationLabel: "connectDropbox",
+            secretKeys: [SETTINGS_KEY_GOOGLE_DRIVE_TOKENS],
+            secretStore: ctx.secretStore,
+        });
         await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
 
         logger.info("[CloudService] Connected Dropbox provider");
@@ -282,17 +288,11 @@ export async function connectGoogleDrive(
     ctx: CloudServiceOperationContext
 ): Promise<CloudStatusSummary> {
     return ctx.runCloudOperation("connectGoogleDrive", async () => {
-        const previousProvider =
-            (await ctx.settings.get(SETTINGS_KEY_PROVIDER)) ?? "";
-        const previousFilesystemBaseDirectory =
-            (await ctx.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ??
-            "";
-        const previousAccountLabel =
-            (await ctx.settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)) ??
-            "";
-        const previousStoredTokens = await ctx.secretStore.getSecret(
-            SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
-        );
+        const previousState = await captureProviderConnectionState({
+            ctx,
+            includeGoogleDriveAccountLabel: true,
+            tokenStorageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+        });
 
         const {
             fetchGoogleAccountLabel,
@@ -344,27 +344,12 @@ export async function connectGoogleDrive(
         } catch (error: unknown) {
             // Roll back any partial state so a previously configured provider
             // remains intact.
-            if (previousStoredTokens) {
-                await ctx.secretStore.setSecret(
-                    SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
-                    previousStoredTokens
-                );
-            } else {
-                await ctx.secretStore.deleteSecret(
-                    SETTINGS_KEY_GOOGLE_DRIVE_TOKENS
-                );
-            }
-
-            // Restore settings (do not run in parallel).
-            await ctx.settings.set(
-                SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
-                previousAccountLabel
-            );
-            await ctx.settings.set(SETTINGS_KEY_PROVIDER, previousProvider);
-            await ctx.settings.set(
-                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-                previousFilesystemBaseDirectory
-            );
+            await restoreProviderConnectionState({
+                ctx,
+                restoreGoogleDriveAccountLabel: true,
+                snapshot: previousState,
+                tokenStorageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+            });
 
             const resolved = ensureError(error);
             throw new Error(
@@ -374,9 +359,11 @@ export async function connectGoogleDrive(
         }
 
         // Clear Dropbox secrets after a successful provider switch.
-        await ctx.secretStore
-            .deleteSecret(SETTINGS_KEY_DROPBOX_TOKENS)
-            .catch(() => {});
+        await deleteProviderSecretsBestEffort({
+            operationLabel: "connectGoogleDrive",
+            secretKeys: [SETTINGS_KEY_DROPBOX_TOKENS],
+            secretStore: ctx.secretStore,
+        });
 
         logger.info("[CloudService] Connected Google Drive provider");
         return ctx.buildStatusSummary();

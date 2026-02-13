@@ -13,7 +13,6 @@ import type { MonitorType, Site } from "@shared/types";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { ensureError } from "@shared/utils/errorHandling";
-import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
 import { WebSocket as NodeWebSocket } from "ws";
 
@@ -25,6 +24,10 @@ import type {
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { withOperationalHooks } from "../../utils/operationalHooks";
+import {
+    resolveMonitorNumericOverride,
+    resolveRequiredMonitorUrlField,
+} from "./shared/monitorConfigValueResolvers";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
@@ -50,19 +53,20 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             );
         }
 
-        const rawUrlCandidate = Reflect.get(monitor, "url");
-        const urlCandidate =
-            typeof rawUrlCandidate === "string" ? rawUrlCandidate.trim() : null;
+        const urlResult = resolveRequiredMonitorUrlField(
+            monitor,
+            "url",
+            "WebSocket keepalive monitor requires a valid ws:// or wss:// URL",
+            ["ws", "wss"]
+        );
 
-        if (
-            typeof urlCandidate !== "string" ||
-            !isValidUrl(urlCandidate, { protocols: ["ws", "wss"] })
-        ) {
+        if (!urlResult.ok) {
             return createMonitorErrorResult(
-                "WebSocket keepalive monitor requires a valid ws:// or wss:// URL",
+                urlResult.message,
                 0
             );
         }
+        const { value: urlCandidate } = urlResult;
 
         const maxPongDelayMs = this.resolveMaxPongDelay(monitor);
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
@@ -314,30 +318,14 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
     }
 
     private resolveMaxPongDelay(monitor: Site["monitors"][0]): number {
-        const monitorValue = Reflect.get(monitor, "maxPongDelayMs") as unknown;
-        if (
-            typeof monitorValue === "number" &&
-            Number.isFinite(monitorValue) &&
-            monitorValue > 0
-        ) {
-            return monitorValue;
-        }
-
-        if (Object.hasOwn(this.config, "maxPongDelayMs")) {
-            const candidate = Reflect.get(
-                this.config,
-                "maxPongDelayMs"
-            ) as unknown;
-            if (
-                typeof candidate === "number" &&
-                Number.isFinite(candidate) &&
-                candidate > 0
-            ) {
-                return candidate;
-            }
-        }
-
-        return DEFAULT_PONG_TIMEOUT_MS;
+        return resolveMonitorNumericOverride({
+            allowEqualMinimum: false,
+            fallbackValue: DEFAULT_PONG_TIMEOUT_MS,
+            minimumValue: 0,
+            monitor,
+            monitorFieldName: "maxPongDelayMs",
+            serviceConfig: this.config,
+        });
     }
 
     public constructor(config: MonitorServiceConfig = {}) {

@@ -401,4 +401,52 @@ describe(migrateProviderBackups, () => {
         expect(encryptedBuffer).toBeDefined();
         expect(isEncryptedPayload(encryptedBuffer!)).toBeTruthy();
     });
+
+    it("refuses overwrite when legacy nested source key maps to an existing canonical target", async () => {
+        const provider = new InMemoryBackupProvider();
+
+        provider.seedBackup({
+            buffer: Buffer.from("legacy-plain", "utf8"),
+            createdAt: 20,
+            encrypted: false,
+            fileName: "uptime-watcher-backup-10.sqlite",
+            key: "backups/legacy/uptime-watcher-backup-10.sqlite",
+        });
+
+        provider.seedBackup({
+            buffer: Buffer.from("existing-canonical", "utf8"),
+            createdAt: 10,
+            encrypted: true,
+            fileName: "uptime-watcher-backup-10.sqlite.enc",
+            key: "backups/uptime-watcher-backup-10.sqlite.enc",
+        });
+
+        const key = await derivePassphraseKey({
+            passphrase: "correct horse battery staple",
+            salt: generateEncryptionSalt(),
+        });
+
+        const request: CloudBackupMigrationRequest = {
+            deleteSource: false,
+            target: "encrypted",
+        };
+
+        const result = await migrateProviderBackups({
+            encryptionKey: key,
+            provider,
+            request,
+        });
+
+        expect(result.migrated).toBe(0);
+        expect(result.failures).toHaveLength(1);
+        expect(result.failures[0]?.key).toBe(
+            "backups/legacy/uptime-watcher-backup-10.sqlite"
+        );
+        expect(result.failures[0]?.message).toMatch(/already exists/u);
+
+        const existingCanonical = provider.readBlob(
+            "backups/uptime-watcher-backup-10.sqlite.enc"
+        );
+        expect(existingCanonical?.toString("utf8")).toBe("existing-canonical");
+    });
 });

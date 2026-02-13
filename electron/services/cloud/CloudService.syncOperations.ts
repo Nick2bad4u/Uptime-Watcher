@@ -10,10 +10,10 @@ import type { CloudServiceOperationContext } from "./CloudService.operationConte
 import { logger } from "../../utils/logger";
 import { ProviderCloudSyncTransport } from "../sync/ProviderCloudSyncTransport";
 import {
-    parseBooleanSetting,
     SETTINGS_KEY_LAST_SYNC_AT,
     SETTINGS_KEY_SYNC_ENABLED,
 } from "./internal/cloudServiceSettings";
+import { assertCloudSyncEnabled } from "./internal/cloudSyncOperationGuard";
 import { resetProviderCloudSyncState } from "./migrations/syncReset";
 import { buildCloudSyncResetPreview } from "./migrations/syncResetPreview";
 
@@ -45,13 +45,10 @@ export async function requestSyncNow(
     ctx: CloudServiceOperationContext
 ): Promise<void> {
     await ctx.runCloudOperation("requestSyncNow", async () => {
-        const syncEnabled = parseBooleanSetting(
-            await ctx.settings.get(SETTINGS_KEY_SYNC_ENABLED)
-        );
-
-        if (!syncEnabled) {
-            throw new Error("Cloud sync is disabled");
-        }
+        await assertCloudSyncEnabled({
+            disabledMessage: "Cloud sync is disabled",
+            settings: ctx.settings,
+        });
 
         const provider = await ctx.resolveProviderOrThrow();
         await ctx.syncEngine.syncNow(provider);
@@ -71,13 +68,10 @@ export async function resetRemoteSyncState(
     ctx: CloudServiceOperationContext
 ): Promise<CloudSyncResetResult> {
     return ctx.runCloudOperation("resetRemoteSyncState", async () => {
-        const syncEnabled = parseBooleanSetting(
-            await ctx.settings.get(SETTINGS_KEY_SYNC_ENABLED)
-        );
-
-        if (!syncEnabled) {
-            throw new Error("Sync must be enabled to reset remote sync");
-        }
+        await assertCloudSyncEnabled({
+            disabledMessage: "Sync must be enabled to reset remote sync",
+            settings: ctx.settings,
+        });
 
         const provider = await ctx.resolveProviderOrThrow({
             requireEncryptionUnlocked: true,

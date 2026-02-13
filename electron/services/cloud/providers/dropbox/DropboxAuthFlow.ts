@@ -8,15 +8,16 @@ import type { DropboxTokens } from "./DropboxTokens";
 
 import {
     createOAuthState,
+    DEFAULT_OAUTH_LOOPBACK_PATH,
     startLoopbackOAuthServer,
 } from "../../oauth/LoopbackOAuthServer";
+import { normalizeProviderOAuthLoopbackError } from "../../oauth/oauthLoopbackError";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
 
 const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 
 const LOOPBACK_IP_HOST_4 = "127.0.0.1" as const;
 const LOOPBACK_REDIRECT_HOST = "localhost" as const;
-const LOOPBACK_PATH = "/oauth2/callback" as const;
 
 /**
  * Default loopback port used for Dropbox OAuth.
@@ -42,13 +43,6 @@ const dropboxTokenExchangeResponseSchema = z
     })
     .loose();
 
-function createRandomState(): string {
-    // Legacy wrapper retained for readability.
-    // Internally we use the shared helper so all providers share a strong
-    // state generation policy.
-    return createOAuthState();
-}
-
 type DropboxAuthClient = Pick<
     DropboxAuth,
     "getAccessTokenFromCode" | "getAuthenticationUrl" | "setClientId"
@@ -68,7 +62,7 @@ export class DropboxAuthFlow {
         timeoutMs?: number;
     }): Promise<DropboxTokens> {
         const timeoutMs = args?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-        const state = createRandomState();
+        const state = createOAuthState();
 
         const auth = this.authFactory();
         auth.setClientId(this.appKey);
@@ -99,7 +93,7 @@ export class DropboxAuthFlow {
         const server = await startLoopbackOAuthServer({
             port: this.loopbackPort,
             redirectHost,
-            redirectPath: LOOPBACK_PATH,
+            redirectPath: DEFAULT_OAUTH_LOOPBACK_PATH,
         });
 
         try {
@@ -133,35 +127,14 @@ export class DropboxAuthFlow {
                 safeUrlForLogging: authorizeUrlForLog,
             });
 
-            try {
-                const callback = await callbackPromise;
-                return { code: callback.code, redirectUri };
-            } catch (error: unknown) {
-                const resolved = ensureError(error);
+            const callback = await callbackPromise.catch((error: unknown) => {
+                throw normalizeProviderOAuthLoopbackError({
+                    error,
+                    providerName: "Dropbox",
+                });
+            });
 
-                if (resolved.message === "OAuth state mismatch") {
-                    throw new Error("Dropbox OAuth state mismatch", {
-                        cause: error,
-                    });
-                }
-
-                if (resolved.message.startsWith("OAuth callback error: ")) {
-                    const details = resolved.message.slice(
-                        "OAuth callback error: ".length
-                    );
-                    throw new Error(`Dropbox OAuth error: ${details}`, {
-                        cause: error,
-                    });
-                }
-
-                if (resolved.message === "OAuth loopback timeout") {
-                    throw new Error("Dropbox OAuth timed out", {
-                        cause: error,
-                    });
-                }
-
-                throw resolved;
-            }
+            return { code: callback.code, redirectUri };
         } catch (error: unknown) {
             const resolved = ensureError(error);
 

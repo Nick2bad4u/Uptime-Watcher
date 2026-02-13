@@ -24,9 +24,8 @@ import {
 } from "./internal/cloudServicePrimitives";
 import {
     SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-    SETTINGS_KEY_ENCRYPTION_MODE,
-    SETTINGS_KEY_ENCRYPTION_SALT,
 } from "./internal/cloudServiceSettings";
+import { persistLocalPassphraseEncryptionState } from "./internal/localPassphraseEncryptionState";
 
 /**
  * Enables or unlocks passphrase-based encryption.
@@ -114,16 +113,12 @@ export async function setEncryptionPassphrase(
                 throw new Error("Incorrect encryption passphrase");
             }
 
-            // NOTE: Do not run settings writes in parallel.
-            await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "passphrase");
-            await ctx.settings.set(
-                SETTINGS_KEY_ENCRYPTION_SALT,
-                remoteEncryption.saltBase64
-            );
-            await ctx.secretStore.setSecret(
-                SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-                encodeBase64(derivedKey)
-            );
+            await persistLocalPassphraseEncryptionState({
+                derivedKey,
+                saltBase64: remoteEncryption.saltBase64,
+                secretStore: ctx.secretStore,
+                settings: ctx.settings,
+            });
 
             derivedKey.fill(0);
 
@@ -150,16 +145,12 @@ export async function setEncryptionPassphrase(
 
         await transport.writeManifest(nextManifest);
 
-        // NOTE: Do not run settings writes in parallel.
-        await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "passphrase");
-        await ctx.settings.set(
-            SETTINGS_KEY_ENCRYPTION_SALT,
-            encodeBase64(salt)
-        );
-        await ctx.secretStore.setSecret(
-            SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-            encodeBase64(key)
-        );
+        await persistLocalPassphraseEncryptionState({
+            derivedKey: key,
+            saltBase64: encodeBase64(salt),
+            secretStore: ctx.secretStore,
+            settings: ctx.settings,
+        });
 
         key.fill(0);
 

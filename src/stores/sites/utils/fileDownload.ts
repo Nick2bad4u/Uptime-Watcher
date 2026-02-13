@@ -5,20 +5,26 @@
  * @packageDocumentation
  */
 
-import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import { logger } from "../../../services/logger";
 import {
+    type BrowserDownloadWarnLogger,
     FileDownloadDomAttachmentError,
     triggerArrayBufferDownload,
     triggerBlobDownload,
 } from "../../../utils/downloads/browserFileDownload";
+import { parseSerializedDatabaseBackupResult } from "../../../utils/downloads/serializedBackupResult";
 import { isPlaywrightAutomation } from "../../../utils/environment";
+
+const FILE_DOWNLOAD_WARN_LOGGER: BrowserDownloadWarnLogger = {
+    warn: (message, error): void => {
+        logger.warn(message, error);
+    },
+};
 
 /**
  * Options for downloading a file in the browser.
@@ -63,11 +69,7 @@ function createAndTriggerDownload(
         buffer,
         fileName,
         mimeType,
-        warnLogger: {
-            warn: (message, error) => {
-                logger.warn(message, error);
-            },
-        },
+        warnLogger: FILE_DOWNLOAD_WARN_LOGGER,
     });
 }
 
@@ -222,58 +224,6 @@ export function generateBackupFileName(
 }
 
 /**
- * Type guard ensuring a value matches {@link SerializedDatabaseBackupResult}.
- */
-function isSerializedDatabaseBackupResult(
-    value: unknown
-): value is SerializedDatabaseBackupResult {
-    if (!isSharedRecord(value)) {
-        return false;
-    }
-
-    const bufferCandidate = value["buffer"];
-    if (!(bufferCandidate instanceof ArrayBuffer)) {
-        return false;
-    }
-
-    const fileNameCandidate = value["fileName"];
-    if (typeof fileNameCandidate !== "string") {
-        return false;
-    }
-
-    const metadataCandidate = value["metadata"];
-    if (!isSharedRecord(metadataCandidate)) {
-        return false;
-    }
-
-    const {
-        appVersion,
-        checksum,
-        createdAt,
-        originalPath,
-        retentionHintDays,
-        schemaVersion,
-        sizeBytes,
-    } = metadataCandidate as Partial<SerializedDatabaseBackupMetadata>;
-
-    return (
-        typeof appVersion === "string" &&
-        typeof checksum === "string" &&
-        typeof createdAt === "number" &&
-        Number.isFinite(createdAt) &&
-        typeof originalPath === "string" &&
-        typeof retentionHintDays === "number" &&
-        Number.isFinite(retentionHintDays) &&
-        typeof schemaVersion === "number" &&
-        Number.isFinite(schemaVersion) &&
-        typeof sizeBytes === "number" &&
-        Number.isFinite(sizeBytes) &&
-        sizeBytes >= 0 &&
-        sizeBytes === bufferCandidate.byteLength
-    );
-}
-
-/**
  * Handles downloading SQLite backup data as a file.
  *
  * @remarks
@@ -298,25 +248,18 @@ function isSerializedDatabaseBackupResult(
 export async function handleSQLiteBackupDownload(
     downloadFunction: () => Promise<SerializedDatabaseBackupResult>
 ): Promise<SerializedDatabaseBackupResult> {
-    const backupResult = await downloadFunction();
-
-    if (!isSerializedDatabaseBackupResult(backupResult)) {
-        throw new TypeError("Invalid backup data received");
-    }
+    const backupResult = parseSerializedDatabaseBackupResult(
+        await downloadFunction()
+    );
 
     if (isPlaywrightAutomation()) {
         const automationTarget = globalThis as typeof globalThis & {
             playwrightLastBackup?: SerializedDatabaseBackupResult;
         };
         automationTarget.playwrightLastBackup = backupResult;
-        const metadataSizeBytes = Number.isFinite(
-            backupResult.metadata.sizeBytes
-        )
-            ? backupResult.metadata.sizeBytes
-            : backupResult.buffer.byteLength;
         logger.info("SQLite backup captured in automation mode", {
             fileName: backupResult.fileName,
-            sizeBytes: metadataSizeBytes,
+            sizeBytes: backupResult.metadata.sizeBytes,
         });
         return backupResult;
     }
@@ -338,11 +281,7 @@ export async function handleSQLiteBackupDownload(
             attachToDom: false,
             blob,
             fileName: normalizedFileName,
-            warnLogger: {
-                warn: (message, error) => {
-                    logger.warn(message, error);
-                },
-            },
+            warnLogger: FILE_DOWNLOAD_WARN_LOGGER,
         });
     } catch (clickError) {
         const normalizedClickError =

@@ -166,6 +166,10 @@
         "**/storybook-static/**": true,
         "**/temp/**": true
     },
+    "markdown.validate.ignoredLinks": [
+        "*-Nick2bad4u",
+        "#a11y-Nick2bad4u"
+    ],
     "markdownlint.config": {
         "extends": ".remarkrc.mjs"
     },

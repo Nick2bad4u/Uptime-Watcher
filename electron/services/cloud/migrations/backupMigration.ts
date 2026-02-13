@@ -10,6 +10,10 @@ import type { CloudStorageProvider } from "../providers/CloudStorageProvider.typ
 import { decryptBuffer, encryptBuffer } from "../crypto/cloudCrypto";
 import { backupMetadataKeyForBackupKey } from "../providers/CloudBackupMetadataFile";
 
+const CANONICAL_BACKUPS_PREFIX = "backups/" as const;
+const ENCRYPTION_KEY_REQUIRED_MESSAGE =
+    "Encryption key is required to migrate backups involving encryption";
+
 function normalizeBackupFileName(args: {
     fileName: string;
     target: CloudBackupMigrationRequest["target"];
@@ -31,6 +35,31 @@ function isTargetEncrypted(
     target: CloudBackupMigrationRequest["target"]
 ): boolean {
     return target === "encrypted";
+}
+
+function toCanonicalBackupObjectKey(fileName: string): string {
+    return `${CANONICAL_BACKUPS_PREFIX}${fileName}`;
+}
+
+function buildMigrationResult(args: {
+    deleteSource: boolean;
+    failures: CloudBackupMigrationResult["failures"];
+    migrated: number;
+    processed: number;
+    skipped: number;
+    startedAt: number;
+    target: CloudBackupMigrationRequest["target"];
+}): CloudBackupMigrationResult {
+    return {
+        completedAt: Date.now(),
+        deleteSource: args.deleteSource,
+        failures: args.failures,
+        migrated: args.migrated,
+        processed: args.processed,
+        skipped: args.skipped,
+        startedAt: args.startedAt,
+        target: args.target,
+    };
 }
 
 /**
@@ -74,8 +103,7 @@ export async function migrateProviderBackups(args: {
         typeof limit === "number" ? backups.slice(0, limit) : backups;
 
     if (selected.length === 0) {
-        return {
-            completedAt: Date.now(),
+        return buildMigrationResult({
             deleteSource,
             failures,
             migrated,
@@ -83,31 +111,27 @@ export async function migrateProviderBackups(args: {
             skipped,
             startedAt,
             target,
-        };
+        });
     }
 
-    // Preload existing backup object keys so we can refuse to overwrite an
-    // already-migrated target.
-    const backupsPrefix = selected[0]?.key.endsWith(selected[0].fileName)
-        ? selected[0].key.slice(0, -selected[0].fileName.length)
-        : "backups/";
-
-    const backupObjects = await provider.listObjects(backupsPrefix);
-    const existingBackupKeys = new Set(backupObjects.map((entry) => entry.key));
+    // Preload existing backup keys so we can refuse to overwrite an existing
+    // target object.
+    //
+    // @remarks
+    // Uploads use the provider's canonical backup layout (`backups/<fileName>`).
+    // Deriving a prefix from the first selected source entry can miss
+    // collisions when legacy keys include nested folders.
+    const existingBackupKeys = new Set(backups.map((entry) => entry.key));
 
     const needsCryptoKey =
         targetEncrypted || selected.some((entry) => entry.encrypted);
     if (needsCryptoKey && encryptionKey === undefined) {
-        throw new Error(
-            "Encryption key is required to migrate backups involving encryption"
-        );
+        throw new Error(ENCRYPTION_KEY_REQUIRED_MESSAGE);
     }
 
     function requireEncryptionKey(): Buffer {
         if (!encryptionKey) {
-            throw new Error(
-                "Encryption key is required to migrate backups involving encryption"
-            );
+            throw new Error(ENCRYPTION_KEY_REQUIRED_MESSAGE);
         }
 
         return encryptionKey;
@@ -150,7 +174,7 @@ export async function migrateProviderBackups(args: {
                     fileName: entry.fileName,
                     target,
                 });
-                const targetKey = `${backupsPrefix}${targetFileName}`;
+                const targetKey = toCanonicalBackupObjectKey(targetFileName);
 
                 if (existingBackupKeys.has(targetKey)) {
                     failures.push({
@@ -200,8 +224,7 @@ export async function migrateProviderBackups(args: {
 
     /* eslint-enable no-await-in-loop -- Restore default rule behavior after migration loop. */
 
-    return {
-        completedAt: Date.now(),
+    return buildMigrationResult({
         deleteSource,
         failures,
         migrated,
@@ -209,5 +232,5 @@ export async function migrateProviderBackups(args: {
         skipped,
         startedAt,
         target,
-    };
+    });
 }

@@ -10917,8 +10917,8 @@ export default defineConfig([
         },
         rules: {
             "@stylistic/curly-newline": "off",
-            "@stylistic/exp-list-style": "off",
             "@stylistic/exp-jsx-props-style": "off",
+            "@stylistic/exp-list-style": "off",
             "@stylistic/line-comment-position": "off",
             "@stylistic/multiline-comment-style": "off",
             "@stylistic/spaced-comment": [

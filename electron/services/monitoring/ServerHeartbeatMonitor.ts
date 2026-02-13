@@ -6,11 +6,15 @@
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
 
 import type { IMonitorService, MonitorServiceConfig } from "./types";
 
+import {
+    resolveMonitorNumericOverride,
+    resolveRequiredMonitorStringField,
+    resolveRequiredMonitorUrlField,
+} from "./shared/monitorConfigValueResolvers";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import {
     createMonitorErrorResult,
@@ -41,33 +45,13 @@ function resolveMaxDriftSeconds(
     monitor: ServerHeartbeatMonitorInstance,
     serviceConfig: MonitorServiceConfig
 ): number {
-    const monitorValue = Reflect.get(
+    return resolveMonitorNumericOverride({
+        fallbackValue: DEFAULT_MAX_DRIFT_SECONDS,
+        minimumValue: 0,
         monitor,
-        "heartbeatMaxDriftSeconds"
-    ) as unknown;
-    if (
-        typeof monitorValue === "number" &&
-        Number.isFinite(monitorValue) &&
-        monitorValue >= 0
-    ) {
-        return monitorValue;
-    }
-
-    if (Object.hasOwn(serviceConfig, "heartbeatMaxDriftSeconds")) {
-        const candidate = Reflect.get(
-            serviceConfig,
-            "heartbeatMaxDriftSeconds"
-        ) as unknown;
-        if (
-            typeof candidate === "number" &&
-            Number.isFinite(candidate) &&
-            candidate >= 0
-        ) {
-            return candidate;
-        }
-    }
-
-    return DEFAULT_MAX_DRIFT_SECONDS;
+        monitorFieldName: "heartbeatMaxDriftSeconds",
+        serviceConfig,
+    });
 }
 
 const behavior: RemoteMonitorBehavior<
@@ -146,74 +130,57 @@ const behavior: RemoteMonitorBehavior<
     failureLogLevel: "warn",
     getOperationName: (context) => `Server heartbeat check for ${context.url}`,
     resolveConfiguration: (monitor, serviceConfig) => {
-        const urlCandidate = Reflect.get(monitor, "url") as unknown;
-        if (typeof urlCandidate !== "string") {
-            return {
-                kind: "error",
-                message: "Heartbeat monitor requires a valid URL",
-            };
-        }
-        const url = urlCandidate.trim();
-        if (!isValidUrl(url)) {
-            return {
-                kind: "error",
-                message: "Heartbeat monitor requires a valid URL",
-            };
-        }
-
-        const statusFieldCandidate = Reflect.get(
+        const urlResult = resolveRequiredMonitorUrlField(
             monitor,
-            "heartbeatStatusField"
-        ) as unknown;
-        if (typeof statusFieldCandidate !== "string") {
+            "url",
+            "Heartbeat monitor requires a valid URL"
+        );
+        if (!urlResult.ok) {
             return {
                 kind: "error",
-                message: "Heartbeat status field is required",
+                message: urlResult.message,
             };
         }
-        const statusField = statusFieldCandidate.trim();
-        if (statusField.length === 0) {
-            return {
-                kind: "error",
-                message: "Heartbeat status field is required",
-            };
-        }
+        const { value: url } = urlResult;
 
-        const timestampFieldCandidate = Reflect.get(
+        const statusFieldResult = resolveRequiredMonitorStringField(
             monitor,
-            "heartbeatTimestampField"
-        ) as unknown;
-        if (typeof timestampFieldCandidate !== "string") {
+            "heartbeatStatusField",
+            "Heartbeat status field is required"
+        );
+        if (!statusFieldResult.ok) {
             return {
                 kind: "error",
-                message: "Heartbeat timestamp field is required",
+                message: statusFieldResult.message,
             };
         }
-        const timestampField = timestampFieldCandidate.trim();
-        if (timestampField.length === 0) {
-            return {
-                kind: "error",
-                message: "Heartbeat timestamp field is required",
-            };
-        }
+        const { value: statusField } = statusFieldResult;
 
-        const expectedStatusCandidate = Reflect.get(
+        const timestampFieldResult = resolveRequiredMonitorStringField(
             monitor,
-            "heartbeatExpectedStatus"
-        ) as unknown;
-        if (typeof expectedStatusCandidate !== "string") {
+            "heartbeatTimestampField",
+            "Heartbeat timestamp field is required"
+        );
+        if (!timestampFieldResult.ok) {
             return {
                 kind: "error",
-                message: "Heartbeat expected status is required",
+                message: timestampFieldResult.message,
             };
         }
-        const expectedStatus = expectedStatusCandidate.trim();
-        if (expectedStatus.length === 0) {
+        const { value: timestampField } = timestampFieldResult;
+
+        const expectedStatusResult = resolveRequiredMonitorStringField(
+            monitor,
+            "heartbeatExpectedStatus",
+            "Heartbeat expected status is required"
+        );
+        if (!expectedStatusResult.ok) {
             return {
                 kind: "error",
-                message: "Heartbeat expected status is required",
+                message: expectedStatusResult.message,
             };
         }
+        const { value: expectedStatus } = expectedStatusResult;
 
         const maxDriftSeconds = resolveMaxDriftSeconds(monitor, serviceConfig);
 

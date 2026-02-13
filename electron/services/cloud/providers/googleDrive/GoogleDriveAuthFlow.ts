@@ -6,6 +6,7 @@ import {
     createOAuthState,
     startLoopbackOAuthServer,
 } from "../../oauth/LoopbackOAuthServer";
+import { normalizeProviderOAuthLoopbackError } from "../../oauth/oauthLoopbackError";
 import { createPkcePair } from "../../oauth/pkce";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
 import { requestGoogleOAuthToken } from "./googleDriveOAuthTokenRequest";
@@ -90,10 +91,17 @@ export class GoogleDriveAuthFlow {
                 safeUrlForLogging: urlForLog,
             });
 
-            const callback = await server.waitForCallback({
-                expectedState: state,
-                timeoutMs: 2 * 60_000,
-            });
+            const callback = await server
+                .waitForCallback({
+                    expectedState: state,
+                    timeoutMs: 2 * 60_000,
+                })
+                .catch((error: unknown) => {
+                    throw normalizeProviderOAuthLoopbackError({
+                        error,
+                        providerName: "Google",
+                    });
+                });
 
             const token = await this.requestTokenFromAuthorizationCode({
                 code: callback.code,

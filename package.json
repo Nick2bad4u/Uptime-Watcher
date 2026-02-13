@@ -1091,7 +1091,7 @@
         "prettier-plugin-tailwindcss": "^0.7.2",
         "prettier-plugin-toml": "^2.0.6",
         "publint": "^0.3.17",
-        "putout": "^41.20.1",
+        "putout": "^41.21.0",
         "react-refresh": "^0.18.0",
         "react-scan": "^0.4.3",
         "recheck-jar": "^4.5.0",

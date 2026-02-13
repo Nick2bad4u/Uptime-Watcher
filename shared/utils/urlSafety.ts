@@ -10,6 +10,7 @@
  */
 
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import { hasNestedHttpSchemeAfterFirstDelimiter } from "@shared/utils/urlSchemeValidation";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import validator from "validator";
@@ -236,9 +237,8 @@ function hasSpaceBeforeQueryOrHash(url: string): boolean {
 }
 
 function isValidHttpUrlWithValidator(url: string): boolean {
-    return validator.isURL(url, {
-        allow_protocol_relative_urls: false,
-        disallow_auth: true,
+    return isValidUrl(url, {
+        disallowAuth: true,
         protocols: ["http", "https"],
         require_host: true,
         require_protocol: true,
@@ -260,6 +260,17 @@ function normalizeHttpUrlForExternalOpen(args: {
     safeUrlForLogging: string;
     url: string;
 }): HttpUrlNormalizationResult {
+    // Reject suspicious nested scheme fragments before attempting
+    // normalization, so malformed concatenation cannot be silently rewritten
+    // into a seemingly valid URL.
+    if (hasNestedHttpSchemeAfterFirstDelimiter(args.url)) {
+        return {
+            ok: false,
+            reason: "must be a valid http(s) URL",
+            safeUrlForLogging: args.safeUrlForLogging,
+        };
+    }
+
     if (isValidHttpUrlWithValidator(args.url)) {
         return {
             normalizedUrl: args.url,

@@ -55,8 +55,6 @@ import {
     loadGoogleDriveProviderDeps,
 } from "./internal/cloudProviderDeps";
 import {
-    decodeStrictBase64,
-    ENCRYPTION_KEY_BYTES,
     parseEncryptionMode,
 } from "./internal/cloudServicePrimitives";
 import {
@@ -64,7 +62,6 @@ import {
     DEFAULT_DROPBOX_APP_KEY,
     parseBooleanSetting,
     parseNumberSetting,
-    SECRET_KEY_ENCRYPTION_DERIVED_KEY,
     setLastError,
     SETTINGS_KEY_DROPBOX_TOKENS,
     SETTINGS_KEY_ENCRYPTION_MODE,
@@ -85,6 +82,7 @@ import {
     buildUnsupportedProviderStatus,
     type CloudStatusCommonArgs,
 } from "./internal/CloudStatusBuilders";
+import { resolveStoredDerivedEncryptionKey } from "./internal/derivedEncryptionKeyState";
 import { resolveCloudProviderOrNull } from "./internal/resolveCloudProviderOrNull";
 import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
 import { EncryptedSyncCloudStorageProvider } from "./providers/EncryptedSyncCloudStorageProvider";
@@ -299,23 +297,10 @@ export class CloudService {
             return provider;
         }
 
-        const rawKey = await this.secretStore.getSecret(
-            SECRET_KEY_ENCRYPTION_DERIVED_KEY
-        );
-
-        if (!rawKey) {
-            if (args?.requireEncryptionUnlocked ?? true) {
-                throw new Error(
-                    "Cloud encryption is enabled but locked on this device"
-                );
-            }
-
-            return provider;
-        }
-
-        const key = await this.loadDerivedEncryptionKeyOrClear(rawKey);
-
-        if (!key) {
+        const keyState = await resolveStoredDerivedEncryptionKey({
+            secretStore: this.secretStore,
+        });
+        if (keyState.kind !== "available") {
             if (args?.requireEncryptionUnlocked ?? true) {
                 throw new Error(
                     "Cloud encryption is enabled but locked on this device"
@@ -327,29 +312,8 @@ export class CloudService {
 
         return new EncryptedSyncCloudStorageProvider({
             inner: provider,
-            key,
+            key: keyState.key,
         });
-    }
-
-    /**
-     * Decodes a derived encryption key and clears the stored secret when it is
-     * corrupted.
-     */
-    private async loadDerivedEncryptionKeyOrClear(
-        rawKeyBase64: string
-    ): Promise<Buffer | undefined> {
-        try {
-            return decodeStrictBase64({
-                expectedBytes: ENCRYPTION_KEY_BYTES,
-                label: "encryption key",
-                value: rawKeyBase64,
-            });
-        } catch {
-            await this.secretStore
-                .deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY)
-                .catch(() => {});
-            return undefined;
-        }
     }
 
     private async resolveProviderOrNull(): Promise<CloudStorageProvider | null> {
@@ -377,40 +341,39 @@ export class CloudService {
             return { encrypted: false, key: undefined };
         }
 
-        const raw = await this.secretStore.getSecret(
-            SECRET_KEY_ENCRYPTION_DERIVED_KEY
-        );
-
-        if (!raw) {
-            return { encrypted: true, key: undefined };
-        }
-
-        const key = await this.loadDerivedEncryptionKeyOrClear(raw);
+        const keyState = await resolveStoredDerivedEncryptionKey({
+            secretStore: this.secretStore,
+        });
 
         return {
             encrypted: true,
-            key,
+            key: keyState.kind === "available" ? keyState.key : undefined,
         };
     }
 
     private async getEncryptionKeyOrThrow(): Promise<Buffer> {
-        const raw = await this.secretStore.getSecret(
-            SECRET_KEY_ENCRYPTION_DERIVED_KEY
-        );
-        if (!raw) {
-            throw new Error(
-                "Cloud encryption is enabled but no local key is available"
-            );
-        }
+        const keyState = await resolveStoredDerivedEncryptionKey({
+            secretStore: this.secretStore,
+        });
 
-        const key = await this.loadDerivedEncryptionKeyOrClear(raw);
-        if (!key) {
-            throw new Error(
-                "Cloud encryption is enabled but locked on this device"
-            );
+        switch (keyState.kind) {
+            case "available": {
+                return keyState.key;
+            }
+            case "missing": {
+                throw new Error(
+                    "Cloud encryption is enabled but no local key is available"
+                );
+            }
+            case "invalid": {
+                throw new Error(
+                    "Cloud encryption is enabled but locked on this device"
+                );
+            }
+            default: {
+                throw new Error("Unexpected derived encryption key state");
+            }
         }
-
-        return key;
     }
 
     private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
@@ -458,17 +421,15 @@ export class CloudService {
         const localEncryptionMode = parseEncryptionMode(
             await this.settings.get(SETTINGS_KEY_ENCRYPTION_MODE)
         );
-        const localEncryptionKeyRaw = await this.secretStore.getSecret(
-            SECRET_KEY_ENCRYPTION_DERIVED_KEY
+        const localEncryptionKeyState = await resolveStoredDerivedEncryptionKey(
+            {
+                secretStore: this.secretStore,
+            }
         );
-
-        let hasLocalEncryptionKey = false;
-        if (typeof localEncryptionKeyRaw === "string") {
-            const candidateKey = await this.loadDerivedEncryptionKeyOrClear(
-                localEncryptionKeyRaw
-            );
-            hasLocalEncryptionKey = candidateKey !== undefined;
-            candidateKey?.fill(0);
+        const hasLocalEncryptionKey =
+            localEncryptionKeyState.kind === "available";
+        if (localEncryptionKeyState.kind === "available") {
+            localEncryptionKeyState.key.fill(0);
         }
 
         const common: CloudStatusCommonArgs = {

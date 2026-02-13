@@ -6,7 +6,6 @@
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
 
 import type {
@@ -15,6 +14,11 @@ import type {
     MonitorServiceConfig,
 } from "./types";
 
+import {
+    resolveMonitorNumericOverride,
+    resolveRequiredMonitorStringField,
+    resolveRequiredMonitorUrlField,
+} from "./shared/monitorConfigValueResolvers";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import {
     createMonitorErrorResult,
@@ -42,33 +46,13 @@ function resolveLagThreshold(
     monitor: ReplicationMonitorInstance,
     serviceConfig: MonitorServiceConfig
 ): number {
-    const monitorValue = Reflect.get(
+    return resolveMonitorNumericOverride({
+        fallbackValue: MINIMUM_LAG_THRESHOLD_SECONDS,
+        minimumValue: MINIMUM_LAG_THRESHOLD_SECONDS,
         monitor,
-        "maxReplicationLagSeconds"
-    ) as unknown;
-    if (
-        typeof monitorValue === "number" &&
-        Number.isFinite(monitorValue) &&
-        monitorValue >= MINIMUM_LAG_THRESHOLD_SECONDS
-    ) {
-        return monitorValue;
-    }
-
-    if (Object.hasOwn(serviceConfig, "maxReplicationLagSeconds")) {
-        const candidate = Reflect.get(
-            serviceConfig,
-            "maxReplicationLagSeconds"
-        ) as unknown;
-        if (
-            typeof candidate === "number" &&
-            Number.isFinite(candidate) &&
-            candidate >= MINIMUM_LAG_THRESHOLD_SECONDS
-        ) {
-            return candidate;
-        }
-    }
-
-    return MINIMUM_LAG_THRESHOLD_SECONDS;
+        monitorFieldName: "maxReplicationLagSeconds",
+        serviceConfig,
+    });
 }
 
 function evaluateTimestamp(
@@ -147,63 +131,44 @@ const behavior: RemoteMonitorBehavior<
     getOperationName: (context) =>
         `Replication lag check for ${context.primaryUrl}`,
     resolveConfiguration: (monitor, serviceConfig) => {
-        const primaryCandidate = Reflect.get(
+        const primaryUrlResult = resolveRequiredMonitorUrlField(
             monitor,
-            "primaryStatusUrl"
-        ) as unknown;
-        if (typeof primaryCandidate !== "string") {
+            "primaryStatusUrl",
+            "Primary status URL is required for replication monitors"
+        );
+        if (!primaryUrlResult.ok) {
             return {
                 kind: "error",
-                message:
-                    "Primary status URL is required for replication monitors",
+                message: primaryUrlResult.message,
             };
         }
-        const primaryUrl = primaryCandidate.trim();
-        if (!isValidUrl(primaryUrl)) {
-            return {
-                kind: "error",
-                message:
-                    "Primary status URL is required for replication monitors",
-            };
-        }
+        const { value: primaryUrl } = primaryUrlResult;
 
-        const replicaCandidate = Reflect.get(
+        const replicaUrlResult = resolveRequiredMonitorUrlField(
             monitor,
-            "replicaStatusUrl"
-        ) as unknown;
-        if (typeof replicaCandidate !== "string") {
+            "replicaStatusUrl",
+            "Replica status URL is required for replication monitors"
+        );
+        if (!replicaUrlResult.ok) {
             return {
                 kind: "error",
-                message:
-                    "Replica status URL is required for replication monitors",
+                message: replicaUrlResult.message,
             };
         }
-        const replicaUrl = replicaCandidate.trim();
-        if (!isValidUrl(replicaUrl)) {
-            return {
-                kind: "error",
-                message:
-                    "Replica status URL is required for replication monitors",
-            };
-        }
+        const { value: replicaUrl } = replicaUrlResult;
 
-        const timestampCandidate = Reflect.get(
+        const timestampFieldResult = resolveRequiredMonitorStringField(
             monitor,
-            "replicationTimestampField"
-        ) as unknown;
-        if (typeof timestampCandidate !== "string") {
+            "replicationTimestampField",
+            "Replication timestamp field is required"
+        );
+        if (!timestampFieldResult.ok) {
             return {
                 kind: "error",
-                message: "Replication timestamp field is required",
+                message: timestampFieldResult.message,
             };
         }
-        const timestampField = timestampCandidate.trim();
-        if (timestampField.length === 0) {
-            return {
-                kind: "error",
-                message: "Replication timestamp field is required",
-            };
-        }
+        const { value: timestampField } = timestampFieldResult;
 
         const thresholdSeconds = resolveLagThreshold(monitor, serviceConfig);
 

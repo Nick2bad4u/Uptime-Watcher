@@ -190,6 +190,22 @@ describe("urlSafety", () => {
             expect(result.ok).toBeFalsy();
         });
 
+        it("rejects URLs ending with a bare scheme delimiter", () => {
+            const result = validateExternalOpenUrlCandidate(
+                "https://example.com://"
+            );
+            expect(result.ok).toBeFalsy();
+        });
+
+        it("rejects URLs containing nested http(s) scheme fragments", () => {
+            expect(
+                validateExternalOpenUrlCandidate("https://http://foo").ok
+            ).toBeFalsy();
+            expect(
+                validateExternalOpenUrlCandidate("http://https://bar/baz").ok
+            ).toBeFalsy();
+        });
+
         it("rejects overly long URLs", () => {
             const url = `https://example.com/${"a".repeat(6000)}`;
             const result = validateExternalOpenUrlCandidate(url);

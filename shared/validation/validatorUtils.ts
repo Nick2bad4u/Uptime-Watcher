@@ -36,6 +36,12 @@ import {
     isNonEmptyString as isNonEmptyStringGuard,
     isValidPort as isValidNumericPort,
 } from "../utils/typeGuards";
+import {
+    hasHttpAuthorityDelimiterIssue,
+    hasMissingProtocolDelimiter,
+    hasNestedHttpSchemeAfterFirstDelimiter,
+    isSchemeOnlyUrl,
+} from "../utils/urlSchemeValidation";
 
 /**
  * Options for {@link isValidUrl}.
@@ -387,68 +393,6 @@ const hasDisallowedUrlCharacters = (
     }
 
     return false;
-};
-
-const isSchemeOnlyUrl = (value: string): boolean =>
-    /^[a-z][\d+.a-z-]*:\/\/$/iu.test(value);
-
-const hasMissingProtocolDelimiter = (
-    value: string,
-    requireProtocol: boolean
-): boolean => requireProtocol && !value.includes("://");
-
-const hasHttpAuthorityDelimiterIssue = (
-    value: string,
-    protocols: readonly string[]
-): boolean => {
-    const requiresAuthorityDelimiter = protocols.some((protocol) => {
-        const normalizedProtocol = protocol.toLowerCase();
-        return normalizedProtocol === "http" || normalizedProtocol === "https";
-    });
-
-    if (!requiresAuthorityDelimiter) {
-        return false;
-    }
-
-    const normalizedValue = value.toLowerCase();
-
-    if (
-        normalizedValue.startsWith("http:") &&
-        normalizedValue.slice(5, 7) !== "//"
-    ) {
-        return true;
-    }
-
-    if (
-        normalizedValue.startsWith("https:") &&
-        normalizedValue.slice(6, 8) !== "//"
-    ) {
-        return true;
-    }
-
-    return false;
-};
-
-const hasNestedHttpSchemeAfterFirstDelimiter = (value: string): boolean => {
-    const firstSchemeSeparator = value.indexOf("://");
-    if (firstSchemeSeparator === -1) {
-        return false;
-    }
-
-    // Reject URLs that end with a bare scheme delimiter. These are commonly
-    // produced by malformed concatenation and are almost never intentional.
-    if (value.endsWith("://")) {
-        return true;
-    }
-
-    const remainder = value.slice(firstSchemeSeparator + 3).toLowerCase();
-    // Avoid a literal "http://" string to satisfy @microsoft/sdl/no-insecure-url.
-    // Also avoid literal concatenation to satisfy no-useless-concat.
-    const httpPrefix = ["http", "://"].join("");
-    const httpsPrefix = ["https", "://"].join("");
-    return (
-        remainder.startsWith(httpPrefix) || remainder.startsWith(httpsPrefix)
-    );
 };
 
 /**

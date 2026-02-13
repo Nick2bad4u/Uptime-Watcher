@@ -29,7 +29,10 @@ export interface BrowserDownloadWarnLogger {
 /**
  * Creates an object URL for the provided blob and guarantees cleanup.
  */
-export function withObjectUrl(blob: Blob, run: (objectURL: string) => void): void {
+export function withObjectUrl(
+    blob: Blob,
+    run: (objectURL: string) => void
+): void {
     const objectURL = URL.createObjectURL(blob);
     try {
         run(objectURL);
@@ -38,7 +41,10 @@ export function withObjectUrl(blob: Blob, run: (objectURL: string) => void): voi
     }
 }
 
-function createDownloadAnchor(objectURL: string, fileName: string): HTMLAnchorElement {
+function createDownloadAnchor(
+    objectURL: string,
+    fileName: string
+): HTMLAnchorElement {
     const anchor = document.createElement("a");
     anchor.href = objectURL;
     anchor.download = fileName;
