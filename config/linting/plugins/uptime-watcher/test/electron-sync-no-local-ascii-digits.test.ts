@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-sync-no-local-ascii-digits",
+ruleTester.run("electron-sync-no-local-ascii-digits",
     getPluginRule("electron-sync-no-local-ascii-digits"),
     {
         invalid: [

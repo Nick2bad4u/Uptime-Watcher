@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-prefer-read-process-env",
+ruleTester.run("electron-prefer-read-process-env",
     getPluginRule("electron-prefer-read-process-env"),
     {
         invalid: [

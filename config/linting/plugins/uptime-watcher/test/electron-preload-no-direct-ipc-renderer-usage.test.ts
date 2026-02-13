@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-preload-no-direct-ipc-renderer-usage",
+ruleTester.run("electron-preload-no-direct-ipc-renderer-usage",
     getPluginRule("electron-preload-no-direct-ipc-renderer-usage"),
     {
         invalid: [

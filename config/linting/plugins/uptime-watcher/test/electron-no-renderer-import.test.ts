@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-renderer-import",
+ruleTester.run("electron-no-renderer-import",
     getPluginRule("electron-no-renderer-import"),
     {
         invalid: [

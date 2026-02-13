@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-process-env",
+ruleTester.run("renderer-no-process-env",
     getPluginRule("renderer-no-process-env"),
     {
         invalid: [

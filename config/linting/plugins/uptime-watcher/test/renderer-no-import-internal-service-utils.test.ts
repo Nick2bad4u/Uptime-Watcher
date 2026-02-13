@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-import-internal-service-utils",
+ruleTester.run("renderer-no-import-internal-service-utils",
     getPluginRule("renderer-no-import-internal-service-utils"),
     {
         invalid: [

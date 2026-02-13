@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-direct-ipc-main-import",
+ruleTester.run("electron-no-direct-ipc-main-import",
     getPluginRule("electron-no-direct-ipc-main-import"),
     {
         invalid: [

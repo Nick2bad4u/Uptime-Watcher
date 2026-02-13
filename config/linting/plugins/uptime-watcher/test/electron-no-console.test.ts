@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-console",
+ruleTester.run("electron-no-console",
     getPluginRule("electron-no-console"),
     {
         invalid: [

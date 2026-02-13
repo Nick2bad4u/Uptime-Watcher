@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-open-devtools-require-dev-only",
+ruleTester.run("electron-open-devtools-require-dev-only",
     getPluginRule("electron-open-devtools-require-dev-only"),
     {
         invalid: [

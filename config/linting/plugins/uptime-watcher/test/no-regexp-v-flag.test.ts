@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/no-regexp-v-flag",
+ruleTester.run("no-regexp-v-flag",
     getPluginRule("no-regexp-v-flag"),
     {
         invalid: [

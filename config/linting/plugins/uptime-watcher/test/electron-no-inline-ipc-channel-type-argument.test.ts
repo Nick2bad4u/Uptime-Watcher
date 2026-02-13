@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-inline-ipc-channel-type-argument",
+ruleTester.run("electron-no-inline-ipc-channel-type-argument",
     getPluginRule("electron-no-inline-ipc-channel-type-argument"),
     {
         invalid: [

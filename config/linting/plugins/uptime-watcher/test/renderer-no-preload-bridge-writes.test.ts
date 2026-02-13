@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-preload-bridge-writes",
+ruleTester.run("renderer-no-preload-bridge-writes",
     getPluginRule("renderer-no-preload-bridge-writes"),
     {
         invalid: [

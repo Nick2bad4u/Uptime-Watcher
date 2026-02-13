@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/preload-no-local-is-plain-object",
+ruleTester.run("preload-no-local-is-plain-object",
     getPluginRule("preload-no-local-is-plain-object"),
     {
         invalid: [

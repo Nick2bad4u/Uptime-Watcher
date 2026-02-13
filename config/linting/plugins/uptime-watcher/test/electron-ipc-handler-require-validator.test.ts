@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-ipc-handler-require-validator",
+ruleTester.run("electron-ipc-handler-require-validator",
     getPluginRule("electron-ipc-handler-require-validator"),
     {
         invalid: [

@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/no-local-identifiers",
+ruleTester.run("no-local-identifiers",
     getPluginRule("no-local-identifiers"),
     {
         invalid: [

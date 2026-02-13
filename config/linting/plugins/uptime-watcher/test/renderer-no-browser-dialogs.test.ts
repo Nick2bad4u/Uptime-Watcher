@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-browser-dialogs",
+ruleTester.run("renderer-no-browser-dialogs",
     getPluginRule("renderer-no-browser-dialogs"),
     {
         invalid: [

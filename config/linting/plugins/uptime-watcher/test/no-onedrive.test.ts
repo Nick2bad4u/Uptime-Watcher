@@ -6,7 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("uptime-watcher/no-onedrive", getPluginRule("no-onedrive"), {
+ruleTester.run("no-onedrive", getPluginRule("no-onedrive"), {
     invalid: [
         {
             code: "const p = 'C:/Users/Nick/OneDrive/file.txt';",

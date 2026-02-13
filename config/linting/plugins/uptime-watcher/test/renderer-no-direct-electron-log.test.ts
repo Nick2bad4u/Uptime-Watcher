@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-direct-electron-log",
+ruleTester.run("renderer-no-direct-electron-log",
     getPluginRule("renderer-no-direct-electron-log"),
     {
         invalid: [

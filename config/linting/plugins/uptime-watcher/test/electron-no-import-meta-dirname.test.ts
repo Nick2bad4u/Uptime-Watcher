@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-import-meta-dirname",
+ruleTester.run("electron-no-import-meta-dirname",
     getPluginRule("electron-no-import-meta-dirname"),
     {
         invalid: [

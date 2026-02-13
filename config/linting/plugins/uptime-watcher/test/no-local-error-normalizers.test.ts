@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/no-local-error-normalizers",
+ruleTester.run("no-local-error-normalizers",
     getPluginRule("no-local-error-normalizers"),
     {
         invalid: [

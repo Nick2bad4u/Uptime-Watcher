@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-browserwindow-require-secure-webpreferences",
+ruleTester.run("electron-browserwindow-require-secure-webpreferences",
     getPluginRule("electron-browserwindow-require-secure-webpreferences"),
     {
         invalid: [

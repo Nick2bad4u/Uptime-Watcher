@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/monitor-fallback-consistency",
+ruleTester.run("monitor-fallback-consistency",
     getPluginRule("monitor-fallback-consistency"),
     {
         invalid: [

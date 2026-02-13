@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/prefer-try-get-error-code",
+ruleTester.run("prefer-try-get-error-code",
     getPluginRule("prefer-try-get-error-code"),
     {
         invalid: [

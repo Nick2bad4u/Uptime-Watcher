@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-direct-bridge-readiness",
+ruleTester.run("renderer-no-direct-bridge-readiness",
     getPluginRule("renderer-no-direct-bridge-readiness"),
     {
         invalid: [

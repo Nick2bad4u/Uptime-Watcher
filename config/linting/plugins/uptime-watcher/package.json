@@ -40,8 +40,8 @@
     "scripts": {
         "lint": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx",
         "lint:fix": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx --fix",
-        "test": "vitest run",
-        "test:watch": "vitest"
+        "test": "cd ../../../../ && vitest run --config vitest.linting.config.ts",
+        "test:watch": "cd ../../../../ && vitest --config vitest.linting.config.ts"
     },
     "dependencies": {
         "eslint": "^9.39.2"

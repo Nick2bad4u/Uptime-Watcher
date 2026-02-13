@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-browserwindow-require-preload",
+ruleTester.run("electron-browserwindow-require-preload",
     getPluginRule("electron-browserwindow-require-preload"),
     {
         invalid: [

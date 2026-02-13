@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-dialog-sync",
+ruleTester.run("electron-no-dialog-sync",
     getPluginRule("electron-no-dialog-sync"),
     {
         invalid: [

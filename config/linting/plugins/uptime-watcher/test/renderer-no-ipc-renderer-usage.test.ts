@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-ipc-renderer-usage",
+ruleTester.run("renderer-no-ipc-renderer-usage",
     getPluginRule("renderer-no-ipc-renderer-usage"),
     {
         invalid: [

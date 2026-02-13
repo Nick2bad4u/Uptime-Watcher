@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-webcontents-execute-javascript",
+ruleTester.run("electron-no-webcontents-execute-javascript",
     getPluginRule("electron-no-webcontents-execute-javascript"),
     {
         invalid: [

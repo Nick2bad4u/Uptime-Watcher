@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/no-call-identifiers",
+ruleTester.run("no-call-identifiers",
     getPluginRule("no-call-identifiers"),
     {
         invalid: [

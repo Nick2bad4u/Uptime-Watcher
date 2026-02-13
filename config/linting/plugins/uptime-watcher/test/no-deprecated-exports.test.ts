@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/no-deprecated-exports",
+ruleTester.run("no-deprecated-exports",
     getPluginRule("no-deprecated-exports"),
     {
         invalid: [

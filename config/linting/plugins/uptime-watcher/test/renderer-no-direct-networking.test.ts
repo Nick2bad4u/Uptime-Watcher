@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/renderer-no-direct-networking",
+ruleTester.run("renderer-no-direct-networking",
     getPluginRule("renderer-no-direct-networking"),
     {
         invalid: [

@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/require-error-cause-in-catch",
+ruleTester.run("require-error-cause-in-catch",
     getPluginRule("require-error-cause-in-catch"),
     {
         invalid: [

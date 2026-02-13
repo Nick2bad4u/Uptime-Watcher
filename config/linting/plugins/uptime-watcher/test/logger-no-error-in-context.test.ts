@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/logger-no-error-in-context",
+ruleTester.run("logger-no-error-in-context",
     getPluginRule("logger-no-error-in-context"),
     {
         invalid: [

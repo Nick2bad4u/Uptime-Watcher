@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/prefer-shared-alias",
+ruleTester.run("prefer-shared-alias",
     getPluginRule("prefer-shared-alias"),
     {
         invalid: [

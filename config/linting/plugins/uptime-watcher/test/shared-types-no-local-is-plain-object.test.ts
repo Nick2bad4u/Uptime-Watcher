@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/shared-types-no-local-is-plain-object",
+ruleTester.run("shared-types-no-local-is-plain-object",
     getPluginRule("shared-types-no-local-is-plain-object"),
     {
         invalid: [

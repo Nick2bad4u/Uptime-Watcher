@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-shell-open-external",
+ruleTester.run("electron-no-shell-open-external",
     getPluginRule("electron-no-shell-open-external"),
     {
         invalid: [

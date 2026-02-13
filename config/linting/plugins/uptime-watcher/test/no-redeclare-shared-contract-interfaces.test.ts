@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/no-redeclare-shared-contract-interfaces",
+ruleTester.run("no-redeclare-shared-contract-interfaces",
     getPluginRule("no-redeclare-shared-contract-interfaces"),
     {
         invalid: [

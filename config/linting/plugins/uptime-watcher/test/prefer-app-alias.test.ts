@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/prefer-app-alias",
+ruleTester.run("prefer-app-alias",
     getPluginRule("prefer-app-alias"),
     {
         invalid: [

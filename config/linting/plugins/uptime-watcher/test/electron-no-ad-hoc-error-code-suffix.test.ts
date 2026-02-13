@@ -6,8 +6,7 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run(
-    "uptime-watcher/electron-no-ad-hoc-error-code-suffix",
+ruleTester.run("electron-no-ad-hoc-error-code-suffix",
     getPluginRule("electron-no-ad-hoc-error-code-suffix"),
     {
         invalid: [
