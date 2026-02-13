@@ -19,18 +19,24 @@ describe("httpMonitorStringUtils", () => {
     describe(resolveHeaderValue, () => {
         it("resolves direct and case-insensitive header values", () => {
             expect(
-                resolveHeaderValue({ "content-type": "application/json" }, "content-type")
+                resolveHeaderValue(
+                    { "content-type": "application/json" },
+                    "content-type"
+                )
             ).toBe("application/json");
 
             expect(
-                resolveHeaderValue({ "content-type": "application/json" }, "Content-Type")
+                resolveHeaderValue(
+                    { "content-type": "application/json" },
+                    "Content-Type"
+                )
             ).toBe("application/json");
         });
 
         it("joins array header values", () => {
-            expect(
-                resolveHeaderValue({ "x-tag": ["a", "b"] }, "x-tag")
-            ).toBe("a, b");
+            expect(resolveHeaderValue({ "x-tag": ["a", "b"] }, "x-tag")).toBe(
+                "a, b"
+            );
         });
 
         it("returns null when header is missing", () => {

@@ -75,7 +75,6 @@ export function extractJsonValueAtPath(
 ): unknown {
     return extractMonitorValueAtPath(payload, path, {
         allowArrayIndexTokens: true,
-        trimSegments: true,
     });
 }
 

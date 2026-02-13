@@ -211,7 +211,6 @@ export function extractNestedFieldValue(
 ): unknown {
     return extractMonitorValueAtPath(source, path, {
         allowArrayIndexTokens: false,
-        trimSegments: true,
     });
 }
 

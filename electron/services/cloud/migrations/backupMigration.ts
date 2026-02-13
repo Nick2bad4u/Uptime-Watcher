@@ -8,7 +8,10 @@ import { ensureError } from "@shared/utils/errorHandling";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
 import { decryptBuffer, encryptBuffer } from "../crypto/cloudCrypto";
-import { backupMetadataKeyForBackupKey } from "../providers/CloudBackupMetadataFile";
+import {
+    collectSourceDeletionErrors,
+    requireMigrationEncryptionKey,
+} from "./backupMigrationHelpers";
 
 const CANONICAL_BACKUPS_PREFIX = "backups/" as const;
 const ENCRYPTION_KEY_REQUIRED_MESSAGE =
@@ -60,6 +63,99 @@ function buildMigrationResult(args: {
         startedAt: args.startedAt,
         target: args.target,
     };
+}
+
+type BackupMigrationEntry = Awaited<
+    ReturnType<CloudStorageProvider["listBackups"]>
+>[number];
+type CloudBackupMigrationTarget = CloudBackupMigrationRequest["target"];
+
+interface SingleMigrationAttemptResult {
+    readonly failureMessage: string | undefined;
+    readonly migrated: boolean;
+    readonly postMigrationWarningMessage: string | undefined;
+    readonly targetKey: string | undefined;
+}
+
+async function migrateSingleEntry(args: {
+    readonly deleteSource: boolean;
+    readonly encryptionKey: Buffer | undefined;
+    readonly entry: BackupMigrationEntry;
+    readonly existingBackupKeys: ReadonlySet<string>;
+    readonly provider: CloudStorageProvider;
+    readonly target: CloudBackupMigrationTarget;
+    readonly targetEncrypted: boolean;
+}): Promise<SingleMigrationAttemptResult> {
+    const targetFileName = normalizeBackupFileName({
+        fileName: args.entry.fileName,
+        target: args.target,
+    });
+    const targetKey = toCanonicalBackupObjectKey(targetFileName);
+
+    if (args.existingBackupKeys.has(targetKey)) {
+        return {
+            failureMessage: `Target backup already exists (${targetKey}); refusing to overwrite`,
+            migrated: false,
+            postMigrationWarningMessage: undefined,
+            targetKey,
+        };
+    }
+
+    try {
+        const downloaded = await args.provider.downloadBackup(args.entry.key);
+
+        const plaintext = downloaded.entry.encrypted
+            ? decryptBuffer({
+                  ciphertext: downloaded.buffer,
+                  key: requireMigrationEncryptionKey(
+                      args.encryptionKey,
+                      ENCRYPTION_KEY_REQUIRED_MESSAGE
+                  ),
+              })
+            : downloaded.buffer;
+
+        const targetBuffer = args.targetEncrypted
+            ? encryptBuffer({
+                  key: requireMigrationEncryptionKey(
+                      args.encryptionKey,
+                      ENCRYPTION_KEY_REQUIRED_MESSAGE
+                  ),
+                  plaintext,
+              })
+            : plaintext;
+
+        await args.provider.uploadBackup({
+            buffer: targetBuffer,
+            encrypted: args.targetEncrypted,
+            fileName: targetFileName,
+            metadata: args.entry.metadata,
+        });
+
+        const deletionErrors = await collectSourceDeletionErrors({
+            deleteSource: args.deleteSource,
+            provider: args.provider,
+            sourceKey: args.entry.key,
+        });
+
+        const postMigrationWarningMessage =
+            deletionErrors.length > 0
+                ? `Migration uploaded target but failed to delete source objects: ${deletionErrors.join(", ")}`
+                : undefined;
+
+        return {
+            failureMessage: undefined,
+            migrated: true,
+            postMigrationWarningMessage,
+            targetKey,
+        };
+    } catch (error) {
+        return {
+            failureMessage: ensureError(error).message,
+            migrated: false,
+            postMigrationWarningMessage: undefined,
+            targetKey,
+        };
+    }
 }
 
 /**
@@ -129,92 +225,38 @@ export async function migrateProviderBackups(args: {
         throw new Error(ENCRYPTION_KEY_REQUIRED_MESSAGE);
     }
 
-    function requireEncryptionKey(): Buffer {
-        if (!encryptionKey) {
-            throw new Error(ENCRYPTION_KEY_REQUIRED_MESSAGE);
-        }
-
-        return encryptionKey;
-    }
-
-    async function deleteSourceIfRequested(sourceKey: string): Promise<void> {
-        if (!deleteSource) {
-            return;
-        }
-
-        const deletions = await Promise.allSettled([
-            provider.deleteObject(sourceKey),
-            provider.deleteObject(backupMetadataKeyForBackupKey(sourceKey)),
-        ]);
-
-        const deletionErrors = deletions
-            .flatMap((result) =>
-                result.status === "rejected"
-                    ? [ensureError(result.reason).message]
-                    : []
-            )
-            .filter((message) => message.trim().length > 0);
-
-        if (deletionErrors.length > 0) {
-            failures.push({
-                key: sourceKey,
-                message: `Migration uploaded target but failed to delete source objects: ${deletionErrors.join(", ")}`,
-            });
-        }
-    }
-
     /* eslint-disable no-await-in-loop -- Migration is intentionally sequential to reduce provider load and keep delete-after-upload semantics simple. */
     for (const entry of selected) {
         processed += 1;
 
         const needsMigration = entry.encrypted !== targetEncrypted;
         if (needsMigration) {
-            try {
-                const targetFileName = normalizeBackupFileName({
-                    fileName: entry.fileName,
-                    target,
-                });
-                const targetKey = toCanonicalBackupObjectKey(targetFileName);
+            const result = await migrateSingleEntry({
+                deleteSource,
+                encryptionKey,
+                entry,
+                existingBackupKeys,
+                provider,
+                target,
+                targetEncrypted,
+            });
 
-                if (existingBackupKeys.has(targetKey)) {
-                    failures.push({
-                        key: entry.key,
-                        message: `Target backup already exists (${targetKey}); refusing to overwrite`,
-                    });
-                } else {
-                    const downloaded = await provider.downloadBackup(entry.key);
+            if (result.migrated && result.targetKey) {
+                migrated += 1;
+                existingBackupKeys.add(result.targetKey);
+            }
 
-                    const plaintext = downloaded.entry.encrypted
-                        ? decryptBuffer({
-                              ciphertext: downloaded.buffer,
-                              key: requireEncryptionKey(),
-                          })
-                        : downloaded.buffer;
-
-                    const targetBuffer = targetEncrypted
-                        ? encryptBuffer({
-                              key: requireEncryptionKey(),
-                              plaintext,
-                          })
-                        : plaintext;
-
-                    await provider.uploadBackup({
-                        buffer: targetBuffer,
-                        encrypted: targetEncrypted,
-                        fileName: targetFileName,
-                        metadata: entry.metadata,
-                    });
-
-                    migrated += 1;
-                    existingBackupKeys.add(targetKey);
-
-                    await deleteSourceIfRequested(entry.key);
-                }
-            } catch (error) {
-                const resolved = ensureError(error);
+            if (result.failureMessage) {
                 failures.push({
                     key: entry.key,
-                    message: resolved.message,
+                    message: result.failureMessage,
+                });
+            }
+
+            if (result.postMigrationWarningMessage) {
+                failures.push({
+                    key: entry.key,
+                    message: result.postMigrationWarningMessage,
                 });
             }
         } else {
