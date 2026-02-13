@@ -1,5 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
-import { isRecord } from "@shared/utils/typeHelpers";
+
+import { extractMonitorValueAtPath } from "./monitorPathTraversal";
 
 /**
  * Result of attempting to parse a JSON payload.
@@ -72,51 +73,10 @@ export function extractJsonValueAtPath(
     payload: unknown,
     path: string
 ): unknown {
-    if (payload === null || payload === undefined) {
-        return undefined;
-    }
-
-    const segments = path.split(".").filter((segment) => segment.length > 0);
-    let current: unknown = payload;
-
-    for (const segment of segments) {
-        if (current === null || current === undefined) {
-            return undefined;
-        }
-
-        const tokens = segment
-            .split("[")
-            .map((token) => token.replace("]", ""));
-        const [firstToken, ...indexTokens] = tokens;
-        const propertyToken = firstToken ?? "";
-
-        if (propertyToken.length > 0) {
-            if (!isRecord(current)) {
-                return undefined;
-            }
-
-            current = current[propertyToken];
-        }
-
-        for (const indexToken of indexTokens) {
-            if (indexToken.length === 0) {
-                return undefined;
-            }
-
-            const parsedIndex = Number.parseInt(indexToken, 10);
-            if (Number.isNaN(parsedIndex)) {
-                return undefined;
-            }
-
-            if (!Array.isArray(current)) {
-                return undefined;
-            }
-
-            current = current[parsedIndex];
-        }
-    }
-
-    return current;
+    return extractMonitorValueAtPath(payload, path, {
+        allowArrayIndexTokens: true,
+        trimSegments: true,
+    });
 }
 
 /**

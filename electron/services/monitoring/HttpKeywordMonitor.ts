@@ -1,74 +1,48 @@
-/**
- * HTTP keyword monitor service built on the shared HTTP core.
- */
-
-import type { Monitor } from "@shared/types";
-
 import { ensureError } from "@shared/utils/errorHandling";
 
+import type {
+    HttpMonitorBehavior,
+    HttpMonitorServiceInstance,
+} from "./shared/httpMonitorCore";
+import type { MonitorByType } from "./shared/monitorCoreHelpers";
 import type { MonitorServiceConfig } from "./types";
 
-import {
-    createHttpMonitorService,
-    type HttpMonitorBehavior,
-    type HttpMonitorServiceInstance,
-} from "./shared/httpMonitorCore";
-import { getTrimmedNonEmptyString } from "./shared/httpMonitorStringUtils";
+import { createHttpMonitorService } from "./shared/httpMonitorCore";
+import { resolveRequiredMonitorStringContext } from "./shared/httpMonitorStringUtils";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
-import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
-/**
- * Runtime configuration contract for HTTP keyword monitor instances.
- *
- * @internal
- */
-type HttpKeywordMonitorConfig = Monitor & { type: "http-keyword" };
+type HttpKeywordMonitorConfig = MonitorByType<"http-keyword">;
 
-const behavior: HttpMonitorBehavior<"http-keyword", { keyword: string }> = {
+interface HttpKeywordMonitorValidationContext {
+    keyword: string;
+}
+
+const HTTP_KEYWORD_MONITOR_BEHAVIOR: HttpMonitorBehavior<
+    "http-keyword",
+    HttpKeywordMonitorValidationContext
+> = {
     evaluateResponse: ({ context, response, responseTime }) => {
-        const body =
-            typeof response.data === "string"
-                ? response.data
-                : JSON.stringify(response.data);
-        const normalizedBody = body.toLowerCase();
-        const normalizedKeyword = context.keyword.toLowerCase();
-        const containsKeyword = normalizedBody.includes(normalizedKeyword);
-
-        if (containsKeyword) {
-            return {
-                details: `Keyword "${context.keyword}" found`,
-                responseTime,
-                status: "up",
-            };
-        }
+        const responseBody =
+            typeof response.data === "string" ? response.data : "";
+        const hasKeyword = responseBody.includes(context.keyword);
 
         return {
-            details: `Keyword "${context.keyword}" not found`,
+            details: hasKeyword
+                ? `Keyword "${context.keyword}" found in response`
+                : `Keyword "${context.keyword}" not found in response`,
             responseTime,
-            status: "degraded",
-        };
+            status: hasKeyword ? "up" : "degraded",
+        } as const;
     },
     operationLabel: "HTTP keyword check",
     scope: "HttpKeywordMonitor",
     type: "http-keyword",
-    validateMonitorSpecifics: (monitor: HttpKeywordMonitorConfig) => {
-        const keyword = getTrimmedNonEmptyString(monitor.bodyKeyword);
-
-        if (!keyword) {
-            return {
-                kind: "error",
-                result: createMonitorErrorResult(
-                    "Monitor missing or invalid keyword",
-                    0
-                ),
-            };
-        }
-
-        return {
-            context: { keyword },
-            kind: "context",
-        };
-    },
+    validateMonitorSpecifics: (monitor: HttpKeywordMonitorConfig) =>
+        resolveRequiredMonitorStringContext({
+            errorMessage: "Monitor missing or invalid keyword",
+            onValue: (keyword) => ({ keyword }),
+            value: monitor.bodyKeyword,
+        }),
 };
 
 type HttpKeywordMonitorConstructor = new (
@@ -82,8 +56,8 @@ const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor =
                 () =>
                     createHttpMonitorService<
                         "http-keyword",
-                        { keyword: string }
-                    >(behavior),
+                        HttpKeywordMonitorValidationContext
+                    >(HTTP_KEYWORD_MONITOR_BEHAVIOR),
                 "HttpKeywordMonitor"
             );
         } catch (error) {
@@ -92,6 +66,10 @@ const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor =
     })();
 
 /**
- * HTTP keyword monitor service powered by the shared HTTP core.
+ * Monitors whether a configured keyword appears in an HTTP response body.
+ *
+ * @remarks
+ * This monitor is useful for validating textual markers in dynamic pages or
+ * API responses where status codes alone are insufficient.
  */
 export class HttpKeywordMonitor extends HttpKeywordMonitorBase {}

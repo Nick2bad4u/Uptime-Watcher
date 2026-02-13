@@ -12,6 +12,7 @@ import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
+import { getLatestHistoryTimestamp } from "../../../utils/monitoring/monitorHistoryTime";
 import { formatResponseTime } from "../../../utils/time";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 
@@ -103,11 +104,6 @@ const resolveMonitorLabel = (monitor: Monitor): string => {
     return monitor.type.toUpperCase();
 };
 
-const extractLatestTimestamp = (monitor: Monitor): number | undefined => {
-    const [latest] = monitor.history;
-    return latest?.timestamp;
-};
-
 const ResponseIcon = AppIcons.metrics.response;
 const IntervalIcon = AppIcons.metrics.time;
 const ActivityIcon = AppIcons.metrics.activity;
@@ -135,7 +131,9 @@ export const SiteCardMonitorList: NamedExoticComponent<SiteCardMonitorListProper
                 monitors.map((monitor) => {
                     const StatusIcon = STATUS_ICON_MAP[monitor.status];
                     const statusLabel = STATUS_LABELS[monitor.status];
-                    const lastTimestamp = extractLatestTimestamp(monitor);
+                    const lastTimestamp = getLatestHistoryTimestamp(
+                        monitor.history
+                    );
                     const isActive = monitor.id === selectedMonitorId;
 
                     const safeResponseLabel = formatResponseTime(

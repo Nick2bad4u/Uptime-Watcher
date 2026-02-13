@@ -1,124 +1,98 @@
-/**
- * HTTP JSON monitor service built on the shared HTTP core.
- */
-
-import type { Monitor } from "@shared/types";
-
 import { ensureError } from "@shared/utils/errorHandling";
 
+import type {
+    HttpMonitorBehavior,
+    HttpMonitorServiceInstance,
+} from "./shared/httpMonitorCore";
+import type { MonitorByType } from "./shared/monitorCoreHelpers";
 import type { MonitorServiceConfig } from "./types";
 
-import { logger } from "../../utils/logger";
-import {
-    createHttpMonitorService,
-    type HttpMonitorBehavior,
-    type HttpMonitorServiceInstance,
-} from "./shared/httpMonitorCore";
+import { createHttpMonitorService } from "./shared/httpMonitorCore";
 import {
     extractJsonValueAtPath,
     isParseFailure,
     parseJsonPayload,
     stringifyJsonValue,
 } from "./shared/httpMonitorJsonUtils";
-import { getTrimmedNonEmptyString } from "./shared/httpMonitorStringUtils";
+import { resolveRequiredMonitorStringContext } from "./shared/httpMonitorStringUtils";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
-import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
-/**
- * Runtime configuration contract for HTTP JSON monitor instances.
- *
- * @internal
- */
-type HttpJsonMonitorConfig = Monitor & { type: "http-json" };
+type HttpJsonMonitorConfig = MonitorByType<"http-json">;
 
-const behavior: HttpMonitorBehavior<
+interface HttpJsonMonitorValidationContext {
+    expectedValue: string;
+    jsonPath: string;
+}
+
+const HTTP_JSON_MONITOR_BEHAVIOR: HttpMonitorBehavior<
     "http-json",
-    { expectedValue: string; jsonPath: string }
+    HttpJsonMonitorValidationContext
 > = {
     evaluateResponse: ({ context, response, responseTime }) => {
-        const parseResult = parseJsonPayload(response.data, (error) => {
-            logger.warn("[HttpJsonMonitor] Failed to parse JSON payload", {
-                message: ensureError(error).message,
-            });
-        });
+        const parsed = parseJsonPayload(response.data);
 
-        if (isParseFailure(parseResult)) {
-            const { error } = parseResult;
+        if (isParseFailure(parsed)) {
             return {
-                details: `JSON parsing failed: ${error.message}`,
+                details: "JSON parsing failed",
                 responseTime,
                 status: "degraded",
-            };
+            } as const;
         }
 
-        const actualValue = extractJsonValueAtPath(
-            parseResult.payload,
-            context.jsonPath
-        );
+        const extracted = extractJsonValueAtPath(parsed.payload, context.jsonPath);
 
-        if (actualValue === undefined) {
+        if (extracted === undefined) {
             return {
-                details: `JSON path "${context.jsonPath}" not found`,
+                details: `JSON path '${context.jsonPath}' not found in response`,
                 responseTime,
                 status: "degraded",
-            };
+            } as const;
         }
 
-        const actualAsString = stringifyJsonValue(actualValue, (error) => {
-            logger.warn("[HttpJsonMonitor] Failed to serialise JSON value", {
-                message: ensureError(error).message,
-            });
-        });
-        if (actualAsString === context.expectedValue) {
+        const normalizedValue = stringifyJsonValue(extracted);
+        if (normalizedValue !== context.expectedValue) {
             return {
-                details: `JSON path "${context.jsonPath}" matched expected value`,
+                details: `JSON value mismatch at path '${context.jsonPath}': expected '${context.expectedValue}' but got '${normalizedValue}'`,
                 responseTime,
-                status: "up",
-            };
+                status: "degraded",
+            } as const;
         }
 
         return {
-            details: `JSON path "${context.jsonPath}" mismatch (expected "${context.expectedValue}", received "${actualAsString}")`,
+            details: `JSON value matched expected value at path '${context.jsonPath}'`,
             responseTime,
-            status: "degraded",
-        };
+            status: "up",
+        } as const;
     },
     operationLabel: "HTTP JSON check",
     scope: "HttpJsonMonitor",
     type: "http-json",
     validateMonitorSpecifics: (monitor: HttpJsonMonitorConfig) => {
-        const jsonPath = getTrimmedNonEmptyString(monitor.jsonPath);
-        const expectedValue = getTrimmedNonEmptyString(
-            monitor.expectedJsonValue
-        );
-
-        if (!jsonPath) {
-            return {
-                kind: "error",
-                result: createMonitorErrorResult(
-                    "Monitor missing or invalid JSON path",
-                    0
-                ),
-            };
+        const jsonPathResult = resolveRequiredMonitorStringContext({
+            errorMessage: "Monitor missing or invalid JSON path",
+            onValue: (value) => value,
+            value: monitor.jsonPath,
+        });
+        if (jsonPathResult.kind === "error") {
+            return jsonPathResult;
         }
 
-        if (!expectedValue) {
-            return {
-                kind: "error",
-                result: createMonitorErrorResult(
-                    "Monitor missing or invalid expected JSON value",
-                    0
-                ),
-            };
+        const expectedValueResult = resolveRequiredMonitorStringContext({
+            errorMessage: "Monitor missing or invalid expected JSON value",
+            onValue: (value) => value,
+            value: monitor.expectedJsonValue,
+        });
+        if (expectedValueResult.kind === "error") {
+            return expectedValueResult;
         }
 
         return {
             context: {
-                expectedValue,
-                jsonPath,
+                expectedValue: expectedValueResult.context,
+                jsonPath: jsonPathResult.context,
             },
             kind: "context",
-        };
+        } as const;
     },
 };
 
@@ -133,8 +107,8 @@ const HttpJsonMonitorBase: HttpJsonMonitorConstructor =
                 () =>
                     createHttpMonitorService<
                         "http-json",
-                        { expectedValue: string; jsonPath: string }
-                    >(behavior),
+                        HttpJsonMonitorValidationContext
+                    >(HTTP_JSON_MONITOR_BEHAVIOR),
                 "HttpJsonMonitor"
             );
         } catch (error) {
@@ -143,6 +117,6 @@ const HttpJsonMonitorBase: HttpJsonMonitorConstructor =
     })();
 
 /**
- * HTTP JSON monitor service driven by the shared HTTP core.
+ * Monitors a JSON response path against an expected stringified value.
  */
 export class HttpJsonMonitor extends HttpJsonMonitorBase {}

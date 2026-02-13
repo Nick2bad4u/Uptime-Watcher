@@ -10,12 +10,8 @@ import type { MouseEvent, NamedExoticComponent } from "react";
 import { memo, useCallback, useId, useMemo, useRef } from "react";
 
 import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
-import {
-    getMonitorDisplayIdentifier,
-    getMonitorTypeDisplayLabel,
-} from "../../../../utils/fallbacks";
 import { AppIcons } from "../../../../utils/icons";
-import { formatTitleSuffix } from "../../../../utils/monitorTitleFormatters";
+import { buildMonitorDisplayInfo } from "../../../../utils/monitoring/monitorDisplayInfo";
 
 const DEFAULT_PORT_VALUES = new Set<number>([80, 443]);
 const PLACEHOLDER_LABEL_DEFAULT = "Select a monitor";
@@ -139,26 +135,25 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
 
         // Memoize the option formatting to avoid recalculation
         const formatMonitorOption = useCallback((monitor: Monitor): string => {
-            const monitorTypeLabel = getMonitorTypeDisplayLabel(monitor.type);
             const fallbackIdentifier = monitor.id;
 
-            const rawSuffix = formatTitleSuffix(monitor).trim();
-            const normalizedSuffix =
-                rawSuffix.startsWith("(") && rawSuffix.endsWith(")")
-                    ? rawSuffix.slice(1, -1)
-                    : rawSuffix;
+            const {
+                connectionInfo,
+                connectionInfoSource,
+                monitorTypeLabel,
+            } = buildMonitorDisplayInfo({
+                fallbackIdentifier,
+                monitor,
+            });
 
             const identifier =
-                normalizedSuffix.length > 0
-                    ? normalizedSuffix
-                    : preferHostPortIdentifier(
+                connectionInfoSource === "identifier"
+                    ? preferHostPortIdentifier(
                           monitor,
-                          getMonitorDisplayIdentifier(
-                              monitor,
-                              fallbackIdentifier
-                          ),
+                          connectionInfo,
                           fallbackIdentifier
-                      );
+                      )
+                    : connectionInfo;
 
             return identifier
                 ? `${monitorTypeLabel}: ${identifier}`

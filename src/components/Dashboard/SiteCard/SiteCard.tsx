@@ -17,7 +17,7 @@
  * @packageDocumentation
  */
 
-import type { Site, StatusHistory } from "@shared/types";
+import type { Site } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
 
@@ -28,6 +28,7 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
+import { getLatestHistoryTimestamp } from "../../../utils/monitoring/monitorHistoryTime";
 import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
 import {
     formatFullTimestamp,
@@ -64,26 +65,6 @@ const formatStatus = (value: string): string => {
     }
     const lowerCased = value.toLowerCase();
     return lowerCased.charAt(0).toUpperCase() + lowerCased.slice(1);
-};
-
-const getLatestHistoryTimestamp = (
-    history: readonly StatusHistory[]
-): number | undefined => {
-    let latestTimestamp: number | undefined = undefined;
-
-    for (const record of history) {
-        const timestamp =
-            typeof record.timestamp === "number" ? record.timestamp : undefined;
-
-        if (
-            timestamp !== undefined &&
-            (latestTimestamp === undefined || timestamp > latestTimestamp)
-        ) {
-            latestTimestamp = timestamp;
-        }
-    }
-
-    return latestTimestamp;
 };
 
 /**

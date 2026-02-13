@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { InMemorySecretStore } from "../../../utils/InMemorySecretStore";
+import { createInMemoryCloudSettingsAdapter } from "./createInMemoryCloudSettingsAdapter";
 
 import {
     SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
@@ -13,23 +14,9 @@ import {
     restoreProviderConnectionState,
 } from "../../../../services/cloud/internal/providerConnectionState";
 
-function createSettingsAdapter(seed?: Record<string, string>): {
-    get: (key: string) => Promise<string | undefined>;
-    set: (key: string, value: string) => Promise<void>;
-} {
-    const data = new Map<string, string>(Object.entries(seed ?? {}));
-
-    return {
-        get: async (key) => data.get(key),
-        set: async (key, value) => {
-            data.set(key, value);
-        },
-    };
-}
-
 describe("providerConnectionState", () => {
     it("captures provider settings, token snapshot, and optional account label", async () => {
-        const settings = createSettingsAdapter({
+        const settings = createInMemoryCloudSettingsAdapter({
             [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/original",
             [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "existing-label",
             [SETTINGS_KEY_PROVIDER]: "filesystem",
@@ -54,7 +41,7 @@ describe("providerConnectionState", () => {
     });
 
     it("restores token + settings snapshot after a failed provider mutation", async () => {
-        const settings = createSettingsAdapter({
+        const settings = createInMemoryCloudSettingsAdapter({
             [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/original",
             [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "existing-label",
             [SETTINGS_KEY_PROVIDER]: "filesystem",

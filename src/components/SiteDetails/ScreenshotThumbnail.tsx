@@ -7,7 +7,6 @@
  */
 
 import { tryGetSafeThirdPartyHttpUrl } from "@shared/utils/urlSafety";
-import { isValidUrl } from "@shared/validation/validatorUtils";
 import {
     type JSX,
     type MouseEvent,
@@ -22,6 +21,7 @@ import { useMount } from "../../hooks/useMount";
 import { selectOpenExternal } from "../../stores/ui/selectors";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
+import { normalizeMonitorExternalUrl } from "../../utils/monitoring/monitorExternalUrl";
 
 /**
  * Props for the ScreenshotThumbnail component
@@ -83,18 +83,8 @@ export const ScreenshotThumbnail = ({
     );
 
     // Calculate safe values using useMemo to avoid infinite loops
-    const safeUrl = useMemo(
-        () => (typeof url === "string" ? url.trim() : ""),
-        [url]
-    );
-
-    const isUrlValid = useMemo(
-        () =>
-            isValidUrl(safeUrl, {
-                disallowAuth: true,
-            }),
-        [safeUrl]
-    );
+    const safeUrl = useMemo(() => normalizeMonitorExternalUrl(url), [url]);
+    const isUrlValid = safeUrl.length > 0;
 
     const screenshotTargetUrl = useMemo((): null | string => {
         if (!isUrlValid) {

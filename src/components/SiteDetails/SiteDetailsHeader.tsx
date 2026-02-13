@@ -9,7 +9,6 @@ import type { Monitor, Site } from "@shared/types";
 import type { MouseEvent, NamedExoticComponent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
-import { isValidUrl } from "@shared/validation/validatorUtils";
 import { memo, useCallback, useMemo } from "react";
 
 import type { UIStore } from "../../stores/ui/types";
@@ -21,6 +20,8 @@ import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { getMonitorTypeDisplayLabel } from "../../utils/fallbacks";
 import { AppIcons } from "../../utils/icons";
+import { normalizeMonitorExternalUrl } from "../../utils/monitoring/monitorExternalUrl";
+import { getLatestMonitorHistoryTimestamp } from "../../utils/monitoring/monitorHistoryTime";
 import { formatFullTimestamp, formatRelativeTimestamp } from "../../utils/time";
 import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { Tooltip } from "../common/Tooltip/Tooltip";
@@ -119,34 +120,6 @@ function getMonitorStateDescriptor(monitor?: Monitor): {
 }
 
 /**
- * Determines the most recent check timestamp for the selected monitor.
- *
- * @param monitor - Monitor with historical status entries.
- *
- * @returns Latest timestamp in milliseconds, or undefined if unavailable.
- */
-function getLastCheckTimestamp(monitor?: Monitor): number | undefined {
-    if (!monitor) {
-        return undefined;
-    }
-
-    let latestTimestamp: number | undefined = undefined;
-
-    for (const entry of monitor.history) {
-        const { timestamp } = entry;
-
-        if (
-            typeof timestamp === "number" &&
-            (latestTimestamp === undefined || timestamp > latestTimestamp)
-        ) {
-            latestTimestamp = timestamp;
-        }
-    }
-
-    return latestTimestamp;
-}
-
-/**
  * Builds the header meta items displayed beneath the site summary.
  *
  * @param parameters - Arguments required to assemble header meta content.
@@ -235,7 +208,7 @@ function useSiteDetailsHeaderModel(
     );
 
     const lastCheckTimestamp = useMemo(
-        () => getLastCheckTimestamp(selectedMonitor),
+        () => getLatestMonitorHistoryTimestamp(selectedMonitor),
         [selectedMonitor]
     );
 
@@ -284,22 +257,14 @@ function useSiteDetailsHeaderModel(
         totalMonitors,
     ]);
 
-    const selectedMonitorUrl = (selectedMonitor?.url ?? "").trim();
+    const selectedMonitorUrl = useMemo(
+        () => normalizeMonitorExternalUrl(selectedMonitor?.url),
+        [selectedMonitor?.url]
+    );
     const hasMonitorData = Boolean(selectedMonitor);
     const hasHttpMonitorUrl =
         selectedMonitor?.type === "http" && selectedMonitorUrl.length > 0;
-
-    const screenshotUrl = useMemo(() => {
-        if (!hasHttpMonitorUrl) {
-            return "";
-        }
-
-        return isValidUrl(selectedMonitorUrl, {
-            disallowAuth: true,
-        })
-            ? selectedMonitorUrl
-            : "";
-    }, [hasHttpMonitorUrl, selectedMonitorUrl]);
+    const screenshotUrl = hasHttpMonitorUrl ? selectedMonitorUrl : "";
 
     return useMemo(() => {
         const baseModel: SiteDetailsHeaderModel = {
@@ -375,14 +340,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
             selectedMonitorUrl,
         } = useSiteDetailsHeaderModel(site, selectedMonitor);
 
-        const isMonitorUrlValid = useMemo(
-            () =>
-                hasHttpMonitorUrl &&
-                isValidUrl(selectedMonitorUrl, {
-                    disallowAuth: true,
-                }),
-            [hasHttpMonitorUrl, selectedMonitorUrl]
-        );
+        const isMonitorUrlValid = hasHttpMonitorUrl;
 
         const monitorStatus = selectedMonitor?.status ?? "unknown";
         const CloseIcon = AppIcons.ui.close;

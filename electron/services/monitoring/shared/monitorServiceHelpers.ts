@@ -16,6 +16,7 @@ import type { NormalizedMonitorConfig as NormalizedMonitorConfigType } from "../
 import type { MonitorCheckResult } from "../types";
 
 import { createMonitorConfig as createMonitorConfigFactory } from "../createMonitorConfig";
+import { extractMonitorValueAtPath } from "./monitorPathTraversal";
 
 /**
  * Derives a {@link NormalizedMonitorConfig} from a partial monitor and optional
@@ -208,30 +209,10 @@ export function extractNestedFieldValue(
     source: unknown,
     path: string
 ): unknown {
-    if (typeof path !== "string" || path.trim().length === 0) {
-        return undefined;
-    }
-
-    const segments = path
-        .split(".")
-        .map((segment) => segment.trim())
-        .filter((segment) => segment.length > 0);
-
-    let current: unknown = source;
-
-    for (const segment of segments) {
-        if (
-            current !== null &&
-            typeof current === "object" &&
-            Object.hasOwn(current, segment)
-        ) {
-            current = Reflect.get(current, segment);
-        } else {
-            return undefined;
-        }
-    }
-
-    return current;
+    return extractMonitorValueAtPath(source, path, {
+        allowArrayIndexTokens: false,
+        trimSegments: true,
+    });
 }
 
 const UNIX_SECONDS_THRESHOLD = 10_000_000_000;

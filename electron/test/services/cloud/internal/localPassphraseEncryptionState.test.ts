@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { InMemorySecretStore } from "../../../utils/InMemorySecretStore";
+import { createInMemoryCloudSettingsAdapter } from "./createInMemoryCloudSettingsAdapter";
 
 import {
     SECRET_KEY_ENCRYPTION_DERIVED_KEY,
@@ -9,23 +10,9 @@ import {
 } from "@electron/services/cloud/internal/cloudServiceSettings";
 import { persistLocalPassphraseEncryptionState } from "@electron/services/cloud/internal/localPassphraseEncryptionState";
 
-function createSettingsAdapter(seed?: Record<string, string>): {
-    get: (key: string) => Promise<string | undefined>;
-    set: (key: string, value: string) => Promise<void>;
-} {
-    const data = new Map<string, string>(Object.entries(seed ?? {}));
-
-    return {
-        get: async (key) => data.get(key),
-        set: async (key, value) => {
-            data.set(key, value);
-        },
-    };
-}
-
 describe(persistLocalPassphraseEncryptionState, () => {
     it("stores passphrase mode, salt, and encoded derived key", async () => {
-        const settings = createSettingsAdapter();
+        const settings = createInMemoryCloudSettingsAdapter();
         const secretStore = new InMemorySecretStore();
         const key = Buffer.from("0123456789abcdef0123456789abcdef", "utf8");
 

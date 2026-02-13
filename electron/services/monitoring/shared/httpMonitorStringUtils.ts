@@ -1,16 +1,56 @@
-import { ensureError } from "@shared/utils/errorHandling";
-import { isRecord } from "@shared/utils/typeHelpers";
+import type { MonitorCheckResult } from "../types";
 
-const TRIMMED_HEADER_VALUE_MAX_LENGTH = 2048;
+import { createMonitorErrorResult } from "./monitorServiceHelpers";
 
 /**
- * Returns a trimmed, non-empty string value or `null` when invalid.
+ * Normalizes a header value by trimming whitespace and collapsing internal
+ * whitespace to single spaces.
+ */
+export function normalizeHeaderValue(value: string): string {
+    return value.replaceAll(/\s+/gu, " ").trim();
+}
+
+/**
+ * Resolves a header value from a response header map case-insensitively.
  *
- * @param value - Candidate value to normalize.
+ * @param headers - Response headers.
+ * @param headerName - Header name to resolve.
  *
- * @returns Normalized string or `null` when the input is not usable.
- *
- * @internal
+ * @returns Header string value if found, otherwise null.
+ */
+export function resolveHeaderValue(
+    headers: Record<string, unknown>,
+    headerName: string
+): null | string {
+    const direct = headers[headerName];
+
+    if (typeof direct === "string") {
+        return direct;
+    }
+
+    if (Array.isArray(direct)) {
+        return direct.join(", ");
+    }
+
+    const lowerName = headerName.toLowerCase();
+
+    for (const [key, value] of Object.entries(headers)) {
+        if (key.toLowerCase() === lowerName) {
+            if (typeof value === "string") {
+                return value;
+            }
+
+            if (Array.isArray(value)) {
+                return value.join(", ");
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Returns a trimmed non-empty string or null.
  */
 export function getTrimmedNonEmptyString(value: unknown): null | string {
     if (typeof value !== "string") {
@@ -18,88 +58,39 @@ export function getTrimmedNonEmptyString(value: unknown): null | string {
     }
 
     const trimmed = value.trim();
-    return trimmed.length === 0 ? null : trimmed;
+
+    return trimmed.length > 0 ? trimmed : null;
 }
 
-/**
- * Normalizes an HTTP header name for lookups.
- *
- * @param value - Raw header name.
- *
- * @returns Lowercased, trimmed header name.
- *
- * @internal
- */
-export function normalizeHeaderName(value: string): string {
-    return value.trim().toLowerCase();
-}
+type RequiredMonitorStringContextResult<TContext> =
+    | Readonly<{ context: TContext; kind: "context" }>
+    | Readonly<{ kind: "error"; result: MonitorCheckResult }>;
 
 /**
- * Normalizes a header value for comparison or logging.
+ * Resolves a required monitor string field and maps it into monitor-specific
+ * validation context.
  *
- * @param value - Raw header value.
+ * @param args - Validation arguments.
  *
- * @returns Trimmed header value capped to a safe length.
- *
- * @internal
+ * @returns Context for valid values or an error monitor result when the value
+ * is missing/invalid.
  */
-export function normalizeHeaderValue(value: string): string {
-    const trimmed = value.trim();
-    if (trimmed.length > TRIMMED_HEADER_VALUE_MAX_LENGTH) {
-        return `${trimmed.slice(0, TRIMMED_HEADER_VALUE_MAX_LENGTH)}…`;
+export function resolveRequiredMonitorStringContext<TContext>(args: {
+    readonly errorMessage: string;
+    readonly onValue: (value: string) => TContext;
+    readonly value: unknown;
+}): RequiredMonitorStringContextResult<TContext> {
+    const resolvedValue = getTrimmedNonEmptyString(args.value);
+
+    if (!resolvedValue) {
+        return {
+            kind: "error",
+            result: createMonitorErrorResult(args.errorMessage, 0),
+        };
     }
 
-    return trimmed;
-}
-
-/**
- * Resolve a header value from the response header map.
- *
- * @param options - Resolution options including the raw headers, header name,
- *   and an optional serialization error callback.
- *
- * @returns Stringified header value or `null` when not found.
- *
- * @internal
- */
-export function resolveHeaderValue(options: {
-    readonly headerName: string;
-    readonly headers: unknown;
-    readonly onSerializeError?: (error: Error) => void;
-}): null | string {
-    const { headerName, headers, onSerializeError } = options;
-    const normalizedName = normalizeHeaderName(headerName);
-
-    if (!isRecord(headers)) {
-        return null;
-    }
-
-    const rawValue = headers[normalizedName];
-
-    if (rawValue === undefined || rawValue === null) {
-        return null;
-    }
-
-    if (Array.isArray(rawValue)) {
-        return rawValue.map(String).join(", ");
-    }
-
-    if (typeof rawValue === "string") {
-        return rawValue;
-    }
-
-    if (typeof rawValue === "number" || typeof rawValue === "boolean") {
-        return String(rawValue);
-    }
-
-    if (rawValue instanceof Date) {
-        return rawValue.toISOString();
-    }
-
-    try {
-        return JSON.stringify(rawValue);
-    } catch (error: unknown) {
-        onSerializeError?.(ensureError(error));
-        return "[unserializable]";
-    }
+    return {
+        context: args.onValue(resolvedValue),
+        kind: "context",
+    };
 }

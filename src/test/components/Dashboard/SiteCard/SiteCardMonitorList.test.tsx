@@ -277,4 +277,31 @@ describe(SiteCardMonitorList, () => {
             ])
         );
     });
+
+    it("uses the latest history timestamp even when history order is unsorted", () => {
+        const now = Date.now();
+        const monitor = createMonitor(
+            {
+                historyTimestamps: [
+                    now - minutes(20),
+                    now - seconds(7),
+                    now - minutes(5),
+                ],
+                id: "unsorted-history-monitor",
+                status: "up",
+                type: "http",
+                url: "https://unsorted-history.example",
+            },
+            0
+        );
+
+        render(
+            <SiteCardMonitorList
+                monitors={[monitor]}
+                selectedMonitorId="unsorted-history-monitor"
+            />
+        );
+
+        expect(screen.getByText("7s ago")).toBeInTheDocument();
+    });
 });

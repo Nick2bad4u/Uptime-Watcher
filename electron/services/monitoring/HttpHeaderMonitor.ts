@@ -1,111 +1,111 @@
-/**
- * HTTP header monitor service built on the shared HTTP core.
- */
-
-import type { Monitor } from "@shared/types";
-
 import { ensureError } from "@shared/utils/errorHandling";
 
+import type {
+    HttpMonitorBehavior,
+    HttpMonitorServiceInstance,
+} from "./shared/httpMonitorCore";
+import type { MonitorByType } from "./shared/monitorCoreHelpers";
 import type { MonitorServiceConfig } from "./types";
 
-import { logger } from "../../utils/logger";
+import { createHttpMonitorService } from "./shared/httpMonitorCore";
 import {
-    createHttpMonitorService,
-    type HttpMonitorBehavior,
-    type HttpMonitorServiceInstance,
-} from "./shared/httpMonitorCore";
-import {
-    getTrimmedNonEmptyString,
     normalizeHeaderValue,
     resolveHeaderValue,
+    resolveRequiredMonitorStringContext,
 } from "./shared/httpMonitorStringUtils";
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
-import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
-/**
- * Runtime configuration contract for HTTP header monitor instances.
- *
- * @internal
- */
-type HttpHeaderMonitorConfig = Monitor & { type: "http-header" };
+type HttpHeaderMonitorConfig = MonitorByType<"http-header">;
 
-const behavior: HttpMonitorBehavior<
+interface HttpHeaderMonitorValidationContext {
+    expectedValue: string;
+    headerName: string;
+}
+
+function isStringArray(value: unknown): value is string[] {
+    return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function toStringHeaderRecord(
+    headers: Record<string, unknown>
+): Record<string, string | string[] | undefined> {
+    const normalizedHeaders: Record<string, string | string[] | undefined> = {};
+
+    for (const [key, value] of Object.entries(headers)) {
+        if (
+            typeof value === "string" ||
+            value === undefined ||
+            isStringArray(value)
+        ) {
+            normalizedHeaders[key] = value;
+        }
+    }
+
+    return normalizedHeaders;
+}
+
+const HTTP_HEADER_MONITOR_BEHAVIOR: HttpMonitorBehavior<
     "http-header",
-    { expectedValue: string; headerName: string }
+    HttpHeaderMonitorValidationContext
 > = {
     evaluateResponse: ({ context, response, responseTime }) => {
-        const resolvedValue = resolveHeaderValue({
-            headerName: context.headerName,
-            headers: response.headers,
-            onSerializeError: (error) => {
-                logger.warn(
-                    "[HttpHeaderMonitor] Unable to serialise header value",
-                    ensureError(error)
-                );
-            },
-        });
+        const headerValue = resolveHeaderValue(
+            toStringHeaderRecord(response.headers),
+            context.headerName
+        );
 
-        if (resolvedValue === null) {
+        if (!headerValue) {
             return {
-                details: `Header "${context.headerName}" not found`,
+                details: `Expected header '${context.headerName}' not found in response`,
                 responseTime,
                 status: "degraded",
-            };
+            } as const;
         }
 
-        const normalizedActual = normalizeHeaderValue(resolvedValue);
-        const normalizedExpected = normalizeHeaderValue(context.expectedValue);
-
-        if (normalizedActual === normalizedExpected) {
+        const normalizedValue = normalizeHeaderValue(headerValue);
+        if (normalizedValue !== context.expectedValue) {
             return {
-                details: `Header "${context.headerName}" matched expected value`,
+                details: `Header '${context.headerName}' mismatch: expected '${context.expectedValue}' but found '${normalizedValue}'`,
                 responseTime,
-                status: "up",
-            };
+                status: "degraded",
+            } as const;
         }
 
         return {
-            details: `Header "${context.headerName}" mismatch (expected "${normalizedExpected}", received "${normalizedActual}")`,
+            details: `Header '${context.headerName}' matched expected value`,
             responseTime,
-            status: "degraded",
-        };
+            status: "up",
+        } as const;
     },
     operationLabel: "HTTP header check",
     scope: "HttpHeaderMonitor",
     type: "http-header",
     validateMonitorSpecifics: (monitor: HttpHeaderMonitorConfig) => {
-        const headerName = getTrimmedNonEmptyString(monitor.headerName);
-        const expectedValue = getTrimmedNonEmptyString(
-            monitor.expectedHeaderValue
-        );
-
-        if (!headerName) {
-            return {
-                kind: "error",
-                result: createMonitorErrorResult(
-                    "Monitor missing or invalid header name",
-                    0
-                ),
-            };
+        const headerNameResult = resolveRequiredMonitorStringContext({
+            errorMessage: "Monitor missing or invalid header name",
+            onValue: (value) => value,
+            value: monitor.headerName,
+        });
+        if (headerNameResult.kind === "error") {
+            return headerNameResult;
         }
 
-        if (!expectedValue) {
-            return {
-                kind: "error",
-                result: createMonitorErrorResult(
-                    "Monitor missing or invalid expected header value",
-                    0
-                ),
-            };
+        const expectedValueResult = resolveRequiredMonitorStringContext({
+            errorMessage: "Monitor missing or invalid expected header value",
+            onValue: (value) => value,
+            value: monitor.expectedHeaderValue,
+        });
+        if (expectedValueResult.kind === "error") {
+            return expectedValueResult;
         }
 
         return {
             context: {
-                expectedValue,
-                headerName,
+                expectedValue: expectedValueResult.context,
+                headerName: headerNameResult.context,
             },
             kind: "context",
-        };
+        } as const;
     },
 };
 
@@ -120,8 +120,8 @@ const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor =
                 () =>
                     createHttpMonitorService<
                         "http-header",
-                        { expectedValue: string; headerName: string }
-                    >(behavior),
+                        HttpHeaderMonitorValidationContext
+                    >(HTTP_HEADER_MONITOR_BEHAVIOR),
                 "HttpHeaderMonitor"
             );
         } catch (error) {
@@ -130,6 +130,6 @@ const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor =
     })();
 
 /**
- * HTTP header monitor service powered by the shared HTTP core.
+ * Monitors an HTTP response header against an expected normalized value.
  */
 export class HttpHeaderMonitor extends HttpHeaderMonitorBase {}
