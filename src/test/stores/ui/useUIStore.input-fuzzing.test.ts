@@ -38,10 +38,28 @@ const mockErrorStore = vi.hoisted(() => ({
     setStoreError: vi.fn(),
 }));
 
+const createStoreErrorHandlerMock = vi.hoisted(() =>
+    vi.fn((storeKey: string, operationName: string) => ({
+        clearError: (): void => {
+            mockErrorStore.clearStoreError(storeKey);
+        },
+        setError: (error: string | undefined): void => {
+            mockErrorStore.setStoreError(storeKey, error);
+        },
+        setLoading: (loading: boolean): void => {
+            mockErrorStore.setOperationLoading(operationName, loading);
+        },
+    }))
+);
+
 vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => mockErrorStore),
     },
+}));
+
+vi.mock("../../../stores/utils/storeErrorHandling", () => ({
+    createStoreErrorHandler: createStoreErrorHandlerMock,
 }));
 
 const mockLogger = vi.hoisted(() => ({
@@ -652,6 +670,37 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             }
         });
 
+        it("should not call SystemService for invalid URLs in mixed batches", () => {
+            const urls = [
+                "https://02k.qhppdpoxnoh.fq/nOFn%F3%98%A9%80p'4I",
+                "http://de1nssl6ui3.s2.rml/RDHtH4aN",
+            ];
+
+            mockOpenExternal.mockClear();
+            mockErrorStore.setStoreError.mockClear();
+
+            for (const url of urls) {
+                useUIStore.getState().openExternal(url);
+            }
+
+            const validUrls = urls.flatMap((candidate) => {
+                const validationResult =
+                    validateExternalOpenUrlCandidate(candidate);
+                return validationResult.ok
+                    ? [validationResult.normalizedUrl]
+                    : [];
+            });
+
+            const invalidCount = urls.length - validUrls.length;
+
+            expect(mockOpenExternal).toHaveBeenCalledTimes(validUrls.length);
+            if (invalidCount > 0) {
+                expect(mockErrorStore.setStoreError).toHaveBeenCalledTimes(
+                    invalidCount
+                );
+            }
+        });
+
         it("should log user action after successful external navigation", async () => {
             const url = "https://example.com";
             const urlForLog = getSafeUrlForLogging(url);
@@ -947,6 +996,55 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 }
             }
         );
+
+        it("should isolate invalid URL failures during interleaved operations", () => {
+            const sites = [
+                {
+                    createdAt: new Date(),
+                    id: "site-1",
+                    identifier: "site-one",
+                    isActive: true,
+                    monitors: [],
+                    monitoring: true,
+                    name: "Site One",
+                    tags: [],
+                    updatedAt: new Date(),
+                },
+            ];
+            const urls = [
+                "https://02k.qhppdpoxnoh.fq/nOFn%F3%98%A9%80p'4I",
+                "http://de1nssl6ui3.s2.rml/RDHtH4aN",
+            ];
+
+            mockOpenExternal.mockClear();
+            mockErrorStore.setStoreError.mockClear();
+
+            for (let index = 0; index < Math.max(sites.length, urls.length); index++) {
+                if (index < sites.length) {
+                    useUIStore.getState().selectSite(sites[index]);
+                }
+
+                if (index < urls.length) {
+                    useUIStore.getState().openExternal(urls[index]!);
+                }
+            }
+
+            const validUrls = urls.flatMap((candidate) => {
+                const validationResult =
+                    validateExternalOpenUrlCandidate(candidate);
+                return validationResult.ok
+                    ? [validationResult.normalizedUrl]
+                    : [];
+            });
+
+            expect(useUIStore.getState().selectedSiteIdentifier).toBe(
+                "site-one"
+            );
+            expect(mockOpenExternal).toHaveBeenCalledTimes(validUrls.length);
+            expect(mockErrorStore.setStoreError).toHaveBeenCalledTimes(
+                urls.length - validUrls.length
+            );
+        });
     });
 
     describe("Edge Cases and Error Scenarios", () => {

@@ -33,7 +33,7 @@
 import type { Site } from "@shared/types";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -148,18 +148,60 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             ): void => {
                 logStoreAction("UIStore", "openExternal", { context });
 
-                const urlForMessage = getSafeUrlForLogging(url);
+                const validationResult = validateExternalOpenUrlCandidate(url);
+                const urlForMessage = validationResult.safeUrlForLogging;
 
                 const errorHandler = createStoreErrorHandler(
                     "system-open-external",
                     "ui.openExternal"
                 );
 
+                const logOpenExternalFailure = (
+                    underlyingError: Error
+                ): void => {
+                    logger.error(
+                        "Failed to open external URL via SystemService",
+                        underlyingError,
+                        {
+                            context,
+                            url: urlForMessage,
+                        }
+                    );
+
+                    logger.user.action("External URL failed", {
+                        error: underlyingError.message,
+                        url: urlForMessage,
+                        ...(context?.siteName
+                            ? { siteName: context.siteName }
+                            : {}),
+                    });
+
+                    logStoreAction("UIStore", "openExternalFailed", {
+                        context,
+                        error: underlyingError.message,
+                        url: urlForMessage,
+                    });
+                };
+
+                if (!validationResult.ok) {
+                    const validationError = new TypeError(
+                        `Unable to open external link (${urlForMessage}): ${validationResult.reason}.`
+                    );
+
+                    errorHandler.clearError();
+                    errorHandler.setError(validationError.message);
+                    logOpenExternalFailure(validationError);
+
+                    return;
+                }
+
                 void (async (): Promise<void> => {
                     try {
                         await withErrorHandling(async () => {
                             try {
-                                await SystemService.openExternal(url);
+                                await SystemService.openExternal(
+                                    validationResult.normalizedUrl
+                                );
                             } catch (error: unknown) {
                                 throw new Error(
                                     `Unable to open external link (${urlForMessage}).`,
@@ -183,28 +225,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                                 normalizedError
                         );
 
-                        logger.error(
-                            "Failed to open external URL via SystemService",
-                            underlyingError,
-                            {
-                                context,
-                                url: urlForMessage,
-                            }
-                        );
-
-                        logger.user.action("External URL failed", {
-                            error: underlyingError.message,
-                            url: urlForMessage,
-                            ...(context?.siteName
-                                ? { siteName: context.siteName }
-                                : {}),
-                        });
-
-                        logStoreAction("UIStore", "openExternalFailed", {
-                            context,
-                            error: underlyingError.message,
-                            url: urlForMessage,
-                        });
+                        logOpenExternalFailure(underlyingError);
                     }
                 })();
             },

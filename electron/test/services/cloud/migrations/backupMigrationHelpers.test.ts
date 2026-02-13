@@ -33,7 +33,7 @@ function createProvider(
 }
 
 describe("backupMigrationHelpers", () => {
-    describe("requireMigrationEncryptionKey", () => {
+    describe(requireMigrationEncryptionKey, () => {
         it("returns provided key", () => {
             const key = Buffer.from("abc");
 
@@ -47,7 +47,7 @@ describe("backupMigrationHelpers", () => {
         });
     });
 
-    describe("collectSourceDeletionErrors", () => {
+    describe(collectSourceDeletionErrors, () => {
         it("skips deletions when deleteSource is false", async () => {
             const deleteObject = vi.fn(async (_key: string) => {
                 // no-op
