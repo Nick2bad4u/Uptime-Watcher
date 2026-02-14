@@ -180,25 +180,24 @@
 }
 
 .site-card__compact-status {
-    display: grid;
-    gap: clamp(0.75rem, 0.6rem + 0.35vi, 1.25rem);
-    grid-auto-rows: minmax(0, 1fr);
-    grid-template-columns: [compact-status-col] 100% [compact-status-end];
-    inline-size: fit-content;
-    justify-items: start;
-    margin-inline: auto;
-    max-inline-size: 100%;
-    min-inline-size: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(0.6rem, 0.5rem + 0.3vi, 1rem);
+    inline-size: 100%;
+    margin-inline: 0;
     padding-block: clamp(0.45rem, 0.3rem + 0.4vi, 0.75rem);
 }
 
 .site-card__compact-status-item {
     display: flex;
+    flex: 1 1 9.5rem;
     flex-flow: row nowrap;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 0.55rem;
-    inline-size: 100%;
+    inline-size: auto;
     min-inline-size: 0;
 }
 

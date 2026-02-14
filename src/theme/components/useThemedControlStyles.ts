@@ -70,7 +70,7 @@ export function useThemedControlStyles(args: {
             borderWidth: "1px",
             fontSize: currentTheme.typography.fontSize.sm,
             outline: "none",
-            padding: basePadding,
+            ...(tone === "transparent" ? {} : { padding: basePadding }),
             transition: TRANSITION_ALL,
             ...(fluid ? { width: "100%" } : {}),
             ...(nextCursor ? { cursor: nextCursor } : {}),
@@ -82,7 +82,6 @@ export function useThemedControlStyles(args: {
                 backgroundColor: "transparent",
                 borderColor: "transparent",
                 borderWidth: "0",
-                padding: "0",
             };
         }
 

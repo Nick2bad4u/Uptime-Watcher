@@ -176,9 +176,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
 
             // Should display just the type name with no additional details
             expect(
-                screen.getByDisplayValue(
-                    "Mystery Type Monitor: unknown-monitor-empty"
-                )
+                screen.getByDisplayValue("Mystery Type Monitor")
             ).toBeInTheDocument();
         });
 

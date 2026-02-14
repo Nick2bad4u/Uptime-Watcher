@@ -5,7 +5,7 @@
 
 import type { MonitorStatus } from "@shared/types";
 
-import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
+import { memo, type NamedExoticComponent, useCallback } from "react";
 
 import { StatusBadge } from "../../common/StatusBadge";
 
@@ -15,35 +15,11 @@ import { StatusBadge } from "../../common/StatusBadge";
  * @public
  */
 export interface SiteCardStatusProperties {
-    /** ID of the currently selected monitor */
-    readonly selectedMonitorId: string;
+    /** Human-readable label for the selected monitor */
+    readonly monitorLabel: string;
     /** Current status of the monitor */
     readonly status: MonitorStatus;
 }
-
-const STATUS_LABEL_ACRONYMS = new Set([
-    "api",
-    "dns",
-    "http",
-]);
-
-const toTitleCase = (value: string): string => {
-    if (!value) {
-        return "";
-    }
-
-    // Preserve already-uppercase segments.
-    if (/^[A-Z0-9]+$/u.test(value)) {
-        return value;
-    }
-
-    const lower = value.toLowerCase();
-    if (STATUS_LABEL_ACRONYMS.has(lower)) {
-        return lower.toUpperCase();
-    }
-
-    return `${value.charAt(0).toUpperCase()}${value.slice(1).toLowerCase()}`;
-};
 
 /**
  * Status section component for site card displaying current monitor status.
@@ -69,22 +45,12 @@ const toTitleCase = (value: string): string => {
  */
 export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
     memo(function SiteCardStatus({
-        selectedMonitorId,
+        monitorLabel,
         status,
     }: SiteCardStatusProperties) {
-        // Ensure selectedMonitorId is a string to prevent runtime errors
-        const safeMonitorId = selectedMonitorId || "unknown";
-        const statusLabel = useMemo(() => {
-            const normalizedSegments = safeMonitorId
-                .trim()
-                .replaceAll(/[\p{Dash_Punctuation}_]+/gu, " ")
-                .split(/\s+/u)
-                .filter(Boolean)
-                .map((segment) => toTitleCase(segment));
-
-            const joined = normalizedSegments.join(" ").trim();
-            return joined.length > 0 ? joined : "Monitor";
-        }, [safeMonitorId]);
+        const safeMonitorLabel = monitorLabel.trim().length > 0
+            ? monitorLabel
+            : "Monitor";
 
         const formatStatus = useCallback(
             (label: string, monitorStatus: MonitorStatus) =>
@@ -95,7 +61,7 @@ export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
         return (
             <StatusBadge
                 formatter={formatStatus}
-                label={`${statusLabel} Status`}
+                label={`${safeMonitorLabel} Status`}
                 size="sm"
                 status={status}
             />

@@ -81,11 +81,13 @@ describe("alertCoordinator", () => {
     beforeEach(() => {
         resetStores();
         alertCoordinator.resetAlertToneInvoker();
+        alertCoordinator.resetStatusAlertDeduplicationForTesting();
     });
 
     afterEach(() => {
         resetStores();
         alertCoordinator.resetAlertToneInvoker();
+        alertCoordinator.resetStatusAlertDeduplicationForTesting();
         vi.clearAllMocks();
     });
 
@@ -110,6 +112,51 @@ describe("alertCoordinator", () => {
 
         expect(result).toBeDefined();
         expect(useAlertStore.getState().alerts).toHaveLength(1);
+    });
+
+    it("suppresses duplicate alerts for identical status update payloads", () => {
+        const timestamp = "2026-02-13T23:45:31.550Z";
+        const update = createStatusUpdate({
+            monitorId: "monitor-dup",
+            siteIdentifier: "site-dup",
+            status: STATUS_KIND.DOWN,
+            timestamp,
+        });
+
+        const firstResult = alertCoordinator.enqueueAlertFromStatusUpdate(
+            update
+        );
+        const secondResult = alertCoordinator.enqueueAlertFromStatusUpdate(
+            update
+        );
+
+        expect(firstResult).toBeDefined();
+        expect(secondResult).toBeUndefined();
+        expect(useAlertStore.getState().alerts).toHaveLength(1);
+        expect(logger.debug).toHaveBeenCalledWith(
+            "Skipping duplicate in-app status alert event",
+            {
+                monitorId: "monitor-dup",
+                previousStatus: STATUS_KIND.UP,
+                siteIdentifier: "site-dup",
+                status: STATUS_KIND.DOWN,
+                timestamp,
+            }
+        );
+    });
+
+    it("allows subsequent alerts when timestamps differ", () => {
+        const firstResult = alertCoordinator.enqueueAlertFromStatusUpdate(
+            createStatusUpdate({ timestamp: "2026-02-13T23:45:31.550Z" })
+        );
+
+        const secondResult = alertCoordinator.enqueueAlertFromStatusUpdate(
+            createStatusUpdate({ timestamp: "2026-02-13T23:45:32.750Z" })
+        );
+
+        expect(firstResult).toBeDefined();
+        expect(secondResult).toBeDefined();
+        expect(useAlertStore.getState().alerts).toHaveLength(2);
     });
 
     it("plays a tone when sound alerts are enabled", () => {

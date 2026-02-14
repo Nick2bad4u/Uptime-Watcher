@@ -103,8 +103,8 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
         } = useDashboardSiteSummaryMeta(dashboardMetaArgs);
 
         const statusFormatter = useCallback(
-            (label: string, monitorStatus: MonitorStatus) =>
-                `${label}: ${toSentenceCase(monitorStatus)}`,
+            (_label: string, monitorStatus: MonitorStatus) =>
+                toSentenceCase(monitorStatus),
             []
         );
 
@@ -194,9 +194,6 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                             textProps={marqueeTextProps}
                             trackClassName="site-card__compact-name-track"
                         />
-                        <ThemedText size="xs" variant="tertiary">
-                            {site.identifier}
-                        </ThemedText>
                         <span
                             aria-hidden="true"
                             className="site-table__row-hint"

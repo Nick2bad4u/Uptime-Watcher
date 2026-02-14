@@ -228,7 +228,7 @@ export const OverviewTab = ({
     return (
         <div className="space-y-6" data-testid="overview-tab">
             {/* Key Metrics Grid */}
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
                 <ThemedCard
                     className="flex flex-col items-center text-center"
                     hoverable
@@ -290,6 +290,22 @@ export const OverviewTab = ({
                 >
                     <ThemedText size="xl" weight="bold">
                         {totalChecks}
+                    </ThemedText>
+                </ThemedCard>
+
+                <ThemedCard
+                    className="flex flex-col items-center text-center"
+                    hoverable
+                    icon={checkIcon}
+                    iconColor={iconColors.status}
+                    title="Monitor ID"
+                >
+                    <ThemedText
+                        className="max-w-full font-mono break-all"
+                        size="xs"
+                        variant="secondary"
+                    >
+                        {selectedMonitor.id}
                     </ThemedText>
                 </ThemedCard>
             </div>

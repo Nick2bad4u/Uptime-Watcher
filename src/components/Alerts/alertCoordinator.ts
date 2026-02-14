@@ -19,6 +19,44 @@ const audioContextRef: { current: AudioContext | null } = {
 
 const ALERT_TONE_MIN_GAIN = 0.0001;
 const ALERT_TONE_MAX_GAIN = 0.08;
+const STATUS_ALERT_DEDUP_WINDOW_MS = 1500;
+
+const recentStatusAlertFingerprints = new Map<string, number>();
+
+const normalizeStatusAlertKeySegment = (segment: string): string =>
+    segment.trim().toLowerCase();
+
+const pruneRecentStatusAlertFingerprints = (now: number): void => {
+    for (const [fingerprint, seenAt] of recentStatusAlertFingerprints) {
+        if (now - seenAt > STATUS_ALERT_DEDUP_WINDOW_MS) {
+            recentStatusAlertFingerprints.delete(fingerprint);
+        }
+    }
+};
+
+const createStatusAlertFingerprint = (update: StatusUpdate): string =>
+    [
+        normalizeStatusAlertKeySegment(update.siteIdentifier),
+        normalizeStatusAlertKeySegment(update.monitorId),
+        normalizeStatusAlertKeySegment(update.timestamp),
+        normalizeStatusAlertKeySegment(update.status),
+        normalizeStatusAlertKeySegment(update.previousStatus ?? "unknown"),
+    ].join("|");
+
+const isDuplicateStatusAlertUpdate = (update: StatusUpdate): boolean => {
+    const now = Date.now();
+    pruneRecentStatusAlertFingerprints(now);
+
+    const fingerprint = createStatusAlertFingerprint(update);
+    const seenAt = recentStatusAlertFingerprints.get(fingerprint);
+
+    if (seenAt !== undefined && now - seenAt <= STATUS_ALERT_DEDUP_WINDOW_MS) {
+        return true;
+    }
+
+    recentStatusAlertFingerprints.set(fingerprint, now);
+    return false;
+};
 
 /**
  * Normalizes the renderer-managed volume preference into the inclusive range
@@ -188,6 +226,15 @@ export const resetAlertAudioContextForTesting = async (): Promise<void> => {
 };
 
 /**
+ * Clears the recent alert-fingerprint cache used for duplicate suppression.
+ *
+ * @internal
+ */
+export const resetStatusAlertDeduplicationForTesting = (): void => {
+    recentStatusAlertFingerprints.clear();
+};
+
+/**
  * Helper to enqueue alerts when settings permit in-app notifications.
  *
  * @param update - Status update payload from the sites store.
@@ -217,6 +264,17 @@ export const enqueueAlertFromStatusUpdate = (
                 status: update.status,
             }
         );
+        return undefined;
+    }
+
+    if (isDuplicateStatusAlertUpdate(update)) {
+        logger.debug("Skipping duplicate in-app status alert event", {
+            monitorId: update.monitorId,
+            previousStatus: update.previousStatus ?? "unknown",
+            siteIdentifier: update.siteIdentifier,
+            status: update.status,
+            timestamp: update.timestamp,
+        });
         return undefined;
     }
 

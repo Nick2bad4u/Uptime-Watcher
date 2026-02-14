@@ -230,7 +230,7 @@ describe(SiteTableRow, () => {
     it("renders core metrics and passes state to action buttons", () => {
         renderRow();
 
-        expect(screen.getByText(baseSite.identifier)).toBeInTheDocument();
+        expect(screen.queryByText(baseSite.identifier)).not.toBeInTheDocument();
         expect(screen.getByText("99.9%")).toBeInTheDocument();
         expect(screen.getByText("88 ms")).toBeInTheDocument();
         expect(screen.getByText("2/2")).toBeInTheDocument();

@@ -27,6 +27,7 @@ import { useSite } from "../../../hooks/site/useSite";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { getMonitorTypeDisplayLabel } from "../../../utils/fallbacks";
 import { AppIcons } from "../../../utils/icons";
 import { getLatestHistoryTimestamp } from "../../../utils/monitoring/monitorHistoryTime";
 import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
@@ -164,10 +165,14 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
 
         const cardPadding = isStacked ? "lg" : "md";
 
+        const monitorStatusLabel = monitor
+            ? getMonitorTypeDisplayLabel(monitor.type)
+            : "Monitor";
+
         const statusSection = (
             <div className="site-card__status">
                 <SiteCardStatus
-                    selectedMonitorId={selectedMonitorId}
+                    monitorLabel={monitorStatusLabel}
                     status={status}
                 />
             </div>

@@ -95,7 +95,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                 return "No Monitor Selected";
             }
 
-            const identifier = getMonitorDisplayIdentifier(monitor, monitor.id);
+            const identifier = getMonitorDisplayIdentifier(monitor, "");
             const monitorTypeLabel = getMonitorTypeDisplayLabel(monitor.type);
 
             if (identifier && identifier !== monitor.id) {
@@ -106,8 +106,8 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
         }, [monitor]);
 
         const subtitleText = useMemo(
-            () => `${site.identifier} • ${monitorSummary}`,
-            [monitorSummary, site.identifier]
+            () => monitorSummary,
+            [monitorSummary]
         );
 
         const subtitleTextProps = useMemo<

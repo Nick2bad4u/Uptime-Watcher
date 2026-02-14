@@ -135,7 +135,7 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
 
         // Memoize the option formatting to avoid recalculation
         const formatMonitorOption = useCallback((monitor: Monitor): string => {
-            const fallbackIdentifier = monitor.id;
+            const fallbackIdentifier = "";
 
             const {
                 connectionInfo,

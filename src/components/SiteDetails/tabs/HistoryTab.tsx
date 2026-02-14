@@ -131,6 +131,20 @@ function getHttpStatusIcon(code: number): IconType | null {
     return null;
 }
 
+function getHttpErrorDetailIcon(details: string): IconType | null {
+    const normalizedDetails = details.trim();
+    const hasResponseCodeLabel = /\bresponse\s*code\b/iu.test(
+        normalizedDetails
+    );
+    const containsErrorLabel = /\berror\b/iu.test(normalizedDetails);
+
+    if (hasResponseCodeLabel && containsErrorLabel) {
+        return AppIcons.status.downFilled;
+    }
+
+    return null;
+}
+
 type HistoryRowStyle = CSSProperties & {
     "--surface-order"?: number;
 };
@@ -398,7 +412,9 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
             const statusCode = extractHttpStatusCode(record.details);
             const StatusCodeIcon =
-                statusCode === null ? null : getHttpStatusIcon(statusCode);
+                statusCode === null
+                    ? getHttpErrorDetailIcon(record.details)
+                    : getHttpStatusIcon(statusCode);
 
             const statusIconNode = StatusCodeIcon ? (
                 <StatusCodeIcon aria-hidden="true" className="size-4" />

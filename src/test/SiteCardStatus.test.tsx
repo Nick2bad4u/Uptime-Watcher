@@ -16,7 +16,7 @@ vi.mock("../components/common/StatusBadge", () => ({
 
 describe(SiteCardStatus, () => {
     it("renders correct label and status for 'up'", () => {
-        render(<SiteCardStatus selectedMonitorId="http" status="up" />);
+        render(<SiteCardStatus monitorLabel="HTTP" status="up" />);
         const badge = screen.getByTestId("status-badge");
         expect(badge).toHaveAttribute("data-label", "HTTP Status");
         expect(badge).toHaveAttribute("data-status", "up");
@@ -24,25 +24,23 @@ describe(SiteCardStatus, () => {
     });
 
     it("renders correct label and status for 'down'", () => {
-        render(<SiteCardStatus selectedMonitorId="port" status="down" />);
+        render(<SiteCardStatus monitorLabel="Port" status="down" />);
         const badge = screen.getByTestId("status-badge");
         expect(badge).toHaveAttribute("data-label", "Port Status");
         expect(badge).toHaveAttribute("data-status", "down");
     });
 
     it("renders correct label and status for 'pending'", () => {
-        render(<SiteCardStatus selectedMonitorId="custom" status="pending" />);
+        render(<SiteCardStatus monitorLabel="Custom" status="pending" />);
         const badge = screen.getByTestId("status-badge");
         expect(badge).toHaveAttribute("data-label", "Custom Status");
         expect(badge).toHaveAttribute("data-status", "pending");
     });
 
     it("renders correct label and status for 'paused'", () => {
-        render(
-            <SiteCardStatus selectedMonitorId="myMonitor" status="paused" />
-        );
+        render(<SiteCardStatus monitorLabel="Website URL" status="paused" />);
         const badge = screen.getByTestId("status-badge");
-        expect(badge).toHaveAttribute("data-label", "Mymonitor Status");
+        expect(badge).toHaveAttribute("data-label", "Website URL Status");
         expect(badge).toHaveAttribute("data-status", "paused");
     });
 });

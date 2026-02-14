@@ -4,14 +4,61 @@
  * controls.
  */
 
-import type { Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 
-import { type ChangeEvent, memo, type NamedExoticComponent } from "react";
+import {
+    type ChangeEvent,
+    memo,
+    type NamedExoticComponent,
+    type SyntheticEvent,
+    useCallback,
+    useMemo,
+} from "react";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons } from "../../../utils/icons";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 import { SiteCardFooter } from "./SiteCardFooter";
+
+const extractMonitorEndpoint = (monitor: Monitor | undefined): string | undefined => {
+    if (!monitor) {
+        return undefined;
+    }
+
+    const candidates = [
+        monitor.url,
+        monitor.host,
+        monitor.baselineUrl,
+        monitor.primaryStatusUrl,
+        monitor.replicaStatusUrl,
+    ];
+
+    for (const candidate of candidates) {
+        if (typeof candidate === "string" && candidate.trim().length > 0) {
+            return candidate.trim();
+        }
+    }
+
+    return undefined;
+};
+
+const toFaviconUrl = (endpoint: string | undefined): string | undefined => {
+    if (!endpoint) {
+        return undefined;
+    }
+
+    const withProtocol = endpoint.includes("://")
+        ? endpoint
+        : `https://${endpoint}`;
+
+    try {
+        const parsed = new URL(withProtocol);
+        return `${parsed.origin}/favicon.ico`;
+    } catch {
+        return undefined;
+    }
+};
 
 /**
  * Display and UI state options
@@ -120,10 +167,50 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
             onStopSiteMonitoring: handleStopSiteMonitoring,
         } = interactions;
 
+        const SiteIcon = AppIcons.ui.site;
+
+        const selectedMonitor = useMemo(
+            () =>
+                site.site.monitors.find(
+                    (monitorEntry) =>
+                        monitorEntry.id === monitoring.selectedMonitorId
+                ) ?? site.site.monitors[0],
+            [monitoring.selectedMonitorId, site.site.monitors]
+        );
+
+        const faviconUrl = useMemo(
+            () => toFaviconUrl(extractMonitorEndpoint(selectedMonitor)),
+            [selectedMonitor]
+        );
+
+        const handleFaviconError = useCallback(
+            (event: SyntheticEvent<HTMLImageElement>): void => {
+                event.currentTarget.style.display = "none";
+            },
+            []
+        );
+
         return (
             <div className="site-card__header-row">
                 <div className="site-card__title-container">
-                    <span aria-hidden="true" className="site-card__title-dot" />
+                    <span
+                        aria-hidden="true"
+                        className="site-card__title-dot"
+                        data-status={selectedMonitor?.status ?? "unknown"}
+                    >
+                        <SiteIcon
+                            className="site-card__title-dot-fallback"
+                            size={12}
+                        />
+                        {faviconUrl ? (
+                            <img
+                                alt=""
+                                className="site-card__title-dot-favicon"
+                                onError={handleFaviconError}
+                                src={faviconUrl}
+                            />
+                        ) : null}
+                    </span>
                     <ThemedText
                         className="site-card__title"
                         size="lg"
