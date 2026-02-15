@@ -29,7 +29,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { Simplify } from "type-fest";
+import type { Promisable, Simplify } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import {
@@ -215,14 +215,14 @@ export type EventMiddleware<EventMap extends TypedEventMap = TypedEventMap> = <
 >(
     event: K,
     data: EventMap[K],
-    next: () => Promise<void> | void
-) => Promise<void> | void;
+    next: () => Promisable<void>
+) => Promisable<void>;
 
 type MiddlewareExecutor<EventMap extends TypedEventMap> = (
     event: EventKey<EventMap>,
     data: EventMap[EventKey<EventMap>],
-    next: () => Promise<void> | void
-) => Promise<void> | void;
+    next: () => Promisable<void>
+) => Promisable<void>;
 
 /**
  * Enhanced event bus with type safety and middleware support.

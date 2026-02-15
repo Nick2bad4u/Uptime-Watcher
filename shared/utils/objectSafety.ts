@@ -6,7 +6,7 @@
  * Object.entries operations with proper type checking and validation.
  */
 
-import type { UnknownRecord } from "type-fest";
+import type { UnknownRecord, ValueOf } from "type-fest";
 
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";
@@ -280,8 +280,8 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
  */
 export function typedObjectEntries<T extends UnknownRecord>(
     obj: T
-): Array<[keyof T, T[keyof T]]> {
-    return castUnchecked<Array<[keyof T, T[keyof T]]>>(Object.entries(obj));
+): Array<[keyof T, ValueOf<T>]> {
+    return castUnchecked<Array<[keyof T, ValueOf<T>]>>(Object.entries(obj));
 }
 
 /**
@@ -336,6 +336,6 @@ export function typedObjectKeys<T extends UnknownRecord>(
  */
 export function typedObjectValues<T extends UnknownRecord>(
     obj: T
-): Array<T[keyof T]> {
-    return castUnchecked<Array<T[keyof T]>>(Object.values(obj));
+): Array<ValueOf<T>> {
+    return castUnchecked<Array<ValueOf<T>>>(Object.values(obj));
 }

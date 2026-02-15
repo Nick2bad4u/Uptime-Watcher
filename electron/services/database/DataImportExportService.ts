@@ -8,7 +8,7 @@
 
 import type { Site, StatusHistory } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { Jsonifiable, JsonValue } from "type-fest";
+import type { Jsonifiable, JsonValue, Promisable } from "type-fest";
 
 import { MAX_IPC_JSON_EXPORT_BYTES } from "@shared/constants/backup";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
@@ -402,7 +402,7 @@ export class DataImportExportService {
             monitorTx: MonitorRepositoryTransactionAdapter;
             settingsTx: SettingsRepositoryTransactionAdapter;
             siteTx: SiteRepositoryTransactionAdapter;
-        }) => Promise<T> | T
+        }) => Promisable<T>
     ): Promise<T> {
         return this.databaseService.executeTransaction(async (db) =>
             operation(createImportTransactionAdapters(db, this.repositories))

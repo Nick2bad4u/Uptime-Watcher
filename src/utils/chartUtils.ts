@@ -12,7 +12,7 @@
  */
 
 import type { ChartScalesConfig } from "@shared/types/chartConfig";
-import type { Simplify, UnknownRecord } from "type-fest";
+import type { Simplify, UnknownRecord, ValueOf } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
@@ -24,7 +24,7 @@ import { ensureRecordLike } from "@shared/utils/typeHelpers";
  */
 export type ScaleConfigResult = Simplify<{
     /** The scale configuration object */
-    config: ChartScalesConfig[keyof ChartScalesConfig] | UnknownRecord;
+    config: UnknownRecord | ValueOf<ChartScalesConfig>;
     /** Whether the scale exists */
     exists: boolean;
 }>;
@@ -58,7 +58,7 @@ export function getScaleConfigSafe(
         // Validate that the scale is actually an object (handle runtime type safety)
         if (typeof scale === "object" && scale !== null) {
             return {
-                config: scale as ChartScalesConfig[keyof ChartScalesConfig],
+                config: scale as ValueOf<ChartScalesConfig>,
                 exists: true,
             };
         }
@@ -85,7 +85,7 @@ export function getScaleConfigSafe(
 export function getScaleConfig(
     config: unknown,
     axis: "x" | "y"
-): ChartScalesConfig[keyof ChartScalesConfig] | undefined {
+): undefined | ValueOf<ChartScalesConfig> {
     const result = getScaleConfigSafe(config, axis);
     return result.exists ? result.config : undefined;
 }

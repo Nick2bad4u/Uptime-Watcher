@@ -17,7 +17,7 @@ import type {
     WebsocketKeepaliveMonitorSchemaType,
 } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
-import type { Jsonify, UnknownRecord } from "type-fest";
+import type { Jsonify, UnknownRecord, ValueOf } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -402,7 +402,7 @@ export type SslMonitor = z.infer<typeof sslMonitorSchema>;
  */
 function getMonitorSchema(
     type: string
-): (typeof monitorSchemas)[keyof typeof monitorSchemas] | undefined {
+): undefined | ValueOf<typeof monitorSchemas> {
     if (!isKnownMonitorTypeKey(type)) {
         return undefined;
     }

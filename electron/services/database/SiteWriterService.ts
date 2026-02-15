@@ -12,6 +12,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
+import type { Promisable } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
@@ -80,7 +81,7 @@ export class SiteWriterService {
         operation: (adapters: {
             monitorTx: MonitorRepositoryTransactionAdapter;
             siteTx: SiteRepositoryTransactionAdapter;
-        }) => Promise<T> | T
+        }) => Promisable<T>
     ): Promise<T> {
         return this.databaseService.executeTransaction(async (db) =>
             operation(

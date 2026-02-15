@@ -1,3 +1,5 @@
+import type { ValueOf } from "type-fest";
+
 import { type JSX, useCallback, useEffect, useMemo } from "react";
 
 import type { AppToast } from "../../stores/alerts/useAlertStore";
@@ -10,7 +12,7 @@ const TOAST_TONE = {
     success: "positive",
 } as const;
 
-type ToastTone = (typeof TOAST_TONE)[keyof typeof TOAST_TONE];
+type ToastTone = ValueOf<typeof TOAST_TONE>;
 
 const CloseIcon = AppIcons.ui.close;
 

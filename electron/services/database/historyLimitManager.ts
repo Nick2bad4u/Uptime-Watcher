@@ -11,6 +11,7 @@
 
 import type { HistoryLimitRules } from "@shared/constants/history";
 import type { Logger } from "@shared/utils/logger/interfaces";
+import type { Promisable } from "type-fest";
 
 import { normalizeHistoryLimit } from "@shared/constants/history";
 
@@ -105,7 +106,7 @@ async function withHistorySettingsAdapters<T>(
     operation: (adapters: {
         historyTx: HistoryRepositoryTransactionAdapter;
         settingsTx: SettingsRepositoryTransactionAdapter;
-    }) => Promise<T> | T
+    }) => Promisable<T>
 ): Promise<T> {
     return databaseService.executeTransaction(async (db) =>
         operation(createHistorySettingsTransactionAdapters(db, repositories))

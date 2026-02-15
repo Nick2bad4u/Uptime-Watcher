@@ -37,7 +37,7 @@
  */
 
 import type { UpdateStatusEventData } from "@shared/types/events";
-import type { Merge } from "type-fest";
+import type { Merge, Promisable } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
@@ -74,7 +74,7 @@ type UpdatesStoreWithPersist = UseBoundStore<
                     fn: (state: UpdatesStore) => void
                 ) => () => void;
                 onHydrate: (fn: (state: UpdatesStore) => void) => () => void;
-                rehydrate: () => Promise<void> | void;
+                rehydrate: () => Promisable<void>;
                 setOptions: (
                     options: Partial<
                         PersistOptions<

@@ -58,6 +58,8 @@
  * @public
  */
 
+import type { Promisable } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
 import { useEffect } from "react";
 
@@ -80,7 +82,7 @@ import { logger } from "../services/logger";
  * @public
  */
 export function useMount(
-    mountCallback: () => Promise<void> | void,
+    mountCallback: () => Promisable<void>,
     unmountCallback?: () => void
 ): void {
     useEffect(

@@ -32,7 +32,7 @@
 
 // Import official Chart.js types
 import type { ChartData, ChartOptions } from "chart.js";
-import type { UnknownRecord } from "type-fest";
+import type { UnknownRecord, ValueOf } from "type-fest";
 
 // Import our custom business logic types
 import type {
@@ -209,7 +209,7 @@ export interface ChartUtilities {
     getPluginConfig: (
         options: ChartOptions | UptimeChartOptions,
         pluginId: string
-    ) => ChartPluginsConfig[keyof ChartPluginsConfig];
+    ) => ValueOf<ChartPluginsConfig>;
 
     /**
      * Safely get scale configuration from chart options.
@@ -222,7 +222,7 @@ export interface ChartUtilities {
     getScaleConfig: (
         options: ChartOptions | UptimeChartOptions,
         scaleId: string
-    ) => ChartScalesConfig[keyof ChartScalesConfig];
+    ) => ValueOf<ChartScalesConfig>;
 
     /**
      * Convert hybrid chart configuration to Chart.js official format.

@@ -21,6 +21,7 @@ import type {
     Simplify,
     Tagged,
     UnknownRecord,
+    ValueOf,
 } from "type-fest";
 
 import { siteSchema } from "@shared/validation/siteSchemas";
@@ -408,7 +409,7 @@ export const CACHE_INVALIDATION_TYPE = {
  * @public
  */
 export type CacheInvalidationReason =
-    (typeof CACHE_INVALIDATION_REASON)[keyof typeof CACHE_INVALIDATION_REASON];
+    ValueOf<typeof CACHE_INVALIDATION_REASON>;
 
 /**
  * Union of cache invalidation types.
@@ -416,7 +417,7 @@ export type CacheInvalidationReason =
  * @public
  */
 export type CacheInvalidationType =
-    (typeof CACHE_INVALIDATION_TYPE)[keyof typeof CACHE_INVALIDATION_TYPE];
+    ValueOf<typeof CACHE_INVALIDATION_TYPE>;
 
 /**
  * Canonical list of cache invalidation reasons.
@@ -720,7 +721,7 @@ export const MONITORING_CONTROL_REASON = {
  * @public
  */
 export type MonitoringControlReason =
-    (typeof MONITORING_CONTROL_REASON)[keyof typeof MONITORING_CONTROL_REASON];
+    ValueOf<typeof MONITORING_CONTROL_REASON>;
 
 /**
  * Canonical list of monitoring control reasons.
@@ -857,7 +858,7 @@ export const UPDATE_STATUS = {
  *
  * @public
  */
-export type UpdateStatus = (typeof UPDATE_STATUS)[keyof typeof UPDATE_STATUS];
+export type UpdateStatus = ValueOf<typeof UPDATE_STATUS>;
 /**
  * Canonical list of auto-update statuses.
  *

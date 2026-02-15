@@ -1,4 +1,5 @@
 import type { Site } from "@shared/types";
+import type { ValueOf } from "type-fest";
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
@@ -30,9 +31,9 @@ export interface LoadSiteInBackgroundDeps {
     }) => Promise<void>;
     /** Emits state sync updates after hydration. */
     readonly emitSitesStateSynchronized: (payload: {
-        action: (typeof STATE_SYNC_ACTION)[keyof typeof STATE_SYNC_ACTION];
+        action: ValueOf<typeof STATE_SYNC_ACTION>;
         siteIdentifier: string;
-        source: (typeof STATE_SYNC_SOURCE)[keyof typeof STATE_SYNC_SOURCE];
+        source: ValueOf<typeof STATE_SYNC_SOURCE>;
         timestamp: number;
     }) => Promise<unknown>;
     /** Identifier of the site to load. */

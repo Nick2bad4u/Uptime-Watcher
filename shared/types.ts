@@ -4,7 +4,7 @@ import type { DnsRecordType } from "@shared/types/schemaTypes";
  *
  * @public
  */
-import type { UnknownRecord } from "type-fest";
+import type { UnknownRecord, ValueOf } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 
@@ -23,7 +23,7 @@ export const STATUS_KIND = {
  *
  * @public
  */
-export type StatusKind = (typeof STATUS_KIND)[keyof typeof STATUS_KIND];
+export type StatusKind = ValueOf<typeof STATUS_KIND>;
 
 /**
  * Ordered list of monitor status literals used for comparisons and UI sort

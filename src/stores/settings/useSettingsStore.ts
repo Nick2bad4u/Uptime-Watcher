@@ -36,6 +36,8 @@
  * @public
  */
 
+import type { Promisable } from "type-fest";
+
 import { isRecord } from "@shared/utils/typeHelpers";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
@@ -113,7 +115,7 @@ export const useSettingsStore: UseBoundStore<
              */
             onHydrate: (fn: (state: SettingsStore) => void) => () => void;
             /** Forces rehydration of the store from persistent storage */
-            rehydrate: () => Promise<void> | void;
+            rehydrate: () => Promisable<void>;
             /**
              * Updates persistence configuration options.
              *

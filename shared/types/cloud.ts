@@ -16,6 +16,8 @@
  * Provider-specific OAuth tokens and secrets must never appear in this module.
  */
 
+import type { ValueOf } from "type-fest";
+
 import type { CloudEncryptionMode } from "./cloudEncryption";
 import type { SerializedDatabaseBackupMetadata } from "./databaseBackup";
 
@@ -34,7 +36,7 @@ export const CLOUD_PROVIDER_KIND = {
 
 /** Union of supported cloud provider identifiers. */
 export type CloudProviderKind =
-    (typeof CLOUD_PROVIDER_KIND)[keyof typeof CLOUD_PROVIDER_KIND];
+    ValueOf<typeof CLOUD_PROVIDER_KIND>;
 
 /**
  * High-level cloud status summary.

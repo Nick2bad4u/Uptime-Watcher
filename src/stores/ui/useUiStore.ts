@@ -31,6 +31,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Promisable } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
@@ -104,7 +105,7 @@ type UIStoreWithPersist = UseBoundStore<
             hasHydrated: () => boolean;
             onFinishHydration: (fn: (state: UIStore) => void) => () => void;
             onHydrate: (fn: (state: UIStore) => void) => () => void;
-            rehydrate: () => Promise<void> | void;
+            rehydrate: () => Promisable<void>;
             setOptions: (
                 options: Partial<PersistOptions<UIStore, UIPersistedState>>
             ) => void;

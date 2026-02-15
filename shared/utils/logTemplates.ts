@@ -26,7 +26,7 @@
  * @packageDocumentation
  */
 
-import type { Simplify, TaggedUnion, UnknownRecord } from "type-fest";
+import type { Simplify, TaggedUnion, UnknownRecord, ValueOf } from "type-fest";
 
 /**
  * Logger interface for type safety with enhanced type utilities.
@@ -453,15 +453,15 @@ export const LOG_TEMPLATES: LogTemplatesInterface = Object.freeze({
  * Type representing all possible log template values.
  */
 export type LogTemplate =
-    | (typeof DEBUG_LOGS)[keyof typeof DEBUG_LOGS]
-    | (typeof ERROR_LOGS)[keyof typeof ERROR_LOGS]
-    | (typeof SERVICE_LOGS)[keyof typeof SERVICE_LOGS]
-    | (typeof WARNING_LOGS)[keyof typeof WARNING_LOGS];
+    | ValueOf<typeof DEBUG_LOGS>
+    | ValueOf<typeof ERROR_LOGS>
+    | ValueOf<typeof SERVICE_LOGS>
+    | ValueOf<typeof WARNING_LOGS>;
 
 type TemplateCategoryMap = {
     [Category in keyof LogTemplatesInterface]: {
         key: keyof LogTemplatesInterface[Category];
-        template: LogTemplatesInterface[Category][keyof LogTemplatesInterface[Category]];
+        template: ValueOf<LogTemplatesInterface[Category]>;
     };
 };
 
@@ -495,7 +495,7 @@ export function interpolateLogTemplate(
     variables: TemplateVariables
 ): string {
     const formatValue = (
-        value: TemplateVariables[keyof TemplateVariables]
+        value: ValueOf<TemplateVariables>
     ): string => {
         if (value === undefined || value === null) {
             return "";

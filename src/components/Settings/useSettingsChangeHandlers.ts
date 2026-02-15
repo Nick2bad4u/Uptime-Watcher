@@ -7,6 +7,8 @@
  * high-level orchestration.
  */
 
+import type { ValueOf } from "type-fest";
+
 import { useCallback } from "react";
 
 import type { AppSettings } from "../../stores/types";
@@ -60,7 +62,7 @@ export function useSettingsChangeHandlers(args: {
 
             // Create a safe update object with validated keys
             const updateEntries: Array<
-                [keyof AppSettings, AppSettings[keyof AppSettings]]
+                [keyof AppSettings, ValueOf<AppSettings>]
             > = [];
 
             // Log and apply changes for allowed keys
@@ -76,7 +78,7 @@ export function useSettingsChangeHandlers(args: {
                     ) {
                         updateEntries.push([
                             allowedKey,
-                            newValue as AppSettings[keyof AppSettings],
+                            newValue as ValueOf<AppSettings>,
                         ]);
 
                         logger.user.settingsChange(

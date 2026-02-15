@@ -30,6 +30,8 @@
  * @packageDocumentation
  */
 
+import type { ValueOf } from "type-fest";
+
 import { castUnchecked } from "@shared/utils/typeHelpers";
 
 /**
@@ -345,13 +347,13 @@ export const ERROR_CATALOG: ErrorCatalogInterface = {
  * @public
  */
 export type ErrorMessage =
-    | (typeof DATABASE_ERRORS)[keyof typeof DATABASE_ERRORS]
-    | (typeof IPC_ERRORS)[keyof typeof IPC_ERRORS]
-    | (typeof MONITOR_ERRORS)[keyof typeof MONITOR_ERRORS]
-    | (typeof NETWORK_ERRORS)[keyof typeof NETWORK_ERRORS]
-    | (typeof SITE_ERRORS)[keyof typeof SITE_ERRORS]
-    | (typeof SYSTEM_ERRORS)[keyof typeof SYSTEM_ERRORS]
-    | (typeof VALIDATION_ERRORS)[keyof typeof VALIDATION_ERRORS];
+    | ValueOf<typeof DATABASE_ERRORS>
+    | ValueOf<typeof IPC_ERRORS>
+    | ValueOf<typeof MONITOR_ERRORS>
+    | ValueOf<typeof NETWORK_ERRORS>
+    | ValueOf<typeof SITE_ERRORS>
+    | ValueOf<typeof SYSTEM_ERRORS>
+    | ValueOf<typeof VALIDATION_ERRORS>;
 
 /**
  * Helper function to create parameterized error messages.

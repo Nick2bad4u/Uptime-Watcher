@@ -4,6 +4,7 @@
  */
 
 import type { IpcResponse as SharedIpcResponse } from "@shared/types/ipc";
+import type { Promisable } from "type-fest";
 
 /**
  * Canonical IPC response shape used by Electron IPC handlers.
@@ -24,7 +25,7 @@ export interface IpcHandlerConfig<
     /** Channel name for the IPC handler */
     channelName: string;
     /** The actual handler function */
-    handler: (...args: TParams) => Promise<TResult> | TResult;
+    handler: (...args: TParams) => Promisable<TResult>;
     /** Optional parameter validation function */
     validateParams?: IpcParameterValidator;
 }

@@ -22,6 +22,7 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { Promisable } from "type-fest";
 
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { isAbortError } from "@shared/utils/abortUtils";
@@ -151,7 +152,7 @@ async function readMonitorUiConfigValue<T>(
     monitorType: MonitorType,
     description: string,
     fallback: T,
-    selector: (config: MonitorTypeConfig | undefined) => Promise<T> | T,
+    selector: (config: MonitorTypeConfig | undefined) => Promisable<T>,
     signal?: AbortSignal
 ): Promise<T> {
     // If the caller already cancelled, return the fallback immediately.

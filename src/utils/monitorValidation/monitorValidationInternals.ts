@@ -1,4 +1,5 @@
 import type { MonitorType } from "@shared/types";
+import type { Promisable } from "type-fest";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { castUnchecked } from "@shared/utils/typeHelpers";
@@ -17,7 +18,7 @@ import type {
 export async function runMonitorValidationOperation<TResult>(
     description: string,
     fallback: TResult,
-    operation: () => Promise<TResult> | TResult
+    operation: () => Promisable<TResult>
 ): Promise<TResult> {
     return withUtilityErrorHandling(
         async () => operation(),

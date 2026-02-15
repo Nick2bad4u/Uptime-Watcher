@@ -10,7 +10,7 @@ import type {
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
 } from "@shared/types/ipc";
-import type { UnknownRecord } from "type-fest";
+import type { Promisable, UnknownRecord } from "type-fest";
 
 import { IPC_INVOKE_CHANNEL_PARAM_COUNTS } from "@shared/types/ipc";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -39,9 +39,7 @@ type ChannelParams<TChannel extends IpcInvokeChannel> = [
 
 type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
     ...args: ChannelParams<TChannel>
-) =>
-    | IpcInvokeChannelResult<TChannel>
-    | Promise<IpcInvokeChannelResult<TChannel>>;
+) => Promisable<IpcInvokeChannelResult<TChannel>>;
 
 /**
  * Registers an IPC invoke handler with standardized correlation handling,
@@ -271,7 +269,7 @@ function createResponseFromExecution<T>(
  */
 export async function withIpcHandler<T>(
     channelName: string,
-    handler: () => Promise<T> | T,
+    handler: () => Promisable<T>,
     options?: WithIpcHandlerOptions<T>
 ): Promise<IpcResponse<T>> {
     const execution = await executeIpcHandler(channelName, handler, options);
@@ -320,7 +318,7 @@ export async function withIpcHandlerValidation<
     TParams extends readonly unknown[],
 >(
     channelName: string,
-    handler: (...validatedParams: TParams) => Promise<T> | T,
+    handler: (...validatedParams: TParams) => Promisable<T>,
     validateParams: IpcParameterValidator,
     params: TParams,
     options?: WithIpcHandlerOptions<T>

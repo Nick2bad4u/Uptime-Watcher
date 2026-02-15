@@ -11,6 +11,7 @@
 
 import type { Site } from "@shared/types";
 import type { AxiosResponse } from "axios";
+import type { Promisable } from "type-fest";
 
 import { createAbortError } from "@shared/utils/abortError";
 import {
@@ -100,7 +101,7 @@ export interface HttpMonitorBehavior<
         monitor: MonitorByType<TType>;
         response: AxiosResponse;
         responseTime: number;
-    }) => MonitorCheckResult | Promise<MonitorCheckResult>;
+    }) => Promisable<MonitorCheckResult>;
     /** Human-readable label describing the operation (used in retry metadata). */
     readonly operationLabel: string;
     readonly scope: string;

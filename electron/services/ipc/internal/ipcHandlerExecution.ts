@@ -3,7 +3,7 @@
  */
 
 import type { CorrelationId } from "@shared/types/events";
-import type { UnknownRecord } from "type-fest";
+import type { Promisable, UnknownRecord } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { withLogContext } from "@shared/utils/loggingContext";
@@ -43,7 +43,7 @@ export type HandlerExecutionResult<T> =
  */
 export async function executeIpcHandler<T>(
     channelName: string,
-    handler: () => Promise<T> | T,
+    handler: () => Promisable<T>,
     options?: IpcHandlerExecutionOptions
 ): Promise<HandlerExecutionResult<T>> {
     const startTime = Date.now();

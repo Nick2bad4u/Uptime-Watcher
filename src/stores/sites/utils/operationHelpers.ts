@@ -5,6 +5,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
@@ -52,7 +53,7 @@ export interface OperationTelemetryConfig {
  * stage keys (`status`, `success`, `error`) via
  * {@link SitesTelemetryStagePayload}.
  */
-export type SitesTelemetryPayload = Readonly<Record<string, unknown>>;
+export type SitesTelemetryPayload = Readonly<UnknownRecord>;
 
 /**
  * Telemetry stage discriminator used by the sites store.
@@ -84,7 +85,7 @@ export type SitesTelemetryStagePayload =
           readonly success: true;
       });
 
-type MutableSitesTelemetryPayload = Record<string, unknown>;
+type MutableSitesTelemetryPayload = UnknownRecord;
 
 type OperationTelemetryInput =
     | OperationTelemetryConfig
@@ -112,7 +113,7 @@ const TELEMETRY_CONFIG_KEYS = [
     "success",
 ] as const;
 
-const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
+const isPlainRecord = (value: unknown): value is UnknownRecord =>
     isSharedRecord(value);
 
 const isTelemetryConfig = (

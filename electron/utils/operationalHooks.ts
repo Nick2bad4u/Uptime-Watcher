@@ -58,7 +58,7 @@
  * @packageDocumentation
  */
 
-import type { Tagged, UnknownRecord } from "type-fest";
+import type { Promisable, Tagged, UnknownRecord } from "type-fest";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { sleepUnref } from "@shared/utils/abortUtils";
@@ -247,17 +247,17 @@ export interface OperationalHooksConfig<T = unknown> {
     /**
      * Callback when operation fails permanently.
      */
-    onFailure?: (error: Error, attempts: number) => Promise<void> | void;
+    onFailure?: (error: Error, attempts: number) => Promisable<void>;
 
     /**
      * Callback when retry is attempted.
      */
-    onRetry?: (attempt: number, error: Error) => Promise<void> | void;
+    onRetry?: (attempt: number, error: Error) => Promisable<void>;
 
     /**
      * Callback when operation succeeds.
      */
-    onSuccess?: (result: T) => Promise<void> | void;
+    onSuccess?: (result: T) => Promisable<void>;
 
     /**
      * Name of the operation for logging and event emission.
