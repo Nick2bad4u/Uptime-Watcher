@@ -302,13 +302,14 @@ const config = defineConfig({
                 // produce subtle layout regressions.
                 "defensive-css/require-named-grid-lines": null,
                 "keyframes-name-pattern": null,
+                // "logical-css/require-logical-keywords": null,
+                // "logical-css/require-logical-properties": null,
+                // "logical-css/require-logical-units": null,
                 "no-descending-specificity": null,
                 "no-duplicate-selectors": null,
                 "order/properties-order": null,
                 "plugin/no-low-performance-animation-properties": null,
                 "plugin/stylelint-group-selectors": null,
-                "plugin/use-logical-properties-and-values": null,
-                "plugin/use-logical-units": null,
                 "scales/font-sizes": null,
                 "scales/line-heights": null,
                 "scss/declaration-property-value-no-unknown": null,
@@ -368,7 +369,7 @@ const config = defineConfig({
          */
         // Core functional plugins
         "stylelint-plugin-defensive-css",
-        "stylelint-plugin-logical-css",
+        // "stylelint-plugin-logical-css",
         "stylelint-gamut",
         "stylelint-use-nesting",
         "stylelint-prettier",
@@ -797,6 +798,29 @@ const config = defineConfig({
         // Length rules
         "length-zero-no-unit": true, // Disallow units for zero lengths (0px -> 0) (verified working)
         "lightness-notation": "percentage",
+        /**
+         * Logical properties and values promotion.
+         *
+         * @remarks
+         * Encourages use of logical properties (e.g., margin-inline-start
+         * instead of margin-left) for better internationalization support. Set
+         * to warning level to gradually adopt these practices.
+         *
+         * @see {@link https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties | MDN Logical Properties}
+         */
+        // "logical-css/require-logical-keywords": [
+        //     true,
+        //     { "ignore": ["caption-side", "offset-anchor", "offset-position"], "severity": "error" },
+        //   ],
+        /**
+         * Logical units enforcement.
+         *
+         * @remarks
+         * Promotes logical units (e.g., inline-size instead of width) for
+         * improved internationalization and writing mode support.
+         */
+        // "logical-css/require-logical-properties": [true, { "severity": "error" }],
+        // "logical-css/require-logical-units": [true, { severity: "warning" }],
         // Layout and structure
         "max-nesting-depth": 4,
         // Media query rules
@@ -819,18 +843,19 @@ const config = defineConfig({
         "no-invalid-double-slash-comments": true,
         "no-invalid-position-at-import-rule": true,
         "no-invalid-position-declaration": true,
+
         "no-irregular-whitespace": true,
+
         // No unknown rules
         "no-unknown-animations": true,
         "no-unknown-custom-media": null,
-
         "no-unknown-custom-properties": null,
 
         "number-max-precision": 15,
+
         // Taken care of Prettier
         "order/order": null,
         "order/properties-alphabetical-order": null,
-
         // Plugin rules
         "plugin/declaration-block-no-ignored-properties": true,
 
@@ -896,7 +921,6 @@ const config = defineConfig({
             },
         ],
         "plugin/no-restricted-syntax": null,
-
         "plugin/no-unresolved-module": null,
         /**
          * Browser feature compatibility validation.
@@ -942,6 +966,7 @@ const config = defineConfig({
                 severity: "warning",
             },
         ],
+
         /**
          * BEM (Block Element Modifier) pattern enforcement.
          *
@@ -986,32 +1011,9 @@ const config = defineConfig({
                 namespace: "uw", // UptimeWatcher namespace
             },
         },
+
         "plugin/stylelint-group-selectors": true,
         "plugin/use-baseline": null,
-
-        /**
-         * Logical properties and values promotion.
-         *
-         * @remarks
-         * Encourages use of logical properties (e.g., margin-inline-start
-         * instead of margin-left) for better internationalization support. Set
-         * to warning level to gradually adopt these practices.
-         *
-         * @see {@link https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties | MDN Logical Properties}
-         */
-        "plugin/use-logical-properties-and-values": [
-            true,
-            { severity: "warning" },
-        ],
-
-        /**
-         * Logical units enforcement.
-         *
-         * @remarks
-         * Promotes logical units (e.g., inline-size instead of width) for
-         * improved internationalization and writing mode support.
-         */
-        "plugin/use-logical-units": [true, { severity: "warning" }],
         "prettier/prettier": true,
         "property-allowed-list": null,
         "property-disallowed-list": null,

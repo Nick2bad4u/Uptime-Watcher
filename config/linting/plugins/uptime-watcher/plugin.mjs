@@ -50,8 +50,10 @@ import preferEnsureErrorReturnTypeRule from "./rules/prefer-ensure-error-return-
 import { preferSharedAliasRule } from "./rules/prefer-shared-alias.mjs";
 import { preferTryGetErrorCodeRule } from "./rules/prefer-try-get-error-code.mjs";
 import preferTypeFestJsonValueRule from "./rules/prefer-type-fest-json-value.mjs";
+import preferTypeFestPromisableRule from "./rules/prefer-type-fest-promisable.mjs";
 import preferTypeFestTaggedBrandsRule from "./rules/prefer-type-fest-tagged-brands.mjs";
 import preferTypeFestUnknownRecordRule from "./rules/prefer-type-fest-unknown-record.mjs";
+import preferTypeFestValueOfRule from "./rules/prefer-type-fest-value-of.mjs";
 import { preloadNoLocalIsPlainObjectRule } from "./rules/preload-no-local-is-plain-object.mjs";
 import { rendererNoBrowserDialogsRule } from "./rules/renderer-no-browser-dialogs.mjs";
 import { rendererNoDirectBridgeReadinessRule } from "./rules/renderer-no-direct-bridge-readiness.mjs";
@@ -159,8 +161,10 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "prefer-ensure-error-return-type": preferEnsureErrorReturnTypeRule,
         "prefer-shared-alias": preferSharedAliasRule,
         "prefer-type-fest-json-value": preferTypeFestJsonValueRule,
+        "prefer-type-fest-promisable": preferTypeFestPromisableRule,
         "prefer-type-fest-tagged-brands": preferTypeFestTaggedBrandsRule,
         "prefer-type-fest-unknown-record": preferTypeFestUnknownRecordRule,
+        "prefer-type-fest-value-of": preferTypeFestValueOfRule,
         "prefer-try-get-error-code": preferTryGetErrorCodeRule,
         "preload-no-local-is-plain-object": preloadNoLocalIsPlainObjectRule,
         "renderer-no-browser-dialogs": rendererNoBrowserDialogsRule,
@@ -265,6 +269,8 @@ const recommendedRuleNames = /** @type {const} */ ([
     "no-regexp-v-flag",
     "require-ensure-error-in-catch",
     "require-error-cause-in-catch",
+    "prefer-type-fest-promisable",
+    "prefer-type-fest-value-of",
 ]);
 
 /**
@@ -423,6 +429,29 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "prefer-app-alias",
             "require-error-cause-in-catch",
             "require-ensure-error-in-catch",
+        ]),
+    }),
+    withUptimeWatcherPlugin({
+        files: [
+            "electron/**/*.{ts,tsx}",
+            "shared/**/*.{ts,tsx}",
+            "src/**/*.{ts,tsx}",
+            "storybook/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx,js,jsx,mts,mjs,cjs,cts}",
+        ],
+        ignores: [
+            "electron/test/**/*",
+            "src/test/**/*",
+            "shared/test/**/*",
+            "**/*.d.ts",
+        ],
+        name: "uptime-watcher:type-fest-conventions",
+        rules: errorRulesFor([
+            "prefer-type-fest-json-value",
+            "prefer-type-fest-promisable",
+            "prefer-type-fest-tagged-brands",
+            "prefer-type-fest-unknown-record",
+            "prefer-type-fest-value-of",
         ]),
     }),
 ]);

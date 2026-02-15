@@ -6,7 +6,7 @@ import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 const isTypeAssertionNode = (node) =>
     node.type === "TSAsExpression" || node.type === "TSTypeAssertion";
 
-const rule = createTypedRule({
+const noDoubleAssertionOutsideTestsRule = createTypedRule({
     /**
      * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
      */
@@ -50,7 +50,7 @@ const rule = createTypedRule({
         type: "problem",
         docs: {
             description:
-                "Disallow double assertions (e.g. `as unknown as`) outside test files.",
+                "disallow double assertions (e.g. `as unknown as`) outside test files.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-double-assertion-outside-tests.md",
         },
@@ -63,4 +63,4 @@ const rule = createTypedRule({
     name: "no-double-assertion-outside-tests",
 });
 
-export default rule;
+export default noDoubleAssertionOutsideTestsRule;

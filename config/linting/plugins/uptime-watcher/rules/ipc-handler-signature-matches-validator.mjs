@@ -38,7 +38,7 @@ const isFunctionExpressionNode = (node) =>
     node.type === "ArrowFunctionExpression" ||
     node.type === "FunctionExpression";
 
-const rule = createTypedRule({
+const ipcHandlerSignatureMatchesValidatorRule = createTypedRule({
     /**
      * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
      */
@@ -223,4 +223,4 @@ const rule = createTypedRule({
     name: "ipc-handler-signature-matches-validator",
 });
 
-export default rule;
+export default ipcHandlerSignatureMatchesValidatorRule;

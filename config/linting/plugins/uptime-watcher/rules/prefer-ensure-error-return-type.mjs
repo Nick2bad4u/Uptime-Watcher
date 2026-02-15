@@ -54,7 +54,7 @@ const isErrorTypeAnnotation = (annotation) => {
     return false;
 };
 
-const rule = createTypedRule({
+const preferEnsureErrorReturnTypeRule = createTypedRule({
     /**
      * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
      */
@@ -159,4 +159,4 @@ const rule = createTypedRule({
     name: "prefer-ensure-error-return-type",
 });
 
-export default rule;
+export default preferEnsureErrorReturnTypeRule;

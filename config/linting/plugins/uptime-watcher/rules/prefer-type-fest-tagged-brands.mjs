@@ -61,7 +61,7 @@ const hasAdHocBrandLiteral = (typeNode) => {
     );
 };
 
-const rule = createTypedRule({
+const preferTypeFestTaggedBrandsRule = createTypedRule({
     /**
      * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
      */
@@ -99,7 +99,7 @@ const rule = createTypedRule({
         type: "suggestion",
         docs: {
             description:
-                "Prefer TypeFest Tagged over ad-hoc intersection branding with __brand/__tag fields.",
+                "require TypeFest Tagged over ad-hoc intersection branding with __brand/__tag fields.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-type-fest-tagged-brands.md",
         },
@@ -112,4 +112,4 @@ const rule = createTypedRule({
     name: "prefer-type-fest-tagged-brands",
 });
 
-export default rule;
+export default preferTypeFestTaggedBrandsRule;

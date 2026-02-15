@@ -1,7 +1,23 @@
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const JSON_BOUNDARY_PATH_PATTERN =
-    /\/(?:config\/linting\/plugins\/uptime-watcher\/test\/fixtures\/typed|electron\/services\/ipc|shared\/(?:types|utils\/logger)|src\/components\/Alerts)\//v;
+    /^(?:config\/linting\/plugins\/uptime-watcher\/test\/fixtures\/typed|electron\/services\/ipc|shared\/(?:types|utils\/logger)|src\/components\/Alerts)(?:\/|$)/v;
+
+/**
+ * @param {string} filePath
+ * @returns {string}
+ */
+const getRepoRelativePath = (filePath) => {
+    const normalizedPath = filePath.replaceAll("\\", "/");
+    const repoMarker = "/Uptime-Watcher/";
+    const markerIndex = normalizedPath.lastIndexOf(repoMarker);
+
+    if (markerIndex === -1) {
+        return normalizedPath;
+    }
+
+    return normalizedPath.slice(markerIndex + repoMarker.length);
+};
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.TSTypeReference} typeNode
@@ -28,13 +44,13 @@ const isRecordLikeUnknown = (typeNode) => {
     );
 };
 
-const rule = createTypedRule({
+const preferTypeFestJsonValueRule = createTypedRule({
     /**
      * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
      */
     create(context) {
         const filePath = context.filename ?? "";
-        const normalizedPath = filePath.replaceAll("\\", "/");
+        const normalizedPath = getRepoRelativePath(filePath);
 
         if (
             !JSON_BOUNDARY_PATH_PATTERN.test(normalizedPath) ||
@@ -77,4 +93,4 @@ const rule = createTypedRule({
     name: "prefer-type-fest-json-value",
 });
 
-export default rule;
+export default preferTypeFestJsonValueRule;

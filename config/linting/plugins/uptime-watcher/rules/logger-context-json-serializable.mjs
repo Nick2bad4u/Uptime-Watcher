@@ -133,7 +133,7 @@ const getLoggerMethod = (callee) => {
     return callee.property.name;
 };
 
-const rule = createTypedRule({
+const loggerContextJsonSerializableRule = createTypedRule({
     /**
      * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
      */
@@ -191,4 +191,4 @@ const rule = createTypedRule({
     name: "logger-context-json-serializable",
 });
 
-export default rule;
+export default loggerContextJsonSerializableRule;

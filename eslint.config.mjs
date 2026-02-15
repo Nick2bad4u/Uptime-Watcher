@@ -1039,6 +1039,15 @@ export default defineConfig([
         },
     },
     {
+        files: [
+            "config/linting/plugins/uptime-watcher/test/fixtures/typed/prefer-ensure-error-return-type.invalid.ts",
+        ],
+        name: "ESLint Plugin Tests - allow intentional any in invalid fixture",
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+        },
+    },
+    {
         files: ["config/linting/plugins/**/test/_internal/ruleTester.ts"],
         name: "ESLint Plugin Tests - internal helper filename",
         rules: {
