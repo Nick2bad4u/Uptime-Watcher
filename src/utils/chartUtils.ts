@@ -16,6 +16,7 @@ import type { Simplify, UnknownRecord, ValueOf } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
+import { objectHasOwn } from "ts-extras";
 
 /**
  * Type-safe scale configuration result describing lookup outcomes.
@@ -52,7 +53,7 @@ export function getScaleConfigSafe(
 
     const { scales } = config;
 
-    if (Object.hasOwn(scales, axis)) {
+    if (objectHasOwn(scales, axis)) {
         const scale: unknown = scales[axis];
 
         // Validate that the scale is actually an object (handle runtime type safety)
@@ -135,7 +136,7 @@ export function getNestedScalePropertySafe(
 
     for (const part of pathParts) {
         const record = ensureRecordLike(current);
-        if (!record || !Object.hasOwn(record, part)) {
+        if (!record || !objectHasOwn(record, part)) {
             return {
                 exists: false,
                 validPath,
@@ -201,7 +202,7 @@ export function getScaleProperty(
     }
 
     // Check if property exists safely
-    if (!Object.hasOwn(record, property)) {
+    if (!objectHasOwn(record, property)) {
         return undefined;
     }
 

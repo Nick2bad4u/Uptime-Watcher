@@ -302,9 +302,9 @@ const config = defineConfig({
                 // produce subtle layout regressions.
                 "defensive-css/require-named-grid-lines": null,
                 "keyframes-name-pattern": null,
-                // "logical-css/require-logical-keywords": null,
-                // "logical-css/require-logical-properties": null,
-                // "logical-css/require-logical-units": null,
+                "logical-css/require-logical-keywords": null,
+                "logical-css/require-logical-properties": null,
+                "logical-css/require-logical-units": null,
                 "no-descending-specificity": null,
                 "no-duplicate-selectors": null,
                 "order/properties-order": null,
@@ -369,7 +369,7 @@ const config = defineConfig({
          */
         // Core functional plugins
         "stylelint-plugin-defensive-css",
-        // "stylelint-plugin-logical-css",
+        "stylelint-plugin-logical-css",
         "stylelint-gamut",
         "stylelint-use-nesting",
         "stylelint-prettier",
@@ -808,10 +808,10 @@ const config = defineConfig({
          *
          * @see {@link https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties | MDN Logical Properties}
          */
-        // "logical-css/require-logical-keywords": [
-        //     true,
-        //     { "ignore": ["caption-side", "offset-anchor", "offset-position"], "severity": "error" },
-        //   ],
+        "logical-css/require-logical-keywords": [
+            true,
+            { "ignore": ["caption-side", "offset-anchor", "offset-position"], "severity": "error" },
+          ],
         /**
          * Logical units enforcement.
          *
@@ -819,8 +819,8 @@ const config = defineConfig({
          * Promotes logical units (e.g., inline-size instead of width) for
          * improved internationalization and writing mode support.
          */
-        // "logical-css/require-logical-properties": [true, { "severity": "error" }],
-        // "logical-css/require-logical-units": [true, { severity: "warning" }],
+        "logical-css/require-logical-properties": [true, { "severity": "error" }],
+        "logical-css/require-logical-units": [true, { severity: "warning" }],
         // Layout and structure
         "max-nesting-depth": 4,
         // Media query rules

@@ -1,5 +1,7 @@
 import type { UnknownRecord } from "type-fest";
 
+import { objectHasOwn } from "ts-extras";
+
 import type { PortNumber } from "../types/units";
 
 import { isRecord } from "./typeHelpers";
@@ -39,7 +41,8 @@ export function isNumber(value: unknown): value is number {
  * Verifies that a value exposes a set of own properties.
  *
  * @remarks
- * Uses {@link Object.hasOwn} to avoid prototype traversal.
+ * Uses {@link objectHasOwn} from ts-extras to avoid prototype traversal and
+ * preserve own-property narrowing.
  *
  * @example
  *
@@ -60,10 +63,7 @@ export function hasProperties<K extends PropertyKey>(
     value: unknown,
     properties: readonly K[]
 ): value is Record<K, unknown> & UnknownRecord {
-    return (
-        isObject(value) &&
-        properties.every((prop) => Object.hasOwn(value, prop))
-    );
+    return isObject(value) && properties.every((prop) => objectHasOwn(value, prop));
 }
 
 /**
@@ -88,7 +88,7 @@ export function hasProperty<K extends PropertyKey>(
     value: unknown,
     property: K
 ): value is Record<K, unknown> & UnknownRecord {
-    return isObject(value) && Object.hasOwn(value, property);
+    return isObject(value) && objectHasOwn(value, property);
 }
 
 /**

@@ -618,10 +618,10 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             errors.push("Import data cannot be empty");
         }
 
-        const parseResult = safeJsonParse<JsonValue>(
-            this.data,
-            (value): value is JsonValue => value !== undefined
-        );
+            const parseResult = safeJsonParse<JsonValue>(
+                this.data,
+                (value): value is JsonValue => value !== undefined
+            );
 
         if (!parseResult.success || parseResult.data === undefined) {
             errors.push("Import data must be valid JSON");

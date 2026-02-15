@@ -22,6 +22,7 @@ import type { Jsonify, UnknownRecord, ValueOf } from "type-fest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
+import { objectHasOwn } from "ts-extras";
 import * as z from "zod";
 
 import {
@@ -282,7 +283,7 @@ export const monitorSchemas: MonitorSchemas = {
 function isKnownMonitorTypeKey(
     value: string
 ): value is keyof typeof monitorSchemas {
-    return Object.hasOwn(monitorSchemas, value);
+    return objectHasOwn(monitorSchemas, value);
 }
 
 /**
@@ -431,7 +432,7 @@ function hasOwnKey<TObject extends object>(
     obj: TObject,
     key: string
 ): key is Extract<keyof TObject, string> {
-    return Object.hasOwn(obj, key);
+    return objectHasOwn(obj, key);
 }
 
 function validateFieldWithSchema(

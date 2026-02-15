@@ -16,7 +16,9 @@ declare const payload: SiteEventPayload;
 declare const variableValue: TemplateVariableValue;
 declare const dynamicValue: ObjectValues<{ readonly enabled: boolean }>;
 
-const assertNever = (_value: never): void => {};
+const assertNever = (value: never): void => {
+    throw new Error(String(value));
+};
 
 if (payload.status === "up" && typeof variableValue === "number") {
     assertNever(dynamicValue as never);

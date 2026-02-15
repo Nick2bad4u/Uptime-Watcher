@@ -1048,6 +1048,15 @@ export default defineConfig([
         },
     },
     {
+        files: [
+            "config/linting/plugins/uptime-watcher/test/fixtures/typed/prefer-ts-extras-is-defined-filter.invalid.ts",
+        ],
+        name: "ESLint Plugin Tests - allow intentional undefined comparison fixture",
+        rules: {
+            "no-undefined": "off",
+        },
+    },
+    {
         files: ["config/linting/plugins/**/test/_internal/ruleTester.ts"],
         name: "ESLint Plugin Tests - internal helper filename",
         rules: {

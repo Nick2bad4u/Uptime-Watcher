@@ -49,6 +49,8 @@ import { preferAppAliasRule } from "./rules/prefer-app-alias.mjs";
 import preferEnsureErrorReturnTypeRule from "./rules/prefer-ensure-error-return-type.mjs";
 import { preferSharedAliasRule } from "./rules/prefer-shared-alias.mjs";
 import { preferTryGetErrorCodeRule } from "./rules/prefer-try-get-error-code.mjs";
+import preferTsExtrasIsDefinedFilterRule from "./rules/prefer-ts-extras-is-defined-filter.mjs";
+import preferTsExtrasObjectHasOwnRule from "./rules/prefer-ts-extras-object-has-own.mjs";
 import preferTypeFestJsonValueRule from "./rules/prefer-type-fest-json-value.mjs";
 import preferTypeFestPromisableRule from "./rules/prefer-type-fest-promisable.mjs";
 import preferTypeFestTaggedBrandsRule from "./rules/prefer-type-fest-tagged-brands.mjs";
@@ -165,6 +167,8 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "prefer-type-fest-tagged-brands": preferTypeFestTaggedBrandsRule,
         "prefer-type-fest-unknown-record": preferTypeFestUnknownRecordRule,
         "prefer-type-fest-value-of": preferTypeFestValueOfRule,
+        "prefer-ts-extras-is-defined-filter": preferTsExtrasIsDefinedFilterRule,
+        "prefer-ts-extras-object-has-own": preferTsExtrasObjectHasOwnRule,
         "prefer-try-get-error-code": preferTryGetErrorCodeRule,
         "preload-no-local-is-plain-object": preloadNoLocalIsPlainObjectRule,
         "renderer-no-browser-dialogs": rendererNoBrowserDialogsRule,
@@ -452,6 +456,20 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "prefer-type-fest-tagged-brands",
             "prefer-type-fest-unknown-record",
             "prefer-type-fest-value-of",
+        ]),
+    }),
+    withUptimeWatcherPlugin({
+        files: [
+            "electron/services/sync/SyncEngine.ts",
+            "shared/utils/typeGuards.ts",
+            "shared/validation/monitorSchemas.ts",
+            "src/components/Alerts/AppToastToast.tsx",
+            "src/utils/chartUtils.ts",
+        ],
+        name: "uptime-watcher:ts-extras-guard-adoption",
+        rules: errorRulesFor([
+            "prefer-ts-extras-is-defined-filter",
+            "prefer-ts-extras-object-has-own",
         ]),
     }),
 ]);

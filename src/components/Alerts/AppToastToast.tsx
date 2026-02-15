@@ -1,6 +1,7 @@
 import type { ValueOf } from "type-fest";
 
 import { type JSX, useCallback, useEffect, useMemo } from "react";
+import { objectHasOwn } from "ts-extras";
 
 import type { AppToast } from "../../stores/alerts/useAlertStore";
 
@@ -71,7 +72,7 @@ export const AppToastToast = (props: AppToastToastProperties): JSX.Element => {
         ]
     );
 
-    const tone: ToastTone = Object.hasOwn(TOAST_TONE, toast.variant)
+    const tone: ToastTone = objectHasOwn(TOAST_TONE, toast.variant)
         ? TOAST_TONE[toast.variant]
         : TOAST_TONE.info;
 

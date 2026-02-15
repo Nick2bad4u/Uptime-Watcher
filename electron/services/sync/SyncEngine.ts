@@ -21,6 +21,7 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
+import { isDefined } from "ts-extras";
 
 import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
@@ -745,7 +746,7 @@ export class SyncEngine {
             const monitorIds = monitorIdsBySite.get(siteId) ?? [];
             const monitors = monitorIds
                 .map((monitorId) => mergedValidMonitorsById.get(monitorId))
-                .filter((monitor): monitor is Monitor => monitor !== undefined);
+                .filter(isDefined);
 
             const siteCandidate: Site = {
                 identifier: siteId,
