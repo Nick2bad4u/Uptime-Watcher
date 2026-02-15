@@ -8,6 +8,8 @@
 
 import type { UnknownRecord, ValueOf } from "type-fest";
 
+import { objectHasOwn } from "ts-extras";
+
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";
 
@@ -64,7 +66,7 @@ export function safeObjectAccess<T>(
         return fallback;
     }
 
-    if (!Object.hasOwn(obj, key)) {
+    if (!objectHasOwn(obj, key)) {
         return fallback;
     }
 
@@ -244,7 +246,7 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
     const result = createNullPrototypeObject<Pick<T, K>>();
 
     for (const key of keys) {
-        if (Object.hasOwn(obj, key)) {
+        if (objectHasOwn(obj, key)) {
             Object.defineProperty(result, key, {
                 configurable: true,
                 enumerable: true,

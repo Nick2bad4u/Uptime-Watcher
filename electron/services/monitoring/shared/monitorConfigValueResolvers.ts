@@ -1,4 +1,5 @@
 import { isValidUrl } from "@shared/validation/validatorUtils";
+import { objectHasOwn } from "ts-extras";
 
 /**
  * Result of resolving a required monitor string field.
@@ -136,11 +137,11 @@ export function resolveMonitorNumericOverride(options: {
 
     const resolvedServiceConfigFieldName =
         serviceConfigFieldName ?? monitorFieldName;
-    if (Object.hasOwn(serviceConfig, resolvedServiceConfigFieldName)) {
+    if (objectHasOwn(serviceConfig, resolvedServiceConfigFieldName)) {
         const serviceCandidate = Reflect.get(
             serviceConfig,
             resolvedServiceConfigFieldName
-        ) as unknown;
+        );
 
         if (isCandidateAccepted(serviceCandidate)) {
             return serviceCandidate;

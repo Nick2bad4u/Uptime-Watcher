@@ -223,4 +223,4 @@ const ipcHandlerSignatureMatchesValidatorRule = createTypedRule({
     name: "ipc-handler-signature-matches-validator",
 });
 
-export default ipcHandlerSignatureMatchesValidatorRule;
+export { ipcHandlerSignatureMatchesValidatorRule };

@@ -45,4 +45,11 @@ if (objectHasOwn(variants, "success")) {
     }
 }
 
+if (Object.hasOwn(variants, "success")) {
+    const successVariant = variants.success;
+    if (successVariant.length === 0) {
+        throw new Error("Success variant should not be empty");
+    }
+}
+
 export const __typedFixtureModule = "typed-fixture-module";

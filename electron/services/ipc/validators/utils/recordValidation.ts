@@ -1,6 +1,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { objectHasOwn } from "ts-extras";
 
 import type { ParameterValueValidationResult } from "./parameterValidation";
 
@@ -43,7 +44,7 @@ export function getForbiddenRecordKeyErrors(
     const errors: string[] = [];
 
     for (const key of FORBIDDEN_RECORD_KEYS) {
-        if (Object.hasOwn(record, key)) {
+        if (objectHasOwn(record, key)) {
             errors.push(`${paramName} must not include reserved key '${key}'`);
         }
     }

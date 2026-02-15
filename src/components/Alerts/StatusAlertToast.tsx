@@ -70,12 +70,8 @@ export const StatusAlertToast = ({
         typeof candidateStatus === "string" && candidateStatus.length > 0
             ? candidateStatus
             : STATUS_KIND.PENDING;
-    const tone = Object.hasOwn(STATUS_TONE, resolvedStatus)
-        ? STATUS_TONE[resolvedStatus]
-        : STATUS_TONE.pending;
-    const headline = Object.hasOwn(STATUS_HEADLINE, resolvedStatus)
-        ? STATUS_HEADLINE[resolvedStatus]
-        : STATUS_HEADLINE.pending;
+    const tone = STATUS_TONE[resolvedStatus];
+    const headline = STATUS_HEADLINE[resolvedStatus];
 
     const { timestampDateTime, timestampLabel } = useMemo(() => {
         const date = new Date(alert.timestamp);

@@ -93,4 +93,4 @@ const preferTypeFestJsonValueRule = createTypedRule({
     name: "prefer-type-fest-json-value",
 });
 
-export default preferTypeFestJsonValueRule;
+export { preferTypeFestJsonValueRule };

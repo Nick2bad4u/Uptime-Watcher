@@ -63,4 +63,4 @@ const noDoubleAssertionOutsideTestsRule = createTypedRule({
     name: "no-double-assertion-outside-tests",
 });
 
-export default noDoubleAssertionOutsideTestsRule;
+export { noDoubleAssertionOutsideTestsRule };

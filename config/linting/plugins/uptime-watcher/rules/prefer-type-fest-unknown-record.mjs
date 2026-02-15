@@ -89,4 +89,4 @@ const preferTypeFestUnknownRecordRule = createTypedRule({
     name: "prefer-type-fest-unknown-record",
 });
 
-export default preferTypeFestUnknownRecordRule;
+export { preferTypeFestUnknownRecordRule };

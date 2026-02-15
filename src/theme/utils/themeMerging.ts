@@ -7,6 +7,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { objectHasOwn } from "ts-extras";
+
 import type { Theme } from "../types";
 
 // Helper function to merge objects, allowing explicit undefined to override
@@ -72,19 +74,19 @@ const mergeColors = (
 
     return {
         ...baseColors,
-        ...(Object.hasOwn(overrideColors, "error") && {
+        ...(objectHasOwn(overrideColors, "error") && {
             error: overrideColors.error,
         }),
-        ...(Object.hasOwn(overrideColors, "errorAlert") && {
+        ...(objectHasOwn(overrideColors, "errorAlert") && {
             errorAlert: overrideColors.errorAlert,
         }),
-        ...(Object.hasOwn(overrideColors, "info") && {
+        ...(objectHasOwn(overrideColors, "info") && {
             info: overrideColors.info,
         }),
-        ...(Object.hasOwn(overrideColors, "success") && {
+        ...(objectHasOwn(overrideColors, "success") && {
             success: overrideColors.success,
         }),
-        ...(Object.hasOwn(overrideColors, "warning") && {
+        ...(objectHasOwn(overrideColors, "warning") && {
             warning: overrideColors.warning,
         }),
         background: mergeWithExplicitUndefined(

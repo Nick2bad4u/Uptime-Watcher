@@ -47,6 +47,7 @@ import {
 import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { objectHasOwn } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -345,7 +346,7 @@ export class WindowService {
      */
     private async waitForViteServer(): Promise<void> {
         const isFetchMock =
-            typeof fetch === "function" && Object.hasOwn(fetch, "mock");
+            typeof fetch === "function" && objectHasOwn(fetch, "mock");
 
         if (isFetchMock) {
             const controller = new AbortController();

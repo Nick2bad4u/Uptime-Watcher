@@ -1,4 +1,5 @@
 import { ensureError } from "@shared/utils/errorHandling";
+import { objectHasOwn } from "ts-extras";
 
 import type { SettingsStore } from "./types";
 
@@ -12,7 +13,7 @@ import { defaultSettings, normalizeAppSettings } from "./state";
 const hasOwn = <T extends object>(
     target: T,
     property: keyof T | string
-): boolean => Object.hasOwn(target, property);
+): boolean => objectHasOwn(target, property);
 
 // Store timer reference for cleanup capability.
 // Use a const ref object to avoid top-level `let` while still allowing

@@ -10,6 +10,7 @@ import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 import { isObject } from "@shared/utils/typeGuards";
+import { objectHasOwn } from "ts-extras";
 
 /**
  * Result tuple produced by the safe JSON helpers.
@@ -98,7 +99,7 @@ const collectObjectValues = collectOwnPropertyValuesSafely;
 const hasDescriptorValue = (
     descriptor: PropertyDescriptor | undefined
 ): descriptor is PropertyDescriptor & { value: unknown } =>
-    Boolean(descriptor && Object.hasOwn(descriptor, "value"));
+    Boolean(descriptor && objectHasOwn(descriptor, "value"));
 
 const isNonNullObject = (value: unknown): value is object =>
     typeof value === "object" && value !== null;

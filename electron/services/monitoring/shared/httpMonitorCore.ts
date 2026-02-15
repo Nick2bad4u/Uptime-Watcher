@@ -21,6 +21,7 @@ import {
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { objectHasOwn } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -381,7 +382,7 @@ export function createHttpMonitorService<
             delete remaining.timeout;
             delete remaining.userAgent;
 
-            if (Object.hasOwn(config, "timeout")) {
+            if (objectHasOwn(config, "timeout")) {
                 const { timeout } = config;
                 if (
                     timeout !== undefined &&
@@ -401,7 +402,7 @@ export function createHttpMonitorService<
                 }
             }
 
-            if (Object.hasOwn(config, "userAgent")) {
+            if (objectHasOwn(config, "userAgent")) {
                 const { userAgent } = config;
                 if (userAgent !== undefined && typeof userAgent !== "string") {
                     throw new Error("Invalid userAgent: must be a string");

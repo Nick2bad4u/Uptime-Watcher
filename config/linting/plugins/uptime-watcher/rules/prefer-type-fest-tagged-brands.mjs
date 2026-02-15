@@ -112,4 +112,4 @@ const preferTypeFestTaggedBrandsRule = createTypedRule({
     name: "prefer-type-fest-tagged-brands",
 });
 
-export default preferTypeFestTaggedBrandsRule;
+export { preferTypeFestTaggedBrandsRule };

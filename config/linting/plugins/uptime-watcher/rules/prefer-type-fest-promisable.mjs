@@ -150,4 +150,4 @@ const preferTypeFestPromisableRule = createTypedRule({
     name: "prefer-type-fest-promisable",
 });
 
-export default preferTypeFestPromisableRule;
+export { preferTypeFestPromisableRule };

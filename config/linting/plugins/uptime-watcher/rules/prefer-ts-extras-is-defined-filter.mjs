@@ -136,4 +136,4 @@ const preferTsExtrasIsDefinedFilterRule = createTypedRule({
     name: "prefer-ts-extras-is-defined-filter",
 });
 
-export default preferTsExtrasIsDefinedFilterRule;
+export { preferTsExtrasIsDefinedFilterRule };

@@ -40,6 +40,13 @@ Rule IDs are always kebab-case:
 
 - `uptime-watcher/<rule-id>`
 
+### Rule module conventions
+
+- Rule modules under `rules/*.mjs` must export rule objects using **named
+  exports** (for example, `export { preferTypeFestValueOfRule };`).
+- `plugin.mjs` must import rule modules using matching **named imports**.
+- Avoid introducing new default exports for individual rule modules.
+
 ## Tests
 
 RuleTester suites live under:

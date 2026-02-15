@@ -1,6 +1,7 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { isPresent } from "ts-extras";
 
 import type { CloudObjectEntry } from "./CloudStorageProvider.types";
 
@@ -90,6 +91,6 @@ export async function listBackupsFromMetadataObjects(args: {
     );
 
     return entries
-        .filter((entry): entry is CloudBackupEntry => entry !== null)
+        .filter(isPresent)
         .toSorted((a, b) => b.metadata.createdAt - a.metadata.createdAt);
 }

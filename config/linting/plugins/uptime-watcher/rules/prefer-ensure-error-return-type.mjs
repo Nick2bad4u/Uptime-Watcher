@@ -159,4 +159,4 @@ const preferEnsureErrorReturnTypeRule = createTypedRule({
     name: "prefer-ensure-error-return-type",
 });
 
-export default preferEnsureErrorReturnTypeRule;
+export { preferEnsureErrorReturnTypeRule };

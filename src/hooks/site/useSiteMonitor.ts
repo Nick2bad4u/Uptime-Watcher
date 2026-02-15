@@ -14,6 +14,7 @@ import type { ChangeEvent } from "react";
 
 import { DEFAULT_MONITOR_STATUS } from "@shared/types";
 import { useCallback, useMemo } from "react";
+import { objectHasOwn } from "ts-extras";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
@@ -100,7 +101,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
 
     let isMonitoring = false;
     if (monitor) {
-        isMonitoring = Object.hasOwn(monitor, "monitoring")
+        isMonitoring = objectHasOwn(monitor, "monitoring")
             ? monitor.monitoring
             : true;
     }

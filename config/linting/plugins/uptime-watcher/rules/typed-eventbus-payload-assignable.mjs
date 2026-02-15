@@ -143,4 +143,4 @@ const typedEventbusPayloadAssignableRule = createTypedRule({
     name: "typed-eventbus-payload-assignable",
 });
 
-export default typedEventbusPayloadAssignableRule;
+export { typedEventbusPayloadAssignableRule };

@@ -8,30 +8,31 @@ import {
 const ruleTester = createTypedRuleTester();
 
 ruleTester.run(
-    "prefer-ts-extras-object-has-own",
-    getPluginRule("prefer-ts-extras-object-has-own"),
+    "prefer-ts-extras-is-present-filter",
+    getPluginRule("prefer-ts-extras-is-present-filter"),
     {
         invalid: [
             {
                 code: readTypedFixture(
-                    "prefer-ts-extras-object-has-own.invalid.ts"
+                    "prefer-ts-extras-is-present-filter.invalid.ts"
                 ),
                 errors: [
-                    { messageId: "preferTsExtrasObjectHasOwn" },
-                    { messageId: "preferTsExtrasObjectHasOwn" },
+                    { messageId: "preferTsExtrasIsPresentFilter" },
+                    { messageId: "preferTsExtrasIsPresentFilter" },
+                    { messageId: "preferTsExtrasIsPresentFilter" },
                 ],
                 filename: typedFixturePath(
-                    "prefer-ts-extras-object-has-own.invalid.ts"
+                    "prefer-ts-extras-is-present-filter.invalid.ts"
                 ),
             },
         ],
         valid: [
             {
                 code: readTypedFixture(
-                    "prefer-ts-extras-object-has-own.valid.ts"
+                    "prefer-ts-extras-is-present-filter.valid.ts"
                 ),
                 filename: typedFixturePath(
-                    "prefer-ts-extras-object-has-own.valid.ts"
+                    "prefer-ts-extras-is-present-filter.valid.ts"
                 ),
             },
         ],

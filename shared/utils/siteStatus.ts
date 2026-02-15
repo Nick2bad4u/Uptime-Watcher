@@ -12,6 +12,7 @@
 import type { SiteForStatus, SiteStatus } from "@shared/types";
 
 import { isMonitorStatus, STATUS_KIND } from "@shared/types";
+import { isPresent } from "ts-extras";
 
 /**
  * Normalizes a site monitors collection by removing nullish entries and
@@ -32,10 +33,7 @@ const normalizeMonitors = (
         null | SiteForStatus["monitors"][number] | undefined
     >;
 
-    return nullableMonitors.filter(
-        (monitor): monitor is SiteForStatus["monitors"][number] =>
-            monitor !== null && monitor !== undefined
-    );
+    return nullableMonitors.filter(isPresent);
 };
 
 /**

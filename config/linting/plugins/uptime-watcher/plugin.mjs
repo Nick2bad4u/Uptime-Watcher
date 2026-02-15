@@ -31,13 +31,13 @@ import { electronPreferReadProcessEnvRule as electronPreferReadProcessEnvironmen
 import { electronPreloadNoDirectIpcRendererUsageRule } from "./rules/electron-preload-no-direct-ipc-renderer-usage.mjs";
 import { electronPreloadNoInlineIpcChannelConstantRule } from "./rules/electron-preload-no-inline-ipc-channel-constant.mjs";
 import { electronSyncNoLocalAsciiDigitsRule } from "./rules/electron-sync-no-local-ascii-digits.mjs";
-import ipcHandlerSignatureMatchesValidatorRule from "./rules/ipc-handler-signature-matches-validator.mjs";
-import loggerContextJsonSerializableRule from "./rules/logger-context-json-serializable.mjs";
+import { ipcHandlerSignatureMatchesValidatorRule } from "./rules/ipc-handler-signature-matches-validator.mjs";
+import { loggerContextJsonSerializableRule } from "./rules/logger-context-json-serializable.mjs";
 import { loggerNoErrorInContextRule } from "./rules/logger-no-error-in-context.mjs";
 import { monitorFallbackConsistencyRule } from "./rules/monitor-fallback-consistency.mjs";
 import { noCallIdentifiersRule } from "./rules/no-call-identifiers.mjs";
 import { noDeprecatedExportsRule } from "./rules/no-deprecated-exports.mjs";
-import noDoubleAssertionOutsideTestsRule from "./rules/no-double-assertion-outside-tests.mjs";
+import { noDoubleAssertionOutsideTestsRule } from "./rules/no-double-assertion-outside-tests.mjs";
 import { noInlineIpcChannelTypeLiteralsRule } from "./rules/no-inline-ipc-channel-type-literals.mjs";
 import { noLocalErrorNormalizersRule } from "./rules/no-local-error-normalizers.mjs";
 import { noLocalIdentifiersRule } from "./rules/no-local-identifiers.mjs";
@@ -46,16 +46,17 @@ import { noOneDriveRule } from "./rules/no-onedrive.mjs";
 import { noRedeclareSharedContractInterfacesRule } from "./rules/no-redeclare-shared-contract-interfaces.mjs";
 import { noRegexpVFlagRule } from "./rules/no-regexp-v-flag.mjs";
 import { preferAppAliasRule } from "./rules/prefer-app-alias.mjs";
-import preferEnsureErrorReturnTypeRule from "./rules/prefer-ensure-error-return-type.mjs";
+import { preferEnsureErrorReturnTypeRule } from "./rules/prefer-ensure-error-return-type.mjs";
 import { preferSharedAliasRule } from "./rules/prefer-shared-alias.mjs";
 import { preferTryGetErrorCodeRule } from "./rules/prefer-try-get-error-code.mjs";
-import preferTsExtrasIsDefinedFilterRule from "./rules/prefer-ts-extras-is-defined-filter.mjs";
-import preferTsExtrasObjectHasOwnRule from "./rules/prefer-ts-extras-object-has-own.mjs";
-import preferTypeFestJsonValueRule from "./rules/prefer-type-fest-json-value.mjs";
-import preferTypeFestPromisableRule from "./rules/prefer-type-fest-promisable.mjs";
-import preferTypeFestTaggedBrandsRule from "./rules/prefer-type-fest-tagged-brands.mjs";
-import preferTypeFestUnknownRecordRule from "./rules/prefer-type-fest-unknown-record.mjs";
-import preferTypeFestValueOfRule from "./rules/prefer-type-fest-value-of.mjs";
+import { preferTsExtrasIsDefinedFilterRule } from "./rules/prefer-ts-extras-is-defined-filter.mjs";
+import { preferTsExtrasIsPresentFilterRule } from "./rules/prefer-ts-extras-is-present-filter.mjs";
+import { preferTsExtrasObjectHasOwnRule } from "./rules/prefer-ts-extras-object-has-own.mjs";
+import { preferTypeFestJsonValueRule } from "./rules/prefer-type-fest-json-value.mjs";
+import { preferTypeFestPromisableRule } from "./rules/prefer-type-fest-promisable.mjs";
+import { preferTypeFestTaggedBrandsRule } from "./rules/prefer-type-fest-tagged-brands.mjs";
+import { preferTypeFestUnknownRecordRule } from "./rules/prefer-type-fest-unknown-record.mjs";
+import { preferTypeFestValueOfRule } from "./rules/prefer-type-fest-value-of.mjs";
 import { preloadNoLocalIsPlainObjectRule } from "./rules/preload-no-local-is-plain-object.mjs";
 import { rendererNoBrowserDialogsRule } from "./rules/renderer-no-browser-dialogs.mjs";
 import { rendererNoDirectBridgeReadinessRule } from "./rules/renderer-no-direct-bridge-readiness.mjs";
@@ -75,7 +76,7 @@ import { sharedTypesNoLocalIsPlainObjectRule } from "./rules/shared-types-no-loc
 import { storeActionsRequireFinallyResetRule } from "./rules/store-actions-require-finally-reset.mjs";
 import { testNoMockReturnValueConstructorsRule } from "./rules/test-no-mock-return-value-constructors.mjs";
 import { tsdocNoConsoleExampleRule } from "./rules/tsdoc-no-console-example.mjs";
-import typedEventbusPayloadAssignableRule from "./rules/typed-eventbus-payload-assignable.mjs";
+import { typedEventbusPayloadAssignableRule } from "./rules/typed-eventbus-payload-assignable.mjs";
 
 const DEFAULT_RULE_DOCS_URL_BASE =
     "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules";
@@ -168,6 +169,7 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "prefer-type-fest-unknown-record": preferTypeFestUnknownRecordRule,
         "prefer-type-fest-value-of": preferTypeFestValueOfRule,
         "prefer-ts-extras-is-defined-filter": preferTsExtrasIsDefinedFilterRule,
+        "prefer-ts-extras-is-present-filter": preferTsExtrasIsPresentFilterRule,
         "prefer-ts-extras-object-has-own": preferTsExtrasObjectHasOwnRule,
         "prefer-try-get-error-code": preferTryGetErrorCodeRule,
         "preload-no-local-is-plain-object": preloadNoLocalIsPlainObjectRule,
@@ -460,10 +462,21 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
     }),
     withUptimeWatcherPlugin({
         files: [
+            "electron/services/ipc/validators/utils/recordValidation.ts",
+            "electron/services/monitoring/shared/httpMonitorCore.ts",
+            "electron/services/monitoring/shared/monitorConfigValueResolvers.ts",
             "electron/services/sync/SyncEngine.ts",
+            "electron/services/window/WindowService.ts",
+            "shared/utils/jsonSafety.ts",
+            "shared/utils/objectSafety.ts",
             "shared/utils/typeGuards.ts",
             "shared/validation/monitorSchemas.ts",
             "src/components/Alerts/AppToastToast.tsx",
+            "src/components/Alerts/StatusAlertToast.tsx",
+            "src/hooks/site/useSiteMonitor.ts",
+            "src/stores/settings/hydration.ts",
+            "src/theme/ThemeManager.ts",
+            "src/theme/utils/themeMerging.ts",
             "src/utils/chartUtils.ts",
         ],
         name: "uptime-watcher:ts-extras-guard-adoption",
@@ -471,6 +484,15 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "prefer-ts-extras-is-defined-filter",
             "prefer-ts-extras-object-has-own",
         ]),
+    }),
+    withUptimeWatcherPlugin({
+        files: [
+            "electron/services/cloud/providers/FilesystemCloudStorageProvider.ts",
+            "electron/services/cloud/providers/cloudBackupListing.ts",
+            "shared/utils/siteStatus.ts",
+        ],
+        name: "uptime-watcher:ts-extras-nullish-filter-adoption",
+        rules: errorRulesFor(["prefer-ts-extras-is-present-filter"]),
     }),
 ]);
 

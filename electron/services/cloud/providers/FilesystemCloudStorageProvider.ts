@@ -12,6 +12,7 @@ import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import * as crypto from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import { isPresent } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -248,9 +249,7 @@ export class FilesystemCloudStorageProvider
                     })
                 );
 
-                const subdirs = subdirCandidates.filter(
-                    (value): value is string => value !== null
-                );
+                const subdirs = subdirCandidates.filter(isPresent);
 
                 const filePaths = entries
                     .filter((entry) => entry.isFile())

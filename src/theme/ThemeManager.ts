@@ -14,6 +14,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import deepEqual from "fast-deep-equal";
+import { objectHasOwn } from "ts-extras";
 
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
@@ -58,7 +59,7 @@ export class ThemeManager {
      * Type guard for concrete theme registry keys.
      */
     private isThemeRegistryKey(value: string): value is keyof typeof themes {
-        return Object.hasOwn(themes, value);
+        return objectHasOwn(themes, value);
     }
 
     /**

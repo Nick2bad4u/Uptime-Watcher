@@ -191,4 +191,4 @@ const loggerContextJsonSerializableRule = createTypedRule({
     name: "logger-context-json-serializable",
 });
 
-export default loggerContextJsonSerializableRule;
+export { loggerContextJsonSerializableRule };

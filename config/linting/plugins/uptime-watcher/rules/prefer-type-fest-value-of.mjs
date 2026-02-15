@@ -90,4 +90,4 @@ const preferTypeFestValueOfRule = createTypedRule({
     name: "prefer-type-fest-value-of",
 });
 
-export default preferTypeFestValueOfRule;
+export { preferTypeFestValueOfRule };
