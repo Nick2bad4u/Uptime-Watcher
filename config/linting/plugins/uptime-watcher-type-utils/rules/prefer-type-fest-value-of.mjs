@@ -79,7 +79,7 @@ const preferTypeFestValueOfRule = createTypedRule({
             description:
                 "require TypeFest ValueOf over direct T[keyof T] indexed-access unions for object value extraction.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-type-fest-value-of.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-type-fest-value-of.md",
         },
         schema: [],
         messages: {

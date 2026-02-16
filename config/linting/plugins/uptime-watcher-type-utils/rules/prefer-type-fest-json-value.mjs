@@ -82,7 +82,7 @@ const preferTypeFestJsonValueRule = createTypedRule({
             description:
                 "require TypeFest JsonValue/JsonObject for payload and context-like contract types in serialization boundaries.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-type-fest-json-value.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-type-fest-json-value.md",
         },
         schema: [],
         messages: {

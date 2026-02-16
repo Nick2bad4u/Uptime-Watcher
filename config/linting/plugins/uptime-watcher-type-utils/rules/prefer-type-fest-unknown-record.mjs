@@ -78,7 +78,7 @@ const preferTypeFestUnknownRecordRule = createTypedRule({
             description:
                 "require TypeFest UnknownRecord over Record<string, unknown> in architecture-critical layers.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-type-fest-unknown-record.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-type-fest-unknown-record.md",
         },
         schema: [],
         messages: {

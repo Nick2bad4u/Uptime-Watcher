@@ -101,7 +101,7 @@ const preferTypeFestTaggedBrandsRule = createTypedRule({
             description:
                 "require TypeFest Tagged over ad-hoc intersection branding with __brand/__tag fields.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-type-fest-tagged-brands.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-type-fest-tagged-brands.md",
         },
         schema: [],
         messages: {

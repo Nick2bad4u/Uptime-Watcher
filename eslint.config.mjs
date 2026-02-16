@@ -213,6 +213,7 @@ import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
 import * as yamlEslintParser from "yaml-eslint-parser";
 
+import uptimeWatcherTypeUtilsPlugin from "./config/linting/plugins/uptime-watcher-type-utils.mjs";
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 
 // import github from 'eslint-plugin-github' -- unused for now
@@ -297,6 +298,18 @@ const ROOT_DIR = import.meta.dirname;
  */
 const uptimeWatcherRepoConfigs =
     /** @type {any} */ (uptimeWatcherPlugin).configs?.["repo"] ?? [];
+
+/**
+ * Repo-scoped uptime-watcher type-utils flat configs.
+ *
+ * @remarks
+ * This transitional plugin owns `type-fest` and `ts-extras` convention rules
+ * to make future extraction/migration independent from core plugin guardrails.
+ *
+ * @type {import("eslint").Linter.Config[]}
+ */
+const uptimeWatcherTypeUtilsRepoConfigs =
+    /** @type {any} */ (uptimeWatcherTypeUtilsPlugin).configs?.["repo"] ?? [];
 
 /**
  * Controls eslint-plugin-file-progress behavior.
@@ -459,6 +472,7 @@ export default defineConfig([
     // This keeps rule coverage aligned with the plugin implementation and
     // avoids accidental drift (or missing plugin registration).
     ...uptimeWatcherRepoConfigs,
+    ...uptimeWatcherTypeUtilsRepoConfigs,
     // #endregion
     // #region 🧩 Custom Flat Configs
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -978,7 +992,10 @@ export default defineConfig([
         },
     },
     {
-        files: ["config/linting/plugins/uptime-watcher/**/*.{mjs,ts,tsx}"],
+        files: [
+            "config/linting/plugins/uptime-watcher/**/*.{mjs,ts,tsx}",
+            "config/linting/plugins/uptime-watcher-type-utils/**/*.{mjs,ts,tsx}",
+        ],
         name: "ESLint Plugin (uptime-watcher) - internal rule authoring overrides",
         rules: {
             "@typescript-eslint/no-unsafe-assignment": "off",
@@ -990,6 +1007,7 @@ export default defineConfig([
             "consistent-return": "off",
             "etc/no-deprecated": "off",
             "func-style": "off",
+            "import-x/no-extraneous-dependencies": "off",
             "init-declarations": "off",
             "jsdoc/require-description": "off",
             "jsdoc/require-param-description": "off",
@@ -997,6 +1015,7 @@ export default defineConfig([
             "max-lines": "off",
             "max-lines-per-function": "off",
             "max-statements": "off",
+            "n/no-extraneous-import": "off",
             "n/no-sync": "off",
             "n/no-unpublished-import": "off",
             "no-continue": "off",
@@ -1064,7 +1083,10 @@ export default defineConfig([
         },
     },
     {
-        files: ["config/linting/plugins/uptime-watcher.mjs"],
+        files: [
+            "config/linting/plugins/uptime-watcher.mjs",
+            "config/linting/plugins/uptime-watcher-type-utils.mjs",
+        ],
         name: "ESLint Plugin Wrapper - allowed re-export",
         rules: {
             "no-barrel-files/no-barrel-files": "off",
@@ -10924,8 +10946,10 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: @Stylistic Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
-    // NOTE: uptime-watcher drift-guard rules are enabled (and scoped) by the
-    // internal plugin's `configs.repo` preset (`...uptimeWatcherRepoConfigs`).
+    // NOTE: uptime-watcher drift-guard and utility-type convention rules are
+    // enabled (and scoped) by the internal repo presets:
+    // `...uptimeWatcherRepoConfigs` and
+    // `...uptimeWatcherTypeUtilsRepoConfigs`.
     // Keep them centralized there to avoid config drift.
     {
         files: ["**/**"],

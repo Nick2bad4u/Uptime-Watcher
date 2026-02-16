@@ -1,0 +1,14 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "name": "eslint-plugin-uptime-watcher-type-utils",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Transitional ts-extras/type-fest ESLint plugin for Uptime Watcher",
+    "type": "module",
+    "exports": {
+        ".": "./plugin.mjs"
+    },
+    "engines": {
+        "node": ">=20.19.0"
+    }
+}

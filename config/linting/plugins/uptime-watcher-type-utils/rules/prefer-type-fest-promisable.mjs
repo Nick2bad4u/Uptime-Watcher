@@ -139,7 +139,7 @@ const preferTypeFestPromisableRule = createTypedRule({
             description:
                 "require TypeFest Promisable for sync-or-async callback contracts currently expressed as Promise<T> | T unions.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-type-fest-promisable.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-type-fest-promisable.md",
         },
         schema: [],
         messages: {

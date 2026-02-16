@@ -197,7 +197,7 @@ const preferTsExtrasIsPresentFilterRule = createTypedRule({
             description:
                 "require ts-extras isPresent in Array.filter callbacks instead of inline nullish checks.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-ts-extras-is-present-filter.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-ts-extras-is-present-filter.md",
         },
         schema: [],
         messages: {

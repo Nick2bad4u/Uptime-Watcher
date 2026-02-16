@@ -49,14 +49,6 @@ import { preferAppAliasRule } from "./rules/prefer-app-alias.mjs";
 import { preferEnsureErrorReturnTypeRule } from "./rules/prefer-ensure-error-return-type.mjs";
 import { preferSharedAliasRule } from "./rules/prefer-shared-alias.mjs";
 import { preferTryGetErrorCodeRule } from "./rules/prefer-try-get-error-code.mjs";
-import { preferTsExtrasIsDefinedFilterRule } from "./rules/prefer-ts-extras-is-defined-filter.mjs";
-import { preferTsExtrasIsPresentFilterRule } from "./rules/prefer-ts-extras-is-present-filter.mjs";
-import { preferTsExtrasObjectHasOwnRule } from "./rules/prefer-ts-extras-object-has-own.mjs";
-import { preferTypeFestJsonValueRule } from "./rules/prefer-type-fest-json-value.mjs";
-import { preferTypeFestPromisableRule } from "./rules/prefer-type-fest-promisable.mjs";
-import { preferTypeFestTaggedBrandsRule } from "./rules/prefer-type-fest-tagged-brands.mjs";
-import { preferTypeFestUnknownRecordRule } from "./rules/prefer-type-fest-unknown-record.mjs";
-import { preferTypeFestValueOfRule } from "./rules/prefer-type-fest-value-of.mjs";
 import { preloadNoLocalIsPlainObjectRule } from "./rules/preload-no-local-is-plain-object.mjs";
 import { rendererNoBrowserDialogsRule } from "./rules/renderer-no-browser-dialogs.mjs";
 import { rendererNoDirectBridgeReadinessRule } from "./rules/renderer-no-direct-bridge-readiness.mjs";
@@ -163,14 +155,6 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "prefer-app-alias": preferAppAliasRule,
         "prefer-ensure-error-return-type": preferEnsureErrorReturnTypeRule,
         "prefer-shared-alias": preferSharedAliasRule,
-        "prefer-type-fest-json-value": preferTypeFestJsonValueRule,
-        "prefer-type-fest-promisable": preferTypeFestPromisableRule,
-        "prefer-type-fest-tagged-brands": preferTypeFestTaggedBrandsRule,
-        "prefer-type-fest-unknown-record": preferTypeFestUnknownRecordRule,
-        "prefer-type-fest-value-of": preferTypeFestValueOfRule,
-        "prefer-ts-extras-is-defined-filter": preferTsExtrasIsDefinedFilterRule,
-        "prefer-ts-extras-is-present-filter": preferTsExtrasIsPresentFilterRule,
-        "prefer-ts-extras-object-has-own": preferTsExtrasObjectHasOwnRule,
         "prefer-try-get-error-code": preferTryGetErrorCodeRule,
         "preload-no-local-is-plain-object": preloadNoLocalIsPlainObjectRule,
         "renderer-no-browser-dialogs": rendererNoBrowserDialogsRule,
@@ -275,8 +259,6 @@ const recommendedRuleNames = /** @type {const} */ ([
     "no-regexp-v-flag",
     "require-ensure-error-in-catch",
     "require-error-cause-in-catch",
-    "prefer-type-fest-promisable",
-    "prefer-type-fest-value-of",
 ]);
 
 /**
@@ -436,63 +418,6 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
             "require-error-cause-in-catch",
             "require-ensure-error-in-catch",
         ]),
-    }),
-    withUptimeWatcherPlugin({
-        files: [
-            "electron/**/*.{ts,tsx}",
-            "shared/**/*.{ts,tsx}",
-            "src/**/*.{ts,tsx}",
-            "storybook/**/*.{ts,tsx}",
-            "scripts/**/*.{ts,tsx,js,jsx,mts,mjs,cjs,cts}",
-        ],
-        ignores: [
-            "electron/test/**/*",
-            "src/test/**/*",
-            "shared/test/**/*",
-            "**/*.d.ts",
-        ],
-        name: "uptime-watcher:type-fest-conventions",
-        rules: errorRulesFor([
-            "prefer-type-fest-json-value",
-            "prefer-type-fest-promisable",
-            "prefer-type-fest-tagged-brands",
-            "prefer-type-fest-unknown-record",
-            "prefer-type-fest-value-of",
-        ]),
-    }),
-    withUptimeWatcherPlugin({
-        files: [
-            "electron/services/ipc/validators/utils/recordValidation.ts",
-            "electron/services/monitoring/shared/httpMonitorCore.ts",
-            "electron/services/monitoring/shared/monitorConfigValueResolvers.ts",
-            "electron/services/sync/SyncEngine.ts",
-            "electron/services/window/WindowService.ts",
-            "shared/utils/jsonSafety.ts",
-            "shared/utils/objectSafety.ts",
-            "shared/utils/typeGuards.ts",
-            "shared/validation/monitorSchemas.ts",
-            "src/components/Alerts/AppToastToast.tsx",
-            "src/components/Alerts/StatusAlertToast.tsx",
-            "src/hooks/site/useSiteMonitor.ts",
-            "src/stores/settings/hydration.ts",
-            "src/theme/ThemeManager.ts",
-            "src/theme/utils/themeMerging.ts",
-            "src/utils/chartUtils.ts",
-        ],
-        name: "uptime-watcher:ts-extras-guard-adoption",
-        rules: errorRulesFor([
-            "prefer-ts-extras-is-defined-filter",
-            "prefer-ts-extras-object-has-own",
-        ]),
-    }),
-    withUptimeWatcherPlugin({
-        files: [
-            "electron/services/cloud/providers/FilesystemCloudStorageProvider.ts",
-            "electron/services/cloud/providers/cloudBackupListing.ts",
-            "shared/utils/siteStatus.ts",
-        ],
-        name: "uptime-watcher:ts-extras-nullish-filter-adoption",
-        rules: errorRulesFor(["prefer-ts-extras-is-present-filter"]),
     }),
 ]);
 

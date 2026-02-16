@@ -74,7 +74,7 @@
         "check:all:test": "npm run check:shared:test && npm run check:electron:test && npm run check:frontend:test && npm run check:benchmarks:test && npm run check:configs:test && npm run check:playwright && npm run check:docusaurus && echo \"TypeScript type checking done!\"",
         "check:benchmarks": "tsc --build config/benchmarks/tsconfig.bench.json",
         "check:benchmarks:test": "npm run check:benchmarks",
-        "check:configs": "npm run verify:storybook-tsconfig && tsc --build config/testing/tsconfig.configs.json && tsc --project config/linting/plugins/uptime-watcher/tsconfig.eslint.json --noEmit",
+        "check:configs": "npm run verify:storybook-tsconfig && tsc --build config/testing/tsconfig.configs.json && tsc --project config/linting/plugins/uptime-watcher/tsconfig.eslint.json --noEmit && tsc --project config/linting/plugins/uptime-watcher-type-utils/tsconfig.eslint.json --noEmit",
         "check:configs:test": "npm run check:configs",
         "check:docusaurus": "npm run --prefix ./docs/docusaurus typecheck",
         "check:electron": "tsc --build tsconfig.electron.json",

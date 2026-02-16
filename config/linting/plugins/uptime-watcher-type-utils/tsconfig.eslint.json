@@ -1,0 +1,48 @@
+{
+    "$schema": "https://www.schemastore.org/tsconfig.json",
+    "compilerOptions": {
+        "allowJs": true,
+        "baseUrl": "../../../..",
+        "checkJs": true,
+        "composite": true,
+        "declaration": true,
+        "declarationDir": "../../../../.cache/builds/test/linting/uptime-watcher-type-utils-eslint/types",
+        "incremental": true,
+        "isolatedDeclarations": false,
+        "noEmit": true,
+        "outDir": "../../../../.cache/builds/test/linting/uptime-watcher-type-utils-eslint",
+        "paths": {
+            "@app/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "rootDir": "../../../..",
+        "tsBuildInfoFile": "../../../../.cache/tsbuildinfo/tsconfig.uptime-watcher-type-utils-eslint.tsbuildinfo"
+    },
+    "exclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/.cache/**"
+    ],
+    "extends": "../../../../tsconfig.json",
+    "include": [
+        "../uptime-watcher-type-utils.mjs",
+        "./**/*.ts",
+        "./**/*.tsx",
+        "./**/*.mts",
+        "./**/*.cts",
+        "./**/*.js",
+        "./**/*.jsx",
+        "./**/*.mjs",
+        "./**/*.cjs"
+    ]
+}

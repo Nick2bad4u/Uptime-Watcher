@@ -213,7 +213,7 @@ const preferTsExtrasObjectHasOwnRule = createTypedRule({
             description:
                 "require ts-extras objectHasOwn over Object.hasOwn for own-property checks that should also narrow object types.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-ts-extras-object-has-own.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-ts-extras-object-has-own.md",
         },
         schema: [],
         messages: {

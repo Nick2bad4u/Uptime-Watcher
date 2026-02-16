@@ -125,7 +125,7 @@ const preferTsExtrasIsDefinedFilterRule = createTypedRule({
             description:
                 "require ts-extras isDefined in Array.filter callbacks instead of inline undefined checks.",
             recommended: false,
-            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-ts-extras-is-defined-filter.md",
+            url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher-type-utils/docs/rules/prefer-ts-extras-is-defined-filter.md",
         },
         schema: [],
         messages: {
