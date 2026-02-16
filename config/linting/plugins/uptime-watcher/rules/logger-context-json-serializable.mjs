@@ -1,6 +1,9 @@
 import ts from "typescript";
 
-import { createTypedRule, getTypedRuleServices } from "../_internal/typed-rule.mjs";
+import {
+    createTypedRule,
+    getTypedRuleServices,
+} from "../_internal/typed-rule.mjs";
 
 const LOGGER_METHODS = new Set([
     "action",
@@ -26,6 +29,7 @@ const NON_SERIALIZABLE_NAME_PATTERN =
  * @param {import("typescript").TypeChecker} checker
  * @param {import("typescript").Type} type
  * @param {Set<import("typescript").Type>} seen
+ *
  * @returns {boolean}
  */
 const isJsonSerializableType = (checker, type, seen = new Set()) => {
@@ -60,7 +64,9 @@ const isJsonSerializableType = (checker, type, seen = new Set()) => {
     }
 
     if (checker.isTupleType(type)) {
-        const tupleType = /** @type {import("typescript").TypeReference} */ (type);
+        const tupleType = /** @type {import("typescript").TypeReference} */ (
+            type
+        );
         return checker
             .getTypeArguments(tupleType)
             .every(
@@ -70,7 +76,9 @@ const isJsonSerializableType = (checker, type, seen = new Set()) => {
     }
 
     if (checker.isArrayType(type)) {
-        const arrayType = /** @type {import("typescript").TypeReference} */ (type);
+        const arrayType = /** @type {import("typescript").TypeReference} */ (
+            type
+        );
         const [elementType] = checker.getTypeArguments(arrayType);
         if (!elementType) {
             return true;
@@ -97,19 +105,19 @@ const isJsonSerializableType = (checker, type, seen = new Set()) => {
 
     return type.getProperties().every(
         /** @returns {boolean} */ (propertySymbol) => {
-        const valueDeclaration = propertySymbol.valueDeclaration;
-        if (!valueDeclaration) {
-            return true;
-        }
+            const valueDeclaration = propertySymbol.valueDeclaration;
+            if (!valueDeclaration) {
+                return true;
+            }
 
-        let propertyType = checker.getTypeOfSymbolAtLocation(
-            propertySymbol,
-            valueDeclaration
-        );
+            let propertyType = checker.getTypeOfSymbolAtLocation(
+                propertySymbol,
+                valueDeclaration
+            );
 
-        propertyType = checker.getNonNullableType(propertyType);
+            propertyType = checker.getNonNullableType(propertyType);
 
-        return isJsonSerializableType(checker, propertyType, seen);
+            return isJsonSerializableType(checker, propertyType, seen);
         }
     );
 };
@@ -135,7 +143,10 @@ const getLoggerMethod = (callee) => {
 
 const loggerContextJsonSerializableRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const { checker, parserServices } = getTypedRuleServices(context);

@@ -1,24 +1,8 @@
-import { normalizePath } from "../_internal/path-utils.mjs";
+import { toRepoRelativePath } from "../_internal/path-utils.mjs";
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const TARGET_PATH_PATTERN =
     /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron|shared)(?:\/|$)/v;
-
-/**
- * @param {string} filePath
- * @returns {string}
- */
-const getRepoRelativePath = (filePath) => {
-    const normalizedPath = normalizePath(filePath);
-    const marker = "/uptime-watcher/";
-    const markerIndex = normalizedPath.toLowerCase().indexOf(marker);
-
-    if (markerIndex === -1) {
-        return normalizedPath;
-    }
-
-    return normalizedPath.slice(markerIndex + marker.length);
-};
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.Expression} node
@@ -82,7 +66,10 @@ const isUndefinedComparison = (node, parameterName) => {
  * @returns {readonly import("@typescript-eslint/utils").TSESTree.Expression[]}
  */
 const flattenLogicalAndTerms = (expression) => {
-    if (expression.type !== "LogicalExpression" || expression.operator !== "&&") {
+    if (
+        expression.type !== "LogicalExpression" ||
+        expression.operator !== "&&"
+    ) {
         return [expression];
     }
 
@@ -94,7 +81,7 @@ const flattenLogicalAndTerms = (expression) => {
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.ArrowFunctionExpression & {
- *   body: import("@typescript-eslint/utils").TSESTree.Expression;
+ *     body: import("@typescript-eslint/utils").TSESTree.Expression;
  * }} callback
  * @param {string} parameterName
  *
@@ -124,11 +111,14 @@ const isNullishFilterGuardBody = (callback, parameterName) => {
 
 const preferTsExtrasIsPresentFilterRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const filePath = context.filename ?? "";
-        const repoRelativePath = getRepoRelativePath(filePath);
+        const repoRelativePath = toRepoRelativePath(filePath);
 
         if (
             !TARGET_PATH_PATTERN.test(repoRelativePath) ||
@@ -165,9 +155,11 @@ const preferTsExtrasIsPresentFilterRule = createTypedRule({
                     return;
                 }
 
-                const expressionCallback = /** @type {import("@typescript-eslint/utils").TSESTree.ArrowFunctionExpression & {
-                 *   body: import("@typescript-eslint/utils").TSESTree.Expression;
-                 * }} */ (callback);
+                const expressionCallback = /**
+                 * @type {import("@typescript-eslint/utils").TSESTree.ArrowFunctionExpression & {
+                 *     body: import("@typescript-eslint/utils").TSESTree.Expression;
+                 * }}
+                 */ (callback);
 
                 const parameter = callback.params[0];
                 if (!parameter || parameter.type !== "Identifier") {

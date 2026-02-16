@@ -1,5 +1,9 @@
 import { getPluginRule } from "./_internal/ruleTester";
-import { createTypedRuleTester, readTypedFixture, typedFixturePath } from "./_internal/typed-rule-tester";
+import {
+    createTypedRuleTester,
+    readTypedFixture,
+    typedFixturePath,
+} from "./_internal/typed-rule-tester";
 
 const ruleTester = createTypedRuleTester();
 
@@ -9,7 +13,9 @@ ruleTester.run(
     {
         invalid: [
             {
-                code: readTypedFixture("prefer-ensure-error-return-type.invalid.ts"),
+                code: readTypedFixture(
+                    "prefer-ensure-error-return-type.invalid.ts"
+                ),
                 errors: [
                     { messageId: "catchVariableMustBeUnknown" },
                     { messageId: "ensureErrorShouldNotBeRecast" },
@@ -21,7 +27,9 @@ ruleTester.run(
         ],
         valid: [
             {
-                code: readTypedFixture("prefer-ensure-error-return-type.valid.ts"),
+                code: readTypedFixture(
+                    "prefer-ensure-error-return-type.valid.ts"
+                ),
                 filename: typedFixturePath(
                     "prefer-ensure-error-return-type.valid.ts"
                 ),

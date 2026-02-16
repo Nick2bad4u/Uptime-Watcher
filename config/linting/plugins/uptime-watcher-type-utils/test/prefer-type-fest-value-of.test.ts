@@ -19,13 +19,17 @@ ruleTester.run(
                     { messageId: "preferValueOf" },
                     { messageId: "preferValueOf" },
                 ],
-                filename: typedFixturePath("prefer-type-fest-value-of.invalid.ts"),
+                filename: typedFixturePath(
+                    "prefer-type-fest-value-of.invalid.ts"
+                ),
             },
         ],
         valid: [
             {
                 code: readTypedFixture("prefer-type-fest-value-of.valid.ts"),
-                filename: typedFixturePath("prefer-type-fest-value-of.valid.ts"),
+                filename: typedFixturePath(
+                    "prefer-type-fest-value-of.valid.ts"
+                ),
             },
         ],
     }

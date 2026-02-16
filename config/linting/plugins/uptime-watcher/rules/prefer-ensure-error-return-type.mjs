@@ -1,4 +1,7 @@
-import { createTypedRule, getTypedRuleServices } from "../_internal/typed-rule.mjs";
+import {
+    createTypedRule,
+    getTypedRuleServices,
+} from "../_internal/typed-rule.mjs";
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} node
@@ -9,8 +12,7 @@ const isEnsureErrorCall = (node) => {
     }
 
     return (
-        node.callee.type === "Identifier" &&
-        node.callee.name === "ensureError"
+        node.callee.type === "Identifier" && node.callee.name === "ensureError"
     );
 };
 
@@ -56,7 +58,10 @@ const isErrorTypeAnnotation = (annotation) => {
 
 const preferEnsureErrorReturnTypeRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const { checker, parserServices } = getTypedRuleServices(context);

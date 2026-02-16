@@ -1,5 +1,3 @@
-
-
 declare const rawValue: unknown;
 
 const parsed = rawValue as unknown as { readonly id: string };

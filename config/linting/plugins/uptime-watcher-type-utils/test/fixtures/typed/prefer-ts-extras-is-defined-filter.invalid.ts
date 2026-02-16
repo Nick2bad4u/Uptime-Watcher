@@ -12,9 +12,7 @@ const numbers = maybeNumbers.filter(
 const monitors = maybeMonitors.filter(
     (monitor): monitor is MonitorRecord => monitor !== undefined
 );
-const strings = maybeStrings.filter(
-    (entry) => entry !== undefined
-);
+const strings = maybeStrings.filter((entry) => entry !== undefined);
 
 const totalCount = numbers.length + monitors.length + strings.length;
 if (totalCount < 0) {

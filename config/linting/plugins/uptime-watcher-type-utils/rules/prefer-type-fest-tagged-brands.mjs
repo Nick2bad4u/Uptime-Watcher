@@ -1,9 +1,14 @@
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
-const BRAND_PROPERTY_NAMES = new Set(["__brand", "__tag", "brand"]);
+const BRAND_PROPERTY_NAMES = new Set([
+    "__brand",
+    "__tag",
+    "brand",
+]);
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.TypeNode} typeNode
+ *
  * @returns {boolean}
  */
 const typeContainsTaggedReference = (typeNode) => {
@@ -30,6 +35,7 @@ const typeContainsTaggedReference = (typeNode) => {
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.TypeNode} typeNode
+ *
  * @returns {boolean}
  */
 const hasAdHocBrandLiteral = (typeNode) => {
@@ -39,31 +45,34 @@ const hasAdHocBrandLiteral = (typeNode) => {
 
     return typeNode.types.some(
         /** @returns {boolean} */ (member) => {
-        if (member.type !== "TSTypeLiteral") {
-            return false;
-        }
-
-        return member.members.some(
-            /** @returns {boolean} */ (literalMember) => {
-            if (literalMember.type !== "TSPropertySignature") {
+            if (member.type !== "TSTypeLiteral") {
                 return false;
             }
 
-            const key = literalMember.key;
-            if (key.type !== "Identifier") {
-                return false;
-            }
+            return member.members.some(
+                /** @returns {boolean} */ (literalMember) => {
+                    if (literalMember.type !== "TSPropertySignature") {
+                        return false;
+                    }
 
-            return BRAND_PROPERTY_NAMES.has(key.name);
-            }
-        );
+                    const key = literalMember.key;
+                    if (key.type !== "Identifier") {
+                        return false;
+                    }
+
+                    return BRAND_PROPERTY_NAMES.has(key.name);
+                }
+            );
         }
     );
 };
 
 const preferTypeFestTaggedBrandsRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const filePath = context.filename ?? "";

@@ -13,7 +13,9 @@ ruleTester.run(
     {
         invalid: [
             {
-                code: readTypedFixture("prefer-type-fest-json-value.invalid.ts"),
+                code: readTypedFixture(
+                    "prefer-type-fest-json-value.invalid.ts"
+                ),
                 errors: [{ messageId: "preferJsonValue" }],
                 filename: typedFixturePath(
                     "prefer-type-fest-json-value.invalid.ts"

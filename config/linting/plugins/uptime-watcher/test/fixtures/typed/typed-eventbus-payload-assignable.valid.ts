@@ -1,5 +1,3 @@
-
-
 interface SiteEventMap {
     "monitor:status": { readonly status: "down" | "up" };
 }

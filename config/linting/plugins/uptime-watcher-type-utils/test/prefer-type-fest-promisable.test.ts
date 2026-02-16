@@ -13,7 +13,9 @@ ruleTester.run(
     {
         invalid: [
             {
-                code: readTypedFixture("prefer-type-fest-promisable.invalid.ts"),
+                code: readTypedFixture(
+                    "prefer-type-fest-promisable.invalid.ts"
+                ),
                 errors: [
                     { messageId: "preferPromisable" },
                     { messageId: "preferPromisable" },
@@ -27,7 +29,9 @@ ruleTester.run(
         valid: [
             {
                 code: readTypedFixture("prefer-type-fest-promisable.valid.ts"),
-                filename: typedFixturePath("prefer-type-fest-promisable.valid.ts"),
+                filename: typedFixturePath(
+                    "prefer-type-fest-promisable.valid.ts"
+                ),
             },
         ],
     }

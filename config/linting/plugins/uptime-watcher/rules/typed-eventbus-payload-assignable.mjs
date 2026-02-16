@@ -5,7 +5,11 @@ import {
     isTypeAssignableTo,
 } from "../_internal/typed-rule.mjs";
 
-const TARGET_METHODS = new Set(["emit", "on", "onTyped"]);
+const TARGET_METHODS = new Set([
+    "emit",
+    "on",
+    "onTyped",
+]);
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.Expression} callee
@@ -24,7 +28,10 @@ const getMethodName = (callee) => {
 
 const typedEventbusPayloadAssignableRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const { checker, parserServices } = getTypedRuleServices(context);
@@ -43,9 +50,10 @@ const typedEventbusPayloadAssignableRule = createTypedRule({
                     return;
                 }
 
-                const tsCall = /** @type {import("typescript").CallLikeExpression} */ (
-                    parserServices.esTreeNodeToTSNodeMap.get(node)
-                );
+                const tsCall =
+                    /** @type {import("typescript").CallLikeExpression} */ (
+                        parserServices.esTreeNodeToTSNodeMap.get(node)
+                    );
                 const callSignature = checker.getResolvedSignature(tsCall);
                 if (!callSignature) {
                     return;
@@ -70,7 +78,8 @@ const typedEventbusPayloadAssignableRule = createTypedRule({
 
                     const payloadTsNode =
                         parserServices.esTreeNodeToTSNodeMap.get(payloadNode);
-                    const payloadType = checker.getTypeAtLocation(payloadTsNode);
+                    const payloadType =
+                        checker.getTypeAtLocation(payloadTsNode);
 
                     if (
                         !isTypeAssignableTo(

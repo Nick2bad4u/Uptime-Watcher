@@ -40,7 +40,10 @@ const isFunctionExpressionNode = (node) =>
 
 const ipcHandlerSignatureMatchesValidatorRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const { checker, parserServices } = getTypedRuleServices(context);
@@ -73,9 +76,10 @@ const ipcHandlerSignatureMatchesValidatorRule = createTypedRule({
                     return;
                 }
 
-                const tsCall = /** @type {import("typescript").CallLikeExpression} */ (
-                    parserServices.esTreeNodeToTSNodeMap.get(node)
-                );
+                const tsCall =
+                    /** @type {import("typescript").CallLikeExpression} */ (
+                        parserServices.esTreeNodeToTSNodeMap.get(node)
+                    );
                 const callSignature = checker.getResolvedSignature(tsCall);
 
                 const expectedHandlerType = getSignatureParameterTypeAt({
@@ -85,43 +89,42 @@ const ipcHandlerSignatureMatchesValidatorRule = createTypedRule({
                     signature: callSignature,
                 });
 
-                const handlerTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-                    handlerNode
-                );
+                const handlerTsNode =
+                    parserServices.esTreeNodeToTSNodeMap.get(handlerNode);
                 const handlerType = checker.getTypeAtLocation(handlerTsNode);
 
                 const expectedHandlerSignature = expectedHandlerType
-                    ? checker.getSignaturesOfType(
-                          expectedHandlerType,
-                          ts.SignatureKind.Call
-                      ).at(0) ?? null
+                    ? (checker
+                          .getSignaturesOfType(
+                              expectedHandlerType,
+                              ts.SignatureKind.Call
+                          )
+                          .at(0) ?? null)
                     : null;
 
-                const handlerSignature = checker.getSignaturesOfType(
-                    handlerType,
-                    ts.SignatureKind.Call
-                ).at(0) ?? null;
+                const handlerSignature =
+                    checker
+                        .getSignaturesOfType(handlerType, ts.SignatureKind.Call)
+                        .at(0) ?? null;
 
-                const expectedHandlerParamType = getSignatureParameterTypeAt(
-                    {
+                const expectedHandlerParamType =
+                    getSignatureParameterTypeAt({
                         checker,
                         index: 0,
                         location: tsCall,
                         signature: expectedHandlerSignature,
-                    }
-                ) ?? null;
+                    }) ?? null;
 
                 const expectedHandlerReturnType =
                     expectedHandlerSignature?.getReturnType() ?? null;
 
-                const actualHandlerParamType = getSignatureParameterTypeAt(
-                    {
+                const actualHandlerParamType =
+                    getSignatureParameterTypeAt({
                         checker,
                         index: 0,
                         location: handlerTsNode,
                         signature: handlerSignature,
-                    }
-                ) ?? null;
+                    }) ?? null;
 
                 const actualHandlerReturnType =
                     handlerSignature?.getReturnType() ?? null;
@@ -162,29 +165,30 @@ const ipcHandlerSignatureMatchesValidatorRule = createTypedRule({
                     });
                 }
 
-                const validatorTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-                    validatorNode
-                );
-                const validatorType = checker.getTypeAtLocation(validatorTsNode);
+                const validatorTsNode =
+                    parserServices.esTreeNodeToTSNodeMap.get(validatorNode);
+                const validatorType =
+                    checker.getTypeAtLocation(validatorTsNode);
 
-                const validatorSignature = checker.getSignaturesOfType(
-                    validatorType,
-                    ts.SignatureKind.Call
-                ).at(0) ?? null;
+                const validatorSignature =
+                    checker
+                        .getSignaturesOfType(
+                            validatorType,
+                            ts.SignatureKind.Call
+                        )
+                        .at(0) ?? null;
 
                 const validatorReturnType =
                     validatorSignature?.getReturnType() ?? null;
-                const handlerParamType = getSignatureParameterTypeAt({
-                    checker,
-                    index: 0,
-                    location: handlerTsNode,
-                    signature: handlerSignature,
-                }) ?? null;
+                const handlerParamType =
+                    getSignatureParameterTypeAt({
+                        checker,
+                        index: 0,
+                        location: handlerTsNode,
+                        signature: handlerSignature,
+                    }) ?? null;
 
-                if (
-                    validatorReturnType === null ||
-                    handlerParamType === null
-                ) {
+                if (validatorReturnType === null || handlerParamType === null) {
                     return;
                 }
 

@@ -1,28 +1,15 @@
-import { normalizePath } from "../_internal/path-utils.mjs";
+import { toRepoRelativePath } from "../_internal/path-utils.mjs";
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const TARGET_PATH_PATTERN =
     /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron|shared|src)(?:\/|$)/v;
 
 /**
- * @param {string} filePath
- * @returns {string}
- */
-const getRepoRelativePath = (filePath) => {
-    const normalizedPath = normalizePath(filePath);
-    const marker = "/uptime-watcher/";
-    const markerIndex = normalizedPath.toLowerCase().indexOf(marker);
-
-    if (markerIndex === -1) {
-        return normalizedPath;
-    }
-
-    return normalizedPath.slice(markerIndex + marker.length);
-};
-
-/**
- * @param {import("@typescript-eslint/utils").TSESTree.Expression | import("@typescript-eslint/utils").TSESTree.PrivateIdentifier} body
+ * @param {
+ *     | import("@typescript-eslint/utils").TSESTree.Expression
+ *     | import("@typescript-eslint/utils").TSESTree.PrivateIdentifier} body
  * @param {string} parameterName
+ *
  * @returns {boolean}
  */
 const isUndefinedFilterGuardBody = (body, parameterName) => {
@@ -60,11 +47,14 @@ const isUndefinedFilterGuardBody = (body, parameterName) => {
 
 const preferTsExtrasIsDefinedFilterRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const filePath = context.filename ?? "";
-        const repoRelativePath = getRepoRelativePath(filePath);
+        const repoRelativePath = toRepoRelativePath(filePath);
 
         if (
             !TARGET_PATH_PATTERN.test(repoRelativePath) ||
@@ -107,7 +97,9 @@ const preferTsExtrasIsDefinedFilterRule = createTypedRule({
                     return;
                 }
 
-                if (!isUndefinedFilterGuardBody(callback.body, parameter.name)) {
+                if (
+                    !isUndefinedFilterGuardBody(callback.body, parameter.name)
+                ) {
                     return;
                 }
 

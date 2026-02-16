@@ -1,5 +1,3 @@
-
-
 interface SiteEventMap {
     "monitor:status": { readonly status: "down" | "up" };
 }
@@ -21,7 +19,10 @@ const bus = new TypedEventBus<SiteEventMap>();
 // @ts-expect-error -- intentional payload mismatch for typed lint rule coverage
 bus.emit("monitor:status", { status: "paused" });
 
-// @ts-expect-error -- intentional listener type mismatch for typed lint rule coverage
-bus.onTyped("monitor:status", (payload: { readonly status: number }) => payload.status);
+bus.onTyped(
+    "monitor:status",
+    // @ts-expect-error -- intentional listener type mismatch for typed lint rule coverage
+    (payload: { readonly status: number }) => payload.status
+);
 
 export const __typedFixtureModule = "typed-fixture-module";

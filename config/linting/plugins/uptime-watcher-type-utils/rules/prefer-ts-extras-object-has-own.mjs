@@ -1,6 +1,6 @@
 import ts from "typescript";
 
-import { normalizePath } from "../_internal/path-utils.mjs";
+import { toRepoRelativePath } from "../_internal/path-utils.mjs";
 import {
     createTypedRule,
     getTypedRuleServices,
@@ -9,22 +9,6 @@ import {
 
 const TARGET_PATH_PATTERN =
     /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron|shared|src)(?:\/|$)/v;
-
-/**
- * @param {string} filePath
- * @returns {string}
- */
-const getRepoRelativePath = (filePath) => {
-    const normalizedPath = normalizePath(filePath);
-    const marker = "/uptime-watcher/";
-    const markerIndex = normalizedPath.toLowerCase().indexOf(marker);
-
-    if (markerIndex === -1) {
-        return normalizedPath;
-    }
-
-    return normalizedPath.slice(markerIndex + marker.length);
-};
 
 /**
  * @param {import("typescript").Type} type
@@ -93,7 +77,7 @@ const isOptionalPropertySymbol = (symbol) => {
 const hasOpenIndexSignature = (checker, type) =>
     Boolean(
         checker.getIndexTypeOfType(type, ts.IndexKind.String) ??
-            checker.getIndexTypeOfType(type, ts.IndexKind.Number)
+        checker.getIndexTypeOfType(type, ts.IndexKind.Number)
     );
 
 /**
@@ -147,12 +131,15 @@ const isRedundantOwnPropertyGuard = (checker, objectType, keyType) => {
 
 const preferTsExtrasObjectHasOwnRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const { checker, parserServices } = getTypedRuleServices(context);
         const filePath = context.filename ?? "";
-        const repoRelativePath = getRepoRelativePath(filePath);
+        const repoRelativePath = toRepoRelativePath(filePath);
 
         if (
             !TARGET_PATH_PATTERN.test(repoRelativePath) ||
@@ -185,12 +172,10 @@ const preferTsExtrasObjectHasOwnRule = createTypedRule({
                     return;
                 }
 
-                const objectTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-                    objectArgument
-                );
-                const keyTsNode = parserServices.esTreeNodeToTSNodeMap.get(
-                    keyArgument
-                );
+                const objectTsNode =
+                    parserServices.esTreeNodeToTSNodeMap.get(objectArgument);
+                const keyTsNode =
+                    parserServices.esTreeNodeToTSNodeMap.get(keyArgument);
 
                 const objectType = checker.getTypeAtLocation(objectTsNode);
                 const keyType = checker.getTypeAtLocation(keyTsNode);

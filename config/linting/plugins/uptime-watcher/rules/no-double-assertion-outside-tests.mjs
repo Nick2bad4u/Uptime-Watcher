@@ -8,7 +8,10 @@ const isTypeAssertionNode = (node) =>
 
 const noDoubleAssertionOutsideTestsRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const filePath = context.filename ?? "";

@@ -1,7 +1,4 @@
-declare function objectHasOwn<
-    TObject,
-    TKey extends PropertyKey,
->(
+declare function objectHasOwn<TObject, TKey extends PropertyKey>(
     object: TObject,
     key: TKey
 ): object is Record<TKey, unknown> & TObject;
@@ -30,10 +27,7 @@ if (objectHasOwn(candidate, "status")) {
 
 if (objectHasOwn(variants, propertyName)) {
     const selectedVariant = variants[propertyName];
-    if (
-        typeof selectedVariant === "string" &&
-        selectedVariant.length === 0
-    ) {
+    if (typeof selectedVariant === "string" && selectedVariant.length === 0) {
         throw new Error("Variant values should not be empty");
     }
 }

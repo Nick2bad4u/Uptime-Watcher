@@ -1,5 +1,9 @@
 import { getPluginRule } from "./_internal/ruleTester";
-import { createTypedRuleTester, readTypedFixture, typedFixturePath } from "./_internal/typed-rule-tester";
+import {
+    createTypedRuleTester,
+    readTypedFixture,
+    typedFixturePath,
+} from "./_internal/typed-rule-tester";
 
 const ruleTester = createTypedRuleTester();
 

@@ -24,7 +24,9 @@ ruleTester.run(
         ],
         valid: [
             {
-                code: readTypedFixture("prefer-type-fest-unknown-record.valid.ts"),
+                code: readTypedFixture(
+                    "prefer-type-fest-unknown-record.valid.ts"
+                ),
                 filename: typedFixturePath(
                     "prefer-type-fest-unknown-record.valid.ts"
                 ),

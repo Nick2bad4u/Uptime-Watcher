@@ -15,7 +15,10 @@ export const createTypedRule = /** @type {any} */ (
 /**
  * Retrieves parser services and type checker for typed rules.
  *
- * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+ * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+ *     string,
+ *     readonly unknown[]
+ * >} context
  */
 export const getTypedRuleServices = (context) => {
     const parserServices = ESLintUtils.getParserServices(context, true);
@@ -42,15 +45,17 @@ export const isTypeAssignableTo = (checker, sourceType, targetType) => {
         return checker.isTypeAssignableTo(sourceType, targetType);
     }
 
-    return checker.typeToString(sourceType) === checker.typeToString(targetType);
+    return (
+        checker.typeToString(sourceType) === checker.typeToString(targetType)
+    );
 };
 
 /**
  * @param {{
- *   checker: import("typescript").TypeChecker;
- *   signature: import("typescript").Signature | null | undefined;
- *   index: number;
- *   location: import("typescript").Node;
+ *     checker: import("typescript").TypeChecker;
+ *     signature: import("typescript").Signature | null | undefined;
+ *     index: number;
+ *     location: import("typescript").Node;
  * }} args
  *
  * @returns {import("typescript").Type | undefined}

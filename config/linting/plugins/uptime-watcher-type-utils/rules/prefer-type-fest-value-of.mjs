@@ -1,37 +1,26 @@
+import { toRepoRelativePath } from "../_internal/path-utils.mjs";
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const VALUE_OF_PATH_PATTERN =
     /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron|scripts|shared|src|storybook)(?:\/|$)/v;
 
 /**
- * @param {string} filePath
- * @returns {string}
- */
-const getRepoRelativePath = (filePath) => {
-    const normalizedPath = filePath.replaceAll("\\", "/");
-    const repoMarker = "/Uptime-Watcher/";
-    const markerIndex = normalizedPath.lastIndexOf(repoMarker);
-
-    if (markerIndex === -1) {
-        return normalizedPath;
-    }
-
-    return normalizedPath.slice(markerIndex + repoMarker.length);
-};
-
-/**
  * @param {string} text
+ *
  * @returns {string}
  */
 const normalizeTypeText = (text) => text.replaceAll(/\s+/gv, "");
 
 const preferTypeFestValueOfRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const filePath = context.filename ?? "";
-        const normalizedPath = getRepoRelativePath(filePath);
+        const normalizedPath = toRepoRelativePath(filePath);
 
         if (
             !VALUE_OF_PATH_PATTERN.test(normalizedPath) ||

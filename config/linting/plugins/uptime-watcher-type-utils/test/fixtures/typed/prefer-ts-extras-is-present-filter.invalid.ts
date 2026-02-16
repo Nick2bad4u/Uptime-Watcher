@@ -12,9 +12,7 @@ const entries = nullableEntries.filter(
 const monitors = nullableMonitors.filter(
     (monitor): monitor is MonitorRecord => monitor !== null
 );
-const numbers = maybeNumbers.filter(
-    (value): value is number => value !== null
-);
+const numbers = maybeNumbers.filter((value): value is number => value !== null);
 
 if (entries.length + monitors.length + numbers.length < 0) {
     throw new TypeError("Unreachable total count");

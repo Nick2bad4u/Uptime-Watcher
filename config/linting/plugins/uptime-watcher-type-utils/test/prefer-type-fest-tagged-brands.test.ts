@@ -13,7 +13,9 @@ ruleTester.run(
     {
         invalid: [
             {
-                code: readTypedFixture("prefer-type-fest-tagged-brands.invalid.ts"),
+                code: readTypedFixture(
+                    "prefer-type-fest-tagged-brands.invalid.ts"
+                ),
                 errors: [{ messageId: "preferTaggedBrand" }],
                 filename: typedFixturePath(
                     "prefer-type-fest-tagged-brands.invalid.ts"
@@ -22,7 +24,9 @@ ruleTester.run(
         ],
         valid: [
             {
-                code: readTypedFixture("prefer-type-fest-tagged-brands.valid.ts"),
+                code: readTypedFixture(
+                    "prefer-type-fest-tagged-brands.valid.ts"
+                ),
                 filename: typedFixturePath(
                     "prefer-type-fest-tagged-brands.valid.ts"
                 ),

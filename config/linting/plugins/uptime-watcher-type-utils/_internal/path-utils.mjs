@@ -1,5 +1,6 @@
 /**
- * @file Shared internal path utilities for uptime-watcher-type-utils ESLint rules.
+ * @file Shared internal path utilities for uptime-watcher-type-utils ESLint
+ *   rules.
  */
 
 /**
@@ -18,4 +19,24 @@ export function normalizePath(filename) {
         /^(?<drive>[A-Za-z]):\//v,
         (_match, drive) => `${String(drive).toLowerCase()}:/`
     );
+}
+
+/**
+ * Converts an absolute/unknown file path to a repo-relative path when possible.
+ *
+ * @param {string} filePath - Candidate file path to relativize.
+ *
+ * @returns {string} Repo-relative path when the repository marker is present;
+ * otherwise the normalized input path.
+ */
+export function toRepoRelativePath(filePath) {
+    const normalizedPath = normalizePath(filePath);
+    const repoMarker = "/uptime-watcher/";
+    const markerIndex = normalizedPath.toLowerCase().indexOf(repoMarker);
+
+    if (markerIndex === -1) {
+        return normalizedPath;
+    }
+
+    return normalizedPath.slice(markerIndex + repoMarker.length);
 }

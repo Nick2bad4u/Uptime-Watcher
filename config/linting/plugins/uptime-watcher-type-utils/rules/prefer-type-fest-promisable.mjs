@@ -1,3 +1,4 @@
+import { toRepoRelativePath } from "../_internal/path-utils.mjs";
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const PROMISABLE_PATH_PATTERN =
@@ -7,26 +8,11 @@ const PROMISABLE_TYPE_NAME = "Promisable";
 const PROMISE_TYPE_NAME = "Promise";
 
 /**
- * @param {string} filePath
- * @returns {string}
- */
-const getRepoRelativePath = (filePath) => {
-    const normalizedPath = filePath.replaceAll("\\", "/");
-    const repoMarker = "/Uptime-Watcher/";
-    const markerIndex = normalizedPath.lastIndexOf(repoMarker);
-
-    if (markerIndex === -1) {
-        return normalizedPath;
-    }
-
-    return normalizedPath.slice(markerIndex + repoMarker.length);
-};
-
-/**
  * @param {import("@typescript-eslint/utils").TSESTree.TypeNode} node
  * @param {string} expectedTypeName
+ *
  * @returns {node is import("@typescript-eslint/utils").TSESTree.TSTypeReference & {
- *   typeName: import("@typescript-eslint/utils").TSESTree.Identifier;
+ *     typeName: import("@typescript-eslint/utils").TSESTree.Identifier;
  * }}
  */
 const isIdentifierTypeReference = (node, expectedTypeName) =>
@@ -36,6 +22,7 @@ const isIdentifierTypeReference = (node, expectedTypeName) =>
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.TypeNode} node
+ *
  * @returns {import("@typescript-eslint/utils").TSESTree.TypeNode | null}
  */
 const getPromiseInnerType = (node) => {
@@ -49,11 +36,14 @@ const getPromiseInnerType = (node) => {
 
 const preferTypeFestPromisableRule = createTypedRule({
     /**
-     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<string, readonly unknown[]>} context
+     * @param {import("@typescript-eslint/utils").TSESLint.RuleContext<
+     *     string,
+     *     readonly unknown[]
+     * >} context
      */
     create(context) {
         const filePath = context.filename ?? "";
-        const normalizedPath = getRepoRelativePath(filePath);
+        const normalizedPath = toRepoRelativePath(filePath);
 
         if (
             !PROMISABLE_PATH_PATTERN.test(normalizedPath) ||

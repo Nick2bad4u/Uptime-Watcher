@@ -1,5 +1,9 @@
 import { getPluginRule } from "./_internal/ruleTester";
-import { createTypedRuleTester, readTypedFixture, typedFixturePath } from "./_internal/typed-rule-tester";
+import {
+    createTypedRuleTester,
+    readTypedFixture,
+    typedFixturePath,
+} from "./_internal/typed-rule-tester";
 
 const ruleTester = createTypedRuleTester();
 
@@ -9,7 +13,9 @@ ruleTester.run(
     {
         invalid: [
             {
-                code: readTypedFixture("no-double-assertion-outside-tests.invalid.ts"),
+                code: readTypedFixture(
+                    "no-double-assertion-outside-tests.invalid.ts"
+                ),
                 errors: [{ messageId: "disallowDoubleAssertion" }],
                 filename: typedFixturePath(
                     "no-double-assertion-outside-tests.invalid.ts"
