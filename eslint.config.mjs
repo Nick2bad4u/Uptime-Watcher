@@ -590,6 +590,7 @@ export default defineConfig([
                         "config/testing/tsconfig.scripts.json",
                         "config/testing/tsconfig.shared.test.json",
                         "config/testing/tsconfig.test.json",
+                        "config/linting/plugins/uptime-watcher-type-utils/tsconfig.eslint.json",
                         "config/linting/plugins/uptime-watcher/tsconfig.eslint.json",
                         "docs/docusaurus/tsconfig.eslint.json",
                         "docs/docusaurus/tsconfig.json",
@@ -637,6 +638,7 @@ export default defineConfig([
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
                 project: [
+                    "config/linting/plugins/uptime-watcher-type-utils/tsconfig.eslint.json",
                     "config/linting/plugins/uptime-watcher/tsconfig.eslint.json",
                     "config/testing/tsconfig.js.json",
                 ],
@@ -1068,7 +1070,7 @@ export default defineConfig([
     },
     {
         files: [
-            "config/linting/plugins/uptime-watcher/test/fixtures/typed/prefer-ts-extras-is-defined-filter.invalid.ts",
+            "config/linting/plugins/uptime-watcher-type-utils/test/fixtures/typed/prefer-ts-extras-is-defined-filter.invalid.ts",
         ],
         name: "ESLint Plugin Tests - allow intentional undefined comparison fixture",
         rules: {

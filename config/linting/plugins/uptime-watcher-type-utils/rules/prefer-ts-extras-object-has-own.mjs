@@ -8,7 +8,7 @@ import {
 } from "../_internal/typed-rule.mjs";
 
 const TARGET_PATH_PATTERN =
-    /^(?:config\/linting\/plugins\/uptime-watcher\/test\/fixtures\/typed|electron|shared|src)(?:\/|$)/v;
+    /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron|shared|src)(?:\/|$)/v;
 
 /**
  * @param {string} filePath

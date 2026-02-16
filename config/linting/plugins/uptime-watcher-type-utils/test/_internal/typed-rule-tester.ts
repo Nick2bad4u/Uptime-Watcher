@@ -33,15 +33,13 @@ export const createTypedRuleTester = (): RuleTester =>
             parser: tsParser,
             parserOptions: {
                 ecmaVersion: "latest",
-                project: [
-                    repoPath(
-                        "config",
-                        "linting",
-                        "plugins",
-                        "uptime-watcher-type-utils",
-                        "tsconfig.eslint.json"
-                    ),
-                ],
+                projectService: {
+                    allowDefaultProject: [
+                        "config/linting/plugins/uptime-watcher-type-utils/test/fixtures/typed/*.ts",
+                    ],
+                    defaultProject:
+                        "config/linting/plugins/uptime-watcher-type-utils/tsconfig.eslint.json",
+                },
                 sourceType: "module",
                 tsconfigRootDir: repoPath(),
             },

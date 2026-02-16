@@ -1,7 +1,7 @@
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const ARCHITECTURE_PATH_PATTERN =
-    /^(?:config\/linting\/plugins\/uptime-watcher\/test\/fixtures\/typed|electron\/services\/ipc|shared|src\/components\/Alerts|src\/stores)(?:\/|$)/v;
+    /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron\/services\/ipc|shared|src\/components\/Alerts|src\/stores)(?:\/|$)/v;
 
 /**
  * @param {string} filePath

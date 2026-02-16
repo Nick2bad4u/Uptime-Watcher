@@ -5,7 +5,9 @@ import { describe, expect, it } from "vitest";
 import uptimeWatcherTypeUtilsPlugin from "../plugin.mjs";
 import { repoPath } from "./_internal/ruleTester";
 
-const pluginRuleIds = Object.keys(uptimeWatcherTypeUtilsPlugin.rules ?? {}).sort();
+const pluginRuleIds = Object.keys(
+    uptimeWatcherTypeUtilsPlugin.rules ?? {}
+).toSorted((left, right) => left.localeCompare(right));
 const docsRoot = repoPath(
     "config",
     "linting",
@@ -20,7 +22,7 @@ describe("type-utils rule docs integrity", () => {
         const docsRuleIds = readdirSync(docsRoot)
             .filter((entry) => entry.endsWith(".md"))
             .map((entry) => entry.slice(0, -3))
-            .sort();
+            .toSorted((left, right) => left.localeCompare(right));
 
         expect(docsRuleIds).toEqual(pluginRuleIds);
     });
@@ -40,7 +42,7 @@ describe("type-utils rule docs integrity", () => {
             const markerIndex = docsUrl.indexOf(marker);
 
             expect(markerIndex).toBeGreaterThanOrEqual(0);
-            if (markerIndex < 0) {
+            if (markerIndex === -1) {
                 continue;
             }
 

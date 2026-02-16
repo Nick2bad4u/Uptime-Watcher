@@ -1,7 +1,7 @@
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const PROMISABLE_PATH_PATTERN =
-    /^(?:config\/linting\/plugins\/uptime-watcher\/test\/fixtures\/typed|electron\/(?:events|services|utils)|scripts|shared\/utils|src\/(?:hooks|stores|utils)|storybook)(?:\/|$)/v;
+    /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron\/(?:events|services|utils)|scripts|shared\/utils|src\/(?:hooks|stores|utils)|storybook)(?:\/|$)/v;
 
 const PROMISABLE_TYPE_NAME = "Promisable";
 const PROMISE_TYPE_NAME = "Promise";

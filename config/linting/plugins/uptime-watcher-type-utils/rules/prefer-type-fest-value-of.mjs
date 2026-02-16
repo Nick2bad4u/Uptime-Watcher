@@ -1,7 +1,7 @@
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const VALUE_OF_PATH_PATTERN =
-    /^(?:config\/linting\/plugins\/uptime-watcher\/test\/fixtures\/typed|electron|scripts|shared|src|storybook)(?:\/|$)/v;
+    /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron|scripts|shared|src|storybook)(?:\/|$)/v;
 
 /**
  * @param {string} filePath

@@ -1,7 +1,7 @@
 import { createTypedRule, isTestFilePath } from "../_internal/typed-rule.mjs";
 
 const JSON_BOUNDARY_PATH_PATTERN =
-    /^(?:config\/linting\/plugins\/uptime-watcher\/test\/fixtures\/typed|electron\/services\/ipc|shared\/(?:types|utils\/logger)|src\/components\/Alerts)(?:\/|$)/v;
+    /^(?:config\/linting\/plugins\/uptime-watcher-type-utils\/test\/fixtures\/typed|electron\/services\/ipc|shared\/(?:types|utils\/logger)|src\/components\/Alerts)(?:\/|$)/v;
 
 /**
  * @param {string} filePath
