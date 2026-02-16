@@ -4,6 +4,354 @@
 
 All notable changes to this project will be documented in this file.
 
+## [23.1.0] - 2026-02-16
+
+
+[[23d6655](https://github.com/Nick2bad4u/Uptime-Watcher/commit/23d665510de92c1156b361d846483043c37d2f1e)...
+[410fe4e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/410fe4e7d1892a46a9a198d03089c92ebdcf2aec)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/23d665510de92c1156b361d846483043c37d2f1e...410fe4e7d1892a46a9a198d03089c92ebdcf2aec))
+
+
+### ✨ Features
+
+- ✨ [feat] Adds ts-extras guard lint enforcement
+
+✨ [feat] Improves type-safety consistency by enforcing shared ts-extras guards for undefined filtering and own-property checks.
+ - Adds new typed lint rules to prevent ad-hoc predicate patterns that weaken narrowing and increase repeated logic.
+ - Applies targeted enforcement where runtime and typed flows benefit most from safer guard behavior.
+
+🚜 [refactor] Replaces manual guard usage in core runtime and shared validation paths.
+ - Migrates existing checks to shared ts-extras utilities to reduce casts and make downstream property/value access safer.
+
+📝 [docs] Documents both new lint rules with clear rationale and covered patterns.
+ - Explains why standardized guards improve readability, reuse, and narrowing reliability.
+
+🧪 [test] Adds typed valid/invalid fixtures and rule tests for both guard-enforcement rules.
+ - Expands lint test coverage and includes a focused fixture override for intentional undefined comparisons.
+
+🎨 [style] Re-enables logical CSS lint plugin rules for keywords, properties, and units.
+ - Restores stricter logical styling guidance to improve layout directionality consistency.
+
+🧹 [chore] Updates linting/tooling dependencies to align with the new guard and style enforcement setup.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d63bcad)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d63bcad2a1d399c046ce0794af72837390526320)
+
+
+- ✨ [feat] Enhance type safety across multiple modules
+ - 🛠️ [fix] Update event bus and middleware to use Promisable for next function return types
+ - 🛠️ [fix] Modify loadSiteInBackground to utilize ValueOf for action and source types
+ - 🛠️ [fix] Refactor DataImportExportService to return Promisable for transaction operations
+ - 🛠️ [fix] Adjust SiteWriterService to use Promisable for operation return types
+ - 🛠️ [fix] Update historyLimitManager to return Promisable for transaction operations
+ - 🛠️ [fix] Modify ipcHandlerExecution to use Promisable for handler return types
+ - 🛠️ [fix] Refactor IPC types to utilize Promisable for handler functions
+ - 🛠️ [fix] Update chartUtils to use ValueOf for scale configuration
+ - 🛠️ [fix] Enhance monitorUiHelpers to return Promisable for readMonitorUiConfigValue
+ - 🛠️ [fix] Adjust monitorValidationInternals to use Promisable for validation operations
+ - 🛠️ [fix] Update various components and hooks to leverage Promisable for async operations
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(28c6374)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/28c63743ff6ddde87f18798a1fb3193a90424841)
+
+
+- ✨ [feat] Adds TypeFest convention lint rules
+
+✨ [feat] Enforces TypeFest utility usage for sync-or-async contracts and object value unions to replace repeated patterns and make type intent clearer.
+ - Expands recommended and core lint coverage so these conventions apply in architecture-critical runtime areas.
+
+🛠️ [fix] Improves typed rule path matching by normalizing to repository-relative paths before boundary checks.
+ - Reduces platform-specific mismatches and lowers false positives from absolute path differences.
+
+🚜 [refactor] Renames internal rule exports and aligns lint metadata wording for cleaner, more consistent plugin rule definitions.
+
+🧪 [test] Adds typed valid/invalid fixtures and rule tests to lock expected behavior for the new conventions.
+
+🧹 [chore] Updates linting, style, and documentation tool dependencies and adjusts logical CSS plugin usage for safer gradual rollout.
+ - Adds a focused lint override for an intentional invalid fixture case.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4e4f308)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e4f308591aee7faf862d6cacfbfa8ba2a9b26db)
+
+
+- ✨ [feat] Introduce new linting rules for TypeScript type safety
+ - 🆕 Add `prefer-type-fest-json-value` rule to enforce using `JsonValue` from TypeFest instead of `Record<string, unknown>` for payloads in serialization boundaries.
+ - 🆕 Add `prefer-type-fest-tagged-brands` rule to encourage the use of TypeFest's `Tagged` type over ad-hoc branding with `__brand` or `__tag` fields.
+ - 🆕 Add `prefer-type-fest-unknown-record` rule to require `UnknownRecord` from TypeFest over `Record<string, unknown>` in architecture-critical layers.
+ - 🆕 Add `typed-eventbus-payload-assignable` rule to ensure TypedEventBus emit payloads and listeners are assignable to event-map contract types.
+ - 🆕 Create a new TypeScript configuration file for the uptime-watcher linting plugin.
+ - 🆕 Implement a typed rule tester utility to facilitate testing of the new linting rules.
+ - 🆕 Add various test fixtures to validate the behavior of the new linting rules, including valid and invalid cases for each rule.
+ - 🆕 Update `package-lock.json` to include TypeFest as a dependency for the new rules.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c8ecc41)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c8ecc41c718d69f4b0633f4e9b9d0d8f8f533953)
+
+
+- ✨ [feat] Enhance Site Card and Dashboard Components
+ - 🆕 [feat] Add monitor favicon support in SiteCardHeader
+   - Introduced `extractMonitorEndpoint` to retrieve valid monitor URLs.
+   - Implemented `toFaviconUrl` to generate favicon URLs from endpoints.
+   - Added favicon image rendering with error handling in SiteCardHeader.
+ - 🔄 [refactor] Update SiteCardStatus to use monitor labels
+   - Replaced `selectedMonitorId` with `monitorLabel` for better clarity.
+   - Simplified status label generation logic.
+ - 🎨 [style] Revamp SiteCompactCard CSS for improved layout
+   - Changed display from grid to flex for better responsiveness.
+   - Adjusted item flex properties for a more balanced layout.
+ - 🔄 [refactor] Modify MonitorSelector to improve option formatting
+   - Updated fallback identifier handling for monitor options.
+ - 🛠️ [fix] Correct SiteTableRow rendering logic
+   - Ensured site identifier is not displayed when not applicable.
+ - 🎨 [style] Adjust SiteTableView CSS for better responsiveness
+   - Updated media queries and column sizes for various screen widths.
+ - 🎨 [style] Refine Header CSS for improved aesthetics
+   - Adjusted padding, backdrop filters, and shadows for a cleaner look.
+ - 🎨 [style] Enhance SiteDetails header styles for better alignment
+   - Centered alignment and increased gap for status elements.
+ - 📝 [test] Update tests for SiteCardStatus to reflect new props
+   - Changed tests to use `monitorLabel` instead of `selectedMonitorId`.
+ - 🧪 [test] Add additional coverage for alertCoordinator
+   - Implemented tests to suppress duplicate alerts based on identical payloads.
+ - 🧪 [test] Enhance MonitorSelector tests for better coverage
+   - Adjusted assertions to reflect changes in monitor display logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e6dcc8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6dcc8a02e927474d2435e360223b44250477ee0)
+
+
+- ✨ [feat] Enhance URL validation and error handling in openExternal method
+ - 🛠️ Update openExternal to use validateExternalOpenUrlCandidate for URL validation
+ - 🔧 Improve error handling by logging failures with detailed context
+ - 🧪 Add input fuzzing tests to ensure invalid URLs are handled correctly
+ - 🧪 Implement tests for isolating invalid URL failures during interleaved operations
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0545bb8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0545bb8e02b0bac590881b11d2ec1994b17595d7)
+
+
+- ✨ [feat] Implement backup migration helpers and enhance path traversal safety
+ - 🛠️ [fix] Add `requireMigrationEncryptionKey` to validate encryption key presence
+ - 🛠️ [fix] Introduce `collectSourceDeletionErrors` to handle source deletion after migration
+ - 🚜 [refactor] Refactor `migrateSingleEntry` for improved clarity and error handling
+ - 🎨 [style] Remove unnecessary options in path extraction functions for cleaner code
+ - 🧪 [test] Add unit tests for backup migration helpers to ensure functionality
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(af686b3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af686b396fbfdc6a8f77327e5f05bb77de4399c0)
+
+
+- ✨ [feat] Enhance monitoring utilities and improve header value handling
+ - 🆕 Introduced `normalizeHeaderValue` to standardize header values by trimming whitespace and collapsing internal spaces.
+ - 🆕 Added `resolveHeaderValue` for case-insensitive header resolution from response headers, supporting both direct and array values.
+ - 🆕 Implemented `resolveRequiredMonitorStringContext` to validate and map monitor-specific fields into context, returning error results for invalid inputs.
+ - 🆕 Created `extractMonitorValueAtPath` for extracting nested values from payloads using dot and bracketed paths, enhancing flexibility in data retrieval.
+ - 🆕 Added `getLatestHistoryTimestamp` and `getLatestMonitorHistoryTimestamp` to compute the most recent timestamps from monitor history, improving monitoring accuracy.
+ - 🆕 Developed `normalizeMonitorExternalUrl` to validate and trim external URLs, ensuring safe rendering in UI components.
+ - 🔄 Refactored `SiteCard` and `SiteDetails` components to utilize new utility functions for improved readability and maintainability.
+ - 🧪 Added comprehensive tests for new utilities and refactored components to ensure functionality and reliability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5fe8d6d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5fe8d6d4df96e2c991c957067264731ab2db1f2b)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Splits utility-type lint plugin
+
+🚜 [refactor] Extracts utility-type lint rules into a dedicated transitional plugin to decouple policy ownership from the core rule set and ease future standalone extraction.
+ - Migrates utility-type and nullish-guard convention rules, associated docs, and metadata links into the new plugin boundary.
+ - Adds a stable wrapper entrypoint plus shared internal typed-rule and path utilities to keep rule imports and typed behavior consistent during migration.
+ - Defines centralized plugin presets (full, recommended, and repo-scoped adoption sets) to preserve staged enforcement without duplicating config logic.
+
+🚜 [refactor] Updates the core lint plugin to keep responsibility focused on remaining architecture and drift-guard rules.
+ - Removes migrated utility-type registrations from the core rule map, recommended list, and repo-scoped presets.
+ - Clarifies plugin ownership in documentation so contributors know where new utility-type conventions belong.
+
+🧪 [test] Realigns plugin validation and project checks with the new split.
+ - Relocates fixtures and rule tests under the new plugin and adds docs-integrity tests to verify rule-to-doc parity and URL consistency.
+ - Extends lint/typecheck wiring so both plugins participate in config checks and internal authoring overrides.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(213ba3c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/213ba3ccadef4d8add00e5ae67ba4759ece37a3b)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update issue and pull request templates for clarity and usability
+ - 🔧 [build] Set blank issues to disabled in issue template configuration
+ - 📝 [docs] Revise custom issue template to improve clarity and structure
+ - 📝 [docs] Simplify feature request template, focusing on problem and solution
+ - 📝 [docs] Streamline bug fix template, emphasizing validation and testing
+ - 📝 [docs] Enhance documentation template for better clarity and verification
+ - 📝 [docs] Refine general pull request template to focus on summary and validation
+ - 📝 [docs] Update quick fix template to emphasize minimal changes and validation
+
+🛠️ [fix] Correct linting plugin paths and configurations
+ - 🔧 [build] Adjust paths in uptime-watcher-type-utils linting rules for accuracy
+ - 🔧 [build] Update ESLint configuration to include new type-utils tsconfig
+ - 🔧 [build] Fix test paths in typed-rule-tester for proper linting rule testing
+
+🎨 [style] Refactor CSS for improved layout and responsiveness
+ - 🎨 [style] Change overflow properties to use logical properties for better support
+ - 🎨 [style] Update navbar styles to enhance mobile responsiveness and usability
+
+⚡ [perf] Optimize performance in linting rules and testing
+ - ⚡ [perf] Improve performance of rule testing by refining project service settings
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cc6ead0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc6ead0c3f689008d3af38bc0ded94b744b02dd4)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Update describe block to use function reference for extractMonitorValueAtPath
+ - Changed the describe block from a string to a function reference for better clarity and consistency in test naming.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aee1fad)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aee1fad81572af93870f7c904d6ec2c181a57563)
+
+
+- 🎨 [style] Add stylistic overrides to ESLint configuration
+
+ - Introduced a new region for stylistic overrides in the ESLint config.
+ - Disabled specific stylistic rules:
+   - "@stylistic/exp-jsx-props-style": "off"
+   - "@stylistic/curly-newline": "off"
+   - "@stylistic/exp-list-style": "off"
+   - "@stylistic/line-comment-position": "off"
+   - "@stylistic/multiline-comment-style": "off"
+   - "@stylistic/spaced-comment": "off"
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8d5e308)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8d5e3089fdaef9d9ef14de3639e7797cc1fa049b)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Migrates lint rule tests to TS RuleTester
+
+🧪 [test] Aligns lint rule suites with the Vitest lifecycle so tests run reliably under one framework.
+ - Removes plugin-prefixed test names to match the new runner expectations and reduce naming coupling.
+
+🔧 [build] Updates test commands to execute from the repository root with the shared linting test config.
+ - Improves consistency between local runs and CI execution.
+
+🚜 [refactor] Strengthens dynamic rule loading with stricter ownership checks and runtime validation.
+ - Improves error clarity when rules are missing or malformed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb1f396)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bb1f396efaaca9d410cbae0fee7051b06ae478d5)
+
+
+- 🧪 [test] Add unit tests for cloud services and URL validation
+
+ - ✨ [test] Implement tests for derived encryption key state management
+   - Created `derivedEncryptionKeyState.test.ts` to verify key storage behavior.
+   - Tests include scenarios for missing keys, valid keys, and corrupted keys.
+
+ - ✨ [test] Add tests for local passphrase encryption state persistence
+   - Created `localPassphraseEncryptionState.test.ts` to ensure passphrase mode, salt, and derived key are stored correctly.
+
+ - ✨ [test] Introduce tests for provider connection state management
+   - Created `providerConnectionState.test.ts` to validate capturing and restoring provider settings and tokens.
+
+ - ✨ [test] Implement tests for provider secret cleanup functionality
+   - Created `providerSecretCleanup.test.ts` to ensure secrets are deleted correctly, even when some deletions fail.
+
+ - ✨ [test] Add tests for backup migration process
+   - Extended `backupMigration.test.ts` to check for overwrite prevention when migrating legacy backups to existing targets.
+
+ - ✨ [test] Introduce tests for OAuth loopback error normalization
+   - Created `oauthLoopbackError.test.ts` to validate error message formatting for various OAuth errors.
+
+ - ✨ [test] Add tests for monitor configuration value resolvers
+   - Created `monitorConfigValueResolvers.test.ts` to ensure proper resolution of monitor fields.
+
+ - ✨ [test] Implement URL safety validation tests
+   - Created `urlSafety.test.ts` to validate URL candidates against safety criteria.
+
+ - ✨ [test] Add tests for URL scheme validation
+   - Created `urlSchemeValidation.test.ts` to ensure proper detection of scheme-related issues in URLs.
+
+🛠️ [fix] Refactor URL safety and validation utilities
+
+ - ⚡ [refactor] Enhance URL safety checks in `urlSafety.ts`
+   - Integrated new validation functions to reject malformed URLs with nested schemes.
+
+ - ⚡ [refactor] Create dedicated URL scheme validation utilities
+   - Moved scheme validation logic to `urlSchemeValidation.ts` for better organization and reuse.
+
+ - 🛠️ [fix] Update file download utilities for better error handling
+   - Refactored `fileDownload.ts` to improve logging and error handling during file downloads.
+
+ - ✨ [feat] Add serialized backup result parsing utility
+   - Introduced `serializedBackupResult.ts` to validate and parse serialized SQLite backup payloads.
+
+ - 🧪 [test] Add tests for serialized backup result parsing
+   - Created `serializedBackupResult.test.ts` to ensure correct validation and parsing of backup data.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a197a08)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a197a08d82193a512b32d833a316cdc3cefa79fd)
+
+
+
+### 🧹 Chores
+
+- *(release)* V23.1.0 [skip ci] [`(410fe4e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/410fe4e7d1892a46a9a198d03089c92ebdcf2aec)
+
+
+- Update changelogs for v23.0.0 [skip ci] [`(23d6655)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/23d665510de92c1156b361d846483043c37d2f1e)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Refactor linting rules and tests for improved code quality
+ - 🛠️ [fix] Replace custom path utility with `toRepoRelativePath` in `prefer-type-fest-unknown-record` and `prefer-type-fest-value-of` rules for consistency and maintainability
+ - 🎨 [style] Clean up code formatting in various linting rules and test files for better readability
+ - 🧪 [test] Update test cases to ensure they align with the new linting rule implementations
+ - ⚡ [perf] Optimize regex patterns in `ARCHITECTURE_PATH_PATTERN` for better performance
+ - 📝 [docs] Improve JSDoc comments for better clarity on function parameters and return types
+ - 🎨 [style] Standardize import statements across multiple files for consistency
+ - 🛠️ [fix] Remove unnecessary comments and whitespace in test files to enhance clarity
+ - 🎨 [style] Adjust formatting in test files to ensure consistent style across the codebase
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(88810ee)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88810eeea9655771fbb96d153815defb0d42e20f)
+
+
+- 🔧 [build] Refactor export statements for linting rules
+ - 🛠️ Change default exports to named exports for multiple linting rules in the uptime-watcher plugin:
+   - `ipc-handler-signature-matches-validator.mjs`
+   - `logger-context-json-serializable.mjs`
+   - `no-double-assertion-outside-tests.mjs`
+   - `prefer-ensure-error-return-type.mjs`
+   - `prefer-ts-extras-is-defined-filter.mjs`
+   - `prefer-ts-extras-is-present-filter.mjs`
+   - `prefer-ts-extras-object-has-own.mjs`
+   - `prefer-type-fest-json-value.mjs`
+   - `prefer-type-fest-promisable.mjs`
+   - `prefer-type-fest-tagged-brands.mjs`
+   - `prefer-type-fest-unknown-record.mjs`
+   - `prefer-type-fest-value-of.mjs`
+   - `typed-eventbus-payload-assignable.mjs`
+ - ✨ [feat] Introduce new linting rule `prefer-ts-extras-is-present-filter`
+   - 📜 Implement logic to enforce the use of `isPresent` from `ts-extras` in `Array.filter` callbacks instead of inline nullish checks.
+   - 🧪 Add tests for the new rule with valid and invalid cases.
+ - 🛠️ [fix] Update usages of `Object.hasOwn` to `objectHasOwn` from `ts-extras` across various files
+   - 🔄 Refactor code in `FilesystemCloudStorageProvider.ts`, `cloudBackupListing.ts`, `recordValidation.ts`, `httpMonitorCore.ts`, `monitorConfigValueResolvers.ts`, `WindowService.ts`, `jsonSafety.ts`, `objectSafety.ts`, `siteStatus.ts`, `StatusAlertToast.tsx`, `useSiteMonitor.ts`, `hydration.ts`, `ThemeManager.ts`, and `themeMerging.ts` to improve consistency and reduce redundancy.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c457e46)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c457e46472377a1bee04848b2d4929b0195c8142)
+
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Updated "electron" from ^40.4.0 to ^40.4.1 for improved stability and performance.
+ - 🔄 Updated "eslint-plugin-eslint-plugin" from ^7.3.0 to ^7.3.1 to incorporate latest linting rules.
+ - 🔄 Updated "eslint-plugin-sql-template" from ^3.1.0 to ^3.2.0 for enhanced SQL template linting.
+ - 🔄 Updated "markdown-to-jsx" from ^9.7.3 to ^9.7.4 for better markdown rendering.
+ - 🔄 Updated "putout" from ^41.21.0 to ^41.23.0 for improved code transformation capabilities.
+ - 🔄 Updated "stylelint" from ^17.2.0 to ^17.3.0 to include the latest style linting features.
+ - 🔄 Updated "stylelint-define-config" from ^17.1.0 to ^17.2.0 for better configuration management.
+ - 🔄 Updated "typedoc" from ^0.28.16 to ^0.28.17 for enhanced TypeScript documentation generation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(87c271a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/87c271ac9010620a57c614f0edda99afc0a7bfba)
+
+
+
+
+
+
 ## [23.0.0] - 2026-02-12
 
 

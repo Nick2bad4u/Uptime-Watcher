@@ -8,11 +8,29 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[177e4dc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/177e4dcd63bc0795bd7e5ad6548c856d580fc042)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...177e4dcd63bc0795bd7e5ad6548c856d580fc042))
+[cc6ead0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc6ead0c3f689008d3af38bc0ded94b744b02dd4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...cc6ead0c3f689008d3af38bc0ded94b744b02dd4))
 
 
 ### ✨ Features
+
+- ✨ [feat] Adds TypeFest convention lint rules
+
+✨ [feat] Enforces TypeFest utility usage for sync-or-async contracts and object value unions to replace repeated patterns and make type intent clearer.
+ - Expands recommended and core lint coverage so these conventions apply in architecture-critical runtime areas.
+
+🛠️ [fix] Improves typed rule path matching by normalizing to repository-relative paths before boundary checks.
+ - Reduces platform-specific mismatches and lowers false positives from absolute path differences.
+
+🚜 [refactor] Renames internal rule exports and aligns lint metadata wording for cleaner, more consistent plugin rule definitions.
+
+🧪 [test] Adds typed valid/invalid fixtures and rule tests to lock expected behavior for the new conventions.
+
+🧹 [chore] Updates linting, style, and documentation tool dependencies and adjusts logical CSS plugin usage for safer gradual rollout.
+ - Adds a focused lint override for an intentional invalid fixture case.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4e4f308)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4e4f308591aee7faf862d6cacfbfa8ba2a9b26db)
+
 
 - ✨ [feat] Enhance system API and preload domain management
  - 🛠️ Refactor system API initialization to use `createPreloadDomain` for better error handling and fallback support.
@@ -824,6 +842,30 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a6ca
 
 ### 📝 Documentation
 
+- 📝 [docs] Update issue and pull request templates for clarity and usability
+ - 🔧 [build] Set blank issues to disabled in issue template configuration
+ - 📝 [docs] Revise custom issue template to improve clarity and structure
+ - 📝 [docs] Simplify feature request template, focusing on problem and solution
+ - 📝 [docs] Streamline bug fix template, emphasizing validation and testing
+ - 📝 [docs] Enhance documentation template for better clarity and verification
+ - 📝 [docs] Refine general pull request template to focus on summary and validation
+ - 📝 [docs] Update quick fix template to emphasize minimal changes and validation
+
+🛠️ [fix] Correct linting plugin paths and configurations
+ - 🔧 [build] Adjust paths in uptime-watcher-type-utils linting rules for accuracy
+ - 🔧 [build] Update ESLint configuration to include new type-utils tsconfig
+ - 🔧 [build] Fix test paths in typed-rule-tester for proper linting rule testing
+
+🎨 [style] Refactor CSS for improved layout and responsiveness
+ - 🎨 [style] Change overflow properties to use logical properties for better support
+ - 🎨 [style] Update navbar styles to enhance mobile responsiveness and usability
+
+⚡ [perf] Optimize performance in linting rules and testing
+ - ⚡ [perf] Improve performance of rule testing by refining project service settings
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cc6ead0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc6ead0c3f689008d3af38bc0ded94b744b02dd4)
+
+
 - 📝 [docs] Update multiple ADRs with revisions and enhancements
 
  - 📝 [docs] ADR-023: Secret Storage and Encryption Policy
@@ -1192,6 +1234,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v23.0.0 [skip ci] [`(23d6655)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/23d665510de92c1156b361d846483043c37d2f1e)
+
+
 - Update changelogs for v22.7.0 [skip ci] [`(dcbf3b1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dcbf3b100f54156299c8233c9cce28f8908eeea2)
 
 
@@ -1262,6 +1307,20 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Updated "electron" from ^40.4.0 to ^40.4.1 for improved stability and performance.
+ - 🔄 Updated "eslint-plugin-eslint-plugin" from ^7.3.0 to ^7.3.1 to incorporate latest linting rules.
+ - 🔄 Updated "eslint-plugin-sql-template" from ^3.1.0 to ^3.2.0 for enhanced SQL template linting.
+ - 🔄 Updated "markdown-to-jsx" from ^9.7.3 to ^9.7.4 for better markdown rendering.
+ - 🔄 Updated "putout" from ^41.21.0 to ^41.23.0 for improved code transformation capabilities.
+ - 🔄 Updated "stylelint" from ^17.2.0 to ^17.3.0 to include the latest style linting features.
+ - 🔄 Updated "stylelint-define-config" from ^17.1.0 to ^17.2.0 for better configuration management.
+ - 🔄 Updated "typedoc" from ^0.28.16 to ^0.28.17 for enhanced TypeScript documentation generation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(87c271a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/87c271ac9010620a57c614f0edda99afc0a7bfba)
+
 
 - 🔧 [build] Update Flatpak build process and Docusaurus configuration
  - 🛠️ Modify npm prune command to handle legacy peer dependencies during Flatpak packaging
