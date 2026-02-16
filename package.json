@@ -891,7 +891,7 @@
         "electron-debug": "^4.1.0",
         "electron-devtools-installer": "^4.0.0",
         "electron-publish": "^26.6.0",
-        "eslint": "^9.39.2",
+        "eslint": "^10.0.0",
         "eslint-config-flat-gitignore": "^2.1.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-find-rules": "^5.0.0",
