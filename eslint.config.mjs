@@ -31,9 +31,6 @@ import * as htmlParser from "@html-eslint/parser";
 import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginDesignTokens from "@metamask/eslint-plugin-design-tokens";
-// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginMicrosoftSdl from "@microsoft/eslint-plugin-sdl";
-import rushStackSecurity from "@rushstack/eslint-plugin-security";
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
@@ -47,8 +44,8 @@ import antfu from "eslint-plugin-antfu";
 import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import pluginBoundaries from "eslint-plugin-boundaries";
-import pluginCanonical from "eslint-plugin-canonical";
-import pluginCasePolice from "eslint-plugin-case-police";
+import pluginCanonicalRaw from "eslint-plugin-canonical";
+import pluginCasePoliceRaw from "eslint-plugin-case-police";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginCleanCode from "eslint-plugin-clean-code";
 // New plugins from user request
@@ -59,17 +56,16 @@ import pluginCompat from "eslint-plugin-compat";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginCssModules from "eslint-plugin-css-modules";
 import depend from "eslint-plugin-depend";
-import pluginDeprecation from "eslint-plugin-deprecation";
 import eslintPluginEslintPlugin from "eslint-plugin-eslint-plugin";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import etc from "eslint-plugin-etc";
 import { plugin as ex } from "eslint-plugin-exception-handling";
-import progress from "eslint-plugin-file-progress";
+import progressRaw from "eslint-plugin-file-progress";
 import pluginFilenameExport from "eslint-plugin-filename-export";
 import pluginFormatSQL from "eslint-plugin-format-sql";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginFunctionNames from "eslint-plugin-function-name";
-import pluginFunctional from "eslint-plugin-functional";
+import pluginFunctionalRaw from "eslint-plugin-functional";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginGoodEffects from "eslint-plugin-goodeffects";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -89,7 +85,7 @@ import listeners from "eslint-plugin-listeners";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginLoadableImports from "eslint-plugin-loadable-imports";
 import eslintPluginMath from "eslint-plugin-math";
-import * as mdx from "eslint-plugin-mdx";
+import * as mdxRaw from "eslint-plugin-mdx";
 import moduleInterop from "eslint-plugin-module-interop";
 import nodePlugin from "eslint-plugin-n";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -97,14 +93,14 @@ import pluginNeverThrow from "eslint-plugin-neverthrow";
 import nitpick from "eslint-plugin-nitpick";
 import noBarrelFiles from "eslint-plugin-no-barrel-files";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginNoConstructBind from "eslint-plugin-no-constructor-bind";
+import pluginNoConstructBindRaw from "eslint-plugin-no-constructor-bind";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginNoExplicitTypeExports from "eslint-plugin-no-explicit-type-exports";
+import pluginNoExplicitTypeExportsRaw from "eslint-plugin-no-explicit-type-exports";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginNFDAR from "eslint-plugin-no-function-declare-after-return";
 // Import * as tailwind4 from "tailwind-csstree";
 import pluginNoHardcoded from "eslint-plugin-no-hardcoded-strings";
-import pluginRegexLook from "eslint-plugin-no-lookahead-lookbehind-regexp";
+import pluginRegexLookRaw from "eslint-plugin-no-lookahead-lookbehind-regexp";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNoOnly from "eslint-plugin-no-only-tests";
 import noSecrets from "eslint-plugin-no-secrets";
@@ -113,7 +109,7 @@ import pluginNoUnary from "eslint-plugin-no-unary-plus";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginNoUnwaited from "eslint-plugin-no-unawaited-dot-catch-throw";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import nounsanitized from "eslint-plugin-no-unsanitized";
+import nounsanitizedRaw from "eslint-plugin-no-unsanitized";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import eslintPluginNoUseExtendNative from "eslint-plugin-no-use-extend-native";
 import nodeDependencies from "eslint-plugin-node-dependencies";
@@ -124,13 +120,13 @@ import paths from "eslint-plugin-paths";
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 import playwright from "eslint-plugin-playwright";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginPreferArrow from "eslint-plugin-prefer-arrow";
+import pluginPreferArrowRaw from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginPromise from "eslint-plugin-promise";
 import * as publint from "eslint-plugin-publint";
 import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
-import pluginReact from "eslint-plugin-react";
+import pluginReactRaw from "eslint-plugin-react";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import react19upgrade from "eslint-plugin-react-19-upgrade";
 import reactCompiler from "eslint-plugin-react-compiler";
@@ -162,10 +158,10 @@ import pluginRegexp from "eslint-plugin-regexp";
 import * as pluginJSDoc from "eslint-plugin-require-jsdoc";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSafeJSX from "eslint-plugin-safe-jsx";
-import pluginSecurity from "eslint-plugin-security";
+import pluginSecurityRaw from "eslint-plugin-security";
 import sonarjs, { configs as sonarjsConfigs } from "eslint-plugin-sonarjs";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginSortClassMembers from "eslint-plugin-sort-class-members";
+import pluginSortClassMembersRaw from "eslint-plugin-sort-class-members";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSortDestructure from "eslint-plugin-sort-destructure-keys";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -178,7 +174,7 @@ import sqlTemplate from "eslint-plugin-sql-template";
 import pluginSSR from "eslint-plugin-ssr-friendly";
 import storybook from "eslint-plugin-storybook";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import styledA11y from "eslint-plugin-styled-components-a11y";
+import styledA11yRaw from "eslint-plugin-styled-components-a11y";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSwitchCase from "eslint-plugin-switch-case";
 import tailwind from "eslint-plugin-tailwindcss";
@@ -201,7 +197,7 @@ import pluginUseMemo from "eslint-plugin-usememo-recommendations";
 import pluginValidateJSX from "eslint-plugin-validate-jsx-nesting";
 // import * as cssPlugin from "eslint-plugin-css"
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginWriteGood from "eslint-plugin-write-good-comments";
+import pluginWriteGoodRaw from "eslint-plugin-write-good-comments";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import xss from "eslint-plugin-xss";
 import eslintPluginYml from "eslint-plugin-yml";
@@ -213,7 +209,6 @@ import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
 import * as yamlEslintParser from "yaml-eslint-parser";
 
-import uptimeWatcherTypeUtilsPlugin from "./config/linting/plugins/uptime-watcher-type-utils.mjs";
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 
 // import github from 'eslint-plugin-github' -- unused for now
@@ -239,6 +234,126 @@ const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
 const jsonSchemaValidatorRules = enableJsonSchemaValidation
     ? { "json-schema-validator/no-invalid": "error" }
     : {};
+
+const microsoftSdlFallbackRuleNames = [
+    "no-angular-bypass-sanitizer",
+    "no-angular-sanitization-trusted-urls",
+    "no-angularjs-bypass-sce",
+    "no-angularjs-enable-svg",
+    "no-angularjs-sanitization-whitelist",
+    "no-cookies",
+    "no-document-domain",
+    "no-document-write",
+    "no-electron-node-integration",
+    "no-html-method",
+    "no-inner-html",
+    "no-insecure-random",
+    "no-insecure-url",
+    "no-msapp-exec-unsafe",
+    "no-postmessage-star-origin",
+    "no-unsafe-alloc",
+    "no-winjs-html-unsafe",
+];
+
+const microsoftSdlFallbackPlugin = {
+    configs: {
+        required: {
+            rules: {},
+        },
+    },
+    rules: Object.fromEntries(
+        microsoftSdlFallbackRuleNames.map((ruleName) => [
+            ruleName,
+            {
+                create: () => ({}),
+                meta: {
+                    docs: {
+                        description:
+                            "Temporarily disabled while awaiting ESLint 10-compatible @microsoft/eslint-plugin-sdl.",
+                    },
+                    schema: [],
+                    type: "problem",
+                },
+            },
+        ])
+    ),
+};
+
+const pluginMicrosoftSdl = microsoftSdlFallbackPlugin;
+/**
+ * NOTE(ESLint10): Re-enable @microsoft/eslint-plugin-sdl once it ships
+ * ESLint 10-compatible dependencies.
+ */
+console.warn(
+    "[eslint.config] @microsoft/eslint-plugin-sdl is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
+);
+
+const deprecationFallbackPlugin = {
+    rules: {
+        deprecation: {
+            create: () => ({}),
+            meta: {
+                docs: {
+                    description:
+                        "Temporarily disabled while awaiting ESLint 10-compatible eslint-plugin-deprecation.",
+                },
+                schema: [],
+                type: "problem",
+            },
+        },
+    },
+};
+
+const pluginDeprecation = deprecationFallbackPlugin;
+/**
+ * NOTE(ESLint10): Re-enable eslint-plugin-deprecation once upstream supports
+ * ESLint 10 / @typescript-eslint v8 runtime contracts.
+ */
+console.warn(
+    "[eslint.config] eslint-plugin-deprecation is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
+);
+
+/**
+ * NOTE(ESLint10): Re-enable @rushstack/eslint-plugin-security once upstream
+ * publishes an ESLint 10-compatible release.
+ */
+const rushStackSecurityRaw = undefined;
+
+console.warn(
+    "[eslint.config] @rushstack/eslint-plugin-security is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
+);
+
+const rushStackSecurityPlugin = rushStackSecurityRaw
+    ? { "@rushstack/security": fixupPluginRules(rushStackSecurityRaw) }
+    : {};
+
+const rushStackSecurityRules = rushStackSecurityRaw
+    ? { "@rushstack/security/no-unsafe-regexp": "warn" }
+    : {};
+
+/**
+ * Compatibility wrappers for legacy plugins that still rely on deprecated rule
+ * context APIs removed in ESLint 10.
+ */
+const pluginCanonical = fixupPluginRules(pluginCanonicalRaw);
+const pluginCasePolice = fixupPluginRules(pluginCasePoliceRaw);
+const pluginFunctional = fixupPluginRules(pluginFunctionalRaw);
+const mdx = mdxRaw;
+const pluginNoConstructBind = fixupPluginRules(pluginNoConstructBindRaw);
+const pluginNoExplicitTypeExports = fixupPluginRules(
+    pluginNoExplicitTypeExportsRaw
+);
+const pluginRegexLook = fixupPluginRules(pluginRegexLookRaw);
+const nounsanitized = fixupPluginRules(nounsanitizedRaw);
+const pluginPreferArrow = fixupPluginRules(pluginPreferArrowRaw);
+const progress = fixupPluginRules(progressRaw);
+// @ts-expect-error -- eslint-plugin-react typings are not yet aligned with
+// @eslint/compat's wrapped plugin type shape.
+const pluginReact = fixupPluginRules(pluginReactRaw);
+const pluginSecurity = fixupPluginRules(pluginSecurityRaw);
+const pluginSortClassMembers = fixupPluginRules(pluginSortClassMembersRaw);
+const styledA11y = fixupPluginRules(styledA11yRaw);
+const pluginWriteGood = fixupPluginRules(pluginWriteGoodRaw);
 // @dword-design/eslint-plugin-import-alias
 // @dword-design/import-alias
 // @ospm/eslint-plugin-react-signals-hooks
@@ -300,18 +415,6 @@ const uptimeWatcherRepoConfigs =
     /** @type {any} */ (uptimeWatcherPlugin).configs?.["repo"] ?? [];
 
 /**
- * Repo-scoped uptime-watcher type-utils flat configs.
- *
- * @remarks
- * This transitional plugin owns `type-fest` and `ts-extras` convention rules
- * to make future extraction/migration independent from core plugin guardrails.
- *
- * @type {import("eslint").Linter.Config[]}
- */
-const uptimeWatcherTypeUtilsRepoConfigs =
-    /** @type {any} */ (uptimeWatcherTypeUtilsPlugin).configs?.["repo"] ?? [];
-
-/**
  * Controls eslint-plugin-file-progress behavior.
  *
  * @remarks
@@ -339,9 +442,9 @@ const HIDE_PROGRESS_FILENAMES = UW_ESLINT_PROGRESS_MODE === "nofile";
 const fileProgressOverridesConfig = {
     name: "CLI: file progress overrides",
     rules: {
-        // The preset already auto-hides on CI, but we also support explicit
-        // local toggles.
-        "progress/activate": DISABLE_PROGRESS ? 0 : 1,
+        // ESLint 10 compatibility: eslint-plugin-file-progress currently
+        // accesses legacy RuleContext APIs and crashes at runtime.
+        "progress/activate": "off",
     },
     settings: {
         progress: {
@@ -466,13 +569,14 @@ export default defineConfig([
     comments.recommended,
     arrayFunc.configs.all,
     ...storybook.configs["flat/recommended"],
-    ...pluginCasePolice.configs.recommended,
+    // NOTE(ESLint10): Re-enable once eslint-plugin-case-police supports
+    // context.getFilename replacements required by ESLint 10.
+    // ...pluginCasePolice.configs.recommended,
     ...jsdocPlugin.configs["examples-and-default-expressions"],
     // Prefer the repo-scoped preset configs shipped with the internal plugin.
     // This keeps rule coverage aligned with the plugin implementation and
     // avoids accidental drift (or missing plugin registration).
     ...uptimeWatcherRepoConfigs,
-    ...uptimeWatcherTypeUtilsRepoConfigs,
     // #endregion
     // #region 🧩 Custom Flat Configs
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -590,7 +694,6 @@ export default defineConfig([
                         "config/testing/tsconfig.scripts.json",
                         "config/testing/tsconfig.shared.test.json",
                         "config/testing/tsconfig.test.json",
-                        "config/linting/plugins/uptime-watcher-type-utils/tsconfig.eslint.json",
                         "config/linting/plugins/uptime-watcher/tsconfig.eslint.json",
                         "docs/docusaurus/tsconfig.eslint.json",
                         "docs/docusaurus/tsconfig.json",
@@ -638,7 +741,6 @@ export default defineConfig([
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
                 project: [
-                    "config/linting/plugins/uptime-watcher-type-utils/tsconfig.eslint.json",
                     "config/linting/plugins/uptime-watcher/tsconfig.eslint.json",
                     "config/testing/tsconfig.js.json",
                 ],
@@ -996,7 +1098,6 @@ export default defineConfig([
     {
         files: [
             "config/linting/plugins/uptime-watcher/**/*.{mjs,ts,tsx}",
-            "config/linting/plugins/uptime-watcher-type-utils/**/*.{mjs,ts,tsx}",
         ],
         name: "ESLint Plugin (uptime-watcher) - internal rule authoring overrides",
         rules: {
@@ -1069,15 +1170,6 @@ export default defineConfig([
         },
     },
     {
-        files: [
-            "config/linting/plugins/uptime-watcher-type-utils/test/fixtures/typed/prefer-ts-extras-is-defined-filter.invalid.ts",
-        ],
-        name: "ESLint Plugin Tests - allow intentional undefined comparison fixture",
-        rules: {
-            "no-undefined": "off",
-        },
-    },
-    {
         files: ["config/linting/plugins/**/test/_internal/ruleTester.ts"],
         name: "ESLint Plugin Tests - internal helper filename",
         rules: {
@@ -1087,7 +1179,6 @@ export default defineConfig([
     {
         files: [
             "config/linting/plugins/uptime-watcher.mjs",
-            "config/linting/plugins/uptime-watcher-type-utils.mjs",
         ],
         name: "ESLint Plugin Wrapper - allowed re-export",
         rules: {
@@ -1467,7 +1558,9 @@ export default defineConfig([
         rules: {
             ...mdx.flat.rules,
             // MDX-specific rules
-            "mdx/remark": "warn",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-mdx ships a
+            // compatible implementation for mdx/remark.
+            "mdx/remark": "off",
             "no-unused-expressions": "error",
             // React rules for MDX components
             "react/react-in-jsx-scope": "off",
@@ -1541,7 +1634,9 @@ export default defineConfig([
             "markdown/require-alt-text": "warn",
             "markdown/table-column-count": "warn",
             // Remark linting integration
-            "mdx/remark": "warn",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-mdx ships a
+            // compatible implementation for mdx/remark.
+            "mdx/remark": "off",
         },
         settings: {
             processor: mdx.createRemarkProcessor({
@@ -1953,7 +2048,7 @@ export default defineConfig([
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
-            "@rushstack/security": rushStackSecurity,
+            ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             "array-func": arrayFunc,
@@ -2161,7 +2256,7 @@ export default defineConfig([
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
-            "@rushstack/security/no-unsafe-regexp": "warn",
+            ...rushStackSecurityRules,
             // Code spacing and formatting rules
             "@stylistic/lines-around-comment": [
                 "off",
@@ -3409,7 +3504,7 @@ export default defineConfig([
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
-            "@rushstack/security": rushStackSecurity,
+            ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             antfu: antfu,
@@ -3655,7 +3750,7 @@ export default defineConfig([
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
-            "@rushstack/security/no-unsafe-regexp": "warn",
+            ...rushStackSecurityRules,
             "@stylistic/jsx-child-element-spacing": "warn",
             "@stylistic/jsx-closing-bracket-location": "warn",
             "@stylistic/jsx-closing-tag-location": "warn",
@@ -5102,7 +5197,7 @@ export default defineConfig([
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
-            "@rushstack/security": rushStackSecurity,
+            ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             antfu: antfu,
@@ -5318,7 +5413,7 @@ export default defineConfig([
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
-            "@rushstack/security/no-unsafe-regexp": "warn",
+            ...rushStackSecurityRules,
             // Code spacing and formatting rules
             "@stylistic/lines-around-comment": [
                 "off",
@@ -6543,7 +6638,7 @@ export default defineConfig([
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             "@microsoft/sdl": pluginMicrosoftSdl,
-            "@rushstack/security": rushStackSecurity,
+            ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
             antfu: antfu,
@@ -6779,7 +6874,7 @@ export default defineConfig([
             "@microsoft/sdl/no-postmessage-star-origin": "warn",
             "@microsoft/sdl/no-unsafe-alloc": "warn",
             "@microsoft/sdl/no-winjs-html-unsafe": "warn",
-            "@rushstack/security/no-unsafe-regexp": "warn",
+            ...rushStackSecurityRules,
             "@stylistic/jsx-child-element-spacing": "warn",
             "@stylistic/jsx-closing-bracket-location": "warn",
             "@stylistic/jsx-closing-tag-location": "warn",
@@ -10949,9 +11044,8 @@ export default defineConfig([
     // MARK: @Stylistic Overrides
     // ═══════════════════════════════════════════════════════════════════════════════
     // NOTE: uptime-watcher drift-guard and utility-type convention rules are
-    // enabled (and scoped) by the internal repo presets:
-    // `...uptimeWatcherRepoConfigs` and
-    // `...uptimeWatcherTypeUtilsRepoConfigs`.
+    // enabled (and scoped) by the internal repo preset:
+    // `...uptimeWatcherRepoConfigs`.
     // Keep them centralized there to avoid config drift.
     {
         files: ["**/**"],
@@ -10989,6 +11083,9 @@ export default defineConfig([
             "callback-return": "off",
             "canonical/destructuring-property-newline": "off",
             "canonical/import-specifier-newline": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-exception-handling
+            // no longer assumes context.parserOptions always exists.
+            "ex/no-unhandled": "off",
             // Deprecated rules - to be removed in future
             "functional/no-promise-reject": "off",
             "functional/no-this-expressions": "off",
@@ -11000,11 +11097,54 @@ export default defineConfig([
             "functional/type-declaration-immutability": "off",
             // Github - to be enabled in future
             "github/filenames-match-regex": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-granular-selectors
+            // drops legacy context.getSource usage.
+            "granular-selectors/granular-selectors": "off",
             "i18n-text/no-en": "off",
+            // NOTE(ESLint10): Re-enable once import-x/unambiguous is
+            // compatible with ESLint 10 parser context assumptions.
+            "import-x/unambiguous": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-istanbul migrates
+            // away from removed rule context APIs.
+            "istanbul/no-ignore-file": "off",
+            "istanbul/prefer-ignore-reason": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-loadable-imports
+            // no longer depends on removed context.getSourceCode APIs.
+            "loadable-imports/sort": "off",
             "no-hardcoded-strings/no-hardcoded-strings": "off", // Will use i18n in future
             "prefer-arrow/prefer-arrow-functions": "off", // Too strict
+            // NOTE(ESLint10): Re-enable once eslint-plugin-react-useeffect
+            // migrates to ESLint 10-compatible rule context access.
+            "react-useeffect/no-non-function-return": "off",
+            // NOTE(ESLint10): Re-enable once
+            // eslint-plugin-sort-react-dependency-arrays updates
+            // `sort` to use ESLint 10-compatible source-code access.
+            "sort-react-dependency-arrays/sort": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-storybook
+            // migrates meta-satisfies-type to ESLint 10-compatible APIs.
+            "storybook/meta-satisfies-type": "off",
             // Styled-components-a11y (and jsx-a11y equivalents)
             "styled-components-a11y/lang": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-tailwindcss updates
+            // classnames-order for ESLint 10 context APIs.
+            "tailwind/classnames-order": "off",
+            // NOTE(ESLint10): Re-enable the remaining tailwind/* rules once
+            // eslint-plugin-tailwindcss is fully ESLint 10 compatible.
+            "tailwind/enforces-negative-arbitrary-values": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-tailwindcss updates
+            // enforces-shorthand for ESLint 10 context APIs.
+            "tailwind/enforces-shorthand": "off",
+            "tailwind/migration-from-tailwind-2": "off",
+            "tailwind/no-arbitrary-value": "off",
+            "tailwind/no-contradicting-classname": "off",
+            "tailwind/no-custom-classname": "off",
+            "tailwind/no-unnecessary-arbitrary-value": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-tsdoc-require
+            // supports ESLint 10 rule context APIs.
+            "tsdoc-require/require": "off",
+            // NOTE(ESLint10): Re-enable once eslint-plugin-tsdoc supports
+            // ESLint 10 without legacy context helpers.
+            "tsdoc/syntax": "off",
             "uptime-watcher/no-call-identifiers": "off",
             "uptime-watcher/no-local-identifiers": "off",
             "write-good-comments/write-good-comments": "off", // Too strict

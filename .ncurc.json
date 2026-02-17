@@ -47,10 +47,7 @@
     "prefix": "",
     "registry": "https://registry.npmjs.org/",
     "registryType": "npm",
-    "reject": [
-        "eslint",
-        "@eslint/js"
-    ],
+    "reject": [],
     "removeRange": false,
     "retry": 3,
     "root": true,

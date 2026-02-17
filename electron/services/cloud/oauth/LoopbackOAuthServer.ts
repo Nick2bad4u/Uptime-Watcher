@@ -1,4 +1,4 @@
-/* eslint-disable @microsoft/sdl/no-insecure-url -- OAuth loopback redirects require http://localhost; https would require local certificates. */
+ 
 
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
 
@@ -452,4 +452,4 @@ export async function startLoopbackOAuthServer(args?: {
     };
 }
 
-/* eslint-enable @microsoft/sdl/no-insecure-url -- End loopback OAuth URL exception. */
+ 

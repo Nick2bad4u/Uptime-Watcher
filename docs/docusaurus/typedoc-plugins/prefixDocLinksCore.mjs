@@ -1,6 +1,6 @@
 // @ts-check
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- This file intentionally uses JSDoc types that trigger TSDoc warnings in this repo; disable the rule for the whole file.
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types, tsdoc/syntax -- This is runtime code used by a TypeDoc plugin; we use JSDoc for typing without introducing TSDoc parsing issues. */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types -- This is runtime code used by a TypeDoc plugin; we use JSDoc for typing without introducing TSDoc parsing issues. */
 
 const SCHEME_RE = /^[a-zA-Z][a-zA-Z+.-]*:/u;
 

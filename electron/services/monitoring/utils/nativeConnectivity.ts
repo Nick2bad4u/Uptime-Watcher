@@ -32,7 +32,7 @@ import type { MonitorCheckResult } from "../types";
 
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
 
-/* eslint-disable @microsoft/sdl/no-insecure-url -- Scheme literals are used only for stripping input; they are not used as navigated/executed URLs. */
+ 
 
 const stripHttpScheme = (value: string): string => {
     const normalized = value.trim();
@@ -49,7 +49,7 @@ const stripHttpScheme = (value: string): string => {
     return normalized;
 };
 
-/* eslint-enable @microsoft/sdl/no-insecure-url -- End scheme stripping section. */
+ 
 
 /**
  * Configuration options for connectivity checking
