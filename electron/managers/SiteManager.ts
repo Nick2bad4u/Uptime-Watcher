@@ -52,6 +52,7 @@ import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -88,6 +89,26 @@ import {
 } from "./siteManager/updateSitesCache";
 import { validateSite as validateSiteHelper } from "./siteManager/validateSite";
 import { SiteManagerStateSync } from "./SiteManagerStateSync";
+
+const toSerializableErrorContext = (
+    error: unknown
+): {
+    errorMessage: string;
+    errorName: string;
+    errorStack?: string;
+} => {
+    const normalizedError = ensureError(error);
+
+    return {
+        errorMessage: normalizedError.message,
+        errorName: normalizedError.name,
+        ...(normalizedError.stack
+            ? {
+                  errorStack: normalizedError.stack,
+              }
+            : {}),
+    };
+};
 
 /**
  * @remarks
@@ -888,7 +909,7 @@ export class SiteManager {
                     onError: (error) => {
                         logger.debug(
                             LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,
-                            error
+                            toSerializableErrorContext(error)
                         );
                     },
                 }
@@ -903,7 +924,7 @@ export class SiteManager {
                     onError: (error) => {
                         logger.debug(
                             LOG_TEMPLATES.debug.SITE_LOADING_ERROR_IGNORED,
-                            error
+                            toSerializableErrorContext(error)
                         );
                     },
                 }

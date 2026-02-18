@@ -117,13 +117,15 @@ const logInvalidStatusUpdateAndThrow = (
     error: z.ZodError,
     metadata: UnknownRecord
 ): never => {
+    const errorContext = {
+        ...metadata,
+        issues: error.issues,
+    };
+
     logger.error(
         "[MonitoringService] Invalid status update returned after checkSiteNow",
         error,
-        {
-            ...metadata,
-            issues: error.issues,
-        }
+        errorContext
     );
 
     const { monitorId, siteIdentifier } = metadata;

@@ -8,6 +8,8 @@ import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteDetails } from "@app/components/SiteDetails/SiteDetails";
 import { useUIStore } from "@app/stores/ui/useUiStore";
+import { hasProperty, isObject } from "@shared/utils/typeGuards";
+import { validateSiteSnapshot } from "@shared/validation/guards";
 import { useEffect } from "react";
 import { action } from "storybook/actions";
 
@@ -51,13 +53,21 @@ const pausedSite = createMockSite({
     name: "Maintenance Window",
 });
 
-interface SiteDetailsStoryArgs {
-    onClose: () => void;
-    site: Site;
-}
+const resolveSiteFromStoryArgs = (args: unknown): Site => {
+    if (!isObject(args) || !hasProperty(args, "site")) {
+        return baseSite;
+    }
+
+    const parseResult = validateSiteSnapshot(args.site);
+    if (!parseResult.success) {
+        return baseSite;
+    }
+
+    return parseResult.data;
+};
 
 const withSiteDetailsState: Decorator = (StoryComponent, context) => {
-    const { site } = context.args as unknown as SiteDetailsStoryArgs;
+    const site = resolveSiteFromStoryArgs(context.args);
 
     useEffect(
         function syncSiteDetailsState(): () => void {
@@ -102,10 +112,7 @@ const meta: Meta<typeof SiteDetails> = {
     },
     component: SiteDetails,
     decorators: [
-        createSiteDecorator((context) => [
-            (context.args as unknown as SiteDetailsStoryArgs | undefined)
-                ?.site ?? baseSite,
-        ]),
+        createSiteDecorator((context) => [resolveSiteFromStoryArgs(context.args)]),
         withSiteDetailsState,
     ],
     parameters: {

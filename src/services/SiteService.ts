@@ -50,10 +50,12 @@ const logInvalidSnapshotAndThrow = (
     metadata: UnknownRecord,
     thrownMessage: string
 ): never => {
-    logger.error(`[SiteService] ${logMessage}`, error, {
+    const errorContext = {
         ...metadata,
         issues: error.issues,
-    });
+    };
+
+    logger.error(`[SiteService] ${logMessage}`, error, errorContext);
 
     throw new ApplicationError({
         cause: error,
@@ -189,13 +191,15 @@ export const SiteService: SiteServiceContract = {
             });
         }
 
+        const validationContext = {
+            invalidIndices,
+            issues,
+        };
+
         logger.error(
             "[SiteService] Invalid site snapshot(s) returned during getSites",
             validationResult.error,
-            {
-                invalidIndices,
-                issues,
-            }
+            validationContext
         );
 
         throw new ApplicationError({

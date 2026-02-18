@@ -60,6 +60,21 @@ const typedEventbusPayloadAssignableRule = createTypedRule({
                 }
 
                 if (methodName === "emit") {
+                    const expectedPayloadSymbol = callSignature.parameters[1];
+                    const expectedPayloadDeclaration =
+                        expectedPayloadSymbol?.valueDeclaration;
+
+                    if (
+                        expectedPayloadDeclaration &&
+                        "dotDotDotToken" in expectedPayloadDeclaration &&
+                        expectedPayloadDeclaration.dotDotDotToken
+                    ) {
+                        // EventEmitter's built-in emit signature is variadic
+                        // (`...args`). There is no single contract payload type
+                        // To validate in that case.
+                        return;
+                    }
+
                     const expectedPayloadType = getSignatureParameterTypeAt({
                         checker,
                         index: 1,

@@ -13,6 +13,8 @@ import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteList } from "@app/components/Dashboard/SiteList/SiteList";
 import { useUIStore } from "@app/stores/ui/useUiStore";
+import { hasProperty, isObject } from "@shared/utils/typeGuards";
+import { validateSiteSnapshot } from "@shared/validation/guards";
 import { useEffect } from "react";
 
 import {
@@ -71,9 +73,75 @@ const defaultSites: readonly Site[] = [
     }),
 ] as const;
 
+const getFallbackSiteListArgs = (): SiteListStoryArgs => ({
+    density: "comfortable",
+    layout: "card-large",
+    presentation: "stacked",
+    sites: defaultSites,
+});
+
+const parseSitesFromStoryArgs = (value: unknown): readonly Site[] => {
+    if (!Array.isArray(value)) {
+        return getFallbackSiteListArgs().sites;
+    }
+
+    const parsedSites: Site[] = [];
+    for (const candidate of value) {
+        const parseResult = validateSiteSnapshot(candidate);
+        if (!parseResult.success) {
+            return getFallbackSiteListArgs().sites;
+        }
+
+        parsedSites.push(parseResult.data);
+    }
+
+    return parsedSites;
+};
+
+const resolveSiteListStoryArgs = (args: unknown): SiteListStoryArgs => {
+    const fallback = getFallbackSiteListArgs();
+
+    if (!isObject(args)) {
+        return fallback;
+    }
+
+    const density =
+        hasProperty(args, "density") &&
+        (args.density === "comfortable" ||
+            args.density === "cozy" ||
+            args.density === "compact")
+            ? args.density
+            : fallback.density;
+
+    const layout =
+        hasProperty(args, "layout") &&
+        (args.layout === "card-large" ||
+            args.layout === "card-compact" ||
+            args.layout === "list")
+            ? args.layout
+            : fallback.layout;
+
+    const presentation =
+        hasProperty(args, "presentation") &&
+        (args.presentation === "stacked" || args.presentation === "grid")
+            ? args.presentation
+            : fallback.presentation;
+
+    const sites = hasProperty(args, "sites")
+        ? parseSitesFromStoryArgs(args.sites)
+        : fallback.sites;
+
+    return {
+        density,
+        layout,
+        presentation,
+        sites,
+    };
+};
+
 const withLayoutState: Decorator = (StoryComponent, context) => {
     const { density, layout, presentation } =
-        context.args as unknown as SiteListStoryArgs;
+        resolveSiteListStoryArgs(context.args);
 
     useEffect(
         function syncSiteListLayout(): () => void {
@@ -167,11 +235,7 @@ const meta: Meta<typeof SiteList> = {
     },
     component: SiteList,
     decorators: [
-        createSiteDecorator(
-            (context) =>
-                (context.args as unknown as SiteListStoryArgs | undefined)
-                    ?.sites ?? []
-        ),
+        createSiteDecorator((context) => resolveSiteListStoryArgs(context.args).sites),
         withLayoutState,
     ],
     parameters: {

@@ -22,8 +22,110 @@ const JSON_PRIMITIVE_NAMES = new Set([
     "true",
 ]);
 
-const NON_SERIALIZABLE_NAME_PATTERN =
-    /\b(?:Date|Function|Map|Promise|RegExp|Set|WeakMap|WeakSet|bigint|symbol)\b/v;
+const NON_SERIALIZABLE_TYPE_NAMES = new Set([
+    "bigint",
+    "Date",
+    "Function",
+    "Map",
+    "Promise",
+    "RegExp",
+    "Set",
+    "symbol",
+    "unique symbol",
+    "WeakMap",
+    "WeakSet",
+]);
+
+const JSON_LITERAL_PRIMITIVE_NAMES = new Set([
+    "false",
+    "null",
+    "true",
+    "undefined",
+]);
+
+/**
+ * @param {string} typeName
+ *
+ * @returns {boolean}
+ */
+const isStringLiteralTypeName = (typeName) =>
+    typeName.length >= 2 &&
+    typeName.startsWith('"') &&
+    typeName.endsWith('"');
+
+/**
+ * @param {string} typeName
+ *
+ * @returns {boolean}
+ */
+const isNumericLiteralTypeName = (typeName) => {
+    if (typeName.length === 0 || typeName === "Infinity" || typeName === "NaN") {
+        return false;
+    }
+
+    return Number.isFinite(Number(typeName));
+};
+
+/**
+ * @param {string} typeName
+ *
+ * @returns {boolean}
+ */
+const isBigIntLiteralTypeName = (typeName) => {
+    if (!typeName.endsWith("n") || typeName.length <= 1) {
+        return false;
+    }
+
+    const bigintSource = typeName.slice(0, -1);
+    return Number.isInteger(Number(bigintSource));
+};
+
+/**
+ * @param {string} typeName
+ *
+ * @returns {boolean}
+ */
+const isLikelyTypeParameterName = (typeName) =>
+    /^[A-Z]\w*$/v.test(typeName);
+
+/**
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression | import("@typescript-eslint/utils").TSESTree.SpreadElement} arg
+ *
+ * @returns {arg is import("@typescript-eslint/utils").TSESTree.Expression}
+ */
+const isContextLiteralExpression = (arg) => {
+    if (arg.type === "SpreadElement") {
+        return false;
+    }
+
+    return (
+        arg.type === "ArrayExpression" ||
+        arg.type === "Literal" ||
+        arg.type === "ObjectExpression" ||
+        arg.type === "TemplateLiteral"
+    );
+};
+
+/**
+ * @param {"action" | "debug" | "error" | "info" | "warn"} loggerMethod
+ * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} callExpression
+ *
+ * @returns {import("@typescript-eslint/utils").TSESTree.Expression | undefined}
+ */
+const getContextArgumentForMethod = (loggerMethod, callExpression) => {
+    // The shared logger signature is:
+    // - error(message, error?, ...args)
+    // - other levels: (message, ...args)
+    // Treat only explicit literal-like context objects as lint targets.
+    const targetIndex = loggerMethod === "error" ? 2 : 1;
+    const candidate = callExpression.arguments.at(targetIndex);
+
+    if (!candidate || !isContextLiteralExpression(candidate)) {
+        return;
+    }
+
+    return candidate;
+};
 
 /**
  * @param {import("typescript").TypeChecker} checker
@@ -41,12 +143,34 @@ const isJsonSerializableType = (checker, type, seen = new Set()) => {
 
     const typeName = checker.typeToString(type).trim();
 
-    if (JSON_PRIMITIVE_NAMES.has(typeName)) {
+    if (
+        NON_SERIALIZABLE_TYPE_NAMES.has(typeName) ||
+        isBigIntLiteralTypeName(typeName)
+    ) {
+        return false;
+    }
+
+    if (
+        typeName === "any" ||
+        typeName === "never" ||
+        typeName === "unknown" ||
+        isLikelyTypeParameterName(typeName)
+    ) {
+        // Unknown/Any/Type-parameter values are normalized at runtime by logger
+        // Utilities. Avoid static false positives on generic forwarding paths.
         return true;
     }
 
-    if (NON_SERIALIZABLE_NAME_PATTERN.test(typeName)) {
-        return false;
+    if (
+        JSON_LITERAL_PRIMITIVE_NAMES.has(typeName) ||
+        isStringLiteralTypeName(typeName) ||
+        isNumericLiteralTypeName(typeName)
+    ) {
+        return true;
+    }
+
+    if (JSON_PRIMITIVE_NAMES.has(typeName)) {
+        return true;
     }
 
     if (type.isUnion()) {
@@ -110,12 +234,10 @@ const isJsonSerializableType = (checker, type, seen = new Set()) => {
                 return true;
             }
 
-            let propertyType = checker.getTypeOfSymbolAtLocation(
+            const propertyType = checker.getTypeOfSymbolAtLocation(
                 propertySymbol,
                 valueDeclaration
             );
-
-            propertyType = checker.getNonNullableType(propertyType);
 
             return isJsonSerializableType(checker, propertyType, seen);
         }
@@ -124,6 +246,8 @@ const isJsonSerializableType = (checker, type, seen = new Set()) => {
 
 /**
  * @param {import("@typescript-eslint/utils").TSESTree.Expression} callee
+ *
+ * @returns {"action" | "debug" | "error" | "info" | "warn" | undefined}
  */
 const getLoggerMethod = (callee) => {
     if (
@@ -138,7 +262,9 @@ const getLoggerMethod = (callee) => {
         return;
     }
 
-    return callee.property.name;
+    return /** @type {"action" | "debug" | "error" | "info" | "warn"} */ (
+        callee.property.name
+    );
 };
 
 const loggerContextJsonSerializableRule = createTypedRule({
@@ -161,7 +287,7 @@ const loggerContextJsonSerializableRule = createTypedRule({
                     return;
                 }
 
-                const contextArg = node.arguments.at(-1);
+                const contextArg = getContextArgumentForMethod(loggerMethod, node);
                 if (!contextArg) {
                     return;
                 }

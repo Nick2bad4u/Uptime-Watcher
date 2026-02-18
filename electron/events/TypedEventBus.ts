@@ -357,7 +357,7 @@ export class TypedEventBus<
 
             // Use EventEmitter's emit to respect once() semantics and internal bookkeeping
             try {
-                this.emit(eventName, enhancedData);
+                this.emit(eventName, castUnchecked<EventMap[K]>(enhancedData));
             } catch (listenerError) {
                 // Log listener errors but don't let them fail the emission
                 // Use base logger directly for error objects since

@@ -8,6 +8,7 @@ import type { JSX } from "react";
 
 import { StatusSubscriptionIndicator } from "@app/components/Header/StatusSubscriptionIndicator";
 import { useSitesStore } from "@app/stores/sites/useSitesStore";
+import { hasProperty, isObject } from "@shared/utils/typeGuards";
 import { useEffect, useMemo } from "react";
 import { action } from "storybook/actions";
 
@@ -18,9 +19,20 @@ type IndicatorVariant =
     | "failed"
     | "disabled";
 
-interface StatusSubscriptionIndicatorStoryArgs {
-    variant: IndicatorVariant;
-}
+const isIndicatorVariant = (value: unknown): value is IndicatorVariant =>
+    value === "connecting" ||
+    value === "degraded" ||
+    value === "disabled" ||
+    value === "failed" ||
+    value === "healthy";
+
+const resolveVariantFromStoryArgs = (args: unknown): IndicatorVariant => {
+    if (!isObject(args) || !hasProperty(args, "variant")) {
+        return "healthy";
+    }
+
+    return isIndicatorVariant(args.variant) ? args.variant : "healthy";
+};
 
 type Story = StoryObj<typeof meta>;
 
@@ -127,8 +139,7 @@ const variantConfig: Record<
 };
 
 const withSubscriptionState: Decorator = (StoryComponent, context) => {
-    const { variant } =
-        context.args as unknown as StatusSubscriptionIndicatorStoryArgs;
+    const variant = resolveVariantFromStoryArgs(context.args);
 
     const config = useMemo(() => variantConfig[variant], [variant]);
     const summaryTemplate = useMemo(

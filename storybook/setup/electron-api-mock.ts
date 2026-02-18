@@ -747,9 +747,7 @@ export const setMockHistoryLimit = (historyLimit: number): void => {
 
 export const installElectronAPIMock = (): ElectronAPI => {
     if (typeof window !== "undefined") {
-        const windowRecord = window as unknown as {
-            electronAPI?: ElectronAPI;
-        };
+        const windowRecord = window as Partial<Pick<Window, "electronAPI">>;
 
         windowRecord.electronAPI ??= electronAPIMock;
     }

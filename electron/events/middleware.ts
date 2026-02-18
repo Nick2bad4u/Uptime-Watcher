@@ -322,7 +322,7 @@ export function createDebugMiddleware<
         const typedEvent = event as EventKey<EventMap>;
         const startTime = Date.now();
 
-        baseLogger.debug(`[EventBus:Debug] Processing event '${typedEvent}'`, {
+        const processingContext = {
             event: typedEvent,
             ...(verbose
                 ? {
@@ -331,7 +331,12 @@ export function createDebugMiddleware<
                   }
                 : undefined),
             timestamp: startTime,
-        });
+        };
+
+        baseLogger.debug(
+            `[EventBus:Debug] Processing event '${typedEvent}'`,
+            processingContext
+        );
 
         const proceed = next;
 
@@ -374,15 +379,16 @@ export function createErrorHandlingMiddleware<
                 await proceed();
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
+                const errorContext = {
+                    data: formatLoggableData(typedData),
+                    event: typedEvent,
+                    serializedData: safeSerialize(data),
+                };
 
                 baseLogger.error(
                     `[EventBus] Error in event '${typedEvent}': ${normalizedError.message}`,
                     normalizedError,
-                    {
-                        data: formatLoggableData(typedData),
-                        event: typedEvent,
-                        serializedData: safeSerialize(data),
-                    }
+                    errorContext
                 );
 
                 onError?.(normalizedError, {
