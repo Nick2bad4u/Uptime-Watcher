@@ -151,7 +151,7 @@ export interface SiteInfo {
  * @returns JSX.Element containing site header with controls
  */
 export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
-    memo(function SiteCardHeader({
+    memo(function SiteCardHeaderComponent({
         display,
         interactions,
         monitoring,

@@ -26,7 +26,7 @@ export interface SurfaceContainerProperties extends ThemedBoxProperties {
  * @returns JSX element providing a themed surface container.
  */
 export const SurfaceContainer: NamedExoticComponent<SurfaceContainerProperties> =
-    memo(function SurfaceContainer({
+    memo(function SurfaceContainerComponent({
         className,
         padding = "lg",
         rounded = "lg",

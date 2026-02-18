@@ -122,7 +122,7 @@ export interface SiteCardMonitorListProperties {
  * Monitor overview list used in stacked site card layout.
  */
 export const SiteCardMonitorList: NamedExoticComponent<SiteCardMonitorListProperties> =
-    memo(function SiteCardMonitorList({
+    memo(function SiteCardMonitorListComponent({
         monitors,
         selectedMonitorId,
     }: SiteCardMonitorListProperties) {

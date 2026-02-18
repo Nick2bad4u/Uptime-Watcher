@@ -58,7 +58,10 @@ export interface SiteTableViewProperties {
  * Renders sites in a compact table layout with fixed column widths.
  */
 export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
-    memo(function SiteTableView({ density, sites }: SiteTableViewProperties) {
+    memo(function SiteTableViewComponent({
+        density,
+        sites,
+    }: SiteTableViewProperties) {
         const densityClassName = DENSITY_CLASS_MAP[density];
         const tableClassName = `site-table ${densityClassName}`;
 

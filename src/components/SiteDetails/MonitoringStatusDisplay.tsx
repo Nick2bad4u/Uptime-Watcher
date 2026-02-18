@@ -43,7 +43,7 @@ export interface MonitoringStatusDisplayProperties {
  * @public
  */
 export const MonitoringStatusDisplay: NamedExoticComponent<MonitoringStatusDisplayProperties> =
-    memo(function MonitoringStatusDisplay({
+    memo(function MonitoringStatusDisplayComponent({
         monitors,
     }: MonitoringStatusDisplayProperties): JSX.Element {
         if (monitors.length === 0) {

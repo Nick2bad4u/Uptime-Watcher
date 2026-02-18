@@ -311,7 +311,7 @@ function useSiteDetailsHeaderModel(
  * @public
  */
 export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties> =
-    memo(function SiteDetailsHeader({
+    memo(function SiteDetailsHeaderComponent({
         onClose,
         selectedMonitor,
         site,

@@ -64,7 +64,7 @@ export interface MarqueeTextProperties {
  * Shared marquee presenter that keeps typography consistent across components.
  */
 export const MarqueeText: NamedExoticComponent<MarqueeTextProperties> = memo(
-    function MarqueeText({
+    function MarqueeTextComponent({
         activeClassName,
         className,
         cloneClassName,

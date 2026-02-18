@@ -87,7 +87,7 @@ export interface StatusBadgeProperties extends CoreComponentProperties {
  * @returns JSX element containing status indicator and text
  */
 export const StatusBadge: NamedExoticComponent<StatusBadgeProperties> = memo(
-    function StatusBadge({
+    function StatusBadgeComponent({
         className = "",
         formatter,
         label,

@@ -44,7 +44,7 @@ export interface SiteCardStatusProperties {
  * @see StatusBadge For the underlying status display component
  */
 export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
-    memo(function SiteCardStatus({
+    memo(function SiteCardStatusComponent({
         monitorLabel,
         status,
     }: SiteCardStatusProperties) {

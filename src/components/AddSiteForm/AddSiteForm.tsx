@@ -136,7 +136,7 @@ const HelperInfoIcon = AppIcons.ui.info;
  */
 
 export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
-    function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
+    function AddSiteFormComponent({ onSuccess }: AddSiteFormProperties) {
         // Subscribe only to the fields we actually use, otherwise this form
         // rerenders on unrelated store updates.
         const clearError = useErrorStore(selectClearError);

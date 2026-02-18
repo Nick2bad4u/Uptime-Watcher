@@ -90,7 +90,7 @@ export interface DynamicMonitorFieldsProperties {
  *   message.
  */
 export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProperties> =
-    memo(function DynamicMonitorFields({
+    memo(function DynamicMonitorFieldsComponent({
         isLoading = false,
         monitorType,
         onChange,

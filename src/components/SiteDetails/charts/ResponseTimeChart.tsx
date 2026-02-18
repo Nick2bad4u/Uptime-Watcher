@@ -106,7 +106,7 @@ export const ResponseTimeChart: NamedExoticComponent<
         data: ResponseTimeChartData;
         options: ChartOptions<"line">;
     }>
-> = memo(function ResponseTimeChart({
+> = memo(function ResponseTimeChartComponent({
     data,
     options,
 }: Readonly<{

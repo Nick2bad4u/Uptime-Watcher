@@ -37,7 +37,7 @@ export interface StatusIndicatorProperties extends CoreComponentProperties {
 }
 
 export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
-    memo(function StatusIndicator({
+    memo(function StatusIndicatorComponent({
         className = "",
         showText = false,
         size = "md",

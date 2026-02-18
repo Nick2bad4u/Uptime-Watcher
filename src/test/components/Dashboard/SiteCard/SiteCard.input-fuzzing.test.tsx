@@ -31,9 +31,13 @@ import type { ReactNode } from "react";
 import type { Site, Monitor, MonitorStatus, MonitorType } from "@shared/types";
 
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
+import { getMonitorTypeDisplayLabel } from "../../../../utils/fallbacks";
 
 // Mock state for testing
 let mockSiteData: Site | null = null;
+
+const normalizeStatusTestIdSegment = (segment: string): string =>
+    segment.replaceAll(/[^\dA-Za-z]/g, "_").toLowerCase();
 
 // Mock all SiteCard sub-components with testid patterns
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
@@ -49,13 +53,15 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
     SiteCardStatus: ({
+        monitorLabel,
         status,
-        selectedMonitorId,
     }: {
+        monitorLabel: string;
         status: MonitorStatus;
-        selectedMonitorId: string;
     }) => (
-        <div data-testid={`site-card-status-${selectedMonitorId}`}>
+        <div
+            data-testid={`site-card-status-${normalizeStatusTestIdSegment(monitorLabel)}`}
+        >
             Status: {status}
         </div>
     ),
@@ -397,17 +403,20 @@ const verifySiteCardStructure = (site: any) => {
         screen.getByTestId(`site-card-header-${site.identifier}`)
     ).toBeInTheDocument();
     if (site.monitors.length > 0) {
+        const expectedMonitorLabel = getMonitorTypeDisplayLabel(
+            site.monitors[0]!.type
+        );
         expect(
-            screen.getByTestId(`site-card-status-${site.monitors[0]!.id}`)
+            screen.getByTestId(
+                `site-card-status-${normalizeStatusTestIdSegment(expectedMonitorLabel)}`
+            )
         ).toBeInTheDocument();
         expect(
             screen.getByTestId(`site-card-history-${site.monitors[0]!.id}`)
         ).toBeInTheDocument();
     } else {
         // Handle sites with no monitors
-        expect(
-            screen.getByTestId(`site-card-status-default`)
-        ).toBeInTheDocument();
+        expect(screen.getByTestId("site-card-status-monitor")).toBeInTheDocument();
         expect(
             screen.getByTestId(`site-card-history-no-monitor`)
         ).toBeInTheDocument();
@@ -472,9 +481,12 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
 
                 // Use more specific selectors to avoid conflicts between multiple cards
                 if (site.monitors.length > 0) {
+                    const expectedMonitorLabel = getMonitorTypeDisplayLabel(
+                        site.monitors[0]!.type
+                    );
                     expect(
                         screen.getByTestId(
-                            `site-card-status-${site.monitors[0]!.id}`
+                            `site-card-status-${normalizeStatusTestIdSegment(expectedMonitorLabel)}`
                         )
                     ).toHaveTextContent("Status: up");
                     expect(
@@ -484,7 +496,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                     ).toHaveTextContent("History: 0 entries");
                 } else {
                     expect(
-                        screen.getByTestId(`site-card-status-default`)
+                        screen.getByTestId("site-card-status-monitor")
                     ).toHaveTextContent("Status: up");
                     expect(
                         screen.getByTestId(`site-card-history-no-monitor`)

@@ -94,7 +94,7 @@ const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
  * @public
  */
 export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
-    function ThemedText({
+    function ThemedTextComponent({
         align = "left",
         as: elementTag = "span",
         children,

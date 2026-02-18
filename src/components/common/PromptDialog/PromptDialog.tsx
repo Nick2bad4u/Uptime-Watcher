@@ -22,7 +22,7 @@ import { AppIcons, getIconSize } from "../../../utils/icons";
 import { Modal } from "../Modal/Modal";
 
 export const PromptDialog: NamedExoticComponent = memo(
-    function PromptDialog(): JSX.Element | null {
+    function PromptDialogComponent(): JSX.Element | null {
         const descriptionId = useId();
         const formId = useId();
         const { cancel, confirm, request, setValue, value } =

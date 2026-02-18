@@ -307,7 +307,10 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
         files: ["electron/services/ipc/handlers/**/*.{ts,tsx}"],
         ignores: ["electron/test/**/*"],
         name: "uptime-watcher:electron-ipc-handler-validation-guardrails",
-        rules: errorRulesFor(["electron-ipc-handler-require-validator"]),
+        rules: errorRulesFor([
+            "electron-ipc-handler-require-validator",
+            "ipc-handler-signature-matches-validator",
+        ]),
     }),
     withUptimeWatcherPlugin({
         files: ["electron/**/*.{ts,tsx}"],
@@ -393,6 +396,29 @@ const repoCoreConfigs = /** @type {readonly FlatConfig[]} */ ([
         ignores: ["src/test/**/*"],
         name: "uptime-watcher:zustand-stores-busy-flags-reset",
         rules: errorRulesFor(["store-actions-require-finally-reset"]),
+    }),
+    withUptimeWatcherPlugin({
+        files: [
+            "docs/**/*.{ts,tsx}",
+            "electron/**/*.{ts,tsx}",
+            "scripts/**/*.{ts,tsx,mts,cts}",
+            "shared/**/*.{ts,tsx,mts,cts}",
+            "src/**/*.{ts,tsx}",
+            "storybook/**/*.{ts,tsx}",
+        ],
+        ignores: [
+            "**/*.d.ts",
+            "electron/test/**/*",
+            "shared/test/**/*",
+            "src/test/**/*",
+        ],
+        name: "uptime-watcher:global-typed-safety-guardrails",
+        rules: errorRulesFor([
+            "logger-context-json-serializable",
+            "no-double-assertion-outside-tests",
+            "prefer-ensure-error-return-type",
+            "typed-eventbus-payload-assignable",
+        ]),
     }),
     withUptimeWatcherPlugin({
         files: [

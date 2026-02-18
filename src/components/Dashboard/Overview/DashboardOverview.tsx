@@ -43,7 +43,7 @@ interface OverviewCardDescriptor {
  * Dashboard overview card grid presenting global monitoring metrics.
  */
 export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties> =
-    memo(function DashboardOverview({ metrics, siteCountLabel }) {
+    memo(function DashboardOverviewComponent({ metrics, siteCountLabel }) {
         const cards = useMemo<OverviewCardDescriptor[]>(() => {
             const averageResponse =
                 typeof metrics.averageResponseTime === "number" &&

@@ -52,7 +52,7 @@ export interface MetricCardProperties {
  * @returns JSX.Element containing the metric display
  */
 export const MetricCard: NamedExoticComponent<MetricCardProperties> = memo(
-    function MetricCard({
+    function MetricCardComponent({
         className = "",
         label,
         value,

@@ -32,7 +32,7 @@ export interface MiniChartBarProperties extends CoreComponentProperties {
 }
 
 export const MiniChartBar: NamedExoticComponent<MiniChartBarProperties> = memo(
-    function MiniChartBar({
+    function MiniChartBarComponent({
         className = "",
         responseTime,
         status,

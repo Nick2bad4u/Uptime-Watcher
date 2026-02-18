@@ -21,7 +21,7 @@ export const UpdateNotificationBanner: NamedExoticComponent<{
     readonly onAction: () => void;
     readonly updateError: string | undefined;
     readonly updateStatus: UpdateStatus;
-}> = memo(function UpdateNotificationBanner({
+}> = memo(function UpdateNotificationBannerComponent({
     onAction,
     updateError,
     updateStatus,

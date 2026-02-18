@@ -129,7 +129,7 @@ const getDensityDataAttributes = (
  * Layout selector for the site list.
  */
 export const SiteListLayoutSelector: NamedExoticComponent<SiteListLayoutSelectorProperties> =
-    memo(function SiteListLayoutSelector({
+    memo(function SiteListLayoutSelectorComponent({
         cardPresentation,
         layout,
         listDensity,

@@ -17,7 +17,7 @@ const RevealIcon = AppIcons.ui.sidebarExpand;
  * Floating sidebar toggle rendered when the navigation is collapsed.
  */
 export const SidebarRevealButton: NamedExoticComponent = memo(
-    function SidebarRevealButton(): JSX.Element | null {
+    function SidebarRevealButtonComponent(): JSX.Element | null {
         const { isDark } = useTheme();
         const { isSidebarOpen, toggleSidebar } = useSidebarLayout();
         const className = useMemo(() => {

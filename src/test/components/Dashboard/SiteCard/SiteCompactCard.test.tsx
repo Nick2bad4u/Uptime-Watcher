@@ -7,6 +7,7 @@ import type { Monitor, Site, StatusHistory } from "@shared/types";
 import { STATUS_KIND } from "@shared/types";
 
 import { SiteCompactCard } from "../../../../components/Dashboard/SiteCard/SiteCompactCard";
+import { getMonitorTypeDisplayLabel } from "../../../../utils/fallbacks";
 
 const mockUseSite = vi.hoisted(() => vi.fn());
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
@@ -134,7 +135,9 @@ describe(SiteCompactCard, () => {
 
         const marqueeTexts = screen.getAllByTestId("marquee-text");
         expect(marqueeTexts[0]).toHaveTextContent("Production");
-        expect(screen.getByText(/site-identifier/)).toBeInTheDocument();
+        expect(marqueeTexts[1]).toHaveTextContent(
+            getMonitorTypeDisplayLabel(baseMonitor.type)
+        );
         expect(screen.getByText("42")).toBeInTheDocument();
 
         await user.click(screen.getByTestId("themed-box"));

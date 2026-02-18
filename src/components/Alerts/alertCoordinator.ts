@@ -20,11 +20,29 @@ const audioContextRef: { current: AudioContext | null } = {
 const ALERT_TONE_MIN_GAIN = 0.0001;
 const ALERT_TONE_MAX_GAIN = 0.08;
 const STATUS_ALERT_DEDUP_WINDOW_MS = 1500;
+const STATUS_ALERT_UNKNOWN_SEGMENT = "unknown";
 
 const recentStatusAlertFingerprints = new Map<string, number>();
 
-const normalizeStatusAlertKeySegment = (segment: string): string =>
-    segment.trim().toLowerCase();
+const normalizeStatusAlertKeySegment = (segment: unknown): string => {
+    if (typeof segment !== "string") {
+        return STATUS_ALERT_UNKNOWN_SEGMENT;
+    }
+
+    const normalizedSegment = segment.trim().toLowerCase();
+    return normalizedSegment.length > 0
+        ? normalizedSegment
+        : STATUS_ALERT_UNKNOWN_SEGMENT;
+};
+
+const hasNonEmptyStatusAlertSegment = (segment: unknown): boolean =>
+    typeof segment === "string" && segment.trim().length > 0;
+
+const hasRequiredStatusAlertFields = (update: StatusUpdate): boolean =>
+    hasNonEmptyStatusAlertSegment(update.monitorId) &&
+    hasNonEmptyStatusAlertSegment(update.siteIdentifier) &&
+    hasNonEmptyStatusAlertSegment(update.status) &&
+    hasNonEmptyStatusAlertSegment(update.timestamp);
 
 const pruneRecentStatusAlertFingerprints = (now: number): void => {
     for (const [fingerprint, seenAt] of recentStatusAlertFingerprints) {
@@ -40,7 +58,9 @@ const createStatusAlertFingerprint = (update: StatusUpdate): string =>
         normalizeStatusAlertKeySegment(update.monitorId),
         normalizeStatusAlertKeySegment(update.timestamp),
         normalizeStatusAlertKeySegment(update.status),
-        normalizeStatusAlertKeySegment(update.previousStatus ?? "unknown"),
+        normalizeStatusAlertKeySegment(
+            update.previousStatus ?? STATUS_ALERT_UNKNOWN_SEGMENT
+        ),
     ].join("|");
 
 const isDuplicateStatusAlertUpdate = (update: StatusUpdate): boolean => {
@@ -242,6 +262,18 @@ export const resetStatusAlertDeduplicationForTesting = (): void => {
 export const enqueueAlertFromStatusUpdate = (
     update: StatusUpdate
 ): StatusAlert | undefined => {
+    if (!hasRequiredStatusAlertFields(update)) {
+        logger.warn("Skipping in-app status alert due invalid update payload", {
+            monitorId: normalizeStatusAlertKeySegment(update.monitorId),
+            siteIdentifier: normalizeStatusAlertKeySegment(
+                update.siteIdentifier
+            ),
+            status: normalizeStatusAlertKeySegment(update.status),
+            timestamp: normalizeStatusAlertKeySegment(update.timestamp),
+        });
+        return undefined;
+    }
+
     const { settings } = useSettingsStore.getState();
 
     if (!settings.inAppAlertsEnabled) {

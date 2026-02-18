@@ -96,7 +96,7 @@ export interface MonitorSelectorProperties {
  * @returns JSX.Element containing the monitor selector dropdown
  */
 export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
-    memo(function MonitorSelector({
+    memo(function MonitorSelectorComponent({
         className = "min-w-20",
         disabled,
         monitors,

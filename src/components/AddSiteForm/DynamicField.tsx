@@ -114,7 +114,7 @@ interface DynamicFieldProperties {
  * @public
  */
 export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
-    function DynamicField({
+    function DynamicFieldComponent({
         disabled = false,
         field,
         onChange,

@@ -46,7 +46,7 @@ function renderEmphasizedMessage(
  * Confirmation dialog component rendered globally.
  */
 export const ConfirmDialog: NamedExoticComponent = memo(
-    function ConfirmDialog(): JSX.Element | null {
+    function ConfirmDialogComponent(): JSX.Element | null {
         const descriptionId = useId();
         const { cancel, confirm, request } = useConfirmDialogControls();
 

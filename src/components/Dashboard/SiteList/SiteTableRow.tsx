@@ -46,7 +46,7 @@ type SurfaceOrderStyle = CSSProperties & {
  * Table row displaying monitoring information for a single site.
  */
 export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
-    function SiteTableRow({
+    function SiteTableRowComponent({
         rowOrder,
         rowVariant,
         site,
@@ -103,8 +103,8 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
         } = useDashboardSiteSummaryMeta(dashboardMetaArgs);
 
         const statusFormatter = useCallback(
-            (_label: string, monitorStatus: MonitorStatus) =>
-                toSentenceCase(monitorStatus),
+            (label: string, monitorStatus: MonitorStatus) =>
+                `${label}: ${toSentenceCase(monitorStatus)}`,
             []
         );
 

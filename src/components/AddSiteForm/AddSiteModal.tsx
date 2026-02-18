@@ -46,7 +46,7 @@ export interface AddSiteModalProperties {
  * @returns JSX element containing the modal dialog with AddSiteForm
  */
 export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
-    function AddSiteModal({ onClose }: AddSiteModalProperties) {
+    function AddSiteModalComponent({ onClose }: AddSiteModalProperties) {
         const { isDark } = useTheme();
         const CloseIcon = AppIcons.ui.close;
         const AddIcon = AppIcons.actions.add;

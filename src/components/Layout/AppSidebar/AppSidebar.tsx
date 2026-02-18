@@ -71,7 +71,7 @@ const STATUS_CLASS_MAP: Record<SiteStatus, string> = {
  * Props are sourced from stores, therefore the component exposes no explicit
  * properties.
  */
-export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
+export const AppSidebar: NamedExoticComponent = memo(function AppSidebarComponent() {
     const { isDark, toggleTheme } = useTheme();
     const { isSidebarOpen, toggleSidebar } = useSidebarLayout();
     const sites = useSitesStore(useCallback((state) => state.sites, []));

@@ -252,7 +252,7 @@ const FILTER_OPTIONS: ReadonlyArray<{
  * @public
  */
 export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
-    function HistoryTab({
+    function HistoryTabComponent({
         formatFullTimestamp,
         formatResponseTime,
         selectedMonitor,

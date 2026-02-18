@@ -171,7 +171,7 @@ export const CloudSettingsSection = (): JSX.Element => {
         fireAndForget(connectGoogleDrive);
     }, [connectGoogleDrive, fireAndForget]);
     const confirmDisconnect = useCallback(
-        async function confirmDisconnect(): Promise<void> {
+        async function confirmDisconnectCallback(): Promise<void> {
             const confirmed = await requestConfirmation({
                 confirmLabel: "Disconnect",
                 message:
@@ -190,7 +190,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const handleDisconnect = useCallback(
-        function handleDisconnect(): void {
+        function handleDisconnectCallback(): void {
             fireAndForget(confirmDisconnect);
         },
         [confirmDisconnect, fireAndForget]
@@ -220,7 +220,9 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const confirmRestoreBackup = useCallback(
-        async function confirmRestoreBackup(key: string): Promise<void> {
+        async function confirmRestoreBackupCallback(
+            key: string
+        ): Promise<void> {
             const entry = backups.find((backup) => backup.key === key);
 
             const confirmed = await requestConfirmation({
@@ -244,14 +246,16 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const handleRestoreBackup = useCallback(
-        function handleRestoreBackup(key: string): void {
+        function handleRestoreBackupCallback(key: string): void {
             fireAndForget(() => confirmRestoreBackup(key));
         },
         [confirmRestoreBackup, fireAndForget]
     );
 
     const confirmDeleteBackup = useCallback(
-        async function confirmDeleteBackup(key: string): Promise<void> {
+        async function confirmDeleteBackupCallback(
+            key: string
+        ): Promise<void> {
             const entry = backups.find((backup) => backup.key === key);
 
             const confirmed = await requestConfirmation({
@@ -282,7 +286,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const handleSetEncryptionPassphrase = useCallback(
-        function handleSetEncryptionPassphrase(): void {
+        function handleSetEncryptionPassphraseCallback(): void {
             fireAndForget(async () => {
                 const encryptionMode = status?.encryptionMode ?? "none";
                 const result = await requestPrompt({
@@ -316,7 +320,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const handleClearEncryptionKey = useCallback(
-        function handleClearEncryptionKey(): void {
+        function handleClearEncryptionKeyCallback(): void {
             fireAndForget(async () => {
                 const confirmed = await requestConfirmation({
                     confirmLabel: "Clear key",
@@ -341,7 +345,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const confirmEncryptBackups = useCallback(
-        async function confirmEncryptBackups(args: {
+        async function confirmEncryptBackupsCallback(args: {
             deleteSource: boolean;
         }): Promise<void> {
             const targetCount = backups.filter(
@@ -380,21 +384,21 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const handleEncryptBackupsKeepOriginals = useCallback(
-        function handleEncryptBackupsKeepOriginals(): void {
+        function handleEncryptBackupsKeepOriginalsCallback(): void {
             fireAndForget(() => confirmEncryptBackups({ deleteSource: false }));
         },
         [confirmEncryptBackups, fireAndForget]
     );
 
     const handleEncryptBackupsDeleteOriginals = useCallback(
-        function handleEncryptBackupsDeleteOriginals(): void {
+        function handleEncryptBackupsDeleteOriginalsCallback(): void {
             fireAndForget(() => confirmEncryptBackups({ deleteSource: true }));
         },
         [confirmEncryptBackups, fireAndForget]
     );
 
     const confirmResetRemoteSyncState = useCallback(
-        async function confirmResetRemoteSyncState(): Promise<void> {
+        async function confirmResetRemoteSyncStateCallback(): Promise<void> {
             const preview =
                 remoteSyncResetPreview ??
                 (await refreshRemoteSyncResetPreview());
@@ -443,14 +447,14 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const handleResetRemoteSyncState = useCallback(
-        function handleResetRemoteSyncState(): void {
+        function handleResetRemoteSyncStateCallback(): void {
             fireAndForget(confirmResetRemoteSyncState);
         },
         [confirmResetRemoteSyncState, fireAndForget]
     );
 
     const handleRefreshRemoteSyncResetPreview = useCallback(
-        function handleRefreshRemoteSyncResetPreview(): void {
+        function handleRefreshRemoteSyncResetPreviewCallback(): void {
             fireAndForget(refreshRemoteSyncResetPreview);
         },
         [fireAndForget, refreshRemoteSyncResetPreview]

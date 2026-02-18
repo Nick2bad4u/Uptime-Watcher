@@ -99,7 +99,7 @@ const formatStatus = (value: string): string => {
  * @returns JSX.Element containing the complete site monitoring card
  */
 export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
-    function SiteCard({ presentation = "grid", site }: SiteCardProperties) {
+    function SiteCardComponent({ presentation = "grid", site }: SiteCardProperties) {
         // Use our custom hook to get all the data and functionality we need
         const {
             averageResponseTime,

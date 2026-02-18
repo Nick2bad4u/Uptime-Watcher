@@ -98,7 +98,7 @@ function areHistoryPropsEqual(
  */
 export const SiteCardHistory: NamedExoticComponent<SiteCardHistoryProperties> =
     memo(
-        function SiteCardHistory({
+        function SiteCardHistoryComponent({
             filteredHistory,
             monitor,
         }: SiteCardHistoryProperties) {

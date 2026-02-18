@@ -86,7 +86,7 @@ export interface FormFieldProperties extends FormFieldBaseProperties {
  * @public
  */
 export const FormField: NamedExoticComponent<FormFieldProperties> = memo(
-    function FormField({
+    function FormFieldComponent({
         children,
         error,
         helpText,

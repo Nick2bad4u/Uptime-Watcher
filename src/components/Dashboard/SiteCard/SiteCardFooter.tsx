@@ -12,7 +12,7 @@ import { ThemedText } from "../../../theme/components/ThemedText";
  * @returns Memoized hint element encouraging users to open the detailed view.
  */
 export const SiteCardFooter: NamedExoticComponent<object> = memo(
-    function SiteCardFooter() {
+    function SiteCardFooterComponent() {
         return (
             <div
                 className="site-card__inline-hint"

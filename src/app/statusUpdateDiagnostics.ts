@@ -47,9 +47,12 @@ export function resolveStatusUpdateSiteIdentifier(
         return siteIdentifierFromSite;
     }
 
-    const siteIdentifierFromEvent = update.siteIdentifier.trim();
-    if (siteIdentifierFromEvent.length > 0) {
-        return siteIdentifierFromEvent;
+    const siteIdentifierCandidate = update.siteIdentifier;
+    if (typeof siteIdentifierCandidate === "string") {
+        const siteIdentifierFromEvent = siteIdentifierCandidate.trim();
+        if (siteIdentifierFromEvent.length > 0) {
+            return siteIdentifierFromEvent;
+        }
     }
 
     return "unknown-site";

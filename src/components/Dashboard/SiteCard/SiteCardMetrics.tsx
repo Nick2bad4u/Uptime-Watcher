@@ -48,7 +48,9 @@ export interface SiteCardMetricsProperties {
  * @returns JSX element containing the metrics grid
  */
 export const SiteCardMetrics: NamedExoticComponent<SiteCardMetricsProperties> =
-    memo(function SiteCardMetrics({ metrics }: SiteCardMetricsProperties) {
+    memo(function SiteCardMetricsComponent({
+        metrics,
+    }: SiteCardMetricsProperties) {
         return (
             <div
                 className="site-card__metrics-grid"

@@ -45,7 +45,6 @@ import arrayFunc from "eslint-plugin-array-func";
 import pluginBetterTailwindcss from "eslint-plugin-better-tailwindcss";
 import pluginBoundaries from "eslint-plugin-boundaries";
 import pluginCanonicalRaw from "eslint-plugin-canonical";
-import pluginCasePoliceRaw from "eslint-plugin-case-police";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginCleanCode from "eslint-plugin-clean-code";
 // New plugins from user request
@@ -288,31 +287,6 @@ console.warn(
     "[eslint.config] @microsoft/eslint-plugin-sdl is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
 );
 
-const deprecationFallbackPlugin = {
-    rules: {
-        deprecation: {
-            create: () => ({}),
-            meta: {
-                docs: {
-                    description:
-                        "Temporarily disabled while awaiting ESLint 10-compatible eslint-plugin-deprecation.",
-                },
-                schema: [],
-                type: "problem",
-            },
-        },
-    },
-};
-
-const pluginDeprecation = deprecationFallbackPlugin;
-/**
- * NOTE(ESLint10): Re-enable eslint-plugin-deprecation once upstream supports
- * ESLint 10 / @typescript-eslint v8 runtime contracts.
- */
-console.warn(
-    "[eslint.config] eslint-plugin-deprecation is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
-);
-
 /**
  * NOTE(ESLint10): Re-enable @rushstack/eslint-plugin-security once upstream
  * publishes an ESLint 10-compatible release.
@@ -336,7 +310,6 @@ const rushStackSecurityRules = rushStackSecurityRaw
  * context APIs removed in ESLint 10.
  */
 const pluginCanonical = fixupPluginRules(pluginCanonicalRaw);
-const pluginCasePolice = fixupPluginRules(pluginCasePoliceRaw);
 const pluginFunctional = fixupPluginRules(pluginFunctionalRaw);
 const mdx = mdxRaw;
 const pluginNoConstructBind = fixupPluginRules(pluginNoConstructBindRaw);
@@ -1281,12 +1254,14 @@ export default defineConfig([
             "html/no-ineffective-attrs": "warn",
             // HTML Eslint Plugin Rules (html/*)
             "html/no-inline-styles": "warn",
+            "html/no-invalid-attr-value": "warn",
             "html/no-invalid-entity": "warn",
             "html/no-invalid-role": "warn",
             "html/no-multiple-empty-lines": "warn",
             "html/no-nested-interactive": "warn",
             "html/no-non-scalable-viewport": "warn",
             "html/no-positive-tabindex": "warn",
+            "html/no-redundant-role": "warn",
             "html/no-restricted-attr-values": "warn",
             "html/no-restricted-attrs": "warn",
             "html/no-restricted-tags": "warn",
@@ -1344,6 +1319,8 @@ export default defineConfig([
                 "error",
                 { enforceBeforeSelfClose: true },
             ],
+            "html/no-invalid-attr-value": "warn",
+            "html/no-redundant-role": "warn",
             "html/require-closing-tags": "off",
             "styled-components-a11y/lang": "off",
             "xss/no-mixed-html": [
@@ -2061,8 +2038,6 @@ export default defineConfig([
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             etc: fixupPluginRules(etc),
@@ -2368,7 +2343,7 @@ export default defineConfig([
             "@typescript-eslint/no-base-to-string": "warn",
             "@typescript-eslint/no-confusing-non-null-assertion": "warn",
             "@typescript-eslint/no-confusing-void-expression": "warn",
-            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-deprecated": "error",
             "@typescript-eslint/no-dupe-class-members": "warn",
             "@typescript-eslint/no-duplicate-enum-values": "warn",
             "@typescript-eslint/no-duplicate-type-constituents": "warn",
@@ -2709,7 +2684,6 @@ export default defineConfig([
                     allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
-            "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
@@ -3519,8 +3493,6 @@ export default defineConfig([
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             etc: fixupPluginRules(etc),
@@ -3875,7 +3847,7 @@ export default defineConfig([
             "@typescript-eslint/no-base-to-string": "warn",
             "@typescript-eslint/no-confusing-non-null-assertion": "warn",
             "@typescript-eslint/no-confusing-void-expression": "warn",
-            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-deprecated": "error",
             "@typescript-eslint/no-dupe-class-members": "warn",
             "@typescript-eslint/no-duplicate-enum-values": "warn",
             "@typescript-eslint/no-duplicate-type-constituents": "warn",
@@ -4143,7 +4115,6 @@ export default defineConfig([
                     allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
-            "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
@@ -5211,8 +5182,6 @@ export default defineConfig([
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             etc: fixupPluginRules(etc),
@@ -5520,7 +5489,7 @@ export default defineConfig([
             "@typescript-eslint/no-base-to-string": "warn",
             "@typescript-eslint/no-confusing-non-null-assertion": "warn",
             "@typescript-eslint/no-confusing-void-expression": "warn",
-            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-deprecated": "error",
             "@typescript-eslint/no-dupe-class-members": "warn",
             "@typescript-eslint/no-duplicate-enum-values": "warn",
             "@typescript-eslint/no-duplicate-type-constituents": "warn",
@@ -5871,7 +5840,6 @@ export default defineConfig([
                     allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
-            "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",
@@ -6652,8 +6620,6 @@ export default defineConfig([
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
-            deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
             etc: fixupPluginRules(etc),
@@ -6999,7 +6965,7 @@ export default defineConfig([
             "@typescript-eslint/no-base-to-string": "warn",
             "@typescript-eslint/no-confusing-non-null-assertion": "warn",
             "@typescript-eslint/no-confusing-void-expression": "warn",
-            "@typescript-eslint/no-deprecated": "warn",
+            "@typescript-eslint/no-deprecated": "error",
             "@typescript-eslint/no-dupe-class-members": "warn",
             "@typescript-eslint/no-duplicate-enum-values": "warn",
             "@typescript-eslint/no-duplicate-type-constituents": "warn",
@@ -7292,7 +7258,6 @@ export default defineConfig([
                     allowed: ["eslint-plugin-react", "axios"],
                 },
             ],
-            "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: ["error", "always"],
             "eslint-plugin-goodeffects/enforceNamedEffectCallbacks": "error",

@@ -96,7 +96,7 @@ export const StatusChart: NamedExoticComponent<
         data: StatusBarChartData;
         options: ChartOptions<"bar">;
     }>
-> = memo(function StatusChart({
+> = memo(function StatusChartComponent({
     data,
     options,
 }: Readonly<{

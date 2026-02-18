@@ -81,7 +81,7 @@ export const UptimeChart: NamedExoticComponent<
         data: UptimeChartData;
         options: ChartOptions<"doughnut">;
     }>
-> = memo(function UptimeChart({
+> = memo(function UptimeChartComponent({
     data,
     options,
 }: Readonly<{

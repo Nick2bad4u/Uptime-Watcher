@@ -40,7 +40,9 @@ export interface SiteCompactCardProperties {
  * Condensed site card used for the "Mini" layout option.
  */
 export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
-    memo(function SiteCompactCard({ site }: SiteCompactCardProperties) {
+    memo(function SiteCompactCardComponent({
+        site,
+    }: SiteCompactCardProperties) {
         const {
             checkCount,
             handleCardClick,

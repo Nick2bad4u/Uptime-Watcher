@@ -98,7 +98,7 @@ export interface ThemedBadgeProperties extends CoreComponentProperties {
  * @public
  */
 export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
-    function ThemedBadge({
+    function ThemedBadgeComponent({
         children,
         className = "",
         icon,

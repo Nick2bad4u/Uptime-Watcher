@@ -115,7 +115,7 @@ const assertUnreachable = (value: never): never => {
 };
 
 export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
-    function Tooltip({
+    function TooltipComponent({
         children,
         className = "",
         containerClassName = "",

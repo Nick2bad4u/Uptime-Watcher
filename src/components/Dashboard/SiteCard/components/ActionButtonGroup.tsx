@@ -85,7 +85,7 @@ export interface ActionButtonGroupProperties {
  * @returns JSX element containing action buttons
  */
 export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties> =
-    memo(function ActionButtonGroup({
+    memo(function ActionButtonGroupComponent({
         allMonitorsRunning,
         buttonSize = "sm",
         disabled,

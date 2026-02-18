@@ -45,7 +45,7 @@ export interface HistoryChartProperties extends CoreComponentProperties {
  *   (following React conventions for conditional rendering)
  */
 export const HistoryChart: NamedExoticComponent<HistoryChartProperties> = memo(
-    function HistoryChart({
+    function HistoryChartComponent({
         className = "",
         history,
         maxItems = 120,

@@ -106,7 +106,7 @@ import { useTheme } from "./theme/useTheme";
  * @see {@link useTheme} for theme management
  * @see {@link src/stores/sites/useSitesStore#useSitesStore} for site state management
  */
-export const App: NamedExoticComponent = memo(function App(): JSX.Element {
+export const App: NamedExoticComponent = memo(function AppComponent(): JSX.Element {
     // Error store
     const { clearError, isLoading, lastError } = useErrorStore(
         useShallow(

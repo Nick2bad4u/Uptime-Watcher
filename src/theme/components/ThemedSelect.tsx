@@ -103,7 +103,7 @@ export interface ThemedSelectProperties
 }
 
 const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
-    function ForwardedSelect(
+    function ForwardedSelectComponent(
         {
             "aria-describedby": ariaDescribedBy,
             [ARIA_LABEL]: ariaLabel,

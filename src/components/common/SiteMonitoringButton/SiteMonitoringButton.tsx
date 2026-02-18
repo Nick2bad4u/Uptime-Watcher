@@ -123,7 +123,7 @@ export interface SiteMonitoringButtonProperties extends CoreComponentProperties 
  * @returns JSX element containing the themed monitoring button
  */
 export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProperties> =
-    memo(function SiteMonitoringButton({
+    memo(function SiteMonitoringButtonComponent({
         allMonitorsRunning,
         className = "",
         compact = false,
@@ -227,3 +227,5 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
             </Tooltip>
         );
     });
+
+SiteMonitoringButton.displayName = "SiteMonitoringButton";
