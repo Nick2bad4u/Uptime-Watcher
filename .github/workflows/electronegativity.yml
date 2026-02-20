@@ -17,7 +17,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
+              uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e # v2.14.2
               with:
                   egress-policy: audit
 
@@ -30,6 +30,6 @@ jobs:
                   input: .
                   version: latest
             - name: Upload SARIF results
-              uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v3.29.5
+              uses: github/codeql-action/upload-sarif@9e907b5e64f6b83e7804b09294d44122997950d6 # v3.29.5
               with:
                   sarif_file: ../electronegativity_results
