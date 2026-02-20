@@ -1,5 +1,34 @@
 # yaml-language-server: $schema=https://www.schemastore.org/pull-request-labeler.json
-
+#
+# =============================================================================
+# PR Labeler Configuration + Label Bootstrap Helper
+# =============================================================================
+#
+# This file configures automatic PR labeling rules (GitHub Action / labeler).
+# It also serves as the *source of label names* if you choose.
+#
+# -----------------------------------------------------------------------------
+# Bootstrap labels (GitHub CLI)
+# -----------------------------------------------------------------------------
+# Quick start (embedded standard label set, create/update):
+#   pwsh ./scripts/bootstrap-labels.ps1
+#
+# Use this file's top-level keys as the label *name* list:
+#   pwsh ./scripts/bootstrap-labels.ps1 -FromLabelerYml
+#
+# Enforce that every key in this file exists in the embedded label definitions:
+#   pwsh ./scripts/bootstrap-labels.ps1 -FromLabelerYml -Strict
+#
+# Safety switches:
+#   -WhatIf    : preview commands without changes
+#   -AuditOnly : report missing/extra/different labels without changes
+#   -NoForce   : create-only (do not update existing labels)
+#   -Repo      : target a specific repo: -Repo "OWNER/REPO"
+#
+# Important:
+# - labeler.yml does NOT contain colors/descriptions. The script uses embedded
+#   defaults for known labels, and (unless -Strict) a fallback for unknown labels.
+# =============================================================================
 "CI/CD":
     - changed-files:
           - any-glob-to-any-file:

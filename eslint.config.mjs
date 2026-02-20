@@ -166,8 +166,6 @@ import pluginSortDestructure from "eslint-plugin-sort-destructure-keys";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSortKeysFix from "eslint-plugin-sort-keys-fix";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginSortReactDependency from "eslint-plugin-sort-react-dependency-arrays";
-// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import sqlTemplate from "eslint-plugin-sql-template";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSSR from "eslint-plugin-ssr-friendly";
@@ -202,7 +200,7 @@ import xss from "eslint-plugin-xss";
 import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
 import globals from "globals";
-import jsoncEslintParser from "jsonc-eslint-parser";
+import * as jsoncEslintParser from "jsonc-eslint-parser";
 import { createRequire } from "node:module";
 import * as path from "node:path";
 import * as tomlEslintParser from "toml-eslint-parser";
@@ -3556,7 +3554,6 @@ export default defineConfig([
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
-            "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
             "ssr-friendly": fixupPluginRules(pluginSSR),
             storybook: storybook,
@@ -4907,7 +4904,6 @@ export default defineConfig([
             "sort-imports": "off",
             "sort-keys": "off",
             "sort-keys-fix/sort-keys-fix": "off",
-            "sort-react-dependency-arrays/sort": "error",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
@@ -6683,7 +6679,6 @@ export default defineConfig([
             "sort-class-members": pluginSortClassMembers,
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
-            "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
@@ -8050,7 +8045,6 @@ export default defineConfig([
             "sort-imports": "off",
             "sort-keys": "off",
             "sort-keys-fix/sort-keys-fix": "off",
-            "sort-react-dependency-arrays/sort": "error",
             "sql-template/no-unsafe-query": "error",
             "ssr-friendly/no-dom-globals-in-constructor": "error",
             "ssr-friendly/no-dom-globals-in-module-scope": "error",
@@ -11081,10 +11075,6 @@ export default defineConfig([
             // NOTE(ESLint10): Re-enable once eslint-plugin-react-useeffect
             // migrates to ESLint 10-compatible rule context access.
             "react-useeffect/no-non-function-return": "off",
-            // NOTE(ESLint10): Re-enable once
-            // eslint-plugin-sort-react-dependency-arrays updates
-            // `sort` to use ESLint 10-compatible source-code access.
-            "sort-react-dependency-arrays/sort": "off",
             // NOTE(ESLint10): Re-enable once eslint-plugin-storybook
             // migrates meta-satisfies-type to ESLint 10-compatible APIs.
             "storybook/meta-satisfies-type": "off",

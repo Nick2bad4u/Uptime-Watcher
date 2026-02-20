@@ -12,11 +12,9 @@ import { existsSync } from "node:fs";
 import * as path from "node:path";
 import { inspect } from "node:util";
 import pc from "picocolors";
-import { visualizer } from "rollup-plugin-visualizer";
 import {
     defineConfig,
     normalizePath,
-    type PluginOption,
     type UserConfigFnObject,
 } from "vite";
 import { analyzer } from "vite-bundle-analyzer";
@@ -167,7 +165,7 @@ const getWasmSourcePath = (): string => {
  * Vite configuration for Uptime Watcher Electron app.
  */
 
-export default defineConfig( ( { command, mode } ) => {
+const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
     // Prefer Vite's provided mode over raw NODE_ENV for consistency.
     const codecovToken = getEnvironmentVariable( "CODECOV_TOKEN" );
     const isTestMode = mode === "test";
@@ -456,39 +454,15 @@ export default defineConfig( ( { command, mode } ) => {
             // can cause significant memory pressure on Windows.
             ...( isBuild
                 ? [
-                    visualizer( {
-                        brotliSize: true,
-                        emitFile: true,
-                        exclude: [
-                            { file: "node_modules/**" },
-                            { file: "**/*.test.*" },
-                            { file: "**/*.spec.*" },
-                        ],
-                        filename: "build-stats.html",
-                        gzipSize: true,
-                        include: [
-                            { file: "**/*.ts" },
-                            { file: "**/*.tsx" },
-                            { file: "**/*.js" },
-                            { file: "**/*.jsx" },
-                            { file: "**/*.mjs" },
-                            { file: "**/*.cjs" },
-                        ],
-                        open: false,
-                        projectRoot: normalizePath( path.resolve( dirname ) ),
-                        sourcemap: true,
-                        template: "treemap",
-                        title: "Electron React Bundle Stats",
-                    } ) as PluginOption,
                     analyzer( {
                         analyzerMode: "static", // Generate static HTML report
                         brotliOptions: {}, // Use default brotli options
                         defaultSizes: "gzip", // Show gzipped sizes by default
-                        fileName: "bundle-analysis", // Different from visualizer
+                        fileName: "bundle-analysis",
                         gzipOptions: {}, // Use default gzip options
-                        openAnalyzer: false, // Don't auto-open (you have visualizer for that)
+                        openAnalyzer: false,
                         reportTitle: "Uptime Watcher Bundle Analysis",
-                        summary: true, // Show summary in console
+                        summary: true,
                     } ),
                 ]
                 : [] ),
@@ -1012,4 +986,9 @@ export default defineConfig( ( { command, mode } ) => {
             },
         },
     };
-} ) satisfies UserConfigFnObject as UserConfigFnObject;
+};
+
+const configuredViteConfig: ReturnType<typeof defineConfig> =
+    defineConfig( viteConfig );
+
+export default configuredViteConfig;

@@ -45,9 +45,18 @@ export const noDeprecatedExportsRule = {
             }
 
             const estreeNode = /** @type {import("estree").Node} */ (node);
+            const sourceCodeWithLegacyJsDocAccessor = /** @type {{
+                getJSDocComment?: (node: import("estree").Node) => any;
+            }} */ (sourceCode);
 
-            if (typeof sourceCode.getJSDocComment === "function") {
-                const jsdoc = sourceCode.getJSDocComment(estreeNode);
+            if (
+                typeof sourceCodeWithLegacyJsDocAccessor.getJSDocComment ===
+                "function"
+            ) {
+                const jsdoc =
+                    sourceCodeWithLegacyJsDocAccessor.getJSDocComment(
+                        estreeNode
+                    );
                 if (jsdoc) {
                     return jsdoc;
                 }

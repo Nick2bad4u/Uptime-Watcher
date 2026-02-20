@@ -61,13 +61,13 @@ Additional wrapped compatibility candidates:
 | `tailwind/no-contradicting-classname`               | Disabled       | ESLint 10 context API incompatibility surface                                         | Rule forced `off`                                  |
 | `tailwind/no-custom-classname`                      | Disabled       | ESLint 10 context API incompatibility surface                                         | Rule forced `off`                                  |
 | `tailwind/no-unnecessary-arbitrary-value`           | Disabled       | ESLint 10 context API incompatibility surface                                         | Rule forced `off`                                  |
-| `sort-react-dependency-arrays/sort`                 | Disabled       | `context.getSourceCode is not a function`                                             | Rule forced `off`                                  |
 | `storybook/meta-satisfies-type`                     | Disabled       | `context.getSourceCode is not a function`                                             | Rule forced `off`                                  |
 | `progress/activate`                                 | Disabled       | `context.getFilename is not a function`                                               | Rule forced `off`                                  |
 
 ## Completed migrations
 
 - `eslint-plugin-deprecation` has been removed in favor of `@typescript-eslint/no-deprecated`.
+- `eslint-plugin-sort-react-dependency-arrays` has been removed; `eslint-plugin-canonical` now provides `canonical/sort-react-dependencies`.
 
 ## Re-enable checklist
 
