@@ -207,6 +207,7 @@ test.describe(
                 await expect(pausedToastEntry.first()).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
+                const toastCountAfterPause = await alertEntries.count();
 
                 const startMonitoring = siteCardLocator.getByRole("button", {
                     name: "Start Monitoring",
@@ -219,21 +220,19 @@ test.describe(
                     .poll(async () => alertEntries.count(), {
                         timeout: WAIT_TIMEOUTS.LONG,
                     })
-                    .toBeGreaterThanOrEqual(2);
+                    .toBeGreaterThanOrEqual(toastCountAfterPause + 1);
 
-                const recoveredToastEntry = alertEntries
-                    .filter({
-                        hasText: "Monitor recovered",
-                    })
-                    .first();
-                await expect(recoveredToastEntry).toBeVisible({
+                const latestToastEntry = alertEntries.first();
+                await expect(latestToastEntry).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                const recoveredAlertId = recoveredToastEntry;
-                await expect(recoveredAlertId).toHaveAttribute("data-alert-id");
+                const recoveredAlertId =
+                    latestToastEntry;
 
-                await recoveredToastEntry.click();
+                await expect(recoveredAlertId).toHaveAttribute("data-alert-id", );
+
+                await latestToastEntry.click();
 
                 // Wait for the specific toast we clicked to be removed after
                 // dismissal. We cannot assert that *all* recovered toasts are

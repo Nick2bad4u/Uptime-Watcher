@@ -341,11 +341,7 @@ export class MonitorScheduler {
         });
 
         try {
-            await this.onCheckCallback(
-                siteIdentifier,
-                monitorId,
-                signal
-            );
+            await this.onCheckCallback(siteIdentifier, monitorId, signal);
         } catch (error) {
             const normalizedError = ensureError(error);
             const logMethod = signal.aborted

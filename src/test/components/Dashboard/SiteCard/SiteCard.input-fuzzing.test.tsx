@@ -416,7 +416,9 @@ const verifySiteCardStructure = (site: any) => {
         ).toBeInTheDocument();
     } else {
         // Handle sites with no monitors
-        expect(screen.getByTestId("site-card-status-monitor")).toBeInTheDocument();
+        expect(
+            screen.getByTestId("site-card-status-monitor")
+        ).toBeInTheDocument();
         expect(
             screen.getByTestId(`site-card-history-no-monitor`)
         ).toBeInTheDocument();

@@ -65,8 +65,7 @@ const WithFormatFailure = ({
         },
         () => {
             if (originalRef.current) {
-                const monitorTypes = window.electronAPI
-                    .monitorTypes as {
+                const monitorTypes = window.electronAPI.monitorTypes as {
                     formatMonitorDetail: FormatMonitorDetail;
                 };
 

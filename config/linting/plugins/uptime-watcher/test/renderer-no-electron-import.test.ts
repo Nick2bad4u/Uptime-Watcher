@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("renderer-no-electron-import",
+ruleTester.run(
+    "renderer-no-electron-import",
     getPluginRule("renderer-no-electron-import"),
     {
         invalid: [

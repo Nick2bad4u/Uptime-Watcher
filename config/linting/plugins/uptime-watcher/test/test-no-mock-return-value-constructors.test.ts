@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("test-no-mock-return-value-constructors",
+ruleTester.run(
+    "test-no-mock-return-value-constructors",
     getPluginRule("test-no-mock-return-value-constructors"),
     {
         invalid: [

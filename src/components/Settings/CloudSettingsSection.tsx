@@ -253,9 +253,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     );
 
     const confirmDeleteBackup = useCallback(
-        async function confirmDeleteBackupCallback(
-            key: string
-        ): Promise<void> {
+        async function confirmDeleteBackupCallback(key: string): Promise<void> {
             const entry = backups.find((backup) => backup.key === key);
 
             const confirmed = await requestConfirmation({

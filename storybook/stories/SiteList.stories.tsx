@@ -140,8 +140,9 @@ const resolveSiteListStoryArgs = (args: unknown): SiteListStoryArgs => {
 };
 
 const withLayoutState: Decorator = (StoryComponent, context) => {
-    const { density, layout, presentation } =
-        resolveSiteListStoryArgs(context.args);
+    const { density, layout, presentation } = resolveSiteListStoryArgs(
+        context.args
+    );
 
     useEffect(
         function syncSiteListLayout(): () => void {
@@ -235,7 +236,9 @@ const meta: Meta<typeof SiteList> = {
     },
     component: SiteList,
     decorators: [
-        createSiteDecorator((context) => resolveSiteListStoryArgs(context.args).sites),
+        createSiteDecorator(
+            (context) => resolveSiteListStoryArgs(context.args).sites
+        ),
         withLayoutState,
     ],
     parameters: {

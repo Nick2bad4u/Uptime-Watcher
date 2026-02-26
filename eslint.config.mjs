@@ -31,6 +31,8 @@ import * as htmlParser from "@html-eslint/parser";
 import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginDesignTokens from "@metamask/eslint-plugin-design-tokens";
+// @ts-expect-error -- plugin types are not yet aligned with strict ESM import typing
+import rushStackSecurityRaw from "@rushstack/eslint-plugin-security";
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
@@ -278,30 +280,20 @@ const microsoftSdlFallbackPlugin = {
 
 const pluginMicrosoftSdl = microsoftSdlFallbackPlugin;
 /**
- * NOTE(ESLint10): Re-enable @microsoft/eslint-plugin-sdl once it ships
- * ESLint 10-compatible dependencies.
+ * NOTE(ESLint10): Re-enable @microsoft/eslint-plugin-sdl once it ships ESLint
+ * 10-compatible dependencies.
  */
 console.warn(
     "[eslint.config] @microsoft/eslint-plugin-sdl is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
 );
 
-/**
- * NOTE(ESLint10): Re-enable @rushstack/eslint-plugin-security once upstream
- * publishes an ESLint 10-compatible release.
- */
-const rushStackSecurityRaw = undefined;
+const rushStackSecurityPlugin = {
+    "@rushstack/security": fixupPluginRules(rushStackSecurityRaw),
+};
 
-console.warn(
-    "[eslint.config] @rushstack/eslint-plugin-security is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
-);
-
-const rushStackSecurityPlugin = rushStackSecurityRaw
-    ? { "@rushstack/security": fixupPluginRules(rushStackSecurityRaw) }
-    : {};
-
-const rushStackSecurityRules = rushStackSecurityRaw
-    ? { "@rushstack/security/no-unsafe-regexp": "warn" }
-    : {};
+const rushStackSecurityRules = {
+    "@rushstack/security/no-unsafe-regexp": "warn",
+};
 
 /**
  * Compatibility wrappers for legacy plugins that still rely on deprecated rule
@@ -1067,9 +1059,7 @@ export default defineConfig([
         },
     },
     {
-        files: [
-            "config/linting/plugins/uptime-watcher/**/*.{mjs,ts,tsx}",
-        ],
+        files: ["config/linting/plugins/uptime-watcher/**/*.{mjs,ts,tsx}"],
         name: "ESLint Plugin (uptime-watcher) - internal rule authoring overrides",
         rules: {
             "@typescript-eslint/no-unsafe-assignment": "off",
@@ -1148,9 +1138,7 @@ export default defineConfig([
         },
     },
     {
-        files: [
-            "config/linting/plugins/uptime-watcher.mjs",
-        ],
+        files: ["config/linting/plugins/uptime-watcher.mjs"],
         name: "ESLint Plugin Wrapper - allowed re-export",
         rules: {
             "no-barrel-files/no-barrel-files": "off",
@@ -1374,6 +1362,7 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: ["**/package.json"],
+        language: "json/json",
         languageOptions: {
             parser: jsoncEslintParser,
             parserOptions: { jsonSyntax: "JSON" },

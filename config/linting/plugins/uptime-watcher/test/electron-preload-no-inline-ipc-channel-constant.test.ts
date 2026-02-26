@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-preload-no-inline-ipc-channel-constant",
+ruleTester.run(
+    "electron-preload-no-inline-ipc-channel-constant",
     getPluginRule("electron-preload-no-inline-ipc-channel-constant"),
     {
         invalid: [

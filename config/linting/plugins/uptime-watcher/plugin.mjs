@@ -141,8 +141,7 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "monitor-fallback-consistency": monitorFallbackConsistencyRule,
         "no-call-identifiers": noCallIdentifiersRule,
         "no-deprecated-exports": noDeprecatedExportsRule,
-        "no-double-assertion-outside-tests":
-            noDoubleAssertionOutsideTestsRule,
+        "no-double-assertion-outside-tests": noDoubleAssertionOutsideTestsRule,
         "no-inline-ipc-channel-type-literals":
             noInlineIpcChannelTypeLiteralsRule,
         "no-local-error-normalizers": noLocalErrorNormalizersRule,

@@ -71,371 +71,386 @@ const STATUS_CLASS_MAP: Record<SiteStatus, string> = {
  * Props are sourced from stores, therefore the component exposes no explicit
  * properties.
  */
-export const AppSidebar: NamedExoticComponent = memo(function AppSidebarComponent() {
-    const { isDark, toggleTheme } = useTheme();
-    const { isSidebarOpen, toggleSidebar } = useSidebarLayout();
-    const sites = useSitesStore(useCallback((state) => state.sites, []));
+export const AppSidebar: NamedExoticComponent = memo(
+    function AppSidebarComponent() {
+        const { isDark, toggleTheme } = useTheme();
+        const { isSidebarOpen, toggleSidebar } = useSidebarLayout();
+        const sites = useSitesStore(useCallback((state) => state.sites, []));
 
-    const selectSite = useUIStore(useCallback((state) => state.selectSite, []));
-    const selectedSiteIdentifier = useUIStore(
-        useCallback((state) => state.selectedSiteIdentifier, [])
-    );
-    const setShowAddSiteModal = useUIStore(
-        useCallback((state) => state.setShowAddSiteModal, [])
-    );
-    const setShowSettings = useUIStore(
-        useCallback((state) => state.setShowSettings, [])
-    );
-    const setShowSiteDetails = useUIStore(
-        useCallback((state) => state.setShowSiteDetails, [])
-    );
-    const setSelectedMonitorId = useSitesStore(
-        useCallback((state) => state.setSelectedMonitorId, [])
-    );
-
-    const [query, setQuery] = useState<string>("");
-    const deferredQuery = useDeferredValue(query);
-
-    const SearchIcon = AppIcons.actions.search;
-
-    const sitesByIdentifier = useMemo(
-        () => new Map(sites.map((site) => [site.identifier, site] as const)),
-        [sites]
-    );
-
-    const filteredSites = useMemo((): readonly Site[] => {
-        const normalizedQuery = deferredQuery.trim().toLowerCase();
-        if (normalizedQuery.length === 0) {
-            return sites;
-        }
-
-        return sites.filter((site) =>
-            site.name.toLowerCase().includes(normalizedQuery)
+        const selectSite = useUIStore(
+            useCallback((state) => state.selectSite, [])
         );
-    }, [deferredQuery, sites]);
+        const selectedSiteIdentifier = useUIStore(
+            useCallback((state) => state.selectedSiteIdentifier, [])
+        );
+        const setShowAddSiteModal = useUIStore(
+            useCallback((state) => state.setShowAddSiteModal, [])
+        );
+        const setShowSettings = useUIStore(
+            useCallback((state) => state.setShowSettings, [])
+        );
+        const setShowSiteDetails = useUIStore(
+            useCallback((state) => state.setShowSiteDetails, [])
+        );
+        const setSelectedMonitorId = useSitesStore(
+            useCallback((state) => state.setSelectedMonitorId, [])
+        );
 
-    // Automatically select the first site to keep the detail pane populated on
-    // first render.
-    useEffect(
-        function selectInitialSite(): void {
-            if (!selectedSiteIdentifier && filteredSites.length > 0) {
-                selectSite(filteredSites[0]);
-            }
-        },
-        [
-            filteredSites,
-            selectedSiteIdentifier,
-            selectSite,
-        ]
-    );
+        const [query, setQuery] = useState<string>("");
+        const deferredQuery = useDeferredValue(query);
 
-    const handleAddSite = useCallback((): void => {
-        setShowAddSiteModal(true);
-    }, [setShowAddSiteModal]);
+        const SearchIcon = AppIcons.actions.search;
 
-    const handleOpenSettings = useCallback((): void => {
-        setShowSettings(true);
-    }, [setShowSettings]);
+        const sitesByIdentifier = useMemo(
+            () =>
+                new Map(sites.map((site) => [site.identifier, site] as const)),
+            [sites]
+        );
 
-    const handleSearchChange = useCallback(
-        (event: ChangeEvent<HTMLInputElement>): void => {
-            setQuery(event.target.value);
-        },
-        []
-    );
-
-    const handleSelectSite = useCallback(
-        (event: MouseEvent<HTMLButtonElement>) => {
-            const { dataset } = event.currentTarget;
-            const { siteIdentifier } = dataset;
-            if (!siteIdentifier) {
-                return;
+        const filteredSites = useMemo((): readonly Site[] => {
+            const normalizedQuery = deferredQuery.trim().toLowerCase();
+            if (normalizedQuery.length === 0) {
+                return sites;
             }
 
-            const siteToSelect = sitesByIdentifier.get(siteIdentifier);
-            if (!siteToSelect) {
-                return;
-            }
+            return sites.filter((site) =>
+                site.name.toLowerCase().includes(normalizedQuery)
+            );
+        }, [deferredQuery, sites]);
 
-            selectSite(siteToSelect);
+        // Automatically select the first site to keep the detail pane populated on
+        // first render.
+        useEffect(
+            function selectInitialSite(): void {
+                if (!selectedSiteIdentifier && filteredSites.length > 0) {
+                    selectSite(filteredSites[0]);
+                }
+            },
+            [
+                filteredSites,
+                selectedSiteIdentifier,
+                selectSite,
+            ]
+        );
 
-            const [primaryMonitor] = siteToSelect.monitors;
-            if (primaryMonitor) {
-                setSelectedMonitorId(
-                    siteToSelect.identifier,
-                    primaryMonitor.id
-                );
-            }
+        const handleAddSite = useCallback((): void => {
+            setShowAddSiteModal(true);
+        }, [setShowAddSiteModal]);
 
-            setShowSiteDetails(true);
+        const handleOpenSettings = useCallback((): void => {
+            setShowSettings(true);
+        }, [setShowSettings]);
 
-            if (
-                getMediaQueryMatches(SIDEBAR_COLLAPSE_MEDIA_QUERY) &&
-                isSidebarOpen
-            ) {
-                toggleSidebar();
-            }
+        const handleSearchChange = useCallback(
+            (event: ChangeEvent<HTMLInputElement>): void => {
+                setQuery(event.target.value);
+            },
+            []
+        );
 
-            // Scroll to the site card in the main content area
-            requestAnimationFrame(() => {
-                scrollToSiteCard(siteIdentifier);
-            });
-        },
-        [
-            isSidebarOpen,
-            selectSite,
-            setSelectedMonitorId,
-            setShowSiteDetails,
-            sitesByIdentifier,
-            toggleSidebar,
-        ]
-    );
+        const handleSelectSite = useCallback(
+            (event: MouseEvent<HTMLButtonElement>) => {
+                const { dataset } = event.currentTarget;
+                const { siteIdentifier } = dataset;
+                if (!siteIdentifier) {
+                    return;
+                }
 
-    const SidebarToggleIcon = isSidebarOpen
-        ? AppIcons.ui.sidebarCollapse
-        : AppIcons.ui.sidebarExpand;
-    const AddIcon = AppIcons.actions.add;
-    const SettingsIcon = AppIcons.settings.gear;
-    const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;
-    const themeButtonLabel = isDark
-        ? "Switch to light mode"
-        : "Switch to dark mode";
-    const themeButtonText = isDark ? "Light Mode" : "Dark Mode";
-    const sidebarToggleLabel = isSidebarOpen
-        ? "Collapse sidebar"
-        : "Expand sidebar";
-    const sidebarToggleTooltip = isSidebarOpen
-        ? "Collapse navigation sidebar"
-        : "Expand navigation sidebar";
+                const siteToSelect = sitesByIdentifier.get(siteIdentifier);
+                if (!siteToSelect) {
+                    return;
+                }
 
-    const logoTooltipContent = useMemo(
-        () => (
-            <div className="app-sidebar__logo-tooltip">
-                <img
-                    alt="Uptime Watcher mascot"
-                    className="app-sidebar__logo-tooltip-image"
-                    src={mascotLogoUrl}
-                />
-            </div>
-        ),
-        []
-    );
-    return (
-        <aside
-            aria-label="Site navigation"
-            className={`app-sidebar ${isDark ? "app-sidebar--dark" : "app-sidebar--light"} ${
-                isSidebarOpen ? "app-sidebar--open" : "app-sidebar--collapsed"
-            }`}
-            data-testid="app-sidebar"
-        >
-            <div className="app-sidebar__inner">
-                <div className="app-sidebar__brand">
-                    <Tooltip content={sidebarToggleTooltip} position="bottom">
-                        {(triggerProps) => (
-                            <button
-                                {...triggerProps}
-                                aria-label={sidebarToggleLabel}
-                                className="app-sidebar__brand-trigger"
-                                data-testid="sidebar-toggle"
-                                onClick={toggleSidebar}
-                                type="button"
+                selectSite(siteToSelect);
+
+                const [primaryMonitor] = siteToSelect.monitors;
+                if (primaryMonitor) {
+                    setSelectedMonitorId(
+                        siteToSelect.identifier,
+                        primaryMonitor.id
+                    );
+                }
+
+                setShowSiteDetails(true);
+
+                if (
+                    getMediaQueryMatches(SIDEBAR_COLLAPSE_MEDIA_QUERY) &&
+                    isSidebarOpen
+                ) {
+                    toggleSidebar();
+                }
+
+                // Scroll to the site card in the main content area
+                requestAnimationFrame(() => {
+                    scrollToSiteCard(siteIdentifier);
+                });
+            },
+            [
+                isSidebarOpen,
+                selectSite,
+                setSelectedMonitorId,
+                setShowSiteDetails,
+                sitesByIdentifier,
+                toggleSidebar,
+            ]
+        );
+
+        const SidebarToggleIcon = isSidebarOpen
+            ? AppIcons.ui.sidebarCollapse
+            : AppIcons.ui.sidebarExpand;
+        const AddIcon = AppIcons.actions.add;
+        const SettingsIcon = AppIcons.settings.gear;
+        const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;
+        const themeButtonLabel = isDark
+            ? "Switch to light mode"
+            : "Switch to dark mode";
+        const themeButtonText = isDark ? "Light Mode" : "Dark Mode";
+        const sidebarToggleLabel = isSidebarOpen
+            ? "Collapse sidebar"
+            : "Expand sidebar";
+        const sidebarToggleTooltip = isSidebarOpen
+            ? "Collapse navigation sidebar"
+            : "Expand navigation sidebar";
+
+        const logoTooltipContent = useMemo(
+            () => (
+                <div className="app-sidebar__logo-tooltip">
+                    <img
+                        alt="Uptime Watcher mascot"
+                        className="app-sidebar__logo-tooltip-image"
+                        src={mascotLogoUrl}
+                    />
+                </div>
+            ),
+            []
+        );
+        return (
+            <aside
+                aria-label="Site navigation"
+                className={`app-sidebar ${isDark ? "app-sidebar--dark" : "app-sidebar--light"} ${
+                    isSidebarOpen
+                        ? "app-sidebar--open"
+                        : "app-sidebar--collapsed"
+                }`}
+                data-testid="app-sidebar"
+            >
+                <div className="app-sidebar__inner">
+                    <div className="app-sidebar__brand">
+                        <Tooltip
+                            content={sidebarToggleTooltip}
+                            position="bottom"
+                        >
+                            {(triggerProps) => (
+                                <button
+                                    {...triggerProps}
+                                    aria-label={sidebarToggleLabel}
+                                    className="app-sidebar__brand-trigger"
+                                    data-testid="sidebar-toggle"
+                                    onClick={toggleSidebar}
+                                    type="button"
+                                >
+                                    <SidebarToggleIcon size={18} />
+                                </button>
+                            )}
+                        </Tooltip>
+
+                        <Tooltip
+                            content={logoTooltipContent}
+                            maxWidth={280}
+                            position="bottom"
+                        >
+                            {(triggerProps) => (
+                                <div
+                                    {...triggerProps}
+                                    className="app-sidebar__brand-logo"
+                                >
+                                    <img
+                                        alt="Uptime Watcher mascot"
+                                        className="app-sidebar__brand-logo-image"
+                                        src={mascotLogoUrl}
+                                    />
+                                </div>
+                            )}
+                        </Tooltip>
+                        <div className="app-sidebar__brand-copy">
+                            <ThemedText
+                                className="app-sidebar__brand-title"
+                                size="md"
+                                weight="semibold"
                             >
-                                <SidebarToggleIcon size={18} />
-                            </button>
-                        )}
-                    </Tooltip>
+                                Uptime Watcher
+                            </ThemedText>
+                            <ThemedText
+                                className="app-sidebar__brand-subtitle"
+                                size="xs"
+                                variant="secondary"
+                            >
+                                Command Center
+                            </ThemedText>
+                        </div>
+                    </div>
 
-                    <Tooltip
-                        content={logoTooltipContent}
-                        maxWidth={280}
-                        position="bottom"
+                    <div className="app-sidebar__search" role="search">
+                        <label
+                            className="app-sidebar__search-label"
+                            htmlFor="sidebar-search"
+                        >
+                            <span className="sr-only">
+                                Search monitored sites
+                            </span>
+                            <span
+                                aria-hidden
+                                className="app-sidebar__search-icon"
+                            >
+                                <SearchIcon size={16} />
+                            </span>
+                            <input
+                                autoComplete="off"
+                                className="app-sidebar__search-input"
+                                data-testid="sidebar-search-input"
+                                id="sidebar-search"
+                                onChange={handleSearchChange}
+                                placeholder="Search sites"
+                                type="search"
+                                value={query}
+                            />
+                        </label>
+                    </div>
+
+                    <nav
+                        aria-label="Monitored sites"
+                        className="app-sidebar__list"
+                        data-testid="sidebar-site-list"
                     >
-                        {(triggerProps) => (
-                            <div
-                                {...triggerProps}
-                                className="app-sidebar__brand-logo"
+                        {filteredSites.length === 0 ? (
+                            <ThemedText
+                                className="app-sidebar__empty"
+                                size="sm"
+                                variant="secondary"
                             >
-                                <img
-                                    alt="Uptime Watcher mascot"
-                                    className="app-sidebar__brand-logo-image"
-                                    src={mascotLogoUrl}
-                                />
-                            </div>
+                                No sites match your search.
+                            </ThemedText>
+                        ) : (
+                            filteredSites.map((site) => {
+                                const status = getSiteDisplayStatus(site);
+                                const statusDescription =
+                                    getSiteStatusDescription(site);
+
+                                let runningMonitors = 0;
+                                for (const monitor of site.monitors) {
+                                    if (monitor.monitoring) {
+                                        runningMonitors += 1;
+                                    }
+                                }
+                                const statusClass = STATUS_CLASS_MAP[status];
+                                const StatusIcon = STATUS_ICON_MAP[status];
+
+                                return (
+                                    <Tooltip
+                                        content={statusDescription}
+                                        key={site.identifier}
+                                        position="right"
+                                        wrapMode="block"
+                                    >
+                                        {(triggerProps) => (
+                                            <button
+                                                {...triggerProps}
+                                                className={`app-sidebar__item ${
+                                                    site.identifier ===
+                                                    selectedSiteIdentifier
+                                                        ? "app-sidebar__item--active"
+                                                        : ""
+                                                }`}
+                                                data-site-identifier={
+                                                    site.identifier
+                                                }
+                                                data-testid="sidebar-site-item"
+                                                onClick={handleSelectSite}
+                                                type="button"
+                                            >
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={`app-sidebar__item-status ${statusClass}`}
+                                                >
+                                                    <StatusIcon className="app-sidebar__item-status-icon" />
+                                                </span>
+                                                <span className="app-sidebar__item-content">
+                                                    <span className="app-sidebar__item-name">
+                                                        {site.name}
+                                                    </span>
+                                                    <span className="app-sidebar__item-meta">
+                                                        {runningMonitors}/
+                                                        {site.monitors.length}
+                                                        {" · "}
+                                                        monitoring
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        )}
+                                    </Tooltip>
+                                );
+                            })
                         )}
-                    </Tooltip>
-                    <div className="app-sidebar__brand-copy">
-                        <ThemedText
-                            className="app-sidebar__brand-title"
-                            size="md"
-                            weight="semibold"
+                    </nav>
+
+                    <div
+                        className="app-sidebar__footer"
+                        data-testid="sidebar-footer-controls"
+                    >
+                        <Tooltip
+                            content="Add a new site"
+                            position="right"
+                            wrapMode="inline"
                         >
-                            Uptime Watcher
-                        </ThemedText>
-                        <ThemedText
-                            className="app-sidebar__brand-subtitle"
-                            size="xs"
-                            variant="secondary"
+                            {(triggerProps) => (
+                                <button
+                                    {...triggerProps}
+                                    aria-label="Add new site"
+                                    className="app-sidebar__icon-button app-sidebar__icon-button--primary"
+                                    onClick={handleAddSite}
+                                    type="button"
+                                >
+                                    <AddIcon size={18} />
+                                    <span className="sr-only">Add Site</span>
+                                </button>
+                            )}
+                        </Tooltip>
+                        <Tooltip
+                            content="Open application settings"
+                            position="right"
                         >
-                            Command Center
-                        </ThemedText>
+                            {(triggerProps) => (
+                                <button
+                                    {...triggerProps}
+                                    aria-label="Open application settings"
+                                    className="app-sidebar__icon-button"
+                                    onClick={handleOpenSettings}
+                                    type="button"
+                                >
+                                    <SettingsIcon size={18} />
+                                    <span className="sr-only">Settings</span>
+                                </button>
+                            )}
+                        </Tooltip>
+                        <Tooltip content={themeButtonLabel} position="right">
+                            {(triggerProps) => (
+                                <button
+                                    {...triggerProps}
+                                    aria-label={themeButtonLabel}
+                                    className="app-sidebar__icon-button"
+                                    onClick={toggleTheme}
+                                    type="button"
+                                >
+                                    <ThemeIcon size={18} />
+                                    <span className="sr-only">
+                                        {themeButtonText}
+                                    </span>
+                                </button>
+                            )}
+                        </Tooltip>
                     </div>
                 </div>
-
-                <div className="app-sidebar__search" role="search">
-                    <label
-                        className="app-sidebar__search-label"
-                        htmlFor="sidebar-search"
-                    >
-                        <span className="sr-only">Search monitored sites</span>
-                        <span aria-hidden className="app-sidebar__search-icon">
-                            <SearchIcon size={16} />
-                        </span>
-                        <input
-                            autoComplete="off"
-                            className="app-sidebar__search-input"
-                            data-testid="sidebar-search-input"
-                            id="sidebar-search"
-                            onChange={handleSearchChange}
-                            placeholder="Search sites"
-                            type="search"
-                            value={query}
-                        />
-                    </label>
-                </div>
-
-                <nav
-                    aria-label="Monitored sites"
-                    className="app-sidebar__list"
-                    data-testid="sidebar-site-list"
-                >
-                    {filteredSites.length === 0 ? (
-                        <ThemedText
-                            className="app-sidebar__empty"
-                            size="sm"
-                            variant="secondary"
-                        >
-                            No sites match your search.
-                        </ThemedText>
-                    ) : (
-                        filteredSites.map((site) => {
-                            const status = getSiteDisplayStatus(site);
-                            const statusDescription =
-                                getSiteStatusDescription(site);
-
-                            let runningMonitors = 0;
-                            for (const monitor of site.monitors) {
-                                if (monitor.monitoring) {
-                                    runningMonitors += 1;
-                                }
-                            }
-                            const statusClass = STATUS_CLASS_MAP[status];
-                            const StatusIcon = STATUS_ICON_MAP[status];
-
-                            return (
-                                <Tooltip
-                                    content={statusDescription}
-                                    key={site.identifier}
-                                    position="right"
-                                    wrapMode="block"
-                                >
-                                    {(triggerProps) => (
-                                        <button
-                                            {...triggerProps}
-                                            className={`app-sidebar__item ${
-                                                site.identifier ===
-                                                selectedSiteIdentifier
-                                                    ? "app-sidebar__item--active"
-                                                    : ""
-                                            }`}
-                                            data-site-identifier={
-                                                site.identifier
-                                            }
-                                            data-testid="sidebar-site-item"
-                                            onClick={handleSelectSite}
-                                            type="button"
-                                        >
-                                            <span
-                                                aria-hidden="true"
-                                                className={`app-sidebar__item-status ${statusClass}`}
-                                            >
-                                                <StatusIcon className="app-sidebar__item-status-icon" />
-                                            </span>
-                                            <span className="app-sidebar__item-content">
-                                                <span className="app-sidebar__item-name">
-                                                    {site.name}
-                                                </span>
-                                                <span className="app-sidebar__item-meta">
-                                                    {runningMonitors}/
-                                                    {site.monitors.length}
-                                                    {" · "}
-                                                    monitoring
-                                                </span>
-                                            </span>
-                                        </button>
-                                    )}
-                                </Tooltip>
-                            );
-                        })
-                    )}
-                </nav>
-
-                <div
-                    className="app-sidebar__footer"
-                    data-testid="sidebar-footer-controls"
-                >
-                    <Tooltip
-                        content="Add a new site"
-                        position="right"
-                        wrapMode="inline"
-                    >
-                        {(triggerProps) => (
-                            <button
-                                {...triggerProps}
-                                aria-label="Add new site"
-                                className="app-sidebar__icon-button app-sidebar__icon-button--primary"
-                                onClick={handleAddSite}
-                                type="button"
-                            >
-                                <AddIcon size={18} />
-                                <span className="sr-only">Add Site</span>
-                            </button>
-                        )}
-                    </Tooltip>
-                    <Tooltip
-                        content="Open application settings"
-                        position="right"
-                    >
-                        {(triggerProps) => (
-                            <button
-                                {...triggerProps}
-                                aria-label="Open application settings"
-                                className="app-sidebar__icon-button"
-                                onClick={handleOpenSettings}
-                                type="button"
-                            >
-                                <SettingsIcon size={18} />
-                                <span className="sr-only">Settings</span>
-                            </button>
-                        )}
-                    </Tooltip>
-                    <Tooltip content={themeButtonLabel} position="right">
-                        {(triggerProps) => (
-                            <button
-                                {...triggerProps}
-                                aria-label={themeButtonLabel}
-                                className="app-sidebar__icon-button"
-                                onClick={toggleTheme}
-                                type="button"
-                            >
-                                <ThemeIcon size={18} />
-                                <span className="sr-only">
-                                    {themeButtonText}
-                                </span>
-                            </button>
-                        )}
-                    </Tooltip>
-                </div>
-            </div>
-        </aside>
-    );
-});
+            </aside>
+        );
+    }
+);

@@ -1019,7 +1019,11 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             mockOpenExternal.mockClear();
             mockErrorStore.setStoreError.mockClear();
 
-            for (let index = 0; index < Math.max(sites.length, urls.length); index++) {
+            for (
+                let index = 0;
+                index < Math.max(sites.length, urls.length);
+                index++
+            ) {
                 if (index < sites.length) {
                     useUIStore.getState().selectSite(sites[index]);
                 }

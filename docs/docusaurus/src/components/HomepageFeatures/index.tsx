@@ -1,5 +1,4 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This file contains multiple unrelated eslint rules that cannot be properly paired */
- 
 
 import Heading from "@theme/Heading";
 import type { CSSProperties, FC, ReactNode } from "react";

@@ -32,8 +32,6 @@ import type { MonitorCheckResult } from "../types";
 
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
 
- 
-
 const stripHttpScheme = (value: string): string => {
     const normalized = value.trim();
     const lower = normalized.toLowerCase();
@@ -48,8 +46,6 @@ const stripHttpScheme = (value: string): string => {
 
     return normalized;
 };
-
- 
 
 /**
  * Configuration options for connectivity checking

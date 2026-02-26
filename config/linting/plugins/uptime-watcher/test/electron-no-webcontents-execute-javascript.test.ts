@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-webcontents-execute-javascript",
+ruleTester.run(
+    "electron-no-webcontents-execute-javascript",
     getPluginRule("electron-no-webcontents-execute-javascript"),
     {
         invalid: [

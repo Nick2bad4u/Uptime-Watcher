@@ -48,9 +48,8 @@ export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
         monitorLabel,
         status,
     }: SiteCardStatusProperties) {
-        const safeMonitorLabel = monitorLabel.trim().length > 0
-            ? monitorLabel
-            : "Monitor";
+        const safeMonitorLabel =
+            monitorLabel.trim().length > 0 ? monitorLabel : "Monitor";
 
         const formatStatus = useCallback(
             (label: string, monitorStatus: MonitorStatus) =>

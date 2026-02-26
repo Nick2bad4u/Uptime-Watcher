@@ -28,7 +28,8 @@
     "format": [
         "dep",
         "time",
-        "ownerChanged"
+        "ownerChanged",
+        "homepage"
     ],
     "global": false,
     "groupFunction": {},

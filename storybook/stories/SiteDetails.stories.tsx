@@ -112,7 +112,9 @@ const meta: Meta<typeof SiteDetails> = {
     },
     component: SiteDetails,
     decorators: [
-        createSiteDecorator((context) => [resolveSiteFromStoryArgs(context.args)]),
+        createSiteDecorator((context) => [
+            resolveSiteFromStoryArgs(context.args),
+        ]),
         withSiteDetailsState,
     ],
     parameters: {

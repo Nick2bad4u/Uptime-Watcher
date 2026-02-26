@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("renderer-no-browser-dialogs",
+ruleTester.run(
+    "renderer-no-browser-dialogs",
     getPluginRule("renderer-no-browser-dialogs"),
     {
         invalid: [

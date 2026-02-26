@@ -41,7 +41,6 @@ Additional wrapped compatibility candidates:
 | Plugin / Rule                                       | Current status | Failure signature observed                                                            | Current workaround                                 |
 | --------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | `@microsoft/eslint-plugin-sdl`                      | Disabled       | Pulls incompatible runtime chain via deprecated APIs/dependencies                     | Plugin import disabled; fallback no-op plugin used |
-| `@rushstack/eslint-plugin-security`                 | Disabled       | `Class extends value undefined is not a constructor or null`                          | Plugin import disabled                             |
 | `eslint-plugin-case-police` (`configs.recommended`) | Disabled       | `context.getFilename is not a function` (`case-police/string-check`)                  | Recommended config spread commented out            |
 | `mdx/remark`                                        | Disabled       | `Cannot read properties of undefined (reading 'bind')`                                | Rule forced `off`                                  |
 | `import-x/unambiguous`                              | Disabled       | `Cannot use 'in' operator to search for 'sourceType' in undefined`                    | Rule forced `off`                                  |
@@ -68,6 +67,8 @@ Additional wrapped compatibility candidates:
 
 - `eslint-plugin-deprecation` has been removed in favor of `@typescript-eslint/no-deprecated`.
 - `eslint-plugin-sort-react-dependency-arrays` has been removed; `eslint-plugin-canonical` now provides `canonical/sort-react-dependencies`.
+- `@rushstack/eslint-plugin-security` is re-enabled (v0.14.2) via `fixupPluginRules(...)`.
+- `eslint-plugin-node-dependencies` package.json rules are re-enabled (v2.1.0).
 
 ## Re-enable checklist
 

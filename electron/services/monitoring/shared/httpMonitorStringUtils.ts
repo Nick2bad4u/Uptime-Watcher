@@ -73,7 +73,7 @@ type RequiredMonitorStringContextResult<TContext> =
  * @param args - Validation arguments.
  *
  * @returns Context for valid values or an error monitor result when the value
- * is missing/invalid.
+ *   is missing/invalid.
  */
 export function resolveRequiredMonitorStringContext<TContext>(args: {
     readonly errorMessage: string;

@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-direct-ipc-handler-wrappers",
+ruleTester.run(
+    "electron-no-direct-ipc-handler-wrappers",
     getPluginRule("electron-no-direct-ipc-handler-wrappers"),
     {
         invalid: [

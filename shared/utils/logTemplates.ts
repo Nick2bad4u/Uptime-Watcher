@@ -494,9 +494,7 @@ export function interpolateLogTemplate(
     template: string,
     variables: TemplateVariables
 ): string {
-    const formatValue = (
-        value: ValueOf<TemplateVariables>
-    ): string => {
+    const formatValue = (value: ValueOf<TemplateVariables>): string => {
         if (value === undefined || value === null) {
             return "";
         }

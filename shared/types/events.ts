@@ -408,16 +408,14 @@ export const CACHE_INVALIDATION_TYPE = {
  *
  * @public
  */
-export type CacheInvalidationReason =
-    ValueOf<typeof CACHE_INVALIDATION_REASON>;
+export type CacheInvalidationReason = ValueOf<typeof CACHE_INVALIDATION_REASON>;
 
 /**
  * Union of cache invalidation types.
  *
  * @public
  */
-export type CacheInvalidationType =
-    ValueOf<typeof CACHE_INVALIDATION_TYPE>;
+export type CacheInvalidationType = ValueOf<typeof CACHE_INVALIDATION_TYPE>;
 
 /**
  * Canonical list of cache invalidation reasons.
@@ -720,8 +718,7 @@ export const MONITORING_CONTROL_REASON = {
  *
  * @public
  */
-export type MonitoringControlReason =
-    ValueOf<typeof MONITORING_CONTROL_REASON>;
+export type MonitoringControlReason = ValueOf<typeof MONITORING_CONTROL_REASON>;
 
 /**
  * Canonical list of monitoring control reasons.

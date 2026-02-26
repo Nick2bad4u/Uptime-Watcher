@@ -107,10 +107,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             return monitorTypeLabel;
         }, [monitor]);
 
-        const subtitleText = useMemo(
-            () => monitorSummary,
-            [monitorSummary]
-        );
+        const subtitleText = useMemo(() => monitorSummary, [monitorSummary]);
 
         const subtitleTextProps = useMemo<
             NonNullable<MarqueeTextProperties["textProps"]>

@@ -12,11 +12,7 @@ import { existsSync } from "node:fs";
 import * as path from "node:path";
 import { inspect } from "node:util";
 import pc from "picocolors";
-import {
-    defineConfig,
-    normalizePath,
-    type UserConfigFnObject,
-} from "vite";
+import { normalizePath, type UserConfigFnObject } from "vite";
 import { analyzer } from "vite-bundle-analyzer";
 import { patchCssModules } from "vite-css-modules";
 import devtoolsJson from "vite-plugin-devtools-json";
@@ -24,27 +20,26 @@ import electron from "vite-plugin-electron";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { coverageConfigDefaults, defaultExclude } from "vitest/config";
 
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
-const formatUnknownError = ( error: unknown ): string => {
-    if ( typeof error === "string" ) {
+const formatUnknownError = (error: unknown): string => {
+    if (typeof error === "string") {
         return error;
     }
 
-    if ( error instanceof Error ) {
+    if (error instanceof Error) {
         return error.message;
     }
 
-    return inspect( error, { depth: 2 } );
+    return inspect(error, { depth: 2 });
 };
 
-const wrapDirectoryResolutionError = ( error: unknown ): Error =>
+const wrapDirectoryResolutionError = (error: unknown): Error =>
     new Error(
-        `Failed to resolve Vite configuration directory: ${ formatUnknownError(
+        `Failed to resolve Vite configuration directory: ${formatUnknownError(
             error
-        ) }`,
+        )}`,
         { cause: error }
     );
 
@@ -53,23 +48,40 @@ const resolveFromConfigDir = (
     relativePath: string
 ): string => {
     try {
-        return path.resolve( baseDir, relativePath );
-    } catch ( error: unknown ) {
+        return path.resolve(baseDir, relativePath);
+    } catch (error: unknown) {
         throw new Error(
-            `Failed to resolve path from Vite config directory: ${ relativePath }`,
+            `Failed to resolve path from Vite config directory: ${relativePath}`,
             { cause: error }
         );
     }
 };
 
-const dirname = ( () => {
+const dirname = (() => {
     try {
         return import.meta.dirname;
-    } catch ( error: unknown ) {
-        throw wrapDirectoryResolutionError( error );
+    } catch (error: unknown) {
+        throw wrapDirectoryResolutionError(error);
     }
-} )();
+})();
 const VITE_BUILD_TARGET = "esnext";
+
+const vitestDefaultExclude = [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/cypress/**",
+    "**/.{idea,git,cache,output,temp}/**",
+    "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
+];
+
+const vitestCoverageDefaultExclude = [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/*.d.ts",
+    "test?(s)/**",
+    "tests/**",
+];
 
 /**
  * Resolves the SQLite WASM source path with fallback logic. Returns a relative
@@ -80,35 +92,35 @@ const getWasmSourcePath = (): string => {
     const fallbackPath =
         "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm";
 
-    const resolveAssetPath = ( relativePath: string ): null | string => {
+    const resolveAssetPath = (relativePath: string): null | string => {
         try {
-            return normalizePath( resolveFromConfigDir( dirname, relativePath ) );
-        } catch ( error: unknown ) {
+            return normalizePath(resolveFromConfigDir(dirname, relativePath));
+        } catch (error: unknown) {
             console.warn(
                 pc.red(
-                    `[WASM] ⚠️  Failed to resolve path '${ relativePath }': ${ formatUnknownError(
+                    `[WASM] ⚠️  Failed to resolve path '${relativePath}': ${formatUnknownError(
                         error
-                    ) }`
+                    )}`
                 )
             );
             return null;
         }
     };
 
-    const assetPathExists = ( absolutePath: null | string ): boolean => {
-        if ( absolutePath === null ) {
+    const assetPathExists = (absolutePath: null | string): boolean => {
+        if (absolutePath === null) {
             return false;
         }
 
         try {
             // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Paths are derived from validated project-relative inputs.
-            return existsSync( absolutePath );
-        } catch ( error: unknown ) {
+            return existsSync(absolutePath);
+        } catch (error: unknown) {
             console.warn(
                 pc.red(
-                    `[WASM] ⚠️  Failed to check existence for '${ absolutePath }': ${ formatUnknownError(
+                    `[WASM] ⚠️  Failed to check existence for '${absolutePath}': ${formatUnknownError(
                         error
-                    ) }`
+                    )}`
                 )
             );
             return false;
@@ -116,18 +128,18 @@ const getWasmSourcePath = (): string => {
     };
 
     // Check primary location (assets directory)
-    const resolvedPrimaryPath = resolveAssetPath( primaryPath );
-    if ( assetPathExists( resolvedPrimaryPath ) ) {
-        console.log( pc.green( `[WASM] ✅ Found SQLite WASM at ${ primaryPath }` ) );
+    const resolvedPrimaryPath = resolveAssetPath(primaryPath);
+    if (assetPathExists(resolvedPrimaryPath)) {
+        console.log(pc.green(`[WASM] ✅ Found SQLite WASM at ${primaryPath}`));
         return primaryPath;
     }
 
     // Check fallback location (node_modules)
-    const resolvedFallbackPath = resolveAssetPath( fallbackPath );
-    if ( assetPathExists( resolvedFallbackPath ) ) {
+    const resolvedFallbackPath = resolveAssetPath(fallbackPath);
+    if (assetPathExists(resolvedFallbackPath)) {
         console.log(
             pc.yellow(
-                `[WASM] ⚠️  Using fallback SQLite WASM from ${ fallbackPath }`
+                `[WASM] ⚠️  Using fallback SQLite WASM from ${fallbackPath}`
             )
         );
         return fallbackPath;
@@ -135,17 +147,17 @@ const getWasmSourcePath = (): string => {
 
     // Neither location has the file
     const errorMessage = [
-        pc.red( "[WASM] ❌ SQLite WASM file not found in expected locations:" ),
-        `  Primary: ${ primaryPath }`,
-        `  Fallback: ${ fallbackPath }`,
+        pc.red("[WASM] ❌ SQLite WASM file not found in expected locations:"),
+        `  Primary: ${primaryPath}`,
+        `  Fallback: ${fallbackPath}`,
         "",
         "To fix this issue:",
         "  1. Run 'npm run copy-wasm' to copy from node_modules",
         "  2. Or run 'npm run download:sqlite' to download it",
         "  3. Or ensure the postinstall script completed successfully",
-    ].join( "\n" );
+    ].join("\n");
 
-    throw new Error( errorMessage );
+    throw new Error(errorMessage);
 };
 
 /**
@@ -165,9 +177,9 @@ const getWasmSourcePath = (): string => {
  * Vite configuration for Uptime Watcher Electron app.
  */
 
-const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
+const viteConfig: UserConfigFnObject = ({ command, mode }) => {
     // Prefer Vite's provided mode over raw NODE_ENV for consistency.
-    const codecovToken = getEnvironmentVariable( "CODECOV_TOKEN" );
+    const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     const isTestMode = mode === "test";
     const isDev = mode === "development";
     const isBuild = command === "build";
@@ -263,44 +275,44 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
             // Explicitly include large dependencies for better chunking
             include: isTestMode
                 ? [
-                    // Exclude react-dom/client in test mode to avoid mocking issues
-                    "react-dom",
-                    "react",
-                    "chart.js",
-                    "react-chartjs-2",
-                    // Prevent Vitest mid-run dependency optimization reloads.
-                    // Without pre-bundling, Vite may discover ts-extras lazily,
-                    // trigger a reload, and leave the test server hanging on
-                    // close in some Windows runs.
-                    "ts-extras",
-                ]
+                      // Exclude react-dom/client in test mode to avoid mocking issues
+                      "react-dom",
+                      "react",
+                      "chart.js",
+                      "react-chartjs-2",
+                      // Prevent Vitest mid-run dependency optimization reloads.
+                      // Without pre-bundling, Vite may discover ts-extras lazily,
+                      // trigger a reload, and leave the test server hanging on
+                      // close in some Windows runs.
+                      "ts-extras",
+                  ]
                 : [
-                    "react-dom/client",
-                    "react-dom",
-                    "react",
-                    "chart.js",
-                    "react-chartjs-2",
-                ],
+                      "react-dom/client",
+                      "react-dom",
+                      "react",
+                      "chart.js",
+                      "react-chartjs-2",
+                  ],
         },
         plugins: [
-            tsconfigPaths( {
+            tsconfigPaths({
                 // Avoid crawling generated folders like storybook-static/.
                 // Explicitly point to the canonical tsconfig(s).
-                projects: [ "./tsconfig.json" ],
-            } ),
+                projects: ["./tsconfig.json"],
+            }),
             // CSS Modules patch to fix Vite's CSS Modules handling
-            patchCssModules( {
+            patchCssModules({
                 generateSourceTypes: true, // Generate .d.ts files for TypeScript support
-            } ),
+            }),
             // Inject package version into import.meta.env.PACKAGE_VERSION
             packageVersion(),
             // CSP: keep strict in dev/prod (avoid unsafe-eval so Electron does not emit warnings).
-            electron( [
+            electron([
                 {
                     // Main process entry file of the Electron App
                     entry: "electron/main.ts",
                     // Hot Restart: Automatically restart the Electron App when main process changes
-                    onstart ( args ) {
+                    onstart(args) {
                         // If this onstart is passed, Electron App will not start automatically.
                         // However, you can start Electron App via startup function.
                         void args.startup();
@@ -342,16 +354,16 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                         resolve: {
                             alias: {
                                 "@app": normalizePath(
-                                    path.resolve( dirname, "src" )
+                                    path.resolve(dirname, "src")
                                 ),
                                 "@assets": normalizePath(
-                                    path.resolve( dirname, "assets" )
+                                    path.resolve(dirname, "assets")
                                 ),
                                 "@electron": normalizePath(
-                                    path.resolve( dirname, "electron" )
+                                    path.resolve(dirname, "electron")
                                 ),
                                 "@shared": normalizePath(
-                                    path.resolve( dirname, "shared" )
+                                    path.resolve(dirname, "shared")
                                 ),
                             },
                         },
@@ -361,7 +373,7 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                     // Preload scripts entry file of the Electron App
                     entry: "electron/preload.ts",
                     // Hot Reload: Refresh the Renderer process when Preload scripts change
-                    onstart ( args ) {
+                    onstart(args) {
                         // Notify the Renderer process to reload the page when the Preload scripts build is complete,
                         // instead of restarting the entire Electron App.
                         args.reload();
@@ -382,28 +394,28 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                         resolve: {
                             alias: {
                                 "@shared": normalizePath(
-                                    path.resolve( dirname, "shared" )
+                                    path.resolve(dirname, "shared")
                                 ),
                             },
                         },
                     },
                 },
-            ] ),
-            react( {
+            ]),
+            react({
                 // Configure babel for any custom transformations if needed
                 babel: {
                     // Use babel configuration files if they exist
                     babelrc: false,
                     configFile: false,
                     // Add any custom babel plugins here if needed
-                    plugins: [ "babel-plugin-react-compiler" ],
+                    plugins: ["babel-plugin-react-compiler"],
                 },
 
                 // Enable Fast Refresh for better development experience
                 // Includes .js, .jsx, .ts, .tsx by default
                 // Use automatic JSX runtime (default, but explicit for clarity)
                 jsxRuntime: "automatic",
-            } ),
+            }),
             // // TypeScript checking in development (ESLint disabled due to flat config compatibility)
             // checker({
             //     typescript: {
@@ -430,43 +442,43 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
              */
             // ViteMcp(),
             // Only include react-scan in development mode to avoid sourcemap warnings in production
-            ...( isDev
+            ...(isDev
                 ? [
-                    reactScan( {
-                        autoDisplayNames: true,
-                        debug: false, // Disable debug logs
-                        enable: true, // Always enabled when included
-                        // React Scan specific options
-                        scanOptions: {
-                            animationSpeed: "fast",
-                            dangerouslyForceRunInProduction: false,
-                            enabled: true, // Always enabled when included
-                            log: false,
-                            showToolbar: true, // Always show in development
-                            trackUnnecessaryRenders: true,
-                        },
-                    } ),
-                ]
-                : [] ),
-            devtoolsJson( { normalizeForWindowsContainer: true } ),
+                      reactScan({
+                          autoDisplayNames: true,
+                          debug: false, // Disable debug logs
+                          enable: true, // Always enabled when included
+                          // React Scan specific options
+                          scanOptions: {
+                              animationSpeed: "fast",
+                              dangerouslyForceRunInProduction: false,
+                              enabled: true, // Always enabled when included
+                              log: false,
+                              showToolbar: true, // Always show in development
+                              trackUnnecessaryRenders: true,
+                          },
+                      }),
+                  ]
+                : []),
+            devtoolsJson({ normalizeForWindowsContainer: true }),
             // Bundle analysis tools are build-only. Running them during `vite serve`
             // (especially alongside vite-plugin-electron's internal watch builds)
             // can cause significant memory pressure on Windows.
-            ...( isBuild
+            ...(isBuild
                 ? [
-                    analyzer( {
-                        analyzerMode: "static", // Generate static HTML report
-                        brotliOptions: {}, // Use default brotli options
-                        defaultSizes: "gzip", // Show gzipped sizes by default
-                        fileName: "bundle-analysis",
-                        gzipOptions: {}, // Use default gzip options
-                        openAnalyzer: false,
-                        reportTitle: "Uptime Watcher Bundle Analysis",
-                        summary: true,
-                    } ),
-                ]
-                : [] ),
-            viteStaticCopy( {
+                      analyzer({
+                          analyzerMode: "static", // Generate static HTML report
+                          brotliOptions: {}, // Use default brotli options
+                          defaultSizes: "gzip", // Show gzipped sizes by default
+                          fileName: "bundle-analysis",
+                          gzipOptions: {}, // Use default gzip options
+                          openAnalyzer: false,
+                          reportTitle: "Uptime Watcher Bundle Analysis",
+                          summary: true,
+                      }),
+                  ]
+                : []),
+            viteStaticCopy({
                 // Use writeBundle hook for better integration with build process
                 hook: "writeBundle",
                 silent: false, // Show copy operations for transparency
@@ -484,118 +496,118 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                         src: wasmSourcePath,
                         transform: {
                             encoding: "buffer" as const, // Use buffer encoding for binary WASM files
-                            handler ( contents: Buffer, filename: string ) {
+                            handler(contents: Buffer, filename: string) {
                                 // Enhanced WASM optimization and validation
                                 const originalSize = contents.length;
-                                const sizeInKB = ( originalSize / 1024 ).toFixed(
+                                const sizeInKB = (originalSize / 1024).toFixed(
                                     2
                                 );
 
                                 // Comprehensive WASM validation
                                 try {
                                     // 1. Validate WASM magic bytes (0x00 0x61 0x73 0x6D)
-                                    const wasmMagic = Buffer.from( [
+                                    const wasmMagic = Buffer.from([
                                         0x00,
                                         0x61,
                                         0x73,
                                         0x6d,
-                                    ] );
+                                    ]);
                                     const isValidWasm = contents
-                                        .subarray( 0, 4 )
-                                        .equals( wasmMagic );
+                                        .subarray(0, 4)
+                                        .equals(wasmMagic);
 
-                                    if ( !isValidWasm ) {
+                                    if (!isValidWasm) {
                                         console.error(
-                                            `❌ [WASM] Invalid WASM magic bytes in ${ filename }`
+                                            `❌ [WASM] Invalid WASM magic bytes in ${filename}`
                                         );
                                         console.error(
-                                            `    Expected: ${ Array.from(
+                                            `    Expected: ${Array.from(
                                                 wasmMagic
                                             )
                                                 .map(
-                                                    ( b ) =>
-                                                        `0x${ b.toString( 16 ).padStart( 2, "0" ) }`
+                                                    (b) =>
+                                                        `0x${b.toString(16).padStart(2, "0")}`
                                                 )
-                                                .join( " " ) }`
+                                                .join(" ")}`
                                         );
                                         console.error(
-                                            `    Found:    ${ Array.from(
-                                                contents.subarray( 0, 4 )
+                                            `    Found:    ${Array.from(
+                                                contents.subarray(0, 4)
                                             )
                                                 .map(
-                                                    ( b ) =>
-                                                        `0x${ b.toString( 16 ).padStart( 2, "0" ) }`
+                                                    (b) =>
+                                                        `0x${b.toString(16).padStart(2, "0")}`
                                                 )
-                                                .join( " " ) }`
+                                                .join(" ")}`
                                         );
                                         throw new Error(
-                                            `Invalid WASM file: ${ filename }`
+                                            `Invalid WASM file: ${filename}`
                                         );
                                     }
 
                                     // 2. Check minimum WASM file size (should be at least 8 bytes for header)
-                                    if ( contents.length < 8 ) {
+                                    if (contents.length < 8) {
                                         console.error(
-                                            `❌ [WASM] File too small (${ contents.length } bytes): ${ filename }`
+                                            `❌ [WASM] File too small (${contents.length} bytes): ${filename}`
                                         );
                                         throw new Error(
-                                            `WASM file too small: ${ filename }`
+                                            `WASM file too small: ${filename}`
                                         );
                                     }
 
                                     // 3. Validate WASM version (bytes 4-7 should be version 1)
-                                    const version = contents.readUInt32LE( 4 );
-                                    if ( version !== 1 ) {
+                                    const version = contents.readUInt32LE(4);
+                                    if (version !== 1) {
                                         console.warn(
-                                            `⚠️  [WASM] Unexpected WASM version ${ version } in ${ filename } (expected 1)`
+                                            `⚠️  [WASM] Unexpected WASM version ${version} in ${filename} (expected 1)`
                                         );
                                     }
 
                                     // 4. Check for reasonable file size (SQLite WASM should be ~1-2MB)
                                     const maxReasonableSize = 5 * 1024 * 1024; // 5MB
                                     const minReasonableSize = 500 * 1024; // 500KB
-                                    if ( contents.length > maxReasonableSize ) {
+                                    if (contents.length > maxReasonableSize) {
                                         console.warn(
-                                            `⚠️  [WASM] Large file size (${ sizeInKB } KB): ${ filename }`
+                                            `⚠️  [WASM] Large file size (${sizeInKB} KB): ${filename}`
                                         );
                                     } else if (
                                         contents.length < minReasonableSize
                                     ) {
                                         console.warn(
-                                            `⚠️  [WASM] Small file size (${ sizeInKB } KB): ${ filename }`
+                                            `⚠️  [WASM] Small file size (${sizeInKB} KB): ${filename}`
                                         );
                                     }
 
                                     // Success logging with detailed info
                                     console.log(
-                                        `✅ [WASM] Optimized ${ filename }`
+                                        `✅ [WASM] Optimized ${filename}`
                                     );
                                     console.log(
-                                        `    📊 Size: ${ sizeInKB } KB (${ originalSize.toLocaleString() } bytes)`
+                                        `    📊 Size: ${sizeInKB} KB (${originalSize.toLocaleString()} bytes)`
                                     );
-                                    console.log( `    🔧 Version: ${ version }` );
+                                    console.log(`    🔧 Version: ${version}`);
                                     // Estimate compression potential (assume typical WASM compression ratio ~65%)
                                     const estimatedCompressedSize =
                                         contents.length * 0.35;
                                     const compressionPotential = (
-                                        ( 1 -
+                                        (1 -
                                             estimatedCompressedSize /
-                                            contents.length ) *
+                                                contents.length) *
                                         100
-                                    ).toFixed( 1 );
+                                    ).toFixed(1);
                                     console.log(
-                                        `    🎯 Compression potential: ${ compressionPotential }% savings possible (estimated)`
+                                        `    🎯 Compression potential: ${compressionPotential}% savings possible (estimated)`
                                     );
 
                                     // Production approach: Preserve SQLite WASM integrity
                                     // Any modification could break database functionality - validation only
                                     return contents;
-                                } catch ( error ) {
+                                } catch (error) {
                                     console.error(
-                                        `💥 [WASM] Processing failed for ${ filename }:`,
+                                        `💥 [WASM] Processing failed for ${filename}:`,
                                         error instanceof Error
                                             ? error.message
-                                            : String( error )
+                                            : String(error)
                                     );
                                     // Re-throw to prevent copying invalid files
                                     throw error;
@@ -607,40 +619,40 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                 // Add file watching for development hot-reload.
                 // IMPORTANT: do not enable in Vitest (`mode=test`) because it can
                 // leak FILEHANDLEs and keep the process alive.
-                ...( shouldWatchStaticCopy
+                ...(shouldWatchStaticCopy
                     ? {
-                        watch: {
-                            options: {
-                                awaitWriteFinish: {
-                                    pollInterval: 100,
-                                    stabilityThreshold: 500,
-                                },
-                                depth: 2,
-                                followSymlinks: true,
-                                // Watch options for chokidar
-                                ignoreInitial: true,
-                                persistent: true,
-                            },
-                            // Watch WASM files for changes during development
-                            reloadPageOnChange: false, // Don't reload entire page for WASM changes
-                        },
-                    }
-                    : {} ),
-            } ),
+                          watch: {
+                              options: {
+                                  awaitWriteFinish: {
+                                      pollInterval: 100,
+                                      stabilityThreshold: 500,
+                                  },
+                                  depth: 2,
+                                  followSymlinks: true,
+                                  // Watch options for chokidar
+                                  ignoreInitial: true,
+                                  persistent: true,
+                              },
+                              // Watch WASM files for changes during development
+                              reloadPageOnChange: false, // Don't reload entire page for WASM changes
+                          },
+                      }
+                    : {}),
+            }),
             // Codecov bundle upload is build-only; exclude from `vite serve` to
             // reduce memory usage and startup time.
-            ...( isBuild
+            ...(isBuild
                 ? [
-                    codecovVitePlugin( {
-                        bundleName: "uptime-watcher",
-                        enableBundleAnalysis: Boolean( codecovToken ),
-                        ...( codecovToken
-                            ? { uploadToken: codecovToken }
-                            : {} ),
-                        telemetry: false, // Disable telemetry for faster builds
-                    } ),
-                ]
-                : [] ),
+                      codecovVitePlugin({
+                          bundleName: "uptime-watcher",
+                          enableBundleAnalysis: Boolean(codecovToken),
+                          ...(codecovToken
+                              ? { uploadToken: codecovToken }
+                              : {}),
+                          telemetry: false, // Disable telemetry for faster builds
+                      }),
+                  ]
+                : []),
         ],
         preview: {
             open: false, // Don't auto-open browser (Electron only)
@@ -651,10 +663,10 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
         publicDir: "public",
         resolve: {
             alias: {
-                "@app": normalizePath( path.resolve( dirname, "src" ) ),
-                "@assets": normalizePath( path.resolve( dirname, "assets" ) ),
-                "@electron": normalizePath( path.resolve( dirname, "electron" ) ),
-                "@shared": normalizePath( path.resolve( dirname, "shared" ) ),
+                "@app": normalizePath(path.resolve(dirname, "src")),
+                "@assets": normalizePath(path.resolve(dirname, "assets")),
+                "@electron": normalizePath(path.resolve(dirname, "electron")),
+                "@shared": normalizePath(path.resolve(dirname, "shared")),
             },
             extensions: [
                 ".ts",
@@ -674,73 +686,73 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
         // `mode=test` on Windows, making shutdown flaky.
         //
         // In test mode we intentionally fall back to Vite defaults.
-        ...( isTestMode
+        ...(isTestMode
             ? {}
             : {
-                server: {
-                    hmr: {
-                        overlay: true, // Show full-screen overlay on errors
-                        port: 5174, // Use different port for HMR to avoid conflicts
-                        protocol: "ws", // Use WebSocket for HMR
-                    },
-                    open: false, // Don't auto-open browser (Electron only)
-                    port: 5173, // Dev server uses port 5173. This is intentionally different from preview port (6174) to prevent accidental overlap.
-                    // Rationale: Separating dev and preview ports allows both environments to run concurrently without port conflicts, aiding development and testing.
-                    strictPort: true, // Fail if port is taken (prevents silent port changes)
-                    warmup: {
-                        // Warm up frequently used files to improve initial loading performance
-                        clientFiles: [
-                            // Main application entry points
-                            "./src/App.tsx",
-                            "./src/main.tsx",
+                  server: {
+                      hmr: {
+                          overlay: true, // Show full-screen overlay on errors
+                          port: 5174, // Use different port for HMR to avoid conflicts
+                          protocol: "ws", // Use WebSocket for HMR
+                      },
+                      open: false, // Don't auto-open browser (Electron only)
+                      port: 5173, // Dev server uses port 5173. This is intentionally different from preview port (6174) to prevent accidental overlap.
+                      // Rationale: Separating dev and preview ports allows both environments to run concurrently without port conflicts, aiding development and testing.
+                      strictPort: true, // Fail if port is taken (prevents silent port changes)
+                      warmup: {
+                          // Warm up frequently used files to improve initial loading performance
+                          clientFiles: [
+                              // Main application entry points
+                              "./src/App.tsx",
+                              "./src/main.tsx",
 
-                            // Core stores (used throughout the app)
-                            "./src/stores/sites/useSitesStore.ts",
-                            "./src/stores/settings/useSettingsStore.ts",
-                            "./src/stores/ui/useUiStore.ts",
-                            "./src/stores/error/useErrorStore.ts",
+                              // Core stores (used throughout the app)
+                              "./src/stores/sites/useSitesStore.ts",
+                              "./src/stores/settings/useSettingsStore.ts",
+                              "./src/stores/ui/useUiStore.ts",
+                              "./src/stores/error/useErrorStore.ts",
 
-                            // Common theme components (used everywhere)
-                            "./src/theme/components/ThemeProvider.tsx",
-                            "./src/theme/components/ThemedBox.tsx",
-                            "./src/theme/components/ThemedButton.tsx",
-                            "./src/theme/components/ThemedText.tsx",
-                            "./src/theme/useTheme.ts",
+                              // Common theme components (used everywhere)
+                              "./src/theme/components/ThemeProvider.tsx",
+                              "./src/theme/components/ThemedBox.tsx",
+                              "./src/theme/components/ThemedButton.tsx",
+                              "./src/theme/components/ThemedText.tsx",
+                              "./src/theme/useTheme.ts",
 
-                            // Heavy chart components (Chart.js is large)
-                            "./src/components/SiteDetails/charts/ResponseTimeChart.tsx",
-                            "./src/components/SiteDetails/charts/UptimeChart.tsx",
-                            "./src/components/SiteDetails/charts/StatusChart.tsx",
-                            "./src/components/common/HistoryChart.tsx",
+                              // Heavy chart components (Chart.js is large)
+                              "./src/components/SiteDetails/charts/ResponseTimeChart.tsx",
+                              "./src/components/SiteDetails/charts/UptimeChart.tsx",
+                              "./src/components/SiteDetails/charts/StatusChart.tsx",
+                              "./src/components/common/HistoryChart.tsx",
 
-                            // Frequently used components
-                            "./src/components/Dashboard/SiteList/SiteList.tsx",
-                            "./src/components/Header/Header.tsx",
-                            "./src/components/SiteDetails/SiteDetails.tsx",
+                              // Frequently used components
+                              "./src/components/Dashboard/SiteList/SiteList.tsx",
+                              "./src/components/Header/Header.tsx",
+                              "./src/components/SiteDetails/SiteDetails.tsx",
 
-                            // Chart utilities and configuration (used by all chart components)
-                            "./src/services/chartConfig.ts",
-                            "./src/utils/chartUtils.ts",
+                              // Chart utilities and configuration (used by all chart components)
+                              "./src/services/chartConfig.ts",
+                              "./src/utils/chartUtils.ts",
 
-                            // Shared types and utilities
-                            "./shared/types.ts",
-                            "./shared/utils/environment.ts",
-                        ],
-                    },
-                    watch: {
-                        awaitWriteFinish: {
-                            pollInterval: 100,
-                            stabilityThreshold: 500,
-                        },
-                        followSymlinks: true,
-                        // Watch options for chokidar
-                        ignoreInitial: true,
-                        persistent: true,
-                        // Watch WASM files for changes during development
-                        useFsEvents: true, // Use native file system events for better performance
-                    },
-                },
-            } ),
+                              // Shared types and utilities
+                              "./shared/types.ts",
+                              "./shared/utils/environment.ts",
+                          ],
+                      },
+                      watch: {
+                          awaitWriteFinish: {
+                              pollInterval: 100,
+                              stabilityThreshold: 500,
+                          },
+                          followSymlinks: true,
+                          // Watch options for chokidar
+                          ignoreInitial: true,
+                          persistent: true,
+                          // Watch WASM files for changes during development
+                          useFsEvents: true, // Use native file system events for better performance
+                      },
+                  },
+              }),
         test: {
             // Directory for storing Vitest test attachments (screenshots, logs, etc.) in a hidden cache folder.
             // This helps keep test artifacts organized and out of the main source tree.
@@ -750,14 +762,14 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                 exclude: [
                     "**/dist*/**",
                     "**/html/**",
-                    ...defaultExclude,
+                    ...vitestDefaultExclude,
                 ],
                 include: [
                     "benchmarks/**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
                 ],
                 includeSamples: true,
                 outputJson: "./coverage/bench-results.json",
-                reporters: [ "default", "verbose" ],
+                reporters: ["default", "verbose"],
             },
             chaiConfig: {
                 includeStack: false,
@@ -816,7 +828,7 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                     "stryker_prompts_by_mutator/**",
                     "temp",
                     "temp/**",
-                    ...coverageConfigDefaults.exclude,
+                    ...vitestCoverageDefaultExclude,
                 ],
                 excludeAfterRemap: true, // Exclude files after remapping for accuracy
                 experimentalAstAwareRemapping: true, // Enabled: may cause ast-v8-to-istanbul column parsing errors
@@ -867,8 +879,8 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                 },
             },
             diff: {
-                aIndicator: pc.magenta( pc.bold( "--" ) ), // Magenta is much more readable than red
-                bIndicator: pc.green( pc.bold( "++" ) ), // Clean single-character indicators
+                aIndicator: pc.magenta(pc.bold("--")), // Magenta is much more readable than red
+                bIndicator: pc.green(pc.bold("++")), // Clean single-character indicators
                 expand: true,
                 // The value 20 for maxDepth was chosen to provide sufficient context for deeply nested object diffs.
                 // This helps debugging complex test failures, but may impact performance for very large or deeply nested objects.
@@ -877,7 +889,7 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                 omitAnnotationLines: true,
                 printBasicPrototype: false,
                 truncateAnnotation: pc.yellow(
-                    pc.bold( "... Diff output truncated for readability" )
+                    pc.bold("... Diff output truncated for readability")
                 ), // Yellow is more eye-catching than cyan
                 // The value 250 for truncateThreshold was selected to balance readability and performance.
                 // It limits the maximum number of diff lines shown, preventing excessively long outputs
@@ -887,7 +899,7 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
             },
             env: {
                 NODE_ENV: "test",
-                PACKAGE_VERSION: process.env[ "PACKAGE_VERSION" ] ?? "unknown",
+                PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
             },
             environment: "jsdom", // Default for React components
             // Test file patterns - exclude electron tests as they have their own config
@@ -897,7 +909,7 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                 "**/docs/**",
                 "**/node_modules/**",
                 "electron/**",
-                ...defaultExclude,
+                ...vitestDefaultExclude,
             ],
             expect: {
                 poll: { interval: 50, timeout: 15_000 },
@@ -924,8 +936,8 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
             maxWorkers: Math.max(
                 1,
                 Number(
-                    process.env[ "MAX_THREADS" ] ??
-                    ( process.env[ "CI" ] ? "1" : "8" )
+                    process.env["MAX_THREADS"] ??
+                        (process.env["CI"] ? "1" : "8")
                 )
             ),
             name: {
@@ -965,7 +977,7 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                 groupOrder: 0,
                 setupFiles: "parallel",
             },
-            setupFiles: [ "./src/test/setup.ts" ], // Setup file for testing
+            setupFiles: ["./src/test/setup.ts"], // Setup file for testing
             slowTestThreshold: 300,
             testTimeout: 15_000, // Set Vitest timeout to 15 seconds
             typecheck: {
@@ -976,10 +988,10 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
                     "**/.{idea,git,cache,output,temp}/**",
                     "**/dist*/**",
                     "**/html/**",
-                    ...defaultExclude,
+                    ...vitestDefaultExclude,
                 ],
                 ignoreSourceErrors: false,
-                include: [ "**/*.{test,spec}-d.?(c|m)[jt]s?(x)" ],
+                include: ["**/*.{test,spec}-d.?(c|m)[jt]s?(x)"],
                 only: false,
                 spawnTimeout: 10_000,
                 tsconfig: "./tsconfig.json",
@@ -988,7 +1000,4 @@ const viteConfig: UserConfigFnObject = ( { command, mode } ) => {
     };
 };
 
-const configuredViteConfig: ReturnType<typeof defineConfig> =
-    defineConfig( viteConfig );
-
-export default configuredViteConfig;
+export default viteConfig;

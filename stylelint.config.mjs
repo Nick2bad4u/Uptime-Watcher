@@ -810,8 +810,15 @@ const config = defineConfig({
          */
         "logical-css/require-logical-keywords": [
             true,
-            { "ignore": ["caption-side", "offset-anchor", "offset-position"], "severity": "error" },
-          ],
+            {
+                ignore: [
+                    "caption-side",
+                    "offset-anchor",
+                    "offset-position",
+                ],
+                severity: "error",
+            },
+        ],
         /**
          * Logical units enforcement.
          *
@@ -819,7 +826,7 @@ const config = defineConfig({
          * Promotes logical units (e.g., inline-size instead of width) for
          * improved internationalization and writing mode support.
          */
-        "logical-css/require-logical-properties": [true, { "severity": "error" }],
+        "logical-css/require-logical-properties": [true, { severity: "error" }],
         "logical-css/require-logical-units": [true, { severity: "warning" }],
         // Layout and structure
         "max-nesting-depth": 4,

@@ -69,7 +69,7 @@ const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor =
  * Monitors whether a configured keyword appears in an HTTP response body.
  *
  * @remarks
- * This monitor is useful for validating textual markers in dynamic pages or
- * API responses where status codes alone are insufficient.
+ * This monitor is useful for validating textual markers in dynamic pages or API
+ * responses where status codes alone are insufficient.
  */
 export class HttpKeywordMonitor extends HttpKeywordMonitorBase {}

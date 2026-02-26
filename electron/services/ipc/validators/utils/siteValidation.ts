@@ -9,9 +9,7 @@ import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import type { IpcParameterValidator } from "../../types";
 import type { ParameterValueValidationResult } from "./parameterValidation";
 
-import {
-    createParamValidator,
-} from "./parameterValidation";
+import { createParamValidator } from "./parameterValidation";
 import { requireRecordParamValue } from "./recordValidation";
 import { requireStringParamValue } from "./stringValidation";
 

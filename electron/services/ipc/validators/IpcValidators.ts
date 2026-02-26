@@ -2,9 +2,7 @@ import {
     validateExternalOpenUrlCandidate,
     validateHttpUrlCandidate,
 } from "@shared/utils/urlSafety";
-import {
-    isNonEmptyString,
-} from "@shared/validation/validatorUtils";
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
 
 /**
  * Maximum byte length accepted for URL parameters passed through IPC.
@@ -111,7 +109,6 @@ export const IpcValidators = {
             disallowAuth: true,
             maxBytes: MAX_IPC_URL_UTF_BYTES,
         });
-
 
         if (validation.ok === false) {
             if (validation.reason === "must be a non-empty string") {

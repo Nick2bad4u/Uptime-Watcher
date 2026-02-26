@@ -35,7 +35,20 @@ const zeroCoverageViteCacheDir = "./.cache/vite-zero-coverage/";
  */
 const zeroCoverageConfig: ViteUserConfigFnObject = defineConfig((env) =>
     mergeConfig(
-        baseViteConfig(env),
+        (() => {
+            const configOrPromise =
+                typeof baseViteConfig === "function"
+                    ? baseViteConfig(env)
+                    : baseViteConfig;
+
+            if (configOrPromise instanceof Promise) {
+                throw new TypeError(
+                    "Async Vite config exports are not supported in vitest.zero-coverage.config.ts."
+                );
+            }
+
+            return configOrPromise;
+        })(),
         defineConfig({
             cacheDir: zeroCoverageViteCacheDir,
             test: {

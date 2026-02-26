@@ -106,527 +106,539 @@ import { useTheme } from "./theme/useTheme";
  * @see {@link useTheme} for theme management
  * @see {@link src/stores/sites/useSitesStore#useSitesStore} for site state management
  */
-export const App: NamedExoticComponent = memo(function AppComponent(): JSX.Element {
-    // Error store
-    const { clearError, isLoading, lastError } = useErrorStore(
-        useShallow(
-            useCallback(
-                (state: ErrorStore) => ({
-                    clearError: state.clearError,
-                    isLoading: state.isLoading,
-                    lastError: state.lastError,
-                }),
-                []
+export const App: NamedExoticComponent = memo(
+    function AppComponent(): JSX.Element {
+        // Error store
+        const { clearError, isLoading, lastError } = useErrorStore(
+            useShallow(
+                useCallback(
+                    (state: ErrorStore) => ({
+                        clearError: state.clearError,
+                        isLoading: state.isLoading,
+                        lastError: state.lastError,
+                    }),
+                    []
+                )
             )
-        )
-    );
-
-    // Sites store
-    // Settings store - store is initialized via the initialization effect below
-    // Store subscription happens automatically when store is accessed
-    const systemNotificationsEnabled = useSettingsStore(
-        useCallback((state) => state.settings.systemNotificationsEnabled, [])
-    );
-    const systemNotificationsSoundEnabled = useSettingsStore(
-        useCallback(
-            (state) => state.settings.systemNotificationsSoundEnabled,
-            []
-        )
-    );
-
-    // UI store
-    const {
-        setShowAddSiteModal,
-        setShowSettings,
-        setShowSiteDetails,
-        setSidebarCollapsedPreference,
-        showAddSiteModal,
-        showSettings,
-        showSiteDetails,
-        sidebarCollapsedPreference,
-        siteListLayout,
-    } = useUIStore(
-        useShallow(
-            useCallback(
-                (state: UIStore) => ({
-                    setShowAddSiteModal: state.setShowAddSiteModal,
-                    setShowSettings: state.setShowSettings,
-                    setShowSiteDetails: state.setShowSiteDetails,
-                    setSidebarCollapsedPreference:
-                        state.setSidebarCollapsedPreference,
-                    showAddSiteModal: state.showAddSiteModal,
-                    showSettings: state.showSettings,
-                    showSiteDetails: state.showSiteDetails,
-                    sidebarCollapsedPreference:
-                        state.sidebarCollapsedPreference,
-                    siteListLayout: state.siteListLayout,
-                }),
-                []
-            )
-        )
-    );
-
-    const { cancel: closeConfirmDialog, isOpen: isConfirmDialogOpen } =
-        useConfirmDialogVisibility();
-
-    const { cancel: closePromptDialog, isOpen: isPromptDialogOpen } =
-        usePromptDialogVisibility();
-
-    // Updates store
-    const {
-        applyUpdate,
-        applyUpdateStatus,
-        setUpdateError,
-        subscribeToUpdateStatusEvents,
-        updateError,
-        updateStatus,
-    } = useUpdatesStore(
-        useShallow(
-            useCallback(
-                (state: UpdatesStore) => ({
-                    applyUpdate: state.applyUpdate,
-                    applyUpdateStatus: state.applyUpdateStatus,
-                    setUpdateError: state.setUpdateError,
-                    subscribeToUpdateStatusEvents:
-                        state.subscribeToUpdateStatusEvents,
-                    updateError: state.updateError,
-                    updateStatus: state.updateStatus,
-                }),
-                []
-            )
-        )
-    );
-
-    const { isDark } = useTheme();
-
-    // Track if initial app initialization is complete to prevent loading overlay flash
-    const [isInitialized, setIsInitialized] = useState<boolean>(false);
-
-    // Sidebar responsive state management
-    const [compactSidebarOpen, setCompactSidebarOpen] =
-        useState<boolean>(false);
-    const [isCompactViewport, setIsCompactViewport] = useState<boolean>(false);
-
-    const isSidebarOpen = isCompactViewport
-        ? compactSidebarOpen
-        : !sidebarCollapsedPreference;
-
-    // Ref to store cache sync cleanup function
-    const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
-    const syncEventsCleanupRef = useRef<(() => void) | null>(null);
-    const updateStatusEventsCleanupRef = useRef<(() => void) | null>(null);
-    const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
-    const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(null);
-    const settingsSubscriptionRef = useRef<(() => void) | null>(null);
-    const debugSubscriptionsRef = useRef<Array<() => void>>([]);
-    const settingsUpdateCountRef = useRef(0);
-    const sitesUpdateCountRef = useRef(0);
-    const uiUpdateCountRef = useRef(0);
-    const errorUpdateCountRef = useRef(0);
-    const updatesUpdateCountRef = useRef(0);
-    const alertsUpdateCountRef = useRef(0);
-    const subscribeToSettingsStore = useCallback((): void => {
-        settingsSubscriptionRef.current = useSettingsStore.subscribe(
-            (state) => {
-                settingsUpdateCountRef.current += 1;
-                logger.info("[App:debug] settings store update", {
-                    count: settingsUpdateCountRef.current,
-                    historyLimit: state.settings.historyLimit,
-                    systemNotificationsEnabled:
-                        state.settings.systemNotificationsEnabled,
-                    systemNotificationsSoundEnabled:
-                        state.settings.systemNotificationsSoundEnabled,
-                });
-            }
         );
-    }, []);
 
-    const cleanupSettingsStoreSubscription = useCallback((): void => {
-        settingsSubscriptionRef.current?.();
-        settingsSubscriptionRef.current = null;
-    }, []);
+        // Sites store
+        // Settings store - store is initialized via the initialization effect below
+        // Store subscription happens automatically when store is accessed
+        const systemNotificationsEnabled = useSettingsStore(
+            useCallback(
+                (state) => state.settings.systemNotificationsEnabled,
+                []
+            )
+        );
+        const systemNotificationsSoundEnabled = useSettingsStore(
+            useCallback(
+                (state) => state.settings.systemNotificationsSoundEnabled,
+                []
+            )
+        );
 
-    useMount(subscribeToSettingsStore, cleanupSettingsStoreSubscription);
+        // UI store
+        const {
+            setShowAddSiteModal,
+            setShowSettings,
+            setShowSiteDetails,
+            setSidebarCollapsedPreference,
+            showAddSiteModal,
+            showSettings,
+            showSiteDetails,
+            sidebarCollapsedPreference,
+            siteListLayout,
+        } = useUIStore(
+            useShallow(
+                useCallback(
+                    (state: UIStore) => ({
+                        setShowAddSiteModal: state.setShowAddSiteModal,
+                        setShowSettings: state.setShowSettings,
+                        setShowSiteDetails: state.setShowSiteDetails,
+                        setSidebarCollapsedPreference:
+                            state.setSidebarCollapsedPreference,
+                        showAddSiteModal: state.showAddSiteModal,
+                        showSettings: state.showSettings,
+                        showSiteDetails: state.showSiteDetails,
+                        sidebarCollapsedPreference:
+                            state.sidebarCollapsedPreference,
+                        siteListLayout: state.siteListLayout,
+                    }),
+                    []
+                )
+            )
+        );
 
-    const persistSidebarPreference = useCallback(
-        (nextOpen: boolean): void => {
-            if (!isCompactViewport) {
-                setSidebarCollapsedPreference(!nextOpen);
-            }
-        },
-        [isCompactViewport, setSidebarCollapsedPreference]
-    );
+        const { cancel: closeConfirmDialog, isOpen: isConfirmDialogOpen } =
+            useConfirmDialogVisibility();
 
-    const showLoadingOverlay = useDelayedLoadingOverlay({
-        isInitialized,
-        isLoading,
-    });
+        const { cancel: closePromptDialog, isOpen: isPromptDialogOpen } =
+            usePromptDialogVisibility();
 
-    /**
-     * Initializes the application by setting up stores, cache sync, and status
-     * update subscriptions.
-     *
-     * @remarks
-     * This function performs sequential initialization to avoid state conflicts
-     * during startup. It also sets up cache synchronization with the backend
-     * and stores the cleanup function for later use during component unmount.
-     *
-     * @returns Promise that resolves when initialization is complete
-     *
-     * @throws Error When store initialization fails
-     */
-    const initializeApp = useCallback(async () => {
-        await runAppBootstrap({
-            cleanupRefs: {
-                cacheSyncCleanupRef,
-                syncEventsCleanupRef,
-                updateStatusEventsCleanupRef,
-            },
-            setIsInitialized,
+        // Updates store
+        const {
+            applyUpdate,
+            applyUpdateStatus,
+            setUpdateError,
             subscribeToUpdateStatusEvents,
-            updateCountRefs: {
-                alertsUpdateCountRef,
-                errorUpdateCountRef,
-                settingsUpdateCountRef,
-                sitesUpdateCountRef,
-                uiUpdateCountRef,
-                updatesUpdateCountRef,
+            updateError,
+            updateStatus,
+        } = useUpdatesStore(
+            useShallow(
+                useCallback(
+                    (state: UpdatesStore) => ({
+                        applyUpdate: state.applyUpdate,
+                        applyUpdateStatus: state.applyUpdateStatus,
+                        setUpdateError: state.setUpdateError,
+                        subscribeToUpdateStatusEvents:
+                            state.subscribeToUpdateStatusEvents,
+                        updateError: state.updateError,
+                        updateStatus: state.updateStatus,
+                    }),
+                    []
+                )
+            )
+        );
+
+        const { isDark } = useTheme();
+
+        // Track if initial app initialization is complete to prevent loading overlay flash
+        const [isInitialized, setIsInitialized] = useState<boolean>(false);
+
+        // Sidebar responsive state management
+        const [compactSidebarOpen, setCompactSidebarOpen] =
+            useState<boolean>(false);
+        const [isCompactViewport, setIsCompactViewport] =
+            useState<boolean>(false);
+
+        const isSidebarOpen = isCompactViewport
+            ? compactSidebarOpen
+            : !sidebarCollapsedPreference;
+
+        // Ref to store cache sync cleanup function
+        const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
+        const syncEventsCleanupRef = useRef<(() => void) | null>(null);
+        const updateStatusEventsCleanupRef = useRef<(() => void) | null>(null);
+        const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
+        const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(
+            null
+        );
+        const settingsSubscriptionRef = useRef<(() => void) | null>(null);
+        const debugSubscriptionsRef = useRef<Array<() => void>>([]);
+        const settingsUpdateCountRef = useRef(0);
+        const sitesUpdateCountRef = useRef(0);
+        const uiUpdateCountRef = useRef(0);
+        const errorUpdateCountRef = useRef(0);
+        const updatesUpdateCountRef = useRef(0);
+        const alertsUpdateCountRef = useRef(0);
+        const subscribeToSettingsStore = useCallback((): void => {
+            settingsSubscriptionRef.current = useSettingsStore.subscribe(
+                (state) => {
+                    settingsUpdateCountRef.current += 1;
+                    logger.info("[App:debug] settings store update", {
+                        count: settingsUpdateCountRef.current,
+                        historyLimit: state.settings.historyLimit,
+                        systemNotificationsEnabled:
+                            state.settings.systemNotificationsEnabled,
+                        systemNotificationsSoundEnabled:
+                            state.settings.systemNotificationsSoundEnabled,
+                    });
+                }
+            );
+        }, []);
+
+        const cleanupSettingsStoreSubscription = useCallback((): void => {
+            settingsSubscriptionRef.current?.();
+            settingsSubscriptionRef.current = null;
+        }, []);
+
+        useMount(subscribeToSettingsStore, cleanupSettingsStoreSubscription);
+
+        const persistSidebarPreference = useCallback(
+            (nextOpen: boolean): void => {
+                if (!isCompactViewport) {
+                    setSidebarCollapsedPreference(!nextOpen);
+                }
             },
+            [isCompactViewport, setSidebarCollapsedPreference]
+        );
+
+        const showLoadingOverlay = useDelayedLoadingOverlay({
+            isInitialized,
+            isLoading,
         });
-    }, [subscribeToUpdateStatusEvents]);
 
-    /**
-     * Cleans up application resources when the component unmounts.
-     *
-     * @remarks
-     * Unsubscribes from status updates and cleans up cache synchronization to
-     * prevent memory leaks and background operations.
-     */
-    const cleanupApp = useCallback(() => {
-        cleanupAppBootstrap({
-            cleanupRefs: {
-                cacheSyncCleanupRef,
-                syncEventsCleanupRef,
-                updateStatusEventsCleanupRef,
-            },
-        });
-    }, []);
-
-    useMount(initializeApp, cleanupApp);
-
-    const subscribeToDebugStores = useCallback((): void => {
-        subscribeToDebugStoresImpl({
-            countRefs: {
-                alertsUpdateCountRef,
-                errorUpdateCountRef,
-                sitesUpdateCountRef,
-                uiUpdateCountRef,
-                updatesUpdateCountRef,
-            },
-            refs: {
-                subscriptionsRef: debugSubscriptionsRef,
-            },
-        });
-    }, []);
-
-    const cleanupDebugStoreSubscriptions = useCallback((): void => {
-        cleanupDebugStoreSubscriptionsImpl({
-            refs: {
-                subscriptionsRef: debugSubscriptionsRef,
-            },
-        });
-    }, []);
-
-    useMount(subscribeToDebugStores, cleanupDebugStoreSubscriptions);
-
-    useEffect(
-        function syncNotificationPreferencesEffect(): void {
-            logger.debug("[App:syncNotifEffect] triggered", {
-                soundEnabled: systemNotificationsSoundEnabled,
-                systemEnabled: systemNotificationsEnabled,
-            });
-            void synchronizeNotificationPreferences();
-        },
-        [systemNotificationsEnabled, systemNotificationsSoundEnabled]
-    );
-
-    // Update status events are subscribed during the initialization pipeline
-    // via the UpdatesStore to keep event ownership consistent.
-
-    // Focus-based state synchronization (disabled by default for performance)
-    useBackendFocusSync(false); // Set to true to enable focus-based backend sync
-
-    const handleSidebarBreakpointChange = useCallback(
-        (event: MediaQueryListEvent): void => {
-            setIsCompactViewport(event.matches);
-            if (event.matches) {
-                setCompactSidebarOpen(false);
-            }
-        },
-        []
-    );
-
-    const closeCompactSidebar = useCallback((): void => {
-        setCompactSidebarOpen(false);
-    }, []);
-
-    const closeNonCompactSidebar = useCallback((): void => {
-        persistSidebarPreference(false);
-    }, [persistSidebarPreference]);
-
-    const cleanupSidebarListener = useCallback(() => {
-        cleanupSidebarMediaQueryListener({
-            refs: {
-                mediaQueryRef: sidebarMediaQueryRef,
-                unsubscribeRef: sidebarMediaQueryUnsubscribeRef,
-            },
-        });
-    }, []);
-
-    useMount(
-        useCallback(() => {
-            setupSidebarMediaQueryListener({
-                closeCompactSidebar: () => {
-                    setCompactSidebarOpen(false);
+        /**
+         * Initializes the application by setting up stores, cache sync, and
+         * status update subscriptions.
+         *
+         * @remarks
+         * This function performs sequential initialization to avoid state
+         * conflicts during startup. It also sets up cache synchronization with
+         * the backend and stores the cleanup function for later use during
+         * component unmount.
+         *
+         * @returns Promise that resolves when initialization is complete
+         *
+         * @throws Error When store initialization fails
+         */
+        const initializeApp = useCallback(async () => {
+            await runAppBootstrap({
+                cleanupRefs: {
+                    cacheSyncCleanupRef,
+                    syncEventsCleanupRef,
+                    updateStatusEventsCleanupRef,
                 },
-                onBreakpointChange: handleSidebarBreakpointChange,
+                setIsInitialized,
+                subscribeToUpdateStatusEvents,
+                updateCountRefs: {
+                    alertsUpdateCountRef,
+                    errorUpdateCountRef,
+                    settingsUpdateCountRef,
+                    sitesUpdateCountRef,
+                    uiUpdateCountRef,
+                    updatesUpdateCountRef,
+                },
+            });
+        }, [subscribeToUpdateStatusEvents]);
+
+        /**
+         * Cleans up application resources when the component unmounts.
+         *
+         * @remarks
+         * Unsubscribes from status updates and cleans up cache synchronization
+         * to prevent memory leaks and background operations.
+         */
+        const cleanupApp = useCallback(() => {
+            cleanupAppBootstrap({
+                cleanupRefs: {
+                    cacheSyncCleanupRef,
+                    syncEventsCleanupRef,
+                    updateStatusEventsCleanupRef,
+                },
+            });
+        }, []);
+
+        useMount(initializeApp, cleanupApp);
+
+        const subscribeToDebugStores = useCallback((): void => {
+            subscribeToDebugStoresImpl({
+                countRefs: {
+                    alertsUpdateCountRef,
+                    errorUpdateCountRef,
+                    sitesUpdateCountRef,
+                    uiUpdateCountRef,
+                    updatesUpdateCountRef,
+                },
+                refs: {
+                    subscriptionsRef: debugSubscriptionsRef,
+                },
+            });
+        }, []);
+
+        const cleanupDebugStoreSubscriptions = useCallback((): void => {
+            cleanupDebugStoreSubscriptionsImpl({
+                refs: {
+                    subscriptionsRef: debugSubscriptionsRef,
+                },
+            });
+        }, []);
+
+        useMount(subscribeToDebugStores, cleanupDebugStoreSubscriptions);
+
+        useEffect(
+            function syncNotificationPreferencesEffect(): void {
+                logger.debug("[App:syncNotifEffect] triggered", {
+                    soundEnabled: systemNotificationsSoundEnabled,
+                    systemEnabled: systemNotificationsEnabled,
+                });
+                void synchronizeNotificationPreferences();
+            },
+            [systemNotificationsEnabled, systemNotificationsSoundEnabled]
+        );
+
+        // Update status events are subscribed during the initialization pipeline
+        // via the UpdatesStore to keep event ownership consistent.
+
+        // Focus-based state synchronization (disabled by default for performance)
+        useBackendFocusSync(false); // Set to true to enable focus-based backend sync
+
+        const handleSidebarBreakpointChange = useCallback(
+            (event: MediaQueryListEvent): void => {
+                setIsCompactViewport(event.matches);
+                if (event.matches) {
+                    setCompactSidebarOpen(false);
+                }
+            },
+            []
+        );
+
+        const closeCompactSidebar = useCallback((): void => {
+            setCompactSidebarOpen(false);
+        }, []);
+
+        const closeNonCompactSidebar = useCallback((): void => {
+            persistSidebarPreference(false);
+        }, [persistSidebarPreference]);
+
+        const cleanupSidebarListener = useCallback(() => {
+            cleanupSidebarMediaQueryListener({
                 refs: {
                     mediaQueryRef: sidebarMediaQueryRef,
                     unsubscribeRef: sidebarMediaQueryUnsubscribeRef,
                 },
-                setIsCompactViewport,
             });
-        }, [handleSidebarBreakpointChange]),
-        cleanupSidebarListener
-    );
+        }, []);
 
-    // Auto-dismiss the navigation drawer on compact viewports once focus leaves it.
-    useCompactSidebarAutoDismiss({
-        closeCompactSidebar,
-        closeNonCompactSidebar,
-        isCompactViewport,
-        isSidebarOpen,
-        sidebarMediaQueryRef,
-    });
+        useMount(
+            useCallback(() => {
+                setupSidebarMediaQueryListener({
+                    closeCompactSidebar: () => {
+                        setCompactSidebarOpen(false);
+                    },
+                    onBreakpointChange: handleSidebarBreakpointChange,
+                    refs: {
+                        mediaQueryRef: sidebarMediaQueryRef,
+                        unsubscribeRef: sidebarMediaQueryUnsubscribeRef,
+                    },
+                    setIsCompactViewport,
+                });
+            }, [handleSidebarBreakpointChange]),
+            cleanupSidebarListener
+        );
 
-    const toggleSidebar = useCallback(() => {
-        if (isCompactViewport) {
-            setCompactSidebarOpen((previous) => !previous);
-            return;
-        }
+        // Auto-dismiss the navigation drawer on compact viewports once focus leaves it.
+        useCompactSidebarAutoDismiss({
+            closeCompactSidebar,
+            closeNonCompactSidebar,
+            isCompactViewport,
+            isSidebarOpen,
+            sidebarMediaQueryRef,
+        });
 
-        const next = !isSidebarOpen;
-        persistSidebarPreference(next);
-    }, [
-        isCompactViewport,
-        isSidebarOpen,
-        persistSidebarPreference,
-    ]);
-
-    const globalMetrics = useGlobalMonitoringMetrics();
-
-    const selectedSite = useSelectedSite();
-
-    /**
-     * Handles update action based on current update status.
-     *
-     * @remarks
-     * If an update has been downloaded, applies the update. Otherwise, resets
-     * the update status to idle and clears any errors.
-     */
-    const handleUpdateAction = useCallback(async () => {
-        if (updateStatus === "downloaded") {
-            try {
-                await applyUpdate();
-            } catch (error: unknown) {
-                logger.error("Failed to apply pending update:", error);
+        const toggleSidebar = useCallback(() => {
+            if (isCompactViewport) {
+                setCompactSidebarOpen((previous) => !previous);
+                return;
             }
-            return;
-        }
 
-        applyUpdateStatus("idle");
-        setUpdateError(undefined);
-    }, [
-        applyUpdate,
-        applyUpdateStatus,
-        setUpdateError,
-        updateStatus,
-    ]);
+            const next = !isSidebarOpen;
+            persistSidebarPreference(next);
+        }, [
+            isCompactViewport,
+            isSidebarOpen,
+            persistSidebarPreference,
+        ]);
 
-    /**
-     * Handles closing the settings modal.
-     */
-    const handleCloseSettings = useCallback(() => {
-        setShowSettings(false);
-    }, [setShowSettings]);
+        const globalMetrics = useGlobalMonitoringMetrics();
 
-    /**
-     * Handles closing the add site modal.
-     */
-    const handleCloseAddSiteModal = useCallback(() => {
-        setShowAddSiteModal(false);
-    }, [setShowAddSiteModal]);
+        const selectedSite = useSelectedSite();
 
-    /**
-     * Handles closing the site details modal.
-     */
-    const handleCloseSiteDetails = useCallback(() => {
-        setShowSiteDetails(false);
-    }, [setShowSiteDetails]);
+        /**
+         * Handles update action based on current update status.
+         *
+         * @remarks
+         * If an update has been downloaded, applies the update. Otherwise,
+         * resets the update status to idle and clears any errors.
+         */
+        const handleUpdateAction = useCallback(async () => {
+            if (updateStatus === "downloaded") {
+                try {
+                    await applyUpdate();
+                } catch (error: unknown) {
+                    logger.error("Failed to apply pending update:", error);
+                }
+                return;
+            }
 
-    /**
-     * Handle escape key for closing modals
-     */
-    const modalConfigs = useMemo(
-        () => [
-            {
-                isOpen: isPromptDialogOpen,
-                onClose: closePromptDialog,
-                priority: 5,
-            },
-            {
-                isOpen: isConfirmDialogOpen,
-                onClose: closeConfirmDialog,
-                priority: 4,
-            },
-            {
-                isOpen: showSiteDetails,
-                onClose: handleCloseSiteDetails,
-                priority: 3, // Highest priority
-            },
-            {
-                isOpen: showAddSiteModal,
-                onClose: handleCloseAddSiteModal,
-                priority: 2,
-            },
-            {
-                isOpen: showSettings,
-                onClose: handleCloseSettings,
-                priority: 1,
-            },
-        ],
-        [
-            closeConfirmDialog,
-            closePromptDialog,
-            handleCloseAddSiteModal,
-            handleCloseSettings,
-            handleCloseSiteDetails,
-            isConfirmDialogOpen,
-            isPromptDialogOpen,
-            showAddSiteModal,
-            showSettings,
-            showSiteDetails,
-        ]
-    );
+            applyUpdateStatus("idle");
+            setUpdateError(undefined);
+        }, [
+            applyUpdate,
+            applyUpdateStatus,
+            setUpdateError,
+            updateStatus,
+        ]);
 
-    useEscapeKeyModalHandler(modalConfigs);
+        /**
+         * Handles closing the settings modal.
+         */
+        const handleCloseSettings = useCallback(() => {
+            setShowSettings(false);
+        }, [setShowSettings]);
 
-    // Extract SiteDetails JSX to avoid complex conditional rendering
-    const siteDetailsJSX =
-        showSiteDetails && selectedSite ? (
-            <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
-        ) : null;
+        /**
+         * Handles closing the add site modal.
+         */
+        const handleCloseAddSiteModal = useCallback(() => {
+            setShowAddSiteModal(false);
+        }, [setShowAddSiteModal]);
 
-    const handleUpdateButtonClick = useCallback(() => {
-        void handleUpdateAction();
-    }, [handleUpdateAction]);
+        /**
+         * Handles closing the site details modal.
+         */
+        const handleCloseSiteDetails = useCallback(() => {
+            setShowSiteDetails(false);
+        }, [setShowSiteDetails]);
 
-    return (
-        <ErrorBoundary>
-            <ThemeProvider>
-                <SidebarLayoutProvider
-                    isSidebarOpen={isSidebarOpen}
-                    toggleSidebar={toggleSidebar}
-                >
-                    <StatusAlertToaster />
-                    <div
-                        className={`app-shell ${isDark ? "app-shell--dark" : "app-shell--light"} ${isSidebarOpen ? "app-shell--sidebar-open" : "app-shell--sidebar-closed"}`}
-                        data-testid="app-container"
+        /**
+         * Handle escape key for closing modals
+         */
+        const modalConfigs = useMemo(
+            () => [
+                {
+                    isOpen: isPromptDialogOpen,
+                    onClose: closePromptDialog,
+                    priority: 5,
+                },
+                {
+                    isOpen: isConfirmDialogOpen,
+                    onClose: closeConfirmDialog,
+                    priority: 4,
+                },
+                {
+                    isOpen: showSiteDetails,
+                    onClose: handleCloseSiteDetails,
+                    priority: 3, // Highest priority
+                },
+                {
+                    isOpen: showAddSiteModal,
+                    onClose: handleCloseAddSiteModal,
+                    priority: 2,
+                },
+                {
+                    isOpen: showSettings,
+                    onClose: handleCloseSettings,
+                    priority: 1,
+                },
+            ],
+            [
+                closeConfirmDialog,
+                closePromptDialog,
+                handleCloseAddSiteModal,
+                handleCloseSettings,
+                handleCloseSiteDetails,
+                isConfirmDialogOpen,
+                isPromptDialogOpen,
+                showAddSiteModal,
+                showSettings,
+                showSiteDetails,
+            ]
+        );
+
+        useEscapeKeyModalHandler(modalConfigs);
+
+        // Extract SiteDetails JSX to avoid complex conditional rendering
+        const siteDetailsJSX =
+            showSiteDetails && selectedSite ? (
+                <SiteDetails
+                    onClose={handleCloseSiteDetails}
+                    site={selectedSite}
+                />
+            ) : null;
+
+        const handleUpdateButtonClick = useCallback(() => {
+            void handleUpdateAction();
+        }, [handleUpdateAction]);
+
+        return (
+            <ErrorBoundary>
+                <ThemeProvider>
+                    <SidebarLayoutProvider
+                        isSidebarOpen={isSidebarOpen}
+                        toggleSidebar={toggleSidebar}
                     >
-                        <AppSidebar />
-                        <SidebarRevealButton />
+                        <StatusAlertToaster />
+                        <div
+                            className={`app-shell ${isDark ? "app-shell--dark" : "app-shell--light"} ${isSidebarOpen ? "app-shell--sidebar-open" : "app-shell--sidebar-closed"}`}
+                            data-testid="app-container"
+                        >
+                            <AppSidebar />
+                            <SidebarRevealButton />
 
-                        <div className="app-shell__main">
-                            {showLoadingOverlay ? (
-                                <output
-                                    aria-label="Loading application"
-                                    aria-live="polite"
-                                    className="loading-overlay"
-                                >
-                                    <ThemedBox
-                                        padding="lg"
-                                        rounded="lg"
-                                        shadow="xl"
-                                        surface="elevated"
+                            <div className="app-shell__main">
+                                {showLoadingOverlay ? (
+                                    <output
+                                        aria-label="Loading application"
+                                        aria-live="polite"
+                                        className="loading-overlay"
                                     >
-                                        <div className="loading-content">
-                                            <div className="loading-spinner" />
-                                            <ThemedText
-                                                size="base"
-                                                weight="medium"
-                                            >
-                                                {UI_MESSAGES.LOADING}
-                                            </ThemedText>
-                                        </div>
-                                    </ThemedBox>
-                                </output>
-                            ) : null}
+                                        <ThemedBox
+                                            padding="lg"
+                                            rounded="lg"
+                                            shadow="xl"
+                                            surface="elevated"
+                                        >
+                                            <div className="loading-content">
+                                                <div className="loading-spinner" />
+                                                <ThemedText
+                                                    size="base"
+                                                    weight="medium"
+                                                >
+                                                    {UI_MESSAGES.LOADING}
+                                                </ThemedText>
+                                            </div>
+                                        </ThemedBox>
+                                    </output>
+                                ) : null}
 
-                            {lastError ? (
-                                <div className="fixed inset-x-0 top-0 z-50 p-4">
-                                    <ErrorAlert
-                                        message={lastError}
-                                        onDismiss={clearError}
-                                        variant="error"
-                                    />
-                                </div>
-                            ) : null}
+                                {lastError ? (
+                                    <div className="fixed inset-x-0 top-0 z-50 p-4">
+                                        <ErrorAlert
+                                            message={lastError}
+                                            onDismiss={clearError}
+                                            variant="error"
+                                        />
+                                    </div>
+                                ) : null}
 
-                            <UpdateNotificationBanner
-                                onAction={handleUpdateButtonClick}
-                                updateError={updateError}
-                                updateStatus={updateStatus}
-                            />
+                                <UpdateNotificationBanner
+                                    onAction={handleUpdateButtonClick}
+                                    updateError={updateError}
+                                    updateStatus={updateStatus}
+                                />
 
-                            <Header />
+                                <Header />
 
-                            <div className="app-shell__content">
-                                {siteListLayout === "card-large" && (
-                                    <DashboardOverview
-                                        metrics={globalMetrics}
-                                        siteCountLabel={
-                                            UI_MESSAGES.SITE_COUNT_LABEL
-                                        }
-                                    />
-                                )}
+                                <div className="app-shell__content">
+                                    {siteListLayout === "card-large" && (
+                                        <DashboardOverview
+                                            metrics={globalMetrics}
+                                            siteCountLabel={
+                                                UI_MESSAGES.SITE_COUNT_LABEL
+                                            }
+                                        />
+                                    )}
 
-                                <div className="app-shell__panel">
-                                    <SiteList />
+                                    <div className="app-shell__panel">
+                                        <SiteList />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {showAddSiteModal ? (
-                        <AddSiteModal onClose={handleCloseAddSiteModal} />
-                    ) : null}
+                        {showAddSiteModal ? (
+                            <AddSiteModal onClose={handleCloseAddSiteModal} />
+                        ) : null}
 
-                    {showSettings ? (
-                        <Settings onClose={handleCloseSettings} />
-                    ) : null}
+                        {showSettings ? (
+                            <Settings onClose={handleCloseSettings} />
+                        ) : null}
 
-                    {siteDetailsJSX}
+                        {siteDetailsJSX}
 
-                    {/*
-                     * Keep the global prompt/confirm dialogs at the end of the
-                     * React tree so their portals are appended last in
-                     * document.body. This guarantees they stack above other
-                     * modals like SiteDetails.
-                     */}
-                    <PromptDialog />
-                    <ConfirmDialog />
-                </SidebarLayoutProvider>
-            </ThemeProvider>
-        </ErrorBoundary>
-    );
-});
+                        {/*
+                         * Keep the global prompt/confirm dialogs at the end of the
+                         * React tree so their portals are appended last in
+                         * document.body. This guarantees they stack above other
+                         * modals like SiteDetails.
+                         */}
+                        <PromptDialog />
+                        <ConfirmDialog />
+                    </SidebarLayoutProvider>
+                </ThemeProvider>
+            </ErrorBoundary>
+        );
+    }
+);

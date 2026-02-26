@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("renderer-no-direct-preload-bridge",
+ruleTester.run(
+    "renderer-no-direct-preload-bridge",
     getPluginRule("renderer-no-direct-preload-bridge"),
     {
         invalid: [

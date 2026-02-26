@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("require-error-cause-in-catch",
+ruleTester.run(
+    "require-error-cause-in-catch",
     getPluginRule("require-error-cause-in-catch"),
     {
         invalid: [

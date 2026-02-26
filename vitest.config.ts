@@ -14,8 +14,23 @@ import {
 import viteConfig from "./vite.config";
 
 export default defineConfig((configEnv) => {
+    const resolvedViteConfig = (() => {
+        const configOrPromise =
+            typeof viteConfig === "function"
+                ? viteConfig(configEnv)
+                : viteConfig;
+
+        if (configOrPromise instanceof Promise) {
+            throw new TypeError(
+                "Async Vite config exports are not supported in vitest.config.ts."
+            );
+        }
+
+        return configOrPromise;
+    })();
+
     const mergedConfig = mergeConfig(
-        viteConfig(configEnv),
+        resolvedViteConfig,
         defineConfig({
             cacheDir: "./.cache/vitest/", // Separate cache to avoid conflicts
             test: {

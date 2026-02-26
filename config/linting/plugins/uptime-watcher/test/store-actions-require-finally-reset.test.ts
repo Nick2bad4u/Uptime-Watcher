@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("store-actions-require-finally-reset",
+ruleTester.run(
+    "store-actions-require-finally-reset",
     getPluginRule("store-actions-require-finally-reset"),
     {
         invalid: [

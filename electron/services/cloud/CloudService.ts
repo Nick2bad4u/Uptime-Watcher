@@ -54,9 +54,7 @@ import {
     loadDropboxProviderDeps,
     loadGoogleDriveProviderDeps,
 } from "./internal/cloudProviderDeps";
-import {
-    parseEncryptionMode,
-} from "./internal/cloudServicePrimitives";
+import { parseEncryptionMode } from "./internal/cloudServicePrimitives";
 import {
     clearLastError,
     DEFAULT_DROPBOX_APP_KEY,

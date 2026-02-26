@@ -187,10 +187,7 @@ export function validateHttpUrlCandidate(
         return primitiveValidation;
     }
 
-    const {
-        normalizedUrl,
-        safeUrlForLogging,
-    } = primitiveValidation;
+    const { normalizedUrl, safeUrlForLogging } = primitiveValidation;
 
     if (
         !isValidUrl(normalizedUrl, {

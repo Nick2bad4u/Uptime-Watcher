@@ -61,10 +61,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         );
 
         if (!urlResult.ok) {
-            return createMonitorErrorResult(
-                urlResult.message,
-                0
-            );
+            return createMonitorErrorResult(urlResult.message, 0);
         }
         const { value: urlCandidate } = urlResult;
 

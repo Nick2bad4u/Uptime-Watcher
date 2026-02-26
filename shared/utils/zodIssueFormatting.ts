@@ -34,8 +34,8 @@ export interface ZodIssueLike {
  */
 export interface FormatZodIssuesOptions {
     /**
-        * When true, prefix each message with a rendered path (e.g.
-        * `foo.bar: ...`).
+     * When true, prefix each message with a rendered path (e.g. `foo.bar:
+     * ...`).
      *
      * @defaultValue true
      */

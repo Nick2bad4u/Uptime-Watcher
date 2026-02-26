@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-inline-ipc-channel-type-argument",
+ruleTester.run(
+    "electron-no-inline-ipc-channel-type-argument",
     getPluginRule("electron-no-inline-ipc-channel-type-argument"),
     {
         invalid: [

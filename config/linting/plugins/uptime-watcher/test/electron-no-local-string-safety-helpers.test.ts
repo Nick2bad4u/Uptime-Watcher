@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-local-string-safety-helpers",
+ruleTester.run(
+    "electron-no-local-string-safety-helpers",
     getPluginRule("electron-no-local-string-safety-helpers"),
     {
         invalid: [

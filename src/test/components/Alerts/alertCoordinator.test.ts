@@ -123,12 +123,10 @@ describe("alertCoordinator", () => {
             timestamp,
         });
 
-        const firstResult = alertCoordinator.enqueueAlertFromStatusUpdate(
-            update
-        );
-        const secondResult = alertCoordinator.enqueueAlertFromStatusUpdate(
-            update
-        );
+        const firstResult =
+            alertCoordinator.enqueueAlertFromStatusUpdate(update);
+        const secondResult =
+            alertCoordinator.enqueueAlertFromStatusUpdate(update);
 
         expect(firstResult).toBeDefined();
         expect(secondResult).toBeUndefined();

@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("tsdoc-no-console-example",
+ruleTester.run(
+    "tsdoc-no-console-example",
     getPluginRule("tsdoc-no-console-example"),
     {
         invalid: [

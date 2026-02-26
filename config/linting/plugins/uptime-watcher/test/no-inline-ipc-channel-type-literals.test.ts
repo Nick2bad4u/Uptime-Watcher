@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("no-inline-ipc-channel-type-literals",
+ruleTester.run(
+    "no-inline-ipc-channel-type-literals",
     getPluginRule("no-inline-ipc-channel-type-literals"),
     {
         invalid: [

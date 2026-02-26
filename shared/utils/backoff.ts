@@ -28,8 +28,8 @@ export interface BackoffDelayOptions {
      *
      * @remarks
      * This is intentionally **not** the same as an "attempt number" that starts
-    * at 1. If you have an attempt number (1-based), convert via
-    * `attemptIndex = attemptNumber - 1`.
+     * at 1. If you have an attempt number (1-based), convert via `attemptIndex
+     * = attemptNumber - 1`.
      */
     readonly attemptIndex: number;
 

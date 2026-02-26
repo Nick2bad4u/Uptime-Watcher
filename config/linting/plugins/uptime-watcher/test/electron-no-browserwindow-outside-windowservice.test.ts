@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-browserwindow-outside-windowservice",
+ruleTester.run(
+    "electron-no-browserwindow-outside-windowservice",
     getPluginRule("electron-no-browserwindow-outside-windowservice"),
     {
         invalid: [

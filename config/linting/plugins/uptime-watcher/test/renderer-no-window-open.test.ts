@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("renderer-no-window-open",
+ruleTester.run(
+    "renderer-no-window-open",
     getPluginRule("renderer-no-window-open"),
     {
         invalid: [

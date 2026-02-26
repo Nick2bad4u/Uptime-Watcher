@@ -63,7 +63,9 @@ export function hasProperties<K extends PropertyKey>(
     value: unknown,
     properties: readonly K[]
 ): value is Record<K, unknown> & UnknownRecord {
-    return isObject(value) && properties.every((prop) => objectHasOwn(value, prop));
+    return (
+        isObject(value) && properties.every((prop) => objectHasOwn(value, prop))
+    );
 }
 
 /**

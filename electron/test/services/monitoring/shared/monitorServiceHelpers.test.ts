@@ -58,9 +58,9 @@ describe(extractNestedFieldValue, () => {
     });
 
     it("returns undefined for missing or blank paths", () => {
-        expect(extractNestedFieldValue({ details: {} }, "details.missing")).toBe(
-            undefined
-        );
+        expect(
+            extractNestedFieldValue({ details: {} }, "details.missing")
+        ).toBe(undefined);
         expect(extractNestedFieldValue({ details: {} }, "   ")).toBe(undefined);
     });
 });

@@ -39,7 +39,10 @@ const HTTP_JSON_MONITOR_BEHAVIOR: HttpMonitorBehavior<
             } as const;
         }
 
-        const extracted = extractJsonValueAtPath(parsed.payload, context.jsonPath);
+        const extracted = extractJsonValueAtPath(
+            parsed.payload,
+            context.jsonPath
+        );
 
         if (extracted === undefined) {
             return {

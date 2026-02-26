@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-dialog-require-automation-bypass",
+ruleTester.run(
+    "electron-dialog-require-automation-bypass",
     getPluginRule("electron-dialog-require-automation-bypass"),
     {
         invalid: [

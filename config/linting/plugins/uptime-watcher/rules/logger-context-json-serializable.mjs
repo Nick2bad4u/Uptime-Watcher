@@ -49,9 +49,7 @@ const JSON_LITERAL_PRIMITIVE_NAMES = new Set([
  * @returns {boolean}
  */
 const isStringLiteralTypeName = (typeName) =>
-    typeName.length >= 2 &&
-    typeName.startsWith('"') &&
-    typeName.endsWith('"');
+    typeName.length >= 2 && typeName.startsWith('"') && typeName.endsWith('"');
 
 /**
  * @param {string} typeName
@@ -59,7 +57,11 @@ const isStringLiteralTypeName = (typeName) =>
  * @returns {boolean}
  */
 const isNumericLiteralTypeName = (typeName) => {
-    if (typeName.length === 0 || typeName === "Infinity" || typeName === "NaN") {
+    if (
+        typeName.length === 0 ||
+        typeName === "Infinity" ||
+        typeName === "NaN"
+    ) {
         return false;
     }
 
@@ -85,11 +87,12 @@ const isBigIntLiteralTypeName = (typeName) => {
  *
  * @returns {boolean}
  */
-const isLikelyTypeParameterName = (typeName) =>
-    /^[A-Z]\w*$/v.test(typeName);
+const isLikelyTypeParameterName = (typeName) => /^[A-Z]\w*$/v.test(typeName);
 
 /**
- * @param {import("@typescript-eslint/utils").TSESTree.Expression | import("@typescript-eslint/utils").TSESTree.SpreadElement} arg
+ * @param {
+ *     | import("@typescript-eslint/utils").TSESTree.Expression
+ *     | import("@typescript-eslint/utils").TSESTree.SpreadElement} arg
  *
  * @returns {arg is import("@typescript-eslint/utils").TSESTree.Expression}
  */
@@ -287,7 +290,10 @@ const loggerContextJsonSerializableRule = createTypedRule({
                     return;
                 }
 
-                const contextArg = getContextArgumentForMethod(loggerMethod, node);
+                const contextArg = getContextArgumentForMethod(
+                    loggerMethod,
+                    node
+                );
                 if (!contextArg) {
                     return;
                 }

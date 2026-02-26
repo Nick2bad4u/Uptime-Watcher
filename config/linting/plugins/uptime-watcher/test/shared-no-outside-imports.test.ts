@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("shared-no-outside-imports",
+ruleTester.run(
+    "shared-no-outside-imports",
     getPluginRule("shared-no-outside-imports"),
     {
         invalid: [

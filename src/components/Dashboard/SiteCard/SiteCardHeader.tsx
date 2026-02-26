@@ -21,7 +21,9 @@ import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 import { SiteCardFooter } from "./SiteCardFooter";
 
-const extractMonitorEndpoint = (monitor: Monitor | undefined): string | undefined => {
+const extractMonitorEndpoint = (
+    monitor: Monitor | undefined
+): string | undefined => {
     if (!monitor) {
         return undefined;
     }

@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Monitor } from "@shared/types";
 
 vi.mock("@shared/utils/abortUtils", async () => {
-    const actual = await vi.importActual<typeof import("@shared/utils/abortUtils")>(
-        "@shared/utils/abortUtils"
-    );
+    const actual = await vi.importActual<
+        typeof import("@shared/utils/abortUtils")
+    >("@shared/utils/abortUtils");
 
     return {
         ...actual,
@@ -116,7 +116,10 @@ describe(DnsMonitor, () => {
         expect(dnsMonitor).toBeInstanceOf(DnsMonitor);
     });
 
-    it("retries transient DNS resolver failures", async ({ task, annotate }) => {
+    it("retries transient DNS resolver failures", async ({
+        task,
+        annotate,
+    }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: DnsMonitor", "component");
         await annotate("Category: Core", "category");
@@ -131,7 +134,10 @@ describe(DnsMonitor, () => {
         const sleepUnrefMock = vi.mocked(sleepUnref);
         sleepUnrefMock.mockClear();
 
-        const monitor = createTestMonitor({ recordType: "A", retryAttempts: 2 });
+        const monitor = createTestMonitor({
+            recordType: "A",
+            retryAttempts: 2,
+        });
         const result = await dnsMonitor.check(monitor);
 
         expect(result.status).toBe("up");

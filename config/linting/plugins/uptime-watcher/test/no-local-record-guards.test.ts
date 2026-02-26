@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("no-local-record-guards",
+ruleTester.run(
+    "no-local-record-guards",
     getPluginRule("no-local-record-guards"),
     {
         invalid: [

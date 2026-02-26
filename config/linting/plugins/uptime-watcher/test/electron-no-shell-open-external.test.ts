@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-shell-open-external",
+ruleTester.run(
+    "electron-no-shell-open-external",
     getPluginRule("electron-no-shell-open-external"),
     {
         invalid: [

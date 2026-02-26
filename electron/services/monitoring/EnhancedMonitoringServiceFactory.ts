@@ -20,10 +20,11 @@
  * **Service Components Created:**
  *
  * - {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}
+ *
  *   - Core monitoring logic with operation correlation -
- *   {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry}
+ *       {@link electron/services/monitoring/MonitorOperationRegistry#MonitorOperationRegistry}
  *   - Operation tracking and race condition prevention -
- *   {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService}
+ *       {@link electron/services/monitoring/MonitorStatusUpdateService#MonitorStatusUpdateService}
  *   - Safe concurrent status updates
  * - {@link OperationTimeoutManager} - Timeout management and resource cleanup
  *

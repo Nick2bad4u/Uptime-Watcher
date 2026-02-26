@@ -1,5 +1,3 @@
- 
-
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -451,5 +449,3 @@ export async function startLoopbackOAuthServer(args?: {
         },
     };
 }
-
- 

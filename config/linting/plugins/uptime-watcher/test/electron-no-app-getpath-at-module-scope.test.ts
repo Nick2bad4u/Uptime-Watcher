@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-app-getpath-at-module-scope",
+ruleTester.run(
+    "electron-no-app-getpath-at-module-scope",
     getPluginRule("electron-no-app-getpath-at-module-scope"),
     {
         invalid: [

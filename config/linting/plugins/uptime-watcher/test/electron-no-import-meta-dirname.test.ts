@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-import-meta-dirname",
+ruleTester.run(
+    "electron-no-import-meta-dirname",
     getPluginRule("electron-no-import-meta-dirname"),
     {
         invalid: [

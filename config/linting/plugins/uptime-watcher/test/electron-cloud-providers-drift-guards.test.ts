@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-cloud-providers-drift-guards",
+ruleTester.run(
+    "electron-cloud-providers-drift-guards",
     getPluginRule("electron-cloud-providers-drift-guards"),
     {
         invalid: [

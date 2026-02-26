@@ -22,9 +22,7 @@ import {
     encodeBase64,
     ENCRYPTION_SALT_BYTES,
 } from "./internal/cloudServicePrimitives";
-import {
-    SECRET_KEY_ENCRYPTION_DERIVED_KEY,
-} from "./internal/cloudServiceSettings";
+import { SECRET_KEY_ENCRYPTION_DERIVED_KEY } from "./internal/cloudServiceSettings";
 import { persistLocalPassphraseEncryptionState } from "./internal/localPassphraseEncryptionState";
 
 /**

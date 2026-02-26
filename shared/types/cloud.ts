@@ -35,8 +35,7 @@ export const CLOUD_PROVIDER_KIND = {
 } as const;
 
 /** Union of supported cloud provider identifiers. */
-export type CloudProviderKind =
-    ValueOf<typeof CLOUD_PROVIDER_KIND>;
+export type CloudProviderKind = ValueOf<typeof CLOUD_PROVIDER_KIND>;
 
 /**
  * High-level cloud status summary.

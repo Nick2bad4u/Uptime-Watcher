@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("monitor-fallback-consistency",
+ruleTester.run(
+    "monitor-fallback-consistency",
     getPluginRule("monitor-fallback-consistency"),
     {
         invalid: [

@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("electron-no-direct-ipc-handle",
+ruleTester.run(
+    "electron-no-direct-ipc-handle",
     getPluginRule("electron-no-direct-ipc-handle"),
     {
         invalid: [

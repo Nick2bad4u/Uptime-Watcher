@@ -52,7 +52,8 @@ export function toTotalAttempts(additionalRetries: unknown): number {
  * Builds a normalized retry plan for monitor checks.
  *
  * @remarks
- * Example: `additionalRetries = 3` becomes `{ additionalRetries: 3, totalAttempts: 4 }`.
+ * Example: `additionalRetries = 3` becomes `{ additionalRetries: 3,
+ * totalAttempts: 4 }`.
  *
  * @public
  */

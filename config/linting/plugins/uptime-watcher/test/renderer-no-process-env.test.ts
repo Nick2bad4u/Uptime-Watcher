@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("renderer-no-process-env",
+ruleTester.run(
+    "renderer-no-process-env",
     getPluginRule("renderer-no-process-env"),
     {
         invalid: [

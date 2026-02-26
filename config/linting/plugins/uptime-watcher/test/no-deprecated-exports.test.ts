@@ -6,7 +6,8 @@ import {
 
 const ruleTester = createRuleTester();
 
-ruleTester.run("no-deprecated-exports",
+ruleTester.run(
+    "no-deprecated-exports",
     getPluginRule("no-deprecated-exports"),
     {
         invalid: [

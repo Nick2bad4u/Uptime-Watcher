@@ -644,7 +644,8 @@ export interface RaceWithTimeoutOptions {
 }
 
 /**
- * Races an operation promise against a timeout (and optional {@link AbortSignal}).
+ * Races an operation promise against a timeout (and optional
+ * {@link AbortSignal}).
  *
  * @remarks
  * This helper is intended for APIs that do not support abort natively. Timeout
@@ -670,12 +671,7 @@ export async function raceWithTimeout<T>(
     operation: Promise<T>,
     options: RaceWithTimeoutOptions
 ): Promise<T> {
-    const {
-        signal,
-        timeoutMessage,
-        timeoutMs,
-        unrefTimer = false,
-    } = options;
+    const { signal, timeoutMessage, timeoutMs, unrefTimer = false } = options;
 
     if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
         return signal ? raceWithAbort(operation, signal) : operation;

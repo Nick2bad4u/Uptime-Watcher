@@ -70,7 +70,7 @@ import type {
     MonitorServiceConfig,
 } from "./types";
 
-import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF  } from "../../constants";
+import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
@@ -83,14 +83,20 @@ import { parseDnsResolutionResult } from "./utils/dnsRecordParsing";
 class DnsAttemptFailedError extends Error {
     public readonly details: string;
 
-    public constructor(details: string, message: string, options?: { cause?: unknown }) {
+    public constructor(
+        details: string,
+        message: string,
+        options?: { cause?: unknown }
+    ) {
         super(message, options);
         this.name = "DnsAttemptFailedError";
         this.details = details;
     }
 }
 
-function isDnsAttemptFailedError(error: unknown): error is DnsAttemptFailedError {
+function isDnsAttemptFailedError(
+    error: unknown
+): error is DnsAttemptFailedError {
     return error instanceof DnsAttemptFailedError;
 }
 
@@ -208,7 +214,10 @@ export class DnsMonitor implements IMonitorService {
 
         // Validate recordType field
         const recordTypeRaw = monitor.recordType;
-        if (typeof recordTypeRaw !== "string" || recordTypeRaw.trim().length === 0) {
+        if (
+            typeof recordTypeRaw !== "string" ||
+            recordTypeRaw.trim().length === 0
+        ) {
             return createMonitorErrorResult(
                 "Monitor missing valid recordType",
                 0
@@ -259,7 +268,8 @@ export class DnsMonitor implements IMonitorService {
         signal?: AbortSignal
     ): Promise<MonitorCheckResult> {
         const startTime = performance.now();
-        const { additionalRetries, totalAttempts } = createMonitorRetryPlan(retryAttempts);
+        const { additionalRetries, totalAttempts } =
+            createMonitorRetryPlan(retryAttempts);
 
         const resolver = this.getDnsResolver(recordType);
         if (!resolver) {

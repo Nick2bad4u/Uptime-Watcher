@@ -137,14 +137,11 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
         const formatMonitorOption = useCallback((monitor: Monitor): string => {
             const fallbackIdentifier = "";
 
-            const {
-                connectionInfo,
-                connectionInfoSource,
-                monitorTypeLabel,
-            } = buildMonitorDisplayInfo({
-                fallbackIdentifier,
-                monitor,
-            });
+            const { connectionInfo, connectionInfoSource, monitorTypeLabel } =
+                buildMonitorDisplayInfo({
+                    fallbackIdentifier,
+                    monitor,
+                });
 
             const identifier =
                 connectionInfoSource === "identifier"

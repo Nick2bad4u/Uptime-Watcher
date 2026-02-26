@@ -83,12 +83,18 @@ export function validateOptionalStringPayload(
     value: unknown,
     options: OptionalStringPayloadValidationOptions
 ): string[] {
-    const optionalError = IpcValidators.optionalString(value, options.paramName);
+    const optionalError = IpcValidators.optionalString(
+        value,
+        options.paramName
+    );
     if (optionalError) {
         return [optionalError];
     }
 
-    if (typeof value === "string" && getUtfByteLength(value) > options.maxBytes) {
+    if (
+        typeof value === "string" &&
+        getUtfByteLength(value) > options.maxBytes
+    ) {
         return [options.maxBytesMessage];
     }
 
