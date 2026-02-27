@@ -8,11 +8,19 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[c457e46](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c457e46472377a1bee04848b2d4929b0195c8142)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...c457e46472377a1bee04848b2d4929b0195c8142))
+[2eedac8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eedac8786f0e9b56659f208f73e7cb43f51fbf9)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...2eedac8786f0e9b56659f208f73e7cb43f51fbf9))
 
 
 ### ✨ Features
+
+- ✨ [feat] Enhance logger context serialization and event bus payload validation
+ - 🛠️ [fix] Update logger context serialization to handle additional error contexts
+ - 🛠️ [fix] Improve event bus payload validation for variadic emit signatures
+ - 📝 [docs] Add tests for logger context and event bus payload scenarios
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cd425f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd425f7024486845872efc0f452e3267186d32a6)
+
 
 - ✨ [feat] Adds ts-extras guard lint enforcement
 
@@ -1016,6 +1024,30 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e251
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Rename component functions for consistency and clarity
+ - 🔧 Refactor `PromptDialog` to `PromptDialogComponent` for better clarity in `src/components/common/PromptDialog/PromptDialog.tsx`
+ - 🔧 Refactor `SiteMonitoringButton` to `SiteMonitoringButtonComponent` in `src/components/common/SiteMonitoringButton/SiteMonitoringButton.tsx`
+ - 🔧 Refactor `StatusBadge` to `StatusBadgeComponent` in `src/components/common/StatusBadge.tsx`
+ - 🔧 Refactor `Tooltip` to `TooltipComponent` in `src/components/common/Tooltip/Tooltip.tsx`
+ - 🔧 Refactor `SurfaceContainer` to `SurfaceContainerComponent` in `src/components/shared/SurfaceContainer.tsx`
+ - 🔧 Refactor `MiniChartBar` to `MiniChartBarComponent` in `src/theme/components/MiniChartBar.tsx`
+ - 🔧 Refactor `StatusIndicator` to `StatusIndicatorComponent` in `src/theme/components/StatusIndicator.tsx`
+ - 🔧 Refactor `ThemedBadge` to `ThemedBadgeComponent` in `src/theme/components/ThemedBadge.tsx`
+ - 🔧 Refactor `ThemedSelect` to `ForwardedSelectComponent` in `src/theme/components/ThemedSelect.tsx`
+ - 🔧 Refactor `ThemedText` to `ThemedTextComponent` in `src/theme/components/ThemedText.tsx`
+
+🧪 [test] Update tests for renamed components
+ - 🔧 Update references in `src/test/components/Dashboard/SiteCard/SiteCard.input-fuzzing.test.tsx` to match new component names
+ - 🔧 Update references in `src/test/components/Dashboard/SiteCard/SiteCompactCard.test.tsx` to match new component names
+
+🛠️ [fix] Improve error handling and formatting in Vite configuration
+ - 🔧 Enhance error formatting in `vite.config.ts` for better readability and debugging
+ - 🔧 Ensure consistent spacing and formatting throughout the Vite configuration file
+ - 🔧 Adjust cache directory settings in `vitest.config.ts` for better organization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(be2e0fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/be2e0fdd5fd60163e40c55363a1523b7ebd1683e)
+
 
 - 🚜 [refactor] Clarifies container access
 
@@ -2035,6 +2067,27 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a197
 
 
 ### 🧹 Chores
+
+- 🧹 [chore] bulk formatting & config overhaul with deps bump
+
+- 🚜 Polish code style across the repo: wrap long lines, unify import/export formatting, trim excess blank lines, simplify arrow bodies, normalize JSDoc and generics.
+- ✨ [dependency] Update a slew of dev/runtime packages (ESLint 10.0.2, ts‑extras, Storybook, Biome, electron, @rushstack/security 0.14.2, node‑dependencies 2.1.0, etc.) and adjust package.json scripts.
+- ⚙️ Tweak configuration files:
+  - add `homepage` to `.ncurc.json`, extend `.secretlintignore`, re‑enable previously blocked ESLint plugins via fixup, add JSON language support, update stylelint logical rules.
+  - overhaul vite/vitest configs for synchronous handling, improved wasm asset checks, watch logic, default excludes, environment polishing.
+  - adjust docs tooling scripts and dependency versions.
+- 🔧 Refactor assorted utilities/services to tighten types, collapse trivial blocks, improve error messages, and fix minor logic (e.g. DNS monitor, IPC validators, backoff docs).
+- 🧪 Reformat hundreds of lint‑plugin tests to consistent `ruleTester.run` signatures and line wrapping.
+- 📝 Update ESLint blocker guide to note re‑enabled plugins.
+- ✅ Small UI component tweaks (destructured props, spacing) and test refactors.
+
+Housekeeping work to enforce style, update dependencies and prepare for further development.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eedac8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eedac8786f0e9b56659f208f73e7cb43f51fbf9)
+
+
+- Update changelogs for v23.1.0 [skip ci] [`(f5fce09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5fce0916ca442e403d3d515c16d191c7a59b2e3)
+
 
 - Update changelogs for v23.0.0 [skip ci] [`(23d6655)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/23d665510de92c1156b361d846483043c37d2f1e)
 

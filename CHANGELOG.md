@@ -4,6 +4,203 @@
 
 All notable changes to this project will be documented in this file.
 
+## [23.3.0] - 2026-02-26
+
+
+[[77ce590](https://github.com/Nick2bad4u/Uptime-Watcher/commit/77ce590049de38c854b16dce5afa93fce63c9757)...
+[a9b4121](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a9b41218422658b98de854a7b6b9831d71a1b673)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/77ce590049de38c854b16dce5afa93fce63c9757...a9b41218422658b98de854a7b6b9831d71a1b673))
+
+
+### 🧹 Chores
+
+- *(release)* V23.3.0 [skip ci] [`(a9b4121)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a9b41218422658b98de854a7b6b9831d71a1b673)
+
+
+- 🧹 [chore] bulk formatting & config overhaul with deps bump
+
+- 🚜 Polish code style across the repo: wrap long lines, unify import/export formatting, trim excess blank lines, simplify arrow bodies, normalize JSDoc and generics.
+- ✨ [dependency] Update a slew of dev/runtime packages (ESLint 10.0.2, ts‑extras, Storybook, Biome, electron, @rushstack/security 0.14.2, node‑dependencies 2.1.0, etc.) and adjust package.json scripts.
+- ⚙️ Tweak configuration files:
+  - add `homepage` to `.ncurc.json`, extend `.secretlintignore`, re‑enable previously blocked ESLint plugins via fixup, add JSON language support, update stylelint logical rules.
+  - overhaul vite/vitest configs for synchronous handling, improved wasm asset checks, watch logic, default excludes, environment polishing.
+  - adjust docs tooling scripts and dependency versions.
+- 🔧 Refactor assorted utilities/services to tighten types, collapse trivial blocks, improve error messages, and fix minor logic (e.g. DNS monitor, IPC validators, backoff docs).
+- 🧪 Reformat hundreds of lint‑plugin tests to consistent `ruleTester.run` signatures and line wrapping.
+- 📝 Update ESLint blocker guide to note re‑enabled plugins.
+- ✅ Small UI component tweaks (destructured props, spacing) and test refactors.
+
+Housekeeping work to enforce style, update dependencies and prepare for further development.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eedac8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eedac8786f0e9b56659f208f73e7cb43f51fbf9)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies and add bootstrap labels script
+
+ - 🔧 Update `@biomejs/biome` from `^2.4.2` to `^2.4.3` for improved functionality.
+ - 🔧 Upgrade `@commitlint` packages from `^20.4.1` to `^20.4.2` for better commit message validation.
+ - 🔧 [dependency] Update `@html-eslint` packages from `^0.55.0` to `^0.56.0` for enhanced HTML linting.
+ - 🔧 Upgrade `@rushstack/eslint-plugin-security` from `^0.13.0` to `^0.14.1` for improved security checks.
+ - 🔧 Update `@stylistic/eslint-plugin` from `^5.8.0` to `^5.9.0` for better styling rules.
+ - 🔧 Upgrade `@types/node` from `^25.2.3` to `^25.3.0` for compatibility with the latest Node.js features.
+ - 🔧 Update `electron` from `^40.4.1` to `^40.6.0` for the latest features and fixes.
+ - 🔧 Upgrade `eslint` from `^10.0.0` to `^10.0.1` for minor improvements.
+ - 🔧 Update `markdown-to-jsx` from `^9.7.4` to `^9.7.5` for bug fixes.
+ - 🔧 Upgrade `putout` from `^42.0.5` to `^42.0.11` for better linting capabilities.
+ - 🔧 Update `rollup-plugin-visualizer` from `^6.0.5` to `^7.0.0` for improved bundle visualization.
+ - 🆕 Add `scripts/bootstrap-labels.ps1` to manage GitHub labels using GitHub CLI.
+   - 📜 The script allows creating/updating labels based on embedded defaults or from `.github/labeler.yml`.
+   - ⚙️ Supports options like `-WhatIf`, `-NoForce`, `-FromLabelerYml`, and `-AuditOnly` for flexible usage.
+   - 📊 Provides detailed output for missing or extra labels during audits.
+ - 🚜 Refactor `vite.config.ts` to improve configuration structure.
+   - 🔄 Change export method to enhance clarity and maintainability.
+   - 🔧 Remove unused `visualizer` plugin configuration and replace it with `analyzer` for bundle analysis.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(77ce590)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/77ce590049de38c854b16dce5afa93fce63c9757)
+
+
+
+
+
+
+## [23.2.0] - 2026-02-18
+
+
+[[f5fce09](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5fce0916ca442e403d3d515c16d191c7a59b2e3)...
+[a2db9b4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a2db9b472f47fe7c6b499bc6ed47dbf3c25199c2)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/f5fce0916ca442e403d3d515c16d191c7a59b2e3...a2db9b472f47fe7c6b499bc6ed47dbf3c25199c2))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance logger context serialization and event bus payload validation
+ - 🛠️ [fix] Update logger context serialization to handle additional error contexts
+ - 🛠️ [fix] Improve event bus payload validation for variadic emit signatures
+ - 📝 [docs] Add tests for logger context and event bus payload scenarios
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cd425f7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd425f7024486845872efc0f452e3267186d32a6)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Rename component functions for consistency and clarity
+ - 🔧 Refactor `PromptDialog` to `PromptDialogComponent` for better clarity in `src/components/common/PromptDialog/PromptDialog.tsx`
+ - 🔧 Refactor `SiteMonitoringButton` to `SiteMonitoringButtonComponent` in `src/components/common/SiteMonitoringButton/SiteMonitoringButton.tsx`
+ - 🔧 Refactor `StatusBadge` to `StatusBadgeComponent` in `src/components/common/StatusBadge.tsx`
+ - 🔧 Refactor `Tooltip` to `TooltipComponent` in `src/components/common/Tooltip/Tooltip.tsx`
+ - 🔧 Refactor `SurfaceContainer` to `SurfaceContainerComponent` in `src/components/shared/SurfaceContainer.tsx`
+ - 🔧 Refactor `MiniChartBar` to `MiniChartBarComponent` in `src/theme/components/MiniChartBar.tsx`
+ - 🔧 Refactor `StatusIndicator` to `StatusIndicatorComponent` in `src/theme/components/StatusIndicator.tsx`
+ - 🔧 Refactor `ThemedBadge` to `ThemedBadgeComponent` in `src/theme/components/ThemedBadge.tsx`
+ - 🔧 Refactor `ThemedSelect` to `ForwardedSelectComponent` in `src/theme/components/ThemedSelect.tsx`
+ - 🔧 Refactor `ThemedText` to `ThemedTextComponent` in `src/theme/components/ThemedText.tsx`
+
+🧪 [test] Update tests for renamed components
+ - 🔧 Update references in `src/test/components/Dashboard/SiteCard/SiteCard.input-fuzzing.test.tsx` to match new component names
+ - 🔧 Update references in `src/test/components/Dashboard/SiteCard/SiteCompactCard.test.tsx` to match new component names
+
+🛠️ [fix] Improve error handling and formatting in Vite configuration
+ - 🔧 Enhance error formatting in `vite.config.ts` for better readability and debugging
+ - 🔧 Ensure consistent spacing and formatting throughout the Vite configuration file
+ - 🔧 Adjust cache directory settings in `vitest.config.ts` for better organization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(be2e0fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/be2e0fdd5fd60163e40c55363a1523b7ebd1683e)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Add comprehensive testing guidelines for TypeScript with Vitest and fast-check
+ - Introduced a new markdown file for TypeScript testing best practices using Vitest and fast-check.
+ - Detailed sections on file naming, test structure, core Vitest APIs, assertions, mocking, property-based testing, and more.
+ - Emphasized the importance of following TypeScript guidelines and maintaining code quality.
+
+📝 [docs] Create YAML guidelines for clear and robust YAML authoring
+ - Added a new markdown file outlining practical guidelines for writing YAML.
+ - Included recommendations on style, structure, values, and tooling to enhance consistency and readability.
+
+📝 [docs] Establish instructions for Copilot as a TypeScript coding assistant
+ - Created a detailed markdown file outlining the role, capabilities, and architecture overview for the Copilot AI assistant.
+ - Defined coding quality standards, operating principles, and required analysis processes to ensure high-quality code delivery.
+
+📝 [docs] Shortened Copilot instructions for concise guidance
+ - Developed a brief version of the Copilot instructions focusing on core identity, thinking framework, and operating principles.
+ - Streamlined the content to provide quick reference for the AI coding assistant working on Uptime Watcher.
+
+🧹 [chore] Remove instructions directory from .gitignore
+ - Deleted the entry for the instructions directory in the .gitignore file to allow tracking of documentation changes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bcaf880)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bcaf8804a3a8b4f8ac0973a4efae5b5681172830)
+
+
+
+### 🧹 Chores
+
+- *(release)* V23.2.0 [skip ci] [`(a2db9b4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a2db9b472f47fe7c6b499bc6ed47dbf3c25199c2)
+
+
+- Update changelogs for v23.1.0 [skip ci] [`(f5fce09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5fce0916ca442e403d3d515c16d191c7a59b2e3)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Upgrade "electron-updater" from "^6.7.3" to "^6.8.3" for improved update handling.
+ - 🔄 Upgrade "@biomejs/biome" from "^2.4.1" to "^2.4.2" for better linting support.
+ - 🔄 Upgrade "@fast-check/vitest" from "^0.2.0" to "^0.2.4" for enhanced testing capabilities.
+ - 🔄 Upgrade "@react-scan/vite-plugin-react-scan" from "^0.2.0" to "^0.2.3" for better integration.
+ - 🔄 Upgrade "@storybook/addon-a11y" and related Storybook packages from "^10.2.8" to "^10.2.10" for accessibility improvements.
+ - 🔄 Upgrade "@tailwindcss/postcss" from "^4.1.18" to "^4.2.0" for updated PostCSS features.
+ - 🔄 Upgrade "electron-builder" and "electron-publish" from "^26.7.0" and "^26.6.0" to "^26.8.1" for better packaging support.
+ - 🔄 Upgrade "eslint-plugin-comment-length" from "^2.2.2" to "^2.3.0" for improved comment length checks.
+ - 🔄 Upgrade "eslint-plugin-compat" from "^6.1.0" to "^6.2.0" for better compatibility checks.
+ - 🔄 Upgrade "eslint-plugin-jsdoc" from "^62.5.5" to "^62.6.0" for enhanced JSDoc support.
+ - 🔄 Upgrade "eslint-plugin-sonarjs" from "^3.0.7" to "^4.0.0" for improved static analysis.
+ - 🔄 Upgrade "eslint-plugin-sort-destructure-keys" from "^2.0.0" to "^3.0.0" for better destructuring key sorting.
+ - 🔄 Upgrade "eslint-plugin-storybook" from "^10.2.8" to "^10.2.10" for Storybook linting improvements.
+ - 🔄 Upgrade "eslint-plugin-testing-library" from "^7.15.4" to "^7.16.0" for better testing library support.
+ - 🔄 Upgrade "eslint-plugin-toml" from "^1.0.4" to "^1.1.1" for TOML linting improvements.
+ - 🔄 Upgrade "eslint-plugin-perfectionist" from "^5.5.0" to "^5.6.0" for enhanced code quality checks.
+ - 🔄 Upgrade "eslint-plugin-playwright" from "^2.5.1" to "^2.7.0" for improved Playwright support.
+ - 🔄 Upgrade "stylelint-declaration-strict-value" from "^1.10.11" to "^1.11.0" for stricter value checks.
+ - 🔄 Upgrade "stylelint-plugin-defensive-css" from "^2.4.2" to "^2.5.0" for better defensive CSS practices.
+ - 🔄 Upgrade "tailwindcss" from "^4.1.18" to "^4.2.0" for the latest Tailwind CSS features.
+ - 🔄 Upgrade "knip" from "^5.83.1" to "^5.84.1" for improved code analysis.
+ - 🔄 Upgrade "npm-check-updates" from "^19.3.2" to "^19.4.0" for better dependency management.
+ - 🔄 Upgrade "putout" from "^42.0.1" to "^42.0.5" for enhanced code transformation capabilities.
+ - 🔄 Upgrade "react-scan" from "^0.5.0" to "^0.5.3" for improved scanning features.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2a4de28)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a4de28d62691533fd52c9b1a0407b3c10044f99)
+
+
+- 🔧 [build] Update dependencies and configuration
+
+ - 🛠️ [fix] Update `@biomejs/biome` from `^2.4.0` to `^2.4.1` for improved stability.
+ - 🛠️ [fix] Upgrade `@eslint/js` from `^9.39.2` to `^10.0.1` to leverage new features and fixes.
+ - 🛠️ [fix] Update `@typescript-eslint` packages from `^8.55.0` to `^8.56.0` for better TypeScript support.
+ - 🛠️ [fix] Upgrade `eslint` from `^9.39.2` to `^10.0.0` to ensure compatibility with latest rules.
+ - 🛠️ [fix] Update `eslint-plugin-better-tailwindcss` from `^4.2.0` to `^4.3.0` for enhanced linting capabilities.
+ - 🛠️ [fix] Upgrade `eslint-plugin-package-json` from `^0.88.2` to `^0.88.3` for minor improvements.
+ - 🛠️ [fix] Update `eslint-plugin-putout` from `^30.0.4` to `^31.0.0` for better linting performance.
+ - 🛠️ [fix] Upgrade `react-scan` from `^0.4.3` to `^1.2.0` for new features and bug fixes.
+ - 🛠️ [fix] Update `stylelint-gamut` from `^1.3.4` to `^2.0.0` for improved style linting.
+ - 🛠️ [fix] Upgrade `stylelint-plugin-logical-css` from `^2.0.1` to `^2.0.2` for better logical CSS support.
+ - 🛠️ [fix] Update `typescript-eslint` from `^8.55.0` to `^8.56.0` for enhanced TypeScript linting.
+ - 🔧 [build] Modify `check:configs` script to remove unnecessary TypeScript checks for `uptime-watcher-type-utils`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c4619e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c4619e105c37698ff63dc33ea43a28875d3b3521)
+
+
+
+
+
+
 ## [23.1.0] - 2026-02-16
 
 
