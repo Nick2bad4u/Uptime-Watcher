@@ -1,52 +1,47 @@
 # This is a Dependabot configuration file for automating dependency updates.
 # The configuration is set to version 2 of the Dependabot schema.
-# It defines update settings for three package ecosystems:
-# GitHub Actions, Bundler, and npm.
-# Each ecosystem has its own update configuration, including:
-# - The directory to scan for dependencies (root directory in this case).
-# - The schedule for checking updates (daily).
-# - Allowing both direct and indirect updates for all packages.
-# - Grouping updates by ecosystem with specific patterns for version updates.
 # yaml-language-server: $schema=https://www.schemastore.org/dependabot-2.0.json
 version: 2
+enable-beta-ecosystems: true
+
+multi-ecosystem-groups:
+    dependabot-all:
+        schedule:
+            interval: "monthly"
+            time: "05:30"
+            timezone: "America/Detroit"
+        assignees:
+            - "Nick2bad4u"
+        target-branch: "main"
+        commit-message:
+            prefix: "[dependabot][all]"
+            prefix-development: "[dependabot][dev][all]"
+            include: "scope"
+        labels:
+            - "dependabot"
+            - "dependencies"
+
 updates:
     - package-ecosystem: github-actions
       cooldown:
           default-days: 3
           include: ["*"]
-      open-pull-requests-limit: 5
       directory: /
-      schedule:
-          interval: weekly
-          time: "05:30"
-          timezone: "America/Detroit"
-      assignees: ["Nick2bad4u"]
       allow:
           # Allow both direct and indirect updates for all packages
           - dependency-type: "all"
       labels:
           - "github-actions"
-          - "dependabot"
-          - "dependencies"
-      commit-message:
-          prefix: "[ci][skip-ci]"
-          prefix-development: "[ci][skip-ci]"
-          include: "scope"
-      groups:
-          github-actions:
-              applies-to: version-updates
-              patterns:
-                  - "*"
+      multi-ecosystem-group: dependabot-all
+      rebase-strategy: auto
+      patterns:
+          - "*"
 
     - package-ecosystem: npm
       cooldown:
           default-days: 3
           include: ["*"]
-      open-pull-requests-limit: 5
       directory: /
-      schedule:
-          interval: weekly
-      assignees: ["Nick2bad4u"]
       rebase-strategy: auto
       versioning-strategy: increase
       allow:
@@ -66,33 +61,17 @@ updates:
           - dependency-name: "form-data"
           - dependency-name: "qs"
           - dependency-name: "tough-cookie"
-
       labels:
           - "npm"
-          - "dependabot"
-          - "dependencies"
-      commit-message:
-          prefix: "[dependency][skip-ci]"
-          prefix-development: "[dev-dependency][skip-ci]"
-          include: "scope"
-      groups:
-          npm-all:
-              applies-to: version-updates
-              patterns:
-                  - "*"
-                  # Exclude local packages from grouping
-              exclude-patterns:
-                  - "@shared/*"
-                  - "file:*"
+      multi-ecosystem-group: dependabot-all
+      patterns:
+          - "*"
 
     - package-ecosystem: npm
       cooldown:
           default-days: 3
           include: ["*"]
       directory: /docs/docusaurus
-      schedule:
-          interval: weekly
-      assignees: ["Nick2bad4u"]
       rebase-strategy: auto
       versioning-strategy: increase
       allow:
@@ -105,17 +84,6 @@ updates:
           - dependency-name: "tough-cookie"
       labels:
           - "npm"
-          - "dependabot"
-          - "dependencies"
-      commit-message:
-          include: "scope"
-          prefix: "[dependency][docusaurus][skip-ci]"
-          prefix-development: "[dev-dependency][docusaurus][skip-ci]"
-
-      groups:
-          npm-all:
-              applies-to: version-updates
-              patterns:
-                  - "*"
-
-enable-beta-ecosystems: true
+      multi-ecosystem-group: dependabot-all
+      patterns:
+          - "*"
