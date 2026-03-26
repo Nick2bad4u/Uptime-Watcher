@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[c457e46](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c457e46472377a1bee04848b2d4929b0195c8142)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...c457e46472377a1bee04848b2d4929b0195c8142))
+[2eedac8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eedac8786f0e9b56659f208f73e7cb43f51fbf9)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...2eedac8786f0e9b56659f208f73e7cb43f51fbf9))
 
 
 ### ✨ Features
@@ -1487,6 +1487,27 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a197
 
 
 ### 🧹 Chores
+
+- 🧹 [chore] bulk formatting & config overhaul with deps bump
+
+- 🚜 Polish code style across the repo: wrap long lines, unify import/export formatting, trim excess blank lines, simplify arrow bodies, normalize JSDoc and generics.
+- ✨ [dependency] Update a slew of dev/runtime packages (ESLint 10.0.2, ts‑extras, Storybook, Biome, electron, @rushstack/security 0.14.2, node‑dependencies 2.1.0, etc.) and adjust package.json scripts.
+- ⚙️ Tweak configuration files:
+  - add `homepage` to `.ncurc.json`, extend `.secretlintignore`, re‑enable previously blocked ESLint plugins via fixup, add JSON language support, update stylelint logical rules.
+  - overhaul vite/vitest configs for synchronous handling, improved wasm asset checks, watch logic, default excludes, environment polishing.
+  - adjust docs tooling scripts and dependency versions.
+- 🔧 Refactor assorted utilities/services to tighten types, collapse trivial blocks, improve error messages, and fix minor logic (e.g. DNS monitor, IPC validators, backoff docs).
+- 🧪 Reformat hundreds of lint‑plugin tests to consistent `ruleTester.run` signatures and line wrapping.
+- 📝 Update ESLint blocker guide to note re‑enabled plugins.
+- ✅ Small UI component tweaks (destructured props, spacing) and test refactors.
+
+Housekeeping work to enforce style, update dependencies and prepare for further development.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eedac8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eedac8786f0e9b56659f208f73e7cb43f51fbf9)
+
+
+- Update changelogs for v23.1.0 [skip ci] [`(f5fce09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5fce0916ca442e403d3d515c16d191c7a59b2e3)
+
 
 - Update changelogs for v23.0.0 [skip ci] [`(23d6655)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/23d665510de92c1156b361d846483043c37d2f1e)
 
