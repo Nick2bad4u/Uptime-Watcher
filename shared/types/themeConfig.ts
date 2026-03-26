@@ -850,31 +850,27 @@ export function mergeThemeConfig(
     overrides: ThemeOverride
 ): ThemeConfig {
     return {
-        animation: mergeSection(
-            baseTheme.animation,
-            overrides.animation
-        ) as AnimationConfig,
-        borderRadius: mergeSection(
-            baseTheme.borderRadius,
-            overrides.borderRadius
-        ) as BorderRadiusConfig,
-        colors: mergeSection(baseTheme.colors, overrides.colors) as ThemeColors,
-        components: mergeSection(
-            baseTheme.components,
-            overrides.components
-        ) as ComponentConfig,
-        shadows: mergeSection(
-            baseTheme.shadows,
-            overrides.shadows
-        ) as ShadowConfig,
-        spacing: mergeSection(
-            baseTheme.spacing,
-            overrides.spacing
-        ) as SpacingConfig,
-        typography: mergeSection(
-            baseTheme.typography,
-            overrides.typography
-        ) as TypographyConfig,
+        animation: castUnchecked<AnimationConfig>(
+            mergeSection(baseTheme.animation, overrides.animation)
+        ),
+        borderRadius: castUnchecked<BorderRadiusConfig>(
+            mergeSection(baseTheme.borderRadius, overrides.borderRadius)
+        ),
+        colors: castUnchecked<ThemeColors>(
+            mergeSection(baseTheme.colors, overrides.colors)
+        ),
+        components: castUnchecked<ComponentConfig>(
+            mergeSection(baseTheme.components, overrides.components)
+        ),
+        shadows: castUnchecked<ShadowConfig>(
+            mergeSection(baseTheme.shadows, overrides.shadows)
+        ),
+        spacing: castUnchecked<SpacingConfig>(
+            mergeSection(baseTheme.spacing, overrides.spacing)
+        ),
+        typography: castUnchecked<TypographyConfig>(
+            mergeSection(baseTheme.typography, overrides.typography)
+        ),
     };
 }
 
@@ -912,5 +908,7 @@ export function createDeepThemeOverride(
     baseTheme: ThemeConfig,
     deepOverrides: DeepThemeOverride
 ): ThemeConfig {
-    return deepMergeSection(baseTheme, deepOverrides) as ThemeConfig;
+    return castUnchecked<ThemeConfig>(
+        deepMergeSection(baseTheme, deepOverrides)
+    );
 }

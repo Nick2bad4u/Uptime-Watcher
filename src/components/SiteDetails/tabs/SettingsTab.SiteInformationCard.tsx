@@ -18,6 +18,14 @@ const IdentifierIcon = AppIcons.ui.link;
 const InfoIcon = AppIcons.ui.info;
 const LastCheckedIcon = AppIcons.metrics.activity;
 
+const formatLastChecked = (lastChecked: Monitor["lastChecked"]): string => {
+    if (!lastChecked) {
+        return "Never";
+    }
+
+    return new Date(lastChecked).toLocaleString();
+};
+
 /**
  * Props for {@link SettingsTabSiteInformationCard}.
  */
@@ -41,6 +49,8 @@ export const SettingsTabSiteInformationCard = ({
     const infoColor = currentTheme.colors.info;
 
     const cardIcon = useMemo(() => <InfoIcon color={infoColor} />, [infoColor]);
+
+    const lastCheckedDisplay = formatLastChecked(selectedMonitor.lastChecked);
 
     return (
         <ThemedCard icon={cardIcon} title="Site Information">
@@ -108,11 +118,7 @@ export const SettingsTabSiteInformationCard = ({
                                 size="xs"
                                 variant="primary"
                             >
-                                {selectedMonitor.lastChecked
-                                    ? new Date(
-                                          selectedMonitor.lastChecked
-                                      ).toLocaleString()
-                                    : "Never"}
+                                {lastCheckedDisplay}
                             </ThemedText>
                         </div>
                     </div>

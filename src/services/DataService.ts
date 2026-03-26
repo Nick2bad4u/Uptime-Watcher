@@ -208,7 +208,7 @@ export const DataService: DataServiceContract = {
                     const response =
                         await api.data.restoreSqliteBackup(payload);
 
-                    return validateServicePayload<SerializedDatabaseRestoreResult>(
+                    return validateServicePayload(
                         validateSerializedDatabaseRestoreResult,
                         response,
                         {

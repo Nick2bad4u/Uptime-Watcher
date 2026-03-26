@@ -10,9 +10,9 @@ import {
     type ChangeEvent,
     memo,
     type NamedExoticComponent,
-    type SyntheticEvent,
     useCallback,
     useMemo,
+    useState,
 } from "react";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -191,11 +191,31 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
             [selectedMonitor]
         );
 
+        const [failedFaviconUrls, setFailedFaviconUrls] = useState<Set<string>>(
+            () => new Set<string>()
+        );
+
+        const isFaviconVisible =
+            typeof faviconUrl === "string" && !failedFaviconUrls.has(faviconUrl);
+
         const handleFaviconError = useCallback(
-            (event: SyntheticEvent<HTMLImageElement>): void => {
-                event.currentTarget.style.display = "none";
+            (): void => {
+                if (typeof faviconUrl !== "string") {
+                    return;
+                }
+
+                setFailedFaviconUrls((previous) => {
+                    if (previous.has(faviconUrl)) {
+                        return previous;
+                    }
+
+                    const next = new Set(previous);
+                    next.add(faviconUrl);
+
+                    return next;
+                });
             },
-            []
+            [faviconUrl]
         );
 
         return (
@@ -210,7 +230,7 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
                             className="site-card__title-dot-fallback"
                             size={12}
                         />
-                        {faviconUrl ? (
+                        {faviconUrl && isFaviconVisible ? (
                             <img
                                 alt=""
                                 className="site-card__title-dot-favicon"

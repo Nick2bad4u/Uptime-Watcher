@@ -11,6 +11,9 @@ import { memo, useMemo } from "react";
 import { formatResponseTime } from "../../utils/time";
 import { useTheme } from "../useTheme";
 
+const formatTimestampLabel = (timestamp: Date | number | string): string =>
+    new Date(timestamp).toLocaleString();
+
 /**
  * Props for the MiniChartBar component
  *
@@ -53,11 +56,14 @@ export const MiniChartBar: NamedExoticComponent<MiniChartBarProperties> = memo(
                 status,
             ]
         );
+
+        const timestampLabel = formatTimestampLabel(timestamp);
+
         return (
             <div
                 className={`themed-mini-chart-bar ${className}`}
                 style={styles}
-                title={`${status} - ${formatResponseTime(responseTime)} at ${new Date(timestamp).toLocaleString()}`}
+                title={`${status} - ${formatResponseTime(responseTime)} at ${timestampLabel}`}
             />
         );
     }

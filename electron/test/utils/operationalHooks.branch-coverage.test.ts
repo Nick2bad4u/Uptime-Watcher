@@ -9,6 +9,20 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
+vi.mock("../../utils/logger.js", () => {
+    const createLoggerMock = () => ({
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+    });
+
+    return {
+        diagnosticsLogger: createLoggerMock(),
+        logger: createLoggerMock(),
+    };
+});
+
 describe("operationalHooks.ts - Branch Coverage", () => {
     let operationalHooks: any;
     let mockEventEmitter: any;
@@ -16,20 +30,6 @@ describe("operationalHooks.ts - Branch Coverage", () => {
     beforeEach(async () => {
         // Reset all mocks before each test
         vi.clearAllMocks();
-
-        // Mock logger
-        vi.mock("../../utils/logger.js", () => {
-            const createLoggerMock = () => ({
-                info: vi.fn(),
-                warn: vi.fn(),
-                error: vi.fn(),
-                debug: vi.fn(),
-            });
-            return {
-                logger: createLoggerMock(),
-                diagnosticsLogger: createLoggerMock(),
-            };
-        });
 
         // Mock TypedEventBus
         mockEventEmitter = {

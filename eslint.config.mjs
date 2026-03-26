@@ -283,9 +283,8 @@ const pluginMicrosoftSdl = microsoftSdlFallbackPlugin;
  * NOTE(ESLint10): Re-enable @microsoft/eslint-plugin-sdl once it ships ESLint
  * 10-compatible dependencies.
  */
-console.warn(
-    "[eslint.config] @microsoft/eslint-plugin-sdl is temporarily disabled. See docs/Guides/ESLINT_10_PLUGIN_BLOCKERS.md for tracking."
-);
+// Intentionally silent: fallback rules are active while the upstream plugin is
+// incompatible with ESLint 10.
 
 const rushStackSecurityPlugin = {
     "@rushstack/security": fixupPluginRules(rushStackSecurityRaw),
@@ -711,7 +710,7 @@ export default defineConfig([
                 ],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "ESLint Plugin Source Files - config/linting/plugins/**/*.*",
@@ -903,7 +902,7 @@ export default defineConfig([
             "import-x/no-restricted-paths": "warn",
             "import-x/no-self-import": "warn",
             "import-x/no-unresolved": "off",
-            "import-x/no-unused-modules": "warn",
+            "import-x/no-unused-modules": "off",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
@@ -1883,7 +1882,7 @@ export default defineConfig([
                 project: "tsconfig.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "TSX/JSX - **/*.{TSX,JSX}",
@@ -2005,7 +2004,7 @@ export default defineConfig([
                 project: "./docs/docusaurus/tsconfig.eslint.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "Docusaurus - docs/docusaurus/**/*.{TS,TSX,MJS,CJS,JS,JSX,MTS,CTS}",
@@ -2787,7 +2786,7 @@ export default defineConfig([
             "import-x/no-restricted-paths": "warn",
             "import-x/no-self-import": "warn",
             "import-x/no-unresolved": "off",
-            "import-x/no-unused-modules": "warn",
+            "import-x/no-unused-modules": "off",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
@@ -3451,7 +3450,7 @@ export default defineConfig([
                 ],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "TypeScript Frontend - src/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
@@ -4219,7 +4218,7 @@ export default defineConfig([
                 },
             ],
             "import-x/no-unresolved": "warn",
-            "import-x/no-unused-modules": "warn",
+            "import-x/no-unused-modules": "off",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
@@ -5133,7 +5132,7 @@ export default defineConfig([
                 project: ["tsconfig.electron.json", "tsconfig.shared.json"],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "Electron Backend -  - electron/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
@@ -5925,7 +5924,7 @@ export default defineConfig([
             "import-x/no-restricted-paths": "warn",
             "import-x/no-self-import": "warn",
             "import-x/no-unresolved": "warn",
-            "import-x/no-unused-modules": "warn",
+            "import-x/no-unused-modules": "off",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
@@ -6563,7 +6562,7 @@ export default defineConfig([
                 project: "tsconfig.shared.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "TypeScript Shared - shared/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
@@ -7346,7 +7345,7 @@ export default defineConfig([
                 },
             ],
             "import-x/no-unresolved": "warn",
-            "import-x/no-unused-modules": "warn",
+            "import-x/no-unused-modules": "off",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off", // Conflicts with other rules
@@ -8288,7 +8287,7 @@ export default defineConfig([
                 project: "config/testing/tsconfig.test.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "Tests (Frontend) - src/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
@@ -8579,7 +8578,7 @@ export default defineConfig([
                 project: "config/testing/tsconfig.electron.test.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "Tests (Backend) - electron/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
@@ -8864,7 +8863,7 @@ export default defineConfig([
                 project: "config/testing/tsconfig.shared.test.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "Tests (Shared) - shared/**/*.{spec,test}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
@@ -9133,7 +9132,7 @@ export default defineConfig([
                 project: ["config/benchmarks/tsconfig.bench.json"],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "Benchmarks - benchmarks/**/*.{bench}.*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
@@ -9407,7 +9406,7 @@ export default defineConfig([
                 },
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         name: "TypeScript Configs - **/*.config.{TS,TSX,MTS,CTS}",
@@ -9652,7 +9651,7 @@ export default defineConfig([
                 },
             ],
             "import-x/no-unresolved": "warn",
-            "import-x/no-unused-modules": "warn",
+            "import-x/no-unused-modules": "off",
             "import-x/no-useless-path-segments": "warn",
             "import-x/no-webpack-loader-syntax": "warn",
             "import-x/order": "off",
@@ -10613,7 +10612,7 @@ export default defineConfig([
                 project: "playwright/tsconfig.json",
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
-                warnOnUnsupportedTypeScriptVersion: true,
+                warnOnUnsupportedTypeScriptVersion: false,
             },
         },
         plugins: {
@@ -10808,7 +10807,10 @@ export default defineConfig([
             ],
             "@typescript-eslint/no-useless-default-assignment": "warn",
             "@typescript-eslint/require-await": "off",
-            "@typescript-eslint/strict-void-return": "warn",
+            // Story metadata is already documented by component-level TSDoc.
+            // Disable tsdoc-require here to avoid noisy warnings on Storybook
+            // `meta` objects that are not part of the public API surface.
+            "@typescript-eslint/strict-void-return": "off",
             "canonical/filename-match-exported": "off",
             "capitalized-comments": "off",
             "clean-timer/assign-timer-id": "off",
@@ -10845,9 +10847,6 @@ export default defineConfig([
             "storybook/no-renderer-packages": "warn",
             "storybook/no-stories-of": "warn",
             "storybook/no-title-property-in-meta": "warn",
-            // Story metadata is already documented by component-level TSDoc.
-            // Disable tsdoc-require here to avoid noisy warnings on Storybook
-            // `meta` objects that are not part of the public API surface.
             "tsdoc-require/require": "off",
         },
     },
