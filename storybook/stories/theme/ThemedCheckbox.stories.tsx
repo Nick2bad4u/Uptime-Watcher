@@ -22,7 +22,7 @@ const meta: Meta<typeof ThemedCheckbox> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 type ThemedCheckboxProps = ComponentProps<typeof ThemedCheckbox>;
 
 const CheckboxWithState = (args: ThemedCheckboxProps): ReactElement => {

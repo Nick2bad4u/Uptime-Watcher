@@ -20,7 +20,7 @@ const meta: Meta<typeof SiteMonitoringButton> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const Idle: Story = {};
 

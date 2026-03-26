@@ -64,7 +64,12 @@ export const SiteCardMetrics: NamedExoticComponent<SiteCardMetricsProperties> =
                     }
 
                     return (
-                        <Tooltip content={tooltip} key={key} position="bottom">
+                        <Tooltip
+                            content={tooltip}
+                            key={key}
+                            position="bottom"
+                            wrapMode="block"
+                        >
                             {(triggerProps) => (
                                 <div
                                     {...triggerProps}

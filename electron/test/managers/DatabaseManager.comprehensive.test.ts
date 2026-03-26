@@ -536,7 +536,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
 
             // Should throw when loadSitesFromDatabase fails
-            await expect(databaseManager.initialize()).rejects.toThrowError(
+            await expect(databaseManager.initialize()).rejects.toThrow(
                 "Failed to load sites"
             );
         });
@@ -704,7 +704,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }
             );
 
-            await expect(databaseManager.initialize()).rejects.toThrowError(
+            await expect(databaseManager.initialize()).rejects.toThrow(
                 "Event emission failed"
             );
         });
@@ -859,7 +859,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             await expect(
                 databaseManager.setHistoryLimit(100)
-            ).rejects.toThrowError("Failed to set limit");
+            ).rejects.toThrow("Failed to set limit");
         });
     });
 
@@ -933,7 +933,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }
             );
 
-            await expect(databaseManager.initialize()).rejects.toThrowError(
+            await expect(databaseManager.initialize()).rejects.toThrow(
                 "Stop event failed"
             );
         });
@@ -1030,7 +1030,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
 
             // Should propagate the error
-            await expect(databaseManager.initialize()).rejects.toThrowError(
+            await expect(databaseManager.initialize()).rejects.toThrow(
                 "Database connection failed"
             );
         });
@@ -1097,7 +1097,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }
             );
 
-            await expect(databaseManager.downloadBackup()).rejects.toThrowError(
+            await expect(databaseManager.downloadBackup()).rejects.toThrow(
                 "File system error"
             );
         });
@@ -1220,7 +1220,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Should throw RangeError, not clamp
             await expect(
                 databaseManager.setHistoryLimit(1500)
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "History limit exceeds maximum of 1000, received: 1500"
             );
         });
@@ -1328,7 +1328,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             await expect(
                 databaseManager.setHistoryLimit(200)
-            ).rejects.toThrowError("Database write error");
+            ).rejects.toThrow("Database write error");
         });
     });
 
@@ -1415,7 +1415,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             await expect(
                 databaseManager.setHistoryLimit(300)
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "[DatabaseManager.setHistoryLimit] History retention rules are not configured"
             );
         });

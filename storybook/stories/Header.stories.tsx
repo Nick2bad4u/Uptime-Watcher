@@ -21,7 +21,7 @@ interface HeaderStoryArgs {
     siteListLayout: SiteListLayoutMode;
 }
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const sampleSites = [
     createMockSite({

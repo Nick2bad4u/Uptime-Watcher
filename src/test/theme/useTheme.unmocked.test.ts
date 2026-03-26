@@ -530,16 +530,16 @@ describe("useTheme - Complete Coverage", () => {
 
             expect(() =>
                 result.current.getAvailabilityColor(999)
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 result.current.getAvailabilityColor(-999)
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 result.current.getAvailabilityDescription(Infinity)
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 result.current.getAvailabilityDescription(-Infinity)
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle invalid color paths", async ({ task, annotate }) => {
@@ -550,10 +550,10 @@ describe("useTheme - Complete Coverage", () => {
 
             const { result } = renderHook(() => useTheme());
 
-            expect(() => result.current.getColor("")).not.toThrowError();
+            expect(() => result.current.getColor("")).not.toThrow();
             expect(() =>
                 result.current.getColor("invalid.path")
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle invalid status values", async ({
@@ -569,10 +569,10 @@ describe("useTheme - Complete Coverage", () => {
 
             expect(() =>
                 result.current.getStatusColor("invalid" as any)
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 result.current.getStatusColor("" as any)
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
 });

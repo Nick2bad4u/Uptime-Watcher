@@ -27,7 +27,7 @@ interface SettingsStoryArgs extends SettingsProperties {
     isDark: boolean;
 }
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const sampleSites = [
     createMockSite({

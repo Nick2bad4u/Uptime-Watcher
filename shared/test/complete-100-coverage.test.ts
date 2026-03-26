@@ -75,7 +75,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
                     "unknownCustomField",
                     "invalidValue"
                 );
-            }).toThrowError("Unknown field: unknownCustomField");
+            }).toThrow("Unknown field: unknownCustomField");
         });
 
         it("should handle error categorization edge cases (lines 478-479, 482)", async ({
@@ -211,7 +211,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
             // This should trigger the error handling in the finally block
             await expect(
                 withErrorHandling(operation, mockStore)
-            ).rejects.toThrowError("Operation failed");
+            ).rejects.toThrow("Operation failed");
 
             // Verify that setLoading was called twice (once at start, once in finally)
             expect(mockStore.setLoading).toHaveBeenCalledTimes(2);

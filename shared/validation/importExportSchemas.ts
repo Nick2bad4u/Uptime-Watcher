@@ -58,10 +58,10 @@ export interface ImportData {
 
 export const importDataSchema: z.ZodType<ImportData> = z
     .object({
-        exportedAt: z.string().optional(),
-        settings: z.record(z.string(), z.string()).optional(),
+        exportedAt: z.string().trim().optional(),
+        settings: z.record(z.string().trim(), z.string().trim()).optional(),
         sites: z.array(importSiteSchema).min(1),
-        version: z.string().optional(),
+        version: z.string().trim().optional(),
     })
     .strict();
 
@@ -77,8 +77,8 @@ export interface ExportData {
 
 export const exportDataSchema: z.ZodType<ExportData> = z
     .object({
-        exportedAt: z.string().min(1),
-        settings: z.record(z.string(), z.string()).optional(),
+        exportedAt: z.string().trim().min(1),
+        settings: z.record(z.string().trim(), z.string().trim()).optional(),
         sites: z.array(siteSchema).min(1),
         version: importExportVersionSchema,
     })

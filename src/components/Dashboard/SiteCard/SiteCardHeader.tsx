@@ -56,7 +56,13 @@ const toFaviconUrl = (endpoint: string | undefined): string | undefined => {
 
     try {
         const parsed = new URL(withProtocol);
-        return `${parsed.origin}/favicon.ico`;
+
+        const lookupUrl = new URL(parsed.href);
+        if (lookupUrl.protocol === "ws:" || lookupUrl.protocol === "wss:") {
+            lookupUrl.protocol = "https:";
+        }
+
+        return `https://api.microlink.io/?url=${encodeURIComponent(lookupUrl.href)}&meta=false&embed=logo.url`;
     } catch {
         return undefined;
     }

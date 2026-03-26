@@ -422,7 +422,7 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                         // Should produce valid JSON
                         expect(() =>
                             JSON.parse(exportedJson)
-                        ).not.toThrowError();
+                        ).not.toThrow();
 
                         const parsed = JSON.parse(exportedJson);
 
@@ -446,7 +446,7 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                         // ExportedAt should be valid ISO date
                         expect(() =>
                             new Date(parsed.exportedAt).toISOString()
-                        ).not.toThrowError();
+                        ).not.toThrow();
                     }
                 ),
                 { numRuns: 25 }

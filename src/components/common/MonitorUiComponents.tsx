@@ -63,8 +63,8 @@ export function ConditionalResponseTime({
     monitorType,
 }: ConditionalResponseTimeProperties): ReactNode {
     const [supportsResponseTime, setSupportsResponseTime] =
-        useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+        useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(
         function checkResponseTimeSupport() {
@@ -127,7 +127,7 @@ export const DetailLabel = ({
     fallback = details,
     monitorType,
 }: DetailLabelProperties): JSX.Element => {
-    const [formattedLabel, setFormattedLabel] = useState<string>(fallback);
+    const [formattedLabel, setFormattedLabel] = useState(fallback);
 
     useEffect(
         function formatDetailLabel() {

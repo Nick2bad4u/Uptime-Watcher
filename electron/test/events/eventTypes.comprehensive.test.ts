@@ -904,12 +904,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
             expect(() => {
                 // Runtime mutation attempt (TypeScript should prevent this at compile time)
                 (EVENT_CATEGORIES.SITE as any).push("new:event");
-            }).not.toThrowError(); // Runtime doesn't prevent this, but TypeScript should
+            }).not.toThrow(); // Runtime doesn't prevent this, but TypeScript should
 
             expect(() => {
                 // Runtime mutation attempt (TypeScript should prevent this at compile time)
                 (EVENT_PRIORITIES.HIGH as any).push("new:event");
-            }).not.toThrowError(); // Runtime doesn't prevent this, but TypeScript should
+            }).not.toThrow(); // Runtime doesn't prevent this, but TypeScript should
         });
     });
 });

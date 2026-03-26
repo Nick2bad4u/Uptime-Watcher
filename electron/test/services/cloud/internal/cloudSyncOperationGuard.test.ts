@@ -15,7 +15,7 @@ describe(assertCloudSyncEnabled, () => {
                 disabledMessage: "Cloud sync is disabled",
                 settings,
             })
-        ).rejects.toThrowError("Cloud sync is disabled");
+        ).rejects.toThrow("Cloud sync is disabled");
     });
 
     it("resolves when sync is enabled", async () => {

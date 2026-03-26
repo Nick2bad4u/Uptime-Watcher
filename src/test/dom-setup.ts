@@ -96,6 +96,8 @@ beforeAll(() => {
 
             public readonly rootMargin: string;
 
+            public readonly scrollMargin: string;
+
             public readonly thresholds: readonly number[];
 
             public constructor(
@@ -105,6 +107,7 @@ beforeAll(() => {
                 this.callback = callback;
                 this.root = options.root ?? null;
                 this.rootMargin = options.rootMargin ?? "";
+                this.scrollMargin = "";
                 const threshold = options.threshold;
                 if (Array.isArray(threshold)) {
                     this.thresholds = Object.freeze([...threshold]);

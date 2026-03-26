@@ -403,7 +403,7 @@ describe("SafeConversions - Property-Based Tests", () => {
                 ];
 
                 for (const fn of functions) {
-                    expect(() => fn()).not.toThrowError();
+                    expect(() => fn()).not.toThrow();
                     const result = fn();
                     expect(typeof result).toBe("number");
                     expect(Number.isNaN(result)).toBeFalsy();

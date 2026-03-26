@@ -57,6 +57,26 @@ describe("dataSchemas", () => {
         expect(parsed.success).toBeFalsy();
     });
 
+    it("accepts blank backup filenames for renderer fallback behavior", () => {
+        const buffer = new ArrayBuffer(8);
+
+        const parsed = validateSerializedDatabaseBackupResult({
+            buffer,
+            fileName: "   ",
+            metadata: {
+                appVersion: "1.0.0",
+                checksum: "abc",
+                createdAt: 1,
+                originalPath: "C:/x",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: buffer.byteLength,
+            },
+        });
+
+        expect(parsed.success).toBeTruthy();
+    });
+
     it("rejects when the buffer is not transferable", () => {
         const parsed = validateSerializedDatabaseRestorePayload({
             buffer: Buffer.from("no"),

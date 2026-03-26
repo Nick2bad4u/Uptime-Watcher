@@ -123,7 +123,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             // Test completely unknown field to trigger the error case
             expect(() => {
                 validateMonitorField("http", "completelyUnknownField", "value");
-            }).toThrowError("Unknown field: completelyUnknownField");
+            }).toThrow("Unknown field: completelyUnknownField");
         });
 
         it("should test field validation with invalid values to trigger Zod errors", async ({

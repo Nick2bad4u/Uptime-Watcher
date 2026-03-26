@@ -183,7 +183,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "INSERT INTO sites (name) VALUES (?) RETURNING *",
                     ["test"]
                 );
-            }).toThrowError("INSERT with RETURNING failed: no result returned");
+            }).toThrow("INSERT with RETURNING failed: no result returned");
         });
         it("should throw error when INSERT returns null", async ({
             task,
@@ -205,7 +205,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     "INSERT INTO sites (name) VALUES (?) RETURNING *",
                     ["test"]
                 );
-            }).toThrowError("INSERT with RETURNING failed: no result returned");
+            }).toThrow("INSERT with RETURNING failed: no result returned");
         });
         it("should enforce validation when provided", () => {
             mockGet.mockReturnValue({ id: "invalid" });
@@ -222,7 +222,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         ): _row is UnknownRecord => false,
                     }
                 )
-            ).toThrowError(/ValidatedRow/);
+            ).toThrow(/ValidatedRow/);
         });
         it("should handle empty array parameters", async ({
             task,
@@ -941,7 +941,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                             _row: UnknownRecord
                         ): _row is UnknownRecord => false,
                     })
-                ).toThrowError(/TestRow/);
+                ).toThrow(/TestRow/);
             });
             it("should return empty array for no records", async ({
                 task,
@@ -1278,7 +1278,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                             ): _row is UnknownRecord => false,
                         }
                     )
-                ).toThrowError(/SingleRow/);
+                ).toThrow(/SingleRow/);
             });
             it("should handle query without parameters", async ({
                 task,
@@ -1606,7 +1606,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                 expect(() =>
                     queryMonitorRows(mockDb, "SELECT * FROM monitors")
-                ).toThrowError(/MonitorRow/);
+                ).toThrow(/MonitorRow/);
             });
 
             it("should validate single history rows", () => {
@@ -1678,7 +1678,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         "INSERT INTO sites (name) VALUES (?) RETURNING *",
                         ["test"]
                     );
-                }).toThrowError("Database connection lost");
+                }).toThrow("Database connection lost");
             });
             it("should handle database exceptions in queryForCount", async ({
                 task,
@@ -1700,7 +1700,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         mockDb,
                         "SELECT COUNT(*) as count FROM nonexistent"
                     );
-                }).toThrowError("Table does not exist");
+                }).toThrow("Table does not exist");
             });
             it("should handle database exceptions in queryForIds", async ({
                 task,
@@ -1719,7 +1719,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 // Act & Assert
                 expect(() => {
                     queryForIds(mockDb, "SELECT id FROM invalid_table");
-                }).toThrowError("SQL syntax error");
+                }).toThrow("SQL syntax error");
             });
             it("should handle database exceptions in queryForRecords", async ({
                 task,
@@ -1738,7 +1738,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 // Act & Assert
                 expect(() => {
                     queryForRecords(mockDb, "SELECT * FROM protected_table");
-                }).toThrowError("Permission denied");
+                }).toThrow("Permission denied");
             });
             it("should handle database exceptions in queryForSingleRecord", async ({
                 task,
@@ -1761,7 +1761,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         "SELECT * FROM slow_table WHERE id = ?",
                         [1]
                     );
-                }).toThrowError("Connection timeout");
+                }).toThrow("Connection timeout");
             });
         });
     });

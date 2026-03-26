@@ -26,7 +26,7 @@ const meta: Meta<typeof MonitoringStatusDisplay> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 /**
  * Generates a representative set of monitors featuring mixed activity states.

@@ -15,7 +15,7 @@ export const notificationPreferenceUpdateSchema: z.ZodType<{
 }> = z
     .object({
         mutedSiteNotificationIdentifiers: z
-            .array(z.string().min(1))
+            .array(z.string().trim().min(1))
             .max(1000)
             .readonly()
             .optional(),
@@ -51,8 +51,8 @@ export const parseNotificationPreferenceUpdate = (
  */
 export const appNotificationRequestSchema: z.ZodType<AppNotificationRequest> = z
     .object({
-        body: z.string().min(1).max(500).optional(),
-        title: z.string().min(1).max(120),
+        body: z.string().trim().min(1).max(500).optional(),
+        title: z.string().trim().min(1).max(120),
     })
     .strict();
 

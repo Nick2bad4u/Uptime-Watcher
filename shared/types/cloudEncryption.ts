@@ -60,9 +60,9 @@ const cloudEncryptionConfigInternalSchema = z.discriminatedUnion("mode", [
         .object({
             configVersion: z.literal(CLOUD_ENCRYPTION_CONFIG_VERSION),
             kdf: z.literal("scrypt"),
-            keyCheckBase64: z.string().min(1),
+            keyCheckBase64: z.string().trim().min(1),
             mode: z.literal("passphrase"),
-            saltBase64: z.string().min(1),
+            saltBase64: z.string().trim().min(1),
         })
         .strict(),
 ]);

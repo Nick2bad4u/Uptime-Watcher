@@ -227,7 +227,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             await act(async () => {
                 await expect(
                     result.current.loadMonitorTypes()
-                ).rejects.toThrowError("invalid payload");
+                ).rejects.toThrow("invalid payload");
             });
 
             expect(result.current.monitorTypes).toEqual([]);
@@ -246,7 +246,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             await act(async () => {
                 await expect(
                     result.current.loadMonitorTypes()
-                ).rejects.toThrowError("invalid payload");
+                ).rejects.toThrow("invalid payload");
             });
 
             expect(result.current.monitorTypes).toEqual([]);
@@ -367,7 +367,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             await act(async () => {
                 await expect(
                     result.current.formatMonitorDetail("http", "details")
-                ).rejects.toThrowError("Format service error");
+                ).rejects.toThrow("Format service error");
             });
 
             expect(
@@ -410,7 +410,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             await act(async () => {
                 await expect(
                     result.current.formatMonitorDetail("http", "details")
-                ).rejects.toThrowError("Formatting failed");
+                ).rejects.toThrow("Formatting failed");
             });
         });
     });

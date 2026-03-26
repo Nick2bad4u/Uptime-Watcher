@@ -8,7 +8,7 @@ import type { JSX } from "react";
 import { HealthIndicator } from "@app/components/Header/HealthIndicator";
 import { useAvailabilityColors } from "@app/theme/useTheme";
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const meta: Meta<typeof HealthIndicator> = {
     args: {

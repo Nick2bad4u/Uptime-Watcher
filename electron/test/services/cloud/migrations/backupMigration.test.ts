@@ -271,7 +271,7 @@ describe(migrateProviderBackups, () => {
 
         await expect(
             migrateProviderBackups({ provider, request })
-        ).rejects.toThrowError(/Encryption key is required/u);
+        ).rejects.toThrow(/Encryption key is required/u);
     });
 
     it("returns failures when an entry cannot be downloaded", async () => {

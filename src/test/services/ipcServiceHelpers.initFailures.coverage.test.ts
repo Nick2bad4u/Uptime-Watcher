@@ -20,7 +20,7 @@ describe("IPC service helper initialization failures", () => {
 
         await expect(
             import("../../services/CloudService")
-        ).rejects.toThrowError("CloudService init failed");
+        ).rejects.toThrow("CloudService init failed");
 
         vi.doUnmock("../../services/utils/createIpcServiceHelpers");
     });
@@ -33,7 +33,7 @@ describe("IPC service helper initialization failures", () => {
             },
         }));
 
-        await expect(import("../../services/DataService")).rejects.toThrowError(
+        await expect(import("../../services/DataService")).rejects.toThrow(
             "DataService init failed"
         );
 
@@ -50,7 +50,7 @@ describe("IPC service helper initialization failures", () => {
 
         await expect(
             import("../../services/NotificationPreferenceService")
-        ).rejects.toThrowError("NotificationPreferenceService init failed");
+        ).rejects.toThrow("NotificationPreferenceService init failed");
 
         vi.doUnmock("../../services/utils/createIpcServiceHelpers");
     });

@@ -19,7 +19,7 @@ const meta: Meta<typeof MiniChartBar> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const Default: Story = {};
 

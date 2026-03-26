@@ -38,7 +38,7 @@ export const DEFAULT_SIDEBAR_LAYOUT: SidebarLayoutContextValue = Object.freeze({
  * Internal React context used to publish sidebar layout state.
  */
 export const SidebarLayoutContext: Context<SidebarLayoutContextValue> =
-    createContext<SidebarLayoutContextValue>(DEFAULT_SIDEBAR_LAYOUT);
+    createContext(DEFAULT_SIDEBAR_LAYOUT);
 
 SidebarLayoutContext.displayName = "SidebarLayoutContext";
 

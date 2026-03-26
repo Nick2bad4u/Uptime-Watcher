@@ -488,7 +488,7 @@ describe("monitorManager helper operations", () => {
                     partialFailures: false,
                 }),
             })
-        ).rejects.toThrowError(/failed to start monitoring/i);
+        ).rejects.toThrow(/failed to start monitoring/i);
     });
 
     it("stopMonitoringAllOperation throws when monitoring remains active", async () => {
@@ -505,7 +505,7 @@ describe("monitorManager helper operations", () => {
                     partialFailures: false,
                 }),
             })
-        ).rejects.toThrowError(/failed to stop monitoring/i);
+        ).rejects.toThrow(/failed to stop monitoring/i);
     });
 
     it("stopMonitoringAllOperation emits when monitoring is inactive", async () => {

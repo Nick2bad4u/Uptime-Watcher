@@ -64,6 +64,7 @@ export function createServerHeartbeatMonitorSchema(
         .extend({
             heartbeatExpectedStatus: z
                 .string()
+.trim()
                 .min(1, "Expected status is required")
                 .max(128, "Expected status must be 128 characters or fewer")
                 .refine((value) => value.trim().length > 0, {

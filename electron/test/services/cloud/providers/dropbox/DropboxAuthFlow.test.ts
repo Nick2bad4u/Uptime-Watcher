@@ -190,7 +190,7 @@ describe(DropboxAuthFlow, () => {
             loopbackPort: 0,
         });
 
-        await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrowError(
+        await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrow(
             "Dropbox OAuth error: denied"
         );
         expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
@@ -228,7 +228,7 @@ describe(DropboxAuthFlow, () => {
             loopbackPort: 0,
         });
 
-        await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrowError(
+        await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrow(
             "Dropbox OAuth state mismatch"
         );
         expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();

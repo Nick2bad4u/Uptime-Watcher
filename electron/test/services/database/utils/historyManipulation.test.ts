@@ -216,7 +216,7 @@ describe("History Manipulation Utilities", () => {
             // Act & Assert
             expect(() =>
                 addHistoryEntry(mockDb, monitorId, sampleStatusHistory)
-            ).toThrowError("Database connection failed");
+            ).toThrow("Database connection failed");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[HistoryManipulation] Failed to add history entry for monitor: test-monitor-123",
@@ -470,7 +470,7 @@ describe("History Manipulation Utilities", () => {
             // Act & Assert
             expect(() =>
                 bulkInsertHistory(mockDb, monitorId, historyEntries)
-            ).toThrowError("Statement execution failed");
+            ).toThrow("Statement execution failed");
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -498,7 +498,7 @@ describe("History Manipulation Utilities", () => {
             // Act & Assert
             expect(() =>
                 bulkInsertHistory(mockDb, monitorId, historyEntries)
-            ).toThrowError("Failed to prepare statement");
+            ).toThrow("Failed to prepare statement");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[HistoryManipulation] Failed to bulk insert history for monitor: test-monitor-123",
@@ -749,7 +749,7 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => deleteAllHistory(mockDb)).toThrowError(
+            expect(() => deleteAllHistory(mockDb)).toThrow(
                 "Cannot delete from history table"
             );
 
@@ -824,7 +824,7 @@ describe("History Manipulation Utilities", () => {
             // Act & Assert
             expect(() =>
                 deleteHistoryByMonitorId(mockDb, monitorId)
-            ).toThrowError("Monitor not found");
+            ).toThrow("Monitor not found");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[HistoryManipulation] Failed to prune history for monitor: test-monitor-123",
@@ -897,7 +897,7 @@ describe("History Manipulation Utilities", () => {
                     // Act & Assert
                     expect(() =>
                         deleteHistoryByMonitorId(mockDb, testMonitorId)
-                    ).toThrowError(errorMessage);
+                    ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
                         `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
@@ -1069,7 +1069,7 @@ describe("History Manipulation Utilities", () => {
             // Act & Assert
             expect(() =>
                 pruneHistoryForMonitor(mockDb, monitorId, 5)
-            ).toThrowError("Cannot select from history table");
+            ).toThrow("Cannot select from history table");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[HistoryManipulation] Failed to prune history for monitor: test-monitor-123",
@@ -1098,7 +1098,7 @@ describe("History Manipulation Utilities", () => {
             // Act & Assert
             expect(() =>
                 pruneHistoryForMonitor(mockDb, monitorId, 5)
-            ).toThrowError("Cannot delete from history table");
+            ).toThrow("Cannot delete from history table");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[HistoryManipulation] Failed to prune history for monitor: test-monitor-123",
@@ -1246,7 +1246,7 @@ describe("History Manipulation Utilities", () => {
                     // Act & Assert
                     expect(() =>
                         pruneHistoryForMonitor(mockDb, testMonitorId, limit)
-                    ).toThrowError(errorMessage);
+                    ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
                         `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
@@ -1282,7 +1282,7 @@ describe("History Manipulation Utilities", () => {
                     // Act & Assert
                     expect(() =>
                         pruneHistoryForMonitor(mockDb, testMonitorId, limit)
-                    ).toThrowError(errorMessage);
+                    ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
                         `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,

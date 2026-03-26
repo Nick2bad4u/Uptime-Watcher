@@ -83,7 +83,7 @@ describe(SiteRepository, () => {
             mockDb.all.mockImplementation(() => {
                 throw new Error("Database error");
             });
-            await expect(repository.findAll()).rejects.toThrowError(
+            await expect(repository.findAll()).rejects.toThrow(
                 "Database error"
             );
         });
@@ -203,7 +203,7 @@ describe(SiteRepository, () => {
                     throw new Error("Upsert failed");
                 }
             );
-            await expect(repository.upsert(siteData)).rejects.toThrowError(
+            await expect(repository.upsert(siteData)).rejects.toThrow(
                 "Upsert failed"
             );
         });
@@ -242,7 +242,7 @@ describe(SiteRepository, () => {
             mockDatabaseService.executeTransaction.mockImplementation(() => {
                 throw new Error("Delete failed");
             });
-            await expect(repository.delete("site1")).rejects.toThrowError(
+            await expect(repository.delete("site1")).rejects.toThrow(
                 "Delete failed"
             );
         });
@@ -371,7 +371,7 @@ describe(SiteRepository, () => {
             mockDatabaseService.executeTransaction.mockImplementation(() => {
                 throw new Error("Bulk insert failed");
             });
-            await expect(repository.bulkInsert(sites)).rejects.toThrowError(
+            await expect(repository.bulkInsert(sites)).rejects.toThrow(
                 "Bulk insert failed"
             );
         });
@@ -586,7 +586,7 @@ describe(SiteRepository, () => {
 
                         await expect(
                             repository.upsert(siteData)
-                        ).rejects.toThrowError(errorMessage);
+                        ).rejects.toThrow(errorMessage);
                     }
                 )
             );

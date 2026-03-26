@@ -81,7 +81,7 @@ describe("Final 100% Coverage Tests", () => {
                     "nonExistentField" as any,
                     "someValue"
                 );
-            }).toThrowError("Unknown field: nonExistentField");
+            }).toThrow("Unknown field: nonExistentField");
         });
     });
 });

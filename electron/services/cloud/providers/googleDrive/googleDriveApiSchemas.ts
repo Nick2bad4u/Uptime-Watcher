@@ -48,7 +48,7 @@ export interface GoogleDriveListResponse {
 
 const googleDriveCreateResponseSchema: z.ZodType<GoogleDriveCreateResponse> = z
     .object({
-        id: z.string().min(1),
+        id: z.string().trim().min(1),
     })
     .loose();
 
@@ -71,8 +71,8 @@ export function parseGoogleDriveCreateResponse(
 
 const googleDriveFileMetadataSchema: z.ZodType<GoogleDriveFileMetadata> = z
     .object({
-        modifiedTime: z.string().optional(),
-        size: z.union([z.string(), z.number()]).optional(),
+        modifiedTime: z.string().trim().optional(),
+        size: z.union([z.string().trim(), z.number()]).optional(),
     })
     .loose();
 
@@ -98,11 +98,11 @@ export function parseGoogleDriveFileMetadata(
 
 const googleDriveFileSchema: z.ZodType<GoogleDriveListedFile> = z
     .object({
-        id: z.string().optional(),
-        mimeType: z.string().optional(),
-        modifiedTime: z.string().optional(),
-        name: z.string().optional(),
-        size: z.union([z.string(), z.number()]).optional(),
+        id: z.string().trim().optional(),
+        mimeType: z.string().trim().optional(),
+        modifiedTime: z.string().trim().optional(),
+        name: z.string().trim().optional(),
+        size: z.union([z.string().trim(), z.number()]).optional(),
     })
     .loose();
 
@@ -112,7 +112,7 @@ const googleDriveListResponseSchema: z.ZodType<{
 }> = z
     .object({
         files: z.array(googleDriveFileSchema).optional(),
-        nextPageToken: z.union([z.string(), z.null()]).optional(),
+        nextPageToken: z.union([z.string().trim(), z.null()]).optional(),
     })
     .loose();
 

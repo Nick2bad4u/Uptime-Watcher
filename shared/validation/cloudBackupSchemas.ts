@@ -13,8 +13,8 @@ import * as z from "zod";
 export const cloudBackupEntrySchema: z.ZodType<CloudBackupEntry> = z
     .object({
         encrypted: z.boolean(),
-        fileName: z.string().min(1),
-        key: z.string().min(1),
+        fileName: z.string().trim().min(1),
+        key: z.string().trim().min(1),
         metadata: serializedDatabaseBackupMetadataSchema,
     })
     .strict();

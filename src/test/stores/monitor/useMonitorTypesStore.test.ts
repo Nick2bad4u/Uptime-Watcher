@@ -169,7 +169,7 @@ describe(useMonitorTypesStore, () => {
         await act(async () => {
             await expect(
                 result.current.loadMonitorTypes()
-            ).rejects.toThrowError("Backend unavailable");
+            ).rejects.toThrow("Backend unavailable");
         });
 
         expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
@@ -329,7 +329,7 @@ describe(useMonitorTypesStore, () => {
         await act(async () => {
             await expect(
                 result.current.formatMonitorDetail("http", "Raw detail")
-            ).rejects.toThrowError("Formatting failed");
+            ).rejects.toThrow("Formatting failed");
         });
 
         // Error should be set in store state
@@ -440,7 +440,7 @@ describe(useMonitorTypesStore, () => {
                     result.current.validateMonitorData("http", {
                         url: "https://example.com",
                     })
-                ).rejects.toThrowError("Backend unavailable");
+                ).rejects.toThrow("Backend unavailable");
             });
 
             // Error should be set in store state

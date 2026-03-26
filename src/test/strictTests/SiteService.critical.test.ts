@@ -178,7 +178,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(siteIdentifier, monitorId)
-            ).rejects.toThrowError("Electron API initialization failed");
+            ).rejects.toThrow("Electron API initialization failed");
 
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
@@ -200,7 +200,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(siteIdentifier, monitorId)
-            ).rejects.toThrowError("IPC communication failed");
+            ).rejects.toThrow("IPC communication failed");
 
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
@@ -222,7 +222,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(siteIdentifier, monitorId)
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "Monitor removal returned an invalid site snapshot for /"
             );
 
@@ -310,7 +310,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(siteIdentifier, monitorId)
-            ).rejects.toThrowError("Operation timeout");
+            ).rejects.toThrow("Operation timeout");
         });
 
         it("should handle null/undefined electron API", async () => {
@@ -329,7 +329,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 // Act & Assert
                 await expect(
                     SiteService.removeMonitor(siteIdentifier, monitorId)
-                ).rejects.toThrowError();
+                ).rejects.toThrow();
             } finally {
                 // Restore the original method
                 (globalThis as any).electronAPI.sites.removeMonitor =
@@ -348,7 +348,7 @@ describe("SiteService Critical Coverage Tests", () => {
 
             await expect(
                 SiteService.removeMonitor(siteIdentifier, monitorId)
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 `Monitor removal returned an invalid site snapshot for ${siteIdentifier}/${monitorId}`
             );
 
@@ -389,7 +389,7 @@ describe("SiteService Critical Coverage Tests", () => {
 
             await expect(
                 SiteService.addSite(createMockSiteSnapshot("invalid-site"))
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "Site creation returned an invalid site snapshot for invalid-site"
             );
 
@@ -427,7 +427,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 (globalThis as any).electronAPI.sites.getSites
             ).mockResolvedValueOnce([invalidSnapshot]);
 
-            await expect(SiteService.getSites()).rejects.toThrowError(
+            await expect(SiteService.getSites()).rejects.toThrow(
                 "getSites returned invalid site snapshot data (indices: 0)"
             );
 
@@ -467,7 +467,7 @@ describe("SiteService Critical Coverage Tests", () => {
 
             await expect(
                 SiteService.updateSite("site-123", { name: "Broken" })
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "Site update returned an invalid site snapshot for site-123"
             );
 
@@ -490,7 +490,7 @@ describe("SiteService Critical Coverage Tests", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
 
             // Act & Assert
-            await expect(SiteService.initialize()).rejects.toThrowError(
+            await expect(SiteService.initialize()).rejects.toThrow(
                 "API unavailable"
             );
             expect(logger.error).toHaveBeenCalledWith(
@@ -589,7 +589,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(longSiteId, longMonitorId)
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 `Monitor removal returned an invalid site snapshot for ${longSiteId}/${longMonitorId}`
             );
 

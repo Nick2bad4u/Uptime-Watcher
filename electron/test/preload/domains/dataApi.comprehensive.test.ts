@@ -108,7 +108,7 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.saveSqliteBackup()).rejects.toThrowError(
+            await expect(dataApi.saveSqliteBackup()).rejects.toThrow(
                 "save-failed"
             );
         });
@@ -139,7 +139,7 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.downloadSqliteBackup()).rejects.toThrowError(
+            await expect(dataApi.downloadSqliteBackup()).rejects.toThrow(
                 "unable to create backup"
             );
         });
@@ -170,7 +170,7 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.exportData()).rejects.toThrowError(
+            await expect(dataApi.exportData()).rejects.toThrow(
                 "export-failed"
             );
         });
@@ -202,7 +202,7 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.importData("{}")).rejects.toThrowError(
+            await expect(dataApi.importData("{}")).rejects.toThrow(
                 "invalid export signature"
             );
         });
@@ -245,7 +245,7 @@ describe("dataApi", () => {
                     buffer: new ArrayBuffer(10),
                     fileName: "restore.db",
                 })
-            ).rejects.toThrowError("restore-failed");
+            ).rejects.toThrow("restore-failed");
         });
     });
 });

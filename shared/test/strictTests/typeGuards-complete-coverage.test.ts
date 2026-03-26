@@ -1229,43 +1229,43 @@ describe("TypeGuards - Complete Function Coverage", () => {
 
             for (const value of testValues) {
                 // Each type guard should handle these values consistently and return boolean
-                expect(() => isObject(value)).not.toThrowError();
+                expect(() => isObject(value)).not.toThrow();
                 expect(typeof isObject(value)).toBe("boolean");
 
-                expect(() => isNumber(value)).not.toThrowError();
+                expect(() => isNumber(value)).not.toThrow();
                 expect(typeof isNumber(value)).toBe("boolean");
 
-                expect(() => isString(value)).not.toThrowError();
+                expect(() => isString(value)).not.toThrow();
                 expect(typeof isString(value)).toBe("boolean");
 
-                expect(() => isBoolean(value)).not.toThrowError();
+                expect(() => isBoolean(value)).not.toThrow();
                 expect(typeof isBoolean(value)).toBe("boolean");
 
-                expect(() => isArray(value)).not.toThrowError();
+                expect(() => isArray(value)).not.toThrow();
                 expect(typeof isArray(value)).toBe("boolean");
 
-                expect(() => isDate(value)).not.toThrowError();
+                expect(() => isDate(value)).not.toThrow();
                 expect(typeof isDate(value)).toBe("boolean");
 
-                expect(() => isError(value)).not.toThrowError();
+                expect(() => isError(value)).not.toThrow();
                 expect(typeof isError(value)).toBe("boolean");
 
-                expect(() => isFunction(value)).not.toThrowError();
+                expect(() => isFunction(value)).not.toThrow();
                 expect(typeof isFunction(value)).toBe("boolean");
 
-                expect(() => isFiniteNumber(value)).not.toThrowError();
+                expect(() => isFiniteNumber(value)).not.toThrow();
                 expect(typeof isFiniteNumber(value)).toBe("boolean");
 
-                expect(() => isNonNegativeNumber(value)).not.toThrowError();
+                expect(() => isNonNegativeNumber(value)).not.toThrow();
                 expect(typeof isNonNegativeNumber(value)).toBe("boolean");
 
-                expect(() => isPositiveNumber(value)).not.toThrowError();
+                expect(() => isPositiveNumber(value)).not.toThrow();
                 expect(typeof isPositiveNumber(value)).toBe("boolean");
 
-                expect(() => isValidPort(value)).not.toThrowError();
+                expect(() => isValidPort(value)).not.toThrow();
                 expect(typeof isValidPort(value)).toBe("boolean");
 
-                expect(() => isValidTimestamp(value)).not.toThrowError();
+                expect(() => isValidTimestamp(value)).not.toThrow();
                 expect(typeof isValidTimestamp(value)).toBe("boolean");
             }
         });

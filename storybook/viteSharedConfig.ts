@@ -248,20 +248,9 @@ export const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
  *
  * @returns Configuration object for the React Vite plugin.
  */
-export const createStorybookReactPluginOptions = (): ReactPluginOptions => {
-    const compilerPlugins = loadReactCompilerPlugins();
-
-    return compilerPlugins.length > 0
-        ? {
-              babel: {
-                  plugins: Array.from(compilerPlugins),
-              },
-              jsxRuntime: "automatic",
-          }
-        : {
-              jsxRuntime: "automatic",
-          };
-};
+export const createStorybookReactPluginOptions = (): ReactPluginOptions => ({
+        jsxRuntime: "automatic",
+    });
 
 /**
  * Builds the shared Vite plugin array used by Storybook tooling.

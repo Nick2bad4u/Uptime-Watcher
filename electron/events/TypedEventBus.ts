@@ -348,7 +348,7 @@ export class TypedEventBus<
             await this.processMiddleware(event, data, correlationId);
 
             // Emit the actual event with enhanced data
-            const enhancedData = this.createEnhancedData<EventMap[K]>(data, {
+            const enhancedData = this.createEnhancedData(data, {
                 busId: this.busId,
                 correlationId,
                 eventName,

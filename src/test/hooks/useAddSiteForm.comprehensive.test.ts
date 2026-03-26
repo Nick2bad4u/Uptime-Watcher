@@ -934,7 +934,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             const { result } = renderHook(() => useAddSiteForm());
 
             // Ensure validation doesn't break with default empty values
-            expect(() => result.current.isFormValid()).not.toThrowError();
+            expect(() => result.current.isFormValid()).not.toThrow();
         });
 
         it("should maintain form validation callback stability", async ({

@@ -981,34 +981,34 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                         // All safe conversion functions should handle these gracefully
                         expect(() =>
                             safeNumberConversion(edgeCase, fallback)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParseFloat(edgeCase, fallback)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParseInt(edgeCase, Math.floor(fallback))
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParseCheckInterval(edgeCase, 60_000)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParsePercentage(edgeCase, 50)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParsePort(edgeCase, 8080)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParsePositiveInt(edgeCase, 1)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParseRetryAttempts(edgeCase, 3)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParseTimeout(edgeCase, 5000)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                         expect(() =>
                             safeParseTimestamp(edgeCase, Date.now())
-                        ).not.toThrowError();
+                        ).not.toThrow();
                     }
                 )
             );

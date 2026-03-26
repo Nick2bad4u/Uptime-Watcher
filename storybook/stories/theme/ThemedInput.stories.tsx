@@ -23,7 +23,7 @@ const meta: Meta<typeof ThemedInput> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 type ThemedInputProps = ComponentProps<typeof ThemedInput>;
 
 type ControlledInputProps = ThemedInputProps & {
@@ -41,7 +41,7 @@ const ControlledInputStory = (props: ControlledInputProps): ReactElement => {
         value = "",
         ...rest
     } = props;
-    const [currentValue, setCurrentValue] = useState<string | number>(value);
+    const [currentValue, setCurrentValue] = useState(value);
 
     return (
         <div

@@ -80,7 +80,7 @@ describe("DataService IPC payload budgets", () => {
                 buffer: new ArrayBuffer(11),
                 fileName: "restore.sqlite",
             })
-        ).rejects.toThrowError(/too large/u);
+        ).rejects.toThrow(/too large/u);
 
         expect(restoreSqliteBackupMock).not.toHaveBeenCalled();
     });
@@ -91,13 +91,13 @@ describe("DataService IPC payload budgets", () => {
                 buffer: {} as unknown as ArrayBuffer,
                 fileName: "restore.sqlite",
             })
-        ).rejects.toThrowError(/ArrayBuffer/u);
+        ).rejects.toThrow(/ArrayBuffer/u);
 
         expect(restoreSqliteBackupMock).not.toHaveBeenCalled();
     });
 
     it("rejects JSON imports larger than MAX_IPC_JSON_IMPORT_BYTES", async () => {
-        await expect(DataService.importData("abcd")).rejects.toThrowError(
+        await expect(DataService.importData("abcd")).rejects.toThrow(
             /too large/u
         );
 

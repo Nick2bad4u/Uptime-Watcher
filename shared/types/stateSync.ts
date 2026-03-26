@@ -32,7 +32,7 @@ export type SiteIdentifierSnapshot = Pick<Site, "identifier">;
  */
 export const siteIdentifierSnapshotSchema: z.ZodType<SiteIdentifierSnapshot> = z
     .object({
-        identifier: z.string().min(1),
+        identifier: z.string().trim().min(1),
     })
     .strict();
 
@@ -246,7 +246,7 @@ export interface SiteSyncDelta {
 const siteSyncDeltaInternalSchema: z.ZodType<SiteSyncDelta> = z
     .object({
         addedSites: stateSyncSitesSchema,
-        removedSiteIdentifiers: z.array(z.string().min(1)),
+        removedSiteIdentifiers: z.array(z.string().trim().min(1)),
         updatedSites: stateSyncSitesSchema,
     })
     .strict();

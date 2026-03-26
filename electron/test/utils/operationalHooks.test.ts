@@ -115,7 +115,7 @@ describe("Operational Hooks", () => {
                     initialDelay: 1,
                     emitEvents: false,
                 })
-            ).rejects.toThrowError("Persistent failure");
+            ).rejects.toThrow("Persistent failure");
 
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
@@ -146,7 +146,7 @@ describe("Operational Hooks", () => {
                     emitEvents: false,
                     failureLogLevel: () => "warn",
                 })
-            ).rejects.toThrowError("cancelled");
+            ).rejects.toThrow("cancelled");
 
             expect(warnSpy).toHaveBeenCalledWith(
                 expect.stringContaining("custom-log-level"),

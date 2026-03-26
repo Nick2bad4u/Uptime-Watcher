@@ -314,7 +314,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         validator,
                         registeredHandlers
                     );
-                }).not.toThrowError();
+                }).not.toThrow();
 
                 expect(mockIpcMain.handle).toHaveBeenCalledWith(
                     channel,
@@ -401,7 +401,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                         validator,
                         registeredHandlers
                     );
-                }).not.toThrowError();
+                }).not.toThrow();
             }
 
             expect(mockIpcMain.handle).toHaveBeenCalledTimes(
@@ -467,7 +467,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                             eventData
                         );
                     }
-                }).not.toThrowError();
+                }).not.toThrow();
 
                 // Reset for other tests
                 mockBrowserWindow.webContents.isDestroyed.mockReturnValue(
@@ -488,7 +488,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     if (webContents && !webContents.isDestroyed()) {
                         webContents.send(channel, {});
                     }
-                }).not.toThrowError();
+                }).not.toThrow();
 
                 // Restore
                 mockBrowserWindow.webContents = originalWebContents;

@@ -197,7 +197,7 @@ function removeUndefinedEntries(value: UnknownRecord): UnknownRecord {
     return result;
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- Returns a JsonValue union (object/array/primitive) by design.
+ 
 function toJsonValue(value: unknown): JsonValue {
     return jsonValueSchema.parse(value);
 }

@@ -506,7 +506,7 @@ describe("StateSyncService", () => {
             const initialErrorCount = mockLogger.error.mock.calls.length;
             const cleanup = await StateSyncService.onStateSyncEvent(callback);
 
-            expect(() => cleanup()).not.toThrowError();
+            expect(() => cleanup()).not.toThrow();
 
             const cleanupErrorCall =
                 mockLogger.error.mock.calls[initialErrorCount];

@@ -71,7 +71,7 @@ describe(validateServicePayload, () => {
                     diagnostics,
                 }
             )
-        ).toThrowError(/returned invalid payload/);
+        ).toThrow(/returned invalid payload/);
 
         try {
             validateServicePayload(

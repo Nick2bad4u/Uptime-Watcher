@@ -67,6 +67,7 @@ export interface EventMetadata {
  */
 export const correlationIdSchema: z.ZodType<CorrelationId> = z
     .string()
+.trim()
     .min(1)
     .pipe(
         z.custom<CorrelationId>(
@@ -80,9 +81,9 @@ export const correlationIdSchema: z.ZodType<CorrelationId> = z
 
 export const eventMetadataSchema: z.ZodType<EventMetadata> = z
     .object({
-        busId: z.string().min(1),
+        busId: z.string().trim().min(1),
         correlationId: correlationIdSchema,
-        eventName: z.string().min(1),
+        eventName: z.string().trim().min(1),
         timestamp: z.int().nonnegative(),
     })
     .strict();
@@ -237,7 +238,7 @@ const bulkStateSyncEventDataSchema = baseEventDataSchema
         action: z.literal(STATE_SYNC_ACTION.BULK_SYNC),
         revision: z.int().nonnegative(),
         siteCount: z.int().nonnegative(),
-        siteIdentifier: z.string().min(1).optional(),
+        siteIdentifier: z.string().trim().min(1).optional(),
         sites: stateSyncSitesArraySchema,
         source: stateSyncSourceSchema,
         truncated: z.boolean().optional(),
@@ -269,7 +270,7 @@ const updateStateSyncEventDataSchema = baseEventDataSchema
         action: z.literal(STATE_SYNC_ACTION.UPDATE),
         delta: siteSyncDeltaSchema,
         revision: z.int().nonnegative(),
-        siteIdentifier: z.string().min(1).optional(),
+        siteIdentifier: z.string().trim().min(1).optional(),
         source: stateSyncSourceSchema,
         truncated: z.literal(false).optional(),
     })
@@ -294,7 +295,7 @@ const deleteStateSyncEventDataSchema = baseEventDataSchema
         action: z.literal(STATE_SYNC_ACTION.DELETE),
         delta: siteSyncDeltaSchema,
         revision: z.int().nonnegative(),
-        siteIdentifier: z.string().min(1).optional(),
+        siteIdentifier: z.string().trim().min(1).optional(),
         source: stateSyncSourceSchema,
         truncated: z.literal(false).optional(),
     })

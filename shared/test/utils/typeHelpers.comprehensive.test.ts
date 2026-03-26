@@ -58,7 +58,7 @@ describe("Shared Type Helpers", () => {
             const validator = (val: unknown): val is { data: string } =>
                 typeof val === "object" && val !== null && "data" in val;
 
-            expect(() => castIpcResponse(response, validator)).toThrowError(
+            expect(() => castIpcResponse(response, validator)).toThrow(
                 "IPC response validation failed"
             );
         });
@@ -236,10 +236,10 @@ describe("Shared Type Helpers", () => {
                 typeof val === "string";
             expect(() =>
                 validateAndConvert(123, isStringValidator)
-            ).toThrowError("Type validation failed");
+            ).toThrow("Type validation failed");
             expect(() =>
                 validateAndConvert(null, isStringValidator)
-            ).toThrowError("Type validation failed");
+            ).toThrow("Type validation failed");
         });
 
         it("should throw with custom error message", async ({
@@ -254,7 +254,7 @@ describe("Shared Type Helpers", () => {
                 typeof val === "string";
             expect(() =>
                 validateAndConvert(123, isStringValidator, "Custom error")
-            ).toThrowError("Custom error");
+            ).toThrow("Custom error");
         });
     });
 

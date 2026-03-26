@@ -452,7 +452,7 @@ describe("DatabaseManager - Coverage Tests", () => {
 
             await expect(
                 databaseManager.initialize()
-            ).resolves.not.toThrowError();
+            ).resolves.not.toThrow();
         });
 
         it("should refresh sites", async ({ annotate }) => {
@@ -534,7 +534,7 @@ describe("DatabaseManager - Coverage Tests", () => {
                 new Error("Database error")
             );
 
-            await expect(databaseManager.refreshSites()).rejects.toThrowError(
+            await expect(databaseManager.refreshSites()).rejects.toThrow(
                 "Database error"
             );
         });
@@ -572,7 +572,7 @@ describe("DatabaseManager - Coverage Tests", () => {
             // Reset settings swallows errors, so it should resolve but not throw
             await expect(
                 databaseManager.resetSettings()
-            ).resolves.not.toThrowError();
+            ).resolves.not.toThrow();
         });
     });
 

@@ -103,7 +103,7 @@ describe("enhancedMonitorChecker helper modules", () => {
                     site,
                     signal: new AbortController().signal,
                 })
-            ).rejects.toThrowError(/no monitor service registered/i);
+            ).rejects.toThrow(/no monitor service registered/i);
         });
     });
 

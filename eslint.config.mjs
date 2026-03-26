@@ -61,7 +61,7 @@ import eslintPluginEslintPlugin from "eslint-plugin-eslint-plugin";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import etc from "eslint-plugin-etc";
 import { plugin as ex } from "eslint-plugin-exception-handling";
-import progressRaw from "eslint-plugin-file-progress";
+import progress from "eslint-plugin-file-progress-2";
 import pluginFilenameExport from "eslint-plugin-filename-export";
 import pluginFormatSQL from "eslint-plugin-format-sql";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -309,9 +309,6 @@ const pluginNoExplicitTypeExports = fixupPluginRules(
 const pluginRegexLook = fixupPluginRules(pluginRegexLookRaw);
 const nounsanitized = fixupPluginRules(nounsanitizedRaw);
 const pluginPreferArrow = fixupPluginRules(pluginPreferArrowRaw);
-const progress = fixupPluginRules(progressRaw);
-// @ts-expect-error -- eslint-plugin-react typings are not yet aligned with
-// @eslint/compat's wrapped plugin type shape.
 const pluginReact = fixupPluginRules(pluginReactRaw);
 const pluginSecurity = fixupPluginRules(pluginSecurityRaw);
 const pluginSortClassMembers = fixupPluginRules(pluginSortClassMembersRaw);
@@ -411,8 +408,13 @@ const fileProgressOverridesConfig = {
     },
     settings: {
         progress: {
-            hide: IS_CI || DISABLE_PROGRESS,
-            hideFileName: HIDE_PROGRESS_FILENAMES,
+            detailedSuccess: true, // Show multi-line final summary (duration, file count, exit code)
+            failureMark: "✖", // Custom mark used for failure completion
+            hide: IS_CI || DISABLE_PROGRESS, // Hide progress output (useful in CI)
+            hideFileName: HIDE_PROGRESS_FILENAMES, // Show generic "Linting..." instead of file names
+            prefixMark: "•", // Marker after plugin name prefix in progress lines
+            spinnerStyle: "dots", // Line | dots | arc | bounce | clock
+            successMark: "✔", // Custom mark used for success completion
         },
     },
 };

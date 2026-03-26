@@ -24,11 +24,11 @@ export interface GoogleDriveTokens {
 
 const googleTokenSchema: z.ZodType<GoogleDriveTokens> = z
     .object({
-        accessToken: z.string().min(1),
+        accessToken: z.string().trim().min(1),
         expiresAt: z.int().nonnegative(),
-        refreshToken: z.string().min(1),
-        scope: z.string().optional(),
-        tokenType: z.string().optional(),
+        refreshToken: z.string().trim().min(1),
+        scope: z.string().trim().optional(),
+        tokenType: z.string().trim().optional(),
     })
     .strict();
 

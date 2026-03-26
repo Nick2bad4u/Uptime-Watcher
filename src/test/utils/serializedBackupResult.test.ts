@@ -36,7 +36,7 @@ describe(parseSerializedDatabaseBackupResult, () => {
                 fileName: "broken.sqlite",
                 metadata: {},
             });
-        }).toThrowError(INVALID_SERIALIZED_BACKUP_DATA_MESSAGE);
+        }).toThrow(INVALID_SERIALIZED_BACKUP_DATA_MESSAGE);
     });
 
     it("throws when metadata size does not match buffer length", () => {
@@ -55,6 +55,6 @@ describe(parseSerializedDatabaseBackupResult, () => {
 
         expect(() => {
             parseSerializedDatabaseBackupResult(payload);
-        }).toThrowError(INVALID_SERIALIZED_BACKUP_DATA_MESSAGE);
+        }).toThrow(INVALID_SERIALIZED_BACKUP_DATA_MESSAGE);
     });
 });

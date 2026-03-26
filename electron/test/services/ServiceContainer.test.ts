@@ -56,12 +56,12 @@ describe(ServiceContainer, () => {
             await annotate("Component: ServiceContainer", "component");
 
             // Test should access simpler services that don't require dependencies first
-            expect(() => container.getDatabaseService()).not.toThrowError();
-            expect(() => container.getNotificationService()).not.toThrowError();
+            expect(() => container.getDatabaseService()).not.toThrow();
+            expect(() => container.getNotificationService()).not.toThrow();
 
             // Complex services should work after initializing dependencies
             container.getSiteManager();
-            expect(() => container.getUptimeOrchestrator()).not.toThrowError();
+            expect(() => container.getUptimeOrchestrator()).not.toThrow();
         });
         it("should handle custom configuration with debug logging enabled", async ({
             task,
@@ -82,16 +82,16 @@ describe(ServiceContainer, () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
                 customContainer.getDatabaseService()
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 customContainer.getNotificationService()
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
                 customContainer.getUptimeOrchestrator()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
         it("should handle partial configuration", async ({
             task,
@@ -108,16 +108,16 @@ describe(ServiceContainer, () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
                 customContainer.getDatabaseService()
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 customContainer.getNotificationService()
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
                 customContainer.getUptimeOrchestrator()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
         it("should handle notification config only", async ({
             task,
@@ -137,16 +137,16 @@ describe(ServiceContainer, () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
                 customContainer.getDatabaseService()
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 customContainer.getNotificationService()
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
                 customContainer.getUptimeOrchestrator()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
     describe("Core Service Getters", () => {
@@ -436,16 +436,16 @@ describe(ServiceContainer, () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
                 customContainer.getDatabaseService()
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 customContainer.getNotificationService()
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
                 customContainer.getUptimeOrchestrator()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
         it("should handle configuration with only enableDebugLogging false", async ({
             task,
@@ -462,16 +462,16 @@ describe(ServiceContainer, () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
                 customContainer.getDatabaseService()
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 customContainer.getNotificationService()
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Complex services should work after initializing dependencies
             customContainer.getSiteManager();
             expect(() =>
                 customContainer.getUptimeOrchestrator()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
         it("should handle configuration with all notification options disabled", async ({
             task,
@@ -491,7 +491,7 @@ describe(ServiceContainer, () => {
             const customContainer = ServiceContainer.getInstance(config);
             expect(() =>
                 customContainer.getNotificationService()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
         it("should handle undefined configuration", async ({
             task,
@@ -505,7 +505,7 @@ describe(ServiceContainer, () => {
             const customContainer = ServiceContainer.getInstance(undefined);
             expect(() =>
                 customContainer.getNotificationService()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
     describe("Service Interdependencies", () => {
@@ -553,9 +553,9 @@ describe(ServiceContainer, () => {
 
             // Test complex services - if they work without throwing, that's good too!
             // These services may have been fixed with the interface unification
-            expect(() => container.getIpcService()).not.toThrowError();
-            expect(() => container.getMonitorManager()).not.toThrowError();
-            expect(() => container.getUptimeOrchestrator()).not.toThrowError();
+            expect(() => container.getIpcService()).not.toThrow();
+            expect(() => container.getMonitorManager()).not.toThrow();
+            expect(() => container.getUptimeOrchestrator()).not.toThrow();
         });
     });
     describe("Debugging and Monitoring Features", () => {
@@ -595,7 +595,7 @@ describe(ServiceContainer, () => {
             expect(() => {
                 debugContainer.getDatabaseService();
                 debugContainer.getNotificationService();
-            }).not.toThrowError();
+            }).not.toThrow();
         });
     });
 });

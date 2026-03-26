@@ -140,7 +140,7 @@ describe("NotificationPreferenceService (strict coverage)", () => {
 
         await expect(
             NotificationPreferenceService.updatePreferences(preferences)
-        ).rejects.toThrowError();
+        ).rejects.toThrow();
         expect(updateBridgeSpy).not.toHaveBeenCalled();
     });
 });

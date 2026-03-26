@@ -118,7 +118,7 @@ describe("Additional Uncovered Lines Tests", () => {
                 const { downloadFile } =
                     await import("../stores/sites/utils/fileDownload");
                 downloadFile({ buffer, fileName });
-            }).rejects.toThrowError("Failed to create object URL");
+            }).rejects.toThrow("Failed to create object URL");
         });
 
         it("should handle appendChild error with fallback", async ({
@@ -184,7 +184,7 @@ describe("Additional Uncovered Lines Tests", () => {
                 const { downloadFile } =
                     await import("../stores/sites/utils/fileDownload");
                 downloadFile({ buffer, fileName });
-            }).rejects.toThrowError("File download failed");
+            }).rejects.toThrow("File download failed");
         });
     });
 
@@ -209,7 +209,7 @@ describe("Additional Uncovered Lines Tests", () => {
             // This test verifies error handling in updateSiteHistory
             expect(() => {
                 mockUpdateSiteHistory();
-            }).toThrowError("Network error");
+            }).toThrow("Network error");
         });
     });
 

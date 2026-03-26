@@ -50,4 +50,19 @@ describe("cloudSyncManifest", () => {
         // Oldest should be trimmed.
         expect(parsed.devices["device-0"]).toBeUndefined();
     });
+
+    it("does not normalize whitespace-padded device IDs into valid IDs", () => {
+        const parsed = parseCloudSyncManifest({
+            devices: {
+                "device-a": { compactedUpToOpId: 2, lastSeenAt: 20 },
+                " device-a ": { compactedUpToOpId: 999, lastSeenAt: 999 },
+                "\tdevice-b\t": { compactedUpToOpId: 7, lastSeenAt: 70 },
+            },
+            manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        });
+
+        expect(Object.keys(parsed.devices)).toEqual(["device-a"]);
+        expect(parsed.devices["device-a"]?.compactedUpToOpId).toBe(2);
+    });
 });

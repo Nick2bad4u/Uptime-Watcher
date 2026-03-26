@@ -413,7 +413,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                     result.endsWith("]") &&
                     result !== "[Complex Object]"
                 ) {
-                    expect(() => JSON.parse(result)).not.toThrowError();
+                    expect(() => JSON.parse(result)).not.toThrow();
                 }
             }
         );
@@ -426,7 +426,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
 
                 // Should either be a JSON string or fallback
                 if (result.startsWith("{") && result.endsWith("}")) {
-                    expect(() => JSON.parse(result)).not.toThrowError();
+                    expect(() => JSON.parse(result)).not.toThrow();
                 }
             }
         );
@@ -451,7 +451,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(() => {
                 const result = safeStringify(input);
                 expect(typeof result).toBe("string");
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         test.prop([fc.array(fc.jsonValue(), { minLength: 0, maxLength: 10 })])(

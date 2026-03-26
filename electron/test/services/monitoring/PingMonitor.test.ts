@@ -219,7 +219,7 @@ describe(PingMonitor, () => {
                 type: "http" as any,
             });
 
-            await expect(pingMonitor.check(httpMonitor)).rejects.toThrowError(
+            await expect(pingMonitor.check(httpMonitor)).rejects.toThrow(
                 "PingMonitor cannot handle monitor type: http"
             );
             expect(mockPerformPingCheckWithRetry).not.toHaveBeenCalled();
@@ -323,7 +323,7 @@ describe(PingMonitor, () => {
 
             const monitor = createMockPingMonitor();
 
-            await expect(pingMonitor.check(monitor)).rejects.toThrowError(
+            await expect(pingMonitor.check(monitor)).rejects.toThrow(
                 "Network unreachable"
             );
         });

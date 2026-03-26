@@ -95,7 +95,7 @@ describe("useSiteMonitoring edge cases", () => {
 
         await expect(
             actions.checkSiteNow("site-edge", "monitor-edge")
-        ).rejects.toThrowError(failure);
+        ).rejects.toThrow(failure);
 
         expect(ensureErrorMock).toHaveBeenCalledWith(failure);
         expect(logStoreActionMock).toHaveBeenCalledWith(
@@ -312,7 +312,7 @@ describe("useSiteMonitoring edge cases", () => {
 
             await vi.advanceTimersByTimeAsync(75);
 
-            await expect(pending).rejects.toThrowError(failure);
+            await expect(pending).rejects.toThrow(failure);
 
             expect(registerMonitoringLock).toHaveBeenCalledWith(
                 site.identifier,

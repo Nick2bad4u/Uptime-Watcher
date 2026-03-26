@@ -140,7 +140,7 @@ describe("shared/utils/retry", () => {
                 maxRetries: 5,
                 shouldRetry,
             })
-        ).rejects.toThrowError("do-not-retry");
+        ).rejects.toThrow("do-not-retry");
 
         expect(operation).toHaveBeenCalledTimes(1);
         expect(shouldRetry).toHaveBeenCalledTimes(1);
@@ -165,7 +165,7 @@ describe("shared/utils/retry", () => {
                 // Runtime contract: non-positive maxRetries is rejected.
                 maxRetries: 0,
             })
-        ).rejects.toThrowError(/maxretries must be a positive number/i);
+        ).rejects.toThrow(/maxretries must be a positive number/i);
 
         expect(operation).not.toHaveBeenCalled();
     });

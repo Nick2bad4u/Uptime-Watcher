@@ -445,7 +445,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                     identifier: "error-site",
                     name: "Error Site",
                 })
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
         });
 
         it("should handle missing site selections gracefully", () => {

@@ -70,7 +70,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrowError(/exceeds size limit/i);
+        ).rejects.toThrow(/exceeds size limit/i);
     });
 
     it("rejects operation objects with a line that exceeds the max line length", async () => {
@@ -95,7 +95,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrowError(/exceeds max length/i);
+        ).rejects.toThrow(/exceeds max length/i);
     });
 
     it("rejects operations keys containing traversal segments", async () => {
@@ -107,7 +107,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/../evil.ndjson")
-        ).rejects.toThrowError(/invalid/i);
+        ).rejects.toThrow(/invalid/i);
     });
 
     it("rejects operations keys with an invalid filename format", async () => {
@@ -121,7 +121,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.readOperationsObject(
                 "sync/devices/a/ops/not-a-valid-name.ndjson"
             )
-        ).rejects.toThrowError(/expected/i);
+        ).rejects.toThrow(/expected/i);
     });
 
     it("rejects operations keys containing backslashes", async () => {
@@ -135,7 +135,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.readOperationsObject(
                 String.raw`sync\devices\a\ops\1-1-1.ndjson`
             )
-        ).rejects.toThrowError(/backslashes/i);
+        ).rejects.toThrow(/backslashes/i);
     });
 
     it("rejects operations keys containing ':' tokens", async () => {
@@ -149,7 +149,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.readOperationsObject(
                 "sync/devices/a:evil/ops/1-1-1.ndjson"
             )
-        ).rejects.toThrowError(/tokens are not allowed|must not contain/i);
+        ).rejects.toThrow(/tokens are not allowed|must not contain/i);
     });
 
     it("rejects appendOperations when deviceId contains path separators", async () => {
@@ -176,7 +176,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.appendOperations("a/b", [operation])
-        ).rejects.toThrowError(/path separators/i);
+        ).rejects.toThrow(/path separators/i);
     });
 
     it("rejects appendOperations when deviceId contains ':'", async () => {
@@ -203,7 +203,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.appendOperations("a:bad", [operation])
-        ).rejects.toThrowError(/must not contain ':'/i);
+        ).rejects.toThrow(/must not contain ':'/i);
     });
 
     it("parses operation objects with CRLF newlines", async () => {
@@ -263,7 +263,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrowError(/at line 2:/i);
+        ).rejects.toThrow(/at line 2:/i);
     });
 
     it("rejects operation objects that contain operations for a different deviceId", async () => {
@@ -288,7 +288,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrowError(/unexpected deviceid/i);
+        ).rejects.toThrow(/unexpected deviceid/i);
     });
 
     it("rejects operation objects whose opId range does not match the key metadata", async () => {
@@ -313,7 +313,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrowError(/opid range is inconsistent/i);
+        ).rejects.toThrow(/opid range is inconsistent/i);
     });
 
     it("rejects operation objects containing invalid UTF-8", async () => {
@@ -330,7 +330,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrowError(/invalid utf-8/i);
+        ).rejects.toThrow(/invalid utf-8/i);
     });
 });
 
@@ -371,7 +371,7 @@ describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
             transport.readSnapshot(
                 `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
             )
-        ).rejects.toThrowError(/invalid utf-8/i);
+        ).rejects.toThrow(/invalid utf-8/i);
     });
 
     it("rejects oversized snapshots", async () => {
@@ -391,7 +391,7 @@ describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
                 transport.readSnapshot(
                     `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
                 )
-            ).rejects.toThrowError(/exceeds size limit/i);
+            ).rejects.toThrow(/exceeds size limit/i);
         } finally {
             // eslint-disable-next-line require-atomic-updates -- test-only env restore
             process.env[envKey] = original;
@@ -455,7 +455,7 @@ describe("ProviderCloudSyncTransport snapshot key validation", () => {
 
         await expect(
             transport.readSnapshot("sync/snapshots/999/1.json")
-        ).rejects.toThrowError(/invalid snapshot key/i);
+        ).rejects.toThrow(/invalid snapshot key/i);
     });
 
     it("accepts snapshot keys matching schema version", async () => {

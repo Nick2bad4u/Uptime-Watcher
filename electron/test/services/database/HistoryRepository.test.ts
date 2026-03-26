@@ -245,7 +245,7 @@ describe(HistoryRepository, () => {
 
             await expect(
                 historyRepository.bulkInsert(monitorId, historyEntries)
-            ).rejects.toThrowError("SQL error");
+            ).rejects.toThrow("SQL error");
 
             expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
         });
@@ -1133,11 +1133,11 @@ describe(HistoryRepository, () => {
                                     status: "up",
                                     responseTime: 200,
                                 })
-                            ).rejects.toThrowError();
+                            ).rejects.toThrow();
 
                             await expect(
                                 historyRepository.findByMonitorId(monitorId)
-                            ).rejects.toThrowError();
+                            ).rejects.toThrow();
                         }
                     )
                 );

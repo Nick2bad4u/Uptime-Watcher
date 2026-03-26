@@ -31,7 +31,7 @@ import { isValidHost } from "./validatorUtils";
  */
 const statusHistorySchema = z
     .object({
-        details: z.string().optional(),
+        details: z.string().trim().optional(),
         responseTime: z.number(),
         status: z.enum(statusHistoryEnumValues),
         timestamp: z.number(),
@@ -97,7 +97,7 @@ const hostValidationSchema = z
  */
 const baseMonitorSchema: BaseMonitorSchemaType = z
     .object({
-        activeOperations: z.array(z.string()).optional(),
+        activeOperations: z.array(z.string().trim()).optional(),
         checkInterval: z
             .number()
             .min(
@@ -208,6 +208,7 @@ const createProtocolUrlSchema = (
         .string({
             error: "URL is required",
         })
+.trim()
         .min(1, "URL is required")
         .refine(
             (value): boolean => isUrlWithAllowedProtocols(value, protocols),
@@ -282,6 +283,7 @@ const isValidHeaderName = (value: string): boolean => {
 /** Shared schema enforcing {@link isValidHeaderName} constraints. */
 const httpHeaderNameSchema = z
     .string()
+.trim()
     .min(1, "Header name is required")
     .max(256, "Header name must be 256 characters or fewer")
     .refine(isValidHeaderName, {
@@ -291,6 +293,7 @@ const httpHeaderNameSchema = z
 /** Shared schema constraining monitored header values. */
 const httpHeaderValueSchema = z
     .string()
+.trim()
     .min(1, "Expected header value is required")
     .max(2048, "Expected header value must be 2048 characters or fewer")
     .refine((value) => value.trim().length > 0, {
@@ -326,6 +329,7 @@ const isValidJsonPath = (value: string): boolean =>
 /** Shared schema validating JSON path configuration fields. */
 const jsonPathSchema = z
     .string()
+.trim()
     .min(1, "JSON path is required")
     .max(512, "JSON path must be 512 characters or fewer")
     .refine(isValidJsonPath, {
@@ -341,6 +345,7 @@ const isValidDotPath = (value: string): boolean =>
 const createDotPathSchema = (fieldLabel: string): z.ZodString =>
     z
         .string()
+.trim()
         .min(1, `${fieldLabel} is required`)
         .max(256, `${fieldLabel} must be 256 characters or fewer`)
         .refine(isValidDotPath, {
@@ -352,6 +357,7 @@ const createDotPathSchema = (fieldLabel: string): z.ZodString =>
  */
 const edgeLocationListSchema = z
     .string()
+.trim()
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
         const entries = value

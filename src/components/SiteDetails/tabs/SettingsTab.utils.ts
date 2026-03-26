@@ -103,7 +103,7 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
  * Hook that resolves the identifier label for the currently selected monitor.
  */
 export function useIdentifierLabel(selectedMonitor: Monitor): string {
-    const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
+    const [label, setLabel] = useState(UiDefaults.loadingLabel);
 
     useEffect(
         function loadLabelWithCleanup() {

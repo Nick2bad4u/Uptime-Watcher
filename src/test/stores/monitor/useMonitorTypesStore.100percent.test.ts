@@ -210,7 +210,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await act(async () => {
                 await expect(
                     result.current.formatMonitorDetail("http", "original")
-                ).rejects.toThrowError("API error");
+                ).rejects.toThrow("API error");
             });
 
             // Test formatMonitorTitleSuffix with API error - should throw
@@ -225,7 +225,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                         "http",
                         {} as Monitor
                     )
-                ).rejects.toThrowError("API error");
+                ).rejects.toThrow("API error");
             });
         });
 
@@ -259,7 +259,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 await act(async () => {
                     await expect(
                         result.current.loadMonitorTypes()
-                    ).rejects.toThrowError("invalid payload");
+                    ).rejects.toThrow("invalid payload");
                 });
 
                 expect(result.current.monitorTypes).toEqual([]);
@@ -345,7 +345,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             await act(async () => {
                 await expect(
                     result.current.loadMonitorTypes()
-                ).rejects.toThrowError("invalid payload");
+                ).rejects.toThrow("invalid payload");
             });
 
             expect(result.current.monitorTypes).toEqual([]);

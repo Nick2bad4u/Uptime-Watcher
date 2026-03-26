@@ -184,7 +184,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await expect(
                 createAbortableOperation(operation, { cleanup })
-            ).rejects.toThrowError("Test error");
+            ).rejects.toThrow("Test error");
 
             expect(cleanup).toHaveBeenCalledTimes(1);
         });
@@ -231,7 +231,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
                 name: "AbortError",
             });
 
-            await expect(sleep(1000, controller.signal)).rejects.toThrowError(
+            await expect(sleep(1000, controller.signal)).rejects.toThrow(
                 "Sleep was aborted"
             );
         });
@@ -244,7 +244,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
             vi.advanceTimersByTime(500);
             controller.abort();
 
-            await expect(promise).rejects.toThrowError("Sleep was aborted");
+            await expect(promise).rejects.toThrow("Sleep was aborted");
         });
 
         it("should work without signal parameter", async () => {
@@ -310,7 +310,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await Promise.all([
                 vi.runAllTimersAsync(), // Run all timers to completion
-                expect(promise).rejects.toThrowError("Always fails"),
+                expect(promise).rejects.toThrow("Always fails"),
             ]);
             expect(operation).toHaveBeenCalledTimes(3); // Initial + 2 retries
         });
@@ -330,7 +330,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await Promise.all([
                 vi.runAllTimersAsync(),
-                expect(promise).rejects.toThrowError("Operation was aborted"),
+                expect(promise).rejects.toThrow("Operation was aborted"),
             ]);
         });
 
@@ -343,7 +343,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
                 retryWithAbort(operation, {
                     signal: controller.signal,
                 })
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
 
             expect(operation).not.toHaveBeenCalled();
         });
@@ -359,7 +359,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await Promise.all([
                 vi.runAllTimersAsync(), // Run all timers to completion
-                expect(promise).rejects.toThrowError("Fails"),
+                expect(promise).rejects.toThrow("Fails"),
             ]);
             expect(operation).toHaveBeenCalledTimes(3); // Initial + 2 retries
         });
@@ -376,7 +376,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await Promise.all([
                 vi.runAllTimersAsync(), // Run all timers to completion
-                expect(promise).rejects.toThrowError("Fails"),
+                expect(promise).rejects.toThrow("Fails"),
             ]);
             expect(operation).toHaveBeenCalledTimes(4); // Initial + 3 retries
         });
@@ -396,7 +396,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await Promise.all([
                 vi.runAllTimersAsync(),
-                expect(promise).rejects.toThrowError("string error"),
+                expect(promise).rejects.toThrow("string error"),
             ]);
             expect(operation).toHaveBeenCalledTimes(2); // Initial + 1 retry
         });
@@ -408,7 +408,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
                 retryWithAbort(operation, {
                     maxRetries: 0,
                 })
-            ).rejects.toThrowError("Fails");
+            ).rejects.toThrow("Fails");
 
             expect(operation).toHaveBeenCalledTimes(1);
         });
@@ -489,7 +489,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
             setTimeout(() => controller.abort(), 500);
             vi.advanceTimersByTime(500);
 
-            await expect(promise).rejects.toThrowError("Operation was aborted");
+            await expect(promise).rejects.toThrow("Operation was aborted");
         });
 
         it("should throw immediately if signal is already aborted", async () => {
@@ -499,7 +499,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
         });
 
         it("should handle operation rejection", async () => {
@@ -508,7 +508,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError("Operation failed");
+            ).rejects.toThrow("Operation failed");
         });
 
         it("should handle slow operation that eventually completes", async () => {

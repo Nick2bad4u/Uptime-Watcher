@@ -118,9 +118,9 @@ describe(createSingleFlight, () => {
 
         const singleFlight = createSingleFlight(fn);
 
-        await expect(singleFlight()).rejects.toThrowError("sync boom");
+        await expect(singleFlight()).rejects.toThrow("sync boom");
         // State should clear after the rejection.
-        await expect(singleFlight()).rejects.toThrowError("sync boom");
+        await expect(singleFlight()).rejects.toThrow("sync boom");
         expect(fn).toHaveBeenCalledTimes(2);
     });
 

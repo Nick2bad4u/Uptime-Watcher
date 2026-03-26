@@ -149,7 +149,7 @@ describe("pingRetry", () => {
 
             await expect(
                 performSinglePingCheck("https://example.com", 1000)
-            ).rejects.toThrowError(/connectivity check failed/i);
+            ).rejects.toThrow(/connectivity check failed/i);
         });
 
         it("throws when connectivity is down", async ({ task, annotate }) => {
@@ -162,7 +162,7 @@ describe("pingRetry", () => {
 
             await expect(
                 performSinglePingCheck("https://example.com", 1000)
-            ).rejects.toThrowError(/connectivity check failed/i);
+            ).rejects.toThrow(/connectivity check failed/i);
         });
     });
 

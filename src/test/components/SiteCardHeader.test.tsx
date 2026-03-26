@@ -53,7 +53,7 @@ describe("SiteCardHeader", () => {
             const mockComponent = () => "SiteCardHeader mock";
             const result = mockComponent();
             expect(result).toBeDefined();
-        }).not.toThrowError();
+        }).not.toThrow();
     });
 
     it("should handle basic props", ({ task, annotate }) => {

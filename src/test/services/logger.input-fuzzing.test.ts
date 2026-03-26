@@ -283,10 +283,10 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             "should handle empty or whitespace messages",
             (emptyMessage) => {
                 // Act & Assert - should not crash with empty messages
-                expect(() => logger.info(emptyMessage)).not.toThrowError();
-                expect(() => logger.debug(emptyMessage)).not.toThrowError();
-                expect(() => logger.warn(emptyMessage)).not.toThrowError();
-                expect(() => logger.error(emptyMessage)).not.toThrowError();
+                expect(() => logger.info(emptyMessage)).not.toThrow();
+                expect(() => logger.debug(emptyMessage)).not.toThrow();
+                expect(() => logger.warn(emptyMessage)).not.toThrow();
+                expect(() => logger.error(emptyMessage)).not.toThrow();
 
                 expect(mockInfo).toHaveBeenCalledWith(
                     `[UPTIME-WATCHER] ${normalizeLogValue(emptyMessage) as string}`
@@ -671,13 +671,13 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - should not crash with null/undefined
                 expect(() =>
                     logger.info(nullishMessage as any)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     logger.debug(nullishMessage as any)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     logger.error(nullishMessage as any)
-                ).not.toThrowError();
+                ).not.toThrow();
             }
         );
 
@@ -690,7 +690,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 });
 
                 // Act & Assert - should not propagate the error
-                expect(() => logger.info(message)).not.toThrowError();
+                expect(() => logger.info(message)).not.toThrow();
             }
         );
 
@@ -717,7 +717,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - should not crash with circular references
                 expect(() =>
                     logger.error("Circular error", circularError)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(mockError).toHaveBeenCalled();
             }
         );
@@ -811,7 +811,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - should handle negative durations gracefully
                 expect(() =>
                     logger.app.performance(operation, negativeDuration)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(mockDebug).toHaveBeenCalled();
             }
         );

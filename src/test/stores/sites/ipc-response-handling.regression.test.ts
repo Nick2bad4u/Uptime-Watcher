@@ -50,7 +50,7 @@ describe("IPC response handling regression", () => {
 
         sitesApi.addSite.mockRejectedValueOnce(new Error("IPC failed"));
 
-        await expect(SiteService.addSite(site)).rejects.toThrowError(
+        await expect(SiteService.addSite(site)).rejects.toThrow(
             /IPC failed/
         );
     });

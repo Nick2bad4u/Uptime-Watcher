@@ -619,7 +619,7 @@ describe(SiteList, () => {
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act & Assert
-            expect(() => render(<SiteList />)).toThrowError();
+            expect(() => render(<SiteList />)).toThrow();
         });
 
         it("should handle malformed site objects", ({ task, annotate }) => {

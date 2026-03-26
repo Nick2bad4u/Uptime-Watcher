@@ -158,7 +158,7 @@ describe("MonitorRepository simple orchestration", () => {
 
         await expect(
             repository.deleteBySiteIdentifier("faulty-site")
-        ).rejects.toThrowError(boom);
+        ).rejects.toThrow(boom);
 
         expect(deleteInternalSpy).not.toHaveBeenCalled();
     });

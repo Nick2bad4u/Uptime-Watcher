@@ -200,7 +200,7 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
         });
 
         test("should reject when signal aborts during operation", async () => {
@@ -214,7 +214,7 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
         });
 
         test("should handle operation that rejects", async () => {
@@ -223,7 +223,7 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError("operation failed");
+            ).rejects.toThrow("operation failed");
         });
 
         test("should remove abort listener when operation resolves", async () => {
@@ -251,7 +251,7 @@ describe("AbortUtils Function Coverage Tests", () => {
                     Promise.reject(new Error("boom")),
                     signal as unknown as AbortSignal
                 )
-            ).rejects.toThrowError("boom");
+            ).rejects.toThrow("boom");
 
             expect(signal.getAbortListenerCount()).toBe(0);
             expect(
@@ -275,7 +275,7 @@ describe("AbortUtils Function Coverage Tests", () => {
 
             signal.dispatchAbort();
 
-            await expect(promise).rejects.toThrowError("Operation was aborted");
+            await expect(promise).rejects.toThrow("Operation was aborted");
             expect(signal.getAbortListenerCount()).toBe(0);
             expect(
                 signal.addCalls.filter((call) => call.type === "abort")
@@ -294,7 +294,7 @@ describe("AbortUtils Function Coverage Tests", () => {
                     Promise.resolve("ok"),
                     signal as unknown as AbortSignal
                 )
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
 
             expect(signal.getAbortListenerCount()).toBe(0);
             expect(

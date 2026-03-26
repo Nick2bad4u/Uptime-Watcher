@@ -52,7 +52,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             "should throw when validator returns false",
             (input) => {
                 const alwaysFalse = (_: unknown): _ is any => false;
-                expect(() => castIpcResponse(input, alwaysFalse)).toThrowError(
+                expect(() => castIpcResponse(input, alwaysFalse)).toThrow(
                     "IPC response validation failed"
                 );
             }
@@ -67,12 +67,12 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
                 if (validatorFunc(input)) {
                     expect(() =>
                         castIpcResponse(input, validator)
-                    ).not.toThrowError();
+                    ).not.toThrow();
                     expect(castIpcResponse(input, validator)).toBe(input);
                 } else {
                     expect(() =>
                         castIpcResponse(input, validator)
-                    ).toThrowError();
+                    ).toThrow();
                 }
             }
         );
@@ -285,7 +285,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             (num) => {
                 const isString = (val: unknown): val is string =>
                     typeof val === "string";
-                expect(() => validateAndConvert(num, isString)).toThrowError(
+                expect(() => validateAndConvert(num, isString)).toThrow(
                     "Type validation failed"
                 );
             }
@@ -297,7 +297,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
                 const alwaysFail = (_: unknown): _ is never => false;
                 expect(() =>
                     validateAndConvert(value, alwaysFail, errorMessage)
-                ).toThrowError(errorMessage);
+                ).toThrow(errorMessage);
             }
         );
 
@@ -314,13 +314,13 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
                 ) {
                     expect(() =>
                         validateAndConvert(value, isArrayOfNumbers)
-                    ).not.toThrowError();
+                    ).not.toThrow();
                     const result = validateAndConvert(value, isArrayOfNumbers);
                     expect(Array.isArray(result)).toBeTruthy();
                 } else {
                     expect(() =>
                         validateAndConvert(value, isArrayOfNumbers)
-                    ).toThrowError();
+                    ).toThrow();
                 }
             }
         );
@@ -344,12 +344,12 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
                 if (validatorFunc(value)) {
                     expect(() =>
                         validateAndConvert(value, validator)
-                    ).not.toThrowError();
+                    ).not.toThrow();
                     expect(validateAndConvert(value, validator)).toBe(value);
                 } else {
                     expect(() =>
                         validateAndConvert(value, validator)
-                    ).toThrowError();
+                    ).toThrow();
                 }
             }
         );
@@ -373,7 +373,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
 
                     expect(() =>
                         validateAndConvert(value, isRecordValidator)
-                    ).not.toThrowError();
+                    ).not.toThrow();
                     const converted = validateAndConvert(
                         value,
                         isRecordValidator

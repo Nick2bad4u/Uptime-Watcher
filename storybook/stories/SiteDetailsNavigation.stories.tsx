@@ -149,7 +149,7 @@ const meta: Meta<typeof SiteDetailsNavigation> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const Default: Story = {};
 

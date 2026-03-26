@@ -340,7 +340,7 @@ describe(useMonitorTypesStore, () => {
             await act(async () => {
                 await expect(
                     result.current.loadMonitorTypes()
-                ).rejects.toThrowError("invalid payload");
+                ).rejects.toThrow("invalid payload");
             });
 
             expect(result.current.monitorTypes).toEqual([]);
@@ -609,7 +609,7 @@ describe(useMonitorTypesStore, () => {
                         "http",
                         "Response time: 150ms"
                     )
-                ).rejects.toThrowError(); // Should throw an error due to unexpected null response
+                ).rejects.toThrow(); // Should throw an error due to unexpected null response
             });
         });
     });
@@ -709,7 +709,7 @@ describe(useMonitorTypesStore, () => {
             await act(async () => {
                 await expect(
                     result.current.formatMonitorTitleSuffix("http", mockMonitor)
-                ).rejects.toThrowError(); // Should throw an error due to unexpected null response
+                ).rejects.toThrow(); // Should throw an error due to unexpected null response
             });
         });
     });

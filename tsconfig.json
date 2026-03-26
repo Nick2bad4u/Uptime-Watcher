@@ -32,6 +32,7 @@
         "extendedDiagnostics": false,
         "forceConsistentCasingInFileNames": true,
         "generateCpuProfile": "profile.cpuprofile",
+        "ignoreDeprecations": "6.0",
         "importHelpers": true,
         "importsNotUsedAsValues": "remove",
         "incremental": true,

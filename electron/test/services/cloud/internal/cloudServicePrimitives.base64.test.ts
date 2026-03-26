@@ -22,7 +22,7 @@ describe("cloudServicePrimitives base64", () => {
                 label: "example",
                 value: "aGVsbG8=\n",
             })
-        ).toThrowError(/whitespace/i);
+        ).toThrow(/whitespace/i);
     });
 
     it("rejects base64 with invalid characters", () => {
@@ -31,7 +31,7 @@ describe("cloudServicePrimitives base64", () => {
                 label: "example",
                 value: "aGVsbG8@",
             })
-        ).toThrowError(/invalid characters/i);
+        ).toThrow(/invalid characters/i);
     });
 
     it("rejects base64 with invalid length", () => {
@@ -40,7 +40,7 @@ describe("cloudServicePrimitives base64", () => {
                 label: "example",
                 value: "aGVsbG8", // Missing padding
             })
-        ).toThrowError(/multiple of 4/i);
+        ).toThrow(/multiple of 4/i);
     });
 
     it("decodeStrictBase64 enforces byte length", () => {
@@ -65,6 +65,6 @@ describe("cloudServicePrimitives base64", () => {
                 label: "salt",
                 value,
             })
-        ).toThrowError(/expected 4 bytes/i);
+        ).toThrow(/expected 4 bytes/i);
     });
 });

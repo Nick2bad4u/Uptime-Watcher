@@ -864,12 +864,12 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     // All validation functions should handle boundary cases gracefully
                     expect(() =>
                         isNonEmptyString(boundaryInput)
-                    ).not.toThrowError();
-                    expect(() => isValidHost(boundaryInput)).not.toThrowError();
-                    expect(() => isValidPort(boundaryInput)).not.toThrowError();
+                    ).not.toThrow();
+                    expect(() => isValidHost(boundaryInput)).not.toThrow();
+                    expect(() => isValidPort(boundaryInput)).not.toThrow();
                     expect(() =>
                         validateSiteData(boundaryInput)
-                    ).not.toThrowError();
+                    ).not.toThrow();
                 }
             );
 

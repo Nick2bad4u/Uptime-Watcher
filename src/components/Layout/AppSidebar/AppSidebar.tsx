@@ -96,7 +96,7 @@ export const AppSidebar: NamedExoticComponent = memo(
             useCallback((state) => state.setSelectedMonitorId, [])
         );
 
-        const [query, setQuery] = useState<string>("");
+        const [query, setQuery] = useState("");
         const deferredQuery = useDeferredValue(query);
 
         const SearchIcon = AppIcons.actions.search;

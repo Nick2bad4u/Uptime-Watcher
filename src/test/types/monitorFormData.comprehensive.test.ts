@@ -251,7 +251,7 @@ describe("Monitor Form Data Types", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     "custom"
                 );
-            }).toThrowError(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/i);
         });
     });
 

@@ -306,7 +306,7 @@ describe("Database Operations Fuzzing Tests", () => {
                             failureIndex < sites.length ? 3 : 1;
 
                         await (failureIndex < sites.length
-                            ? expect(resultPromise).rejects.toThrowError(
+                            ? expect(resultPromise).rejects.toThrow(
                                   SIMULATED_TRANSACTION_FAILURE
                               )
                             : expect(resultPromise).resolves.toBeUndefined());

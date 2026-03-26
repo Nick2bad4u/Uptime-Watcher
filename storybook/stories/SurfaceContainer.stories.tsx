@@ -32,7 +32,7 @@ const meta: Meta<typeof SurfaceContainer> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const BaseSurface: Story = {};
 

@@ -38,7 +38,7 @@ describe("jsonSafety property tests", () => {
         test.prop([fc.anything()])(
             "never throws for arbitrary values",
             (sample) => {
-                expect(() => stringifyUnsafe(sample)).not.toThrowError();
+                expect(() => stringifyUnsafe(sample)).not.toThrow();
             }
         );
 

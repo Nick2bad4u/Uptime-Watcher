@@ -1059,7 +1059,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             // Act & Assert - setting undefined site should not crash
             expect(() =>
                 useUIStore.getState().selectSite(undefined)
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(
                 useUIStore.getState().selectedSiteIdentifier
             ).toBeUndefined();
@@ -1078,7 +1078,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     // Act & Assert - should not crash
                     expect(() =>
                         useUIStore.getState().openExternal(url)
-                    ).not.toThrowError();
+                    ).not.toThrow();
                 } finally {
                     // Restore electronAPI
                     if (globalThis.window && originalAPI) {

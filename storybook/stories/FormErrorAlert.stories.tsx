@@ -21,12 +21,12 @@ const meta: Meta<typeof FormErrorAlert> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 type FormErrorAlertProps = ComponentProps<typeof FormErrorAlert>;
 
 const InteractiveStory = (args: FormErrorAlertProps): ReactElement => {
     const { error, onClearError, ...rest } = args;
-    const [message, setMessage] = useState<string | null>(error ?? null);
+    const [message, setMessage] = useState(error ?? null);
 
     const handleClear = (): void => {
         setMessage(null);

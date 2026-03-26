@@ -45,7 +45,7 @@ describe("systemApi", () => {
 
         await expect(
             systemApi.openExternal("https://fail.example")
-        ).rejects.toThrowError(/ipc operation failed/i);
+        ).rejects.toThrow(/ipc operation failed/i);
     });
 
     it("invokes quit-and-install via invoke", async () => {

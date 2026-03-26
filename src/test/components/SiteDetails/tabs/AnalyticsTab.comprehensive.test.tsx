@@ -1047,7 +1047,7 @@ describe(AnalyticsTab, () => {
             // Should not crash even if formatting functions throw
             expect(() => {
                 render(<AnalyticsTab {...props} />);
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         it.each([

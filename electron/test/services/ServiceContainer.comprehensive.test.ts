@@ -717,7 +717,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             // so there should be no dependency error in normal usage
             expect(() => {
                 container.getMonitorManager();
-            }).not.toThrowError();
+            }).not.toThrow();
 
             expect(container.getMonitorManager()).toBeDefined();
         });
@@ -1113,7 +1113,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
             await expect(
                 databaseManager.setHistoryLimit(1000)
-            ).rejects.toThrowError("Database error");
+            ).rejects.toThrow("Database error");
         });
 
         it("should handle setupNewMonitors operation", async ({

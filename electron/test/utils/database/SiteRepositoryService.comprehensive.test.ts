@@ -562,7 +562,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             await expect(
                 siteRepositoryService.getSitesFromDatabase()
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrow(SiteLoadingError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to fetch sites from database: Database error",
                 error
@@ -581,7 +581,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             await expect(
                 siteRepositoryService.getSitesFromDatabase()
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrow(SiteLoadingError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to fetch sites from database: String error",
                 expect.objectContaining({ message: "String error" })
@@ -673,7 +673,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             await expect(
                 siteRepositoryService.loadSitesIntoCache(mockSiteCache)
-            ).rejects.toThrowError(error);
+            ).rejects.toThrow(error);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to load sites into cache: Cache error",
@@ -706,7 +706,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             await expect(
                 siteRepositoryService.loadSitesIntoCache(mockSiteCache)
-            ).rejects.toThrowError(errorString);
+            ).rejects.toThrow(errorString);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to load sites into cache: Unknown error",

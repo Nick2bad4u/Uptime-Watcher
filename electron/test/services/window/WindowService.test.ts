@@ -396,7 +396,7 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => windowService.closeMainWindow()).not.toThrowError();
+            expect(() => windowService.closeMainWindow()).not.toThrow();
         });
 
         it("should not close if window is destroyed", async ({
@@ -862,7 +862,7 @@ describe(WindowService, () => {
                 // Directly call loadDevelopmentContent to catch errors
                 await expect(
                     (testWindowService as any).loadDevelopmentContent()
-                ).rejects.toThrowError();
+                ).rejects.toThrow();
 
                 expect(waitForViteServerSpy).toHaveBeenCalled();
                 expect(logger.error).toHaveBeenCalledWith(
@@ -901,7 +901,7 @@ describe(WindowService, () => {
                 // Directly call loadDevelopmentContent to catch errors
                 await expect(
                     (testWindowService as any).loadDevelopmentContent()
-                ).rejects.toThrowError();
+                ).rejects.toThrow();
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "Failed to loadDevelopmentContent",
@@ -1275,7 +1275,7 @@ describe(WindowService, () => {
             // Directly call loadDevelopmentContent to catch errors
             await expect(
                 (testWindowService as any).loadDevelopmentContent()
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
 
             expect(waitForViteServerSpy).toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith(
@@ -1382,7 +1382,7 @@ describe(WindowService, () => {
                         waitForViteServer: () => Promise<void>;
                     }
                 ).waitForViteServer()
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "Mocked fetch reported Vite server as unavailable"
             );
 
@@ -1420,7 +1420,7 @@ describe(WindowService, () => {
                     await vi.advanceTimersToNextTimerAsync();
                 }
 
-                await expect(waitPromise).rejects.toThrowError(
+                await expect(waitPromise).rejects.toThrow(
                     "Vite dev server did not become available after 20 attempts"
                 );
                 expect(attempts).toBe(20);
@@ -1555,7 +1555,7 @@ describe(WindowService, () => {
             (windowService as any).mainWindow = null;
 
             // Should not crash when trying to show destroyed window
-            expect(() => readyCallback()).not.toThrowError();
+            expect(() => readyCallback()).not.toThrow();
         });
     });
 

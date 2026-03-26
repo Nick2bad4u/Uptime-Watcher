@@ -56,7 +56,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                     null,
                     (k, v) => `${k}:${v}`
                 )
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Test safeObjectOmit function
             const omitResult = objectSafetyModule.safeObjectOmit(testObj, [
@@ -158,7 +158,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                                     collected.push([key, value]);
                                 }
                             );
-                        }).not.toThrowError();
+                        }).not.toThrow();
 
                         // Should collect all enumerable string keys
                         const expectedKeys = Object.keys(obj);
@@ -189,7 +189,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                                     collected.push([key, value]);
                                 }
                             );
-                        }).not.toThrowError();
+                        }).not.toThrow();
 
                         expect(collected).toHaveLength(0);
                     }

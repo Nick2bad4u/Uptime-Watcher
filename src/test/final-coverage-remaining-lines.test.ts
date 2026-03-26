@@ -96,7 +96,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
                     "completelyInvalidFieldName",
                     "value"
                 );
-            }).toThrowError("Unknown field: completelyInvalidFieldName");
+            }).toThrow("Unknown field: completelyInvalidFieldName");
         });
 
         test("should trigger unknown field error for field not in any schema", ({
@@ -116,7 +116,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             // Test with a field name that doesn't exist in any schema
             expect(() => {
                 validateMonitorField("ping", "nonExistentField123", 123);
-            }).toThrowError("Unknown field: nonExistentField123");
+            }).toThrow("Unknown field: nonExistentField123");
         });
     });
 

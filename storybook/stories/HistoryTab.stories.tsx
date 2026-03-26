@@ -65,7 +65,7 @@ const meta: Meta<typeof HistoryTab> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const DefaultHistory: Story = {
     play: async ({ canvasElement, step }) => {

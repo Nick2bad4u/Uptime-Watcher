@@ -35,10 +35,10 @@ describe("databaseSchema integration (node-sqlite3-wasm)", () => {
         const db = new sqliteModule.Database(":memory:");
 
         try {
-            expect(() => createDatabaseSchema(db)).not.toThrowError();
+            expect(() => createDatabaseSchema(db)).not.toThrow();
             expect(() =>
                 synchronizeDatabaseSchemaVersion(db)
-            ).not.toThrowError();
+            ).not.toThrow();
 
             const sitesTable = db.get(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='sites'"

@@ -481,7 +481,7 @@ describe("Cache Utils Property-Based Tests", () => {
 
                 await expect(
                     getCachedOrFetch(cache, key, fetcher, ttl)
-                ).rejects.toThrowError("Fetch failed");
+                ).rejects.toThrow("Fetch failed");
 
                 expect(fetcher).toHaveBeenCalledTimes(1);
                 expect(cache.get(key)).toBeUndefined(); // Should not cache errors

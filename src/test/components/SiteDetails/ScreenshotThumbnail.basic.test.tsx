@@ -152,7 +152,7 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
             const props = createThumbnailProps();
             expect(() => {
                 render(<ScreenshotThumbnail {...props} />);
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         it("should display the correct site name in caption", () => {
@@ -226,12 +226,12 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
             // Focus should not throw
             expect(() => {
                 fireEvent.focus(link);
-            }).not.toThrowError();
+            }).not.toThrow();
 
             // Blur should not throw
             expect(() => {
                 fireEvent.blur(link);
-            }).not.toThrowError();
+            }).not.toThrow();
         });
     });
 
@@ -264,7 +264,7 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
             // Should handle Enter key without throwing (no portal issues)
             expect(() => {
                 fireEvent.keyDown(link, { key: "Enter", code: "Enter" });
-            }).not.toThrowError();
+            }).not.toThrow();
         });
     });
 

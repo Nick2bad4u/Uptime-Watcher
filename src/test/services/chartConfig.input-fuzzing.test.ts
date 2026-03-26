@@ -218,7 +218,7 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - should not throw
                 expect(() =>
                     chartConfig.getDoughnutChartConfig(totalChecks)
-                ).not.toThrowError();
+                ).not.toThrow();
 
                 const config = chartConfig.getDoughnutChartConfig(totalChecks);
                 expect(config).toBeDefined();
@@ -231,7 +231,7 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - should not throw with large values
                 expect(() =>
                     chartConfig.getDoughnutChartConfig(totalChecks)
-                ).not.toThrowError();
+                ).not.toThrow();
 
                 const config = chartConfig.getDoughnutChartConfig(totalChecks);
                 expect(config).toBeDefined();
@@ -333,7 +333,7 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
                 // Act & Assert - should not crash with extreme values
                 expect(() =>
                     chartConfig.getDoughnutChartConfig(extremeValue)
-                ).not.toThrowError();
+                ).not.toThrow();
             }
         );
 
@@ -345,11 +345,11 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
                 const service = new ChartConfigService(minimalTheme);
 
                 // Act & Assert - should not crash
-                expect(() => service.getLineChartConfig()).not.toThrowError();
+                expect(() => service.getLineChartConfig()).not.toThrow();
                 expect(() =>
                     service.getDoughnutChartConfig(0)
-                ).not.toThrowError();
-                expect(() => service.getBarChartConfig()).not.toThrowError();
+                ).not.toThrow();
+                expect(() => service.getBarChartConfig()).not.toThrow();
             }
         );
     });

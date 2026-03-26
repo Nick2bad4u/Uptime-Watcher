@@ -112,7 +112,7 @@ export const attachOriginalMetadata: <TPayload extends object>(
 export function cloneArrayPayload<TPayload extends ArrayPayload>(
     payload: TPayload
 ): TPayload {
-    const structuredCloneResult = tryStructuredClone<TPayload>(payload);
+    const structuredCloneResult = tryStructuredClone(payload);
     if (structuredCloneResult !== undefined) {
         return structuredCloneResult;
     }
@@ -132,7 +132,7 @@ export function cloneArrayPayload<TPayload extends ArrayPayload>(
 export function cloneObjectPayload<TPayload extends NonArrayObjectPayload>(
     payload: TPayload
 ): TPayload {
-    const structuredCloneResult = tryStructuredClone<TPayload>(payload);
+    const structuredCloneResult = tryStructuredClone(payload);
     if (structuredCloneResult !== undefined) {
         return structuredCloneResult;
     }

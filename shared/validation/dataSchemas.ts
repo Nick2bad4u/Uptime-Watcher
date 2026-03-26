@@ -22,10 +22,10 @@ const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
 export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
     z
         .object({
-            appVersion: z.string().min(1),
-            checksum: z.string().min(1),
+            appVersion: z.string().trim().min(1),
+            checksum: z.string().trim().min(1),
             createdAt: z.number(),
-            originalPath: z.string().min(1),
+            originalPath: z.string().trim().min(1),
             retentionHintDays: z.number(),
             schemaVersion: z.number(),
             sizeBytes: z.number(),
@@ -45,7 +45,10 @@ export const serializedDatabaseBackupResultSchema: z.ZodType<{
                 message: `Backup buffer exceeds maximum IPC transfer size (${DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} bytes)`,
             }
         ),
-        fileName: z.string().min(1),
+        // Intentionally allow blank/whitespace names from upstream callers.
+        // Renderer-side download logic performs fallback filename generation.
+        // eslint-disable-next-line zod/prefer-string-schema-with-trim -- blank names are valid input for fallback behavior.
+        fileName: z.string(),
         metadata: serializedDatabaseBackupMetadataSchema,
     })
     .strict();
@@ -61,8 +64,8 @@ export const serializedDatabaseBackupSaveResultSchema: z.ZodType<SerializedDatab
             z
                 .object({
                     canceled: z.literal(false),
-                    fileName: z.string().min(1),
-                    filePath: z.string().min(1),
+                    fileName: z.string().trim().min(1),
+                    filePath: z.string().trim().min(1),
                     metadata: serializedDatabaseBackupMetadataSchema,
                 })
                 .strict(),
@@ -75,7 +78,7 @@ export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
 }> = z
     .object({
         buffer: arrayBufferSchema,
-        fileName: z.string().min(1).optional(),
+        fileName: z.string().trim().min(1).optional(),
     })
     .strict();
 
@@ -86,7 +89,7 @@ export const serializedDatabaseRestoreResultSchema: z.ZodType<{
 }> = z
     .object({
         metadata: serializedDatabaseBackupMetadataSchema,
-        preRestoreFileName: z.string().min(1).optional(),
+        preRestoreFileName: z.string().trim().min(1).optional(),
         restoredAt: z.number(),
     })
     .strict();
@@ -112,10 +115,10 @@ export const validationResultSchema: z.ZodType<{
 }> = z
     .object({
         data: anyValueSchema.optional(),
-        errors: z.array(z.string()),
-        metadata: z.record(z.string(), anyValueSchema).optional(),
+        errors: z.array(z.string().trim()),
+        metadata: z.record(z.string().trim(), anyValueSchema).optional(),
         success: z.boolean(),
-        warnings: z.array(z.string()).optional(),
+        warnings: z.array(z.string().trim()).optional(),
     })
     .strict();
 

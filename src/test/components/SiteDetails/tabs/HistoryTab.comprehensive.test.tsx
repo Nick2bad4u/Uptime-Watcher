@@ -633,7 +633,7 @@ describe(HistoryTab, () => {
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
                 )
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle missing settings gracefully", ({
@@ -663,7 +663,7 @@ describe(HistoryTab, () => {
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
                 )
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle history records with missing fields", ({
@@ -691,7 +691,7 @@ describe(HistoryTab, () => {
                 render(
                     <HistoryTab {...defaultProps} selectedMonitor={monitor} />
                 )
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
 

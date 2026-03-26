@@ -135,11 +135,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(
                 () =>
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })
-            ).toThrowError("maxMiddleware must be positive, got 0");
+            ).toThrow("maxMiddleware must be positive, got 0");
             expect(
                 () =>
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })
-            ).toThrowError("maxMiddleware must be positive, got -1");
+            ).toThrow("maxMiddleware must be positive, got -1");
         });
         it("should set max listeners to 50 by default", async ({
             task,
@@ -263,7 +263,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             bus.registerMiddleware(mockMiddleware);
             bus.registerMiddleware(mockMiddleware2);
 
-            expect(() => bus.registerMiddleware(vi.fn())).toThrowError(
+            expect(() => bus.registerMiddleware(vi.fn())).toThrow(
                 "Maximum middleware limit (2) exceeded. Consider increasing maxMiddleware or combining middleware functions."
             );
         });
@@ -277,7 +277,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             await expect(
                 eventBus.emitTyped("string-event", "test")
-            ).rejects.toThrowError("Middleware error");
+            ).rejects.toThrow("Middleware error");
 
             expect(errorMiddleware).toHaveBeenCalled();
             expect(mockMiddleware2).not.toHaveBeenCalled();
@@ -649,7 +649,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle events with no listeners", async () => {
             await expect(
                 eventBus.emitTyped("string-event", "test")
-            ).resolves.not.toThrowError();
+            ).resolves.not.toThrow();
         });
         it("should preserve array indices and length", async () => {
             eventBus.onTyped("array-event", mockListener);
@@ -833,7 +833,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(
                 () =>
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: 0 })
-            ).toThrowError("maxMiddleware must be positive, got 0");
+            ).toThrow("maxMiddleware must be positive, got 0");
         });
         it("should handle constructor with negative maxMiddleware", async ({
             task,
@@ -848,7 +848,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(
                 () =>
                     new TypedEventBus<TestEvents>("test", { maxMiddleware: -1 })
-            ).toThrowError("maxMiddleware must be positive, got -1");
+            ).toThrow("maxMiddleware must be positive, got -1");
         });
         it("should handle middleware that modifies next function but still processes", async () => {
             const modifyingMiddleware: EventMiddleware = vi.fn(

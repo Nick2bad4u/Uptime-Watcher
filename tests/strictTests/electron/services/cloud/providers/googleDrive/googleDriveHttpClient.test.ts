@@ -431,7 +431,7 @@ describe("googleDriveHttpClient (strict coverage)", () => {
 
         await expect(
             client.files.get({ fileId: "abc", alt: "media" })
-        ).rejects.toThrowError(/did not return binary content/i);
+        ).rejects.toThrow(/did not return binary content/i);
     });
 
     it("lists files with correct params and Authorization header", async () => {

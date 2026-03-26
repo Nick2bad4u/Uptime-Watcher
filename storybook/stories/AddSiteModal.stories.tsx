@@ -18,7 +18,7 @@ import {
     SAMPLE_MONITOR_TYPES,
 } from "./setup/monitorTypeMocks";
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const sampleSites = [
     createMockSite({

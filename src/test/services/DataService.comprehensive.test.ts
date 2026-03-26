@@ -219,7 +219,7 @@ describe("DataService", () => {
             const initializationError = new Error("Electron API not available");
             mockWaitForElectronBridge.mockRejectedValue(initializationError);
 
-            await expect(DataService.initialize()).rejects.toThrowError(
+            await expect(DataService.initialize()).rejects.toThrow(
                 "Electron API not available"
             );
 
@@ -276,7 +276,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.downloadSqliteBackup()
-            ).rejects.toThrowError("Init failed");
+            ).rejects.toThrow("Init failed");
 
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
@@ -291,7 +291,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.downloadSqliteBackup()
-            ).rejects.toThrowError("Backup failed");
+            ).rejects.toThrow("Backup failed");
 
             expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
@@ -343,7 +343,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.restoreSqliteBackup(createMockRestorePayload())
-            ).rejects.toThrowError("Bridge init failed");
+            ).rejects.toThrow("Bridge init failed");
         });
 
         it("should normalize backend errors via ensureError", async () => {
@@ -378,7 +378,7 @@ describe("DataService", () => {
             const initError = new Error("Init failed");
             mockWaitForElectronBridge.mockRejectedValue(initError);
 
-            await expect(DataService.exportData()).rejects.toThrowError(
+            await expect(DataService.exportData()).rejects.toThrow(
                 "Init failed"
             );
 
@@ -389,7 +389,7 @@ describe("DataService", () => {
             const exportError = new Error("Export failed");
             mockElectronAPI.data.exportData.mockRejectedValue(exportError);
 
-            await expect(DataService.exportData()).rejects.toThrowError(
+            await expect(DataService.exportData()).rejects.toThrow(
                 "Export failed"
             );
 
@@ -435,7 +435,7 @@ describe("DataService", () => {
                 123 as unknown as string
             );
 
-            await expect(DataService.exportData()).rejects.toThrowError(
+            await expect(DataService.exportData()).rejects.toThrow(
                 "Export data payload must be a string"
             );
         });
@@ -463,7 +463,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.importData(importData)
-            ).rejects.toThrowError("Init failed");
+            ).rejects.toThrow("Init failed");
 
             expect(mockElectronAPI.data.importData).not.toHaveBeenCalled();
         });
@@ -475,7 +475,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.importData(importData)
-            ).rejects.toThrowError("Import failed");
+            ).rejects.toThrow("Import failed");
 
             expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
@@ -550,7 +550,7 @@ describe("DataService", () => {
                 "yes" as unknown as boolean
             );
 
-            await expect(DataService.importData("{}")).rejects.toThrowError(
+            await expect(DataService.importData("{}")).rejects.toThrow(
                 "Import data response must be a boolean"
             );
         });
@@ -627,7 +627,7 @@ describe("DataService", () => {
                 throw new Error("Synchronous error");
             });
 
-            await expect(DataService.exportData()).rejects.toThrowError(
+            await expect(DataService.exportData()).rejects.toThrow(
                 "Synchronous error"
             );
         });
@@ -636,14 +636,14 @@ describe("DataService", () => {
             // Remove the electronAPI
             delete (globalThis as any).window.electronAPI;
 
-            await expect(DataService.exportData()).rejects.toThrowError();
+            await expect(DataService.exportData()).rejects.toThrow();
         });
 
         it("should handle partial electron API gracefully", async () => {
             // Remove specific method
             delete (globalThis as any).window.electronAPI.data.exportData;
 
-            await expect(DataService.exportData()).rejects.toThrowError();
+            await expect(DataService.exportData()).rejects.toThrow();
         });
 
         it("should handle network-like errors in backup operations", async () => {
@@ -655,7 +655,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.downloadSqliteBackup()
-            ).rejects.toThrowError("ECONNRESET");
+            ).rejects.toThrow("ECONNRESET");
         });
 
         it("should handle file system errors in import operations", async () => {
@@ -665,7 +665,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.importData('{"data":"test"}')
-            ).rejects.toThrowError("ENOSPC");
+            ).rejects.toThrow("ENOSPC");
         });
     });
 
@@ -691,7 +691,7 @@ describe("DataService", () => {
 
             await expect(
                 DataService.downloadSqliteBackup()
-            ).rejects.toThrowError(/exceeds maximum ipc transfer size/i);
+            ).rejects.toThrow(/exceeds maximum ipc transfer size/i);
         });
 
         it("should handle unicode characters in export/import", async () => {

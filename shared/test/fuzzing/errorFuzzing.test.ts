@@ -27,7 +27,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
         await expect(
             withErrorHandling(failingOperation, context)
-        ).rejects.toThrowError("Test error");
+        ).rejects.toThrow("Test error");
 
         // Verify line 141 was hit - console.error should be called
         expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -73,7 +73,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
             await expect(
                 withErrorHandling(failingOperation, context)
-            ).rejects.toThrowError(errorMessage);
+            ).rejects.toThrow(errorMessage);
 
             // Verify line 141 was hit - console.error should be called instead of logger.error
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -106,7 +106,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
             await expect(
                 withErrorHandling(failingOperation, context)
-            ).rejects.toThrowError(errorMessage);
+            ).rejects.toThrow(errorMessage);
 
             // Verify the specific message format for line 141
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -133,7 +133,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
         await expect(
             withErrorHandling(failingOperation, context)
-        ).rejects.toThrowError("Test error");
+        ).rejects.toThrow("Test error");
 
         // Verify line 141 console.error call with default message
         expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -200,7 +200,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
                 await expect(
                     withErrorHandling(failingOperation, context)
-                ).rejects.toThrowError(errorMessage);
+                ).rejects.toThrow(errorMessage);
 
                 // Should call console.error with default message when operationName is falsy
                 const expectedMessage = invalidOperationName

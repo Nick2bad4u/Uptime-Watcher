@@ -333,7 +333,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(manager.isSubscribed()).toBeFalsy();
-            expect(() => manager.unsubscribe()).not.toThrowError();
+            expect(() => manager.unsubscribe()).not.toThrow();
             expect(manager.isSubscribed()).toBeFalsy();
         });
     });
@@ -772,7 +772,7 @@ describe("StatusUpdateHandler", () => {
 
             expect(() =>
                 statusChangedCallback(statusUpdate)
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle errors in full sync gracefully", async ({
@@ -788,7 +788,7 @@ describe("StatusUpdateHandler", () => {
 
             await manager.subscribe();
 
-            expect(() => statusChangedCallback({})).not.toThrowError();
+            expect(() => statusChangedCallback({})).not.toThrow();
         });
     });
 

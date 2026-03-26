@@ -218,7 +218,7 @@ describe("middleware.ts", () => {
             const mw = createErrorHandlingMiddleware({
                 continueOnError: false,
             });
-            await expect(mw("eventF", {}, next)).rejects.toThrowError("fail2");
+            await expect(mw("eventF", {}, next)).rejects.toThrow("fail2");
         });
     });
     describe(createRateLimitMiddleware, () => {
@@ -320,7 +320,7 @@ describe("middleware.ts", () => {
                 eventK: (_data: EventPayloadValue) => false,
             };
             const mw = createValidationMiddleware(validators);
-            await expect(mw("eventK", 1, next)).rejects.toThrowError(
+            await expect(mw("eventK", 1, next)).rejects.toThrow(
                 "Validation failed for event 'eventK'"
             );
             expect(logger.error).toHaveBeenCalled();
@@ -339,7 +339,7 @@ describe("middleware.ts", () => {
                 }),
             };
             const mw = createValidationMiddleware(validators);
-            await expect(mw("eventL", 1, next)).rejects.toThrowError("bad");
+            await expect(mw("eventL", 1, next)).rejects.toThrow("bad");
             expect(logger.error).toHaveBeenCalled();
         });
     });

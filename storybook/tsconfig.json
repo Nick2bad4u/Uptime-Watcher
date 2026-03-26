@@ -10,6 +10,7 @@
         "moduleResolution": "bundler",
         "noEmit": true,
         "outDir": "../.cache/builds/test/storybook",
+        "rootDir": "..",
         "tsBuildInfoFile": "../.cache/tsbuildinfo/tsconfig.storybook.tsbuildinfo",
         "types": [
             "node",

@@ -24,7 +24,7 @@ describe("Schemas - Missing Coverage", () => {
 
             expect(() => {
                 validateMonitorField("http", "unknown_field", "test-value");
-            }).toThrowError("Unknown field: unknown_field");
+            }).toThrow("Unknown field: unknown_field");
         });
 
         test("should test various field scenarios", ({ task, annotate }) => {
@@ -48,7 +48,7 @@ describe("Schemas - Missing Coverage", () => {
             for (const { type, field, value } of testCases) {
                 expect(() => {
                     validateMonitorField(type, field, value);
-                }).toThrowError(`Unknown field: ${field}`);
+                }).toThrow(`Unknown field: ${field}`);
             }
         });
     });

@@ -209,7 +209,7 @@ const AnalyticsTabStory = ({
         siteDetailsChartTimeRange
     );
     const [showAdvancedMetricsState, setShowAdvancedMetricsState] =
-        useState<boolean>(showAdvancedMetrics);
+        useState(showAdvancedMetrics);
 
     const handleToggleAdvanced = useCallback(
         (next: boolean): void => {
@@ -279,7 +279,7 @@ const meta: Meta<typeof AnalyticsTab> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const DefaultView: Story = {};
 

@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { HeaderControls } from "@app/components/Header/HeaderControls";
 import { action } from "storybook/actions";
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const meta: Meta<typeof HeaderControls> = {
     args: {

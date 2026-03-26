@@ -463,7 +463,7 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
             expect(() => {
                 // @ts-expect-error - Testing readonly behavior
                 LOG_TEMPLATES.debug = {};
-            }).toThrowError();
+            }).toThrow();
         });
 
         it("should have correct structure", () => {

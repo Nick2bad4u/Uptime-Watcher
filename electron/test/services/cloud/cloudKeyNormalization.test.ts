@@ -22,10 +22,10 @@ describe("cloudKeyNormalization", () => {
     });
 
     it("rejects traversal segments by default", () => {
-        expect(() => normalizeCloudObjectKey("backups/../evil")).toThrowError(
+        expect(() => normalizeCloudObjectKey("backups/../evil")).toThrow(
             "path traversal"
         );
-        expect(() => normalizeCloudObjectKey("./evil")).toThrowError(
+        expect(() => normalizeCloudObjectKey("./evil")).toThrow(
             "path traversal"
         );
     });
@@ -43,18 +43,18 @@ describe("cloudKeyNormalization", () => {
             normalizeCloudObjectKey("a".repeat(101), {
                 maxByteLength: 100,
             })
-        ).toThrowError("must not exceed");
+        ).toThrow("must not exceed");
     });
 
     it("enforces a default byte budget for provider object keys", () => {
         expect(() =>
             normalizeProviderObjectKey("a".repeat(10_000))
-        ).toThrowError(`${DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES}`);
+        ).toThrow(`${DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES}`);
     });
 
     it("assertCloudObjectKey rejects empty and trailing slash keys", () => {
-        expect(() => assertCloudObjectKey("")).toThrowError("cannot be empty");
-        expect(() => assertCloudObjectKey("backups/")).toThrowError(
+        expect(() => assertCloudObjectKey("")).toThrow("cannot be empty");
+        expect(() => assertCloudObjectKey("backups/")).toThrow(
             "must not end"
         );
     });

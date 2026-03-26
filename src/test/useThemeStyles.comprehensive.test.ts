@@ -276,7 +276,7 @@ describe(useThemeStyles, () => {
 
         expect(() => {
             renderHook(() => useThemeStyles());
-        }).not.toThrowError();
+        }).not.toThrow();
 
         globalThis.matchMedia = originalMatchMedia;
     });

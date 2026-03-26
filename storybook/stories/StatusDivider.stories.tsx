@@ -8,7 +8,7 @@ import type { JSX } from "react";
 import { StatusDivider } from "@app/components/Header/StatusDivider";
 import { ThemedText } from "@app/theme/components/ThemedText";
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const meta: Meta<typeof StatusDivider> = {
     component: StatusDivider,

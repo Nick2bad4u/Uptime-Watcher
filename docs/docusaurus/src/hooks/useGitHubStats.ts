@@ -112,7 +112,7 @@ export function useGitHubStats(): UseGitHubStatsReturn {
  *   application.
  */
 export function usePackageVersion(): UsePackageVersionReturn {
-    const [version, setVersion] = useState<string>("12.5.0");
+    const [version, setVersion] = useState("12.5.0");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<null | string>(null);
 

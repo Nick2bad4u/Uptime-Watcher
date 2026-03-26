@@ -391,16 +391,16 @@ describe("SiteStatus utilities fuzzing tests", () => {
             (site) => {
                 expect(() =>
                     calculateSiteMonitoringStatus(site as SiteForStatus)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     calculateSiteStatus(site as SiteForStatus)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     getSiteDisplayStatus(site as SiteForStatus)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     getSiteStatusDescription(site as SiteForStatus)
-                ).not.toThrowError();
+                ).not.toThrow();
             }
         );
 

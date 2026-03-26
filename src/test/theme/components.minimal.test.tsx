@@ -285,7 +285,7 @@ describe("Theme Components - Basic Functionality", () => {
 
             expect(() =>
                 render(<StatusIndicator status="up" />)
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should show text when enabled", ({ task, annotate }) => {

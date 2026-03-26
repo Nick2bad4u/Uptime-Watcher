@@ -112,7 +112,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Test event emission doesn't throw
                 await expect(
                     eventBus.emitTyped(eventType as UptimeEventName, payload)
-                ).resolves.not.toThrowError();
+                ).resolves.not.toThrow();
             }
         );
 
@@ -407,7 +407,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Event emission should throw due to middleware error
                 await expect(
                     eventBus.emitTyped(eventType as UptimeEventName, payload)
-                ).rejects.toThrowError("Middleware error");
+                ).rejects.toThrow("Middleware error");
 
                 // Cleanup
                 eventBus.removeMiddleware(errorMiddleware);
@@ -567,7 +567,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Emit event - should not throw despite error listener (emitTyped handles errors gracefully)
                 await expect(
                     eventBus.emitTyped(eventType as UptimeEventName, payload)
-                ).resolves.not.toThrowError();
+                ).resolves.not.toThrow();
 
                 eventBus.offTyped(eventType as UptimeEventName, errorListener);
                 eventBus.offTyped(eventType as UptimeEventName, normalListener);
@@ -584,7 +584,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                     eventBus.emit(String(eventType), {
                         test: true,
                     });
-                }).not.toThrowError();
+                }).not.toThrow();
             }
         );
 
@@ -601,7 +601,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Should not cause issues
                 expect(() => {
                     eventBus.emit(String(eventType), payload);
-                }).not.toThrowError();
+                }).not.toThrow();
 
                 expect(listener).toHaveBeenCalledTimes(1);
             }
@@ -641,7 +641,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Should handle any payload type
                 expect(() => {
                     eventBus.emit("database:error", invalidPayload);
-                }).not.toThrowError();
+                }).not.toThrow();
 
                 expect(listener).toHaveBeenCalledTimes(1);
 

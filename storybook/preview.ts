@@ -1,7 +1,7 @@
 // eslint-disable-next-line sonarjs/no-implicit-dependencies -- Storybook uses Vite alias to load global styles
 import "@app/index.css";
 import type { ThemeName } from "@app/theme/types";
-import type { Decorator, Preview, ReactRenderer } from "@storybook/react";
+import type { Decorator, Preview } from "@storybook/react";
 
 import { useMount } from "@app/hooks/useMount";
 import { themeManager } from "@app/theme/ThemeManager";
@@ -122,7 +122,7 @@ const resolveStoryTheme = (
     return fallback;
 };
 
-const withTailwindThemeClasses = withThemeByClassName<ReactRenderer>({
+const withTailwindThemeClasses = withThemeByClassName({
     defaultTheme: DEFAULT_STORY_THEME,
     themes: STORYBOOK_THEME_CLASS_MAP,
 });

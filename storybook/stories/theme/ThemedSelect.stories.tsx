@@ -21,7 +21,7 @@ const meta: Meta<typeof ThemedSelect> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 type ThemedSelectProps = ComponentProps<typeof ThemedSelect>;
 
 type StoryArgsWithKey<TProps> = TProps & { key?: Key };

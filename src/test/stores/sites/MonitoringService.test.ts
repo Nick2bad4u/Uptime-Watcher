@@ -215,7 +215,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.checkSiteNow("site-abc", "monitor-123")
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "checkSiteNow returned an invalid status update"
             );
         });
@@ -270,7 +270,7 @@ describe("MonitoringService", () => {
                     siteIdentifier,
                     monitorId
                 )
-            ).rejects.toThrowError("Failed to start monitoring");
+            ).rejects.toThrow("Failed to start monitoring");
         });
 
         it("should handle empty siteIdentifier", async ({ task, annotate }) => {
@@ -441,7 +441,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.startMonitoring()
-            ).rejects.toThrowError("global failure");
+            ).rejects.toThrow("global failure");
         });
     });
 
@@ -494,7 +494,7 @@ describe("MonitoringService", () => {
                     siteIdentifier,
                     monitorId
                 )
-            ).rejects.toThrowError("Failed to stop monitoring");
+            ).rejects.toThrow("Failed to stop monitoring");
         });
 
         it("should handle empty siteIdentifier", async ({ task, annotate }) => {
@@ -668,7 +668,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.stopMonitoring()
-            ).rejects.toThrowError("stop failed");
+            ).rejects.toThrow("stop failed");
         });
     });
 
@@ -705,10 +705,10 @@ describe("MonitoringService", () => {
             try {
                 await expect(
                     MonitoringService.startMonitoringForMonitor("test", "test")
-                ).rejects.toThrowError(MOCK_BRIDGE_ERROR_MESSAGE);
+                ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
                 await expect(
                     MonitoringService.stopMonitoringForMonitor("test", "test")
-                ).rejects.toThrowError(MOCK_BRIDGE_ERROR_MESSAGE);
+                ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
             } finally {
                 (globalThis as any).window.electronAPI = originalWindowBridge;
                 (globalThis as any).electronAPI = originalGlobalBridge;
@@ -830,7 +830,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.startMonitoringForMonitor("test", "test")
-            ).rejects.toThrowError("Network error");
+            ).rejects.toThrow("Network error");
         });
 
         it("should propagate validation errors from backend", async ({
@@ -849,7 +849,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.stopMonitoringForMonitor("invalid", "test")
-            ).rejects.toThrowError("Invalid site ID");
+            ).rejects.toThrow("Invalid site ID");
         });
 
         it("should handle timeout errors", async ({ task, annotate }) => {
@@ -865,7 +865,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.startMonitoringForMonitor("test", "test")
-            ).rejects.toThrowError("Request timeout");
+            ).rejects.toThrow("Request timeout");
         });
 
         it("should handle backend service unavailable errors", async ({
@@ -884,7 +884,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.stopMonitoringForMonitor("test", "test")
-            ).rejects.toThrowError("Monitoring service unavailable");
+            ).rejects.toThrow("Monitoring service unavailable");
         });
     });
 

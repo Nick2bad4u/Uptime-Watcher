@@ -412,7 +412,7 @@ describe("100% Coverage Edge Cases", () => {
                     undefined,
                     true
                 )
-            ).rejects.toThrowError("Async error");
+            ).rejects.toThrow("Async error");
         });
 
         it("should handle async operation failure without fallback", async () => {
@@ -421,7 +421,7 @@ describe("100% Coverage Edge Cases", () => {
                 .mockRejectedValue(new Error("Async error"));
             await expect(
                 withUtilityErrorHandling(operation, "test-operation")
-            ).rejects.toThrowError(
+            ).rejects.toThrow(
                 "test-operation failed and no fallback value provided"
             );
         });
@@ -475,7 +475,7 @@ describe("100% Coverage Edge Cases", () => {
             expect(form.tagName).toBe("FORM");
 
             // Fire submit event and verify it doesn't throw
-            expect(() => fireEvent.submit(form)).not.toThrowError();
+            expect(() => fireEvent.submit(form)).not.toThrow();
         });
 
         it("should handle radio group changes", () => {
@@ -491,7 +491,7 @@ describe("100% Coverage Edge Cases", () => {
             const radioButton = screen.getByTestId("radio-new");
 
             expect(radioButton).toBeInTheDocument();
-            expect(() => fireEvent.click(radioButton)).not.toThrowError();
+            expect(() => fireEvent.click(radioButton)).not.toThrow();
         });
 
         it("should handle select field changes", () => {
@@ -504,7 +504,7 @@ describe("100% Coverage Edge Cases", () => {
                 fireEvent.change(select, {
                     target: { value: "port" },
                 })
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle text field changes", () => {
@@ -517,7 +517,7 @@ describe("100% Coverage Edge Cases", () => {
                 fireEvent.change(input, {
                     target: { value: "New Site" },
                 })
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
 

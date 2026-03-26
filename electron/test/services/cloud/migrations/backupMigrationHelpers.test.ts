@@ -43,7 +43,7 @@ describe("backupMigrationHelpers", () => {
         it("throws with provided message when missing", () => {
             expect(() =>
                 requireMigrationEncryptionKey(undefined, "missing key")
-            ).toThrowError("missing key");
+            ).toThrow("missing key");
         });
     });
 

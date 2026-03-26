@@ -467,7 +467,7 @@ describe("ServiceContainer - Hoisted Mocks", () => {
             container = ServiceContainer.getInstance(emptyConfig);
 
             expect(container).toBeDefined();
-            expect(() => container.getSiteManager()).not.toThrowError();
+            expect(() => container.getSiteManager()).not.toThrow();
         });
     });
 });

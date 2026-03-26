@@ -141,7 +141,7 @@ describe("State Sync Domain API", () => {
             const error = new Error("Failed to get sync status");
             mockIpcRenderer.invoke.mockRejectedValue(error);
 
-            await expect(api.getSyncStatus()).rejects.toThrowError(
+            await expect(api.getSyncStatus()).rejects.toThrow(
                 "Failed to get sync status"
             );
         });
@@ -226,7 +226,7 @@ describe("State Sync Domain API", () => {
             const error = new Error("Sync operation failed");
             mockIpcRenderer.invoke.mockRejectedValue(error);
 
-            await expect(api.requestFullSync()).rejects.toThrowError(
+            await expect(api.requestFullSync()).rejects.toThrow(
                 "Sync operation failed"
             );
         });
@@ -235,7 +235,7 @@ describe("State Sync Domain API", () => {
             const networkError = new Error("Network unreachable during sync");
             mockIpcRenderer.invoke.mockRejectedValue(networkError);
 
-            await expect(api.requestFullSync()).rejects.toThrowError(
+            await expect(api.requestFullSync()).rejects.toThrow(
                 "Network unreachable during sync"
             );
         });
@@ -246,7 +246,7 @@ describe("State Sync Domain API", () => {
             );
             mockIpcRenderer.invoke.mockRejectedValue(conflictError);
 
-            await expect(api.requestFullSync()).rejects.toThrowError(
+            await expect(api.requestFullSync()).rejects.toThrow(
                 "Database conflict during synchronization"
             );
         });
@@ -361,12 +361,12 @@ describe("State Sync Domain API", () => {
                     async (error) => {
                         mockIpcRenderer.invoke.mockRejectedValue(error);
 
-                        await expect(api.getSyncStatus()).rejects.toThrowError(
+                        await expect(api.getSyncStatus()).rejects.toThrow(
                             error.message
                         );
                         await expect(
                             api.requestFullSync()
-                        ).rejects.toThrowError(error.message);
+                        ).rejects.toThrow(error.message);
                     }
                 ),
                 { numRuns: 10 }
@@ -379,7 +379,7 @@ describe("State Sync Domain API", () => {
             mockIpcRenderer.invoke.mockRejectedValueOnce(
                 new Error("Sync conflict")
             );
-            await expect(api.requestFullSync()).rejects.toThrowError(
+            await expect(api.requestFullSync()).rejects.toThrow(
                 "Sync conflict"
             );
 
@@ -449,10 +449,10 @@ describe("State Sync Domain API", () => {
             const corruptionError = new Error("Database corrupted during sync");
             mockIpcRenderer.invoke.mockRejectedValue(corruptionError);
 
-            await expect(api.getSyncStatus()).rejects.toThrowError(
+            await expect(api.getSyncStatus()).rejects.toThrow(
                 "Database corrupted during sync"
             );
-            await expect(api.requestFullSync()).rejects.toThrowError(
+            await expect(api.requestFullSync()).rejects.toThrow(
                 "Database corrupted during sync"
             );
         });
@@ -463,7 +463,7 @@ describe("State Sync Domain API", () => {
             );
             mockIpcRenderer.invoke.mockRejectedValue(memoryError);
 
-            await expect(api.requestFullSync()).rejects.toThrowError(
+            await expect(api.requestFullSync()).rejects.toThrow(
                 "Out of memory during sync operation"
             );
         });
@@ -474,7 +474,7 @@ describe("State Sync Domain API", () => {
                 createIpcResponse(malformedData)
             );
 
-            await expect(api.getSyncStatus()).rejects.toThrowError(
+            await expect(api.getSyncStatus()).rejects.toThrow(
                 /failed validation/i
             );
         });

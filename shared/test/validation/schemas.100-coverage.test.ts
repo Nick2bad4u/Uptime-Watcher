@@ -30,7 +30,7 @@ describe("Schemas - 100% Coverage Tests", () => {
             expect(() => {
                 // Create a scenario that will trigger line 399 in validateFieldWithSchema
                 validateMonitorField("http", "unknownField", "test");
-            }).toThrowError("Unknown field: unknownField");
+            }).toThrow("Unknown field: unknownField");
         });
 
         test("should handle validation error categorization at line 482", ({

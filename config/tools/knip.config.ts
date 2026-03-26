@@ -149,7 +149,6 @@ const knipConfig: KnipConfig = {
     project: [],
     rules: {
         binaries: "error",
-        classMembers: "warn",
         dependencies: "error",
         devDependencies: "error",
         duplicates: "error",

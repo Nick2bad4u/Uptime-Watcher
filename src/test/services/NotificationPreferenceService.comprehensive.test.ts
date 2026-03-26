@@ -116,7 +116,7 @@ describe("NotificationPreferenceService", () => {
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: false,
             })
-        ).rejects.toThrowError();
+        ).rejects.toThrow();
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
     });
 
@@ -130,7 +130,7 @@ describe("NotificationPreferenceService", () => {
                 systemNotificationsEnabled: true,
                 systemNotificationsSoundEnabled: true,
             })
-        ).rejects.toThrowError();
+        ).rejects.toThrow();
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
     });
 
@@ -142,7 +142,7 @@ describe("NotificationPreferenceService", () => {
 
         await expect(
             NotificationPreferenceService.updatePreferences(invalidPreferences)
-        ).rejects.toThrowError(/Invalid notification preferences:/u);
+        ).rejects.toThrow(/Invalid notification preferences:/u);
 
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
     });

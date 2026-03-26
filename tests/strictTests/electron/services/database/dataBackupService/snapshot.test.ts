@@ -127,7 +127,7 @@ describe("snapshot (strict coverage)", () => {
                 dbPath: "/tmp/mock-db.sqlite",
                 snapshotPath: "/tmp/backup\0snapshot.sqlite",
             });
-        }).toThrowError(/nul bytes/i);
+        }).toThrow(/nul bytes/i);
 
         expect(execCalls).toHaveLength(1);
         expect(execCalls[0]).toContain("PRAGMA busy_timeout");
@@ -192,7 +192,7 @@ describe("snapshot (strict coverage)", () => {
                 snapshotDir: "/tmp/mock-dir",
                 snapshotFileName: "backup-snapshot.sqlite",
             })
-        ).toThrowError(/sqlite_error/i);
+        ).toThrow(/sqlite_error/i);
 
         expect(databaseService.close).not.toHaveBeenCalled();
         expect(databaseService.initialize).not.toHaveBeenCalled();
@@ -278,7 +278,7 @@ describe("snapshot (strict coverage)", () => {
                 snapshotDir: "/tmp/mock-dir",
                 snapshotFileName: "backup-snapshot.sqlite",
             })
-        ).toThrowError(/sqlite_busy/i);
+        ).toThrow(/sqlite_busy/i);
 
         expect(databaseService.close).toHaveBeenCalledTimes(1);
         expect(databaseService.initialize).toHaveBeenCalledTimes(1);

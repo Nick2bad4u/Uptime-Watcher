@@ -58,7 +58,7 @@ describe("Fixed Coverage Tests", () => {
             // Test with a field that doesn't exist in any schema
             expect(() => {
                 validateMonitorField("http", "totallyUnknownField", "value");
-            }).toThrowError("Unknown field: totallyUnknownField");
+            }).toThrow("Unknown field: totallyUnknownField");
         });
     });
 
@@ -150,7 +150,7 @@ describe("Fixed Coverage Tests", () => {
             // This should cover the error handling in the finally block
             await expect(
                 withErrorHandling(operation, mockStore)
-            ).rejects.toThrowError("Operation failed");
+            ).rejects.toThrow("Operation failed");
 
             // Verify the calls happened
             expect(mockStore.setLoading).toHaveBeenCalledTimes(2);

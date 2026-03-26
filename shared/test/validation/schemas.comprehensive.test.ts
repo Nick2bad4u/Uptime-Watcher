@@ -175,7 +175,7 @@ describe("baseMonitorSchema", () => {
             fc.property(baseMonitorArbitrary, (baseMonitor) => {
                 expect(() =>
                     baseMonitorSchema.parse(baseMonitor)
-                ).not.toThrowError();
+                ).not.toThrow();
             })
         );
     });
@@ -213,8 +213,8 @@ describe("baseMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => baseMonitorSchema.parse(invalidLow)).toThrowError();
-        expect(() => baseMonitorSchema.parse(invalidHigh)).toThrowError();
+        expect(() => baseMonitorSchema.parse(invalidLow)).toThrow();
+        expect(() => baseMonitorSchema.parse(invalidHigh)).toThrow();
     });
 
     it("should require valid timeout range", async ({ task, annotate }) => {
@@ -247,8 +247,8 @@ describe("baseMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => baseMonitorSchema.parse(invalidLow)).toThrowError();
-        expect(() => baseMonitorSchema.parse(invalidHigh)).toThrowError();
+        expect(() => baseMonitorSchema.parse(invalidLow)).toThrow();
+        expect(() => baseMonitorSchema.parse(invalidHigh)).toThrow();
     });
 
     it("should require valid retry attempts range", async ({
@@ -284,8 +284,8 @@ describe("baseMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => baseMonitorSchema.parse(invalidLow)).toThrowError();
-        expect(() => baseMonitorSchema.parse(invalidHigh)).toThrowError();
+        expect(() => baseMonitorSchema.parse(invalidLow)).toThrow();
+        expect(() => baseMonitorSchema.parse(invalidHigh)).toThrow();
     });
 
     it("should allow responseTime of -1 for never checked", async ({
@@ -309,7 +309,7 @@ describe("baseMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => baseMonitorSchema.parse(monitor)).not.toThrowError();
+        expect(() => baseMonitorSchema.parse(monitor)).not.toThrow();
     });
 
     it("should reject responseTime below -1", async ({ task, annotate }) => {
@@ -329,7 +329,7 @@ describe("baseMonitorSchema", () => {
             responseTime: -2, // Invalid
         };
 
-        expect(() => baseMonitorSchema.parse(monitor)).toThrowError();
+        expect(() => baseMonitorSchema.parse(monitor)).toThrow();
     });
 });
 
@@ -356,7 +356,7 @@ describe("httpMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => httpMonitorSchema.parse(httpMonitor)).not.toThrowError();
+        expect(() => httpMonitorSchema.parse(httpMonitor)).not.toThrow();
     });
 
     it("should reject invalid URLs", async ({ task, annotate }) => {
@@ -388,7 +388,7 @@ describe("httpMonitorSchema", () => {
                 history: [],
             };
 
-            expect(() => httpMonitorSchema.parse(monitor)).toThrowError();
+            expect(() => httpMonitorSchema.parse(monitor)).toThrow();
         }
     });
 
@@ -416,8 +416,8 @@ describe("httpMonitorSchema", () => {
             url: "https://example.com",
         };
 
-        expect(() => httpMonitorSchema.parse(httpUrl)).not.toThrowError();
-        expect(() => httpMonitorSchema.parse(httpsUrl)).not.toThrowError();
+        expect(() => httpMonitorSchema.parse(httpUrl)).not.toThrow();
+        expect(() => httpMonitorSchema.parse(httpsUrl)).not.toThrow();
     });
 });
 
@@ -445,7 +445,7 @@ describe("portMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => portMonitorSchema.parse(portMonitor)).not.toThrowError();
+        expect(() => portMonitorSchema.parse(portMonitor)).not.toThrow();
     });
 
     it("should accept various valid host formats", async ({
@@ -482,7 +482,7 @@ describe("portMonitorSchema", () => {
                 history: [],
             };
 
-            expect(() => portMonitorSchema.parse(monitor)).not.toThrowError();
+            expect(() => portMonitorSchema.parse(monitor)).not.toThrow();
         }
     });
 
@@ -515,7 +515,7 @@ describe("portMonitorSchema", () => {
                 history: [],
             };
 
-            expect(() => portMonitorSchema.parse(monitor)).toThrowError();
+            expect(() => portMonitorSchema.parse(monitor)).toThrow();
         }
     });
 
@@ -548,7 +548,7 @@ describe("portMonitorSchema", () => {
                 history: [],
             };
 
-            expect(() => portMonitorSchema.parse(monitor)).not.toThrowError();
+            expect(() => portMonitorSchema.parse(monitor)).not.toThrow();
         }
     });
 
@@ -580,7 +580,7 @@ describe("portMonitorSchema", () => {
                 history: [],
             };
 
-            expect(() => portMonitorSchema.parse(monitor)).toThrowError();
+            expect(() => portMonitorSchema.parse(monitor)).toThrow();
         }
     });
 });
@@ -608,7 +608,7 @@ describe("pingMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => pingMonitorSchema.parse(pingMonitor)).not.toThrowError();
+        expect(() => pingMonitorSchema.parse(pingMonitor)).not.toThrow();
     });
 
     it("should accept various valid host formats for ping", async ({
@@ -642,7 +642,7 @@ describe("pingMonitorSchema", () => {
                 history: [],
             };
 
-            expect(() => pingMonitorSchema.parse(monitor)).not.toThrowError();
+            expect(() => pingMonitorSchema.parse(monitor)).not.toThrow();
         }
     });
 });
@@ -818,7 +818,7 @@ describe("siteSchema", () => {
             ],
         };
 
-        expect(() => siteSchema.parse(site)).not.toThrowError();
+        expect(() => siteSchema.parse(site)).not.toThrow();
     });
 
     it("should validate site with multiple monitors", async ({
@@ -863,7 +863,7 @@ describe("siteSchema", () => {
             ],
         };
 
-        expect(() => siteSchema.parse(site)).not.toThrowError();
+        expect(() => siteSchema.parse(site)).not.toThrow();
     });
 
     it("should require at least one monitor", async ({ task, annotate }) => {
@@ -879,7 +879,7 @@ describe("siteSchema", () => {
             monitors: [],
         };
 
-        expect(() => siteSchema.parse(site)).toThrowError();
+        expect(() => siteSchema.parse(site)).toThrow();
     });
 
     it("should validate identifier length constraints", async ({
@@ -916,8 +916,8 @@ describe("siteSchema", () => {
             identifier: "a".repeat(101), // Too long
         };
 
-        expect(() => siteSchema.parse(shortIdentifier)).toThrowError();
-        expect(() => siteSchema.parse(longIdentifier)).toThrowError();
+        expect(() => siteSchema.parse(shortIdentifier)).toThrow();
+        expect(() => siteSchema.parse(longIdentifier)).toThrow();
     });
 
     it("should validate name length constraints", async ({
@@ -954,8 +954,8 @@ describe("siteSchema", () => {
             name: "a".repeat(201), // Too long
         };
 
-        expect(() => siteSchema.parse(shortName)).toThrowError();
-        expect(() => siteSchema.parse(longName)).toThrowError();
+        expect(() => siteSchema.parse(shortName)).toThrow();
+        expect(() => siteSchema.parse(longName)).toThrow();
     });
 });
 
@@ -1212,7 +1212,7 @@ describe(validateMonitorField, () => {
         // Test validateFieldWithSchema with unknown field name
         expect(() => {
             validateMonitorField("http", "unknownField", "value");
-        }).toThrowError("Unknown field: unknownField");
+        }).toThrow("Unknown field: unknownField");
     });
 
     it("should handle field validation for common base fields", async ({
@@ -1573,7 +1573,7 @@ describe("Edge cases and boundary conditions", () => {
             history: [],
         };
 
-        expect(() => httpMonitorSchema.parse(monitor)).not.toThrowError();
+        expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
     });
 
     it("should handle maximum valid values", async ({ task, annotate }) => {
@@ -1595,7 +1595,7 @@ describe("Edge cases and boundary conditions", () => {
             history: [],
         };
 
-        expect(() => httpMonitorSchema.parse(monitor)).not.toThrowError();
+        expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
     });
 
     it("should handle all valid status values", async ({ task, annotate }) => {
@@ -1625,7 +1625,7 @@ describe("Edge cases and boundary conditions", () => {
                 history: [],
             };
 
-            expect(() => httpMonitorSchema.parse(monitor)).not.toThrowError();
+            expect(() => httpMonitorSchema.parse(monitor)).not.toThrow();
         }
     });
 
@@ -1658,10 +1658,10 @@ describe("Edge cases and boundary conditions", () => {
 
         expect(() =>
             httpMonitorSchema.parse(monitorWithoutDate)
-        ).not.toThrowError();
+        ).not.toThrow();
         expect(() =>
             httpMonitorSchema.parse(monitorWithDate)
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 });
 
@@ -1759,7 +1759,7 @@ describe("Missing Branch Coverage", () => {
 
             expect(() => {
                 validateMonitorField("http", "nonExistentField", "value");
-            }).toThrowError("Unknown field: nonExistentField");
+            }).toThrow("Unknown field: nonExistentField");
         });
 
         it("should handle fields that exist in specific schema shape", async ({
@@ -2059,7 +2059,7 @@ describe("sslMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => sslMonitorSchema.parse(monitor)).not.toThrowError();
+        expect(() => sslMonitorSchema.parse(monitor)).not.toThrow();
     });
 
     it("should reject monitors without valid host", async ({
@@ -2086,7 +2086,7 @@ describe("sslMonitorSchema", () => {
             history: [],
         } satisfies SslMonitor;
 
-        expect(() => sslMonitorSchema.parse(monitor)).toThrowError();
+        expect(() => sslMonitorSchema.parse(monitor)).toThrow();
     });
 
     it("should reject monitors with invalid port", async ({
@@ -2113,7 +2113,7 @@ describe("sslMonitorSchema", () => {
             history: [],
         } satisfies SslMonitor;
 
-        expect(() => sslMonitorSchema.parse(monitor)).toThrowError();
+        expect(() => sslMonitorSchema.parse(monitor)).toThrow();
     });
 
     it("should enforce certificate warning day bounds", async ({
@@ -2145,8 +2145,8 @@ describe("sslMonitorSchema", () => {
             certificateWarningDays: 400,
         } satisfies SslMonitor;
 
-        expect(() => sslMonitorSchema.parse(outOfLowerBound)).toThrowError();
-        expect(() => sslMonitorSchema.parse(outOfUpperBound)).toThrowError();
+        expect(() => sslMonitorSchema.parse(outOfLowerBound)).toThrow();
+        expect(() => sslMonitorSchema.parse(outOfUpperBound)).toThrow();
     });
 });
 
@@ -2176,7 +2176,7 @@ describe("httpKeywordMonitorSchema", () => {
 
         expect(() =>
             monitorSchemas["http-keyword"].parse(httpKeywordMonitor)
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 
     it("should reject empty keyword values", async ({ task, annotate }) => {
@@ -2201,7 +2201,7 @@ describe("httpKeywordMonitorSchema", () => {
 
         expect(() =>
             monitorSchemas["http-keyword"].parse(invalidMonitor)
-        ).toThrowError();
+        ).toThrow();
     });
 
     it("should reject missing keyword field", async ({ task, annotate }) => {
@@ -2225,7 +2225,7 @@ describe("httpKeywordMonitorSchema", () => {
 
         expect(() =>
             monitorSchemas["http-keyword"].parse(invalidMonitor)
-        ).toThrowError();
+        ).toThrow();
     });
 });
 
@@ -2255,7 +2255,7 @@ describe("httpStatusMonitorSchema", () => {
 
         expect(() =>
             monitorSchemas["http-status"].parse(httpStatusMonitor)
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 
     it("should reject non-integer status codes", async ({ task, annotate }) => {
@@ -2280,7 +2280,7 @@ describe("httpStatusMonitorSchema", () => {
 
         expect(() =>
             monitorSchemas["http-status"].parse(invalidMonitor)
-        ).toThrowError();
+        ).toThrow();
     });
 
     it("should reject out-of-range status codes", async ({
@@ -2310,7 +2310,7 @@ describe("httpStatusMonitorSchema", () => {
 
             expect(() =>
                 monitorSchemas["http-status"].parse(invalidMonitor)
-            ).toThrowError();
+            ).toThrow();
         }
     });
 });
@@ -2342,7 +2342,7 @@ describe("cdnEdgeConsistencyMonitorSchema", () => {
 
         expect(() =>
             cdnEdgeConsistencyMonitorSchema.parse(monitor)
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 
     it("should reject invalid edge endpoint list", async ({
@@ -2370,7 +2370,7 @@ describe("cdnEdgeConsistencyMonitorSchema", () => {
 
         expect(() =>
             cdnEdgeConsistencyMonitorSchema.parse(monitor)
-        ).toThrowError();
+        ).toThrow();
     });
 });
 
@@ -2399,7 +2399,7 @@ describe("replicationMonitorSchema", () => {
 
         expect(() =>
             replicationMonitorSchema.parse(monitor)
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 
     it("should reject replication monitor with missing timestamp field", async ({
@@ -2427,7 +2427,7 @@ describe("replicationMonitorSchema", () => {
             history: [],
         };
 
-        expect(() => replicationMonitorSchema.parse(monitor)).toThrowError();
+        expect(() => replicationMonitorSchema.parse(monitor)).toThrow();
     });
 });
 
@@ -2460,7 +2460,7 @@ describe("serverHeartbeatMonitorSchema", () => {
 
         expect(() =>
             serverHeartbeatMonitorSchema.parse(monitor)
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 
     it("should reject heartbeat monitor with negative drift", async ({
@@ -2491,7 +2491,7 @@ describe("serverHeartbeatMonitorSchema", () => {
 
         expect(() =>
             serverHeartbeatMonitorSchema.parse(monitor)
-        ).toThrowError();
+        ).toThrow();
     });
 });
 
@@ -2521,7 +2521,7 @@ describe("websocketKeepaliveMonitorSchema", () => {
 
         expect(() =>
             websocketKeepaliveMonitorSchema.parse(monitor)
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 
     it("should reject keepalive monitor with invalid URL", async ({
@@ -2549,6 +2549,6 @@ describe("websocketKeepaliveMonitorSchema", () => {
 
         expect(() =>
             websocketKeepaliveMonitorSchema.parse(monitor)
-        ).toThrowError();
+        ).toThrow();
     });
 });

@@ -131,7 +131,7 @@ describe(ConfigurationManager, () => {
             // The cache is private, so we just test that the method executes without error
             expect(() =>
                 configManager.clearValidationCache()
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
 
@@ -872,7 +872,7 @@ describe(ConfigurationManager, () => {
 
             await expect(
                 configManager.validateMonitorConfiguration(monitor)
-            ).rejects.toThrowError("Validation error");
+            ).rejects.toThrow("Validation error");
         });
 
         it("should handle site validator errors gracefully", async ({
@@ -894,7 +894,7 @@ describe(ConfigurationManager, () => {
 
             await expect(
                 configManager.validateSiteConfiguration(site)
-            ).rejects.toThrowError("Site validation error");
+            ).rejects.toThrow("Site validation error");
         });
     });
 

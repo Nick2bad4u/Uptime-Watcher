@@ -20,7 +20,7 @@ import type {
     ReactNode,
     SyntheticEvent,
 } from "react";
-import type { SetOptional, SetRequired, UnknownRecord } from "type-fest";
+import type { SetOptional, SetRequired } from "type-fest";
 
 /**
  * Core set of structural properties shared by many UI components.
@@ -107,10 +107,13 @@ export type ComponentSize = "lg" | "md" | "sm" | "xl" | "xs";
  */
 export type ComponentVariant =
     | "danger"
+    | "error"
     | "ghost"
+    | "outline"
     | "primary"
     | "secondary"
     | "success"
+    | "tertiary"
     | "warning";
 
 /**
@@ -360,8 +363,8 @@ export interface StandardButtonProperties
      * in a dialog footer) while still triggering form submission.
      */
     readonly form?: string;
-    /** Click handler for button interactions */
-    readonly onClick?: ClickHandler;
+    /** Click handler for button interactions. */
+    readonly onClick?: ClickFlexibleHandler<HTMLButtonElement>;
 
     /**
      * Key down handler for keyboard interactions (e.g., arrow-key tab
@@ -572,7 +575,10 @@ export interface StandardDataDisplayProperties<TItem>
  *
  * @public
  */
-export type ComponentProperties<TBase, TOverrides = UnknownRecord> = Omit<
+export type ComponentProperties<
+    TBase,
+    TOverrides = Record<never, never>,
+> = Omit<
     TBase,
     keyof TOverrides
 > &

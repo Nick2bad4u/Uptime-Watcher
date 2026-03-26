@@ -301,7 +301,7 @@ describe("Fallback Utilities", () => {
             );
 
             // Should not throw when called
-            expect(() => handler()).not.toThrowError();
+            expect(() => handler()).not.toThrow();
         });
 
         it("should work with different operation names", async ({
@@ -350,7 +350,7 @@ describe("Fallback Utilities", () => {
                     const handler = withAsyncErrorHandling(mockAsyncOp, "test");
 
                     // Should not throw when handler is called
-                    expect(() => handler()).not.toThrowError();
+                    expect(() => handler()).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
                     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -367,7 +367,7 @@ describe("Fallback Utilities", () => {
                     const handler = withAsyncErrorHandling(mockAsyncOp, "test");
 
                     // Should not throw when handler is called, even if async op fails
-                    expect(() => handler()).not.toThrowError();
+                    expect(() => handler()).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
                     await new Promise((resolve) => setTimeout(resolve, 0));

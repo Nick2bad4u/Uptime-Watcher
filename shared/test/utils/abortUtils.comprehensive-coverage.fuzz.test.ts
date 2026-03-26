@@ -216,7 +216,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
             await expect(
                 createAbortableOperation(operation, { cleanup })
-            ).rejects.toThrowError(error);
+            ).rejects.toThrow(error);
 
             expect(operation).toHaveBeenCalledTimes(1);
             expect(cleanup).toHaveBeenCalledTimes(1);
@@ -274,7 +274,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             const controller = new AbortController();
             controller.abort();
 
-            await expect(sleep(1000, controller.signal)).rejects.toThrowError(
+            await expect(sleep(1000, controller.signal)).rejects.toThrow(
                 "Sleep was aborted"
             );
         });
@@ -290,7 +290,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 const startTime = Date.now();
                 await expect(
                     sleep(sleepMs, controller.signal)
-                ).rejects.toThrowError("Sleep was aborted");
+                ).rejects.toThrow("Sleep was aborted");
                 const endTime = Date.now();
 
                 // Sleep should be interrupted before completion
@@ -314,7 +314,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             const sleepPromise = sleep(1000, controller.signal);
             controller.abort();
 
-            await expect(sleepPromise).rejects.toThrowError(
+            await expect(sleepPromise).rejects.toThrow(
                 "Sleep was aborted"
             );
         });
@@ -376,7 +376,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                         maxRetries,
                         initialDelay: 1, // Minimal delay
                     })
-                ).rejects.toThrowError("Operation failed");
+                ).rejects.toThrow("Operation failed");
 
                 expect(operation).toHaveBeenCalledTimes(maxRetries + 1);
             }
@@ -397,7 +397,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                     initialDelay: 100,
                     signal: controller.signal,
                 })
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
 
             // Should not retry after abort
             expect(operation).toHaveBeenCalledTimes(1);
@@ -414,7 +414,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 retryWithAbort(operation, {
                     signal: controller.signal,
                 })
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
 
             expect(operation).not.toHaveBeenCalled();
         });
@@ -517,7 +517,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                     maxRetries: 1,
                     initialDelay: 1, // Minimal delay
                 })
-            ).rejects.toThrowError("string error");
+            ).rejects.toThrow("string error");
         });
     });
 
@@ -623,7 +623,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
         });
 
         test.prop([fc.integer({ min: 50, max: 200 })])(
@@ -641,7 +641,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
                 await expect(
                     raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError("Operation was aborted");
+                ).rejects.toThrow("Operation was aborted");
 
                 // Verify the delay parameter is in expected range
                 expect(operationDelay).toBeGreaterThanOrEqual(50);
@@ -656,7 +656,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError(error);
+            ).rejects.toThrow(error);
         });
 
         test("sets up abort listener before racing", async () => {
@@ -670,7 +670,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
             await expect(
                 raceWithAbort(operation, controller.signal)
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
         });
 
         test.prop([fc.integer({ min: 10, max: 100 })])(
@@ -750,7 +750,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                     initialDelay: 100,
                     signal: combinedSignal,
                 })
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
 
             expect(attemptCount).toBe(1);
         });
@@ -794,7 +794,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 expect(combinedSignal.aborted).toBeTruthy();
 
                 // All utilities should respect the abort
-                await expect(sleep(1000, combinedSignal)).rejects.toThrowError(
+                await expect(sleep(1000, combinedSignal)).rejects.toThrow(
                     "Sleep was aborted"
                 );
 
@@ -803,7 +803,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                     retryWithAbort(operation, {
                         signal: combinedSignal,
                     })
-                ).rejects.toThrowError("Operation was aborted");
+                ).rejects.toThrow("Operation was aborted");
 
                 expect(operation).not.toHaveBeenCalled();
             }

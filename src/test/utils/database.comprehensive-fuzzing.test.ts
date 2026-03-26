@@ -599,7 +599,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             "safeQuery",
                             injection
                         );
-                    }).toThrowError("SQL injection detected");
+                    }).toThrow("SQL injection detected");
                 }
             }
         );

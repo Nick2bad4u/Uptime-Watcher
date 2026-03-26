@@ -132,7 +132,7 @@ describe(DropboxTokenManager, () => {
         await secretStore.setSecret("cloud.dropbox.tokens", "not-json");
 
         await expect(manager.getStoredTokens()).resolves.toBeUndefined();
-        await expect(manager.getAccessToken()).rejects.toThrowError(
+        await expect(manager.getAccessToken()).rejects.toThrow(
             /Dropbox is not connected/iu
         );
     });

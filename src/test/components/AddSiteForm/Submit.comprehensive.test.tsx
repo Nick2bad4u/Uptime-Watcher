@@ -622,7 +622,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                             (typeof testValue === "string" &&
                                 testValue.trim().length === 0)
                     ).toBeTruthy();
-                }).not.toThrowError();
+                }).not.toThrow();
             },
             propertyTimeoutMs
         );
@@ -973,7 +973,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
             await expect(
                 handleSubmit(mockEvent, properties)
-            ).rejects.toThrowError("Unsupported monitor type");
+            ).rejects.toThrow("Unsupported monitor type");
         });
     });
 });

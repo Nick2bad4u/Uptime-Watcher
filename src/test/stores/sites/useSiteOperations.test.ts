@@ -240,7 +240,7 @@ describe(createSiteOperationsActions, () => {
 
             await expect(
                 actions.addMonitorToSite("nonexistent-site", mockMonitor)
-            ).rejects.toThrowError(ERROR_CATALOG.sites.NOT_FOUND);
+            ).rejects.toThrow(ERROR_CATALOG.sites.NOT_FOUND);
         });
     });
 
@@ -435,7 +435,7 @@ describe(createSiteOperationsActions, () => {
             const error = new Error("Delete failed");
             mockElectronAPI.sites.removeSite.mockRejectedValue(error);
 
-            await expect(actions.deleteSite("test-site")).rejects.toThrowError(
+            await expect(actions.deleteSite("test-site")).rejects.toThrow(
                 "Delete failed"
             );
             expect(mockDeps.removeSite).not.toHaveBeenCalled();
@@ -452,7 +452,7 @@ describe(createSiteOperationsActions, () => {
 
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(false);
 
-            await expect(actions.deleteSite("test-site")).rejects.toThrowError(
+            await expect(actions.deleteSite("test-site")).rejects.toThrow(
                 "Site removal failed for test-site: Backend returned false"
             );
             expect(mockDeps.removeSite).not.toHaveBeenCalled();
@@ -513,7 +513,7 @@ describe(createSiteOperationsActions, () => {
                 new Error("Backend error")
             );
 
-            await expect(actions.initializeSites()).rejects.toThrowError(
+            await expect(actions.initializeSites()).rejects.toThrow(
                 "Backend error"
             );
         });
@@ -568,7 +568,7 @@ describe(createSiteOperationsActions, () => {
 
             await expect(
                 actions.modifySite("test-site", { name: "Updated" })
-            ).rejects.toThrowError("Update failed");
+            ).rejects.toThrow("Update failed");
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 
@@ -834,7 +834,7 @@ describe(createSiteOperationsActions, () => {
                     buffer: new ArrayBuffer(8),
                     fileName: "restore.sqlite",
                 })
-            ).rejects.toThrowError("Restore failed");
+            ).rejects.toThrow("Restore failed");
         });
     });
 });

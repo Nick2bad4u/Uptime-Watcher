@@ -202,7 +202,7 @@ describe(ErrorBoundary, () => {
                         <ThrowingComponent shouldThrow />
                     </ErrorBoundary>
                 );
-            }).not.toThrowError();
+            }).not.toThrow();
         });
     });
 

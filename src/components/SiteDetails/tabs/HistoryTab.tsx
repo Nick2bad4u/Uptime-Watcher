@@ -352,7 +352,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 ? historyLimit
                 : Math.min(10, Math.max(1, historyLength));
 
-        const selectedMonitorHistoryLengthRef = useRef<number>(
+        const selectedMonitorHistoryLengthRef = useRef(
             selectedMonitor.history.length
         );
 

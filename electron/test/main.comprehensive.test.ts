@@ -401,7 +401,7 @@ describe("main.ts - Electron Main Process", () => {
 
             if (beforeExitHandler) {
                 // The beforeExit handler doesn't throw synchronously - it logs and handles errors internally
-                expect(() => beforeExitHandler()).not.toThrowError();
+                expect(() => beforeExitHandler()).not.toThrow();
 
                 // Give some time for the async cleanup to run and error handling to complete
                 await new Promise((resolve) => setTimeout(resolve, 100));
@@ -598,7 +598,7 @@ describe("main.ts - Electron Main Process", () => {
             // Should not throw when cleanup method is missing
             expect(() => {
                 if (beforeExitHandler) beforeExitHandler();
-            }).not.toThrowError();
+            }).not.toThrow();
         });
         it("should handle null applicationService gracefully", async ({
             task,
@@ -632,7 +632,7 @@ describe("main.ts - Electron Main Process", () => {
             // Should not throw when applicationService is null
             expect(() => {
                 if (beforeExitHandler) beforeExitHandler();
-            }).not.toThrowError();
+            }).not.toThrow();
 
             // Restore default implementation for subsequent tests
             mockConstructableReturnValue(

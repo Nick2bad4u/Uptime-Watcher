@@ -23,7 +23,7 @@ describe("validateOAuthAuthorizeUrl()", () => {
                 providerName: "Test",
                 url: "http://example.com/oauth?x=1",
             })
-        ).toThrowError(/unexpected.*OAuth URL/iu);
+        ).toThrow(/unexpected.*OAuth URL/iu);
     });
 
     it("rejects non-https schemes (mailto)", () => {
@@ -32,7 +32,7 @@ describe("validateOAuthAuthorizeUrl()", () => {
                 providerName: "Test",
                 url: "mailto:test@example.com",
             })
-        ).toThrowError(/unexpected.*OAuth URL/iu);
+        ).toThrow(/unexpected.*OAuth URL/iu);
     });
 
     it("rejects disallowed schemes (file)", () => {
@@ -41,7 +41,7 @@ describe("validateOAuthAuthorizeUrl()", () => {
                 providerName: "Test",
                 url: "file:///C:/Windows/System32",
             })
-        ).toThrowError(/disallowed.*OAuth URL/iu);
+        ).toThrow(/disallowed.*OAuth URL/iu);
     });
 
     it("rejects credential-bearing URLs", () => {
@@ -50,6 +50,6 @@ describe("validateOAuthAuthorizeUrl()", () => {
                 providerName: "Test",
                 url: "https://user:pass@example.com/oauth",
             })
-        ).toThrowError(/disallowed.*OAuth URL/iu);
+        ).toThrow(/disallowed.*OAuth URL/iu);
     });
 });

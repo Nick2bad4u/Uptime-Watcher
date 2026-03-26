@@ -24,13 +24,13 @@ const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> =
     z.discriminatedUnion("kind", [
         z
             .object({
-                baseDirectory: z.string().min(1),
+                baseDirectory: z.string().trim().min(1),
                 kind: z.literal(CLOUD_PROVIDER_KIND.FILESYSTEM),
             })
             .strict(),
         z
             .object({
-                accountLabel: z.string().min(1).optional(),
+                accountLabel: z.string().trim().min(1).optional(),
                 kind: z.enum([
                     CLOUD_PROVIDER_KIND.DROPBOX,
                     CLOUD_PROVIDER_KIND.GOOGLE_DRIVE,
@@ -52,7 +52,7 @@ const cloudStatusSummaryInternalSchema = z
         encryptionLocked: z.boolean(),
         encryptionMode: cloudEncryptionModeSchema,
         lastBackupAt: z.number().nullable(),
-        lastError: z.string().min(1).optional(),
+        lastError: z.string().trim().min(1).optional(),
         lastSyncAt: z.number().nullable(),
         provider: cloudProviderKindSchema.nullable(),
         providerDetails: cloudProviderDetailsSchema.optional(),
@@ -87,7 +87,7 @@ export const cloudStatusSummarySchema: z.ZodType<CloudStatusSummary> =
 const cloudSyncResetPreviewDeviceSchema: z.ZodType<CloudSyncResetPreviewDevice> =
     z
         .object({
-            deviceId: z.string().min(1),
+            deviceId: z.string().trim().min(1),
             newestCreatedAtEpochMs: z.number().optional(),
             oldestCreatedAtEpochMs: z.number().optional(),
             operationObjectCount: z.int().nonnegative(),
@@ -97,10 +97,10 @@ const cloudSyncResetPreviewDeviceSchema: z.ZodType<CloudSyncResetPreviewDevice> 
 /** Zod schema for {@link CloudSyncResetPreview}. */
 const cloudSyncResetPreviewInternalSchema = z
     .object({
-        deviceIds: z.array(z.string().min(1)),
+        deviceIds: z.array(z.string().trim().min(1)),
         fetchedAt: z.number(),
-        latestSnapshotKey: z.string().min(1).optional(),
-        operationDeviceIds: z.array(z.string().min(1)),
+        latestSnapshotKey: z.string().trim().min(1).optional(),
+        operationDeviceIds: z.array(z.string().trim().min(1)),
         operationObjectCount: z.int().nonnegative(),
         otherObjectCount: z.int().nonnegative(),
         perDevice: z.array(cloudSyncResetPreviewDeviceSchema),
@@ -128,8 +128,8 @@ const cloudSyncResetDeletionFailureSchema: z.ZodType<
     CloudSyncResetResult["failedDeletions"][number]
 > = z
     .object({
-        key: z.string().min(1),
-        message: z.string().min(1),
+        key: z.string().trim().min(1),
+        message: z.string().trim().min(1),
     })
     .strict();
 
@@ -140,7 +140,7 @@ const cloudSyncResetResultInternalSchema = z
         deletedObjects: z.int().nonnegative(),
         failedDeletions: z.array(cloudSyncResetDeletionFailureSchema),
         resetAt: z.number(),
-        seededSnapshotKey: z.string().min(1).optional(),
+        seededSnapshotKey: z.string().trim().min(1).optional(),
         startedAt: z.number(),
     })
     .strict();

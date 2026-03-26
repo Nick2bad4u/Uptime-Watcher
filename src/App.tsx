@@ -204,13 +204,13 @@ export const App: NamedExoticComponent = memo(
         const { isDark } = useTheme();
 
         // Track if initial app initialization is complete to prevent loading overlay flash
-        const [isInitialized, setIsInitialized] = useState<boolean>(false);
+        const [isInitialized, setIsInitialized] = useState(false);
 
         // Sidebar responsive state management
         const [compactSidebarOpen, setCompactSidebarOpen] =
-            useState<boolean>(false);
+            useState(false);
         const [isCompactViewport, setIsCompactViewport] =
-            useState<boolean>(false);
+            useState(false);
 
         const isSidebarOpen = isCompactViewport
             ? compactSidebarOpen

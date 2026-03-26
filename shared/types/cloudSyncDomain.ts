@@ -2,6 +2,8 @@
  * Canonical domain payloads for true multi-device sync (ADR-016).
  */
 
+/* eslint-disable zod/prefer-string-schema-with-trim -- Cloud sync protocol parsing must preserve payload strings/keys exactly and avoid lossy normalization. */
+
 import { BASE_MONITOR_TYPES } from "@shared/types";
 import * as z from "zod";
 
@@ -102,3 +104,5 @@ export type CloudSyncSettingsConfig = Record<string, string>;
 
 export const cloudSyncSettingsConfigSchema: z.ZodType<CloudSyncSettingsConfig> =
     z.record(z.string().min(1), z.string());
+
+/* eslint-enable zod/prefer-string-schema-with-trim -- End protocol-preserving no-trim exception scope. */

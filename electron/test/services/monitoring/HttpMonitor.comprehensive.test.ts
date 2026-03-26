@@ -289,15 +289,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             expect(() =>
                 httpMonitor.updateConfig({ timeout: -1000 })
-            ).toThrowError("Invalid timeout: must be a positive number");
-            expect(() => httpMonitor.updateConfig({ timeout: 0 })).toThrowError(
+            ).toThrow("Invalid timeout: must be a positive number");
+            expect(() => httpMonitor.updateConfig({ timeout: 0 })).toThrow(
                 "Invalid timeout: must be a positive number"
             );
             expect(() =>
                 httpMonitor.updateConfig({
                     timeout: "invalid" as any,
                 })
-            ).toThrowError("Invalid timeout: must be a positive number");
+            ).toThrow("Invalid timeout: must be a positive number");
         });
 
         it("should throw error for invalid userAgent", async ({
@@ -313,7 +313,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 httpMonitor.updateConfig({
                     userAgent: 123 as any,
                 })
-            ).toThrowError("Invalid userAgent: must be a string");
+            ).toThrow("Invalid userAgent: must be a string");
         });
     });
 
@@ -338,7 +338,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 status: "pending" as const,
             } as any;
 
-            await expect(httpMonitor.check(monitor)).rejects.toThrowError(
+            await expect(httpMonitor.check(monitor)).rejects.toThrow(
                 "HttpMonitor cannot handle monitor type: ping"
             );
         });

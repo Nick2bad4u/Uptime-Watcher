@@ -133,7 +133,7 @@ describe("CloudService", () => {
         const disconnected = await cloudService.disconnect();
         expect(disconnected.provider).toBeNull();
 
-        await expect(cloudService.listBackups()).rejects.toThrowError(
+        await expect(cloudService.listBackups()).rejects.toThrow(
             "Cloud provider is not configured"
         );
     });
@@ -165,7 +165,7 @@ describe("CloudService", () => {
             secretStore: new InMemorySecretStore(),
         });
 
-        await expect(cloudService.requestSyncNow()).rejects.toThrowError(
+        await expect(cloudService.requestSyncNow()).rejects.toThrow(
             "Cloud sync is disabled"
         );
     });
@@ -202,7 +202,7 @@ describe("CloudService", () => {
             cloudService.configureFilesystemProvider({
                 baseDirectory: ` ${baseDirectory}`,
             })
-        ).rejects.toThrowError(
+        ).rejects.toThrow(
             "Filesystem base directory must not have leading or trailing whitespace"
         );
     });
@@ -245,7 +245,7 @@ describe("CloudService", () => {
         expect(status.configured).toBeFalsy();
         expect(status.connected).toBeFalsy();
 
-        await expect(cloudService.listBackups()).rejects.toThrowError(
+        await expect(cloudService.listBackups()).rejects.toThrow(
             "Cloud provider is not configured"
         );
     });
@@ -282,7 +282,7 @@ describe("CloudService", () => {
 
         await expect(
             cloudService.setEncryptionPassphrase("correct\nhorse")
-        ).rejects.toThrowError(
+        ).rejects.toThrow(
             "Passphrase must not contain control characters"
         );
     });

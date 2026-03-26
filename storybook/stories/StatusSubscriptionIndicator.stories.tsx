@@ -34,7 +34,7 @@ const resolveVariantFromStoryArgs = (args: unknown): IndicatorVariant => {
     return isIndicatorVariant(args.variant) ? args.variant : "healthy";
 };
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const logRetry = action("sites/retryStatusSubscription");
 

@@ -118,7 +118,7 @@ describe("SettingsService", () => {
             const error = new Error("Electron API unavailable");
             mockWaitForElectronBridge.mockRejectedValue(error);
 
-            await expect(SettingsService.initialize()).rejects.toThrowError(
+            await expect(SettingsService.initialize()).rejects.toThrow(
                 "Electron API unavailable"
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -131,7 +131,7 @@ describe("SettingsService", () => {
             const error = "String error";
             mockWaitForElectronBridge.mockRejectedValue(error);
 
-            await expect(SettingsService.initialize()).rejects.toThrowError(
+            await expect(SettingsService.initialize()).rejects.toThrow(
                 "String error"
             );
             expect(mockLogger.error).toHaveBeenCalled();
@@ -141,7 +141,7 @@ describe("SettingsService", () => {
         it("should handle null/undefined initialization errors", async () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
-            await expect(SettingsService.initialize()).rejects.toThrowError(
+            await expect(SettingsService.initialize()).rejects.toThrow(
                 "null"
             );
             expect(mockLogger.error).toHaveBeenCalled();
@@ -171,7 +171,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.getHistoryLimit()
-            ).rejects.toThrowError("Initialization failed");
+            ).rejects.toThrow("Initialization failed");
             expect(
                 mockElectronAPI.settings.getHistoryLimit
             ).not.toHaveBeenCalled();
@@ -183,7 +183,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.getHistoryLimit()
-            ).rejects.toThrowError("Failed to get history limit");
+            ).rejects.toThrow("Failed to get history limit");
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.getHistoryLimit
@@ -284,7 +284,7 @@ describe("SettingsService", () => {
             const error = new Error("Initialization failed");
             mockWaitForElectronBridge.mockRejectedValue(error);
 
-            await expect(SettingsService.resetSettings()).rejects.toThrowError(
+            await expect(SettingsService.resetSettings()).rejects.toThrow(
                 "Initialization failed"
             );
             expect(
@@ -296,7 +296,7 @@ describe("SettingsService", () => {
             const error = new Error("Failed to reset settings");
             mockElectronAPI.settings.resetSettings.mockRejectedValue(error);
 
-            await expect(SettingsService.resetSettings()).rejects.toThrowError(
+            await expect(SettingsService.resetSettings()).rejects.toThrow(
                 "Failed to reset settings"
             );
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
@@ -339,7 +339,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.updateHistoryLimit(1000)
-            ).rejects.toThrowError("Initialization failed");
+            ).rejects.toThrow("Initialization failed");
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
             ).not.toHaveBeenCalled();
@@ -353,7 +353,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.updateHistoryLimit(1000)
-            ).rejects.toThrowError("Failed to update history limit");
+            ).rejects.toThrow("Failed to update history limit");
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
@@ -426,7 +426,7 @@ describe("SettingsService", () => {
 
                 await expect(
                     SettingsService.updateHistoryLimit(limit)
-                ).rejects.toThrowError(RangeError);
+                ).rejects.toThrow(RangeError);
 
                 expect(mockLogger.warn).toHaveBeenCalledWith(
                     "History limit update rejected: requested limit could not be normalised",
@@ -547,7 +547,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.getHistoryLimit()
-            ).rejects.toThrowError("Synchronous error");
+            ).rejects.toThrow("Synchronous error");
         });
 
         it("should handle missing electron API methods gracefully", async () => {
@@ -557,7 +557,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.getHistoryLimit()
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
         });
 
         it("should handle partial electron API gracefully", async () => {
@@ -575,13 +575,13 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.getHistoryLimit()
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
             await expect(
                 SettingsService.resetSettings()
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
             await expect(
                 SettingsService.updateHistoryLimit(100)
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
         });
 
         it("should handle database-like errors in operations", async () => {
@@ -598,7 +598,7 @@ describe("SettingsService", () => {
                 );
                 await expect(
                     SettingsService.getHistoryLimit()
-                ).rejects.toThrowError(error.message);
+                ).rejects.toThrow(error.message);
             }
         });
 
@@ -616,7 +616,7 @@ describe("SettingsService", () => {
                 );
                 await expect(
                     SettingsService.resetSettings()
-                ).rejects.toThrowError(error.message);
+                ).rejects.toThrow(error.message);
             }
         });
     });
@@ -680,7 +680,7 @@ describe("SettingsService", () => {
 
             await expect(
                 SettingsService.updateHistoryLimit(Number.MAX_VALUE)
-            ).rejects.toThrowError(TypeError);
+            ).rejects.toThrow(TypeError);
 
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "History limit update rejected: requested limit could not be normalised",
@@ -726,7 +726,7 @@ describe("SettingsService", () => {
                     );
                     await expect(
                         SettingsService.updateHistoryLimit(value)
-                    ).rejects.toThrowError();
+                    ).rejects.toThrow();
                     expect(
                         mockElectronAPI.settings.updateHistoryLimit
                     ).toHaveBeenCalledWith(value);

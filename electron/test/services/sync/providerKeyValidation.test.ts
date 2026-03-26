@@ -14,13 +14,13 @@ describe("providerKeyValidation", () => {
         it("accepts valid persisted device IDs", () => {
             expect(() => {
                 assertValidSyncDeviceId("device-a");
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         it("rejects IDs containing path separators", () => {
             expect(() => {
                 assertValidSyncDeviceId("device/a");
-            }).toThrowError(/path separators/i);
+            }).toThrow(/path separators/i);
         });
     });
 
@@ -28,7 +28,7 @@ describe("providerKeyValidation", () => {
         it("accepts canonical provider keys", () => {
             expect(() => {
                 assertSafeProviderKey("sync/devices/device-a/ops/1-1-1.ndjson");
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         it("rejects traversal segments", () => {
@@ -36,7 +36,7 @@ describe("providerKeyValidation", () => {
                 assertSafeProviderKey(
                     "sync/devices/device-a/ops/../evil.ndjson"
                 );
-            }).toThrowError(/traversal/i);
+            }).toThrow(/traversal/i);
         });
 
         it("rejects backslashes", () => {
@@ -44,7 +44,7 @@ describe("providerKeyValidation", () => {
                 assertSafeProviderKey(
                     String.raw`sync\devices\device-a\ops\1-1-1.ndjson`
                 );
-            }).toThrowError(/backslashes/i);
+            }).toThrow(/backslashes/i);
         });
     });
 
@@ -52,7 +52,7 @@ describe("providerKeyValidation", () => {
         it("accepts canonical operations object keys", () => {
             expect(() => {
                 assertOpsObjectKey("sync/devices/device-a/ops/123-1-9.ndjson");
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         it("rejects invalid filename metadata", () => {
@@ -60,7 +60,7 @@ describe("providerKeyValidation", () => {
                 assertOpsObjectKey(
                     "sync/devices/device-a/ops/not-valid-filename.ndjson"
                 );
-            }).toThrowError(/expected <createdat>-<firstopid>-<lastopid>/i);
+            }).toThrow(/expected <createdat>-<firstopid>-<lastopid>/i);
         });
 
         it("returns false for invalid operations keys", () => {
@@ -78,13 +78,13 @@ describe("providerKeyValidation", () => {
                 assertSnapshotKey(
                     `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1-0123456789abcdef0123456789abcdef.json`
                 );
-            }).not.toThrowError();
+            }).not.toThrow();
         });
 
         it("rejects mismatched schema versions", () => {
             expect(() => {
                 assertSnapshotKey("sync/snapshots/999/1.json");
-            }).toThrowError(/invalid snapshot key/i);
+            }).toThrow(/invalid snapshot key/i);
         });
     });
 });

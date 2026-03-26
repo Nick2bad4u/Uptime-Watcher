@@ -177,7 +177,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => parseCacheKey("site:" as any)).toThrowError(
+            expect(() => parseCacheKey("site:" as any)).toThrow(
                 "Invalid cache key format: site:"
             );
         });
@@ -194,7 +194,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() => parseCacheKey(":site-123" as any)).toThrowError(
+            expect(() => parseCacheKey(":site-123" as any)).toThrow(
                 "Invalid cache key format:"
             );
         });
@@ -213,11 +213,11 @@ describe("Cache Keys Function Coverage", () => {
 
             expect(() =>
                 parseCacheKey(":loading:site-123" as any)
-            ).toThrowError("Invalid cache key format:");
-            expect(() => parseCacheKey("site::site-123" as any)).toThrowError(
+            ).toThrow("Invalid cache key format:");
+            expect(() => parseCacheKey("site::site-123" as any)).toThrow(
                 "Invalid cache key format:"
             );
-            expect(() => parseCacheKey("site:loading:" as any)).toThrowError(
+            expect(() => parseCacheKey("site:loading:" as any)).toThrow(
                 "Invalid cache key format:"
             );
         });

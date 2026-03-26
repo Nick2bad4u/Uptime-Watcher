@@ -13,8 +13,8 @@ export interface GoogleUserInfoResponse {
 
 const googleUserInfoSchema: z.ZodType<GoogleUserInfoResponse> = z
     .object({
-        email: z.string().min(1).optional(),
-        name: z.string().min(1).optional(),
+        email: z.string().trim().min(1).optional(),
+        name: z.string().trim().min(1).optional(),
     })
     .loose();
 

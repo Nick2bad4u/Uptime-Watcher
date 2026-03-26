@@ -307,7 +307,7 @@ describe("DatabaseManager Foundation Tests", () => {
 
             await expect(
                 databaseManager.initialize()
-            ).resolves.not.toThrowError();
+            ).resolves.not.toThrow();
         });
 
         it("should set history limit successfully", async ({

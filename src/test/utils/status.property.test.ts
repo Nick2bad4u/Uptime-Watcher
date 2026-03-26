@@ -422,9 +422,9 @@ describe("Status Utils Property-Based Tests", () => {
     describe("Integration and edge cases", () => {
         test("should handle null-like inputs gracefully", () => {
             // These test what happens with various falsy/edge case inputs
-            expect(() => getStatusIcon("")).not.toThrowError();
-            expect(() => formatStatusWithIcon("a")).not.toThrowError();
-            expect(() => createStatusIdentifier("a")).not.toThrowError();
+            expect(() => getStatusIcon("")).not.toThrow();
+            expect(() => formatStatusWithIcon("a")).not.toThrow();
+            expect(() => createStatusIdentifier("a")).not.toThrow();
         });
 
         test.prop([fc.string().filter((s) => s.length <= 100)])(
@@ -445,11 +445,11 @@ describe("Status Utils Property-Based Tests", () => {
         );
 
         test("should handle unicode and special characters", () => {
-            expect(() => getStatusIcon("测试")).not.toThrowError();
-            expect(() => formatStatusWithIcon("🚀 status")).not.toThrowError();
+            expect(() => getStatusIcon("测试")).not.toThrow();
+            expect(() => formatStatusWithIcon("🚀 status")).not.toThrow();
             expect(() =>
                 createStatusIdentifier("test-émoji_status")
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Results should still be valid
             expect(getStatusIcon("测试")).toBe("⚪");

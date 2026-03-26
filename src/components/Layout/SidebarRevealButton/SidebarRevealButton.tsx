@@ -4,8 +4,9 @@
 
 import type { JSX } from "react/jsx-runtime";
 
-import { memo, type NamedExoticComponent, useMemo } from "react";
+import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
 
+import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
@@ -20,6 +21,15 @@ export const SidebarRevealButton: NamedExoticComponent = memo(
     function SidebarRevealButtonComponent(): JSX.Element | null {
         const { isDark } = useTheme();
         const { isSidebarOpen, toggleSidebar } = useSidebarLayout();
+        const hasBlockingOverlay = useUIStore(
+            useCallback(
+                (state) =>
+                    state.showAddSiteModal ||
+                    state.showSettings ||
+                    state.showSiteDetails,
+                []
+            )
+        );
         const className = useMemo(() => {
             const classes = ["sidebar-reveal-button"];
             if (isDark) {
@@ -28,7 +38,7 @@ export const SidebarRevealButton: NamedExoticComponent = memo(
             return classes.join(" ");
         }, [isDark]);
 
-        if (isSidebarOpen) {
+        if (hasBlockingOverlay || isSidebarOpen) {
             return null;
         }
 

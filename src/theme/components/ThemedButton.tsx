@@ -53,7 +53,6 @@
 
 import type {
     ComponentProperties,
-    EventHandlers,
     StandardButtonProperties,
 } from "@shared/types/componentProps";
 
@@ -68,8 +67,6 @@ import {
     useCallback,
 } from "react";
 
-import type { ButtonSize, ButtonVariant } from "./types";
-
 import { renderColoredIcon } from "./iconUtils";
 import { CSS_CLASSES } from "./types";
 
@@ -79,19 +76,7 @@ import { CSS_CLASSES } from "./types";
  * @public
  */
 export type ThemedButtonProperties = ComponentProperties<
-    StandardButtonProperties,
-    Readonly<{
-        /** Optional test id forwarded to the underlying <button>. */
-        readonly "data-testid"?: string;
-        /** Click handler for the button */
-        onClick?: EventHandlers.ClickWithEvent<HTMLButtonElement>;
-        /** Key down handler for keyboard navigation patterns (e.g., ARIA tabs). */
-        onKeyDown?: EventHandlers.KeyPress<HTMLButtonElement>;
-        /** Size variant for the button */
-        size?: ButtonSize;
-        /** Visual variant for the button styling */
-        variant?: ButtonVariant;
-    }>
+    StandardButtonProperties
 >;
 
 // Default styles object to prevent infinite render loops
@@ -157,7 +142,7 @@ const ThemedButtonComponent = ({
         `themed-button--${variant}`,
         `themed-button--size-${size}`,
         fullWidth && "themed-button--full-width",
-        (disabled || loading) && "themed-button--loading",
+        (disabled ? true : loading) && "themed-button--loading",
         className,
     ]
         .filter(Boolean)
@@ -227,7 +212,7 @@ const ThemedButtonComponent = ({
                           .replaceAll(/\s+/gu, "-")}`
                     : undefined)
             }
-            disabled={disabled || loading}
+            disabled={disabled ? true : loading}
             form={form}
             onClick={handleClick}
             style={style}

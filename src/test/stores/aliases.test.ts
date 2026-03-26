@@ -125,7 +125,7 @@ describe("Store Alias Methods", () => {
             expect(typeof store.syncSites).toBe("function");
 
             // Call the alias to ensure it doesn't throw - it should delegate correctly
-            await expect(store.syncSites()).resolves.not.toThrowError();
+            await expect(store.syncSites()).resolves.not.toThrow();
         });
 
         it("fullResyncSites should exist and be callable", async () => {
@@ -139,7 +139,7 @@ describe("Store Alias Methods", () => {
             expect(typeof store.fullResyncSites).toBe("function");
 
             // Call the alias to ensure it doesn't throw - it should delegate correctly
-            await expect(store.fullResyncSites()).resolves.not.toThrowError();
+            await expect(store.fullResyncSites()).resolves.not.toThrow();
         });
     });
 

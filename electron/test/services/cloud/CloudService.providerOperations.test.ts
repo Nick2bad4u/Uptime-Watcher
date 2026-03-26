@@ -126,7 +126,7 @@ describe("CloudService.providerOperations", () => {
             settings,
         });
 
-        await expect(connectDropbox(ctx)).rejects.toThrowError(
+        await expect(connectDropbox(ctx)).rejects.toThrow(
             "Dropbox connection verification failed: boom"
         );
 
@@ -197,7 +197,7 @@ describe("CloudService.providerOperations", () => {
             settings,
         });
 
-        await expect(connectGoogleDrive(ctx)).rejects.toThrowError(
+        await expect(connectGoogleDrive(ctx)).rejects.toThrow(
             "label failed"
         );
 
@@ -291,7 +291,7 @@ describe("CloudService.providerOperations", () => {
             settings,
         });
 
-        await expect(connectGoogleDrive(ctx)).rejects.toThrowError(
+        await expect(connectGoogleDrive(ctx)).rejects.toThrow(
             "Google Drive connect failed while persisting configuration: settings failed"
         );
 

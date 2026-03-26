@@ -43,18 +43,18 @@ describe("Logger Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 // These tests verify the logger can be called without throwing errors
-                expect(() => logger.debug("Debug message")).not.toThrowError();
+                expect(() => logger.debug("Debug message")).not.toThrow();
                 expect(() =>
                     logger.info("Info message", {
                         key: "value",
                     })
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     logger.warn("Warning message", "extra", 123)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     logger.error("Error message", new Error("test"))
-                ).not.toThrowError();
+                ).not.toThrow();
             });
 
             it("should handle Error objects in error method", async ({
@@ -71,7 +71,7 @@ describe("Logger Utilities", () => {
 
                 expect(() =>
                     logger.error("Error occurred", error)
-                ).not.toThrowError();
+                ).not.toThrow();
             });
 
             it("should handle non-Error objects in error method", async ({
@@ -87,7 +87,7 @@ describe("Logger Utilities", () => {
 
                 expect(() =>
                     logger.error("Custom error", errorObject)
-                ).not.toThrowError();
+                ).not.toThrow();
             });
 
             it("should handle edge cases", async ({ task, annotate }) => {
@@ -96,14 +96,14 @@ describe("Logger Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(() => logger.info("")).not.toThrowError();
-                expect(() => logger.debug("Just message")).not.toThrowError();
+                expect(() => logger.info("")).not.toThrow();
+                expect(() => logger.debug("Just message")).not.toThrow();
                 expect(() =>
                     logger.error("Null error", null)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     logger.error("Undefined error", undefined)
-                ).not.toThrowError();
+                ).not.toThrow();
             });
         });
 
@@ -137,23 +137,23 @@ describe("Logger Utilities", () => {
                     dbLogger.debug("Executing query", {
                         sql: "SELECT * FROM users",
                     })
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     dbLogger.info("Database migration completed", {
                         version: "1.2.0",
                     })
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     dbLogger.warn("Connection pool low", {
                         available: 2,
                         total: 10,
                     })
-                ).not.toThrowError();
+                ).not.toThrow();
 
                 const dbError = new Error("Connection timeout");
                 expect(() =>
                     dbLogger.error("Database connection failed", dbError)
-                ).not.toThrowError();
+                ).not.toThrow();
             });
         });
 
@@ -188,23 +188,23 @@ describe("Logger Utilities", () => {
                         time: 245,
                         url: "https://example.com",
                     })
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     monitorLogger.info("Monitor check started", {
                         siteIdentifier: "abc123",
                     })
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     monitorLogger.warn("High response time detected", {
                         responseTime: 5000,
                         threshold: 3000,
                     })
-                ).not.toThrowError();
+                ).not.toThrow();
 
                 const timeoutError = new Error("Request timeout");
                 expect(() =>
                     monitorLogger.error("Monitor check failed", timeoutError)
-                ).not.toThrowError();
+                ).not.toThrow();
             });
         });
 
@@ -261,7 +261,7 @@ describe("Logger Utilities", () => {
                     for (let i = 0; i < 100; i++) {
                         logger.info(`Message ${i}`);
                     }
-                }).not.toThrowError();
+                }).not.toThrow();
             });
 
             it("should handle concurrent logging from multiple loggers", async ({
@@ -279,7 +279,7 @@ describe("Logger Utilities", () => {
                         dbLogger.info(`DB ${i}`);
                         monitorLogger.info(`Monitor ${i}`);
                     }
-                }).not.toThrowError();
+                }).not.toThrow();
             });
 
             it("should handle logging with circular references", async ({
@@ -296,7 +296,7 @@ describe("Logger Utilities", () => {
 
                 expect(() => {
                     logger.info("Circular reference", circular);
-                }).not.toThrowError();
+                }).not.toThrow();
             });
 
             it("should handle very large objects", async ({
@@ -316,7 +316,7 @@ describe("Logger Utilities", () => {
 
                 expect(() => {
                     logger.debug("Large object", largeObject);
-                }).not.toThrowError();
+                }).not.toThrow();
             });
         });
 
@@ -336,7 +336,7 @@ describe("Logger Utilities", () => {
                         configPath: "/path/to/config",
                     });
                     logger.info("Application started successfully");
-                }).not.toThrowError();
+                }).not.toThrow();
             });
 
             it("should handle database operation logging", async ({
@@ -358,7 +358,7 @@ describe("Logger Utilities", () => {
                         duration: 5000,
                         sql: "SELECT * FROM large_table",
                     });
-                }).not.toThrowError();
+                }).not.toThrow();
             });
 
             it("should handle monitoring workflow logging", async ({
@@ -384,7 +384,7 @@ describe("Logger Utilities", () => {
                         status: "up",
                         responseTime: 234,
                     });
-                }).not.toThrowError();
+                }).not.toThrow();
             });
         });
     });

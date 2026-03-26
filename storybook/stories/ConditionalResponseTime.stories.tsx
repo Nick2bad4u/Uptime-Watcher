@@ -39,7 +39,7 @@ const meta: Meta<typeof ConditionalResponseTime> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const SupportsResponseTime: Story = {};
 

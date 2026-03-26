@@ -16,14 +16,14 @@ const googleApiErrorEnvelopeSchema = z
                     .array(
                         z
                             .object({
-                                message: z.string().optional(),
-                                reason: z.string().optional(),
+                                message: z.string().trim().optional(),
+                                reason: z.string().trim().optional(),
                             })
                             .loose()
                     )
                     .optional(),
-                message: z.string().optional(),
-                status: z.string().optional(),
+                message: z.string().trim().optional(),
+                status: z.string().trim().optional(),
             })
             .loose()
             .optional(),

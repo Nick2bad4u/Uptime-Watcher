@@ -366,7 +366,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             await expect(
                 siteWriterService.createSite(mockSite)
-            ).rejects.toThrowError("Transaction failed");
+            ).rejects.toThrow("Transaction failed");
         });
     });
 
@@ -487,7 +487,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             await expect(
                 siteWriterService.deleteSite(mockSitesCache, "test-site")
-            ).rejects.toThrowError("Database deletion failed");
+            ).rejects.toThrow("Database deletion failed");
         });
     });
 
@@ -782,7 +782,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             await expect(
                 siteWriterService.updateSite(mockSitesCache, "nonexistent", {})
-            ).rejects.toThrowError(SiteNotFoundError);
+            ).rejects.toThrow(SiteNotFoundError);
         });
 
         it("should throw SiteNotFoundError when identifier is empty", async ({
@@ -799,7 +799,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             await expect(
                 siteWriterService.updateSite(mockSitesCache, "", {})
-            ).rejects.toThrowError(SiteNotFoundError);
+            ).rejects.toThrow(SiteNotFoundError);
         });
 
         it("should handle updates without monitors field", async ({
@@ -1021,7 +1021,7 @@ describe("SiteWriterService Coverage Tests", () => {
                     newMonitors,
                     mockMonitoringConfig
                 )
-            ).resolves.not.toThrowError();
+            ).resolves.not.toThrow();
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to handle monitor interval changes for site test-site:",

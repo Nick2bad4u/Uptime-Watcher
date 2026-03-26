@@ -307,7 +307,7 @@ describe(performSinglePortCheck, () => {
             // The function should let the error bubble up since it doesn't catch it
             await expect(
                 performSinglePortCheck("error.com", 80, 1000)
-            ).rejects.toThrowError("Network unreachable");
+            ).rejects.toThrow("Network unreachable");
         });
     });
 
@@ -422,7 +422,7 @@ describe(performSinglePortCheck, () => {
             // The function should still work but not log anything
             await expect(
                 performSinglePortCheck("error.example.com", 80, 1000)
-            ).rejects.toThrowError("isDev error");
+            ).rejects.toThrow("isDev error");
         });
     });
 

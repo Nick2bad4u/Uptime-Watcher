@@ -153,7 +153,7 @@ describe(DataBackupService, () => {
                     dbPath: "/tmp/mock-db.sqlite",
                     snapshotPath: "/tmp/backup\0snapshot.sqlite",
                 });
-            }).toThrowError(/nul bytes/i);
+            }).toThrow(/nul bytes/i);
 
             // Even when failing early, we should still close the transient
             // connection created for VACUUM INTO.
@@ -470,7 +470,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download database backup: Backup creation failed",
@@ -507,7 +507,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download database backup: String error message",
@@ -609,7 +609,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download database backup: null",
@@ -834,7 +834,7 @@ describe(DataBackupService, () => {
                     buffer,
                     fileName: "restore.sqlite",
                 })
-            ).rejects.toThrowError(/quick_check failed/u);
+            ).rejects.toThrow(/quick_check failed/u);
 
             // We wrote the incoming file, but never created a snapshot or
             // attempted to swap in the corrupted database.
@@ -852,7 +852,7 @@ describe(DataBackupService, () => {
                     buffer,
                     fileName: "not-sqlite.bin",
                 })
-            ).rejects.toThrowError(/not a valid SQLite database file/u);
+            ).rejects.toThrow(/not a valid SQLite database file/u);
 
             expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
             expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
@@ -936,7 +936,7 @@ describe(DataBackupService, () => {
 
             await expect(
                 dataBackupService.applyDatabaseBackupResult(backup)
-            ).rejects.toThrowError(/not a valid SQLite database file/u);
+            ).rejects.toThrow(/not a valid SQLite database file/u);
 
             expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
             expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
@@ -968,7 +968,7 @@ describe(DataBackupService, () => {
 
             await expect(
                 dataBackupService.applyDatabaseBackupResult(backup)
-            ).rejects.toThrowError("copy failed");
+            ).rejects.toThrow("copy failed");
 
             expect(mockDatabaseService.close).toHaveBeenCalled();
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
@@ -994,7 +994,7 @@ describe(DataBackupService, () => {
             // Act & Assert
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download database backup: Cannot access user data path",
@@ -1024,7 +1024,7 @@ describe(DataBackupService, () => {
             // should still be surfaced.
             await expect(
                 dataBackupService.downloadDatabaseBackup()
-            ).rejects.toThrowError(SiteLoadingError);
+            ).rejects.toThrow(SiteLoadingError);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to download database backup: Backup failed",

@@ -43,7 +43,7 @@ describe(useSiteDetailsUiStore, () => {
         // Should exist and be callable even if the store doesn't expose it
         expect(() =>
             result.current.syncActiveSiteDetailsTab("site-1")
-        ).not.toThrowError();
+        ).not.toThrow();
     });
 
     it("passes through syncActiveSiteDetailsTab when provided", () => {

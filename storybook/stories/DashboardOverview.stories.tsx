@@ -69,7 +69,7 @@ const meta: Meta<typeof DashboardOverview> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const HealthyFleet: Story = {};
 

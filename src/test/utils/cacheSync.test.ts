@@ -1352,7 +1352,7 @@ describe("cacheSync", () => {
                 expect(typeof cleanup).toBe("function");
 
                 // Property: Cleanup function should not throw
-                expect(() => cleanup()).not.toThrowError();
+                expect(() => cleanup()).not.toThrow();
 
                 // Property: Warning should be logged when cache sync is not available
                 if (!normalizedEnvironment.hasWindow) {

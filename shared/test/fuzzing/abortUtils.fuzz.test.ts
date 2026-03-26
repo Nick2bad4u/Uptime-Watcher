@@ -164,7 +164,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
                 await expect(
                     createAbortableOperation(operation, { cleanup })
-                ).rejects.toThrowError("Operation failed");
+                ).rejects.toThrow("Operation failed");
 
                 expect(cleanup).toHaveBeenCalledTimes(1);
             }
@@ -182,7 +182,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
                 await expect(
                     createAbortableOperation(operation, { timeoutMs, cleanup })
-                ).rejects.toThrowError();
+                ).rejects.toThrow();
 
                 expect(cleanup).toHaveBeenCalledTimes(1);
             }
@@ -231,7 +231,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                     Math.max(2, Math.floor(ms / 2))
                 );
 
-                await expect(sleepPromise).rejects.toThrowError(
+                await expect(sleepPromise).rejects.toThrow(
                     "Sleep was aborted"
                 );
             }
@@ -243,7 +243,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 const controller = new AbortController();
                 controller.abort();
 
-                await expect(sleep(ms, controller.signal)).rejects.toThrowError(
+                await expect(sleep(ms, controller.signal)).rejects.toThrow(
                     "Sleep was aborted"
                 );
             }
@@ -297,7 +297,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                         maxRetries,
                         initialDelay: 1, // Very short delay for speed
                     })
-                ).rejects.toThrowError("Always fails");
+                ).rejects.toThrow("Always fails");
 
                 expect(operation).toHaveBeenCalledTimes(maxRetries + 1);
             }
@@ -320,7 +320,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 // Abort after short delay
                 setTimeout(() => controller.abort(), 10);
 
-                await expect(retryPromise).rejects.toThrowError(
+                await expect(retryPromise).rejects.toThrow(
                     "Operation was aborted"
                 );
             }
@@ -344,7 +344,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                     initialDelay,
                     backoffMultiplier: 2,
                 })
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
 
             const elapsed = Date.now() - start;
             const expectedMinTime = initialDelay; // Just the one delay now
@@ -361,7 +361,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
             await expect(
                 retryWithAbort(operation, { signal: controller.signal })
-            ).rejects.toThrowError("Operation was aborted");
+            ).rejects.toThrow("Operation was aborted");
 
             expect(operation).not.toHaveBeenCalled();
         });
@@ -472,7 +472,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 // Abort after delayMs
                 setTimeout(() => controller.abort(), delayMs);
 
-                await expect(racePromise).rejects.toThrowError(
+                await expect(racePromise).rejects.toThrow(
                     "Operation was aborted"
                 );
             }
@@ -488,7 +488,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
                 await expect(
                     raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError("Operation was aborted");
+                ).rejects.toThrow("Operation was aborted");
             }
         );
 
@@ -500,7 +500,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
                 await expect(
                     raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError(errorMessage);
+                ).rejects.toThrow(errorMessage);
             }
         );
 
@@ -581,7 +581,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 // Abort during first retry - ensure it happens before operation completes
                 setTimeout(() => controller.abort(), timeoutMs);
 
-                await expect(retryPromise).rejects.toThrowError(
+                await expect(retryPromise).rejects.toThrow(
                     "Operation was aborted"
                 );
                 expect(attempts).toBeLessThanOrEqual(2);

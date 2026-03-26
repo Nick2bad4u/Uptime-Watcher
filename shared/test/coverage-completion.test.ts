@@ -113,7 +113,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 validateMonitorField("http", "nonExistentField", {
                     nonExistentField: "value",
                 });
-            }).toThrowError("Unknown field: nonExistentField");
+            }).toThrow("Unknown field: nonExistentField");
         });
 
         it("should trigger unknown field error for field not in any schema", async ({
@@ -129,7 +129,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 validateMonitorField("http", "totallyMadeUpField", {
                     totallyMadeUpField: "value",
                 });
-            }).toThrowError("Unknown field: totallyMadeUpField");
+            }).toThrow("Unknown field: totallyMadeUpField");
         });
     });
 
@@ -189,7 +189,7 @@ describe("100% Coverage - Remaining Lines", () => {
                 validateMonitorField("http", "unknownField", {
                     unknownField: "test",
                 });
-            }).toThrowError("Unknown field: unknownField");
+            }).toThrow("Unknown field: unknownField");
 
             // These tests ensure we hit all the previously uncovered lines
         });

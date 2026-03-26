@@ -58,7 +58,7 @@ export function createDnsMonitorSchema(
 ): DnsMonitorSchemaType {
     return args.baseMonitorSchema
         .extend({
-            expectedValue: z.string().optional(),
+            expectedValue: z.string().trim().optional(),
             host: args.hostValidationSchema,
             recordType: z.enum(
                 [

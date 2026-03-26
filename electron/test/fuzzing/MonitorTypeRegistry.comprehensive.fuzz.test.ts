@@ -53,7 +53,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     // Property: function should never throw for any string input
                     expect(() =>
                         getMonitorTypeConfig(input)
-                    ).not.toThrowError();
+                    ).not.toThrow();
 
                     const result = getMonitorTypeConfig(input);
                     // Property: result is either undefined or a valid config object
@@ -79,7 +79,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             ];
 
             for (const testCase of edgeCases) {
-                expect(() => getMonitorTypeConfig(testCase)).not.toThrowError();
+                expect(() => getMonitorTypeConfig(testCase)).not.toThrow();
                 const result = getMonitorTypeConfig(testCase);
                 if (result) {
                     expect(typeof result).toBe("object");
@@ -93,7 +93,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.string(), (input: string) => {
                     // Property: validation should never throw
-                    expect(() => isValidMonitorType(input)).not.toThrowError();
+                    expect(() => isValidMonitorType(input)).not.toThrow();
 
                     const result = isValidMonitorType(input);
                     // Property: result must be a boolean
@@ -117,7 +117,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                         // Property: should handle non-string inputs gracefully
                         expect(() =>
                             isValidMonitorType(input)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                     }
                 )
             );
@@ -164,7 +164,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     // Property: should never throw for any string input
                     expect(() =>
                         getMonitorServiceFactory(input)
-                    ).not.toThrowError();
+                    ).not.toThrow();
                 })
             );
         });
@@ -201,7 +201,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 }),
             };
 
-            expect(() => registerMonitorType(validConfig)).not.toThrowError();
+            expect(() => registerMonitorType(validConfig)).not.toThrow();
             expect(isValidMonitorType(validConfig.type)).toBeTruthy();
             expect(getMonitorTypeConfig(validConfig.type)).toBeDefined();
         });
@@ -285,7 +285,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                         // Property: registration with valid field should not throw
                         expect(() =>
                             registerMonitorType(config)
-                        ).not.toThrowError();
+                        ).not.toThrow();
                     }
                 )
             );
@@ -299,7 +299,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     // Property: type guard should never throw
                     expect(() =>
                         isValidMonitorTypeGuard(input)
-                    ).not.toThrowError();
+                    ).not.toThrow();
 
                     const result = isValidMonitorTypeGuard(input);
                     // Property: result must be boolean
@@ -345,7 +345,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
 
             expect(() =>
                 createMonitorWithTypeGuards("http", testMonitor)
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
 
@@ -363,13 +363,13 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             for (const maliciousInput of sqlInjectionAttempts) {
                 expect(() =>
                     getMonitorTypeConfig(maliciousInput)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     isValidMonitorType(maliciousInput)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     getMonitorServiceFactory(maliciousInput)
-                ).not.toThrowError();
+                ).not.toThrow();
 
                 const result = getMonitorTypeConfig(maliciousInput);
                 expect(result).toBeUndefined(); // Should not find malicious "types"
@@ -388,10 +388,10 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             for (const maliciousInput of xssAttempts) {
                 expect(() =>
                     getMonitorTypeConfig(maliciousInput)
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     isValidMonitorType(maliciousInput)
-                ).not.toThrowError();
+                ).not.toThrow();
 
                 const result = getMonitorTypeConfig(maliciousInput);
                 expect(result).toBeUndefined();
@@ -411,11 +411,11 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             ];
 
             for (const input of specialChars) {
-                expect(() => getMonitorTypeConfig(input)).not.toThrowError();
-                expect(() => isValidMonitorType(input)).not.toThrowError();
+                expect(() => getMonitorTypeConfig(input)).not.toThrow();
+                expect(() => isValidMonitorType(input)).not.toThrow();
                 expect(() =>
                     getMonitorServiceFactory(input)
-                ).not.toThrowError();
+                ).not.toThrow();
             }
         });
 
@@ -423,11 +423,11 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             const largeString = "a".repeat(100_000);
             const deepObject = { a: { b: { c: { d: { e: "deep" } } } } };
 
-            expect(() => getMonitorTypeConfig(largeString)).not.toThrowError();
-            expect(() => isValidMonitorType(largeString)).not.toThrowError();
+            expect(() => getMonitorTypeConfig(largeString)).not.toThrow();
+            expect(() => isValidMonitorType(largeString)).not.toThrow();
             // Registry APIs are string-keyed; ensure deep objects don't break
             // unrelated registry operations.
-            expect(() => JSON.stringify(deepObject)).not.toThrowError();
+            expect(() => JSON.stringify(deepObject)).not.toThrow();
         });
     });
 

@@ -46,7 +46,7 @@ describe(scrollToSiteCard, () => {
             siteList.append(card);
             document.body.append(siteList);
 
-            expect(() => scrollToSiteCard('a"b')).not.toThrowError();
+            expect(() => scrollToSiteCard('a"b')).not.toThrow();
             expect(cardScrollSpy).toHaveBeenCalledTimes(1);
         } finally {
             Reflect.set(globalThis, "CSS", originalCss);
@@ -55,6 +55,6 @@ describe(scrollToSiteCard, () => {
 
     it("is a no-op when the site list container is missing", () => {
         document.body.innerHTML = "";
-        expect(() => scrollToSiteCard("example.com")).not.toThrowError();
+        expect(() => scrollToSiteCard("example.com")).not.toThrow();
     });
 });

@@ -158,7 +158,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                             />,
                             { container }
                         );
-                    }).not.toThrowError();
+                    }).not.toThrow();
 
                     // Verify button renders
                     const button = screen.getByTestId("themed-button");
@@ -677,7 +677,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                             />,
                             { container }
                         );
-                    }).not.toThrowError();
+                    }).not.toThrow();
 
                     // Button should render even with invalid handler
                     const button = screen.getByTestId("themed-button");

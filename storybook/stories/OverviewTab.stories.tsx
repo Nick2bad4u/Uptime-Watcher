@@ -126,7 +126,7 @@ const meta: Meta<typeof OverviewTab> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const DefaultOverview: Story = {};
 

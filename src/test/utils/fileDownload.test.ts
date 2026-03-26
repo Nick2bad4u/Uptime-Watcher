@@ -190,7 +190,7 @@ describe("File Download Utility", () => {
                 throw new Error("createObjectURL failed");
             });
 
-            expect(() => downloadFile({ buffer, fileName })).toThrowError();
+            expect(() => downloadFile({ buffer, fileName })).toThrow();
         });
 
         it("should handle createElement errors", async ({ task, annotate }) => {
@@ -208,7 +208,7 @@ describe("File Download Utility", () => {
                     throw new Error("createElement failed");
                 });
 
-            expect(() => downloadFile({ buffer, fileName })).toThrowError();
+            expect(() => downloadFile({ buffer, fileName })).toThrow();
         });
 
         it("should handle appendChild errors with fallback attempt", async ({
@@ -231,7 +231,7 @@ describe("File Download Utility", () => {
             // The fallback will try the same createAndTriggerDownload again, so append will fail again
             // This means the fallback also fails and should throw "File download failed"
             // Fallback retry uses a direct click without DOM attachment.
-            expect(() => downloadFile({ buffer, fileName })).not.toThrowError();
+            expect(() => downloadFile({ buffer, fileName })).not.toThrow();
 
             // Verify that append was called (indicating both primary and fallback attempts)
             expect(globalThis.document.body.append).toHaveBeenCalled();
@@ -616,10 +616,10 @@ describe("File Download Utility", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError(TypeError);
+            ).rejects.toThrow(TypeError);
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError("Invalid backup data received");
+            ).rejects.toThrow("Invalid backup data received");
         });
 
         it("should throw TypeError for null backup data", async ({
@@ -635,7 +635,7 @@ describe("File Download Utility", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError(TypeError);
+            ).rejects.toThrow(TypeError);
         });
 
         it("should throw TypeError when required fields are missing", async ({
@@ -662,7 +662,7 @@ describe("File Download Utility", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError(TypeError);
+            ).rejects.toThrow(TypeError);
         });
 
         it("should handle empty backup buffers", async ({ task, annotate }) => {
@@ -719,7 +719,7 @@ describe("File Download Utility", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError("Download trigger failed");
+            ).rejects.toThrow("Download trigger failed");
         });
 
         it("should handle non-Error click failures", async ({
@@ -740,7 +740,7 @@ describe("File Download Utility", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError("Download trigger failed");
+            ).rejects.toThrow("Download trigger failed");
         });
 
         it("should clean up object URL even when click fails", async ({
@@ -761,7 +761,7 @@ describe("File Download Utility", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError();
+            ).rejects.toThrow();
 
             expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
                 "mock-object-url"
@@ -783,7 +783,7 @@ describe("File Download Utility", () => {
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrowError("Download failed");
+            ).rejects.toThrow("Download failed");
         });
 
         it("should handle large backup data", async ({ task, annotate }) => {
@@ -829,7 +829,7 @@ describe("File Download Utility", () => {
 
                     await expect(
                         handleSQLiteBackupDownload(mockDownloadFunction)
-                    ).rejects.toThrowError(errorMessage);
+                    ).rejects.toThrow(errorMessage);
 
                     expect(mockDownloadFunction).toHaveBeenCalledTimes(1);
                 }

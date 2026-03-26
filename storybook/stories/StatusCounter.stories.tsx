@@ -8,7 +8,7 @@ import type { JSX } from "react";
 import { StatusCounter } from "@app/components/Header/StatusCounter";
 import { ThemedText } from "@app/theme/components/ThemedText";
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const meta: Meta<typeof StatusCounter> = {
     args: {

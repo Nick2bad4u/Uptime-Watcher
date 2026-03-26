@@ -31,7 +31,7 @@ const meta: Meta<typeof DetailLabel> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const HttpStatus: Story = {};
 

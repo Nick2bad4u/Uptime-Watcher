@@ -81,7 +81,7 @@ describe("logging context helpers", () => {
         input["self"] = input;
         input["nested"] = { parent: input };
 
-        expect(() => normalizeLogValue(input)).not.toThrowError();
+        expect(() => normalizeLogValue(input)).not.toThrow();
 
         const sanitized = normalizeLogValue(input);
         expect(sanitized).toEqual({

@@ -638,7 +638,7 @@ describe("Chart Utils Property-Based Tests", () => {
                             "nested.deep.invalid"
                         );
                         getScaleProperty(config, "x", "type");
-                    }).not.toThrowError();
+                    }).not.toThrow();
                 })
             );
         });
@@ -658,7 +658,7 @@ describe("Chart Utils Property-Based Tests", () => {
                     expect(() => {
                         const result = getScaleConfigSafe(circular, "x");
                         expect(result.exists).toBeTruthy();
-                    }).not.toThrowError();
+                    }).not.toThrow();
                 })
             );
         });

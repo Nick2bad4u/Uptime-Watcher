@@ -39,7 +39,7 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
                 ) {
                     expect(() =>
                         validateMonitorField("http", fieldName, value)
-                    ).toThrowError(/Unknown field/);
+                    ).toThrow(/Unknown field/);
                 }
             }
         );
@@ -48,7 +48,7 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
             // Directly target line 404
             expect(() =>
                 validateMonitorField("http", "totallyInvalidFieldName", "value")
-            ).toThrowError("Unknown field: totallyInvalidFieldName");
+            ).toThrow("Unknown field: totallyInvalidFieldName");
         });
     });
 
@@ -91,12 +91,12 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
                 expect(() => {
                     const result = validateSiteData(input);
                     expect(result).toBeDefined();
-                }).not.toThrowError();
+                }).not.toThrow();
 
                 expect(() => {
                     const result = validateMonitorData("http", input);
                     expect(result).toBeDefined();
-                }).not.toThrowError();
+                }).not.toThrow();
             }
         );
     });

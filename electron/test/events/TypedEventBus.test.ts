@@ -151,7 +151,7 @@ describe(TypedEventBus, () => {
             // Should throw when a listener throws (standard EventEmitter behavior)
             expect(() => {
                 eventBus.emit("test-event", { data: "test" });
-            }).toThrowError("Listener error");
+            }).toThrow("Listener error");
 
             expect(errorListener).toHaveBeenCalled();
             // Normal listener won't be called if error listener throws first
@@ -175,7 +175,7 @@ describe(TypedEventBus, () => {
 
             expect(() => {
                 eventBus.emit("test-event", { data: "test" });
-            }).toThrowError("First listener error");
+            }).toThrow("First listener error");
 
             expect(errorListener).toHaveBeenCalled();
         });
@@ -264,7 +264,7 @@ describe(TypedEventBus, () => {
 
             expect(() => {
                 eventBus.emit("test-event", { data: "test" });
-            }).not.toThrowError();
+            }).not.toThrow();
         });
         it("should handle removing non-existent listeners", async ({
             task,
@@ -278,7 +278,7 @@ describe(TypedEventBus, () => {
             const listener = vi.fn();
             expect(() => {
                 eventBus.off("test-event", listener);
-            }).not.toThrowError();
+            }).not.toThrow();
         });
     });
     describe("cleanup", () => {

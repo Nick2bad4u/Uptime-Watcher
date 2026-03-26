@@ -97,7 +97,7 @@ const meta: Meta<typeof ResponseTimeChart> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const NormalOperation: Story = {};
 

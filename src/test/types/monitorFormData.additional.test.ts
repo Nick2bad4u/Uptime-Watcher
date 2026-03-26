@@ -538,13 +538,13 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     "DNS"
                 );
-            }).toThrowError(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/i);
 
             expect(() => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     "HTTP"
                 );
-            }).toThrowError(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/i);
         });
 
         it("should handle empty string type", async ({ task, annotate }) => {
@@ -560,7 +560,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     ""
                 );
-            }).toThrowError(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/i);
         });
 
         it("should handle very long type names", async ({ task, annotate }) => {
@@ -579,7 +579,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     longType
                 );
-            }).toThrowError(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/i);
         });
 
         it("should create consistent base properties for all types", async ({

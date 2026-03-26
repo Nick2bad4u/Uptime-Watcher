@@ -110,7 +110,7 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             await expect(
                 MonitoringService.startMonitoringForSite(siteIdentifier)
-            ).rejects.toThrowError("Failed to start site monitoring");
+            ).rejects.toThrow("Failed to start site monitoring");
         });
 
         it("should work with empty string site identifier", async ({
@@ -189,7 +189,7 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             await expect(
                 MonitoringService.stopMonitoringForSite(siteIdentifier)
-            ).rejects.toThrowError("Failed to stop site monitoring");
+            ).rejects.toThrow("Failed to stop site monitoring");
         });
 
         it("should work with empty string site identifier", async ({
@@ -283,7 +283,7 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             await expect(
                 MonitoringService.startMonitoringForSite(siteIdentifier)
-            ).rejects.toThrowError("Network error");
+            ).rejects.toThrow("Network error");
         });
 
         it("should handle timeout errors", async ({ task, annotate }) => {
@@ -303,7 +303,7 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             await expect(
                 MonitoringService.stopMonitoringForSite(siteIdentifier)
-            ).rejects.toThrowError("Request timeout");
+            ).rejects.toThrow("Request timeout");
         });
     });
 });

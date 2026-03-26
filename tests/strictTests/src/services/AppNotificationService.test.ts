@@ -92,7 +92,7 @@ describe("AppNotificationService (strict coverage)", () => {
                 title: "T",
                 body: "B",
             })
-        ).rejects.toThrowError(/not ready/i);
+        ).rejects.toThrow(/not ready/i);
 
         expect(notifyAppEventSpy).not.toHaveBeenCalled();
     });

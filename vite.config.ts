@@ -402,15 +402,6 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 },
             ]),
             react({
-                // Configure babel for any custom transformations if needed
-                babel: {
-                    // Use babel configuration files if they exist
-                    babelrc: false,
-                    configFile: false,
-                    // Add any custom babel plugins here if needed
-                    plugins: ["babel-plugin-react-compiler"],
-                },
-
                 // Enable Fast Refresh for better development experience
                 // Includes .js, .jsx, .ts, .tsx by default
                 // Use automatic JSX runtime (default, but explicit for clarity)
@@ -455,7 +446,6 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                               enabled: true, // Always enabled when included
                               log: false,
                               showToolbar: true, // Always show in development
-                              trackUnnecessaryRenders: true,
                           },
                       }),
                   ]
@@ -482,8 +472,6 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 // Use writeBundle hook for better integration with build process
                 hook: "writeBundle",
                 silent: false, // Show copy operations for transparency
-                // Enhanced static copy options for WASM optimization
-                structured: false, // Flatten structure for Electron
                 targets: [
                     {
                         // Enable symlink dereferencing for reliability

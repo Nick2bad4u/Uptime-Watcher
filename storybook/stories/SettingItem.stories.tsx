@@ -30,12 +30,12 @@ const meta: Meta<typeof SettingItem> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 type SettingItemProps = ComponentProps<typeof SettingItem>;
 
 const WithSelectStory = (args: SettingItemProps): ReactElement => {
     const rest = { ...args };
-    const [selectedInterval, setSelectedInterval] = useState<string>("1");
+    const [selectedInterval, setSelectedInterval] = useState("1");
 
     return (
         <SettingItem

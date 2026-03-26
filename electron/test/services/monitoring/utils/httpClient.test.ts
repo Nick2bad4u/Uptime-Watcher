@@ -355,21 +355,21 @@ describe("HTTP Client Utils", () => {
             const requestError = new Error("Request error");
             await expect(
                 requestErrorHandler(requestError)
-            ).rejects.toThrowError("Request error");
+            ).rejects.toThrow("Request error");
 
             // Test response error handler
             const responseError = new Error("Response error");
             await expect(
                 responseErrorHandler(responseError)
-            ).rejects.toThrowError("Response error");
+            ).rejects.toThrow("Response error");
 
             // Test with non-Error objects
             await expect(
                 requestErrorHandler("String error")
-            ).rejects.toThrowError("String error");
+            ).rejects.toThrow("String error");
             await expect(
                 responseErrorHandler("String error")
-            ).rejects.toThrowError("String error");
+            ).rejects.toThrow("String error");
         });
         it("should calculate response time for error responses", async () => {
             // Arrange
@@ -404,7 +404,7 @@ describe("HTTP Client Utils", () => {
             } as any;
 
             // Test error handler modifies the error object with response time
-            await expect(responseErrorHandler(error)).rejects.toThrowError();
+            await expect(responseErrorHandler(error)).rejects.toThrow();
 
             // The error should have been modified with response time
             expect(error.responseTime).toBe(750); // 1750 - 1000

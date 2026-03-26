@@ -55,7 +55,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                     .fn()
                     .mockReturnValue(false) as unknown as ValidatorFunction;
 
-                expect(() => castIpcResponse(response, validator)).toThrowError(
+                expect(() => castIpcResponse(response, validator)).toThrow(
                     "IPC response validation failed"
                 );
                 expect(validator).toHaveBeenCalledWith(response);
@@ -76,7 +76,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                 } else {
                     expect(() =>
                         castIpcResponse(response, validator)
-                    ).toThrowError();
+                    ).toThrow();
                 }
             }
         );
@@ -115,7 +115,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         );
 
         test.prop([fc.anything()])("should never throw errors", (value) => {
-            expect(() => isArray(value)).not.toThrowError();
+            expect(() => isArray(value)).not.toThrow();
             expect(typeof isArray(value)).toBe("boolean");
         });
 
@@ -159,7 +159,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         });
 
         test.prop([fc.anything()])("should never throw errors", (value) => {
-            expect(() => isRecord(value)).not.toThrowError();
+            expect(() => isRecord(value)).not.toThrow();
             expect(typeof isRecord(value)).toBe("boolean");
         });
 
@@ -226,7 +226,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.anything(), fc.string()])(
             "should never throw errors",
             (obj, key) => {
-                expect(() => safePropertyAccess(obj, key)).not.toThrowError();
+                expect(() => safePropertyAccess(obj, key)).not.toThrow();
             }
         );
 
@@ -302,7 +302,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                     .fn()
                     .mockReturnValue(false) as unknown as ValidatorFunction;
 
-                expect(() => validateAndConvert(value, validator)).toThrowError(
+                expect(() => validateAndConvert(value, validator)).toThrow(
                     "Type validation failed"
                 );
                 expect(validator).toHaveBeenCalledWith(value);
@@ -318,7 +318,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
 
                 expect(() =>
                     validateAndConvert(value, validator, errorMessage)
-                ).toThrowError(errorMessage);
+                ).toThrow(errorMessage);
             }
         );
 
@@ -336,7 +336,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                 } else {
                     expect(() =>
                         validateAndConvert(value, validator)
-                    ).toThrowError();
+                    ).toThrow();
                 }
             }
         );
@@ -350,8 +350,8 @@ describe("TypeHelpers utilities fuzzing tests", () => {
             expect(validateAndConvert("test", isString)).toBe("test");
             expect(validateAndConvert(42, isNumber)).toBe(42);
 
-            expect(() => validateAndConvert(42, isString)).toThrowError();
-            expect(() => validateAndConvert("test", isNumber)).toThrowError();
+            expect(() => validateAndConvert(42, isString)).toThrow();
+            expect(() => validateAndConvert("test", isNumber)).toThrow();
         });
 
         test.prop([fc.string()])("should preserve type information", (str) => {
@@ -369,11 +369,11 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.anything()])(
             "all functions should handle any input without crashing",
             (input) => {
-                expect(() => isArray(input)).not.toThrowError();
-                expect(() => isRecord(input)).not.toThrowError();
+                expect(() => isArray(input)).not.toThrow();
+                expect(() => isRecord(input)).not.toThrow();
                 expect(() =>
                     safePropertyAccess(input, "key")
-                ).not.toThrowError();
+                ).not.toThrow();
             }
         );
 
@@ -408,8 +408,8 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                 }
 
                 // Ensure type guards don't throw errors
-                expect(() => isArray(value)).not.toThrowError();
-                expect(() => isRecord(value)).not.toThrowError();
+                expect(() => isArray(value)).not.toThrow();
+                expect(() => isRecord(value)).not.toThrow();
             }
         );
 

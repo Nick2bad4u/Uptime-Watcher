@@ -533,7 +533,7 @@ function deepMergeSection<TTarget>(
 const mergeSection = <TSection>(
     baseSection: TSection,
     overrideSection?: PartialDeep<TSection>
-): TSection => deepMergeSection<TSection>(baseSection, overrideSection);
+): TSection => deepMergeSection(baseSection, overrideSection);
 
 /**
  * Typography configuration interface.
@@ -850,31 +850,31 @@ export function mergeThemeConfig(
     overrides: ThemeOverride
 ): ThemeConfig {
     return {
-        animation: mergeSection<AnimationConfig>(
+        animation: mergeSection(
             baseTheme.animation,
             overrides.animation
-        ),
-        borderRadius: mergeSection<BorderRadiusConfig>(
+        ) as AnimationConfig,
+        borderRadius: mergeSection(
             baseTheme.borderRadius,
             overrides.borderRadius
-        ),
-        colors: mergeSection<ThemeColors>(baseTheme.colors, overrides.colors),
-        components: mergeSection<ComponentConfig>(
+        ) as BorderRadiusConfig,
+        colors: mergeSection(baseTheme.colors, overrides.colors) as ThemeColors,
+        components: mergeSection(
             baseTheme.components,
             overrides.components
-        ),
-        shadows: mergeSection<ShadowConfig>(
+        ) as ComponentConfig,
+        shadows: mergeSection(
             baseTheme.shadows,
             overrides.shadows
-        ),
-        spacing: mergeSection<SpacingConfig>(
+        ) as ShadowConfig,
+        spacing: mergeSection(
             baseTheme.spacing,
             overrides.spacing
-        ),
-        typography: mergeSection<TypographyConfig>(
+        ) as SpacingConfig,
+        typography: mergeSection(
             baseTheme.typography,
             overrides.typography
-        ),
+        ) as TypographyConfig,
     };
 }
 
@@ -912,5 +912,5 @@ export function createDeepThemeOverride(
     baseTheme: ThemeConfig,
     deepOverrides: DeepThemeOverride
 ): ThemeConfig {
-    return deepMergeSection<ThemeConfig>(baseTheme, deepOverrides);
+    return deepMergeSection(baseTheme, deepOverrides) as ThemeConfig;
 }

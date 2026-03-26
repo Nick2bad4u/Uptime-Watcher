@@ -38,7 +38,7 @@ describe("jsonSafety fuzz tests", () => {
         test.prop([fc.anything()])(
             "never throws for arbitrary inputs",
             (value) => {
-                expect(() => stringifyUnsafe(value)).not.toThrowError();
+                expect(() => stringifyUnsafe(value)).not.toThrow();
             }
         );
     });

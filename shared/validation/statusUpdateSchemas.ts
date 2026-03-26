@@ -22,6 +22,7 @@ import { monitorStatusEnumValues } from "./statusValidationPrimitives";
  */
 const isoTimestampSchema: z.ZodType<string> = z
     .string()
+.trim()
     .refine(
         (value) => !Number.isNaN(Date.parse(value)),
         "Timestamp must be a valid ISO 8601 string"
@@ -50,7 +51,7 @@ type StatusUpdateSchema = z.ZodObject<{
 const createStatusUpdateSchema = (): StatusUpdateSchema =>
     z
         .object({
-            details: z.string().optional(),
+            details: z.string().trim().optional(),
             monitor: monitorSchema,
             monitorId: monitorIdSchema,
             previousStatus: z.enum(monitorStatusEnumValues).optional(),

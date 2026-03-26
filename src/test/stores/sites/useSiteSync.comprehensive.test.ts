@@ -868,7 +868,7 @@ describe("useSiteSync", () => {
                 timestamp: Date.now(),
             };
 
-            expect(() => eventHandler(duplicateEvent)).not.toThrowError();
+            expect(() => eventHandler(duplicateEvent)).not.toThrow();
             expect(logger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected in incoming sync delta additions",
                 expect.objectContaining({

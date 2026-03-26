@@ -30,12 +30,12 @@ const meta: Meta<typeof ErrorAlert> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 type ErrorAlertProps = ComponentProps<typeof ErrorAlert>;
 
 const DismissibleStory = (args: ErrorAlertProps): ReactElement => {
     const { onDismiss, ...rest } = args;
-    const [visible, setVisible] = useState<boolean>(true);
+    const [visible, setVisible] = useState(true);
 
     if (!visible) {
         return (

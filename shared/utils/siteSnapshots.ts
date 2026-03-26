@@ -332,7 +332,7 @@ export function toMonitorSnapshotOverlay(
         overlay.lastChecked = normalizedDate;
     }
 
-    return hasOverlayValues<MonitorSnapshotOverlay>(overlay)
+    return hasOverlayValues(overlay)
         ? overlay
         : undefined;
 }
@@ -369,7 +369,7 @@ export function toSiteSnapshotOverlay(
         }
     }
 
-    return hasOverlayValues<SiteSnapshotOverlay>(overlay) ? overlay : undefined;
+    return hasOverlayValues(overlay) ? overlay : undefined;
 }
 
 /**

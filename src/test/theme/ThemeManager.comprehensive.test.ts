@@ -282,7 +282,7 @@ describe(ThemeManager, () => {
             const lightTheme = themeManager.getTheme("light");
             expect(() =>
                 themeManager.applyTheme(lightTheme)
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;
@@ -304,7 +304,7 @@ describe(ThemeManager, () => {
             // Apply theme and verify it doesn't throw
             expect(() =>
                 themeManager.applyTheme(lightTheme)
-            ).not.toThrowError();
+            ).not.toThrow();
 
             // Verify basic functionality (the actual calls may vary based on internal implementation)
             // We just verify that the applyTheme method executes without errors
@@ -323,7 +323,7 @@ describe(ThemeManager, () => {
 
             for (const themeName of availableThemes) {
                 const theme = themeManager.getTheme(themeName);
-                expect(() => themeManager.applyTheme(theme)).not.toThrowError();
+                expect(() => themeManager.applyTheme(theme)).not.toThrow();
             }
         });
     });
@@ -485,10 +485,10 @@ describe(ThemeManager, () => {
 
             expect(() =>
                 themeManager.applyTheme(incompleteTheme)
-            ).not.toThrowError();
+            ).not.toThrow();
             expect(() =>
                 themeManager.generateCSSVariables(incompleteTheme)
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle null/undefined values gracefully", async ({
@@ -511,7 +511,7 @@ describe(ThemeManager, () => {
 
             expect(() =>
                 themeManager.applyTheme(themeWithNulls)
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should work without DOM environment", async ({
@@ -527,7 +527,7 @@ describe(ThemeManager, () => {
             delete (globalThis as any).document;
 
             const theme = themeManager.getTheme("light");
-            expect(() => themeManager.applyTheme(theme)).not.toThrowError();
+            expect(() => themeManager.applyTheme(theme)).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;

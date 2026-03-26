@@ -254,7 +254,7 @@ describe(HistoryTab, () => {
                         selectedMonitor={monitorWithUndefinedHistory}
                     />
                 )
-            ).not.toThrowError();
+            ).not.toThrow();
         });
 
         it("should handle history records with missing fields", ({
@@ -286,7 +286,7 @@ describe(HistoryTab, () => {
                         selectedMonitor={monitorWithIncompleteHistory}
                     />
                 )
-            ).not.toThrowError();
+            ).not.toThrow();
         });
     });
 });

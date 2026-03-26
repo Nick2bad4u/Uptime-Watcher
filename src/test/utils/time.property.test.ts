@@ -422,13 +422,13 @@ describe("Time Utils Property-Based Tests", () => {
             "should handle negative durations gracefully",
             (ms) => {
                 // Functions should not throw for negative inputs
-                expect(() => formatDuration(Math.abs(ms))).not.toThrowError();
+                expect(() => formatDuration(Math.abs(ms))).not.toThrow();
                 expect(() =>
                     formatIntervalDuration(Math.abs(ms))
-                ).not.toThrowError();
+                ).not.toThrow();
                 expect(() =>
                     formatResponseDuration(Math.abs(ms))
-                ).not.toThrowError();
+                ).not.toThrow();
             }
         );
 
@@ -451,10 +451,10 @@ describe("Time Utils Property-Based Tests", () => {
         ])(
             "should handle very large timestamps without throwing",
             (timestamp) => {
-                expect(() => formatFullTimestamp(timestamp)).not.toThrowError();
+                expect(() => formatFullTimestamp(timestamp)).not.toThrow();
                 expect(() =>
                     formatRelativeTimestamp(timestamp)
-                ).not.toThrowError();
+                ).not.toThrow();
             }
         );
 

@@ -210,7 +210,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
 
             const { syncFromBackend } = useSettingsStore.getState();
 
-            await expect(syncFromBackend()).rejects.toThrowError(
+            await expect(syncFromBackend()).rejects.toThrow(
                 "Backend sync failed"
             );
 
@@ -294,7 +294,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
 
             const { syncFromBackend } = useSettingsStore.getState();
 
-            await expect(syncFromBackend()).rejects.toThrowError(
+            await expect(syncFromBackend()).rejects.toThrow(
                 "API call failed"
             );
             expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(

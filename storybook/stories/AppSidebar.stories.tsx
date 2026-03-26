@@ -22,7 +22,7 @@ interface AppSidebarStoryArgs {
     isSidebarOpen: boolean;
 }
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const sampleSites = [
     createMockSite({

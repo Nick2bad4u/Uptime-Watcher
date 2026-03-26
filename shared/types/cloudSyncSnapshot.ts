@@ -2,6 +2,8 @@
  * Cloud sync snapshot types (ADR-016).
  */
 
+/* eslint-disable zod/prefer-string-schema-with-trim -- Cloud sync protocol parsing must preserve payload strings/keys exactly and avoid lossy normalization. */
+
 import type { CloudSyncState } from "@shared/types/cloudSyncState";
 
 import {
@@ -68,3 +70,5 @@ export const cloudSyncSnapshotSchema: z.ZodType<CloudSyncSnapshot> = z
 export function parseCloudSyncSnapshot(candidate: unknown): CloudSyncSnapshot {
     return cloudSyncSnapshotSchema.parse(candidate);
 }
+
+/* eslint-enable zod/prefer-string-schema-with-trim -- End protocol-preserving no-trim exception scope. */

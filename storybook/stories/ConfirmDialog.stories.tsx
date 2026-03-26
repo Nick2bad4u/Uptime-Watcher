@@ -14,7 +14,7 @@ interface ConfirmDialogStoryArgs {
     withDetails: boolean;
 }
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 const withDialogState: Decorator = (StoryComponent, context) => {
     const args = context.args as Partial<ConfirmDialogStoryArgs> | undefined;

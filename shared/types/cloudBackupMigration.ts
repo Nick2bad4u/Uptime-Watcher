@@ -74,8 +74,8 @@ export function parseCloudBackupMigrationRequest(
 const cloudBackupMigrationFailureSchema: z.ZodType<CloudBackupMigrationFailure> =
     z
         .object({
-            key: z.string().min(1),
-            message: z.string().min(1),
+            key: z.string().trim().min(1),
+            message: z.string().trim().min(1),
         })
         .strict();
 

@@ -90,7 +90,7 @@ const meta: Meta<typeof SiteTableRow> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj;
 
 export const DefaultRow: Story = {};
 

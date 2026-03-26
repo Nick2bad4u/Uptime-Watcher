@@ -219,7 +219,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 await expect(
                     createDatabaseBackup(testDbPath)
-                ).rejects.toThrowError(/exceeds maximum allowed size/i);
+                ).rejects.toThrow(/exceeds maximum allowed size/i);
 
                 expect(mockReadFile).not.toHaveBeenCalled();
                 expect(logger.error).toHaveBeenCalledWith(
@@ -248,7 +248,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 await expect(
                     createDatabaseBackup(testDbPath)
-                ).rejects.toThrowError(fileError);
+                ).rejects.toThrow(fileError);
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -275,7 +275,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 await expect(
                     createDatabaseBackup(testDbPath)
-                ).rejects.toThrowError(permissionError);
+                ).rejects.toThrow(permissionError);
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -300,7 +300,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 await expect(
                     createDatabaseBackup(testDbPath)
-                ).rejects.toThrowError("String error");
+                ).rejects.toThrow("String error");
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -326,7 +326,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 await expect(
                     createDatabaseBackup(testDbPath)
-                ).rejects.toThrowError(timeoutError);
+                ).rejects.toThrow(timeoutError);
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -356,7 +356,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                         dbPath: testDbPath,
                         fileName: customFileName,
                     })
-                ).rejects.toThrowError(error);
+                ).rejects.toThrow(error);
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -666,7 +666,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                             await expect(
                                 createDatabaseBackup(testPath)
-                            ).rejects.toThrowError();
+                            ).rejects.toThrow();
                             expect(logger.error).toHaveBeenCalledWith(
                                 "[DatabaseBackup] Failed to create database backup",
                                 expect.objectContaining({

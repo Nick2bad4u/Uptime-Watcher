@@ -403,7 +403,7 @@ export function queryMonitorRows(
     sql: string,
     params?: DbValue[]
 ): MonitorRow[] {
-    return queryForRecords<MonitorRow>(db, sql, params, MONITOR_ROW_VALIDATION);
+    return queryForRecords(db, sql, params, MONITOR_ROW_VALIDATION);
 }
 
 /**
@@ -414,7 +414,7 @@ export function queryMonitorRow(
     sql: string,
     params?: DbValue[]
 ): MonitorRow | null | undefined {
-    return queryForSingleRecord<MonitorRow>(
+    return queryForSingleRecord(
         db,
         sql,
         params,

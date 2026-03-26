@@ -176,7 +176,7 @@ describe("monitorTypesApi", () => {
                 createIpcResponse({ not: "an array" })
             );
 
-            await expect(api.getMonitorTypes()).rejects.toThrowError(
+            await expect(api.getMonitorTypes()).rejects.toThrow(
                 /failed validation/i
             );
         });
@@ -203,7 +203,7 @@ describe("monitorTypesApi", () => {
                 ])
             );
 
-            await expect(api.getMonitorTypes()).rejects.toThrowError(
+            await expect(api.getMonitorTypes()).rejects.toThrow(
                 /failed validation/i
             );
         });
@@ -213,7 +213,7 @@ describe("monitorTypesApi", () => {
                 new Error("Failed to load monitor types")
             );
 
-            await expect(api.getMonitorTypes()).rejects.toThrowError(
+            await expect(api.getMonitorTypes()).rejects.toThrow(
                 "Failed to load monitor types"
             );
         });

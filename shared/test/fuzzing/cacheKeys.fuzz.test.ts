@@ -179,7 +179,7 @@ describe("cacheKeys fuzzing tests", () => {
                         fc.constant("too:many:colons:here") // Too many parts
                     ),
                     (invalidKey) => {
-                        expect(() => parseCacheKey(invalidKey)).toThrowError();
+                        expect(() => parseCacheKey(invalidKey)).toThrow();
                     }
                 ),
                 { numRuns: 50 }

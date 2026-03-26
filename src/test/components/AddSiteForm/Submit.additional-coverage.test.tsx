@@ -318,7 +318,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             // Expect this to throw an error
             await expect(
                 handleSubmit(mockEvent, properties)
-            ).rejects.toThrowError("Unsupported monitor type: unknown");
+            ).rejects.toThrow("Unsupported monitor type: unknown");
         });
     });
 
@@ -441,7 +441,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             // Expect this to throw an error for unsupported monitor type
             await expect(
                 handleSubmit(mockEvent, properties)
-            ).rejects.toThrowError("Unsupported monitor type: unsupported");
+            ).rejects.toThrow("Unsupported monitor type: unsupported");
         });
     });
 

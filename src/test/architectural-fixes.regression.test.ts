@@ -118,7 +118,7 @@ describe("Architectural Fixes Regression Tests", () => {
                     const cache = new TypedCache<string, number>(adaptedConfig);
                     cache.set("test", 1);
                     return cache.get("test");
-                }).not.toThrowError();
+                }).not.toThrow();
             }
         });
 
@@ -139,7 +139,7 @@ describe("Architectural Fixes Regression Tests", () => {
                 await import("../../electron/services/monitoring/EnhancedMonitorChecker");
                 await import("../../electron/services/monitoring/MonitorOperationRegistry");
                 await import("../../electron/services/monitoring/OperationTimeoutManager");
-            }).not.toThrowError();
+            }).not.toThrow();
         });
     });
 });

@@ -18,11 +18,11 @@ export interface GoogleTokenResponse {
 
 export const googleTokenResponseSchema: z.ZodType<GoogleTokenResponse> = z
     .object({
-        access_token: z.string().min(1),
+        access_token: z.string().trim().min(1),
         expires_in: z.int().positive().optional(),
-        refresh_token: z.string().min(1).optional(),
-        scope: z.string().optional(),
-        token_type: z.string().optional(),
+        refresh_token: z.string().trim().min(1).optional(),
+        scope: z.string().trim().optional(),
+        token_type: z.string().trim().optional(),
     })
     .loose();
 
@@ -36,8 +36,8 @@ export interface GoogleOAuthErrorResponse {
 
 const googleOAuthErrorResponseSchema: z.ZodType<GoogleOAuthErrorResponse> = z
     .object({
-        error: z.string().min(1),
-        error_description: z.string().optional(),
+        error: z.string().trim().min(1),
+        error_description: z.string().trim().optional(),
     })
     .loose();
 

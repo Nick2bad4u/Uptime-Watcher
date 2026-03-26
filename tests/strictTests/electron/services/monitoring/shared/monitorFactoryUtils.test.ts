@@ -59,7 +59,7 @@ describe("monitorFactoryUtils.buildMonitorFactory", () => {
             buildMonitorFactory(() => {
                 throw "boom";
             }, "SSL Monitor")
-        ).toThrowError(normalizedError);
+        ).toThrow(normalizedError);
 
         expect(ensureErrorSpy).toHaveBeenCalledTimes(1);
         expect(normalizedError.message).toBe(

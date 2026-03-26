@@ -1061,10 +1061,10 @@ describe("Status Utilities", () => {
                 "all status functions should handle arbitrary input gracefully",
                 (status) => {
                     // Property: None of these should throw
-                    expect(() => getStatusIcon(status)).not.toThrowError();
+                    expect(() => getStatusIcon(status)).not.toThrow();
                     expect(() =>
                         formatStatusWithIcon(status)
-                    ).not.toThrowError();
+                    ).not.toThrow();
 
                     // Property: All should return non-empty strings
                     const icon = getStatusIcon(status);
@@ -1103,7 +1103,7 @@ describe("Status Utilities", () => {
                     // Property: Should not throw with valid text input
                     expect(() =>
                         createStatusIdentifier(text)
-                    ).not.toThrowError();
+                    ).not.toThrow();
 
                     const result = createStatusIdentifier(text);
 

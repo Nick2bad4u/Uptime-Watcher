@@ -10,7 +10,7 @@ describe(assertNever, () => {
     it("throws with context and includes string value", () => {
         expect(() =>
             assertNever("unexpected" as never, "unit-test")
-        ).toThrowError(
+        ).toThrow(
             "[unit-test] Reached unreachable code with value: unexpected"
         );
     });
@@ -18,14 +18,14 @@ describe(assertNever, () => {
     it("formats functions and falls back to <unserializable> for objects that cannot be JSON stringified", () => {
         expect(() =>
             assertNever(function named() {} as never, "fn")
-        ).toThrowError(
+        ).toThrow(
             "[fn] Reached unreachable code with value: [Function named]"
         );
 
         // BigInt cannot be JSON stringified; exercise the catch branch.
         expect(() =>
             assertNever({ value: 1n } as unknown as never, "bigint")
-        ).toThrowError(
+        ).toThrow(
             "[bigint] Reached unreachable code with value: <unserializable>"
         );
     });
@@ -33,25 +33,25 @@ describe(assertNever, () => {
     it("formats null/undefined and other primitives", () => {
         expect(() =>
             assertNever(null as unknown as never, "null")
-        ).toThrowError("[null] Reached unreachable code with value: null");
+        ).toThrow("[null] Reached unreachable code with value: null");
 
         expect(() =>
             assertNever(undefined as unknown as never, "undef")
-        ).toThrowError(
+        ).toThrow(
             "[undef] Reached unreachable code with value: undefined"
         );
 
         expect(() =>
             assertNever(true as unknown as never, "bool")
-        ).toThrowError("[bool] Reached unreachable code with value: true");
+        ).toThrow("[bool] Reached unreachable code with value: true");
 
-        expect(() => assertNever(123 as unknown as never, "num")).toThrowError(
+        expect(() => assertNever(123 as unknown as never, "num")).toThrow(
             "[num] Reached unreachable code with value: 123"
         );
 
         expect(() =>
             assertNever(Symbol("x") as unknown as never, "sym")
-        ).toThrowError(
+        ).toThrow(
             /\[sym\] Reached unreachable code with value: Symbol\(x\)/u
         );
     });
@@ -59,7 +59,7 @@ describe(assertNever, () => {
     it("stringifies plain objects", () => {
         expect(() =>
             assertNever({ ok: true } as unknown as never, "obj")
-        ).toThrowError(
+        ).toThrow(
             '[obj] Reached unreachable code with value: {"ok":true}'
         );
     });

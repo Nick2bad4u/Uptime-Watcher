@@ -158,7 +158,7 @@ describe("sitesApi", () => {
     it("throws when an IPC call fails", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
-        await expect(sitesApi.getSites()).rejects.toThrowError(
+        await expect(sitesApi.getSites()).rejects.toThrow(
             /ipc operation failed/i
         );
     });
@@ -171,6 +171,6 @@ describe("sitesApi", () => {
 
         await expect(
             sitesApi.removeSite(baseSite.identifier)
-        ).rejects.toThrowError(/failed validation/i);
+        ).rejects.toThrow(/failed validation/i);
     });
 });

@@ -127,7 +127,7 @@ describe("pingRetry utilities", () => {
 
         await expect(
             performSinglePingCheck("unlucky", 10)
-        ).rejects.toThrowError(/Connectivity check failed: boom/);
+        ).rejects.toThrow(/Connectivity check failed: boom/);
     });
 
     it("delegates retry orchestration to withOperationalHooks", async () => {

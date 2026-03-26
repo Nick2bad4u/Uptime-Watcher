@@ -12,7 +12,7 @@ export function createNonWhitespaceStringSchema(args: {
     readonly maxLengthMessage?: string;
     readonly requiredMessage: string;
 }): z.ZodString {
-    const baseSchema = z.string();
+    const baseSchema = z.string().trim();
 
     const withMax =
         typeof args.maxLength === "number"

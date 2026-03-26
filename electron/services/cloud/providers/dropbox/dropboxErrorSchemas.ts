@@ -11,7 +11,7 @@ interface DropboxErrorSummaryPayload {
 
 const dropboxErrorSummarySchema: z.ZodType<DropboxErrorSummaryPayload> = z
     .object({
-        error_summary: z.string().min(1).optional(),
+        error_summary: z.string().trim().min(1).optional(),
     })
     .loose();
 

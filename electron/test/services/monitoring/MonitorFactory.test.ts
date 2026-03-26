@@ -72,7 +72,7 @@ describe("MonitorFactory - Fixed", () => {
 
             expect(() =>
                 getMonitor("invalid" as any, mockMonitorConfig)
-            ).toThrowError();
+            ).toThrow();
         });
 
         it("should get monitor with configuration", async ({
@@ -127,7 +127,7 @@ describe("MonitorFactory - Fixed", () => {
             try {
                 expect(() =>
                     getMonitorWithResult("ping", mockMonitorConfig)
-                ).toThrowError(MonitorConfigurationError);
+                ).toThrow(MonitorConfigurationError);
             } finally {
                 factorySpy.mockRestore();
                 clearMonitorFactoryCache();
@@ -181,7 +181,7 @@ describe("MonitorFactory - Fixed", () => {
             getMonitor("ping", mockMonitorConfig);
 
             // Clear cache should not throw
-            expect(() => clearMonitorFactoryCache()).not.toThrowError();
+            expect(() => clearMonitorFactoryCache()).not.toThrow();
         });
     });
 
@@ -199,7 +199,7 @@ describe("MonitorFactory - Fixed", () => {
                 timeout: 10_000,
                 userAgent: "Updated-Agent/1.0",
             };
-            expect(() => updateMonitorConfig(newConfig)).not.toThrowError();
+            expect(() => updateMonitorConfig(newConfig)).not.toThrow();
         });
     });
 });

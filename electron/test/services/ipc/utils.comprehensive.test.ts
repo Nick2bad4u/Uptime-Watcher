@@ -1708,7 +1708,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         null,
                         registeredHandlers
                     )
-                ).toThrowError(/Missing validateParams/u);
+                ).toThrow(/Missing validateParams/u);
             });
 
             it("should execute registered handler with validation", async ({
@@ -1915,7 +1915,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         null,
                         registeredHandlers
                     )
-                ).toThrowError(
+                ).toThrow(
                     `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`
                 );
 
@@ -1958,7 +1958,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                         vi.fn().mockReturnValue(null),
                         registeredHandlers
                     )
-                ).toThrowError(registrationError);
+                ).toThrow(registrationError);
 
                 expect(
                     registeredHandlers.has(CHANNELS_FOR_TESTS.failure)

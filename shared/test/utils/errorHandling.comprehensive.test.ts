@@ -79,7 +79,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, mockStore)
-            ).rejects.toThrowError("Test error");
+            ).rejects.toThrow("Test error");
 
             expect(mockStore.clearError).toHaveBeenCalledTimes(1);
             expect(mockStore.setLoading).toHaveBeenCalledWith(true);
@@ -167,7 +167,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, mockBackendContext)
-            ).rejects.toThrowError("Backend error");
+            ).rejects.toThrow("Backend error");
 
             expect(mockBackendContext.logger.error).toHaveBeenCalledWith(
                 "Failed to test-operation",
@@ -194,7 +194,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, contextWithoutName)
-            ).rejects.toThrowError("Backend error");
+            ).rejects.toThrow("Backend error");
 
             expect(contextWithoutName.logger.error).toHaveBeenCalledWith(
                 "Async operation failed",
@@ -286,7 +286,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(mockOperation, mockStore)
-            ).rejects.toThrowError("Operation error");
+            ).rejects.toThrow("Operation error");
 
             expect(mockConsole.warn).toHaveBeenCalledWith(
                 "Store operation failed for:",
@@ -459,7 +459,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
             await expect(
                 withErrorHandling(operations[2]!, mockStore)
-            ).rejects.toThrowError("third failed");
+            ).rejects.toThrow("third failed");
 
             const fourthResult = await withErrorHandling(
                 operations[3]!,

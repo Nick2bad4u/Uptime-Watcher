@@ -71,6 +71,7 @@ export function createHttpKeywordMonitorSchema(
         .extend({
             bodyKeyword: z
                 .string()
+.trim()
                 .min(1, "Keyword is required")
                 .max(1024, "Keyword must be 1024 characters or fewer")
                 .refine((keyword) => keyword.trim().length > 0, {
@@ -91,6 +92,7 @@ export function createHttpJsonMonitorSchema(
         .extend({
             expectedJsonValue: z
                 .string()
+.trim()
                 .min(1, "Expected JSON value is required")
                 .max(
                     2048,

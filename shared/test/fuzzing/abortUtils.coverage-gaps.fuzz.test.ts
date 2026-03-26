@@ -158,7 +158,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
 
                 await expect(
                     raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError("Operation was aborted");
+                ).rejects.toThrow("Operation was aborted");
             }
         );
 
@@ -188,7 +188,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
 
                 vi.advanceTimersByTime(delayMs + 10);
 
-                await expect(racePromise).rejects.toThrowError(
+                await expect(racePromise).rejects.toThrow(
                     "Operation was aborted"
                 );
             }
@@ -231,7 +231,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
 
                 await expect(
                     raceWithAbort(operation, controller.signal)
-                ).rejects.toThrowError(errorMessage);
+                ).rejects.toThrow(errorMessage);
             }
         );
     });
@@ -336,7 +336,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                 // All should be aborted
                 await Promise.all(
                     racePromises.map((promise) =>
-                        expect(promise).rejects.toThrowError(
+                        expect(promise).rejects.toThrow(
                             "Operation was aborted"
                         )
                     )

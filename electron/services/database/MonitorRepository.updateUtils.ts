@@ -25,7 +25,7 @@ export interface BuildUpdateFieldsAndValuesResult {
     readonly updateValues: DbValue[];
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- Returns a DbValue union (null | number | string) or undefined by design.
+ 
 function convertValueForDatabase(
     key: string,
     value: unknown

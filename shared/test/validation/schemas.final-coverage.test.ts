@@ -133,7 +133,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                     "completelyUnknownFieldName",
                     "value"
                 );
-            }).toThrowError("Unknown field: completelyUnknownFieldName");
+            }).toThrow("Unknown field: completelyUnknownFieldName");
         });
 
         it("should handle unknown field in both specific and base schemas", async ({
@@ -148,7 +148,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
             // Test with field that exists in neither the specific nor base schema
             expect(() => {
                 validateMonitorField("port", "nonExistentField", "value");
-            }).toThrowError("Unknown field: nonExistentField");
+            }).toThrow("Unknown field: nonExistentField");
         });
     });
 
@@ -227,7 +227,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                             testCase.field,
                             testCase.value
                         );
-                    }).toThrowError("Unknown field: unknownField");
+                    }).toThrow("Unknown field: unknownField");
                 } else {
                     const result = validateMonitorField(
                         testCase.type,

@@ -37,7 +37,7 @@ describe(downloadBackupWithMetadata, () => {
 
         await expect(
             downloadBackupWithMetadata({ downloadObject, key })
-        ).rejects.toThrowError(/metadata mismatch/i);
+        ).rejects.toThrow(/metadata mismatch/i);
     });
 
     it("throws when metadata fileName does not match the requested key basename", async () => {
@@ -69,7 +69,7 @@ describe(downloadBackupWithMetadata, () => {
 
         await expect(
             downloadBackupWithMetadata({ downloadObject, key })
-        ).rejects.toThrowError(/filename/i);
+        ).rejects.toThrow(/filename/i);
     });
 });
 
@@ -102,7 +102,7 @@ describe(uploadBackupWithMetadata, () => {
                 },
                 uploadObject,
             })
-        ).rejects.toThrowError(/metadata upload failed/i);
+        ).rejects.toThrow(/metadata upload failed/i);
 
         expect(deleteObject).toHaveBeenCalledWith("backups/backup.sqlite");
     });
