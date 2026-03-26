@@ -131,7 +131,7 @@ const meta: Meta<typeof DynamicMonitorFieldsStory> = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 export const HttpFields: Story = {};
 

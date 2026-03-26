@@ -332,6 +332,12 @@ const config: Config = {
                     sidebarCollapsible: true,
                     sidebarPath: "./sidebars.ts",
                 },
+                googleTagManager: {
+                    containerId: "GTM-T8J6HPLF",
+                },
+                gtag: {
+                    trackingID: "G-18DR1S6R1T",
+                },
                 pages: {
                     editUrl:
                         "https://github.com/Nick2bad4u/Uptime-Watcher/issues/new?template=custom-issue.md#",

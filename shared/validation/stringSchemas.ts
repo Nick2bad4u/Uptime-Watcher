@@ -12,7 +12,9 @@ export function createNonWhitespaceStringSchema(args: {
     readonly maxLengthMessage?: string;
     readonly requiredMessage: string;
 }): z.ZodString {
-    const baseSchema = z.string().trim();
+    // Preserve caller-provided whitespace and only reject all-whitespace input.
+    // eslint-disable-next-line zod/prefer-string-schema-with-trim -- This schema validates without normalizing values.
+    const baseSchema = z.string();
 
     const withMax =
         typeof args.maxLength === "number"

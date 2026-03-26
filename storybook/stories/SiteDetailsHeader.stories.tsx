@@ -30,7 +30,7 @@ const meta: Meta<typeof SiteDetailsHeader> = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 interface SiteDetailsHeaderScenario {
     readonly httpMonitor: Monitor;

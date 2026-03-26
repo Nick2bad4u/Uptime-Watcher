@@ -31,7 +31,9 @@ import { isValidHost } from "./validatorUtils";
  */
 const statusHistorySchema = z
     .object({
-        details: z.string().trim().optional(),
+        // Preserve raw status detail text when validating history entries.
+        // eslint-disable-next-line zod/prefer-string-schema-with-trim -- Validation must not normalize persisted monitor data.
+        details: z.string().optional(),
         responseTime: z.number(),
         status: z.enum(statusHistoryEnumValues),
         timestamp: z.number(),
@@ -97,7 +99,9 @@ const hostValidationSchema = z
  */
 const baseMonitorSchema: BaseMonitorSchemaType = z
     .object({
-        activeOperations: z.array(z.string().trim()).optional(),
+        // Preserve raw active operation identifiers when validating monitor state.
+        // eslint-disable-next-line zod/prefer-string-schema-with-trim -- Validation must not normalize persisted monitor data.
+        activeOperations: z.array(z.string()).optional(),
         checkInterval: z
             .number()
             .min(

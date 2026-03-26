@@ -30,7 +30,7 @@ const meta: Meta<typeof ErrorAlert> = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 type ErrorAlertProps = ComponentProps<typeof ErrorAlert>;
 
 const DismissibleStory = (args: ErrorAlertProps): ReactElement => {

@@ -30,7 +30,7 @@ const meta: Meta<typeof SettingItem> = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 type SettingItemProps = ComponentProps<typeof SettingItem>;
 
 const WithSelectStory = (args: SettingItemProps): ReactElement => {

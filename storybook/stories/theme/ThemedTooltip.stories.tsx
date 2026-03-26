@@ -16,7 +16,7 @@ const meta: Meta<typeof ThemedTooltip> = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
     render: (args) => (

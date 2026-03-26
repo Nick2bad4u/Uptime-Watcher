@@ -21,7 +21,7 @@ const meta: Meta<typeof FormErrorAlert> = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 type FormErrorAlertProps = ComponentProps<typeof FormErrorAlert>;
 
 const InteractiveStory = (args: FormErrorAlertProps): ReactElement => {

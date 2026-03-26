@@ -20,7 +20,7 @@ const meta: Meta<typeof DefaultErrorFallback> = {
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof meta>;
 
 const StubReload = ({
     children,
