@@ -4,6 +4,80 @@
 
 All notable changes to this project will be documented in this file.
 
+## [23.4.0] - 2026-03-26
+
+
+[[bfe9ac1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bfe9ac1bed35b8264eedce6c0fee38a0f0e751cb)...
+[e344447](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e344447243a21a55521cc49dd51bee28a848eb95)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/bfe9ac1bed35b8264eedce6c0fee38a0f0e751cb...e344447243a21a55521cc49dd51bee28a848eb95))
+
+
+### 🛠️ Other Changes
+
+- [skip-ci] Refactor Dependabot config for multi-ecosystem support
+
+Updated Dependabot configuration to enable multi-ecosystem groups and adjust scheduling for dependency updates.  [skip-ci] [`(00e1822)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/00e182241dbf3849982e433b4ca85864dda2ce1a)
+
+
+
+### 🧹 Chores
+
+- *(release)* V23.4.0 [skip ci] [`(e344447)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e344447243a21a55521cc49dd51bee28a848eb95)
+
+
+- Update changelogs for v23.3.0 [skip ci] [`(3d55e6c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3d55e6c04064dc735d65eaf246e7a8520bf1a9cd)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update logger mocking in tests and improve theme configuration handling
+ - 🧪 [test] Refactor logger mocking in operationalHooks tests for better clarity
+ - 🛠️ [fix] Simplify theme configuration merging by using castUnchecked for type safety
+ - 🎨 [style] Enhance SiteCardHeader component to manage favicon visibility with state
+ - 🎨 [style] Format last checked timestamp in SettingsTab.SiteInformationCard for better readability
+ - 🛠️ [fix] Adjust DataService to ensure proper payload validation
+ - 🎨 [style] Improve timestamp formatting in MiniChartBar component for consistent display
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0af0c58)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0af0c58df353c9839c057c6a025bc08213922d15)
+
+
+- 🔧 [build] Update dependencies and ESLint configurations
+ - 🔧 Update "type-fest" dependency to version "^5.5.0" in package.json
+ - 🛠️ Add Google Tag Manager and gtag tracking IDs in docusaurus.config.ts
+ - 🛠️ Modify ESLint rules for react-naming-convention and react-x in eslint.config.mjs
+ - 📝 Preserve raw status detail text and active operation identifiers in monitorSchemas.common.ts
+ - 📝 Adjust stringSchemas.ts to preserve caller-provided whitespace
+ - 🎨 Update Storybook stories to use the correct StoryObj type
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(544c75a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/544c75a2cd57920c66f501d81bbf9f47740a7484)
+
+
+- 🔧 [build] Update eslint-plugin-jsdoc to version 62.8.1
+ - [dependency] Update eslint-plugin-jsdoc ^62.8.1 in package.json and package-lock.json
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(feb0e72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/feb0e727f79b345fd34708726bc4d310959fac69)
+
+
+- 🔧 [build] Update Storybook configuration and TypeScript settings
+ - 🛠️ Refactor Storybook story definitions to use `StoryObj` without type parameters for consistency across multiple story files.
+ - 🔧 Adjust `tsconfig.json` for Storybook to set `rootDir` to the parent directory, improving module resolution.
+ - 🔧 Modify `viteSharedConfig.ts` to simplify the React plugin options by removing unnecessary Babel plugin configurations.
+
+🧪 [test] Improve error handling in tests
+ - 🛠️ Update error assertions in various test files to use `toThrow` instead of `toThrowError` for better compatibility with Jest's latest practices.
+ - 🧪 Refactor tests in `googleDriveHttpClient.test.ts`, `DatabaseService.transactions.test.ts`, and others to ensure they correctly handle expected errors.
+
+📝 [docs] Update TypeScript configuration
+ - 🔧 Add `ignoreDeprecations` option to `tsconfig.json` to suppress warnings for deprecated features, streamlining the development experience.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bfe9ac1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bfe9ac1bed35b8264eedce6c0fee38a0f0e751cb)
+
+
+
+
+
+
 ## [23.3.0] - 2026-02-26
 
 

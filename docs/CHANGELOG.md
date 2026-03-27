@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[2eedac8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2eedac8786f0e9b56659f208f73e7cb43f51fbf9)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...2eedac8786f0e9b56659f208f73e7cb43f51fbf9))
+[544c75a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/544c75a2cd57920c66f501d81bbf9f47740a7484)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...544c75a2cd57920c66f501d81bbf9f47740a7484))
 
 
 ### ✨ Features
@@ -1266,6 +1266,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v23.3.0 [skip ci] [`(3d55e6c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3d55e6c04064dc735d65eaf246e7a8520bf1a9cd)
+
+
 - 🧹 [chore] bulk formatting & config overhaul with deps bump
 
 - 🚜 Polish code style across the repo: wrap long lines, unify import/export formatting, trim excess blank lines, simplify arrow bodies, normalize JSDoc and generics.
@@ -1360,6 +1363,32 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies and ESLint configurations
+ - 🔧 Update "type-fest" dependency to version "^5.5.0" in package.json
+ - 🛠️ Add Google Tag Manager and gtag tracking IDs in docusaurus.config.ts
+ - 🛠️ Modify ESLint rules for react-naming-convention and react-x in eslint.config.mjs
+ - 📝 Preserve raw status detail text and active operation identifiers in monitorSchemas.common.ts
+ - 📝 Adjust stringSchemas.ts to preserve caller-provided whitespace
+ - 🎨 Update Storybook stories to use the correct StoryObj type
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(544c75a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/544c75a2cd57920c66f501d81bbf9f47740a7484)
+
+
+- 🔧 [build] Update Storybook configuration and TypeScript settings
+ - 🛠️ Refactor Storybook story definitions to use `StoryObj` without type parameters for consistency across multiple story files.
+ - 🔧 Adjust `tsconfig.json` for Storybook to set `rootDir` to the parent directory, improving module resolution.
+ - 🔧 Modify `viteSharedConfig.ts` to simplify the React plugin options by removing unnecessary Babel plugin configurations.
+
+🧪 [test] Improve error handling in tests
+ - 🛠️ Update error assertions in various test files to use `toThrow` instead of `toThrowError` for better compatibility with Jest's latest practices.
+ - 🧪 Refactor tests in `googleDriveHttpClient.test.ts`, `DatabaseService.transactions.test.ts`, and others to ensure they correctly handle expected errors.
+
+📝 [docs] Update TypeScript configuration
+ - 🔧 Add `ignoreDeprecations` option to `tsconfig.json` to suppress warnings for deprecated features, streamlining the development experience.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bfe9ac1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bfe9ac1bed35b8264eedce6c0fee38a0f0e751cb)
+
 
 - 🔧 [build] Update dependencies and add bootstrap labels script
 
