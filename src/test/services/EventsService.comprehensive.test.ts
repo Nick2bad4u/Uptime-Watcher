@@ -345,9 +345,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(
-                EventsService.onMonitorDown(callback)
-            ).rejects.toThrow("Init failed");
+            await expect(EventsService.onMonitorDown(callback)).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(mockElectronAPI.events.onMonitorDown).not.toHaveBeenCalled();
         });
@@ -597,9 +597,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(
-                EventsService.onMonitorUp(callback)
-            ).rejects.toThrow("Init failed");
+            await expect(EventsService.onMonitorUp(callback)).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(mockElectronAPI.events.onMonitorUp).not.toHaveBeenCalled();
         });
@@ -623,9 +623,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(
-                EventsService.onSiteAdded(callback)
-            ).rejects.toThrow("Init failed");
+            await expect(EventsService.onSiteAdded(callback)).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(mockElectronAPI.events.onSiteAdded).not.toHaveBeenCalled();
         });
@@ -649,9 +649,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(
-                EventsService.onSiteRemoved(callback)
-            ).rejects.toThrow("Init failed");
+            await expect(EventsService.onSiteRemoved(callback)).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(mockElectronAPI.events.onSiteRemoved).not.toHaveBeenCalled();
         });
@@ -675,9 +675,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(
-                EventsService.onSiteUpdated(callback)
-            ).rejects.toThrow("Init failed");
+            await expect(EventsService.onSiteUpdated(callback)).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(mockElectronAPI.events.onSiteUpdated).not.toHaveBeenCalled();
         });
@@ -701,9 +701,9 @@ describe("EventsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
-            await expect(
-                EventsService.onTestEvent(callback)
-            ).rejects.toThrow("Init failed");
+            await expect(EventsService.onTestEvent(callback)).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(mockElectronAPI.events.onTestEvent).not.toHaveBeenCalled();
         });

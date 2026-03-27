@@ -237,9 +237,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             setTimeout(() => controller.abort(), abortDelay);
                             vi.advanceTimersByTime(abortDelay);
 
-                            await expect(promise).rejects.toThrow(
-                                "Aborted"
-                            );
+                            await expect(promise).rejects.toThrow("Aborted");
                             expect(cleanup).toHaveBeenCalledTimes(1);
                         }
                     )
@@ -352,9 +350,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                     signal: controller.signal,
                 });
 
-                await expect(promise).rejects.toThrow(
-                    "Operation was aborted"
-                );
+                await expect(promise).rejects.toThrow("Operation was aborted");
             });
         }
     );

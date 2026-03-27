@@ -551,9 +551,7 @@ describe("useTheme - Complete Coverage", () => {
             const { result } = renderHook(() => useTheme());
 
             expect(() => result.current.getColor("")).not.toThrow();
-            expect(() =>
-                result.current.getColor("invalid.path")
-            ).not.toThrow();
+            expect(() => result.current.getColor("invalid.path")).not.toThrow();
         });
 
         it("should handle invalid status values", async ({

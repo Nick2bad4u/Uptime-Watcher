@@ -167,9 +167,9 @@ describe(useMonitorTypesStore, () => {
         const { result } = renderHook(() => useMonitorTypesStore());
 
         await act(async () => {
-            await expect(
-                result.current.loadMonitorTypes()
-            ).rejects.toThrow("Backend unavailable");
+            await expect(result.current.loadMonitorTypes()).rejects.toThrow(
+                "Backend unavailable"
+            );
         });
 
         expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(

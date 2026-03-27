@@ -290,9 +290,9 @@ describe("OperationHelpers", () => {
                 name: "Updated Duplicate",
             };
 
-            expect(() =>
-                applySavedSiteToStore(savedSite, mockDeps)
-            ).toThrow(DuplicateSiteIdentifierError);
+            expect(() => applySavedSiteToStore(savedSite, mockDeps)).toThrow(
+                DuplicateSiteIdentifierError
+            );
             expect(setSitesSpy).not.toHaveBeenCalled();
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected while persisting backend snapshot",
@@ -332,9 +332,9 @@ describe("OperationHelpers", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() =>
-                getSiteByIdentifier("nonexistent", mockDeps)
-            ).toThrow("Site not found");
+            expect(() => getSiteByIdentifier("nonexistent", mockDeps)).toThrow(
+                "Site not found"
+            );
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
         });
 

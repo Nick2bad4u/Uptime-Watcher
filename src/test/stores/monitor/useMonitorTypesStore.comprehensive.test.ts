@@ -338,9 +338,9 @@ describe(useMonitorTypesStore, () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             await act(async () => {
-                await expect(
-                    result.current.loadMonitorTypes()
-                ).rejects.toThrow("invalid payload");
+                await expect(result.current.loadMonitorTypes()).rejects.toThrow(
+                    "invalid payload"
+                );
             });
 
             expect(result.current.monitorTypes).toEqual([]);

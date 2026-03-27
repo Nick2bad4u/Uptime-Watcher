@@ -669,15 +669,9 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             "should handle null/undefined messages gracefully",
             (nullishMessage) => {
                 // Act & Assert - should not crash with null/undefined
-                expect(() =>
-                    logger.info(nullishMessage as any)
-                ).not.toThrow();
-                expect(() =>
-                    logger.debug(nullishMessage as any)
-                ).not.toThrow();
-                expect(() =>
-                    logger.error(nullishMessage as any)
-                ).not.toThrow();
+                expect(() => logger.info(nullishMessage as any)).not.toThrow();
+                expect(() => logger.debug(nullishMessage as any)).not.toThrow();
+                expect(() => logger.error(nullishMessage as any)).not.toThrow();
             }
         );
 

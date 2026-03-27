@@ -770,9 +770,7 @@ describe("StatusUpdateHandler", () => {
                 previousStatus: "up" as const,
             };
 
-            expect(() =>
-                statusChangedCallback(statusUpdate)
-            ).not.toThrow();
+            expect(() => statusChangedCallback(statusUpdate)).not.toThrow();
         });
 
         it("should handle errors in full sync gracefully", async ({

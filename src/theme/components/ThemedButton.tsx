@@ -75,9 +75,8 @@ import { CSS_CLASSES } from "./types";
  *
  * @public
  */
-export type ThemedButtonProperties = ComponentProperties<
-    StandardButtonProperties
->;
+export type ThemedButtonProperties =
+    ComponentProperties<StandardButtonProperties>;
 
 // Default styles object to prevent infinite render loops
 const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};

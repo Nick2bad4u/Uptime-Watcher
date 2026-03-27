@@ -142,9 +142,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                             },
                         };
 
-                        expect(() =>
-                            isIpcResponse(response)
-                        ).not.toThrow();
+                        expect(() => isIpcResponse(response)).not.toThrow();
                         const result = isIpcResponse(response);
                         expect(result).toBeTruthy();
                     }
@@ -160,9 +158,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                     if (isIpcResponse(input)) {
                         // May throw or return data based on success flag
                         if ((input as { success: boolean }).success) {
-                            expect(() =>
-                                extractIpcData(input)
-                            ).not.toThrow();
+                            expect(() => extractIpcData(input)).not.toThrow();
                         } else {
                             expect(() => extractIpcData(input)).toThrow();
                         }
@@ -223,9 +219,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                             warnings,
                         };
 
-                        expect(() =>
-                            extractIpcData(response)
-                        ).not.toThrow();
+                        expect(() => extractIpcData(response)).not.toThrow();
                         const result = extractIpcData(response);
                         expect(result).toBe(data);
                     }
@@ -370,9 +364,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                             error: success ? undefined : error,
                         };
 
-                        expect(() =>
-                            isIpcResponse(response)
-                        ).not.toThrow();
+                        expect(() => isIpcResponse(response)).not.toThrow();
                         expect(isIpcResponse(response)).toBeTruthy();
 
                         if (success) {
@@ -380,9 +372,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                                 extractIpcData(response)
                             ).not.toThrow();
                         } else {
-                            expect(() =>
-                                extractIpcData(response)
-                            ).toThrow();
+                            expect(() => extractIpcData(response)).toThrow();
                         }
                     }
                 )
@@ -437,9 +427,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                     ).not.toThrow();
 
                     if (success) {
-                        expect(() =>
-                            extractIpcData(response)
-                        ).not.toThrow();
+                        expect(() => extractIpcData(response)).not.toThrow();
                         const result = extractIpcData(response);
                         expect(result).toBe(maliciousData);
                     }

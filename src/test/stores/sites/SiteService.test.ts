@@ -310,9 +310,9 @@ describe("SiteService", () => {
             const duplicateError = new Error("Site already exists");
             mockElectronAPI.sites.addSite.mockRejectedValueOnce(duplicateError);
 
-            await expect(
-                SiteService.addSite(duplicateSite)
-            ).rejects.toThrow("Site already exists");
+            await expect(SiteService.addSite(duplicateSite)).rejects.toThrow(
+                "Site already exists"
+            );
         });
     });
 
@@ -446,9 +446,9 @@ describe("SiteService", () => {
             const identifier = "site-to-remove";
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(false);
 
-            await expect(
-                SiteService.removeSite(identifier)
-            ).rejects.toThrow(/backend returned false/i);
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                /backend returned false/i
+            );
         });
 
         it("should handle removal errors", async ({ task, annotate }) => {
@@ -461,9 +461,9 @@ describe("SiteService", () => {
             const error = new Error("Failed to remove site");
             mockElectronAPI.sites.removeSite.mockRejectedValueOnce(error);
 
-            await expect(
-                SiteService.removeSite(identifier)
-            ).rejects.toThrow("Failed to remove site");
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                "Failed to remove site"
+            );
         });
 
         it("should handle non-existent site removal", async ({
@@ -481,9 +481,9 @@ describe("SiteService", () => {
                 notFoundError
             );
 
-            await expect(
-                SiteService.removeSite(identifier)
-            ).rejects.toThrow("Site not found");
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                "Site not found"
+            );
         });
 
         it("should handle empty site identifier", async ({
@@ -546,9 +546,9 @@ describe("SiteService", () => {
                 await expect(
                     SiteService.updateSite("test", {})
                 ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
-                await expect(
-                    SiteService.removeSite("test")
-                ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
+                await expect(SiteService.removeSite("test")).rejects.toThrow(
+                    MOCK_BRIDGE_ERROR_MESSAGE
+                );
             } finally {
                 (globalThis as any).window.electronAPI = originalWindowBridge;
                 (globalThis as any).electronAPI = originalGlobalBridge;
@@ -719,9 +719,9 @@ describe("SiteService", () => {
                 timeoutError
             );
 
-            await expect(
-                SiteService.updateSite("test", {})
-            ).rejects.toThrow("Request timeout");
+            await expect(SiteService.updateSite("test", {})).rejects.toThrow(
+                "Request timeout"
+            );
         });
     });
 });

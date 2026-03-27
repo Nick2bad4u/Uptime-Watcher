@@ -452,9 +452,7 @@ describe("Time Utils Property-Based Tests", () => {
             "should handle very large timestamps without throwing",
             (timestamp) => {
                 expect(() => formatFullTimestamp(timestamp)).not.toThrow();
-                expect(() =>
-                    formatRelativeTimestamp(timestamp)
-                ).not.toThrow();
+                expect(() => formatRelativeTimestamp(timestamp)).not.toThrow();
             }
         );
 

@@ -209,9 +209,9 @@ describe(useCloudStore, () => {
             new Error("boom")
         );
 
-        await expect(
-            useCloudStore.getState().connectDropbox()
-        ).rejects.toThrow("boom");
+        await expect(useCloudStore.getState().connectDropbox()).rejects.toThrow(
+            "boom"
+        );
 
         const [toast] = useAlertStore.getState().toasts;
         expect(toast?.variant).toBe("error");

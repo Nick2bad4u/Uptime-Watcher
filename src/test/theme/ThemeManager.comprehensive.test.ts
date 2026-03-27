@@ -280,9 +280,7 @@ describe(ThemeManager, () => {
             delete (globalThis as any).document;
 
             const lightTheme = themeManager.getTheme("light");
-            expect(() =>
-                themeManager.applyTheme(lightTheme)
-            ).not.toThrow();
+            expect(() => themeManager.applyTheme(lightTheme)).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;
@@ -302,9 +300,7 @@ describe(ThemeManager, () => {
             const lightTheme = themeManager.getTheme("light");
 
             // Apply theme and verify it doesn't throw
-            expect(() =>
-                themeManager.applyTheme(lightTheme)
-            ).not.toThrow();
+            expect(() => themeManager.applyTheme(lightTheme)).not.toThrow();
 
             // Verify basic functionality (the actual calls may vary based on internal implementation)
             // We just verify that the applyTheme method executes without errors
@@ -509,9 +505,7 @@ describe(ThemeManager, () => {
                 borderRadius: {},
             } as any;
 
-            expect(() =>
-                themeManager.applyTheme(themeWithNulls)
-            ).not.toThrow();
+            expect(() => themeManager.applyTheme(themeWithNulls)).not.toThrow();
         });
 
         it("should work without DOM environment", async ({

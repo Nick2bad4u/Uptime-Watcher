@@ -125,9 +125,9 @@ describe("pingRetry utilities", () => {
             await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performSinglePingCheck } = module;
 
-        await expect(
-            performSinglePingCheck("unlucky", 10)
-        ).rejects.toThrow(/Connectivity check failed: boom/);
+        await expect(performSinglePingCheck("unlucky", 10)).rejects.toThrow(
+            /Connectivity check failed: boom/
+        );
     });
 
     it("delegates retry orchestration to withOperationalHooks", async () => {

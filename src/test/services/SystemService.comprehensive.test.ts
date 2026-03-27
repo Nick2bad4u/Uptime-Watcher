@@ -126,9 +126,7 @@ describe("SystemService", () => {
         it("should handle null/undefined initialization errors", async () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
-            await expect(SystemService.initialize()).rejects.toThrow(
-                "null"
-            );
+            await expect(SystemService.initialize()).rejects.toThrow("null");
             expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(null);
         });

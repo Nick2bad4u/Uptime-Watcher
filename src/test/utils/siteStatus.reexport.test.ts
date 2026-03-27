@@ -267,9 +267,7 @@ describe("Shared SiteStatus Utilities", () => {
                 await import("@shared/utils/siteStatus");
 
             // These should handle invalid inputs gracefully
-            expect(() =>
-                getSiteStatusVariant("invalid" as any)
-            ).not.toThrow();
+            expect(() => getSiteStatusVariant("invalid" as any)).not.toThrow();
         });
     });
 });

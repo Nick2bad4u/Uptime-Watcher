@@ -927,15 +927,9 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(typeof result.current.setTheme).toBe("function");
 
             await act(async () => {
-                expect(() =>
-                    result.current.setTheme("dark")
-                ).not.toThrow();
-                expect(() =>
-                    result.current.setTheme("light")
-                ).not.toThrow();
-                expect(() =>
-                    result.current.setTheme("system")
-                ).not.toThrow();
+                expect(() => result.current.setTheme("dark")).not.toThrow();
+                expect(() => result.current.setTheme("light")).not.toThrow();
+                expect(() => result.current.setTheme("system")).not.toThrow();
             });
         });
 

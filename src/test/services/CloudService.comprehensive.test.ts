@@ -285,9 +285,7 @@ describe("CloudService", () => {
     });
 
     it("rejects empty restore key", async () => {
-        await expect(CloudService.restoreBackup("")).rejects.toThrow(
-            TypeError
-        );
+        await expect(CloudService.restoreBackup("")).rejects.toThrow(TypeError);
     });
 
     it("connects Dropbox", async () => {
@@ -314,9 +312,9 @@ describe("CloudService", () => {
     });
 
     it("rejects empty encryption passphrase", async () => {
-        await expect(
-            CloudService.setEncryptionPassphrase(" ")
-        ).rejects.toThrow(TypeError);
+        await expect(CloudService.setEncryptionPassphrase(" ")).rejects.toThrow(
+            TypeError
+        );
     });
 
     it("migrates backups", async () => {

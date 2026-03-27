@@ -1062,9 +1062,7 @@ describe("Status Utilities", () => {
                 (status) => {
                     // Property: None of these should throw
                     expect(() => getStatusIcon(status)).not.toThrow();
-                    expect(() =>
-                        formatStatusWithIcon(status)
-                    ).not.toThrow();
+                    expect(() => formatStatusWithIcon(status)).not.toThrow();
 
                     // Property: All should return non-empty strings
                     const icon = getStatusIcon(status);
@@ -1101,9 +1099,7 @@ describe("Status Utilities", () => {
                 "createStatusIdentifier should handle valid text input gracefully",
                 (text) => {
                     // Property: Should not throw with valid text input
-                    expect(() =>
-                        createStatusIdentifier(text)
-                    ).not.toThrow();
+                    expect(() => createStatusIdentifier(text)).not.toThrow();
 
                     const result = createStatusIdentifier(text);
 

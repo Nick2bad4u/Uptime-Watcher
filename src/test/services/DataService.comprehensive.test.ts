@@ -274,9 +274,9 @@ describe("DataService", () => {
             const initError = new Error("Init failed");
             mockWaitForElectronBridge.mockRejectedValue(initError);
 
-            await expect(
-                DataService.downloadSqliteBackup()
-            ).rejects.toThrow("Init failed");
+            await expect(DataService.downloadSqliteBackup()).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
@@ -289,9 +289,9 @@ describe("DataService", () => {
                 backupError
             );
 
-            await expect(
-                DataService.downloadSqliteBackup()
-            ).rejects.toThrow("Backup failed");
+            await expect(DataService.downloadSqliteBackup()).rejects.toThrow(
+                "Backup failed"
+            );
 
             expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
@@ -461,9 +461,9 @@ describe("DataService", () => {
             mockWaitForElectronBridge.mockRejectedValue(initError);
             const importData = '{"sites":[]}';
 
-            await expect(
-                DataService.importData(importData)
-            ).rejects.toThrow("Init failed");
+            await expect(DataService.importData(importData)).rejects.toThrow(
+                "Init failed"
+            );
 
             expect(mockElectronAPI.data.importData).not.toHaveBeenCalled();
         });
@@ -473,9 +473,9 @@ describe("DataService", () => {
             mockElectronAPI.data.importData.mockRejectedValue(importError);
             const importData = '{"sites":[]}';
 
-            await expect(
-                DataService.importData(importData)
-            ).rejects.toThrow("Import failed");
+            await expect(DataService.importData(importData)).rejects.toThrow(
+                "Import failed"
+            );
 
             expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
@@ -653,9 +653,9 @@ describe("DataService", () => {
                 networkError
             );
 
-            await expect(
-                DataService.downloadSqliteBackup()
-            ).rejects.toThrow("ECONNRESET");
+            await expect(DataService.downloadSqliteBackup()).rejects.toThrow(
+                "ECONNRESET"
+            );
         });
 
         it("should handle file system errors in import operations", async () => {
@@ -689,9 +689,9 @@ describe("DataService", () => {
                 largeBackup
             );
 
-            await expect(
-                DataService.downloadSqliteBackup()
-            ).rejects.toThrow(/exceeds maximum ipc transfer size/i);
+            await expect(DataService.downloadSqliteBackup()).rejects.toThrow(
+                /exceeds maximum ipc transfer size/i
+            );
         });
 
         it("should handle unicode characters in export/import", async () => {

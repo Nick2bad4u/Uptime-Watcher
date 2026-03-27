@@ -215,9 +215,7 @@ describe("MonitoringService", () => {
 
             await expect(
                 MonitoringService.checkSiteNow("site-abc", "monitor-123")
-            ).rejects.toThrow(
-                "checkSiteNow returned an invalid status update"
-            );
+            ).rejects.toThrow("checkSiteNow returned an invalid status update");
         });
     });
 
@@ -439,9 +437,9 @@ describe("MonitoringService", () => {
                 failure
             );
 
-            await expect(
-                MonitoringService.startMonitoring()
-            ).rejects.toThrow("global failure");
+            await expect(MonitoringService.startMonitoring()).rejects.toThrow(
+                "global failure"
+            );
         });
     });
 
@@ -666,9 +664,9 @@ describe("MonitoringService", () => {
                 failure
             );
 
-            await expect(
-                MonitoringService.stopMonitoring()
-            ).rejects.toThrow("stop failed");
+            await expect(MonitoringService.stopMonitoring()).rejects.toThrow(
+                "stop failed"
+            );
         });
     });
 

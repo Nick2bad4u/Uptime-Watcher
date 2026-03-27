@@ -168,9 +168,7 @@ describe("Validation Fuzzing Tests", () => {
                     (numbers: number[], separator: string) => {
                         const malformedIp = numbers.join(separator);
 
-                        expect(() =>
-                            isValidHost(malformedIp)
-                        ).not.toThrow();
+                        expect(() => isValidHost(malformedIp)).not.toThrow();
                         const result = isValidHost(malformedIp);
                         expect(typeof result).toBe("boolean");
                     }

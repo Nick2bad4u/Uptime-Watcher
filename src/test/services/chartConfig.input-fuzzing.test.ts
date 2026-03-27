@@ -346,9 +346,7 @@ describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
 
                 // Act & Assert - should not crash
                 expect(() => service.getLineChartConfig()).not.toThrow();
-                expect(() =>
-                    service.getDoughnutChartConfig(0)
-                ).not.toThrow();
+                expect(() => service.getDoughnutChartConfig(0)).not.toThrow();
                 expect(() => service.getBarChartConfig()).not.toThrow();
             }
         );

@@ -141,9 +141,7 @@ describe("SettingsService", () => {
         it("should handle null/undefined initialization errors", async () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
-            await expect(SettingsService.initialize()).rejects.toThrow(
-                "null"
-            );
+            await expect(SettingsService.initialize()).rejects.toThrow("null");
             expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(null);
         });
@@ -169,9 +167,9 @@ describe("SettingsService", () => {
             const error = new Error("Initialization failed");
             mockWaitForElectronBridge.mockRejectedValue(error);
 
-            await expect(
-                SettingsService.getHistoryLimit()
-            ).rejects.toThrow("Initialization failed");
+            await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
+                "Initialization failed"
+            );
             expect(
                 mockElectronAPI.settings.getHistoryLimit
             ).not.toHaveBeenCalled();
@@ -181,9 +179,9 @@ describe("SettingsService", () => {
             const error = new Error("Failed to get history limit");
             mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(error);
 
-            await expect(
-                SettingsService.getHistoryLimit()
-            ).rejects.toThrow("Failed to get history limit");
+            await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
+                "Failed to get history limit"
+            );
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.getHistoryLimit
@@ -545,9 +543,9 @@ describe("SettingsService", () => {
                 throw new Error("Synchronous error");
             });
 
-            await expect(
-                SettingsService.getHistoryLimit()
-            ).rejects.toThrow("Synchronous error");
+            await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
+                "Synchronous error"
+            );
         });
 
         it("should handle missing electron API methods gracefully", async () => {
@@ -555,9 +553,7 @@ describe("SettingsService", () => {
                 throw new TypeError("Cannot read properties of undefined");
             });
 
-            await expect(
-                SettingsService.getHistoryLimit()
-            ).rejects.toThrow();
+            await expect(SettingsService.getHistoryLimit()).rejects.toThrow();
         });
 
         it("should handle partial electron API gracefully", async () => {
@@ -573,12 +569,8 @@ describe("SettingsService", () => {
                 }
             );
 
-            await expect(
-                SettingsService.getHistoryLimit()
-            ).rejects.toThrow();
-            await expect(
-                SettingsService.resetSettings()
-            ).rejects.toThrow();
+            await expect(SettingsService.getHistoryLimit()).rejects.toThrow();
+            await expect(SettingsService.resetSettings()).rejects.toThrow();
             await expect(
                 SettingsService.updateHistoryLimit(100)
             ).rejects.toThrow();
@@ -596,9 +588,9 @@ describe("SettingsService", () => {
                 mockElectronAPI.settings.getHistoryLimit.mockRejectedValueOnce(
                     error
                 );
-                await expect(
-                    SettingsService.getHistoryLimit()
-                ).rejects.toThrow(error.message);
+                await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
+                    error.message
+                );
             }
         });
 
@@ -614,9 +606,9 @@ describe("SettingsService", () => {
                 mockElectronAPI.settings.resetSettings.mockRejectedValueOnce(
                     error
                 );
-                await expect(
-                    SettingsService.resetSettings()
-                ).rejects.toThrow(error.message);
+                await expect(SettingsService.resetSettings()).rejects.toThrow(
+                    error.message
+                );
             }
         });
     });

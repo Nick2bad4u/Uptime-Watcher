@@ -715,12 +715,8 @@ describe("Time Utilities", () => {
 
             // These should not throw errors
             expect(() => formatDuration(largeNumber)).not.toThrow();
-            expect(() =>
-                formatIntervalDuration(largeNumber)
-            ).not.toThrow();
-            expect(() =>
-                formatResponseDuration(largeNumber)
-            ).not.toThrow();
+            expect(() => formatIntervalDuration(largeNumber)).not.toThrow();
+            expect(() => formatResponseDuration(largeNumber)).not.toThrow();
             expect(() => formatResponseTime(largeNumber)).not.toThrow();
         });
 

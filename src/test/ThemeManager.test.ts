@@ -569,9 +569,7 @@ describe(ThemeManager, () => {
             expect(() =>
                 manager.applyTheme(themeWithNullShadows)
             ).not.toThrow();
-            expect(() =>
-                manager.applyTheme(themeWithNullColors)
-            ).not.toThrow();
+            expect(() => manager.applyTheme(themeWithNullColors)).not.toThrow();
             expect(() =>
                 manager.applyTheme(themeWithNullTypography)
             ).not.toThrow();
