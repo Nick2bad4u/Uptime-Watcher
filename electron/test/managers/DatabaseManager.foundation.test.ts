@@ -305,9 +305,7 @@ describe("DatabaseManager Foundation Tests", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
-            await expect(
-                databaseManager.initialize()
-            ).resolves.not.toThrow();
+            await expect(databaseManager.initialize()).resolves.not.toThrow();
         });
 
         it("should set history limit successfully", async ({

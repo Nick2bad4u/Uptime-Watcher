@@ -46,7 +46,6 @@ import {
     type WebPreferences,
 } from "electron";
 import { randomInt } from "node:crypto";
-import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { objectHasOwn } from "ts-extras";
@@ -80,7 +79,7 @@ const resolveCurrentDirectory = (): string => {
             return path.dirname(globalFilename);
         }
 
-        const entryScriptPath = process.argv[1];
+        const [, entryScriptPath] = process.argv;
         if (typeof entryScriptPath === "string" && entryScriptPath.length > 0) {
             return path.dirname(path.resolve(entryScriptPath));
         }
@@ -91,30 +90,36 @@ const resolveCurrentDirectory = (): string => {
 
 const currentDirectory = resolveCurrentDirectory();
 
+const resolveAppPath = (): string =>
+    app.isReady() ? app.getAppPath() : process.cwd();
+
 const resolveProductionDistDirectory = (): string => {
+    const appPath = resolveAppPath();
+
+    const [, entryScriptPath] = process.argv;
+    const entryDirectory =
+        typeof entryScriptPath === "string" && entryScriptPath.length > 0
+            ? path.dirname(path.resolve(entryScriptPath))
+            : undefined;
+
     const directoryCandidates = [
+        path.resolve(appPath, "dist"),
+        path.resolve(appPath),
+        ...(typeof entryDirectory === "string" && entryDirectory.length > 0
+            ? [
+                  path.resolve(entryDirectory, "../dist"),
+                  path.resolve(entryDirectory, "dist"),
+              ]
+            : []),
+        getProductionDistDirectory(currentDirectory),
         path.resolve(process.cwd(), "dist"),
-        path.resolve(currentDirectory, "../dist"),
         path.resolve(currentDirectory, "dist"),
     ];
 
-    try {
-        const appPath = app.getAppPath();
-        directoryCandidates.push(path.resolve(appPath, "dist"));
-        directoryCandidates.push(path.resolve(appPath));
-    } catch {
-        // Ignore: app path may be unavailable during early startup.
-    }
+    const [preferredDirectory] = directoryCandidates;
 
-    const existingDirectory = directoryCandidates.find((candidate) => {
-        const indexPath = path.join(candidate, "index.html");
-        const preloadPath = path.join(candidate, "preload.js");
-
-        return fs.existsSync(indexPath) && fs.existsSync(preloadPath);
-    });
-
-    if (typeof existingDirectory === "string") {
-        return existingDirectory;
+    if (typeof preferredDirectory === "string") {
+        return preferredDirectory;
     }
 
     return getProductionDistDirectory(currentDirectory);

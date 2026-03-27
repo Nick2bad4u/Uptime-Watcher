@@ -145,9 +145,7 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
                     abortController.abort("Test timeout");
                 }, 1);
 
-                await expect(sleepPromise).rejects.toThrow(
-                    "Sleep was aborted"
-                );
+                await expect(sleepPromise).rejects.toThrow("Sleep was aborted");
             }
         });
     });

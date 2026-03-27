@@ -249,7 +249,7 @@ export function buildMonitorParameters(
         const { columns } = generateSqlParameters();
 
         // Return values in the same order as columns
-         
+
         return columns.map((column): DbValue => {
             const value = row[column];
             return convertToDbValue(value) ?? null;

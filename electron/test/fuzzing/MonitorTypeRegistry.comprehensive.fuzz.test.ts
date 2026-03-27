@@ -51,9 +51,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.string(), (input: string) => {
                     // Property: function should never throw for any string input
-                    expect(() =>
-                        getMonitorTypeConfig(input)
-                    ).not.toThrow();
+                    expect(() => getMonitorTypeConfig(input)).not.toThrow();
 
                     const result = getMonitorTypeConfig(input);
                     // Property: result is either undefined or a valid config object
@@ -115,9 +113,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     ),
                     (input: any) => {
                         // Property: should handle non-string inputs gracefully
-                        expect(() =>
-                            isValidMonitorType(input)
-                        ).not.toThrow();
+                        expect(() => isValidMonitorType(input)).not.toThrow();
                     }
                 )
             );
@@ -162,9 +158,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.string(), (input: string) => {
                     // Property: should never throw for any string input
-                    expect(() =>
-                        getMonitorServiceFactory(input)
-                    ).not.toThrow();
+                    expect(() => getMonitorServiceFactory(input)).not.toThrow();
                 })
             );
         });
@@ -283,9 +277,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                         };
 
                         // Property: registration with valid field should not throw
-                        expect(() =>
-                            registerMonitorType(config)
-                        ).not.toThrow();
+                        expect(() => registerMonitorType(config)).not.toThrow();
                     }
                 )
             );
@@ -297,9 +289,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.string(), (input: string) => {
                     // Property: type guard should never throw
-                    expect(() =>
-                        isValidMonitorTypeGuard(input)
-                    ).not.toThrow();
+                    expect(() => isValidMonitorTypeGuard(input)).not.toThrow();
 
                     const result = isValidMonitorTypeGuard(input);
                     // Property: result must be boolean
@@ -364,9 +354,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 expect(() =>
                     getMonitorTypeConfig(maliciousInput)
                 ).not.toThrow();
-                expect(() =>
-                    isValidMonitorType(maliciousInput)
-                ).not.toThrow();
+                expect(() => isValidMonitorType(maliciousInput)).not.toThrow();
                 expect(() =>
                     getMonitorServiceFactory(maliciousInput)
                 ).not.toThrow();
@@ -389,9 +377,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 expect(() =>
                     getMonitorTypeConfig(maliciousInput)
                 ).not.toThrow();
-                expect(() =>
-                    isValidMonitorType(maliciousInput)
-                ).not.toThrow();
+                expect(() => isValidMonitorType(maliciousInput)).not.toThrow();
 
                 const result = getMonitorTypeConfig(maliciousInput);
                 expect(result).toBeUndefined();
@@ -413,9 +399,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
             for (const input of specialChars) {
                 expect(() => getMonitorTypeConfig(input)).not.toThrow();
                 expect(() => isValidMonitorType(input)).not.toThrow();
-                expect(() =>
-                    getMonitorServiceFactory(input)
-                ).not.toThrow();
+                expect(() => getMonitorServiceFactory(input)).not.toThrow();
             }
         });
 

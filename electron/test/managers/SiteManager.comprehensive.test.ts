@@ -651,9 +651,7 @@ describe("SiteManager - Comprehensive", () => {
                 )
                 .mockRejectedValue(new Error("DB error"));
 
-            await expect(siteManager.getSites()).rejects.toThrow(
-                "DB error"
-            );
+            await expect(siteManager.getSites()).rejects.toThrow("DB error");
             expect(getSitesSpy).toHaveBeenCalled();
         });
     });
@@ -812,9 +810,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager["getSiteSnapshotForMutation"]("missing-site")
-            ).rejects.toThrow(
-                "Site with identifier missing-site not found"
-            );
+            ).rejects.toThrow("Site with identifier missing-site not found");
         });
     });
 
@@ -950,9 +946,7 @@ describe("SiteManager - Comprehensive", () => {
 
             await expect(
                 siteManager.removeMonitor("missing-site", "monitor-1")
-            ).rejects.toThrow(
-                "Site with identifier missing-site not found"
-            );
+            ).rejects.toThrow("Site with identifier missing-site not found");
         });
     });
 
@@ -1684,9 +1678,7 @@ describe("SiteManager - Comprehensive", () => {
                 errors: ["Invalid site"],
             });
 
-            await expect(
-                siteManager["validateSite"](mockSite)
-            ).rejects.toThrow(
+            await expect(siteManager["validateSite"](mockSite)).rejects.toThrow(
                 "Site validation failed for 'site-1': Invalid site"
             );
         });

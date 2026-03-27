@@ -1111,9 +1111,9 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 new Error("Database error")
             );
 
-            await expect(
-                databaseManager.setHistoryLimit(1000)
-            ).rejects.toThrow("Database error");
+            await expect(databaseManager.setHistoryLimit(1000)).rejects.toThrow(
+                "Database error"
+            );
         });
 
         it("should handle setupNewMonitors operation", async ({

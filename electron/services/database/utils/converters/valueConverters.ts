@@ -33,7 +33,7 @@ export type DbValue = null | number | string;
  * Prefer this helper instead of ad-hoc `typeof` chains so the conversion rules
  * stay consistent across repositories and mappers.
  */
- 
+
 export function convertToDbValue(value: unknown): DbValue | undefined {
     let result: DbValue | undefined = undefined;
 

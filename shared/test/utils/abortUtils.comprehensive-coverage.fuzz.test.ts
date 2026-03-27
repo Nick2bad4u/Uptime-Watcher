@@ -288,9 +288,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 setTimeout(() => controller.abort(), sleepMs / 4);
 
                 const startTime = Date.now();
-                await expect(
-                    sleep(sleepMs, controller.signal)
-                ).rejects.toThrow("Sleep was aborted");
+                await expect(sleep(sleepMs, controller.signal)).rejects.toThrow(
+                    "Sleep was aborted"
+                );
                 const endTime = Date.now();
 
                 // Sleep should be interrupted before completion
@@ -314,9 +314,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             const sleepPromise = sleep(1000, controller.signal);
             controller.abort();
 
-            await expect(sleepPromise).rejects.toThrow(
-                "Sleep was aborted"
-            );
+            await expect(sleepPromise).rejects.toThrow("Sleep was aborted");
         });
     });
 

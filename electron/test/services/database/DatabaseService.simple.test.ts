@@ -492,14 +492,10 @@ describe("DatabaseService Coverage Tests", () => {
                                 expect(db).toBeDefined();
                             } else if (errorOnConnect) {
                                 // Error scenarios
-                                expect(() =>
-                                    instance.getDatabase()
-                                ).toThrow();
+                                expect(() => instance.getDatabase()).toThrow();
                             } else if (!initialized) {
                                 // Uninitialized state
-                                expect(() =>
-                                    instance.getDatabase()
-                                ).toThrow();
+                                expect(() => instance.getDatabase()).toThrow();
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);
@@ -546,9 +542,7 @@ describe("DatabaseService Coverage Tests", () => {
                             if (shouldThrow) {
                                 await expect(
                                     instance.executeTransaction(mockCallback)
-                                ).rejects.toThrow(
-                                    "Mock transaction error"
-                                );
+                                ).rejects.toThrow("Mock transaction error");
                             } else {
                                 const result =
                                     await instance.executeTransaction(

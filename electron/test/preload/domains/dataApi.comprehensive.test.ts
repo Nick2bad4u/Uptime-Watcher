@@ -170,9 +170,7 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            await expect(dataApi.exportData()).rejects.toThrow(
-                "export-failed"
-            );
+            await expect(dataApi.exportData()).rejects.toThrow("export-failed");
         });
     });
 

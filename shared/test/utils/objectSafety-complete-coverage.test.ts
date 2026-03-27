@@ -330,9 +330,9 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
             expect(() => safeObjectPick(null as any, ["key"])).toThrow(
                 TypeError
             );
-            expect(() =>
-                safeObjectPick(undefined as any, ["key"])
-            ).toThrow(TypeError);
+            expect(() => safeObjectPick(undefined as any, ["key"])).toThrow(
+                TypeError
+            );
         });
 
         it("should handle empty pick array", async ({ task, annotate }) => {

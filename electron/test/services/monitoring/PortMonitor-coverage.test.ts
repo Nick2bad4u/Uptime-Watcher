@@ -586,9 +586,9 @@ describe("PortMonitor Coverage Tests", () => {
             const retryError = new Error("Port check failed after retries");
             vi.mocked(performPortCheckWithRetry).mockRejectedValue(retryError);
 
-            await expect(
-                portMonitor.check(validPortMonitor)
-            ).rejects.toThrow("Port check failed after retries");
+            await expect(portMonitor.check(validPortMonitor)).rejects.toThrow(
+                "Port check failed after retries"
+            );
         });
 
         it("should handle different host formats", async ({

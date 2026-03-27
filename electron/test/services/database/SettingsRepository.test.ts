@@ -168,9 +168,7 @@ describe(SettingsRepository, () => {
             (mockDatabase.all as any).mockImplementation(() => {
                 throw error;
             });
-            await expect(repository.getAll()).rejects.toThrow(
-                "Database error"
-            );
+            await expect(repository.getAll()).rejects.toThrow("Database error");
         });
         it("should handle null value gracefully", async ({
             task,

@@ -196,27 +196,25 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
         );
 
         const isFaviconVisible =
-            typeof faviconUrl === "string" && !failedFaviconUrls.has(faviconUrl);
+            typeof faviconUrl === "string" &&
+            !failedFaviconUrls.has(faviconUrl);
 
-        const handleFaviconError = useCallback(
-            (): void => {
-                if (typeof faviconUrl !== "string") {
-                    return;
+        const handleFaviconError = useCallback((): void => {
+            if (typeof faviconUrl !== "string") {
+                return;
+            }
+
+            setFailedFaviconUrls((previous) => {
+                if (previous.has(faviconUrl)) {
+                    return previous;
                 }
 
-                setFailedFaviconUrls((previous) => {
-                    if (previous.has(faviconUrl)) {
-                        return previous;
-                    }
+                const next = new Set(previous);
+                next.add(faviconUrl);
 
-                    const next = new Set(previous);
-                    next.add(faviconUrl);
-
-                    return next;
-                });
-            },
-            [faviconUrl]
-        );
+                return next;
+            });
+        }, [faviconUrl]);
 
         return (
             <div className="site-card__header-row">

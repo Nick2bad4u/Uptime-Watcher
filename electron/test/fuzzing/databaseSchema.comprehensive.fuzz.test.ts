@@ -246,9 +246,9 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                                 )
                             );
                         } else {
-                            expect(() =>
-                                createDatabaseTables(testDb)
-                            ).toThrow("SQL execution failed");
+                            expect(() => createDatabaseTables(testDb)).toThrow(
+                                "SQL execution failed"
+                            );
                         }
                     }
                 )
@@ -328,9 +328,9 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                         }
 
                         if (shouldFail) {
-                            expect(() =>
-                                createDatabaseIndexes(testDb)
-                            ).toThrow(errorType);
+                            expect(() => createDatabaseIndexes(testDb)).toThrow(
+                                errorType
+                            );
                         } else {
                             // Execute multiple times to test idempotency
                             for (let i = 0; i < indexCount; i++) {

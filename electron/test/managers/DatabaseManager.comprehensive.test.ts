@@ -857,9 +857,9 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }
             );
 
-            await expect(
-                databaseManager.setHistoryLimit(100)
-            ).rejects.toThrow("Failed to set limit");
+            await expect(databaseManager.setHistoryLimit(100)).rejects.toThrow(
+                "Failed to set limit"
+            );
         });
     });
 
@@ -1218,9 +1218,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
 
             // Should throw RangeError, not clamp
-            await expect(
-                databaseManager.setHistoryLimit(1500)
-            ).rejects.toThrow(
+            await expect(databaseManager.setHistoryLimit(1500)).rejects.toThrow(
                 "History limit exceeds maximum of 1000, received: 1500"
             );
         });
@@ -1326,9 +1324,9 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }
             );
 
-            await expect(
-                databaseManager.setHistoryLimit(200)
-            ).rejects.toThrow("Database write error");
+            await expect(databaseManager.setHistoryLimit(200)).rejects.toThrow(
+                "Database write error"
+            );
         });
     });
 
@@ -1413,9 +1411,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 mockConfigurationManager.getHistoryRetentionRules
             ).mockReturnValue(undefined as any);
 
-            await expect(
-                databaseManager.setHistoryLimit(300)
-            ).rejects.toThrow(
+            await expect(databaseManager.setHistoryLimit(300)).rejects.toThrow(
                 "[DatabaseManager.setHistoryLimit] History retention rules are not configured"
             );
         });

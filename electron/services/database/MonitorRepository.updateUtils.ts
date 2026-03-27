@@ -25,7 +25,6 @@ export interface BuildUpdateFieldsAndValuesResult {
     readonly updateValues: DbValue[];
 }
 
- 
 function convertValueForDatabase(
     key: string,
     value: unknown

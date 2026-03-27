@@ -70,9 +70,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
                     ).not.toThrow();
                     expect(castIpcResponse(input, validator)).toBe(input);
                 } else {
-                    expect(() =>
-                        castIpcResponse(input, validator)
-                    ).toThrow();
+                    expect(() => castIpcResponse(input, validator)).toThrow();
                 }
             }
         );

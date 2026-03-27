@@ -353,23 +353,23 @@ describe("HTTP Client Utils", () => {
 
             // Test request error handler
             const requestError = new Error("Request error");
-            await expect(
-                requestErrorHandler(requestError)
-            ).rejects.toThrow("Request error");
+            await expect(requestErrorHandler(requestError)).rejects.toThrow(
+                "Request error"
+            );
 
             // Test response error handler
             const responseError = new Error("Response error");
-            await expect(
-                responseErrorHandler(responseError)
-            ).rejects.toThrow("Response error");
+            await expect(responseErrorHandler(responseError)).rejects.toThrow(
+                "Response error"
+            );
 
             // Test with non-Error objects
-            await expect(
-                requestErrorHandler("String error")
-            ).rejects.toThrow("String error");
-            await expect(
-                responseErrorHandler("String error")
-            ).rejects.toThrow("String error");
+            await expect(requestErrorHandler("String error")).rejects.toThrow(
+                "String error"
+            );
+            await expect(responseErrorHandler("String error")).rejects.toThrow(
+                "String error"
+            );
         });
         it("should calculate response time for error responses", async () => {
             // Arrange

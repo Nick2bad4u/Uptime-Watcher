@@ -98,9 +98,7 @@ describe("Logger Utilities", () => {
 
                 expect(() => logger.info("")).not.toThrow();
                 expect(() => logger.debug("Just message")).not.toThrow();
-                expect(() =>
-                    logger.error("Null error", null)
-                ).not.toThrow();
+                expect(() => logger.error("Null error", null)).not.toThrow();
                 expect(() =>
                     logger.error("Undefined error", undefined)
                 ).not.toThrow();

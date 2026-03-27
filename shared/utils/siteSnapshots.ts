@@ -332,9 +332,7 @@ export function toMonitorSnapshotOverlay(
         overlay.lastChecked = normalizedDate;
     }
 
-    return hasOverlayValues(overlay)
-        ? overlay
-        : undefined;
+    return hasOverlayValues(overlay) ? overlay : undefined;
 }
 
 /**

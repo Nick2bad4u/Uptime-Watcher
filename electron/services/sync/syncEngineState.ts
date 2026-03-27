@@ -197,7 +197,6 @@ function removeUndefinedEntries(value: UnknownRecord): UnknownRecord {
     return result;
 }
 
- 
 function toJsonValue(value: unknown): JsonValue {
     return jsonValueSchema.parse(value);
 }

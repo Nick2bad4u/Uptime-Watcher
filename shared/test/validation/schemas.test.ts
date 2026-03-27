@@ -234,9 +234,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "http" as const,
                 };
 
-                expect(() =>
-                    baseMonitorSchema.parse(validData)
-                ).not.toThrow();
+                expect(() => baseMonitorSchema.parse(validData)).not.toThrow();
             }
         });
 
@@ -260,9 +258,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type,
                 };
 
-                expect(() =>
-                    baseMonitorSchema.parse(validData)
-                ).not.toThrow();
+                expect(() => baseMonitorSchema.parse(validData)).not.toThrow();
             }
         });
 
@@ -303,9 +299,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete invalidData[fieldToRemove as keyof typeof validData];
 
-                expect(() =>
-                    baseMonitorSchema.parse(invalidData)
-                ).toThrow();
+                expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
             }
         });
 
@@ -438,9 +432,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     url,
                 };
 
-                expect(() =>
-                    httpMonitorSchema.parse(invalidData)
-                ).toThrow();
+                expect(() => httpMonitorSchema.parse(invalidData)).toThrow();
             }
         });
 
@@ -528,9 +520,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() =>
-                    portMonitorSchema.parse(validData)
-                ).not.toThrow();
+                expect(() => portMonitorSchema.parse(validData)).not.toThrow();
             }
         });
 
@@ -568,9 +558,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() =>
-                    portMonitorSchema.parse(invalidData)
-                ).toThrow();
+                expect(() => portMonitorSchema.parse(invalidData)).toThrow();
             }
         });
 
@@ -604,9 +592,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() =>
-                    portMonitorSchema.parse(validData)
-                ).not.toThrow();
+                expect(() => portMonitorSchema.parse(validData)).not.toThrow();
             }
         });
 
@@ -1538,9 +1524,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 url: "https://a.co", // Minimum valid HTTPS URL
             };
 
-            expect(() =>
-                httpMonitorSchema.parse(minValidData)
-            ).not.toThrow();
+            expect(() => httpMonitorSchema.parse(minValidData)).not.toThrow();
         });
 
         it("should handle maximum valid values", async ({ task, annotate }) => {
@@ -1563,9 +1547,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 port: 65_535, // Maximum port
             };
 
-            expect(() =>
-                portMonitorSchema.parse(maxValidData)
-            ).not.toThrow();
+            expect(() => portMonitorSchema.parse(maxValidData)).not.toThrow();
         });
 
         it("should handle special IP addresses", async ({ task, annotate }) => {
@@ -1597,9 +1579,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                     type: "port" as const,
                 };
 
-                expect(() =>
-                    portMonitorSchema.parse(validData)
-                ).not.toThrow();
+                expect(() => portMonitorSchema.parse(validData)).not.toThrow();
             }
         });
     });
@@ -1749,9 +1729,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 bodyKeyword: "ready",
             };
 
-            expect(() =>
-                httpKeywordMonitorSchema.parse(monitor)
-            ).not.toThrow();
+            expect(() => httpKeywordMonitorSchema.parse(monitor)).not.toThrow();
         });
 
         it("should reject empty keyword", async ({ task, annotate }) => {
@@ -1774,9 +1752,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 bodyKeyword: " ",
             };
 
-            expect(() =>
-                httpKeywordMonitorSchema.parse(monitor)
-            ).toThrow();
+            expect(() => httpKeywordMonitorSchema.parse(monitor)).toThrow();
         });
     });
 
@@ -1804,9 +1780,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 expectedStatusCode: 204,
             };
 
-            expect(() =>
-                httpStatusMonitorSchema.parse(monitor)
-            ).not.toThrow();
+            expect(() => httpStatusMonitorSchema.parse(monitor)).not.toThrow();
         });
 
         it("should reject invalid status code", async ({ task, annotate }) => {

@@ -364,9 +364,9 @@ describe("State Sync Domain API", () => {
                         await expect(api.getSyncStatus()).rejects.toThrow(
                             error.message
                         );
-                        await expect(
-                            api.requestFullSync()
-                        ).rejects.toThrow(error.message);
+                        await expect(api.requestFullSync()).rejects.toThrow(
+                            error.message
+                        );
                     }
                 ),
                 { numRuns: 10 }

@@ -336,9 +336,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                 // All should be aborted
                 await Promise.all(
                     racePromises.map((promise) =>
-                        expect(promise).rejects.toThrow(
-                            "Operation was aborted"
-                        )
+                        expect(promise).rejects.toThrow("Operation was aborted")
                     )
                 );
             }

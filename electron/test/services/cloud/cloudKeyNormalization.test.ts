@@ -47,15 +47,13 @@ describe("cloudKeyNormalization", () => {
     });
 
     it("enforces a default byte budget for provider object keys", () => {
-        expect(() =>
-            normalizeProviderObjectKey("a".repeat(10_000))
-        ).toThrow(`${DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES}`);
+        expect(() => normalizeProviderObjectKey("a".repeat(10_000))).toThrow(
+            `${DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES}`
+        );
     });
 
     it("assertCloudObjectKey rejects empty and trailing slash keys", () => {
         expect(() => assertCloudObjectKey("")).toThrow("cannot be empty");
-        expect(() => assertCloudObjectKey("backups/")).toThrow(
-            "must not end"
-        );
+        expect(() => assertCloudObjectKey("backups/")).toThrow("must not end");
     });
 });

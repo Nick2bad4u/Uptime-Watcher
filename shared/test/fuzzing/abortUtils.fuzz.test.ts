@@ -231,9 +231,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                     Math.max(2, Math.floor(ms / 2))
                 );
 
-                await expect(sleepPromise).rejects.toThrow(
-                    "Sleep was aborted"
-                );
+                await expect(sleepPromise).rejects.toThrow("Sleep was aborted");
             }
         );
 

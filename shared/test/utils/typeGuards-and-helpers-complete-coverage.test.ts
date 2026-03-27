@@ -1016,9 +1016,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
                 typeof value === "number" && !Number.isNaN(value);
 
             expect(validateAndConvert(42, numberValidator)).toBe(42);
-            expect(() =>
-                validateAndConvert("42", numberValidator)
-            ).toThrow();
+            expect(() => validateAndConvert("42", numberValidator)).toThrow();
         });
     });
 

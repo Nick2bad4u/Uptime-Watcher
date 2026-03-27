@@ -447,9 +447,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
 
             const exportPromise = service.exportAllData();
-            await expect(exportPromise).rejects.toThrow(
-                DataImportExportError
-            );
+            await expect(exportPromise).rejects.toThrow(DataImportExportError);
             await expect(exportPromise).rejects.toThrow(
                 /Failed to export data: Export payload is too large/u
             );
@@ -625,9 +623,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 throw "String error";
             });
 
-            await expect(
-                service.importDataFromJson("invalid")
-            ).rejects.toThrow(DataImportExportError);
+            await expect(service.importDataFromJson("invalid")).rejects.toThrow(
+                DataImportExportError
+            );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to parse import data: String error",
@@ -1199,9 +1197,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 operationError
             );
 
-            await expect(
-                service.persistImportedData([], {})
-            ).rejects.toThrow(operationError);
+            await expect(service.persistImportedData([], {})).rejects.toThrow(
+                operationError
+            );
         });
 
         it("should handle transaction callback errors", async ({
@@ -1224,9 +1222,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 async (operation: any) => await operation()
             );
 
-            await expect(
-                service.persistImportedData([], {})
-            ).rejects.toThrow(transactionError);
+            await expect(service.persistImportedData([], {})).rejects.toThrow(
+                transactionError
+            );
         });
 
         it("should handle repository method failures during transaction", async ({
@@ -1249,9 +1247,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 async (operation: any) => await operation()
             );
 
-            await expect(
-                service.persistImportedData([], {})
-            ).rejects.toThrow(deleteError);
+            await expect(service.persistImportedData([], {})).rejects.toThrow(
+                deleteError
+            );
         });
     });
 

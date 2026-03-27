@@ -38,7 +38,7 @@ describe("cloudSync", () => {
             syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
             timestamp: 2,
             value: {
-                "key": 1,
+                key: 1,
                 " key ": 2,
             },
         } as const;

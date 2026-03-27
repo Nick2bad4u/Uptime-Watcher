@@ -217,9 +217,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     size: DEFAULT_MAX_BACKUP_SIZE_BYTES + 1,
                 } as unknown as Awaited<ReturnType<typeof fs.stat>>);
 
-                await expect(
-                    createDatabaseBackup(testDbPath)
-                ).rejects.toThrow(/exceeds maximum allowed size/i);
+                await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                    /exceeds maximum allowed size/i
+                );
 
                 expect(mockReadFile).not.toHaveBeenCalled();
                 expect(logger.error).toHaveBeenCalledWith(
@@ -246,9 +246,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 fileError.name = "ENOENT";
                 mockReadFile.mockRejectedValue(fileError);
 
-                await expect(
-                    createDatabaseBackup(testDbPath)
-                ).rejects.toThrow(fileError);
+                await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                    fileError
+                );
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -273,9 +273,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 permissionError.name = "EACCES";
                 mockReadFile.mockRejectedValue(permissionError);
 
-                await expect(
-                    createDatabaseBackup(testDbPath)
-                ).rejects.toThrow(permissionError);
+                await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                    permissionError
+                );
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -298,9 +298,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 mockReadFile.mockRejectedValue("String error");
 
-                await expect(
-                    createDatabaseBackup(testDbPath)
-                ).rejects.toThrow("String error");
+                await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                    "String error"
+                );
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",
@@ -324,9 +324,9 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 timeoutError.name = "TIMEOUT";
                 mockReadFile.mockRejectedValue(timeoutError);
 
-                await expect(
-                    createDatabaseBackup(testDbPath)
-                ).rejects.toThrow(timeoutError);
+                await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
+                    timeoutError
+                );
 
                 expect(logger.error).toHaveBeenCalledWith(
                     "[DatabaseBackup] Failed to create database backup",

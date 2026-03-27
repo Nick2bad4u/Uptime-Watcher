@@ -414,12 +414,7 @@ export function queryMonitorRow(
     sql: string,
     params?: DbValue[]
 ): MonitorRow | null | undefined {
-    return queryForSingleRecord(
-        db,
-        sql,
-        params,
-        MONITOR_ROW_VALIDATION
-    );
+    return queryForSingleRecord(db, sql, params, MONITOR_ROW_VALIDATION);
 }
 
 /**

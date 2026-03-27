@@ -227,10 +227,9 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                const recoveredAlertId =
-                    latestToastEntry;
+                const recoveredAlertId = latestToastEntry;
 
-                await expect(recoveredAlertId).toHaveAttribute("data-alert-id", );
+                await expect(recoveredAlertId).toHaveAttribute("data-alert-id");
 
                 await latestToastEntry.click();
 

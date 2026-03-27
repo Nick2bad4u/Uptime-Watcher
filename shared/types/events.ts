@@ -67,7 +67,7 @@ export interface EventMetadata {
  */
 export const correlationIdSchema: z.ZodType<CorrelationId> = z
     .string()
-.trim()
+    .trim()
     .min(1)
     .pipe(
         z.custom<CorrelationId>(

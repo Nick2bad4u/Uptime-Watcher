@@ -371,9 +371,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
             (input) => {
                 expect(() => isArray(input)).not.toThrow();
                 expect(() => isRecord(input)).not.toThrow();
-                expect(() =>
-                    safePropertyAccess(input, "key")
-                ).not.toThrow();
+                expect(() => safePropertyAccess(input, "key")).not.toThrow();
             }
         );
 

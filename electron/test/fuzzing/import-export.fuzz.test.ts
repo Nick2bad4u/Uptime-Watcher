@@ -420,9 +420,7 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                         const exportedJson = await service.exportAllData();
 
                         // Should produce valid JSON
-                        expect(() =>
-                            JSON.parse(exportedJson)
-                        ).not.toThrow();
+                        expect(() => JSON.parse(exportedJson)).not.toThrow();
 
                         const parsed = JSON.parse(exportedJson);
 

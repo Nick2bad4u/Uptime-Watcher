@@ -13,8 +13,7 @@ export function useDelayedLoadingOverlay(args: {
     readonly isInitialized: boolean;
     readonly isLoading: boolean;
 }): boolean {
-    const [showLoadingOverlay, setShowLoadingOverlay] =
-        useState(false);
+    const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
     // Create stable callbacks to avoid direct setState in useEffect
     const clearLoadingOverlay = useCallback(() => {

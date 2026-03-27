@@ -1656,12 +1656,8 @@ describe("Edge cases and boundary conditions", () => {
             lastChecked: new Date(),
         };
 
-        expect(() =>
-            httpMonitorSchema.parse(monitorWithoutDate)
-        ).not.toThrow();
-        expect(() =>
-            httpMonitorSchema.parse(monitorWithDate)
-        ).not.toThrow();
+        expect(() => httpMonitorSchema.parse(monitorWithoutDate)).not.toThrow();
+        expect(() => httpMonitorSchema.parse(monitorWithDate)).not.toThrow();
     });
 });
 
@@ -2368,9 +2364,7 @@ describe("cdnEdgeConsistencyMonitorSchema", () => {
             history: [],
         };
 
-        expect(() =>
-            cdnEdgeConsistencyMonitorSchema.parse(monitor)
-        ).toThrow();
+        expect(() => cdnEdgeConsistencyMonitorSchema.parse(monitor)).toThrow();
     });
 });
 
@@ -2397,9 +2391,7 @@ describe("replicationMonitorSchema", () => {
             history: [],
         };
 
-        expect(() =>
-            replicationMonitorSchema.parse(monitor)
-        ).not.toThrow();
+        expect(() => replicationMonitorSchema.parse(monitor)).not.toThrow();
     });
 
     it("should reject replication monitor with missing timestamp field", async ({
@@ -2458,9 +2450,7 @@ describe("serverHeartbeatMonitorSchema", () => {
             history: [],
         };
 
-        expect(() =>
-            serverHeartbeatMonitorSchema.parse(monitor)
-        ).not.toThrow();
+        expect(() => serverHeartbeatMonitorSchema.parse(monitor)).not.toThrow();
     });
 
     it("should reject heartbeat monitor with negative drift", async ({
@@ -2489,9 +2479,7 @@ describe("serverHeartbeatMonitorSchema", () => {
             history: [],
         };
 
-        expect(() =>
-            serverHeartbeatMonitorSchema.parse(monitor)
-        ).toThrow();
+        expect(() => serverHeartbeatMonitorSchema.parse(monitor)).toThrow();
     });
 });
 
@@ -2547,8 +2535,6 @@ describe("websocketKeepaliveMonitorSchema", () => {
             history: [],
         };
 
-        expect(() =>
-            websocketKeepaliveMonitorSchema.parse(monitor)
-        ).toThrow();
+        expect(() => websocketKeepaliveMonitorSchema.parse(monitor)).toThrow();
     });
 });

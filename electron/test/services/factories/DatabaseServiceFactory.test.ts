@@ -143,12 +143,8 @@ describe(DatabaseServiceFactory, () => {
             // Since dependencies are private, we can verify they were stored by
             // checking that services can be created successfully
             expect(() => factory.createBackupService()).not.toThrow();
-            expect(() =>
-                factory.createImportExportService()
-            ).not.toThrow();
-            expect(() =>
-                factory.createSiteRepositoryService()
-            ).not.toThrow();
+            expect(() => factory.createImportExportService()).not.toThrow();
+            expect(() => factory.createSiteRepositoryService()).not.toThrow();
         });
     });
 

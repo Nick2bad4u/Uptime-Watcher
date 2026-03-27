@@ -197,9 +197,7 @@ describe("CloudService.providerOperations", () => {
             settings,
         });
 
-        await expect(connectGoogleDrive(ctx)).rejects.toThrow(
-            "label failed"
-        );
+        await expect(connectGoogleDrive(ctx)).rejects.toThrow("label failed");
 
         // Provider + filesystem config should remain intact.
         await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(

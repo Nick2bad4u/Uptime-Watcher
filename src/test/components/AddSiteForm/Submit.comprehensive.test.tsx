@@ -971,9 +971,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                     "unsupported-type" as unknown as FormSubmitProperties["monitorType"],
             });
 
-            await expect(
-                handleSubmit(mockEvent, properties)
-            ).rejects.toThrow("Unsupported monitor type");
+            await expect(handleSubmit(mockEvent, properties)).rejects.toThrow(
+                "Unsupported monitor type"
+            );
         });
     });
 });

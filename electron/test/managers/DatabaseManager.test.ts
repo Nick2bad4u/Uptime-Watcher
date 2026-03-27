@@ -575,9 +575,9 @@ describe(DatabaseManager, () => {
                 new Error("Set limit failed")
             );
 
-            await expect(
-                databaseManager.setHistoryLimit(500)
-            ).rejects.toThrow("Set limit failed");
+            await expect(databaseManager.setHistoryLimit(500)).rejects.toThrow(
+                "Set limit failed"
+            );
         });
 
         it("should update internal history limit on successful set", async () => {
@@ -652,9 +652,7 @@ describe(DatabaseManager, () => {
             );
 
             // This should not throw because the error is caught and logged
-            await expect(
-                databaseManager.initialize()
-            ).resolves.not.toThrow();
+            await expect(databaseManager.initialize()).resolves.not.toThrow();
         });
     });
 

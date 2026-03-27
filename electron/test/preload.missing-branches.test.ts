@@ -123,12 +123,12 @@ describe("preload.ts - Missing Branch Coverage", () => {
             await expect(exposedAPI.sites.addSite({})).rejects.toThrow(
                 "IPC failed"
             );
-            await expect(
-                exposedAPI.sites.updateSite("id", {})
-            ).rejects.toThrow("IPC failed");
-            await expect(
-                exposedAPI.sites.removeSite("test")
-            ).rejects.toThrow("IPC failed");
+            await expect(exposedAPI.sites.updateSite("id", {})).rejects.toThrow(
+                "IPC failed"
+            );
+            await expect(exposedAPI.sites.removeSite("test")).rejects.toThrow(
+                "IPC failed"
+            );
         });
         it("should handle invoke errors in monitoring API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
@@ -181,15 +181,15 @@ describe("preload.ts - Missing Branch Coverage", () => {
             );
 
             // Test settings API error handling
-            await expect(
-                exposedAPI.settings.getHistoryLimit()
-            ).rejects.toThrow("Settings failed");
+            await expect(exposedAPI.settings.getHistoryLimit()).rejects.toThrow(
+                "Settings failed"
+            );
             await expect(
                 exposedAPI.settings.updateHistoryLimit(100)
             ).rejects.toThrow("Settings failed");
-            await expect(
-                exposedAPI.settings.resetSettings()
-            ).rejects.toThrow("Settings failed");
+            await expect(exposedAPI.settings.resetSettings()).rejects.toThrow(
+                "Settings failed"
+            );
         });
         it("should handle invoke errors in system API", async () => {
             mockIpcRenderer.invoke.mockRejectedValue(
@@ -377,15 +377,11 @@ describe("preload.ts - Missing Branch Coverage", () => {
             expect(() =>
                 exposedAPI.events.onUpdateStatus(callback)
             ).not.toThrow();
-            expect(() =>
-                exposedAPI.events.onMonitorUp(callback)
-            ).not.toThrow();
+            expect(() => exposedAPI.events.onMonitorUp(callback)).not.toThrow();
             expect(() =>
                 exposedAPI.events.onMonitorDown(callback)
             ).not.toThrow();
-            expect(() =>
-                exposedAPI.events.onTestEvent(callback)
-            ).not.toThrow();
+            expect(() => exposedAPI.events.onTestEvent(callback)).not.toThrow();
             expect(() =>
                 exposedAPI.events.onCacheInvalidated(callback)
             ).not.toThrow();

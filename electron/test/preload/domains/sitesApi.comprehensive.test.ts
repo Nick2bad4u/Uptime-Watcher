@@ -169,8 +169,8 @@ describe("sitesApi", () => {
             data: "not-a-boolean",
         });
 
-        await expect(
-            sitesApi.removeSite(baseSite.identifier)
-        ).rejects.toThrow(/failed validation/i);
+        await expect(sitesApi.removeSite(baseSite.identifier)).rejects.toThrow(
+            /failed validation/i
+        );
     });
 });

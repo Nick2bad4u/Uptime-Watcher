@@ -578,11 +578,7 @@ export interface StandardDataDisplayProperties<TItem>
 export type ComponentProperties<
     TBase,
     TOverrides = Record<never, never>,
-> = Omit<
-    TBase,
-    keyof TOverrides
-> &
-    TOverrides;
+> = Omit<TBase, keyof TOverrides> & TOverrides;
 
 /**
  * Utility type for making certain properties required.

@@ -450,9 +450,7 @@ describe("DatabaseManager - Coverage Tests", () => {
                 "purpose"
             );
 
-            await expect(
-                databaseManager.initialize()
-            ).resolves.not.toThrow();
+            await expect(databaseManager.initialize()).resolves.not.toThrow();
         });
 
         it("should refresh sites", async ({ annotate }) => {

@@ -62,8 +62,7 @@ export function ConditionalResponseTime({
     fallback,
     monitorType,
 }: ConditionalResponseTimeProperties): ReactNode {
-    const [supportsResponseTime, setSupportsResponseTime] =
-        useState(false);
+    const [supportsResponseTime, setSupportsResponseTime] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(

@@ -292,9 +292,7 @@ describe(withUtilityErrorHandling, () => {
             withUtilityErrorHandling(async () => {
                 throw new Error("fatal");
             }, "dangerous")
-        ).rejects.toThrow(
-            "dangerous failed and no fallback value provided"
-        );
+        ).rejects.toThrow("dangerous failed and no fallback value provided");
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "dangerous failed",

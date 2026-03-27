@@ -22,7 +22,7 @@ import { monitorStatusEnumValues } from "./statusValidationPrimitives";
  */
 const isoTimestampSchema: z.ZodType<string> = z
     .string()
-.trim()
+    .trim()
     .refine(
         (value) => !Number.isNaN(Date.parse(value)),
         "Timestamp must be a valid ISO 8601 string"

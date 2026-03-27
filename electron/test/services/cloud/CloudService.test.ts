@@ -282,9 +282,7 @@ describe("CloudService", () => {
 
         await expect(
             cloudService.setEncryptionPassphrase("correct\nhorse")
-        ).rejects.toThrow(
-            "Passphrase must not contain control characters"
-        );
+        ).rejects.toThrow("Passphrase must not contain control characters");
     });
 
     it("accepts passphrase with accidental surrounding whitespace when unlocking existing encryption", async () => {

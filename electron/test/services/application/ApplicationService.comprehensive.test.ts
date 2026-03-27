@@ -581,9 +581,7 @@ describe(ApplicationService, () => {
             setTimeout(() => abortController.abort(), 10);
 
             // Assert - Should handle cancellation
-            await expect(cleanupPromise).rejects.toThrow(
-                "Operation aborted"
-            );
+            await expect(cleanupPromise).rejects.toThrow("Operation aborted");
 
             // Verify test signal is still intact
             expect(signal.aborted).toBeFalsy();

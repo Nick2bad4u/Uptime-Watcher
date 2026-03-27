@@ -43,15 +43,15 @@ describe(normalizeHistoryLimit, () => {
 
     it("throws a TypeError when provided non-finite input", () => {
         expect(() => normalizeHistoryLimit(Number.NaN)).toThrow(TypeError);
-        expect(() =>
-            normalizeHistoryLimit("25" as unknown as number)
-        ).toThrow(TypeError);
+        expect(() => normalizeHistoryLimit("25" as unknown as number)).toThrow(
+            TypeError
+        );
     });
 
     it("throws a RangeError when the value is infinite or above the maximum", () => {
-        expect(() =>
-            normalizeHistoryLimit(Number.POSITIVE_INFINITY)
-        ).toThrow(RangeError);
+        expect(() => normalizeHistoryLimit(Number.POSITIVE_INFINITY)).toThrow(
+            RangeError
+        );
         expect(() =>
             normalizeHistoryLimit(customRules.maxLimit + 1, customRules)
         ).toThrow(RangeError);

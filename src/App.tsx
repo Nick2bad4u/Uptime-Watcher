@@ -207,10 +207,8 @@ export const App: NamedExoticComponent = memo(
         const [isInitialized, setIsInitialized] = useState(false);
 
         // Sidebar responsive state management
-        const [compactSidebarOpen, setCompactSidebarOpen] =
-            useState(false);
-        const [isCompactViewport, setIsCompactViewport] =
-            useState(false);
+        const [compactSidebarOpen, setCompactSidebarOpen] = useState(false);
+        const [isCompactViewport, setIsCompactViewport] = useState(false);
 
         const isSidebarOpen = isCompactViewport
             ? compactSidebarOpen
