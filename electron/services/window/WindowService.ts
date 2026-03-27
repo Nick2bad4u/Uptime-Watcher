@@ -39,12 +39,14 @@ import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { withRetry } from "@shared/utils/retry";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
+    app,
     BrowserWindow,
     type Event,
     type HandlerDetails,
     type WebPreferences,
 } from "electron";
 import { randomInt } from "node:crypto";
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { objectHasOwn } from "ts-extras";
@@ -62,16 +64,63 @@ import {
 } from "./utils/productionSecurityHeaders";
 
 /**
- * Absolute directory path for this module.
+ * Resolves the absolute directory path for this module.
  *
  * @remarks
- * Do not use `import.meta.dirname` because bundlers may not preserve it. Prefer
- * deriving it from `import.meta.url`, which is robust in both Node ESM and
- * bundled builds.
+ * Primary source is `import.meta.url`. Some bundled CJS runtimes may provide an
+ * undefined module URL; in that case we fall back to `globalThis.__filename`
+ * (when available) and finally to the current working directory.
  */
-const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
+const resolveCurrentDirectory = (): string => {
+    try {
+        return path.dirname(fileURLToPath(import.meta.url));
+    } catch {
+        const globalFilename = Reflect.get(globalThis, "__filename");
+        if (typeof globalFilename === "string" && globalFilename.length > 0) {
+            return path.dirname(globalFilename);
+        }
 
-const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(currentDirectory);
+        const entryScriptPath = process.argv[1];
+        if (typeof entryScriptPath === "string" && entryScriptPath.length > 0) {
+            return path.dirname(path.resolve(entryScriptPath));
+        }
+
+        return process.cwd();
+    }
+};
+
+const currentDirectory = resolveCurrentDirectory();
+
+const resolveProductionDistDirectory = (): string => {
+    const directoryCandidates = [
+        path.resolve(process.cwd(), "dist"),
+        path.resolve(currentDirectory, "../dist"),
+        path.resolve(currentDirectory, "dist"),
+    ];
+
+    try {
+        const appPath = app.getAppPath();
+        directoryCandidates.push(path.resolve(appPath, "dist"));
+        directoryCandidates.push(path.resolve(appPath));
+    } catch {
+        // Ignore: app path may be unavailable during early startup.
+    }
+
+    const existingDirectory = directoryCandidates.find((candidate) => {
+        const indexPath = path.join(candidate, "index.html");
+        const preloadPath = path.join(candidate, "preload.js");
+
+        return fs.existsSync(indexPath) && fs.existsSync(preloadPath);
+    });
+
+    if (typeof existingDirectory === "string") {
+        return existingDirectory;
+    }
+
+    return getProductionDistDirectory(currentDirectory);
+};
+
+const PRODUCTION_DIST_DIRECTORY = resolveProductionDistDirectory();
 
 /**
  * Service responsible for window management and lifecycle.
@@ -759,7 +808,7 @@ export class WindowService {
         // Use ternary for simple conditional path selection
         return isDev()
             ? path.join(process.cwd(), "dist", preloadFileName) // Development: look in dist directory
-            : path.join(currentDirectory, preloadFileName); // Production: relative to current directory
+            : path.join(PRODUCTION_DIST_DIRECTORY, preloadFileName); // Production: resolved dist directory
     }
 
     /**
@@ -817,7 +866,7 @@ export class WindowService {
                 async () => {
                     if (this.mainWindow) {
                         await this.mainWindow.loadFile(
-                            path.join(currentDirectory, "../dist/index.html")
+                            path.join(PRODUCTION_DIST_DIRECTORY, "index.html")
                         );
                     }
                 },

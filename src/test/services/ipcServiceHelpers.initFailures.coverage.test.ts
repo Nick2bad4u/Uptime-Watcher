@@ -12,46 +12,55 @@ import { describe, expect, it, vi } from "vitest";
 describe("IPC service helper initialization failures", () => {
     it("surfaces CloudService helper initialization errors", async () => {
         vi.resetModules();
-        vi.doMock("../../services/utils/createIpcServiceHelpers", () => ({
-            getIpcServiceHelpers: () => {
+        const helpersModule = await import(
+            "../../services/utils/createIpcServiceHelpers"
+        );
+        const getHelpersSpy = vi
+            .spyOn(helpersModule, "getIpcServiceHelpers")
+            .mockImplementation(() => {
                 throw new Error("CloudService init failed");
-            },
-        }));
+            });
 
         await expect(
             import("../../services/CloudService")
         ).rejects.toThrow("CloudService init failed");
 
-        vi.doUnmock("../../services/utils/createIpcServiceHelpers");
+        getHelpersSpy.mockRestore();
     });
 
     it("surfaces DataService helper initialization errors", async () => {
         vi.resetModules();
-        vi.doMock("../../services/utils/createIpcServiceHelpers", () => ({
-            getIpcServiceHelpers: () => {
+        const helpersModule = await import(
+            "../../services/utils/createIpcServiceHelpers"
+        );
+        const getHelpersSpy = vi
+            .spyOn(helpersModule, "getIpcServiceHelpers")
+            .mockImplementation(() => {
                 throw new Error("DataService init failed");
-            },
-        }));
+            });
 
         await expect(import("../../services/DataService")).rejects.toThrow(
             "DataService init failed"
         );
 
-        vi.doUnmock("../../services/utils/createIpcServiceHelpers");
+        getHelpersSpy.mockRestore();
     });
 
     it("surfaces NotificationPreferenceService helper initialization errors", async () => {
         vi.resetModules();
-        vi.doMock("../../services/utils/createIpcServiceHelpers", () => ({
-            getIpcServiceHelpers: () => {
+        const helpersModule = await import(
+            "../../services/utils/createIpcServiceHelpers"
+        );
+        const getHelpersSpy = vi
+            .spyOn(helpersModule, "getIpcServiceHelpers")
+            .mockImplementation(() => {
                 throw new Error("NotificationPreferenceService init failed");
-            },
-        }));
+            });
 
         await expect(
             import("../../services/NotificationPreferenceService")
         ).rejects.toThrow("NotificationPreferenceService init failed");
 
-        vi.doUnmock("../../services/utils/createIpcServiceHelpers");
+        getHelpersSpy.mockRestore();
     });
 });
