@@ -541,9 +541,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 set({ restoringBackupKey: key });
 
                 try {
-                    const entryName =
-                        get().backups.find((backup) => backup.key === key)
-                            ?.fileName ?? key;
+                    const entryName = get().backups.find((backup) => backup.key === key)?.fileName ?? key;
 
                     const startedToastId = enqueueCloudOperationStartedToast({
                         message: `Restoring ${entryName}`,

@@ -359,16 +359,18 @@ function validateAgainstSchema(schema, data, filePath) {
 
     // Per-property checks
     for (const [key, rawDefinition] of Object.entries(properties)) {
-        const definition = /**
-         * @type {{
-         *     type?: string;
-         *     enum?: string[];
-         *     minLength?: number;
-         *     pattern?: string;
-         *     minItems?: number;
-         *     items?: { type?: string };
-         * }}
-         */ (rawDefinition);
+        const definition =
+            /**
+             * @type {{
+             *     type?: string;
+             *     enum?: string[];
+             *     minLength?: number;
+             *     pattern?: string;
+             *     minItems?: number;
+             *     items?: { type?: string };
+             * }}
+             */
+            (rawDefinition);
 
         const value = data[key];
         if (value === undefined || value === null) {

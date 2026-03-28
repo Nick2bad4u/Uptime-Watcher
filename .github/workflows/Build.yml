@@ -62,8 +62,9 @@ jobs:
             - name: Setup Node.js environment (v25)
               uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
               with:
-                  node-version: 25
+                  node-version-file: .node-version
                   cache: npm
+                  cache-dependency-path: package-lock.json
 
             - name: Show git diff for Uptime-Watcher (debug)
               id: git_diff
@@ -198,8 +199,9 @@ jobs:
             - name: Setup Node.js environment (v25)
               uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
               with:
-                  node-version: 25
+                  node-version-file: .node-version
                   cache: npm
+                  cache-dependency-path: package-lock.json
 
             - name: Install Linux build dependencies
               id: install_linux_deps
@@ -1061,8 +1063,9 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
               with:
-                  node-version: "25"
+                  node-version-file: .node-version
                   cache: npm
+                  cache-dependency-path: package-lock.json
 
             - name: Install git-cliff
               run: npm install -g git-cliff --force

@@ -684,8 +684,8 @@ export default defineConfig([
     // ═══════════════════════════════════════════════════════════════════════════════
     {
         files: [
-            "config/linting/plugins/**/*.{js,ts,mjs,cjs,mts,cts}",
-            "config/linting/rules/**/*.{js,ts,mjs,cjs,mts,cts}",
+            "config/linting/plugins/**/*.{js,ts,mjs,mts,cts}",
+            "config/linting/rules/**/*.{js,ts,mjs,mts,cts}",
         ],
         ...eslintPluginEslintPlugin.configs["all-type-checked"],
         ignores: [],
@@ -1139,7 +1139,10 @@ export default defineConfig([
         },
     },
     {
-        files: ["config/linting/plugins/uptime-watcher.mjs"],
+        files: [
+            "config/linting/plugins/uptime-watcher.mjs",
+            "config/linting/plugins/uptime-watcher/plugin.cjs",
+        ],
         name: "ESLint Plugin Wrapper - allowed re-export",
         rules: {
             "no-barrel-files/no-barrel-files": "off",

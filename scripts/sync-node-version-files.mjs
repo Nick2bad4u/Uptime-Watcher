@@ -163,9 +163,11 @@ const resolveMinimumEngineVersion = (enginesValue) => {
     }
 
     const nodeEngineRange = enginesValue["node"].trim();
-    const match = /^>=\s*(\d+\.\d+\.\d+)$/v.exec(nodeEngineRange);
+    const match = /^>=\s*(?<minimumVersion>\d+\.\d+\.\d+)$/v.exec(
+        nodeEngineRange
+    );
 
-    return match?.[1] ?? null;
+    return match?.groups?.["minimumVersion"] ?? null;
 };
 
 /**
