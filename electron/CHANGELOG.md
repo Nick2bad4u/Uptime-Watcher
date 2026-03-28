@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[0af0c58](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0af0c58df353c9839c057c6a025bc08213922d15)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...0af0c58df353c9839c057c6a025bc08213922d15))
+[5b1df5b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b1df5ba92752de0bfea5cb252cd1c634160e144)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...5b1df5ba92752de0bfea5cb252cd1c634160e144))
 
 
 ### ✨ Features
@@ -1790,6 +1790,16 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aa7f
 
 ### 🎨 Styling
 
+- 🎨 [style] Improve code formatting and consistency across multiple files
+ - ✨ [feat] Add a new script to synchronize Node version files, ensuring consistency in `.node-version` and `.nvmrc`
+ - 🛠️ [fix] Normalize Node.js version strings and validate against package.json engines
+ - 🧪 [test] Update tests to ensure proper error handling and assertions in various utility functions
+ - 🎨 [style] Refactor code for better readability by removing unnecessary line breaks and improving indentation
+ - 📝 [docs] Enhance comments and documentation for clarity on function purposes and expected behaviors
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5b1df5b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b1df5ba92752de0bfea5cb252cd1c634160e144)
+
+
 - 🎨 [style] Update describe block to use function reference for extractMonitorValueAtPath
  - Changed the describe block from a string to a function reference for better clarity and consistency in test naming.
 
@@ -2064,6 +2074,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a197
 
 ### 🧹 Chores
 
+- Update changelogs for v23.4.0 [skip ci] [`(9f777e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9f777e171c27e3924470eec591b81917cceb8404)
+
+
 - Update changelogs for v23.3.0 [skip ci] [`(3d55e6c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3d55e6c04064dc735d65eaf246e7a8520bf1a9cd)
 
 
@@ -2161,6 +2174,15 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Refactor WindowService path resolution and enhance IPC service helper tests
+ - 🛠️ Update current directory resolution logic to handle various module loading scenarios
+ - 🛠️ Implement robust production distribution directory resolution
+ - 🧪 Improve IPC service helper initialization error tests for better coverage
+ - 🧪 Refactor test setup to use spies instead of uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuyyyyytuuuuuuuuuuuuuuuuuuu
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(57d6127)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/57d6127dc1975a36834c1ca2b86b51d9c0178f2c)
+
 
 - 🔧 [build] Update logger mocking in tests and improve theme configuration handling
  - 🧪 [test] Refactor logger mocking in operationalHooks tests for better clarity

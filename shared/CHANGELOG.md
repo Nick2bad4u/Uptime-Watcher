@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[0af0c58](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0af0c58df353c9839c057c6a025bc08213922d15)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...0af0c58df353c9839c057c6a025bc08213922d15))
+[5b1df5b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b1df5ba92752de0bfea5cb252cd1c634160e144)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...5b1df5ba92752de0bfea5cb252cd1c634160e144))
 
 
 ### ✨ Features
@@ -1261,6 +1261,16 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(588c
 
 ### 🎨 Styling
 
+- 🎨 [style] Improve code formatting and consistency across multiple files
+ - ✨ [feat] Add a new script to synchronize Node version files, ensuring consistency in `.node-version` and `.nvmrc`
+ - 🛠️ [fix] Normalize Node.js version strings and validate against package.json engines
+ - 🧪 [test] Update tests to ensure proper error handling and assertions in various utility functions
+ - 🎨 [style] Refactor code for better readability by removing unnecessary line breaks and improving indentation
+ - 📝 [docs] Enhance comments and documentation for clarity on function purposes and expected behaviors
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5b1df5b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5b1df5ba92752de0bfea5cb252cd1c634160e144)
+
+
 - 🎨 [style] Improve documentation formatting in various components
  - 📝 Update comments in `CloudProviderSetupPanel.model.ts` for better readability
  - 📝 Enhance comments in `useInAppAlertTonePreview.ts` for clarity
@@ -1487,6 +1497,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a197
 
 
 ### 🧹 Chores
+
+- Update changelogs for v23.4.0 [skip ci] [`(9f777e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9f777e171c27e3924470eec591b81917cceb8404)
+
 
 - Update changelogs for v23.3.0 [skip ci] [`(3d55e6c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3d55e6c04064dc735d65eaf246e7a8520bf1a9cd)
 
