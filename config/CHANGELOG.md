@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[0e8b9c5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e8b9c59566af2f68214c17544bd47b90bbf423c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...0e8b9c59566af2f68214c17544bd47b90bbf423c))
+[08e25c2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08e25c2d624cc2971772535e4e74e0de600540f2)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...08e25c2d624cc2971772535e4e74e0de600540f2))
 
 
 ### ✨ Features
@@ -1002,6 +1002,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb1f
 
 ### 🧹 Chores
 
+- Update changelogs for v23.5.0 [skip ci] [`(1b40367)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1b4036755092063172b2e190abca2e7021df61c6)
+
+
 - Update changelogs for v23.4.0 [skip ci] [`(9f777e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9f777e171c27e3924470eec591b81917cceb8404)
 
 
@@ -1092,6 +1095,38 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Refactor plugin import statements and improve error handling
+ - 🛠️ Update import statements to use a consistent plugin variable name
+ - 🛠️ Enhance error messages for better clarity in rule registration
+ - 🧪 Adjust tests to reflect changes in plugin variable usage
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(08e25c2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08e25c2d624cc2971772535e4e74e0de600540f2)
+
+
+- 🔧 [build] Update GitHub Actions workflows and permissions
+
+ - 🔧 [build] Remove unnecessary input parameters from Build.yml workflow
+ - 🔧 [build] Simplify branch reference handling in Build.yml
+ - 🔧 [build] Adjust permissions in cleanReleases.yml to read-only
+ - 🔧 [build] Set minimal permissions for deploy-docusaurus.yml
+ - 🔧 [build] Add read permissions for git-sizer-dispatch.yml and git-sizer.yml
+ - 🔧 [build] Update permissions in gitleaks.yml to read-only
+ - 🔧 [build] Modify permissions in jekyll-gh-pages.yml for deployment
+ - 🔧 [build] Refine permissions in mega-linter.yml for checks and pull requests
+ - 🔧 [build] Update permissions in mirror-eslint-plugin.yml to read-only
+ - 🔧 [build] Adjust permissions in npm-audit.yml to allow writing issues
+ - 🔧 [build] Set read permissions in release-stats.yml and repo-stats.yml
+ - 🔧 [build] Update scorecards.yml to minimal permissions
+ - 🔧 [build] Set permissions in sitemap.yml for write access
+ - 🛠️ [fix] Remove default Google OAuth client secret from googleOAuthConfig.ts
+ - 🛠️ [fix] Update database backup size check to use buffer length
+ - 🎨 [style] Improve regex handling in detect-zero-coverage-tests.ts
+ - 🎨 [style] Sanitize log messages in download-sqlite3-wasm.mjs
+ - 🎨 [style] Update test assertions for consistency in ui-monitoring-status-display.ui.playwright.test.ts
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a1306b3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a1306b39ab3d8c8c4e847de78d35190b23edfeab)
+
 
 - 🔧 [build] Update Node.js setup in workflow files
 
