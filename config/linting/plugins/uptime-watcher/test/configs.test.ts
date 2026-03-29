@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import uptimeWatcherPlugin from "../plugin.mjs";
+import plugin from "../plugin.mjs";
 
 interface FlatConfigLike {
     files?: unknown;
@@ -10,13 +10,13 @@ interface FlatConfigLike {
     rules?: Record<string, unknown>;
 }
 
-function getPluginConfigs(plugin: unknown): null | Record<string, unknown> {
-    if (!isObject(plugin)) {
+function getPluginConfigs(pluginConfig: unknown): null | Record<string, unknown> {
+    if (!isObject(pluginConfig)) {
         return null;
     }
 
     const configsKey = "configs" as const;
-    const configs = plugin[configsKey];
+    const configs = pluginConfig[configsKey];
     if (!isObject(configs)) {
         return null;
     }
@@ -37,7 +37,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
  * configs, or forgetting to register the plugin on a config item).
  */
 describe("uptime-watcher plugin configs", () => {
-    const configs = getPluginConfigs(uptimeWatcherPlugin);
+    const configs = getPluginConfigs(plugin);
 
     it("exports the expected config keys", () => {
         expect(configs).toBeDefined();

@@ -3,7 +3,7 @@ import { RuleTester } from "@typescript-eslint/rule-tester";
 import * as path from "node:path";
 import { afterAll, describe, it } from "vitest";
 
-import uptimeWatcherPlugin from "../../plugin.mjs";
+import plugin from "../../plugin.mjs";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
@@ -40,7 +40,7 @@ const isRuleModule = (value: unknown): value is PluginRuleModule => {
 };
 
 export const getPluginRule = (ruleId: string): PluginRuleModule => {
-    const rules = uptimeWatcherPlugin.rules;
+    const rules = plugin.rules;
     if (!rules) {
         throw new Error("uptimeWatcherPlugin.rules must be defined");
     }
@@ -48,7 +48,7 @@ export const getPluginRule = (ruleId: string): PluginRuleModule => {
     const dynamicRules = rules as Record<string, unknown>;
     if (!Object.hasOwn(dynamicRules, ruleId)) {
         throw new TypeError(
-            `Rule '${ruleId}' is not registered in uptimeWatcherPlugin`
+            `Rule '${ruleId}' is not registered in plugin`
         );
     }
 

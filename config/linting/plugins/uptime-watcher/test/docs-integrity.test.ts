@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
-import uptimeWatcherPlugin from "../plugin.mjs";
+import plugin from "../plugin.mjs";
 
 interface RuleWithMeta {
     readonly meta?: {
@@ -19,7 +19,7 @@ function isRuleWithMeta(value: unknown): value is RuleWithMeta {
 
 describe("uptime-watcher rule docs", () => {
     it("every rule has a docs url and a matching docs/rules/<id>.md file", () => {
-        const rules = uptimeWatcherPlugin.rules;
+        const rules = plugin.rules;
         expect(rules).toBeDefined();
 
         const docsDir = path.join(

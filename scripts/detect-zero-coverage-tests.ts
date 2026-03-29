@@ -200,7 +200,7 @@ interface EvaluationResult {
  * @returns Escaped pattern that cannot alter regex structure.
  */
 function escapeRegularExpressionLiteral(value: string): string {
-    return value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return value.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
 }
 
 /**
