@@ -192,6 +192,18 @@ interface EvaluationResult {
 }
 
 /**
+ * Escapes regex metacharacters in user-provided text so it can be used as a
+ * literal search fragment inside a regular expression.
+ *
+ * @param value - Raw user-provided pattern text.
+ *
+ * @returns Escaped pattern that cannot alter regex structure.
+ */
+function escapeRegularExpressionLiteral(value: string): string {
+    return value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
  * Parses incoming CLI arguments into strongly typed options.
  *
  * @param argv - Raw arguments passed to the process after the executable name.
@@ -220,7 +232,10 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
                 if (!patternValue) {
                     throw new Error("--pattern expects a value");
                 }
-                filePattern = new RegExp(patternValue, "i");
+                filePattern = new RegExp(
+                    escapeRegularExpressionLiteral(patternValue),
+                    "iu"
+                );
                 index += 1;
                 break;
             }

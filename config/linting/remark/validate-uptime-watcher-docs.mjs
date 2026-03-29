@@ -249,8 +249,11 @@ function shouldPreferRelativeGitHubLink(urlString) {
     try {
         const parsed = new URL(urlString);
         const hostname = parsed.hostname.toLowerCase();
+        const normalizedHostname = hostname.startsWith("www.")
+            ? hostname.slice("www.".length)
+            : hostname;
 
-        if (!hostname.endsWith("github.com")) {
+        if (normalizedHostname !== "github.com") {
             return false;
         }
 

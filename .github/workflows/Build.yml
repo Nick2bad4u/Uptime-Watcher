@@ -24,11 +24,6 @@ on:
             - "tsconfig*.json"
             - "vite.config.ts"
     workflow_dispatch:
-        inputs:
-            branch:
-                description: "Branch to run against"
-                required: true
-                default: "main"
 
 permissions:
     contents: read
@@ -55,7 +50,7 @@ jobs:
               id: checkout_code
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
-                  ref: ${{ github.event.inputs.branch || github.ref }}
+                  ref: ${{ github.ref }}
                   fetch-depth: 0
                   fetch-tags: true
 
@@ -112,7 +107,7 @@ jobs:
               run: |
                   set -euo pipefail
 
-                  target_branch="${{ github.event.inputs.branch || github.ref_name }}"
+                  target_branch="${{ github.ref_name }}"
 
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -1116,7 +1111,7 @@ jobs:
                     echo "No changelog changes to commit"
                   else
                     git commit -m "chore: update changelogs for v${{ needs.bump-version.outputs.new_version }} [skip ci]"
-                    git push origin ${{ github.event.inputs.branch || github.ref_name }}
+                    git push origin ${{ github.ref_name }}
                     echo "Changelogs updated and pushed to repository"
                   fi
               continue-on-error: true

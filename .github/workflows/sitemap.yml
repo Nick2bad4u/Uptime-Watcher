@@ -5,6 +5,9 @@ name: GitHub Pages - Generate XML sitemap
 on:
     workflow_dispatch:
 
+permissions:
+    contents: read
+
 concurrency:
     group: sitemap-${{ github.ref }}
     cancel-in-progress: false
@@ -13,6 +16,9 @@ jobs:
     sitemap_job:
         runs-on: ubuntu-latest
         name: Generate a sitemap
+        permissions:
+            contents: write
+            pull-requests: write
 
         steps:
             # Step to harden the runner for security purposes

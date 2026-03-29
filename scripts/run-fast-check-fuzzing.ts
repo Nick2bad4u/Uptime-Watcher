@@ -325,8 +325,12 @@ async function main(): Promise<void> {
 
         for (const target of options.targets) {
             const script = TARGET_TO_SCRIPT[target];
+            const seedLoggingSuffix =
+                childEnv.FAST_CHECK_SEED === undefined
+                    ? ""
+                    : " and FAST_CHECK_SEED=[provided]";
             console.log(
-                `\n[fast-check] Running '${script}' with FAST_CHECK_NUM_RUNS=${childEnv.FAST_CHECK_NUM_RUNS}${childEnv.FAST_CHECK_SEED ? ` and FAST_CHECK_SEED=${childEnv.FAST_CHECK_SEED}` : ""}...`
+                `\n[fast-check] Running '${script}' with FAST_CHECK_NUM_RUNS=${childEnv.FAST_CHECK_NUM_RUNS}${seedLoggingSuffix}...`
             );
             await runNpmScript(script, childEnv, options.passthroughArgs);
         }

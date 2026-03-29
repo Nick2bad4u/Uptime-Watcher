@@ -55,8 +55,9 @@ on:
             - "CHANGELOG.md"
     workflow_dispatch:
 
-# Declare default permissions as read only.
-permissions: read-all
+# Declare minimal default permissions; the analysis job grants only what it needs.
+permissions:
+    contents: read
 
 concurrency:
     group: scorecards-${{ github.ref }}

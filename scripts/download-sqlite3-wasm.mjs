@@ -63,10 +63,22 @@ const noUpdate = process.argv.includes("--no-update");
  */
 
 /**
+ * Normalizes potentially user-controlled values before writing them to logs.
+ *
+ * @param {string} value
+ * @returns {string}
+ */
+function sanitizeForSingleLineLog(value) {
+    return value.replaceAll(/[\r\n\u2028\u2029]/g, " ");
+}
+
+/**
  * @param {string} message
  */
 function failAndExit(message) {
-    console.error(`[wasm-download] ERROR: ${message}`);
+    console.error(
+        `[wasm-download] ERROR: ${sanitizeForSingleLineLog(message)}`
+    );
     process.exit(1);
 }
 
@@ -220,12 +232,15 @@ async function checkForUpdates() {
         console.log("[wasm-download] You have the latest version");
         return { hasUpdate: false, latestVersion: latestHash, currentVersion };
     } catch (error) {
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.warn(
-            // @ts-expect-error -- Unknown ok for error messages
-            `[wasm-download] Warning: Could not check for updates: ${error.message}`
+            `[wasm-download] Warning: Could not check for updates: ${sanitizeForSingleLineLog(errorMessage)}`
         );
-        // @ts-expect-error -- Unknown ok for error messages
-        return { hasUpdate: false, error: error.message };
+        return {
+            hasUpdate: false,
+            error: sanitizeForSingleLineLog(errorMessage),
+        };
     }
 }
 

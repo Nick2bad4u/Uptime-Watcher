@@ -4,7 +4,9 @@ name: npm audit
 on:
     workflow_dispatch:
 
-permissions: write-all
+permissions:
+    contents: read
+    issues: write
 
 jobs:
     scan:

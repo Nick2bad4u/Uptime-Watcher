@@ -935,5 +935,10 @@ describe("Application Service Benchmarks", () => {
         const cpuTrend =
             lastSnapshot.state.cpuUsage.percentCPUUsage -
             firstSnapshot.state.cpuUsage.percentCPUUsage;
+
+        void totalAlerts;
+        void averageMonitoringOverhead;
+        void memoryTrend;
+        void cpuTrend;
     });
 });

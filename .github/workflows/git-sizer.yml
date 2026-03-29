@@ -20,6 +20,9 @@ on:
             - "CHANGELOG.md"
     workflow_dispatch:
 
+permissions:
+    contents: read
+
 jobs:
     run-git-sizer:
         name: git-sizer - ${{ github.repository }}

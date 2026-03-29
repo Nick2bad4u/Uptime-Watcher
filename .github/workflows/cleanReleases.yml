@@ -19,7 +19,8 @@ on:
                 required: true
                 default: "true"
 
-permissions: write-all
+permissions:
+    contents: write
 
 jobs:
     clean_releases:

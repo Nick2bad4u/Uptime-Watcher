@@ -91,7 +91,7 @@ test.describe(
                 await expect(statusDisplay).toContainText(/Monitor Status/i);
                 await expect(statusDisplay).toContainText(/(0|1)\/1 active/);
                 await expect(statusDisplay).toContainText(/Website URL/i);
-                await expect(statusDisplay).toContainText(/example.com/i);
+                await expect(statusDisplay).toContainText("example.com");
 
                 const monitorEntries = page.getByTestId(/monitor-status-/);
                 await expect(monitorEntries).toHaveCount(1);

@@ -11,26 +11,6 @@ on:
             - ".github/workflows/mirror-eslint-plugin.yml"
 
     workflow_dispatch:
-        inputs:
-            target_repository:
-                description: "Target repo in owner/name form (overrides vars.ESLINT_PLUGIN_MIRROR_REPO)."
-                required: false
-                type: string
-            target_branch:
-                description: "Target branch to push to."
-                required: false
-                default: "main"
-                type: string
-            run_validation:
-                description: "Run plugin lint/tests before mirroring (slower)."
-                required: false
-                default: false
-                type: boolean
-            force_sync:
-                description: "DANGEROUS: Force-push to target branch (rewrites history). Only applies to workflow_dispatch runs."
-                required: false
-                default: false
-                type: boolean
 
 permissions:
     contents: read
@@ -64,15 +44,10 @@ jobs:
               run: |
                   set -euo pipefail
 
-                  TARGET_REPO="${{ github.event.inputs.target_repository }}"
+                  TARGET_REPO="${{ vars['ESLINT_PLUGIN_MIRROR_REPO'] }}"
 
                   if [[ -z "${TARGET_REPO}" ]]; then
-                      TARGET_REPO="${{ vars['ESLINT_PLUGIN_MIRROR_REPO'] }}"
-                  fi
-
-                  if [[ -z "${TARGET_REPO}" ]]; then
-                      echo "Missing target repository. Provide workflow_dispatch input 'target_repository'" \
-                          "or define a repo variable 'ESLINT_PLUGIN_MIRROR_REPO'." >&2
+                      echo "Missing target repository. Define the repo variable 'ESLINT_PLUGIN_MIRROR_REPO'." >&2
                       exit 1
                   fi
 
@@ -89,26 +64,6 @@ jobs:
                       exit 1
                   fi
 
-            - name: Setup Node.js (optional validation)
-              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
-              uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-              with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
-
-            - name: Install dependencies (optional)
-              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
-              run: npm install --force
-
-            - name: Run lint checks (optional)
-              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
-              run: npm run lint:fix
-
-            - name: Run linting-rule tests (optional)
-              if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_validation }}
-              run: npx vitest run --config vitest.linting.config.ts
-
             - name: Prepare mirror working directory
               shell: bash
               run: |
@@ -122,10 +77,8 @@ jobs:
               working-directory: ./temp/eslint-plugin-mirror
               env:
                   SOURCE_DIR: ${{ env.SOURCE_DIR }}
-                  EVENT_NAME: ${{ github.event_name }}
                   TARGET_REPO: ${{ steps.target.outputs.repo }}
-                  TARGET_BRANCH: ${{ github.event.inputs.target_branch }}
-                  FORCE_SYNC: ${{ github.event.inputs.force_sync }}
+                  TARGET_BRANCH: main
                   MIRROR_TOKEN: ${{ secrets['ESLINT_PLUGIN_MIRROR_TOKEN'] }}
               run: |
                   set -euo pipefail
@@ -169,13 +122,8 @@ jobs:
 
                   git commit -m "Mirror from ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
 
-                  if [[ "${EVENT_NAME}" == "workflow_dispatch" && "${FORCE_SYNC}" == "true" ]]; then
-                      echo "WARNING: force_sync enabled; force-pushing to ${TARGET_REPO}@${TARGET_BRANCH}" >&2
-                      git push origin "HEAD:${TARGET_BRANCH}" --force-with-lease
-                  else
-                      # IMPORTANT: normal push only (no force). This will NOT rewrite the
-                      # target repo history; it only appends commits. If the target branch
-                      # diverges due to manual edits, the push will fail instead of
-                      # overwriting history.
-                      git push origin "HEAD:${TARGET_BRANCH}"
-                  fi
+                  # IMPORTANT: normal push only (no force). This will NOT rewrite the
+                  # target repo history; it only appends commits. If the target branch
+                  # diverges due to manual edits, the push will fail instead of
+                  # overwriting history.
+                  git push origin "HEAD:${TARGET_BRANCH}"

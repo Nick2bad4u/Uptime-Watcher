@@ -9,6 +9,9 @@ on:
                 description: "Repository to analyze (e.g., https://github.com/owner/repo.git)"
                 required: true
 
+permissions:
+    contents: read
+
 jobs:
     run-git-sizer:
         name: git-sizer - ${{ github.event.inputs.repo }}

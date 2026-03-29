@@ -13,6 +13,9 @@ on:
             - "package.json"
             - "*.md"
 
+permissions:
+    contents: read
+
 jobs:
     metrics:
         runs-on: ubuntu-latest

@@ -15,9 +15,6 @@
  */
 // @ts-check
 
-// @ts-ignore -- Ignore missing types for remark-ignore
-import { ignoreStart, ignoreEnd } from "remark-ignore";
-
 import requireSnippets from "./config/linting/remark/require-snippets.mjs";
 import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-watcher-docs.mjs";
 
