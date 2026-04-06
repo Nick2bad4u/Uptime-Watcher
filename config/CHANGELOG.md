@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[08e25c2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08e25c2d624cc2971772535e4e74e0de600540f2)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...08e25c2d624cc2971772535e4e74e0de600540f2))
+[f8ecd14](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f8ecd14b5ccfbcc597935ccaf4e9821334245c75)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...f8ecd14b5ccfbcc597935ccaf4e9821334245c75))
 
 
 ### ✨ Features
@@ -1002,6 +1002,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb1f
 
 ### 🧹 Chores
 
+- Update changelogs for v23.6.0 [skip ci] [`(c24e032)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24e03226d70379135f56887c86cc85cdd7df742)
+
+
 - Update changelogs for v23.5.0 [skip ci] [`(1b40367)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1b4036755092063172b2e190abca2e7021df61c6)
 
 
@@ -1095,6 +1098,67 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies and devDependencies in package.json
+ - 📦 Upgrade axios from ^1.13.6 to ^1.14.0
+ - 📦 Upgrade validator from ^13.15.26 to ^13.15.35
+ - 📦 Upgrade @biomejs/biome from ^2.4.9 to ^2.4.10
+ - 📦 Upgrade @cspell/cspell-bundled-dicts and @cspell/cspell-types from ^9.7.0 to ^9.8.0
+ - 📦 Upgrade @double-great/stylelint-a11y from ^3.4.8 to ^3.4.9
+ - 📦 Upgrade @eslint/compat from ^2.0.3 to ^2.0.4
+ - 📦 Upgrade @eslint/config-helpers from ^0.5.3 to ^0.5.4
+ - 📦 Upgrade @eslint/css from ^1.0.0 to ^1.1.0
+ - 📦 Upgrade @eslint/markdown from ^8.0.0 to ^8.0.1
+ - 📦 Upgrade @eslint/mcp from ^0.3.2 to ^0.3.3
+ - 📦 Upgrade @fast-check/vitest from ^0.3.0 to ^0.4.0
+ - 📦 Upgrade @html-eslint/eslint-plugin and @html-eslint/parser from ^0.58.1 to ^0.59.0
+ - 📦 Upgrade @playwright/test from ^1.58.2 to ^1.59.1
+ - 📦 Upgrade @secretlint/secretlint-rule-* from ^11.4.0 to ^11.5.0 and ^11.4.1
+ - 📦 Upgrade @storybook/* from ^10.3.3 to ^10.3.4
+ - 📦 Upgrade @stylistic/stylelint-plugin from ^5.0.1 to ^5.1.0
+ - 📦 Upgrade @types/node from ^25.5.0 to ^25.5.2
+ - 📦 Upgrade @typescript-eslint/* from ^8.57.2 to ^8.58.0
+ - 📦 Upgrade canvas from ^3.2.2 to ^3.2.3
+ - 📦 Upgrade cspell from ^9.7.0 to ^9.8.0
+ - 📦 Upgrade cssnano from ^7.1.3 to ^7.1.4
+ - 📦 Upgrade electron from ^41.1.0 to ^41.1.1
+ - 📦 Upgrade eslint from ^10.1.0 to ^10.2.0
+ - 📦 Upgrade eslint-plugin-boundaries from ^6.0.1 to ^6.0.2
+ - 📦 Upgrade eslint-plugin-file-progress-2 from ^3.4.3 to ^3.4.4
+ - 📦 Upgrade eslint-plugin-jsdoc from ^62.8.1 to ^62.9.0
+ - 📦 Upgrade eslint-plugin-package-json from ^0.91.0 to ^0.91.1
+ - 📦 Upgrade eslint-plugin-perfectionist from ^5.7.0 to ^5.8.0
+ - 📦 Upgrade eslint-plugin-publint from ^0.3.5 to ^0.4.0
+ - 📦 Upgrade eslint-plugin-react-dom from ^3.0.0 to ^4.2.3
+ - 📦 Upgrade eslint-plugin-react-naming-convention from ^3.0.0 to ^4.2.3
+ - 📦 Upgrade eslint-plugin-react-rsc from ^3.0.0 to ^4.2.3
+ - 📦 Upgrade eslint-plugin-sort-class-members from ^1.21.0 to ^1.22.1
+ - 📦 Upgrade eslint-plugin-storybook from ^10.3.3 to ^10.3.4
+ - 📦 Upgrade eslint-plugin-unicorn from ^63.0.0 to ^64.0.0
+ - 📦 Upgrade eslint-plugin-zod from ^3.5.0 to ^3.5.1
+ - 📦 Upgrade knip from ^6.0.6 to ^6.3.0
+ - 📦 Upgrade npm-check-updates from ^19.6.6 to ^20.0.0
+ - 📦 Upgrade npm-package-json-lint from ^9.1.0 to ^10.2.0
+ - 📦 Upgrade putout from ^42.2.3 to ^42.4.2
+ - 📦 Upgrade secretlint from ^11.4.0 to ^11.4.1
+ - 📦 Upgrade storybook from ^10.3.3 to ^10.3.4
+ - 📦 Upgrade stylelint-plugin-defensive-css from ^2.8.0 to ^2.8.1
+ - 📦 Upgrade typedoc-plugin-dt-links from ^2.0.47 to ^2.0.49
+ - 📦 Upgrade typedoc-plugin-missing-exports from ^4.1.2 to ^4.1.3
+ - 📦 Upgrade typescript-eslint from ^8.57.2 to ^8.58.0
+ - 📦 Upgrade vite-plugin-static-copy from ^4.0.0 to ^4.0.1
+
+🛠️ [fix] Enhance Electron helper functions in playwright/fixtures/electron-helpers.ts
+ - 🔧 Add functions to ensure the existence of paths and handle child processes
+ - 🔧 Implement logic to copy the WebAssembly runtime for SQLite if not present
+ - 🔧 Improve cleanup logic for user data directories with retries on busy file system errors
+
+📝 [test] Update property-based tests in shared/test/schemas.property.test.ts
+ - ✅ Add schema validation checks to ensure site data conforms to expected structure
+ - ✅ Ensure validation results are consistent with schema parsing results
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f8ecd14)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f8ecd14b5ccfbcc597935ccaf4e9821334245c75)
+
 
 - 🔧 [build] Refactor plugin import statements and improve error handling
  - 🛠️ Update import statements to use a consistent plugin variable name
