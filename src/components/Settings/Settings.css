@@ -921,6 +921,27 @@
         color-mix(in srgb, var(--shadow-base-color) 12%, transparent);
 }
 
+.settings-modal .settings-item--volume-control {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+
+    & .setting-control {
+        justify-content: stretch;
+        inline-size: 100%;
+        min-inline-size: 0;
+    }
+
+    & .settings-alert-volume-control {
+        inline-size: 100%;
+        min-inline-size: 0;
+    }
+
+    & .settings-alert-volume-control__row {
+        flex-wrap: wrap;
+    }
+}
+
 .settings-theme-preview {
     display: inline-flex;
     align-items: center;

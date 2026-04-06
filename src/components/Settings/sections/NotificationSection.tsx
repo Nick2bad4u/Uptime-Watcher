@@ -60,6 +60,7 @@ export const NotificationSection = ({
                         title="In-app alert sound"
                     />
                     <SettingItem
+                        className="settings-item--volume-control"
                         control={inAppAlertVolumeControl}
                         description="Fine-tune how loud the in-app alert tone plays."
                         disabled={isVolumeControlDisabled}

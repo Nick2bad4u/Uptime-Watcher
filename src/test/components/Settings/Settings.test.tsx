@@ -737,4 +737,15 @@ describe("Settings Component", () => {
         const slider = screen.getByLabelText("In-app alert volume");
         expect(slider).toBeDisabled();
     });
+
+    it("renders the alert volume control in a stacked settings row", () => {
+        render(<Settings onClose={mockOnClose} />);
+
+        const slider = screen.getByLabelText("In-app alert volume");
+        const volumeSettingItem = slider.closest(
+            ".settings-item--volume-control"
+        );
+
+        expect(volumeSettingItem).toBeInTheDocument();
+    });
 });
