@@ -88,9 +88,9 @@
     "emit": "docs",
     "entryPointStrategy": "expand",
     "entryPoints": [
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/src/**/*.{ts,mts,cts,tsx,js,jsx}",
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/electron/**/*.{ts,mts,cts,tsx,js,jsx}",
-        "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/shared/**/*.{ts,mts,cts,tsx,js,jsx}"
+        "../../src",
+        "../../electron",
+        "../../shared"
     ],
     "exclude": [
         "**/dist/**",

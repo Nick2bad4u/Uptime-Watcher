@@ -88,9 +88,9 @@
     "emit": "docs",
     "entryPointStrategy": "expand",
     "entryPoints": [
-        "../../src/**/*.{ts,mts,cts,tsx,js,jsx}",
-        "../../electron/**/*.{ts,mts,cts,tsx,js,jsx}",
-        "../../shared/**/*.{ts,mts,cts,tsx,js,jsx}"
+        "../../src",
+        "../../electron",
+        "../../shared"
     ],
     "exclude": [
         "**/dist/**",

@@ -88,8 +88,13 @@ jobs:
             - name: List TypeDoc output directories
               run: |
                   echo "TypeDoc output directories:"
-                  ls -l docs/docusaurus/docs
-                  ls -l docs
+                  if [ -d "docs/docusaurus/docs" ]; then
+                      ls -l docs/docusaurus/docs
+                  else
+                      echo "TypeDoc docs directory was not generated."
+                  fi
+
+                  ls -l docs || true
 
             - name: Build Docusaurus website
               run: npm run docusaurus:build
