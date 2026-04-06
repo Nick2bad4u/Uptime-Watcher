@@ -36,6 +36,7 @@ import rushStackSecurityRaw from "@rushstack/eslint-plugin-security";
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tseslintParser from "@typescript-eslint/parser";
+import vite from "@typpi/eslint-plugin-vite";
 import vitest from "@vitest/eslint-plugin";
 import gitignore from "eslint-config-flat-gitignore";
 import eslintConfigPrettier from "eslint-config-prettier";
@@ -54,6 +55,7 @@ import * as pluginCleanCode from "eslint-plugin-clean-code";
 import pluginCleanTimer from "eslint-plugin-clean-timer";
 import eslintPluginCommentLength from "eslint-plugin-comment-length";
 import pluginCompat from "eslint-plugin-compat";
+import copilot from "eslint-plugin-copilot";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginCssModules from "eslint-plugin-css-modules";
 import depend from "eslint-plugin-depend";
@@ -61,16 +63,19 @@ import eslintPluginEslintPlugin from "eslint-plugin-eslint-plugin";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import etc from "eslint-plugin-etc";
 import { plugin as ex } from "eslint-plugin-exception-handling";
-import progress from "eslint-plugin-file-progress-2";
+import fileProgressPlugin from "eslint-plugin-file-progress-2";
 import pluginFilenameExport from "eslint-plugin-filename-export";
 import pluginFormatSQL from "eslint-plugin-format-sql";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginFunctionNames from "eslint-plugin-function-name";
 import pluginFunctionalRaw from "eslint-plugin-functional";
+import githubActions from "eslint-plugin-github-actions-2";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginGoodEffects from "eslint-plugin-goodeffects";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginGranular from "eslint-plugin-granular-selectors";
+// @ts-expect-error -- Package does not currently ship TypeScript declarations
+import immutable from "eslint-plugin-immutable";
 import { importX } from "eslint-plugin-import-x";
 // Zod Tree Shaking Plugin https://github.com/colinhacks/zod/issues/4433#issuecomment-2921500831
 import importZod from "eslint-plugin-import-zod";
@@ -159,6 +164,7 @@ import pluginRegexp from "eslint-plugin-regexp";
 import * as pluginJSDoc from "eslint-plugin-require-jsdoc";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginSafeJSX from "eslint-plugin-safe-jsx";
+import sdl from "eslint-plugin-sdl-2";
 import pluginSecurityRaw from "eslint-plugin-security";
 import sonarjs, { configs as sonarjsConfigs } from "eslint-plugin-sonarjs";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -184,8 +190,8 @@ import pluginTopLevel from "eslint-plugin-toplevel";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginTotalFunctions from "eslint-plugin-total-functions";
 import pluginTsdoc from "eslint-plugin-tsdoc";
-// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import pluginTSDocRequire from "eslint-plugin-tsdoc-require";
+import tsdocRequire from "eslint-plugin-tsdoc-require-2";
+import typefest from "eslint-plugin-typefest";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
@@ -233,58 +239,6 @@ const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
 const jsonSchemaValidatorRules = enableJsonSchemaValidation
     ? { "json-schema-validator/no-invalid": "error" }
     : {};
-
-const microsoftSdlFallbackRuleNames = [
-    "no-angular-bypass-sanitizer",
-    "no-angular-sanitization-trusted-urls",
-    "no-angularjs-bypass-sce",
-    "no-angularjs-enable-svg",
-    "no-angularjs-sanitization-whitelist",
-    "no-cookies",
-    "no-document-domain",
-    "no-document-write",
-    "no-electron-node-integration",
-    "no-html-method",
-    "no-inner-html",
-    "no-insecure-random",
-    "no-insecure-url",
-    "no-msapp-exec-unsafe",
-    "no-postmessage-star-origin",
-    "no-unsafe-alloc",
-    "no-winjs-html-unsafe",
-];
-
-const microsoftSdlFallbackPlugin = {
-    configs: {
-        required: {
-            rules: {},
-        },
-    },
-    rules: Object.fromEntries(
-        microsoftSdlFallbackRuleNames.map((ruleName) => [
-            ruleName,
-            {
-                create: () => ({}),
-                meta: {
-                    docs: {
-                        description:
-                            "Temporarily disabled while awaiting ESLint 10-compatible @microsoft/eslint-plugin-sdl.",
-                    },
-                    schema: [],
-                    type: "problem",
-                },
-            },
-        ])
-    ),
-};
-
-const pluginMicrosoftSdl = microsoftSdlFallbackPlugin;
-/**
- * NOTE(ESLint10): Re-enable @microsoft/eslint-plugin-sdl once it ships ESLint
- * 10-compatible dependencies.
- */
-// Intentionally silent: fallback rules are active while the upstream plugin is
-// incompatible with ESLint 10.
 
 const rushStackSecurityPlugin = {
     "@rushstack/security": fixupPluginRules(rushStackSecurityRaw),
@@ -525,7 +479,56 @@ export default defineConfig([
     // MARK:  Base Flat Configs
     // ═══════════════════════════════════════════════════════════════════════════════
     importX.flatConfigs.typescript,
-    progress.configs["recommended-ci"],
+    fileProgressPlugin.configs["recommended-ci"],
+    ...copilot.configs["all"],
+    ...sdl.configs.required,
+    {
+        ...githubActions.configs["all"],
+        files: [".github/workflows/*.{yml,yaml}"],
+        name: "GitHub Actions workflows",
+    },
+    vite.configs["all"],
+    {
+        ...immutable.configs.recommended,
+        files: ["functional/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}"],
+        name: "Immutable: functional (not used in this repo)",
+        plugins: {
+            redux: immutable,
+        },
+    },
+    {
+        files: [
+            "src/**/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}",
+            "electron/**/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}",
+            "shared/**/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}",
+        ],
+        name: "Write Good Comments: source folders (not used in this repo)",
+        plugins: {
+            "write-good-comments": pluginWriteGood,
+        },
+        rules: {
+            "write-good-comments/inclusive-language-comments": "off",
+            "write-good-comments/no-profane-comments": "off",
+            "write-good-comments/readability-comments": "off",
+            "write-good-comments/spellcheck-comments": "off",
+            "write-good-comments/task-comment-format": "off",
+            "write-good-comments/write-good-comments": "off",
+        },
+    },
+    {
+        files: [
+            "src/**/*.{ts,tsx,mts,cts}",
+            "electron/**/*.{ts,tsx,mts,cts}",
+            "shared/**/*.{ts,tsx,mts,cts}",
+        ],
+        name: "Typefest Rules for source folders",
+        plugins: {
+            typefest,
+        },
+        rules: {
+            ...typefest.configs.experimental.rules,
+        },
+    },
     fileProgressOverridesConfig,
     noBarrelFiles.flat,
     // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
@@ -715,7 +718,6 @@ export default defineConfig([
         },
         name: "ESLint Plugin Source Files - config/linting/plugins/**/*.*",
         plugins: {
-            "@microsoft/sdl": pluginMicrosoftSdl,
             "@typescript-eslint": tseslint,
             canonical: pluginCanonical,
             "comment-length": eslintPluginCommentLength,
@@ -773,7 +775,6 @@ export default defineConfig([
             ...pluginCanonical.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
@@ -783,23 +784,6 @@ export default defineConfig([
             ...pluginTotalFunctions.configs.recommended.rules,
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
-            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
-            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
-            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
-            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
-            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-            "@microsoft/sdl/no-cookies": "warn",
-            "@microsoft/sdl/no-document-domain": "warn",
-            "@microsoft/sdl/no-document-write": "warn",
-            "@microsoft/sdl/no-electron-node-integration": "warn",
-            "@microsoft/sdl/no-html-method": "warn",
-            "@microsoft/sdl/no-inner-html": "warn",
-            "@microsoft/sdl/no-insecure-random": "off",
-            "@microsoft/sdl/no-insecure-url": "warn",
-            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-            "@microsoft/sdl/no-postmessage-star-origin": "warn",
-            "@microsoft/sdl/no-unsafe-alloc": "warn",
-            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
             "@typescript-eslint/no-explicit-any": "warn",
             "@typescript-eslint/no-unsafe-assignment": "warn",
             "@typescript-eslint/no-unsafe-member-access": "warn",
@@ -1014,6 +998,23 @@ export default defineConfig([
             "n/prefer-node-protocol": "warn",
             "n/prefer-promises/dns": "warn",
             "n/prefer-promises/fs": "warn",
+            "sdl/no-angular-bypass-sanitizer": "warn",
+            "sdl/no-angular-sanitization-trusted-urls": "warn",
+            "sdl/no-angularjs-bypass-sce": "warn",
+            "sdl/no-angularjs-enable-svg": "warn",
+            "sdl/no-angularjs-sanitization-whitelist": "warn",
+            "sdl/no-cookies": "warn",
+            "sdl/no-document-domain": "warn",
+            "sdl/no-document-write": "warn",
+            "sdl/no-electron-node-integration": "warn",
+            "sdl/no-html-method": "warn",
+            "sdl/no-inner-html": "warn",
+            "sdl/no-insecure-random": "off",
+            "sdl/no-insecure-url": "warn",
+            "sdl/no-msapp-exec-unsafe": "warn",
+            "sdl/no-postmessage-star-origin": "warn",
+            "sdl/no-unsafe-alloc": "warn",
+            "sdl/no-winjs-html-unsafe": "warn",
             "security/detect-non-literal-fs-filename": "off",
             "security/detect-object-injection": "off",
             "sort-class-members/sort-class-members": [
@@ -2015,7 +2016,6 @@ export default defineConfig([
             "@docusaurus": pluginDocusaurus,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
-            "@microsoft/sdl": pluginMicrosoftSdl,
             ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
@@ -2087,7 +2087,7 @@ export default defineConfig([
             "switch-case": pluginSwitchCase,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
-            "tsdoc-require": pluginTSDocRequire,
+            "tsdoc-require-2": tsdocRequire,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -2134,7 +2134,6 @@ export default defineConfig([
             ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
@@ -2205,23 +2204,23 @@ export default defineConfig([
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
-            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
-            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
-            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
-            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
-            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-            "@microsoft/sdl/no-cookies": "warn",
-            "@microsoft/sdl/no-document-domain": "warn",
-            "@microsoft/sdl/no-document-write": "warn",
-            "@microsoft/sdl/no-electron-node-integration": "warn",
-            "@microsoft/sdl/no-html-method": "warn",
-            "@microsoft/sdl/no-inner-html": "warn",
-            "@microsoft/sdl/no-insecure-random": "off",
-            "@microsoft/sdl/no-insecure-url": "warn",
-            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-            "@microsoft/sdl/no-postmessage-star-origin": "warn",
-            "@microsoft/sdl/no-unsafe-alloc": "warn",
-            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "sdl/no-angular-bypass-sanitizer": "warn",
+            "sdl/no-angular-sanitization-trusted-urls": "warn",
+            "sdl/no-angularjs-bypass-sce": "warn",
+            "sdl/no-angularjs-enable-svg": "warn",
+            "sdl/no-angularjs-sanitization-whitelist": "warn",
+            "sdl/no-cookies": "warn",
+            "sdl/no-document-domain": "warn",
+            "sdl/no-document-write": "warn",
+            "sdl/no-electron-node-integration": "warn",
+            "sdl/no-html-method": "warn",
+            "sdl/no-inner-html": "warn",
+            "sdl/no-insecure-random": "off",
+            "sdl/no-insecure-url": "warn",
+            "sdl/no-msapp-exec-unsafe": "warn",
+            "sdl/no-postmessage-star-origin": "warn",
+            "sdl/no-unsafe-alloc": "warn",
+            "sdl/no-winjs-html-unsafe": "warn",
             ...rushStackSecurityRules,
             // Code spacing and formatting rules
             "@stylistic/lines-around-comment": [
@@ -3220,7 +3219,7 @@ export default defineConfig([
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
             "total-functions/require-strict-mode": "off",
-            "tsdoc-require/require": "warn", // Backend-specific unicorn rules
+            "tsdoc-require-2/require": "warn", // Backend-specific unicorn rules
             // Documentation
             "tsdoc/syntax": "warn",
             "unicorn/filename-case": [
@@ -3459,7 +3458,6 @@ export default defineConfig([
             "@arthurgeron/react-usememo": flatConfig,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
-            "@microsoft/sdl": pluginMicrosoftSdl,
             ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
@@ -3546,7 +3544,7 @@ export default defineConfig([
             tailwind: tailwind,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
-            "tsdoc-require": pluginTSDocRequire,
+            "tsdoc-require-2": tsdocRequire,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -3595,7 +3593,6 @@ export default defineConfig([
             ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -3686,23 +3683,23 @@ export default defineConfig([
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
-            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
-            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
-            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
-            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
-            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-            "@microsoft/sdl/no-cookies": "warn",
-            "@microsoft/sdl/no-document-domain": "warn",
-            "@microsoft/sdl/no-document-write": "warn",
-            "@microsoft/sdl/no-electron-node-integration": "warn",
-            "@microsoft/sdl/no-html-method": "warn",
-            "@microsoft/sdl/no-inner-html": "warn",
-            "@microsoft/sdl/no-insecure-random": "off",
-            "@microsoft/sdl/no-insecure-url": "warn",
-            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-            "@microsoft/sdl/no-postmessage-star-origin": "warn",
-            "@microsoft/sdl/no-unsafe-alloc": "warn",
-            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "sdl/no-angular-bypass-sanitizer": "warn",
+            "sdl/no-angular-sanitization-trusted-urls": "warn",
+            "sdl/no-angularjs-bypass-sce": "warn",
+            "sdl/no-angularjs-enable-svg": "warn",
+            "sdl/no-angularjs-sanitization-whitelist": "warn",
+            "sdl/no-cookies": "warn",
+            "sdl/no-document-domain": "warn",
+            "sdl/no-document-write": "warn",
+            "sdl/no-electron-node-integration": "warn",
+            "sdl/no-html-method": "warn",
+            "sdl/no-inner-html": "warn",
+            "sdl/no-insecure-random": "off",
+            "sdl/no-insecure-url": "warn",
+            "sdl/no-msapp-exec-unsafe": "warn",
+            "sdl/no-postmessage-star-origin": "warn",
+            "sdl/no-unsafe-alloc": "warn",
+            "sdl/no-winjs-html-unsafe": "warn",
             ...rushStackSecurityRules,
             "@stylistic/jsx-child-element-spacing": "warn",
             "@stylistic/jsx-closing-bracket-location": "warn",
@@ -4910,7 +4907,7 @@ export default defineConfig([
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
-            "tsdoc-require/require": "warn", // Optimized Unicorn rules (reduced false positives)
+            "tsdoc-require-2/require": "warn", // Optimized Unicorn rules (reduced false positives)
             // Documentation
             "tsdoc/syntax": "warn",
             "unicorn/filename-case": [
@@ -5135,7 +5132,6 @@ export default defineConfig([
         plugins: {
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
-            "@microsoft/sdl": pluginMicrosoftSdl,
             ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
@@ -5209,7 +5205,7 @@ export default defineConfig([
             "switch-case": pluginSwitchCase,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
-            "tsdoc-require": pluginTSDocRequire,
+            "tsdoc-require-2": tsdocRequire,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -5257,7 +5253,6 @@ export default defineConfig([
             ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
@@ -5333,23 +5328,23 @@ export default defineConfig([
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
-            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
-            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
-            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
-            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
-            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-            "@microsoft/sdl/no-cookies": "warn",
-            "@microsoft/sdl/no-document-domain": "warn",
-            "@microsoft/sdl/no-document-write": "warn",
-            "@microsoft/sdl/no-electron-node-integration": "warn",
-            "@microsoft/sdl/no-html-method": "warn",
-            "@microsoft/sdl/no-inner-html": "warn",
-            "@microsoft/sdl/no-insecure-random": "off",
-            "@microsoft/sdl/no-insecure-url": "warn",
-            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-            "@microsoft/sdl/no-postmessage-star-origin": "warn",
-            "@microsoft/sdl/no-unsafe-alloc": "warn",
-            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "sdl/no-angular-bypass-sanitizer": "warn",
+            "sdl/no-angular-sanitization-trusted-urls": "warn",
+            "sdl/no-angularjs-bypass-sce": "warn",
+            "sdl/no-angularjs-enable-svg": "warn",
+            "sdl/no-angularjs-sanitization-whitelist": "warn",
+            "sdl/no-cookies": "warn",
+            "sdl/no-document-domain": "warn",
+            "sdl/no-document-write": "warn",
+            "sdl/no-electron-node-integration": "warn",
+            "sdl/no-html-method": "warn",
+            "sdl/no-inner-html": "warn",
+            "sdl/no-insecure-random": "off",
+            "sdl/no-insecure-url": "warn",
+            "sdl/no-msapp-exec-unsafe": "warn",
+            "sdl/no-postmessage-star-origin": "warn",
+            "sdl/no-unsafe-alloc": "warn",
+            "sdl/no-winjs-html-unsafe": "warn",
             ...rushStackSecurityRules,
             // Code spacing and formatting rules
             "@stylistic/lines-around-comment": [
@@ -6334,7 +6329,7 @@ export default defineConfig([
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
-            "tsdoc-require/require": "warn", // Backend-specific unicorn rules
+            "tsdoc-require-2/require": "warn", // Backend-specific unicorn rules
             // Documentation
             "tsdoc/syntax": "warn",
             "unicorn/filename-case": [
@@ -6565,7 +6560,6 @@ export default defineConfig([
             "@arthurgeron/react-usememo": flatConfig,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
-            "@microsoft/sdl": pluginMicrosoftSdl,
             ...rushStackSecurityPlugin,
             "@stylistic": stylistic,
             "@typescript-eslint": tseslint,
@@ -6650,7 +6644,7 @@ export default defineConfig([
             tailwind: tailwind,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
-            "tsdoc-require": pluginTSDocRequire,
+            "tsdoc-require-2": tsdocRequire,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -6699,7 +6693,6 @@ export default defineConfig([
             ...eslintReactNamingConvention.configs.recommended.rules,
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -6782,23 +6775,23 @@ export default defineConfig([
                 },
             ],
             "@metamask/design-tokens/prefer-theme-color-classnames": "error",
-            "@microsoft/sdl/no-angular-bypass-sanitizer": "warn",
-            "@microsoft/sdl/no-angular-sanitization-trusted-urls": "warn",
-            "@microsoft/sdl/no-angularjs-bypass-sce": "warn",
-            "@microsoft/sdl/no-angularjs-enable-svg": "warn",
-            "@microsoft/sdl/no-angularjs-sanitization-whitelist": "warn",
-            "@microsoft/sdl/no-cookies": "warn",
-            "@microsoft/sdl/no-document-domain": "warn",
-            "@microsoft/sdl/no-document-write": "warn",
-            "@microsoft/sdl/no-electron-node-integration": "warn",
-            "@microsoft/sdl/no-html-method": "warn",
-            "@microsoft/sdl/no-inner-html": "warn",
-            "@microsoft/sdl/no-insecure-random": "off",
-            "@microsoft/sdl/no-insecure-url": "warn",
-            "@microsoft/sdl/no-msapp-exec-unsafe": "warn",
-            "@microsoft/sdl/no-postmessage-star-origin": "warn",
-            "@microsoft/sdl/no-unsafe-alloc": "warn",
-            "@microsoft/sdl/no-winjs-html-unsafe": "warn",
+            "sdl/no-angular-bypass-sanitizer": "warn",
+            "sdl/no-angular-sanitization-trusted-urls": "warn",
+            "sdl/no-angularjs-bypass-sce": "warn",
+            "sdl/no-angularjs-enable-svg": "warn",
+            "sdl/no-angularjs-sanitization-whitelist": "warn",
+            "sdl/no-cookies": "warn",
+            "sdl/no-document-domain": "warn",
+            "sdl/no-document-write": "warn",
+            "sdl/no-electron-node-integration": "warn",
+            "sdl/no-html-method": "warn",
+            "sdl/no-inner-html": "warn",
+            "sdl/no-insecure-random": "off",
+            "sdl/no-insecure-url": "warn",
+            "sdl/no-msapp-exec-unsafe": "warn",
+            "sdl/no-postmessage-star-origin": "warn",
+            "sdl/no-unsafe-alloc": "warn",
+            "sdl/no-winjs-html-unsafe": "warn",
             ...rushStackSecurityRules,
             "@stylistic/jsx-child-element-spacing": "warn",
             "@stylistic/jsx-closing-bracket-location": "warn",
@@ -8031,7 +8024,7 @@ export default defineConfig([
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
-            "tsdoc-require/require": "warn", // Optimized Unicorn rules (reduced false positives)
+            "tsdoc-require-2/require": "warn", // Optimized Unicorn rules (reduced false positives)
             // Documentation
             "tsdoc/syntax": "warn",
             "unicorn/filename-case": [
@@ -9426,7 +9419,7 @@ export default defineConfig([
             sonarjs: sonarjs,
             "sort-class-members": pluginSortClassMembers,
             tsdoc: pluginTsdoc,
-            "tsdoc-require": pluginTSDocRequire,
+            "tsdoc-require-2": tsdocRequire,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "write-good-comments": pluginWriteGood,
@@ -9864,7 +9857,7 @@ export default defineConfig([
             "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
-            "tsdoc-require/require": "warn", // Backend-specific unicorn rules
+            "tsdoc-require-2/require": "warn", // Backend-specific unicorn rules
             // Documentation
             "tsdoc/syntax": "warn",
             "unicorn/filename-case": [
@@ -10377,7 +10370,7 @@ export default defineConfig([
             sonarjs: sonarjs,
             "sort-class-members": pluginSortClassMembers,
             tsdoc: pluginTsdoc,
-            "tsdoc-require": pluginTSDocRequire,
+            "tsdoc-require-2": tsdocRequire,
             unicorn: eslintPluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "write-good-comments": pluginWriteGood,
@@ -10835,7 +10828,7 @@ export default defineConfig([
             "storybook/no-renderer-packages": "warn",
             "storybook/no-stories-of": "warn",
             "storybook/no-title-property-in-meta": "warn",
-            "tsdoc-require/require": "off",
+            "tsdoc-require-2/require": "off",
         },
     },
     // #endregion
@@ -11047,7 +11040,7 @@ export default defineConfig([
             "tailwind/no-unnecessary-arbitrary-value": "off",
             // NOTE(ESLint10): Re-enable once eslint-plugin-tsdoc-require
             // supports ESLint 10 rule context APIs.
-            "tsdoc-require/require": "off",
+            "tsdoc-require-2/require": "off",
             // NOTE(ESLint10): Re-enable once eslint-plugin-tsdoc supports
             // ESLint 10 without legacy context helpers.
             "tsdoc/syntax": "off",

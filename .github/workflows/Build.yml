@@ -2,27 +2,13 @@
 # yamllint disable rule:line-length
 name: Build and Release Electron App
 
+run-name: Build and Release Electron App
+
 concurrency:
     group: build-${{ github.ref }}
     cancel-in-progress: true
 
 on:
-    push:
-        branches:
-            - main
-        paths:
-            - ".github/workflows/Build.yml"
-            - "assets/**"
-            - "config/**"
-            - "electron/**"
-            - "electron-builder.config.ts"
-            - "package-lock.json"
-            - "package.json"
-            - "public/**"
-            - "shared/**"
-            - "src/**"
-            - "tsconfig*.json"
-            - "vite.config.ts"
     workflow_dispatch:
 
 permissions:
