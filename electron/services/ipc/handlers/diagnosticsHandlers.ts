@@ -245,7 +245,7 @@ export function registerDiagnosticsHandlers({
                 timestamp: report.timestamp,
             });
 
-            return undefined;
+            
         },
         SystemHandlerValidators.reportPreloadGuard
     );

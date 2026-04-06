@@ -894,11 +894,14 @@ describe("Schema Property-Based Tests", () => {
             test.prop([siteArbitrary])(
                 "should validate site data using validation function",
                 (siteData) => {
+                    const schemaResult = siteSchema.safeParse(siteData);
+                    expect(schemaResult.success).toBeTruthy();
+
                     const result = validateSiteData(siteData);
                     expect(result.success).toBeTruthy();
-                    if (result.success) {
+                    if (result.success && schemaResult.success) {
                         expect(result.data).toBeDefined();
-                        expect(result.data).toMatchObject(siteData);
+                        expect(result.data).toStrictEqual(schemaResult.data);
                     }
                 }
             );

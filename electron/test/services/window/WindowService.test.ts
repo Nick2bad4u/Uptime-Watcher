@@ -22,6 +22,7 @@ vi.mock("electron", () => {
         removeListener: vi.fn(),
         show: vi.fn(),
         webContents: {
+            isDestroyed: vi.fn(() => false),
             on: vi.fn(),
             once: vi.fn(),
             openDevTools: vi.fn(),
@@ -112,6 +113,7 @@ describe(WindowService, () => {
             BrowserWindow as unknown as { __mockWindow: any }
         ).__mockWindow;
         vi.mocked(mockWindowRef.isDestroyed).mockReturnValue(false);
+        vi.mocked(mockWindowRef.webContents.isDestroyed).mockReturnValue(false);
         vi.mocked(mockWindowRef.removeListener).mockImplementation(() => {
             // noop for cleanup assertions
         });
@@ -774,6 +776,46 @@ describe(WindowService, () => {
                     expect.objectContaining({ message: "File not found" })
                 );
             });
+
+            it("should ignore production load interruptions while shutting down", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const mockWindowRef = (
+                    BrowserWindow as unknown as { __mockWindow: any }
+                ).__mockWindow;
+
+                const shutdownLoadError = new Error(
+                    "ERR_FAILED (-2) loading 'file:///dist/index.html'"
+                );
+                vi.mocked(mockWindowRef.loadFile).mockRejectedValue(
+                    shutdownLoadError
+                );
+
+                const window = windowService.createMainWindow();
+                vi.mocked(window.isDestroyed).mockReturnValue(true);
+                vi.mocked(window.webContents.isDestroyed).mockReturnValue(true);
+
+                windowService.closeMainWindow();
+
+                await new Promise((resolve) => setTimeout(resolve, 0));
+
+                expect(logger.debug).toHaveBeenCalledWith(
+                    "[WindowService] Ignoring production load interruption during shutdown",
+                    expect.objectContaining({
+                        message: shutdownLoadError.message,
+                    })
+                );
+                expect(logger.error).not.toHaveBeenCalledWith(
+                    "Failed to loadProductionContent",
+                    expect.anything()
+                );
+            });
         });
 
         describe("development mode", () => {
@@ -890,25 +932,26 @@ describe(WindowService, () => {
                 const window = testWindowService.createMainWindow();
 
                 // Mock waitForViteServer to succeed but then simulate window destruction check
-                vi.spyOn(
+                const waitForViteServerSpy = vi.spyOn(
                     testWindowService as any,
                     "waitForViteServer"
                 ).mockResolvedValue(undefined);
 
                 // Simulate window being destroyed after server is ready but before load
                 vi.mocked(window.isDestroyed).mockReturnValue(true);
+                vi.clearAllMocks();
 
-                // Directly call loadDevelopmentContent to catch errors
                 await expect(
                     (testWindowService as any).loadDevelopmentContent()
-                ).rejects.toThrow();
+                ).resolves.toBeUndefined();
 
-                expect(logger.error).toHaveBeenCalledWith(
+                expect(waitForViteServerSpy).toHaveBeenCalled();
+                expect(logger.debug).toHaveBeenCalledWith(
+                    "[WindowService] Skipping development load because the main window closed before the Vite server was ready"
+                );
+                expect(logger.error).not.toHaveBeenCalledWith(
                     "Failed to loadDevelopmentContent",
-                    expect.objectContaining({
-                        message:
-                            "Main window was destroyed while waiting for Vite server",
-                    })
+                    expect.anything()
                 );
             });
 

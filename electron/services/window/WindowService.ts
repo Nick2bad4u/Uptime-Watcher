@@ -33,18 +33,18 @@
  * @packageDocumentation
  */
 
+import type {
+    Event,
+    HandlerDetails,
+    WebPreferences,
+} from "electron";
+
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { withRetry } from "@shared/utils/retry";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import {
-    app,
-    BrowserWindow,
-    type Event,
-    type HandlerDetails,
-    type WebPreferences,
-} from "electron";
+import * as electron from "electron";
 import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -61,6 +61,36 @@ import {
     applyProductionDocumentSecurityHeaders,
     getProductionCspHeaderValue,
 } from "./utils/productionSecurityHeaders";
+
+const BrowserWindowCtor: typeof electron.BrowserWindow = electron.BrowserWindow;
+type BrowserWindowInstance = InstanceType<typeof BrowserWindowCtor>;
+
+type UnknownMethod = (this: object, ...args: never[]) => unknown;
+
+/**
+ * Determines whether a value is a callable method.
+ *
+ * @param value - Candidate value.
+ * @returns True when the value can be invoked like a function.
+ */
+const isUnknownMethod = (value: unknown): value is UnknownMethod =>
+    typeof value === "function";
+
+/**
+ * Resolves a callable property from an object without leaking `any`.
+ *
+ * @param target - Object that may expose the method.
+ * @param propertyKey - Candidate method name.
+ *
+ * @returns Callable property when present; otherwise `undefined`.
+ */
+const getCallableProperty = (
+    target: object,
+    propertyKey: string
+): undefined | UnknownMethod => {
+    const candidate = Reflect.get(target, propertyKey) as unknown;
+    return isUnknownMethod(candidate) ? candidate : undefined;
+};
 
 /**
  * Resolves the absolute directory path for this module.
@@ -90,8 +120,47 @@ const resolveCurrentDirectory = (): string => {
 
 const currentDirectory = resolveCurrentDirectory();
 
-const resolveAppPath = (): string =>
-    app.isReady() ? app.getAppPath() : process.cwd();
+/**
+ * Attempts to resolve Electron's application path when the runtime exposes the
+ * required `app` lifecycle methods.
+ *
+ * @remarks
+ * Some unit tests partially mock the `electron` module and omit the `app`
+ * export entirely, or provide an object without the full lifecycle API. This
+ * helper keeps production behaviour unchanged while ensuring module evaluation
+ * never crashes under partial mocks.
+ *
+ * @returns The resolved application path when available; otherwise `undefined`.
+ */
+const tryResolveElectronAppPath = (): string | undefined => {
+    try {
+        const electronApp = Reflect.get(electron, "app") as unknown;
+
+        if (!electronApp || typeof electronApp !== "object") {
+            return undefined;
+        }
+
+        const isReady = getCallableProperty(electronApp, "isReady");
+        const getAppPath = getCallableProperty(electronApp, "getAppPath");
+
+        if (!isReady || !getAppPath) {
+            return undefined;
+        }
+
+        if (isReady.call(electronApp) !== true) {
+            return undefined;
+        }
+
+        const appPath = getAppPath.call(electronApp);
+        return typeof appPath === "string" && appPath.length > 0
+            ? appPath
+            : undefined;
+    } catch {
+        return undefined;
+    }
+};
+
+const resolveAppPath = (): string => tryResolveElectronAppPath() ?? process.cwd();
 
 const resolveProductionDistDirectory = (): string => {
     const appPath = resolveAppPath();
@@ -125,7 +194,19 @@ const resolveProductionDistDirectory = (): string => {
     return getProductionDistDirectory(currentDirectory);
 };
 
-const PRODUCTION_DIST_DIRECTORY = resolveProductionDistDirectory();
+const productionDistDirectoryCache: { value: string | undefined } = {
+    value: undefined,
+};
+
+/**
+ * Resolves and memoizes the production dist directory on first use.
+ *
+ * @returns Absolute production dist directory path.
+ */
+const getResolvedProductionDistDirectory = (): string => {
+    productionDistDirectoryCache.value ??= resolveProductionDistDirectory();
+    return productionDistDirectoryCache.value;
+};
 
 /**
  * Service responsible for window management and lifecycle.
@@ -152,7 +233,17 @@ export class WindowService {
     } as const;
 
     /** Reference to the main application window (null if not created) */
-    private mainWindow: BrowserWindow | null = null;
+    private mainWindow: BrowserWindowInstance | null = null;
+
+    /**
+     * Tracks whether the main window is intentionally shutting down.
+     *
+     * @remarks
+     * Electron rejects pending `loadURL` / `loadFile` promises when a window is
+     * closed before navigation completes. That is expected during application
+     * teardown and should not escalate into a fatal process shutdown.
+     */
+    private isMainWindowClosing = false;
 
     /** Tracks whether production security headers were attached. */
     private hasAttachedProductionSecurityHeaders = false;
@@ -304,7 +395,7 @@ export class WindowService {
         });
     }
 
-    /**
+/**
      * Load development content after waiting for Vite server.
      *
      * @remarks
@@ -336,7 +427,7 @@ export class WindowService {
      *
      * @returns Promise that resolves when content is loaded or rejects on error
      */
-    private async loadDevelopmentContent(): Promise<void> {
+private async loadDevelopmentContent(): Promise<void> {
         return withErrorHandling(
             async () => {
                 const targetWindow = this.mainWindow;
@@ -344,14 +435,29 @@ export class WindowService {
                 await this.waitForViteServer();
 
                 if (!targetWindow || targetWindow.isDestroyed()) {
-                    throw new Error(
-                        "Main window was destroyed while waiting for Vite server"
+                    logger.debug(
+                        "[WindowService] Skipping development load because the main window closed before the Vite server was ready"
                     );
+                    return;
                 }
 
-                await targetWindow.loadURL(
-                    WindowService.VITE_SERVER_CONFIG.SERVER_URL
-                );
+                try {
+                    await targetWindow.loadURL(
+                        WindowService.VITE_SERVER_CONFIG.SERVER_URL
+                    );
+                } catch (error: unknown) {
+                    if (this.isBenignWindowLoadFailure(error, targetWindow)) {
+                        logger.debug(
+                            "[WindowService] Ignoring development load interruption during shutdown",
+                            {
+                                message: ensureError(error).message,
+                            }
+                        );
+                        return;
+                    }
+
+                    throw error;
+                }
 
                 // Delay opening DevTools to ensure renderer is ready
                 const devToolsTimer = setTimeout(() => {
@@ -380,7 +486,7 @@ export class WindowService {
         );
     }
 
-    /**
+/**
      * Wait for Vite dev server to be ready with exponential backoff.
      *
      * @remarks
@@ -398,7 +504,7 @@ export class WindowService {
      *
      * @throws When server doesn't become available within timeout
      */
-    private async waitForViteServer(): Promise<void> {
+private async waitForViteServer(): Promise<void> {
         const isFetchMock =
             typeof fetch === "function" && objectHasOwn(fetch, "mock");
 
@@ -511,6 +617,46 @@ export class WindowService {
         }
     }
 
+/**
+     * Determines whether a window load failure is expected during teardown.
+     *
+     * @param error - Unknown load failure.
+     * @param targetWindow - Window that initiated the navigation.
+     *
+     * @returns `true` when the error was caused by intentional window shutdown.
+     */
+    private isBenignWindowLoadFailure(
+        error: unknown,
+        targetWindow: BrowserWindowInstance
+    ): boolean {
+        const normalizedError = ensureError(error);
+        const {message} = normalizedError;
+        const {webContents} = targetWindow;
+        const isAbortLikeError =
+            message.includes("ERR_ABORTED") ||
+            message.includes("ERR_FAILED") ||
+            message.includes("Object has been destroyed") ||
+            message.includes("WebContents was destroyed");
+
+        if (!isAbortLikeError) {
+            return false;
+        }
+
+        return (
+            this.isMainWindowClosing ||
+            targetWindow.isDestroyed() ||
+            webContents.isDestroyed()
+        );
+    }
+
+
+
+
+
+
+
+
+
     /**
      * Determines whether a navigation target should be allowed inside the app
      * window.
@@ -547,7 +693,7 @@ export class WindowService {
                 const targetPath = fileURLToPath(parsed);
                 return isPathWithinDirectory(
                     targetPath,
-                    PRODUCTION_DIST_DIRECTORY
+                    getResolvedProductionDistDirectory()
                 );
             }
 
@@ -583,6 +729,7 @@ export class WindowService {
      */
     public closeMainWindow(): void {
         if (this.hasMainWindow()) {
+            this.isMainWindowClosing = true;
             this.mainWindow?.close();
         }
     }
@@ -604,7 +751,7 @@ export class WindowService {
      *
      * @returns The created BrowserWindow instance
      */
-    public createMainWindow(): BrowserWindow {
+    public createMainWindow(): BrowserWindowInstance {
         const existingWindow = this.mainWindow;
         if (existingWindow) {
             logger.warn(
@@ -613,7 +760,9 @@ export class WindowService {
             return existingWindow;
         }
 
-        this.mainWindow = new BrowserWindow({
+        this.isMainWindowClosing = false;
+
+        this.mainWindow = new BrowserWindowCtor({
             height: 800,
             minHeight: 600,
             minWidth: 800,
@@ -640,23 +789,29 @@ export class WindowService {
         // surface for compromised renderer content.
         try {
             const { session } = this.mainWindow.webContents;
+            type PermissionRequestHandler = NonNullable<
+                Parameters<typeof session.setPermissionRequestHandler>[0]
+            >;
 
             session.setPermissionCheckHandler(() => false);
-            session.setPermissionRequestHandler(
-                (_webContents, permission, grantPermission) => {
-                    if (!this.loggedDeniedPermissions.has(permission)) {
-                        this.loggedDeniedPermissions.add(permission);
-                        logger.warn(
-                            "[WindowService] Denied permission request",
-                            { permission }
-                        );
-                    }
-
-                    // Electron expects a boolean "grant" flag here, not an
-                    // error-first Node.js callback.
-                    grantPermission(false);
+            const handlePermissionRequest: PermissionRequestHandler = (
+                _webContents,
+                permission,
+                grantPermission
+            ) => {
+                if (!this.loggedDeniedPermissions.has(permission)) {
+                    this.loggedDeniedPermissions.add(permission);
+                    logger.warn(
+                        "[WindowService] Denied permission request",
+                        { permission }
+                    );
                 }
-            );
+
+                // Electron expects a boolean "grant" flag here, not an
+                // error-first Node.js callback.
+                grantPermission(false);
+            };
+            session.setPermissionRequestHandler(handlePermissionRequest);
 
             // Extra hardening (Electron APIs differ slightly across versions).
             if (typeof session.setDevicePermissionHandler === "function") {
@@ -664,7 +819,13 @@ export class WindowService {
             }
 
             if (typeof session.setDisplayMediaRequestHandler === "function") {
-                session.setDisplayMediaRequestHandler((_request, callback) => {
+                type DisplayMediaRequestHandler = NonNullable<
+                    Parameters<typeof session.setDisplayMediaRequestHandler>[0]
+                >;
+                const handleDisplayMediaRequest: DisplayMediaRequestHandler = (
+                    _request,
+                    callback
+                ) => {
                     if (!this.hasLoggedDisplayMediaDenial) {
                         this.hasLoggedDisplayMediaDenial = true;
                         logger.warn(
@@ -677,7 +838,10 @@ export class WindowService {
                     // assigning `undefined` is not allowed for optional
                     // properties. Omitting the keys is the typed way to deny.)
                     callback({});
-                });
+                };
+                session.setDisplayMediaRequestHandler(
+                    handleDisplayMediaRequest
+                );
             }
         } catch (error: unknown) {
             logger.warn(
@@ -701,7 +865,13 @@ export class WindowService {
 
             try {
                 const sess = this.mainWindow.webContents.session;
-                sess.webRequest.onHeadersReceived((details, callback) => {
+                type OnHeadersReceivedHandler = NonNullable<
+                    Parameters<typeof sess.webRequest.onHeadersReceived>[0]
+                >;
+                const onHeadersReceived: OnHeadersReceivedHandler = (
+                    details,
+                    callback
+                ) => {
                     // Only documents should receive CSP and related headers.
                     // When Electron provides resourceType, use it to avoid
                     // mutating headers for non-document resources.
@@ -747,7 +917,9 @@ export class WindowService {
                         cancel: false,
                         responseHeaders,
                     });
-                });
+                };
+
+                sess.webRequest.onHeadersReceived(onHeadersReceived);
 
                 this.hasAttachedProductionSecurityHeaders = true;
             } catch (error: unknown) {
@@ -773,8 +945,8 @@ export class WindowService {
     /**
      * Get all browser windows.
      */
-    public getAllWindows(): BrowserWindow[] {
-        return BrowserWindow.getAllWindows();
+    public getAllWindows(): BrowserWindowInstance[] {
+        return BrowserWindowCtor.getAllWindows();
     }
 
     /**
@@ -782,7 +954,7 @@ export class WindowService {
      *
      * @returns Main window instance or null if not created
      */
-    public getMainWindow(): BrowserWindow | null {
+    public getMainWindow(): BrowserWindowInstance | null {
         return this.mainWindow;
     }
 
@@ -813,7 +985,7 @@ export class WindowService {
         // Use ternary for simple conditional path selection
         return isDev()
             ? path.join(process.cwd(), "dist", preloadFileName) // Development: look in dist directory
-            : path.join(PRODUCTION_DIST_DIRECTORY, preloadFileName); // Production: resolved dist directory
+            : path.join(getResolvedProductionDistDirectory(), preloadFileName); // Production: resolved dist directory
     }
 
     /**
@@ -857,6 +1029,8 @@ export class WindowService {
             return;
         }
 
+        const targetWindow = this.mainWindow;
+
         if (isDev()) {
             logger.debug(
                 "[WindowService] Development mode: waiting for Vite dev server"
@@ -864,22 +1038,57 @@ export class WindowService {
             logger.debug("[WindowService] NODE_ENV:", getNodeEnv());
             // Load from Vite dev server
             // Wait for Vite server before loading content
-            void this.loadDevelopmentContent();
+            void (async (): Promise<void> => {
+                try {
+                    await this.loadDevelopmentContent();
+                } catch {
+                    // Errors are already logged inside withErrorHandling.
+                }
+            })();
         } else {
             logger.debug("[WindowService] Production mode: loading from dist");
-            void withErrorHandling(
-                async () => {
-                    if (this.mainWindow) {
-                        await this.mainWindow.loadFile(
-                            path.join(PRODUCTION_DIST_DIRECTORY, "index.html")
-                        );
-                    }
-                },
-                {
-                    logger,
-                    operationName: "loadProductionContent",
+            void (async (): Promise<void> => {
+                try {
+                    await withErrorHandling(
+                        async () => {
+                            if (this.mainWindow) {
+                                try {
+                                    await this.mainWindow.loadFile(
+                                        path.join(
+                                            getResolvedProductionDistDirectory(),
+                                            "index.html"
+                                        )
+                                    );
+                                } catch (error: unknown) {
+                                    if (
+                                        this.isBenignWindowLoadFailure(
+                                            error,
+                                            targetWindow
+                                        )
+                                    ) {
+                                        logger.debug(
+                                            "[WindowService] Ignoring production load interruption during shutdown",
+                                            {
+                                                message:
+                                                    ensureError(error).message,
+                                            }
+                                        );
+                                        return;
+                                    }
+
+                                    throw error;
+                                }
+                            }
+                        },
+                        {
+                            logger,
+                            operationName: "loadProductionContent",
+                        }
+                    );
+                } catch {
+                    // Errors are already logged inside withErrorHandling.
                 }
-            );
+            })();
         }
     }
 

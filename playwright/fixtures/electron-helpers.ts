@@ -9,8 +9,10 @@
 
 import { _electron as electron } from "@playwright/test";
 import type { ElectronApplication, Page } from "@playwright/test";
+import { execFileSync } from "node:child_process";
+import type { ChildProcess } from "node:child_process";
 import { createWriteStream, type WriteStream } from "node:fs";
-import { copyFile, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
+import { access, copyFile, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
 
@@ -22,6 +24,170 @@ import {
     registerApplicationUserDataDirectory,
     registerPageUserDataDirectory,
 } from "../utils/userDataDirectoryRegistry";
+
+const PLAYWRIGHT_CLOSE_TIMEOUT_MS = 5000;
+const USER_DATA_REMOVAL_RETRY_DELAYS_MS = [250, 500, 1000] as const;
+
+const isBusyFileSystemError = (error: unknown): boolean => {
+    const code =
+        typeof error === "object" && error !== null && "code" in error
+            ? Reflect.get(error, "code")
+            : undefined;
+
+    return code === "EBUSY" || code === "ENOTEMPTY" || code === "EPERM";
+};
+
+const waitForDelay = async (delayMs: number): Promise<void> => {
+    if (delayMs <= 0) {
+        return;
+    }
+
+    await new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, delayMs);
+        timer.unref();
+    });
+};
+
+const ensurePathExists = async (candidatePath: string): Promise<boolean> => {
+    try {
+        await access(candidatePath);
+        return true;
+    } catch {
+        return false;
+    }
+};
+
+const ensureElectronRuntimeWasm = async (): Promise<void> => {
+    const workspaceRoot = process.cwd();
+    const distDirectory = path.join(workspaceRoot, "dist");
+    const distWasmPath = path.join(distDirectory, "node-sqlite3-wasm.wasm");
+
+    if (await ensurePathExists(distWasmPath)) {
+        return;
+    }
+
+    const sourceCandidates = [
+        path.join(workspaceRoot, "assets", "node-sqlite3-wasm.wasm"),
+        path.join(
+            workspaceRoot,
+            "node_modules",
+            "node-sqlite3-wasm",
+            "dist",
+            "node-sqlite3-wasm.wasm"
+        ),
+    ];
+
+    const sourcePath = await (async (): Promise<string | undefined> => {
+        for (const candidate of sourceCandidates) {
+            if (await ensurePathExists(candidate)) {
+                return candidate;
+            }
+        }
+
+        return undefined;
+    })();
+
+    if (!sourcePath) {
+        throw new Error(
+            "Unable to locate node-sqlite3-wasm.wasm for Playwright Electron launches"
+        );
+    }
+
+    await mkdir(distDirectory, { recursive: true });
+    await copyFile(sourcePath, distWasmPath);
+};
+
+const hasChildProcessExited = (
+    childProcess: ChildProcess | null | undefined
+): boolean =>
+    !childProcess ||
+    childProcess.exitCode !== null ||
+    childProcess.signalCode !== null ||
+    childProcess.killed;
+
+const forceTerminateChildProcess = (childProcess: ChildProcess): void => {
+    if (hasChildProcessExited(childProcess)) {
+        return;
+    }
+
+    try {
+        if (process.platform === "win32" && typeof childProcess.pid === "number") {
+            execFileSync(
+                "taskkill",
+                ["/F", "/T", "/PID", String(childProcess.pid)],
+                { stdio: "ignore" }
+            );
+            return;
+        }
+
+        childProcess.kill("SIGKILL");
+    } catch {
+        // Best-effort termination only.
+    }
+};
+
+const waitForChildProcessExit = async (
+    childProcess: ChildProcess | null | undefined,
+    timeoutMs: number
+): Promise<void> => {
+    if (hasChildProcessExited(childProcess)) {
+        return;
+    }
+
+    await new Promise<void>((resolve) => {
+        if (!childProcess) {
+            resolve();
+            return;
+        }
+
+        let settled = false;
+
+        const settle = (): void => {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            childProcess.off("close", settle);
+            childProcess.off("exit", settle);
+            resolve();
+        };
+
+        childProcess.once("close", settle);
+        childProcess.once("exit", settle);
+
+        const timer = setTimeout(() => {
+            forceTerminateChildProcess(childProcess);
+            settle();
+        }, timeoutMs);
+
+        timer.unref();
+    });
+};
+
+const removeUserDataDirectory = async (userDataDir: string): Promise<void> => {
+    if (process.env["PLAYWRIGHT_PRESERVE_USER_DATA_DIR"] === "1") {
+        return;
+    }
+
+    const retrySchedule = [0, ...USER_DATA_REMOVAL_RETRY_DELAYS_MS];
+
+    for (const [attemptIndex, delayMs] of retrySchedule.entries()) {
+        if (delayMs > 0) {
+            await waitForDelay(delayMs);
+        }
+
+        try {
+            await rm(userDataDir, { recursive: true, force: true });
+            return;
+        } catch (error) {
+            const isLastAttempt = attemptIndex === retrySchedule.length - 1;
+            if (!isBusyFileSystemError(error) || isLastAttempt) {
+                throw error;
+            }
+        }
+    }
+};
 
 /**
  * Launch Electron with CI-compatible configuration.
@@ -47,6 +213,8 @@ export async function launchElectronApp(
     customArgs: string[] = [],
     customEnv: Record<string, string> = {}
 ): Promise<ElectronApplication> {
+    await ensureElectronRuntimeWasm();
+
     const userDataDir = await mkdtemp(
         path.join(tmpdir(), "uptime-watcher-playwright-")
     );
@@ -154,10 +322,18 @@ export async function launchElectronApp(
                                 logsOutputDir,
                                 relative
                             );
-                            await mkdir(path.dirname(destination), {
-                                recursive: true,
-                            });
-                            await copyFile(source, destination);
+                            try {
+                                await mkdir(path.dirname(destination), {
+                                    recursive: true,
+                                });
+                                await copyFile(source, destination);
+                            } catch (error) {
+                                if (isBusyFileSystemError(error)) {
+                                    return;
+                                }
+
+                                throw error;
+                            }
                         })
                     );
                 };
@@ -185,11 +361,7 @@ export async function launchElectronApp(
         },
         async () => {
             try {
-                if (process.env["PLAYWRIGHT_PRESERVE_USER_DATA_DIR"] === "1") {
-                    return;
-                }
-
-                await rm(userDataDir, { recursive: true, force: true });
+                await removeUserDataDirectory(userDataDir);
             } catch (error) {
                 console.warn(
                     "[Playwright] Failed to remove temporary userData directory",
@@ -286,7 +458,13 @@ export async function launchElectronApp(
     }) as ElectronApplication["firstWindow"];
 
     app.on("close", () => {
-        void runCleanup();
+        void (async (): Promise<void> => {
+            await waitForChildProcessExit(
+                electronProcess,
+                PLAYWRIGHT_CLOSE_TIMEOUT_MS
+            );
+            await runCleanup();
+        })();
     });
 
     if (isCoverageEnabled) {
@@ -316,6 +494,11 @@ export async function launchElectronApp(
                 closeError = error;
             }
 
+            await waitForChildProcessExit(
+                electronProcess,
+                PLAYWRIGHT_CLOSE_TIMEOUT_MS
+            );
+
             await runCleanup();
 
             if (coverageError) {
@@ -340,6 +523,11 @@ export async function launchElectronApp(
             } catch (error) {
                 closeError = error;
             }
+
+            await waitForChildProcessExit(
+                electronProcess,
+                PLAYWRIGHT_CLOSE_TIMEOUT_MS
+            );
 
             await runCleanup();
 
