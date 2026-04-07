@@ -1,6 +1,8 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import { stringSplit } from "ts-extras";
+
 import {
     backupMetadataKeyForBackupKey,
     parseCloudBackupMetadataFileBuffer,
@@ -133,7 +135,7 @@ export async function downloadBackupWithMetadata(args: {
         );
     }
 
-    const expectedFileName = args.key.split("/").pop() ?? "";
+    const expectedFileName = stringSplit(args.key, "/").pop() ?? "";
     if (expectedFileName && entry.fileName !== expectedFileName) {
         throw new Error(
             `Backup metadata mismatch: expected fileName '${expectedFileName}' but received '${entry.fileName}'`

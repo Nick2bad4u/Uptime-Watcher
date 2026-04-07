@@ -5,6 +5,7 @@ import { createCombinedAbortSignal } from "@shared/utils/abortUtils";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomInt } from "node:crypto";
+import { isInteger, stringSplit  } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -821,7 +822,7 @@ export class MonitorScheduler {
     private parseIntervalKey(
         intervalKey: string
     ): null | { monitorId: string; siteIdentifier: string } {
-        const parts = intervalKey.split("|");
+        const parts = stringSplit(intervalKey, "|");
         if (parts.length !== 2) return null;
 
         const [siteIdentifier, monitorId] = parts;
@@ -852,7 +853,7 @@ export class MonitorScheduler {
      * @internal
      */
     private validateCheckInterval(checkInterval: number): number {
-        if (!Number.isInteger(checkInterval) || checkInterval <= 0) {
+        if (!isInteger(checkInterval) || checkInterval <= 0) {
             throw new Error(
                 `Invalid check interval: ${checkInterval}. Must be a positive integer.`
             );

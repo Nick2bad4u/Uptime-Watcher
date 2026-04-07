@@ -11,6 +11,7 @@
 import { isMonitorStatus, type Monitor, type Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
+import { arrayFind, safeCastTo  } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import { normalizeMonitorInternal } from "./monitorOperations.normalize";
@@ -34,7 +35,7 @@ export function findMonitorInSite(
     site: Site,
     monitorId: string
 ): Monitor | undefined {
-    return site.monitors.find((monitor) => monitor.id === monitorId);
+    return arrayFind(site.monitors, (monitor) => monitor.id === monitorId);
 }
 
 /**
@@ -144,7 +145,7 @@ export function updateMonitorInSite(
             try {
                 // Ignore any id field in updates to preserve original monitor identity.
                 const restUpdates = { ...updates };
-                delete (restUpdates as { id?: unknown }).id;
+                delete (safeCastTo<{ id?: unknown }>(restUpdates)).id;
 
                 const merged: Partial<Monitor> = {
                     ...baseline,

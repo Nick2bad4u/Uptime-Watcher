@@ -9,6 +9,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface NotificationRequest {
@@ -170,19 +171,19 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 600; i++) {
             const template =
                 notificationTemplates[
-                    Math.floor(Math.random() * notificationTemplates.length)
+                    Math.floor(secureRandomFloat() * notificationTemplates.length)
                 ];
             const titleTemplate =
                 template.titleTemplates[
-                    Math.floor(Math.random() * template.titleTemplates.length)
+                    Math.floor(secureRandomFloat() * template.titleTemplates.length)
                 ];
             const bodyTemplate =
                 template.bodyTemplates[
-                    Math.floor(Math.random() * template.bodyTemplates.length)
+                    Math.floor(secureRandomFloat() * template.bodyTemplates.length)
                 ];
 
             // Determine urgency based on distribution
-            const urgencyRand = Math.random();
+            const urgencyRand = secureRandomFloat();
             let urgency: "low" | "normal" | "critical";
             if (urgencyRand < template.urgencyDistribution.low) {
                 urgency = "low";
@@ -207,14 +208,14 @@ describe("Notification Service Benchmarks", () => {
             // Simulate creation timing
             const validationTime = Math.max(
                 1,
-                complexity * 0.5 + Math.random() * 2
+                complexity * 0.5 + secureRandomFloat() * 2
             );
             const formattingTime = Math.max(
                 1,
-                complexity * 0.8 + Math.random() * 3
+                complexity * 0.8 + secureRandomFloat() * 3
             );
             const creationTime =
-                validationTime + formattingTime + Math.random() * 5;
+                validationTime + formattingTime + secureRandomFloat() * 5;
 
             // Simulate validation warnings
             const warnings: string[] = [];
@@ -224,7 +225,7 @@ describe("Notification Service Benchmarks", () => {
                 warnings.push("Body text is quite long");
             if (template.actionsCount > 3)
                 warnings.push("Too many actions may not display properly");
-            if (urgency === "critical" && Math.random() > 0.9)
+            if (urgency === "critical" && secureRandomFloat() > 0.9)
                 warnings.push("Critical notifications may be rate-limited");
 
             const creationTask: CreationTask = {
@@ -234,7 +235,7 @@ describe("Notification Service Benchmarks", () => {
                 creationTime,
                 validationTime,
                 formattingTime,
-                success: Math.random() > 0.01, // 99% success rate
+                success: secureRandomFloat() > 0.01, // 99% success rate
                 warnings,
             };
 
@@ -325,17 +326,17 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 800; i++) {
             const scenario =
                 deliveryScenarios[
-                    Math.floor(Math.random() * deliveryScenarios.length)
+                    Math.floor(secureRandomFloat() * deliveryScenarios.length)
                 ];
             const platform =
                 scenario.platforms[
-                    Math.floor(Math.random() * scenario.platforms.length)
+                    Math.floor(secureRandomFloat() * scenario.platforms.length)
                 ];
 
             const startTime = Date.now();
 
             // Calculate delivery latency
-            const variance = (Math.random() - 0.5) * scenario.variance;
+            const variance = (secureRandomFloat() - 0.5) * scenario.variance;
             const platformOverhead =
                 scenario.platformOverhead[
                     platform as keyof typeof scenario.platformOverhead
@@ -348,7 +349,7 @@ describe("Notification Service Benchmarks", () => {
             const endTime = startTime + deliveryLatency;
 
             // Determine success/failure
-            const success = Math.random() < scenario.successRate;
+            const success = secureRandomFloat() < scenario.successRate;
 
             // Simulate platform-specific behavior
             const platformSpecific: Record<string, unknown> = {};
@@ -375,14 +376,14 @@ describe("Notification Service Benchmarks", () => {
                         "low",
                         "normal",
                         "critical",
-                    ][Math.floor(Math.random() * 3)];
+                    ][Math.floor(secureRandomFloat() * 3)];
                     break;
                 }
             }
 
             // Simulate user interaction (15% interaction rate)
             let userInteraction: NotificationDelivery["userInteraction"];
-            if (success && Math.random() < 0.15) {
+            if (success && secureRandomFloat() < 0.15) {
                 const interactionTypes = [
                     "click",
                     "dismiss",
@@ -391,10 +392,10 @@ describe("Notification Service Benchmarks", () => {
                 ];
                 userInteraction = {
                     action: interactionTypes[
-                        Math.floor(Math.random() * interactionTypes.length)
+                        Math.floor(secureRandomFloat() * interactionTypes.length)
                     ],
-                    timestamp: endTime + Math.random() * 30_000, // Within 30 seconds
-                    value: Math.random() > 0.7 ? "user-response" : undefined,
+                    timestamp: endTime + secureRandomFloat() * 30_000, // Within 30 seconds
+                    value: secureRandomFloat() > 0.7 ? "user-response" : undefined,
                 };
             }
 
@@ -499,13 +500,13 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 1000; i++) {
             const category =
                 notificationCategories[
-                    Math.floor(Math.random() * notificationCategories.length)
+                    Math.floor(secureRandomFloat() * notificationCategories.length)
                 ];
             const urgency = [
                 "low",
                 "normal",
                 "critical",
-            ][Math.floor(Math.random() * 3)];
+            ][Math.floor(secureRandomFloat() * 3)];
 
             // Determine priority based on urgency and category
             let priority: number;
@@ -566,7 +567,7 @@ describe("Notification Service Benchmarks", () => {
 
                 for (const notification of candidates) {
                     notification.processedAt =
-                        currentTime + Math.random() * 1000; // Process within the interval
+                        currentTime + secureRandomFloat() * 1000; // Process within the interval
                     notification.waitTime =
                         notification.processedAt - notification.queuedAt;
 
@@ -670,7 +671,7 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 500; i++) {
             const category =
                 notificationCategories[
-                    Math.floor(Math.random() * notificationCategories.length)
+                    Math.floor(secureRandomFloat() * notificationCategories.length)
                 ];
             const timestamp = Date.now() + i * 1000; // One per second
 
@@ -816,7 +817,7 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 200; i++) {
             const strategy =
                 coordinationStrategies[
-                    Math.floor(Math.random() * coordinationStrategies.length)
+                    Math.floor(secureRandomFloat() * coordinationStrategies.length)
                 ];
             const notificationId = `multi-channel-${i}`;
 
@@ -865,8 +866,8 @@ describe("Notification Service Benchmarks", () => {
                     }
                 }
 
-                const latency = baseLatency + Math.random() * 50;
-                const success = Math.random() < successRate;
+                const latency = baseLatency + secureRandomFloat() * 50;
+                const success = secureRandomFloat() < successRate;
                 const endTime = startTime + latency;
 
                 if (success) {
@@ -895,8 +896,8 @@ describe("Notification Service Benchmarks", () => {
             if (needsFallback && strategy.fallbackChain.length > 0) {
                 for (const fallbackChannel of strategy.fallbackChain) {
                     const startTime = Date.now() + 200; // Fallback delay
-                    const latency = 100 + Math.random() * 100; // Fallback is typically slower
-                    const success = Math.random() < 0.85; // Lower success rate for fallback
+                    const latency = 100 + secureRandomFloat() * 100; // Fallback is typically slower
+                    const success = secureRandomFloat() < 0.85; // Lower success rate for fallback
                     const endTime = startTime + latency;
 
                     const fallbackDelivery: ChannelDelivery = {

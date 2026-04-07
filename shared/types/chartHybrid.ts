@@ -34,6 +34,8 @@
 import type { ChartData, ChartOptions } from "chart.js";
 import type { UnknownRecord, ValueOf } from "type-fest";
 
+import { safeCastTo } from "ts-extras";
+
 // Import our custom business logic types
 import type {
     ChartDataPoint,
@@ -314,6 +316,6 @@ export function isUptimeChartData(data: unknown): data is UptimeChartData {
         typeof data === "object" &&
         data !== null &&
         "datasets" in data &&
-        Array.isArray((data as { datasets: unknown }).datasets)
+        Array.isArray((safeCastTo(data)).datasets)
     );
 }

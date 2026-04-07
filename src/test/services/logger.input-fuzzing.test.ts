@@ -27,6 +27,7 @@ import * as fc from "fast-check";
 
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { serializeError } from "@shared/utils/logger/common";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock electron-log/renderer
 vi.mock("electron-log/renderer", () => ({
@@ -721,7 +722,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             (duration) => {
                 // Test with very large and very small durations
                 const extremeDuration =
-                    Math.random() > 0.5
+                    secureRandomFloat() > 0.5
                         ? duration * 1_000_000
                         : duration / 1_000_000;
 

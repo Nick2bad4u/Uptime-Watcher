@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 class MockUptimeCalculator {
     calculateUptime(
@@ -55,7 +56,7 @@ describe("Uptime Calculator Performance", () => {
             calculator = new MockUptimeCalculator();
             testData = Array.from({ length: 10_000 }, (_, i) => ({
                 timestamp: Date.now() - i * 60_000,
-                isUp: Math.random() > 0.05,
+                isUp: secureRandomFloat() > 0.05,
             }));
         },
         { warmupIterations: 5, iterations: 500 }
@@ -67,7 +68,7 @@ describe("Uptime Calculator Performance", () => {
             calculator = new MockUptimeCalculator();
             const data = Array.from({ length: 1000 }, (_, i) => ({
                 timestamp: Date.now() - i * 60_000,
-                isUp: Math.random() > 0.05,
+                isUp: secureRandomFloat() > 0.05,
             }));
             calculator.calculateUptime(data, 24 * 60 * 60 * 1000);
         },
@@ -80,7 +81,7 @@ describe("Uptime Calculator Performance", () => {
             calculator = new MockUptimeCalculator();
             const data = Array.from({ length: 5000 }, (_, i) => ({
                 timestamp: Date.now() - i * 60_000,
-                isUp: Math.random() > 0.05,
+                isUp: secureRandomFloat() > 0.05,
             }));
             calculator.calculateSLA(data, 99.9);
         },

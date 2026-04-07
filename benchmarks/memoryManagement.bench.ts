@@ -17,6 +17,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Simplified LRU cache used to benchmark cache eviction and memory churn.
@@ -152,7 +153,7 @@ class MemoryPressureSimulator {
         const bytesPerMB = 1024 * 1024;
         const arraySize = (sizeInMB * bytesPerMB) / 8; // 8 bytes per number
         const largeArray = Array.from({ length: arraySize }, () =>
-            Math.random()
+            secureRandomFloat()
         );
         this.allocatedObjects.push(largeArray);
     }
@@ -227,15 +228,15 @@ interface HistoryEntry {
  */
 function generateHistoryEntry(): HistoryEntry {
     return {
-        timestamp: Date.now() - Math.random() * 86_400_000,
-        status: Math.random() > 0.05 ? "up" : "down",
-        responseTime: Math.floor(Math.random() * 1000) + 10,
+        timestamp: Date.now() - secureRandomFloat() * 86_400_000,
+        status: secureRandomFloat() > 0.05 ? "up" : "down",
+        responseTime: Math.floor(secureRandomFloat() * 1000) + 10,
         metadata:
-            Math.random() > 0.7
+            secureRandomFloat() > 0.7
                 ? {
-                      error: `Error ${Math.floor(Math.random() * 100)}`,
-                      details: `Details ${Math.floor(Math.random() * 1000)}`,
-                      retryCount: Math.floor(Math.random() * 5),
+                      error: `Error ${Math.floor(secureRandomFloat() * 100)}`,
+                      details: `Details ${Math.floor(secureRandomFloat() * 1000)}`,
+                      retryCount: Math.floor(secureRandomFloat() * 5),
                   }
                 : undefined,
     };
@@ -272,9 +273,9 @@ function generateMonitorData(
                 ? `https://example${monitorIndex}.com`
                 : undefined,
         config: {
-            timeout: Math.floor(Math.random() * 30_000) + 5000,
-            interval: Math.floor(Math.random() * 600_000) + 60_000,
-            retryAttempts: Math.floor(Math.random() * 5) + 1,
+            timeout: Math.floor(secureRandomFloat() * 30_000) + 5000,
+            interval: Math.floor(secureRandomFloat() * 600_000) + 60_000,
+            retryAttempts: Math.floor(secureRandomFloat() * 5) + 1,
             headers:
                 monitorIndex % 3 === 0
                     ? {
@@ -283,8 +284,8 @@ function generateMonitorData(
                       }
                     : undefined,
         },
-        status: Math.random() > 0.05 ? "up" : "down",
-        responseTime: Math.floor(Math.random() * 1000) + 10,
+        status: secureRandomFloat() > 0.05 ? "up" : "down",
+        responseTime: Math.floor(secureRandomFloat() * 1000) + 10,
         history,
     };
 }
@@ -321,22 +322,22 @@ function generateSiteData(
         monitors,
         history,
         metadata: {
-            createdAt: Date.now() - Math.random() * 86_400_000 * 30,
-            lastUpdated: Date.now() - Math.random() * 3_600_000,
+            createdAt: Date.now() - secureRandomFloat() * 86_400_000 * 30,
+            lastUpdated: Date.now() - secureRandomFloat() * 3_600_000,
             tags: [
-                `tag-${Math.floor(Math.random() * 10)}`,
-                `category-${Math.floor(Math.random() * 5)}`,
+                `tag-${Math.floor(secureRandomFloat() * 10)}`,
+                `category-${Math.floor(secureRandomFloat() * 5)}`,
             ],
             description: `Description for site ${siteIndex}`.repeat(
-                Math.floor(Math.random() * 10) + 1
+                Math.floor(secureRandomFloat() * 10) + 1
             ),
             configuration: {
-                alertThreshold: Math.floor(Math.random() * 60) + 30,
-                checkInterval: Math.floor(Math.random() * 600) + 60,
+                alertThreshold: Math.floor(secureRandomFloat() * 60) + 30,
+                checkInterval: Math.floor(secureRandomFloat() * 600) + 60,
                 notificationSettings: {
-                    email: Math.random() > 0.5,
-                    sms: Math.random() > 0.7,
-                    webhook: Math.random() > 0.8,
+                    email: secureRandomFloat() > 0.5,
+                    sms: secureRandomFloat() > 0.7,
+                    webhook: secureRandomFloat() > 0.8,
                 },
             },
         },
@@ -358,7 +359,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
 
                 // Access patterns
                 for (let i = 0; i < 200; i++) {
-                    const key = `site-${Math.floor(Math.random() * 100)}`;
+                    const key = `site-${Math.floor(secureRandomFloat() * 100)}`;
                     cache.get(key);
 
                     if (i % 10 === 0) {
@@ -380,7 +381,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     objects.push({
                         id: `obj-${i}`,
                         timestamp: Date.now(),
-                        data: Array.from({ length: 100 }).fill(Math.random()),
+                        data: Array.from({ length: 100 }).fill(secureRandomFloat()),
                         metadata: {
                             created: Date.now(),
                             type: "small-object",
@@ -392,9 +393,9 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 // Access and modify objects
                 for (let i = 0; i < 500; i++) {
                     const obj =
-                        objects[Math.floor(Math.random() * objects.length)];
-                    obj.data[Math.floor(Math.random() * obj.data.length)] =
-                        Math.random();
+                        objects[Math.floor(secureRandomFloat() * objects.length)];
+                    obj.data[Math.floor(secureRandomFloat() * obj.data.length)] =
+                        secureRandomFloat();
                     obj.metadata.lastAccessed = Date.now();
                 }
             },
@@ -439,8 +440,8 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 // Simulate realistic access patterns
                 for (let i = 0; i < 2000; i++) {
                     // 80% access existing items
-                    if (Math.random() < 0.8) {
-                        const key = `site-${Math.floor(Math.random() * 1000)}`;
+                    if (secureRandomFloat() < 0.8) {
+                        const key = `site-${Math.floor(secureRandomFloat() * 1000)}`;
                         const data = cache.get(key);
                         if (data) {
                             // Simulate data modification
@@ -558,7 +559,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
 
                 // Heavy access patterns
                 for (let i = 0; i < 10_000; i++) {
-                    const key = `site-${Math.floor(Math.random() * 5000)}`;
+                    const key = `site-${Math.floor(secureRandomFloat() * 5000)}`;
                     cache.get(key);
                 }
             },
@@ -578,15 +579,15 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                             .fill(null)
                             .map(() => ({
                                 timestamp: Date.now(),
-                                value: Math.random(),
+                                value: secureRandomFloat(),
                                 metadata: {
-                                    index: Math.floor(Math.random() * 1000),
-                                    category: `category-${Math.floor(Math.random() * 10)}`,
+                                    index: Math.floor(secureRandomFloat() * 1000),
+                                    category: `category-${Math.floor(secureRandomFloat() * 10)}`,
                                     tags: Array.from({ length: 5 })
                                         .fill(null)
                                         .map(
                                             () =>
-                                                `tag-${Math.floor(Math.random() * 100)}`
+                                                `tag-${Math.floor(secureRandomFloat() * 100)}`
                                         ),
                                 },
                             })),
@@ -653,14 +654,14 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     const obj = {
                         id: i,
-                        data: Array.from({ length: 100 }).fill(Math.random()),
+                        data: Array.from({ length: 100 }).fill(secureRandomFloat()),
                         parent: null as any,
                         children: [] as any[],
                     };
 
                     if (i > 0) {
                         const parent =
-                            objects[Math.floor(Math.random() * objects.length)];
+                            objects[Math.floor(secureRandomFloat() * objects.length)];
                         obj.parent = parent;
                         parent.children.push(obj);
                     }
@@ -686,7 +687,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
 
                 // Create objects
                 for (let i = 0; i < 1000; i++) {
-                    const obj = { id: i, data: Math.random() };
+                    const obj = { id: i, data: secureRandomFloat() };
                     objects.push(obj);
 
                     // Store in both maps
@@ -703,7 +704,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 // Access patterns
                 for (let i = 0; i < 2000; i++) {
                     const obj =
-                        objects[Math.floor(Math.random() * objects.length)];
+                        objects[Math.floor(secureRandomFloat() * objects.length)];
                     regularMap.get(obj);
                     weakMap.get(obj);
                 }
@@ -735,7 +736,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
 
                     const listener = () => {
                         // Simulate event handling
-                        Math.random();
+                        secureRandomFloat();
                     };
 
                     target.addEventListener(listener);
@@ -759,7 +760,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     // Allocate temporary objects
                     const temp = {
-                        data: Array.from({ length: 1000 }).fill(Math.random()),
+                        data: Array.from({ length: 1000 }).fill(secureRandomFloat()),
                         created: Date.now(),
                         id: i,
                     };
@@ -785,13 +786,13 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                         const obj = pool.pop();
                         // Reset object
                         obj.data = Array.from({ length: 100 }).fill(
-                            Math.random()
+                            secureRandomFloat()
                         );
                         obj.used = true;
                         return obj;
                     }
                     return {
-                        data: Array.from({ length: 100 }).fill(Math.random()),
+                        data: Array.from({ length: 100 }).fill(secureRandomFloat()),
                         used: true,
                         pooled: true,
                     };
@@ -811,7 +812,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     // Simulate usage
                     obj.data.sort();
 
-                    if (Math.random() > 0.3) {
+                    if (secureRandomFloat() > 0.3) {
                         returnToPool(obj);
                     }
                 }
@@ -827,7 +828,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 10_000; i++) {
                     smallObjects.push({
                         id: i,
-                        value: Math.random(),
+                        value: secureRandomFloat(),
                         timestamp: Date.now(),
                     });
                 }
@@ -841,7 +842,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                             .fill(null)
                             .map((_, j) => ({
                                 index: j,
-                                value: Math.random(),
+                                value: secureRandomFloat(),
                                 timestamp: Date.now(),
                             })),
                     });

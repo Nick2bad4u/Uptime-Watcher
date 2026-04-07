@@ -18,6 +18,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { arrayJoin } from "ts-extras";
 
 import type { IMonitorService, MonitorServiceConfig } from "./types";
 
@@ -195,7 +196,7 @@ export function getMonitorWithResult(
 ): MonitorServiceResult {
     // Validate monitor type using registry
     if (!isValidMonitorType(type)) {
-        const availableTypes = getRegisteredMonitorTypes().join(", ");
+        const availableTypes = arrayJoin(getRegisteredMonitorTypes(), ", ");
         throw new Error(
             `Unsupported monitor type: ${type}. Available types: ${availableTypes}`
         );
@@ -204,7 +205,7 @@ export function getMonitorWithResult(
     // Get factory from registry
     const factory = getMonitorServiceFactory(type);
     if (!factory) {
-        const availableTypes = getRegisteredMonitorTypes().join(", ");
+        const availableTypes = arrayJoin(getRegisteredMonitorTypes(), ", ");
         throw new Error(
             `Monitor type '${type}' is registered in the type registry but no service factory is available. ` +
                 `This indicates a configuration mismatch. Available types: ${availableTypes}`

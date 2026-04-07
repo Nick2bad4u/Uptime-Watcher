@@ -13,6 +13,7 @@ import { test, fc } from "@fast-check/vitest";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useAddSiteForm } from "../../components/SiteDetails/useAddSiteForm";
 import type { MonitorType } from "@shared/types";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock the useMonitorFields hook
 const mockGetFields = vi.fn();
@@ -1352,7 +1353,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 const { result } = renderHook(() => useAddSiteForm());
 
                 // Generate appropriate test data for the monitor type
-                const testName = `Test Site ${Math.random().toString(36).slice(2, 8)}`;
+                const testName = `Test Site ${secureRandomFloat().toString(36).slice(2, 8)}`;
                 let testUrl = "";
                 let testHost = "";
                 let testPort = "";

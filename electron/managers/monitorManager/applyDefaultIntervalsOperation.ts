@@ -15,6 +15,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isEmpty } from "ts-extras";
 
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
@@ -68,7 +69,7 @@ export async function applyDefaultIntervalsOperation(args: {
             Boolean(monitor.id) && shouldApplyDefaultInterval(monitor)
     );
 
-    if (monitorsNeedingRemediation.length === 0) {
+    if (isEmpty(monitorsNeedingRemediation)) {
         dependencies.logger.debug(
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,

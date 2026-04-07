@@ -27,6 +27,7 @@ import {
     NotificationService,
     type NotificationConfig,
 } from "../../electron/services/notifications/NotificationService";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock Electron's Notification API for benchmarking
 vi.mock("electron", () => ({
@@ -136,7 +137,7 @@ class EnhancedAlertSystem {
                     "status_change",
                 ][i % 3] as any,
                 conditions: {
-                    threshold: Math.random() * 1000,
+                    threshold: secureRandomFloat() * 1000,
                     timeWindow: 300_000,
                 },
                 severity: [
@@ -145,7 +146,7 @@ class EnhancedAlertSystem {
                     "high",
                     "critical",
                 ][i % 4] as any,
-                isEnabled: Math.random() > 0.1,
+                isEnabled: secureRandomFloat() > 0.1,
             };
             this.rules.set(rule.id, rule);
         }
@@ -155,9 +156,9 @@ class EnhancedAlertSystem {
             const monitorId = `monitor-${i}`;
             const data = Array.from({ length: 100 }, (_, j) => ({
                 timestamp: Date.now() - j * 60_000,
-                responseTime: Math.random() * 2000,
-                status: Math.random() > 0.1 ? "online" : "offline",
-                success: Math.random() > 0.05,
+                responseTime: secureRandomFloat() * 2000,
+                status: secureRandomFloat() > 0.1 ? "online" : "offline",
+                success: secureRandomFloat() > 0.05,
             }));
             this.monitorData.set(monitorId, data);
         }
@@ -191,12 +192,12 @@ class EnhancedAlertSystem {
         monitorId: string
     ): Promise<Alert | null> {
         // Optimized evaluation for benchmarking
-        const shouldTrigger = Math.random() > 0.9; // 10% chance to trigger
+        const shouldTrigger = secureRandomFloat() > 0.9; // 10% chance to trigger
 
         if (!shouldTrigger) return null;
 
         const alert: Alert = {
-            id: `alert-${Date.now()}-${Math.random()}`,
+            id: `alert-${Date.now()}-${secureRandomFloat()}`,
             ruleId: rule.id,
             monitorId,
             severity: rule.severity,

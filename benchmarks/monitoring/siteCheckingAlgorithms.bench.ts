@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for Site Checking
 interface SiteCheckRequest {
@@ -642,7 +643,7 @@ class MockSiteChecker {
         const baseDelay = strategy.baseDelay;
         const backoffDelay =
             baseDelay * strategy.backoffMultiplier ** (attempt - 1);
-        const jitter = Math.random() * strategy.jitterFactor * backoffDelay;
+        const jitter = secureRandomFloat() * strategy.jitterFactor * backoffDelay;
 
         return Math.min(backoffDelay + jitter, strategy.maxDelay);
     }
@@ -862,12 +863,12 @@ interface SiteCheckerInstance {
 
 class NetworkSimulator {
     async resolve(url: string): Promise<string> {
-        await this.delay(10 + Math.random() * 50); // DNS lookup time
+        await this.delay(10 + secureRandomFloat() * 50); // DNS lookup time
         return "192.168.1.100"; // Mock IP
     }
 
     async establishConnection(ip: string, timeout: number): Promise<void> {
-        const connectionTime = 20 + Math.random() * 100;
+        const connectionTime = 20 + secureRandomFloat() * 100;
         if (connectionTime > timeout) {
             throw new Error("Connection timeout");
         }
@@ -875,15 +876,15 @@ class NetworkSimulator {
     }
 
     async performTLSHandshake(ip: string): Promise<void> {
-        await this.delay(50 + Math.random() * 150); // TLS handshake time
+        await this.delay(50 + secureRandomFloat() * 150); // TLS handshake time
     }
 
     async performHttpRequest(request: SiteCheckRequest): Promise<any> {
-        const responseTime = 100 + Math.random() * 500;
+        const responseTime = 100 + secureRandomFloat() * 500;
         await this.delay(responseTime);
 
         // Simulate various response scenarios
-        const scenario = Math.random();
+        const scenario = secureRandomFloat();
 
         if (scenario < 0.85) {
             // Success response
@@ -929,7 +930,7 @@ class NetworkSimulator {
 
     simulateConnectionSetup(domain: string): number {
         // Simulate connection setup overhead
-        return 50 + Math.random() * 100;
+        return 50 + secureRandomFloat() * 100;
     }
 
     private async delay(ms: number): Promise<void> {
@@ -943,10 +944,10 @@ class MockDNSResolver {
 
         // Simulate DNS lookup time based on domain
         const lookupTime = domain.includes("fast")
-            ? 5 + Math.random() * 10
+            ? 5 + secureRandomFloat() * 10
             : domain.includes("slow")
-              ? 100 + Math.random() * 200
-              : 20 + Math.random() * 80;
+              ? 100 + secureRandomFloat() * 200
+              : 20 + secureRandomFloat() * 80;
 
         await this.delay(lookupTime);
 
@@ -955,7 +956,7 @@ class MockDNSResolver {
             throw new Error(`DNS resolution failed for ${domain}`);
         }
 
-        return `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        return `192.168.${Math.floor(secureRandomFloat() * 255)}.${Math.floor(secureRandomFloat() * 255)}`;
     }
 
     private async delay(ms: number): Promise<void> {
@@ -965,7 +966,7 @@ class MockDNSResolver {
 
 class MockSSLValidator {
     async validateCertificates(url: string): Promise<CertificateInfo[]> {
-        await this.delay(20 + Math.random() * 30);
+        await this.delay(20 + secureRandomFloat() * 30);
 
         const domain = new URL(url).hostname;
         const now = new Date();
@@ -1225,8 +1226,8 @@ describe("Site Checking Algorithms Performance", () => {
                         `category${index % 4}`,
                     ],
                     category: "api",
-                    averageResponseTime: 300 + Math.random() * 400,
-                    successRate: 0.92 + Math.random() * 0.07,
+                    averageResponseTime: 300 + secureRandomFloat() * 400,
+                    successRate: 0.92 + secureRandomFloat() * 0.07,
                     alertThresholds: {
                         responseTime: 1500,
                         downtime: 15_000,
@@ -1354,7 +1355,7 @@ describe("Site Checking Algorithms Performance", () => {
                         siteName: `${domain} Page ${i}`,
                         tags: [`optimized`, domain.split(".")[0]],
                         category: "web",
-                        averageResponseTime: 200 + Math.random() * 300,
+                        averageResponseTime: 200 + secureRandomFloat() * 300,
                         successRate: 0.98,
                         alertThresholds: {
                             responseTime: 1000,
@@ -1420,7 +1421,7 @@ describe("Site Checking Algorithms Performance", () => {
                         `tier${Math.floor(index / 5)}`,
                     ],
                     category: "service",
-                    averageResponseTime: 150 + Math.random() * 200,
+                    averageResponseTime: 150 + secureRandomFloat() * 200,
                     successRate: 0.995,
                     alertThresholds: {
                         responseTime: 1000,

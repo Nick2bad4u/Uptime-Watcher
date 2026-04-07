@@ -46,6 +46,7 @@ import {
     type ReactNode,
     useMemo,
 } from "react";
+import { arrayJoin, safeCastTo  } from "ts-extras";
 
 import type { BadgeSize, BadgeVariant } from "./types";
 
@@ -115,7 +116,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
                 borderRadius: currentTheme.borderRadius.full,
                 cursor: "default",
                 display: "inline-flex",
-                fontFamily: currentTheme.typography.fontFamily.sans.join(", "),
+                fontFamily: arrayJoin(currentTheme.typography.fontFamily.sans, ", "),
                 fontWeight: currentTheme.typography.fontWeight.medium,
                 gap: currentTheme.spacing.xs,
                 justifyContent: "center",
@@ -180,7 +181,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
             // Type-safe style lookup with fallbacks for custom values
             const getSizeStyle = (sizeKey: BadgeSize): CSSProperties => {
                 if (sizeKey in sizeStyles) {
-                    return sizeStyles[sizeKey as keyof typeof sizeStyles];
+                    return sizeStyles[safeCastTo<keyof typeof sizeStyles>(sizeKey)];
                 }
                 return sizeStyles.md;
             };
@@ -190,7 +191,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
             ): CSSProperties => {
                 if (variantKey in variantStyles) {
                     return variantStyles[
-                        variantKey as keyof typeof variantStyles
+                        safeCastTo<keyof typeof variantStyles>(variantKey)
                     ];
                 }
                 return variantStyles.primary;

@@ -4,7 +4,7 @@
  */
 
 import type { IpcResponse as SharedIpcResponse } from "@shared/types/ipc";
-import type { Promisable } from "type-fest";
+import type { Promisable, UnknownArray  } from "type-fest";
 
 /**
  * Canonical IPC response shape used by Electron IPC handlers.
@@ -19,7 +19,7 @@ export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
  * @public
  */
 export interface IpcHandlerConfig<
-    TParams extends readonly unknown[] = readonly unknown[],
+    TParams extends Readonly<UnknownArray> = Readonly<UnknownArray>,
     TResult = unknown,
 > {
     /** Channel name for the IPC handler */
@@ -45,7 +45,7 @@ export interface IpcHandlerConfig<
  * execution.
  */
 export type IpcParameterValidator = (
-    params: readonly unknown[]
+    params: Readonly<UnknownArray>
 ) => null | string[];
 
 /**

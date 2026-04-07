@@ -5,6 +5,8 @@
 
 import type { EventMetadata } from "@shared/types/events";
 
+import { safeCastTo } from "ts-extras";
+
 /**
  * Determines whether the provided value conforms to {@link EventMetadata}.
  *
@@ -15,7 +17,7 @@ export function isEventMetadata(value: unknown): value is EventMetadata {
         return false;
     }
 
-    const candidate = value as Partial<EventMetadata>;
+    const candidate = safeCastTo(value);
 
     return (
         typeof candidate.busId === "string" &&

@@ -8,6 +8,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { Dropbox, DropboxResponseError } from "dropbox";
+import { objectValues } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -139,7 +140,7 @@ function hasTag(
         return true;
     }
 
-    for (const next of Object.values(record)) {
+    for (const next of objectValues(record)) {
         let hasMatchingTag = false;
 
         if (Array.isArray(next)) {

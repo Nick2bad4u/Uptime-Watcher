@@ -5,6 +5,7 @@ import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview"
 import type { StoreApi, UseBoundStore } from "zustand";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { arrayFind, arrayJoin  } from "ts-extras";
 import { create } from "zustand";
 
 import { CloudService } from "../../services/CloudService";
@@ -358,7 +359,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudToast({
                         message:
                             messageParts.length > 0
-                                ? messageParts.join(" • ")
+                                ? arrayJoin(messageParts, " • ")
                                 : undefined,
                         title,
                         variant: "success",
@@ -367,7 +368,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     void dispatchSystemNotificationIfEnabled({
                         body:
                             messageParts.length > 0
-                                ? messageParts.join(" • ")
+                                ? arrayJoin(messageParts, " • ")
                                 : undefined,
                         title,
                     });
@@ -509,7 +510,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     enqueueCloudToast({
                         message:
                             messageParts.length > 0
-                                ? messageParts.join(" • ")
+                                ? arrayJoin(messageParts, " • ")
                                 : undefined,
                         title: "Remote sync reset",
                         variant: "success",
@@ -518,7 +519,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     void dispatchSystemNotificationIfEnabled({
                         body:
                             messageParts.length > 0
-                                ? messageParts.join(" • ")
+                                ? arrayJoin(messageParts, " • ")
                                 : undefined,
                         title: "Remote sync reset",
                     });
@@ -541,7 +542,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 set({ restoringBackupKey: key });
 
                 try {
-                    const entryName = get().backups.find((backup) => backup.key === key)?.fileName ?? key;
+                    const entryName = arrayFind(get().backups, (backup) => backup.key === key)?.fileName ?? key;
 
                     const startedToastId = enqueueCloudOperationStartedToast({
                         message: `Restoring ${entryName}`,

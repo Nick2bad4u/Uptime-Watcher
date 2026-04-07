@@ -1,6 +1,7 @@
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { stringSplit } from "ts-extras";
 
 /**
  * Default maximum size budget for provider object keys.
@@ -84,7 +85,7 @@ function collapseConsecutiveSlashes(value: string): string {
 }
 
 function assertNoTraversalSegments(value: string): void {
-    const segments = value.split("/");
+    const segments = stringSplit(value, "/");
     if (segments.some((segment) => segment === "." || segment === "..")) {
         throw new Error("Cloud key must not contain path traversal segments");
     }

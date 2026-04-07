@@ -9,6 +9,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface MigrationDefinition {
@@ -137,16 +138,16 @@ describe("Database Migration Operations Benchmarks", () => {
         for (let i = 0; i < 100; i++) {
             const scenario =
                 schemaMigrationTypes[
-                    Math.floor(Math.random() * schemaMigrationTypes.length)
+                    Math.floor(secureRandomFloat() * schemaMigrationTypes.length)
                 ];
             const dbSize =
-                databaseSizes[Math.floor(Math.random() * databaseSizes.length)];
+                databaseSizes[Math.floor(secureRandomFloat() * databaseSizes.length)];
 
             const operations: MigrationOperation[] =
                 scenario.operationTypes.map((opType, index) => ({
                     operationId: `op-${migrationCounter}-${index}`,
                     type: opType as MigrationOperation["type"],
-                    target: `table_${Math.floor(Math.random() * dbSize.tableCount)}`,
+                    target: `table_${Math.floor(secureRandomFloat() * dbSize.tableCount)}`,
                     sql: `-- ${opType} operation on ${dbSize.name} database`,
                     estimatedRows: Math.floor(
                         dbSize.totalRows / dbSize.tableCount
@@ -199,7 +200,7 @@ describe("Database Migration Operations Benchmarks", () => {
                 high: 0.8,
             }[migration.riskLevel];
 
-            const variance = (Math.random() - 0.5) * riskVariance;
+            const variance = (secureRandomFloat() - 0.5) * riskVariance;
             actualDuration *= 1 + variance;
 
             // Simulate operation-specific timing
@@ -239,7 +240,7 @@ describe("Database Migration Operations Benchmarks", () => {
                     high: 0.15,
                 }[migration.riskLevel];
 
-                if (Math.random() < failureRate) {
+                if (secureRandomFloat() < failureRate) {
                     success = false;
                     error = `${operation.type} operation failed on ${operation.target}`;
                     break;
@@ -276,7 +277,7 @@ describe("Database Migration Operations Benchmarks", () => {
             migrationExecutions.push(execution);
 
             // Add time gap between migrations
-            currentTime += Math.random() * 5000 + 1000; // 1-6 seconds
+            currentTime += secureRandomFloat() * 5000 + 1000; // 1-6 seconds
         }
 
         // Calculate schema migration metrics
@@ -378,13 +379,13 @@ describe("Database Migration Operations Benchmarks", () => {
         for (let i = 0; i < 80; i++) {
             const scenario =
                 dataMigrationScenarios[
-                    Math.floor(Math.random() * dataMigrationScenarios.length)
+                    Math.floor(secureRandomFloat() * dataMigrationScenarios.length)
                 ];
             const dbSize =
-                databaseSizes[Math.floor(Math.random() * databaseSizes.length)];
+                databaseSizes[Math.floor(secureRandomFloat() * databaseSizes.length)];
 
             const recordsToProcess = Math.floor(
-                dbSize.totalRows * (0.1 + Math.random() * 0.4)
+                dbSize.totalRows * (0.1 + secureRandomFloat() * 0.4)
             ); // 10-50% of data
             const batchCount = Math.ceil(recordsToProcess / scenario.batchSize);
 
@@ -392,7 +393,7 @@ describe("Database Migration Operations Benchmarks", () => {
                 (opType, index) => ({
                     operationId: `data-op-${migrationCounter}-${index}`,
                     type: opType as MigrationOperation["type"],
-                    target: `table_${Math.floor(Math.random() * dbSize.tableCount)}`,
+                    target: `table_${Math.floor(secureRandomFloat() * dbSize.tableCount)}`,
                     sql: `-- ${opType} operation processing ${recordsToProcess} records`,
                     estimatedRows: Math.floor(
                         recordsToProcess / scenario.operations.length
@@ -474,7 +475,7 @@ describe("Database Migration Operations Benchmarks", () => {
                     }
 
                     // Add variance
-                    const variance = (Math.random() - 0.5) * 0.4;
+                    const variance = (secureRandomFloat() - 0.5) * 0.4;
                     const actualBatchTime = baseBatchTime * (1 + variance);
 
                     // Simulate batch failure
@@ -484,7 +485,7 @@ describe("Database Migration Operations Benchmarks", () => {
                         high: 0.02,
                     }[migration.riskLevel];
 
-                    if (Math.random() < batchFailureRate) {
+                    if (secureRandomFloat() < batchFailureRate) {
                         success = false;
                         error = `Batch ${batch + 1} failed during ${operation.type}`;
                         break;
@@ -500,7 +501,7 @@ describe("Database Migration Operations Benchmarks", () => {
 
                     // Simulate memory pressure or lock contention
                     if (batch > 0 && batch % 10 === 0) {
-                        currentTime += Math.random() * 50; // 0-50ms pause every 10 batches
+                        currentTime += secureRandomFloat() * 50; // 0-50ms pause every 10 batches
                     }
                 }
 
@@ -534,7 +535,7 @@ describe("Database Migration Operations Benchmarks", () => {
             dataExecutions.push(execution);
 
             // Add cooldown time between data migrations
-            currentTime += Math.random() * 10_000 + 5000; // 5-15 seconds
+            currentTime += secureRandomFloat() * 10_000 + 5000; // 5-15 seconds
         }
 
         // Calculate data migration metrics
@@ -644,7 +645,7 @@ describe("Database Migration Operations Benchmarks", () => {
         for (let i = 0; i < 30; i++) {
             const scenario =
                 rollbackScenarios[
-                    Math.floor(Math.random() * rollbackScenarios.length)
+                    Math.floor(secureRandomFloat() * rollbackScenarios.length)
                 ];
 
             if (
@@ -695,10 +696,10 @@ describe("Database Migration Operations Benchmarks", () => {
                 migrationRollbackTime *= urgencyMultiplier;
 
                 // Add complexity based on migration type (simulated)
-                const migrationComplexity = Math.random();
+                const migrationComplexity = secureRandomFloat();
                 if (migrationComplexity > 0.8) {
                     migrationRollbackTime *= 3; // Complex migration
-                    dataLoss = Math.random() > 0.7; // 30% chance of data loss
+                    dataLoss = secureRandomFloat() > 0.7; // 30% chance of data loss
                 } else if (migrationComplexity > 0.6) {
                     migrationRollbackTime *= 2; // Medium complexity
                 }
@@ -712,7 +713,7 @@ describe("Database Migration Operations Benchmarks", () => {
                         critical: 0.25,
                     }[scenario.urgency] ?? 0.05;
 
-                if (Math.random() < rollbackFailureRate) {
+                if (secureRandomFloat() < rollbackFailureRate) {
                     success = false;
                     error = `Failed to rollback migration ${migrationToRollback}`;
 
@@ -770,7 +771,7 @@ describe("Database Migration Operations Benchmarks", () => {
             // Save state snapshot
             migrationHistory.push({ ...currentState });
 
-            currentTime = endTime + Math.random() * 30_000 + 10_000; // 10-40 seconds between rollbacks
+            currentTime = endTime + secureRandomFloat() * 30_000 + 10_000; // 10-40 seconds between rollbacks
         }
 
         // Calculate rollback metrics
@@ -854,7 +855,7 @@ describe("Database Migration Operations Benchmarks", () => {
 
         // Generate complex dependency scenarios
         for (let scenario = 0; scenario < 20; scenario++) {
-            const migrationCount = Math.floor(Math.random() * 20) + 10; // 10-30 migrations
+            const migrationCount = Math.floor(secureRandomFloat() * 20) + 10; // 10-30 migrations
             const migrations: MigrationDefinition[] = [];
 
             // Create base migrations
@@ -863,7 +864,7 @@ describe("Database Migration Operations Benchmarks", () => {
                     migrationId: `dep-migration-${scenario}-${i}`,
                     version: `${scenario}.0.${i}`,
                     name: `migration-${i}`,
-                    type: Math.random() > 0.5 ? "schema" : "data",
+                    type: secureRandomFloat() > 0.5 ? "schema" : "data",
                     operations: [
                         {
                             operationId: `op-${scenario}-${i}`,
@@ -872,12 +873,12 @@ describe("Database Migration Operations Benchmarks", () => {
                         },
                     ],
                     dependencies: [],
-                    rollbackSupported: Math.random() > 0.2,
-                    estimatedDuration: Math.random() * 10_000 + 2000, // 2-12 seconds
+                    rollbackSupported: secureRandomFloat() > 0.2,
+                    estimatedDuration: secureRandomFloat() * 10_000 + 2000, // 2-12 seconds
                     riskLevel:
-                        Math.random() > 0.7
+                        secureRandomFloat() > 0.7
                             ? "high"
-                            : Math.random() > 0.4
+                            : secureRandomFloat() > 0.4
                               ? "medium"
                               : "low",
                 };
@@ -890,13 +891,13 @@ describe("Database Migration Operations Benchmarks", () => {
                 const migration = migrations[i];
 
                 // Random dependency probability
-                if (Math.random() > 0.4) {
+                if (secureRandomFloat() > 0.4) {
                     // 60% chance of having dependencies
                     const dependencyCount =
-                        Math.floor(Math.random() * Math.min(3, i)) + 1;
+                        Math.floor(secureRandomFloat() * Math.min(3, i)) + 1;
 
                     for (let d = 0; d < dependencyCount; d++) {
-                        const depIndex = Math.floor(Math.random() * i);
+                        const depIndex = Math.floor(secureRandomFloat() * i);
                         const depMigration = migrations[depIndex];
 
                         if (

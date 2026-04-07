@@ -12,6 +12,8 @@
  * @public
  */
 
+import { arrayAt } from "ts-extras";
+
 import type { CHART_TIME_PERIODS } from "../constants";
 
 import { UiDefaults } from "./fallbacks";
@@ -69,7 +71,7 @@ function formatRoundedDuration(
     milliseconds: number,
     units: readonly DurationUnitDefinition[]
 ): string {
-    const fallbackUnit = units.at(-1);
+    const fallbackUnit = arrayAt(units, -1);
 
     if (!fallbackUnit) {
         throw new Error(

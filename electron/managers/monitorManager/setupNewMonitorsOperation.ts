@@ -14,6 +14,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isEmpty } from "ts-extras";
 
 import { logger } from "../../utils/logger";
 
@@ -46,7 +47,7 @@ export async function setupNewMonitorsOperation(args: {
         (monitor) => monitor.id && newMonitorIds.includes(monitor.id)
     );
 
-    if (newMonitors.length === 0) {
+    if (isEmpty(newMonitors)) {
         logger.debug(
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,

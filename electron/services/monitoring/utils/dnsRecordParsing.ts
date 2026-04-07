@@ -11,6 +11,8 @@
  */
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { arrayFirst, arrayJoin, isEmpty   } from "ts-extras";
+
 
 /** Parsed/normalized DNS record data for display and verification. */
 export interface ParsedDnsRecords {
@@ -57,7 +59,7 @@ const parseAddressRecords = (
     const actualValues = result.filter(isString);
     return {
         actualValues,
-        details: `${recordType} records: ${actualValues.join(", ")}`,
+        details: `${recordType} records: ${arrayJoin(actualValues, ", ")}`,
         hasRecords: actualValues.length > 0,
         skipExpectedValueCheck: false,
     };
@@ -114,7 +116,7 @@ const parseCaaRecords = (result: unknown): ParsedDnsRecords => {
 };
 
 const parseCnameRecords = (result: unknown): ParsedDnsRecords => {
-    if (!Array.isArray(result) || result.length === 0) {
+    if (!Array.isArray(result) || isEmpty(result)) {
         return {
             actualValues: [],
             details: "No CNAME records found",
@@ -128,7 +130,7 @@ const parseCnameRecords = (result: unknown): ParsedDnsRecords => {
         actualValues,
         details:
             actualValues.length > 0
-                ? `CNAME record: ${actualValues[0]}`
+                ? `CNAME record: ${arrayFirst(actualValues)}`
                 : "No CNAME records found",
         hasRecords: actualValues.length > 0,
         skipExpectedValueCheck: false,
@@ -157,9 +159,8 @@ const parseMxRecords = (result: unknown): ParsedDnsRecords => {
         return [];
     });
 
-    const formattedRecords = mxRecords
-        .map((record) => `${record.priority} ${record.exchange}`)
-        .join(", ");
+    const formattedRecords = arrayJoin(mxRecords
+        .map((record) => `${record.priority} ${record.exchange}`), ", ");
 
     const actualValues = mxRecords.map((record) => record.exchange);
     return {
@@ -196,12 +197,11 @@ const parseNaptrRecords = (result: unknown): ParsedDnsRecords => {
     const actualValues = naptr.map((record) => record.replacement);
     return {
         actualValues,
-        details: `NAPTR records: ${naptr
+        details: `NAPTR records: ${arrayJoin(naptr
             .map(
                 (record) =>
                     `${record.flags} ${record.service} ${record.replacement}`
-            )
-            .join(", ")}`,
+            ), ", ")}`,
         hasRecords: actualValues.length > 0,
         skipExpectedValueCheck: false,
     };
@@ -267,12 +267,11 @@ const parseSrvRecords = (result: unknown): ParsedDnsRecords => {
         return [];
     });
 
-    const formattedRecords = srvRecords
+    const formattedRecords = arrayJoin(srvRecords
         .map(
             (record) =>
                 `${record.priority} ${record.weight} ${record.port} ${record.name}`
-        )
-        .join(", ");
+        ), ", ");
 
     const actualValues = srvRecords.map((record) => record.name);
     return {
@@ -342,7 +341,7 @@ const parseTxtRecords = (result: unknown): ParsedDnsRecords => {
     const flatRecords = txtRecords.flatMap((entry) => entry.filter(isString));
     return {
         actualValues: flatRecords,
-        details: `TXT records: ${flatRecords.join(", ")}`,
+        details: `TXT records: ${arrayJoin(flatRecords, ", ")}`,
         hasRecords: flatRecords.length > 0,
         skipExpectedValueCheck: false,
     };

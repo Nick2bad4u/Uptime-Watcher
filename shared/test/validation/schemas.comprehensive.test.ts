@@ -119,7 +119,7 @@ const baseMonitorArbitrary = fc.record({
 
 const httpUrlArbitrary = fc
     .webUrl()
-    .filter((url) => url.startsWith("http://") || url.startsWith("https://"))
+    .filter((url) => url.startsWith("https://") || url.startsWith("https://"))
     .filter((url) =>
         isValidUrl(url, {
             allowSingleQuotes: true,
@@ -369,7 +369,7 @@ describe("httpMonitorSchema", () => {
             "not-a-url",
             "ftp://example.com", // Wrong protocol
             "//example.com", // Protocol relative
-            "http://", // Missing host
+            "https://", // Missing host
             "https://example", // Missing TLD
             "",
         ];

@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Synthetic representation of an API request handled by the benchmark harness.
@@ -459,7 +460,7 @@ class MockApiKeyRepository {
 
     /** Generates a pseudo-random API key string. */
     private generateKey(): string {
-        return `ak_${Math.random().toString(36).slice(2, 15)}${Math.random().toString(36).slice(2, 15)}`;
+        return `ak_${secureRandomFloat().toString(36).slice(2, 15)}${secureRandomFloat().toString(36).slice(2, 15)}`;
     }
 
     /**

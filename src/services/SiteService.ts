@@ -16,6 +16,7 @@ import {
     validateSiteSnapshot,
     validateSiteSnapshots,
 } from "@shared/validation/guards";
+import { arrayJoin, isEmpty  } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -182,7 +183,7 @@ export const SiteService: SiteServiceContract = {
             )
         ).toSorted((a, b) => a - b);
 
-        if (issues.length === 0) {
+        if (isEmpty(issues)) {
             throw new ApplicationError({
                 cause: validationResult.error,
                 code: "RENDERER_SERVICE_INVALID_PAYLOAD",
@@ -210,9 +211,9 @@ export const SiteService: SiteServiceContract = {
                 issues,
             },
             message:
-                invalidIndices.length === 0
+                isEmpty(invalidIndices)
                     ? "[SiteService] getSites returned invalid site snapshot data"
-                    : `[SiteService] getSites returned invalid site snapshot data (indices: ${invalidIndices.join(", ")})`,
+                    : `[SiteService] getSites returned invalid site snapshot data (indices: ${arrayJoin(invalidIndices, ", ")})`,
         });
     }),
 

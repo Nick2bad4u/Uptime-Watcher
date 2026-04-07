@@ -1,6 +1,7 @@
 import type { StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { arrayJoin, safeCastTo  } from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 
@@ -53,7 +54,7 @@ const pruneRecentStatusAlertFingerprints = (now: number): void => {
 };
 
 const createStatusAlertFingerprint = (update: StatusUpdate): string =>
-    [
+    arrayJoin([
         normalizeStatusAlertKeySegment(update.siteIdentifier),
         normalizeStatusAlertKeySegment(update.monitorId),
         normalizeStatusAlertKeySegment(update.timestamp),
@@ -61,7 +62,7 @@ const createStatusAlertFingerprint = (update: StatusUpdate): string =>
         normalizeStatusAlertKeySegment(
             update.previousStatus ?? STATUS_ALERT_UNKNOWN_SEGMENT
         ),
-    ].join("|");
+    ], "|");
 
 const isDuplicateStatusAlertUpdate = (update: StatusUpdate): boolean => {
     const now = Date.now();
@@ -111,9 +112,7 @@ const ensureAudioContext = (): AudioContext | null => {
         return audioContextRef.current;
     }
 
-    const globalObject = globalThis as typeof globalThis & {
-        webkitAudioContext?: typeof AudioContext;
-    };
+    const globalObject = safeCastTo(globalThis);
 
     let context: AudioContext | null = null;
 

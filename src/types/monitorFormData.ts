@@ -22,6 +22,7 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
+import { isInteger, safeCastTo  } from "ts-extras";
 
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
@@ -529,7 +530,7 @@ export function isHttpStatusFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
         typeof data.expectedStatusCode === "number" &&
-        Number.isInteger(data.expectedStatusCode) &&
+        isInteger(data.expectedStatusCode) &&
         data.expectedStatusCode >= 100 &&
         data.expectedStatusCode <= 599
     );
@@ -569,7 +570,7 @@ export function isHttpLatencyFormData(
 export function isDnsFormData(
     data: Partial<MonitorFormData>
 ): data is DnsFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (safeCastTo(data)).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -593,7 +594,7 @@ export function isDnsFormData(
 export function isPingFormData(
     data: Partial<MonitorFormData>
 ): data is PingFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (safeCastTo(data)).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -615,7 +616,7 @@ export function isPingFormData(
 export function isPortFormData(
     data: Partial<MonitorFormData>
 ): data is PortFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (safeCastTo(data)).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -639,7 +640,7 @@ export function isPortFormData(
 export function isSslFormData(
     data: Partial<MonitorFormData>
 ): data is SslFormData {
-    const hostCandidate: unknown = (data as UnknownRecord)["host"];
+    const hostCandidate: unknown = (safeCastTo(data)).host;
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -786,7 +787,7 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
         return false;
     }
 
-    const formData = data as Partial<MonitorFormData>;
+    const formData = safeCastTo(data);
 
     if (!validateMonitorType(formData.type)) {
         return false;
@@ -796,12 +797,12 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
 
     // Use type-safe access with proper typing
     const validator = (
-        FORM_DATA_VALIDATORS as Partial<
+        safeCastTo<Partial<
             Record<
                 MonitorType,
                 ((data: Partial<MonitorFormData>) => boolean) | undefined
             >
-        >
+        >>(FORM_DATA_VALIDATORS)
     )[monitorType];
     if (!validator) {
         return false;

@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface WindowState {
@@ -132,7 +133,7 @@ describe("Window Service Benchmarks", () => {
 
         for (let i = 0; i < 200; i++) {
             const windowType =
-                windowTypes[Math.floor(Math.random() * windowTypes.length)];
+                windowTypes[Math.floor(secureRandomFloat() * windowTypes.length)];
 
             // Create window configuration based on type
             const config: WindowConfig = {
@@ -148,8 +149,8 @@ describe("Window Service Benchmarks", () => {
                         : windowType === "settings"
                           ? 600
                           : 400,
-                x: Math.floor(Math.random() * 500),
-                y: Math.floor(Math.random() * 300),
+                x: Math.floor(secureRandomFloat() * 500),
+                y: Math.floor(secureRandomFloat() * 300),
                 minWidth: 400,
                 minHeight: 300,
                 resizable: windowType !== "splash",
@@ -172,7 +173,7 @@ describe("Window Service Benchmarks", () => {
                 backgroundColor: "#ffffff",
                 hasShadow: windowType !== "splash",
                 opacity: windowType === "splash" ? 0.95 : 1,
-                darkTheme: Math.random() > 0.5,
+                darkTheme: secureRandomFloat() > 0.5,
                 transparent: windowType === "splash",
                 type: "normal",
                 titleBarStyle: "default",
@@ -194,12 +195,12 @@ describe("Window Service Benchmarks", () => {
             };
 
             // Simulate window creation timing
-            const creationTime = Math.random() * 50 + 10; // 10-60ms
-            const initializationTime = Math.random() * 100 + 20; // 20-120ms
+            const creationTime = secureRandomFloat() * 50 + 10; // 10-60ms
+            const initializationTime = secureRandomFloat() * 100 + 20; // 20-120ms
             const renderTime =
                 windowType === "main"
-                    ? Math.random() * 200 + 50
-                    : Math.random() * 100 + 25; // Varies by complexity
+                    ? secureRandomFloat() * 200 + 50
+                    : secureRandomFloat() * 100 + 25; // Varies by complexity
 
             const task: WindowCreationTask = {
                 windowId: `window-${i}`,
@@ -209,7 +210,7 @@ describe("Window Service Benchmarks", () => {
                 initializationTime,
                 renderTime,
                 totalTime: creationTime + initializationTime + renderTime,
-                success: Math.random() > 0.02, // 98% success rate
+                success: secureRandomFloat() > 0.02, // 98% success rate
             };
 
             creationTasks.push(task);
@@ -237,32 +238,32 @@ describe("Window Service Benchmarks", () => {
 
         const windows: WindowState[] = Array.from({ length: 50 }, (_, i) => ({
             id: `window-${i}`,
-            isVisible: Math.random() > 0.2,
-            isMinimized: Math.random() > 0.8,
-            isMaximized: Math.random() > 0.7,
-            isFullScreen: Math.random() > 0.9,
+            isVisible: secureRandomFloat() > 0.2,
+            isMinimized: secureRandomFloat() > 0.8,
+            isMaximized: secureRandomFloat() > 0.7,
+            isFullScreen: secureRandomFloat() > 0.9,
             isFocused: i === 0, // Only first window is focused initially
             bounds: {
-                x: Math.floor(Math.random() * 1000),
-                y: Math.floor(Math.random() * 600),
-                width: Math.floor(Math.random() * 800) + 400,
-                height: Math.floor(Math.random() * 600) + 300,
+                x: Math.floor(secureRandomFloat() * 1000),
+                y: Math.floor(secureRandomFloat() * 600),
+                width: Math.floor(secureRandomFloat() * 800) + 400,
+                height: Math.floor(secureRandomFloat() * 600) + 300,
             },
             title: `Window ${i}`,
             webContents: {
-                isLoading: Math.random() > 0.8,
-                canGoBack: Math.random() > 0.5,
-                canGoForward: Math.random() > 0.7,
+                isLoading: secureRandomFloat() > 0.8,
+                canGoBack: secureRandomFloat() > 0.5,
+                canGoForward: secureRandomFloat() > 0.7,
             },
         }));
 
         const transitions: StateTransition[] = [];
 
         for (let i = 0; i < 500; i++) {
-            const window = windows[Math.floor(Math.random() * windows.length)];
+            const window = windows[Math.floor(secureRandomFloat() * windows.length)];
             const operation =
                 operationTypes[
-                    Math.floor(Math.random() * operationTypes.length)
+                    Math.floor(secureRandomFloat() * operationTypes.length)
                 ];
 
             const fromState = { ...window };
@@ -310,7 +311,7 @@ describe("Window Service Benchmarks", () => {
             }
 
             // Simulate transition timing
-            const transitionTime = Math.random() * 20 + 5; // 5-25ms
+            const transitionTime = secureRandomFloat() * 20 + 5; // 5-25ms
 
             const transition: StateTransition = {
                 windowId: window.id,
@@ -318,7 +319,7 @@ describe("Window Service Benchmarks", () => {
                 toState,
                 operation,
                 transitionTime,
-                success: Math.random() > 0.01, // 99% success rate
+                success: secureRandomFloat() > 0.01, // 99% success rate
             };
 
             transitions.push(transition);
@@ -345,11 +346,11 @@ describe("Window Service Benchmarks", () => {
         const activeWindows = Array.from({ length: 25 }, (_, i) => ({
             id: `focus-window-${i}`,
             zIndex: i,
-            canFocus: Math.random() > 0.1,
-            isModal: Math.random() > 0.8,
+            canFocus: secureRandomFloat() > 0.1,
+            isModal: secureRandomFloat() > 0.8,
             parent:
-                Math.random() > 0.7
-                    ? `focus-window-${Math.floor(Math.random() * i)}`
+                secureRandomFloat() > 0.7
+                    ? `focus-window-${Math.floor(secureRandomFloat() * i)}`
                     : undefined,
         }));
 
@@ -365,13 +366,13 @@ describe("Window Service Benchmarks", () => {
                 "deactivate",
             ];
             const eventType =
-                eventTypes[Math.floor(Math.random() * eventTypes.length)];
+                eventTypes[Math.floor(secureRandomFloat() * eventTypes.length)];
 
             const targetWindow =
-                activeWindows[Math.floor(Math.random() * activeWindows.length)];
+                activeWindows[Math.floor(secureRandomFloat() * activeWindows.length)];
 
             // Simulate focus event processing
-            const propagationTime = Math.random() * 10 + 2; // 2-12ms
+            const propagationTime = secureRandomFloat() * 10 + 2; // 2-12ms
 
             let fromWindow: string | undefined;
             let toWindow: string | undefined;
@@ -380,7 +381,7 @@ describe("Window Service Benchmarks", () => {
                 toWindow = targetWindow.id;
                 // Find currently focused window
                 const currentlyFocused = activeWindows.find(
-                    (w) => Math.random() > 0.5
+                    (w) => secureRandomFloat() > 0.5
                 );
                 fromWindow = currentlyFocused?.id;
             } else if (eventType === "blur" || eventType === "focus-lost") {
@@ -394,7 +395,7 @@ describe("Window Service Benchmarks", () => {
                 fromWindow,
                 toWindow,
                 propagationTime,
-                preventDefault: Math.random() > 0.9, // 10% of events are prevented
+                preventDefault: secureRandomFloat() > 0.9, // 10% of events are prevented
             };
 
             focusEvents.push(focusEvent);
@@ -430,9 +431,9 @@ describe("Window Service Benchmarks", () => {
 
         const windowPool = Array.from({ length: 30 }, (_, i) => ({
             id: `coord-window-${i}`,
-            type: windowTypes[Math.floor(Math.random() * windowTypes.length)],
-            isActive: Math.random() > 0.2,
-            priority: Math.floor(Math.random() * 5) + 1,
+            type: windowTypes[Math.floor(secureRandomFloat() * windowTypes.length)],
+            isActive: secureRandomFloat() > 0.2,
+            priority: Math.floor(secureRandomFloat() * 5) + 1,
         }));
 
         const coordinationTasks: CoordinationTask[] = [];
@@ -451,7 +452,7 @@ describe("Window Service Benchmarks", () => {
         for (let i = 0; i < 150; i++) {
             const coordinationType =
                 coordinationTypes[
-                    Math.floor(Math.random() * coordinationTypes.length)
+                    Math.floor(secureRandomFloat() * coordinationTypes.length)
                 ];
 
             // Determine affected windows based on coordination type
@@ -468,7 +469,7 @@ describe("Window Service Benchmarks", () => {
                 }
                 case "cascade_close": {
                     // Affects a chain of dependent windows
-                    const chainLength = Math.floor(Math.random() * 5) + 2;
+                    const chainLength = Math.floor(secureRandomFloat() * 5) + 2;
                     affectedWindows = windowPool
                         .slice(0, chainLength)
                         .map((w) => w.id);
@@ -477,8 +478,8 @@ describe("Window Service Benchmarks", () => {
                 case "focus_chain": {
                     // Affects a subset of focusable windows
                     affectedWindows = windowPool
-                        .filter(() => Math.random() > 0.5)
-                        .slice(0, Math.floor(Math.random() * 8) + 2)
+                        .filter(() => secureRandomFloat() > 0.5)
+                        .slice(0, Math.floor(secureRandomFloat() * 8) + 2)
                         .map((w) => w.id);
                     break;
                 }
@@ -491,9 +492,9 @@ describe("Window Service Benchmarks", () => {
                 }
                 default: {
                     // Random subset
-                    const subsetSize = Math.floor(Math.random() * 10) + 3;
+                    const subsetSize = Math.floor(secureRandomFloat() * 10) + 3;
                     affectedWindows = windowPool
-                        .toSorted(() => Math.random() - 0.5)
+                        .toSorted(() => secureRandomFloat() - 0.5)
                         .slice(0, subsetSize)
                         .map((w) => w.id);
                 }
@@ -513,11 +514,11 @@ describe("Window Service Benchmarks", () => {
             const executionTime =
                 baseTime +
                 affectedWindows.length * perWindowTime +
-                Math.random() * 10;
+                secureRandomFloat() * 10;
 
             // Synchronization overhead increases with window count
             const synchronizationOverhead =
-                affectedWindows.length * 0.5 + Math.random() * 3;
+                affectedWindows.length * 0.5 + secureRandomFloat() * 3;
 
             const task: CoordinationTask = {
                 taskId: `coord-task-${i}`,
@@ -525,7 +526,7 @@ describe("Window Service Benchmarks", () => {
                 affectedWindows,
                 coordinationType,
                 executionTime,
-                success: Math.random() > 0.03, // 97% success rate
+                success: secureRandomFloat() > 0.03, // 97% success rate
                 synchronizationOverhead,
             };
 
@@ -567,10 +568,10 @@ describe("Window Service Benchmarks", () => {
         const managedWindows = Array.from({ length: 40 }, (_, i) => ({
             id: `bounds-window-${i}`,
             currentBounds: {
-                x: Math.floor(Math.random() * 1000),
-                y: Math.floor(Math.random() * 600),
-                width: Math.floor(Math.random() * 800) + 400,
-                height: Math.floor(Math.random() * 600) + 300,
+                x: Math.floor(secureRandomFloat() * 1000),
+                y: Math.floor(secureRandomFloat() * 600),
+                width: Math.floor(secureRandomFloat() * 800) + 400,
+                height: Math.floor(secureRandomFloat() * 600) + 300,
             },
             constraints: {
                 minWidth: 300,
@@ -578,7 +579,7 @@ describe("Window Service Benchmarks", () => {
                 maxWidth: 1920,
                 maxHeight: 1080,
             },
-            resizable: Math.random() > 0.1,
+            resizable: secureRandomFloat() > 0.1,
         }));
 
         const boundsOperations: BoundsOperation[] = [];
@@ -595,11 +596,11 @@ describe("Window Service Benchmarks", () => {
         for (let i = 0; i < 400; i++) {
             const window =
                 managedWindows[
-                    Math.floor(Math.random() * managedWindows.length)
+                    Math.floor(secureRandomFloat() * managedWindows.length)
                 ];
             const operationType =
                 operationTypes[
-                    Math.floor(Math.random() * operationTypes.length)
+                    Math.floor(secureRandomFloat() * operationTypes.length)
                 ];
 
             const oldBounds = { ...window.currentBounds };
@@ -612,14 +613,14 @@ describe("Window Service Benchmarks", () => {
                         window.constraints.minWidth,
                         Math.min(
                             window.constraints.maxWidth,
-                            oldBounds.width + (Math.random() - 0.5) * 400
+                            oldBounds.width + (secureRandomFloat() - 0.5) * 400
                         )
                     );
                     newBounds.height = Math.max(
                         window.constraints.minHeight,
                         Math.min(
                             window.constraints.maxHeight,
-                            oldBounds.height + (Math.random() - 0.5) * 300
+                            oldBounds.height + (secureRandomFloat() - 0.5) * 300
                         )
                     );
                     break;
@@ -629,14 +630,14 @@ describe("Window Service Benchmarks", () => {
                         0,
                         Math.min(
                             1920 - oldBounds.width,
-                            oldBounds.x + (Math.random() - 0.5) * 200
+                            oldBounds.x + (secureRandomFloat() - 0.5) * 200
                         )
                     );
                     newBounds.y = Math.max(
                         0,
                         Math.min(
                             1080 - oldBounds.height,
-                            oldBounds.y + (Math.random() - 0.5) * 150
+                            oldBounds.y + (secureRandomFloat() - 0.5) * 150
                         )
                     );
                     break;
@@ -644,19 +645,19 @@ describe("Window Service Benchmarks", () => {
                 case "move_and_resize": {
                     newBounds.x = Math.max(
                         0,
-                        oldBounds.x + (Math.random() - 0.5) * 100
+                        oldBounds.x + (secureRandomFloat() - 0.5) * 100
                     );
                     newBounds.y = Math.max(
                         0,
-                        oldBounds.y + (Math.random() - 0.5) * 75
+                        oldBounds.y + (secureRandomFloat() - 0.5) * 75
                     );
                     newBounds.width = Math.max(
                         window.constraints.minWidth,
-                        oldBounds.width + (Math.random() - 0.5) * 200
+                        oldBounds.width + (secureRandomFloat() - 0.5) * 200
                     );
                     newBounds.height = Math.max(
                         window.constraints.minHeight,
-                        oldBounds.height + (Math.random() - 0.5) * 150
+                        oldBounds.height + (secureRandomFloat() - 0.5) * 150
                     );
                     break;
                 }
@@ -681,13 +682,13 @@ describe("Window Service Benchmarks", () => {
             }
 
             // Simulate operation timing
-            const validationTime = Math.random() * 2 + 1; // 1-3ms
+            const validationTime = secureRandomFloat() * 2 + 1; // 1-3ms
             const animationTime =
                 operationType.includes("move") ||
                 operationType.includes("resize")
-                    ? Math.random() * 200 + 50
+                    ? secureRandomFloat() * 200 + 50
                     : 0; // 50-250ms for animated operations
-            const applyTime = Math.random() * 5 + 2; // 2-7ms
+            const applyTime = secureRandomFloat() * 5 + 2; // 2-7ms
 
             const operation: BoundsOperation = {
                 windowId: window.id,
@@ -699,7 +700,7 @@ describe("Window Service Benchmarks", () => {
                 applyTime,
                 success:
                     window.resizable || !operationType.includes("resize")
-                        ? Math.random() > 0.01
+                        ? secureRandomFloat() > 0.01
                         : false,
             };
 
@@ -767,7 +768,7 @@ describe("Window Service Benchmarks", () => {
                 | undefined;
 
             // Determine event based on existing windows
-            if (lifecycleWindows.length === 0 || Math.random() < 0.3) {
+            if (lifecycleWindows.length === 0 || secureRandomFloat() < 0.3) {
                 // Create new window
                 event = "create";
                 windowId = `lifecycle-window-${i}`;
@@ -782,7 +783,7 @@ describe("Window Service Benchmarks", () => {
                 // Operate on existing window
                 window =
                     lifecycleWindows[
-                        Math.floor(Math.random() * lifecycleWindows.length)
+                        Math.floor(secureRandomFloat() * lifecycleWindows.length)
                     ];
                 windowId = window.id;
 
@@ -792,7 +793,7 @@ describe("Window Service Benchmarks", () => {
                 } else if (window.state === "destroyed") {
                     continue; // Skip destroyed windows
                 } else {
-                    event = events[Math.floor(Math.random() * events.length)];
+                    event = events[Math.floor(secureRandomFloat() * events.length)];
                 }
             }
 
@@ -804,8 +805,8 @@ describe("Window Service Benchmarks", () => {
 
             switch (event) {
                 case "create": {
-                    processingTime = Math.random() * 50 + 20; // 20-70ms
-                    resourcesAllocated = Math.floor(Math.random() * 100) + 50; // 50-150 units
+                    processingTime = secureRandomFloat() * 50 + 20; // 20-70ms
+                    resourcesAllocated = Math.floor(secureRandomFloat() * 100) + 50; // 50-150 units
                     memoryUsage += resourcesAllocated;
                     if (window) {
                         window.state = "created";
@@ -814,8 +815,8 @@ describe("Window Service Benchmarks", () => {
                     break;
                 }
                 case "show": {
-                    processingTime = Math.random() * 30 + 10; // 10-40ms
-                    resourcesAllocated = Math.floor(Math.random() * 20) + 10; // 10-30 units
+                    processingTime = secureRandomFloat() * 30 + 10; // 10-40ms
+                    resourcesAllocated = Math.floor(secureRandomFloat() * 20) + 10; // 10-30 units
                     memoryUsage += resourcesAllocated;
                     if (window) {
                         window.state = "visible";
@@ -824,8 +825,8 @@ describe("Window Service Benchmarks", () => {
                     break;
                 }
                 case "hide": {
-                    processingTime = Math.random() * 20 + 5; // 5-25ms
-                    resourcesFreed = Math.floor(Math.random() * 15) + 5; // 5-20 units
+                    processingTime = secureRandomFloat() * 20 + 5; // 5-25ms
+                    resourcesFreed = Math.floor(secureRandomFloat() * 15) + 5; // 5-20 units
                     memoryUsage = Math.max(0, memoryUsage - resourcesFreed);
                     if (window) {
                         window.state = "hidden";
@@ -835,7 +836,7 @@ describe("Window Service Benchmarks", () => {
                 }
                 case "close":
                 case "destroy": {
-                    processingTime = Math.random() * 40 + 15; // 15-55ms
+                    processingTime = secureRandomFloat() * 40 + 15; // 15-55ms
                     resourcesFreed = memoryUsage; // Free all resources
                     memoryUsage = 0;
                     if (window) {
@@ -845,9 +846,9 @@ describe("Window Service Benchmarks", () => {
                     break;
                 }
                 default: {
-                    processingTime = Math.random() * 15 + 3; // 3-18ms
+                    processingTime = secureRandomFloat() * 15 + 3; // 3-18ms
                     // Minor resource adjustments for other events
-                    const adjustment = (Math.random() - 0.5) * 10;
+                    const adjustment = (secureRandomFloat() - 0.5) * 10;
                     if (adjustment > 0) {
                         resourcesAllocated = adjustment;
                         memoryUsage += adjustment;

@@ -35,6 +35,7 @@ import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { arrayJoin, stringSplit  } from "ts-extras";
 
 import { logger } from "../services/logger";
 
@@ -515,16 +516,11 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
 
                 // Fallback: Generate a reasonable label from the monitor type
                 // Convert from camelCase/snake_case to Title Case
-                const titleCase = monitorType
+                const titleCase = arrayJoin(stringSplit(arrayJoin(stringSplit(monitorType
 
-                    .replaceAll(/[_-]/gu, " ") // Replace underscores and hyphens with spaces
-                    // Convert camelCase segments into spaced words without regex lookarounds.
-                    .split(" ")
-                    .map((segment) => splitCamelCase(segment))
-                    .join(" ")
-                    .split(" ")
-                    .map((word) => formatMonitorTypeSegment(word))
-                    .join(" ");
+                    .replaceAll(/[_-]/gu, " "), " ")
+                    .map((segment) => splitCamelCase(segment)), " "), " ")
+                    .map((word) => formatMonitorTypeSegment(word)), " ");
 
                 return `${titleCase} Monitor`;
             }

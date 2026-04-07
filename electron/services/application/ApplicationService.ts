@@ -58,6 +58,7 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 import { app } from "electron";
+import { arrayFind, arrayJoin, isEmpty, safeCastTo    } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type {
@@ -87,7 +88,7 @@ const hasCloseFunction = (
     typeof candidate === "object" &&
     candidate !== null &&
     "close" in candidate &&
-    typeof (candidate as { close?: unknown }).close === "function";
+    typeof (safeCastTo<{ close?: unknown }>(candidate)).close === "function";
 
 /**
  * High-level coordinator responsible for wiring Electron application lifecycle
@@ -138,7 +139,7 @@ export class ApplicationService {
     private readonly handleActivate = (): void => {
         logger.info(LOG_TEMPLATES.services.APPLICATION_ACTIVATED);
         const windowService = this.serviceContainer.getWindowService();
-        if (windowService.getAllWindows().length === 0) {
+        if (isEmpty(windowService.getAllWindows())) {
             logger.info(LOG_TEMPLATES.services.APPLICATION_CREATING_WINDOW);
             windowService.createMainWindow();
         }
@@ -216,9 +217,7 @@ export class ApplicationService {
             // future-compatible with async closure
             this.serviceContainer.getWindowService().closeMainWindow();
 
-            const databaseServiceEntry = services.find(
-                ({ name }) => name === "DatabaseService"
-            );
+            const databaseServiceEntry = arrayFind(services, ({ name }) => name === "DatabaseService");
 
             if (databaseServiceEntry) {
                 const serviceCandidate = databaseServiceEntry.service;
@@ -722,7 +721,7 @@ export class ApplicationService {
                         LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
                         {
                             identifier: payload.site.identifier,
-                            updatedFields: payload.updatedFields.join(", "),
+                            updatedFields: arrayJoin(payload.updatedFields, ", "),
                         }
                     );
                     this.emitRendererEvent(

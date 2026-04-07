@@ -9,6 +9,7 @@
 import type { MonitorType } from "@shared/types";
 
 import { type ComponentProps, type JSX, useMemo } from "react";
+import { safeCastTo } from "ts-extras";
 
 import { ThemedBadge } from "../../../../theme/components/ThemedBadge";
 import { ThemedCard } from "../../../../theme/components/ThemedCard";
@@ -101,7 +102,7 @@ export const AnalyticsKeyMetricsGrid = ({
         [DownIcon]
     );
 
-    const badgeVariant = progressVariant as BadgeVariant;
+    const badgeVariant = safeCastTo<BadgeVariant>(progressVariant);
 
     return (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

@@ -11,6 +11,7 @@ import {
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isValidPersistedDeviceId } from "@shared/validation/persistedDeviceIdValidation";
+import { objectEntries, objectKeys  } from "ts-extras";
 import * as z from "zod";
 
 export const CLOUD_SYNC_MANIFEST_VERSION = 1 as const;
@@ -90,7 +91,7 @@ export const cloudSyncManifestSchema: z.ZodType<CloudSyncManifest> =
 export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
     const parsed = cloudSyncManifestInternalSchema.parse(candidate);
 
-    const validEntries = Object.entries(parsed.devices).filter(([deviceId]) =>
+    const validEntries = objectEntries(parsed.devices).filter(([deviceId]) =>
         isValidPersistedDeviceId(deviceId)
     );
 
@@ -101,7 +102,7 @@ export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
                   .slice(0, MAX_MANIFEST_DEVICES)
             : validEntries;
 
-    if (limited.length === Object.keys(parsed.devices).length) {
+    if (limited.length === objectKeys(parsed.devices).length) {
         return parsed;
     }
 

@@ -15,6 +15,7 @@ import {
     createValidStatusHistory,
     createValidMonitors,
 } from "./testHelpers";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("testHelpers", () => {
     describe(createValidMonitor, () => {
@@ -502,7 +503,7 @@ describe("testHelpers", () => {
             // Create history for each monitor
             const histories = monitors.map(() =>
                 createValidStatusHistory({
-                    timestamp: Date.now() - Math.random() * 100_000,
+                    timestamp: Date.now() - secureRandomFloat() * 100_000,
                 })
             );
 

@@ -1,6 +1,7 @@
 import type { Monitor, MonitorType } from "@shared/types";
 
 import { validateMonitorType } from "@shared/utils/validation";
+import { objectKeys } from "ts-extras";
 
 /** Function that produces a human-readable suffix for monitor titles. */
 export type TitleSuffixFormatter = (monitor: Monitor) => string;
@@ -137,7 +138,7 @@ export function registerTitleSuffixFormatter(
  * Restores the formatter registry to the default state.
  */
 export function resetMonitorTitleSuffixFormatters(): void {
-    for (const key of Object.keys(monitorTitleSuffixFormatters)) {
+    for (const key of objectKeys(monitorTitleSuffixFormatters)) {
         if (isMonitorTypeKey(key)) {
             Reflect.deleteProperty(monitorTitleSuffixFormatters, key);
         }

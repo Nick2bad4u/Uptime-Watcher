@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for React Context system
 type ContextValue = Record<string, any>;
@@ -367,7 +368,7 @@ class MockReactContext {
 
     private simulateConsumerRender(consumer: ContextConsumer): number {
         // Base render work
-        let renderWork = Math.random() * 2;
+        let renderWork = secureRandomFloat() * 2;
 
         // Additional work based on value size
         renderWork += consumer.lastValue
@@ -376,7 +377,7 @@ class MockReactContext {
 
         // Additional work for selector computation
         if (consumer.selectorFunction) {
-            renderWork += Number(Math.random()) * 1;
+            renderWork += Number(secureRandomFloat()) * 1;
         }
 
         return renderWork;
@@ -549,7 +550,7 @@ class MockReactContext {
 
         Object.entries(value).forEach(([key, val]) => {
             // Simulate frequency analysis
-            if (Math.random() > 0.5) {
+            if (secureRandomFloat() > 0.5) {
                 highFreq[key] = val;
             } else {
                 lowFreq[key] = val;
@@ -618,9 +619,9 @@ class MockReactContext {
 
         this.selectorCache.forEach((cached, selectorId) => {
             // Simulate selector performance analysis
-            const executionCount = Math.floor(Math.random() * 100) + 1;
-            const totalExecutionTime = Math.random() * 50;
-            const cacheHitRate = Math.random() * 0.8 + 0.2; // 20-100%
+            const executionCount = Math.floor(secureRandomFloat() * 100) + 1;
+            const totalExecutionTime = secureRandomFloat() * 50;
+            const cacheHitRate = secureRandomFloat() * 0.8 + 0.2; // 20-100%
 
             selectorStats.push({
                 selectorId,
@@ -683,30 +684,30 @@ describe("React Context Performance", () => {
                         contextIndex,
                         data: Array.from({ length: 10 }, (_, i) => ({
                             id: i,
-                            value: Math.random() * 100,
+                            value: secureRandomFloat() * 100,
                             timestamp: Date.now(),
                         })),
                         settings: {
                             theme: ["light", "dark"][
-                                Math.floor(Math.random() * 2)
+                                Math.floor(secureRandomFloat() * 2)
                             ],
                             language: [
                                 "en",
                                 "es",
                                 "fr",
-                            ][Math.floor(Math.random() * 3)],
-                            notifications: Math.random() > 0.5,
+                            ][Math.floor(secureRandomFloat() * 3)],
+                            notifications: secureRandomFloat() > 0.5,
                         },
                         user: {
-                            id: Math.floor(Math.random() * 1000),
+                            id: Math.floor(secureRandomFloat() * 1000),
                             role: [
                                 "admin",
                                 "user",
                                 "guest",
-                            ][Math.floor(Math.random() * 3)],
+                            ][Math.floor(secureRandomFloat() * 3)],
                             permissions: Array.from(
                                 { length: 5 },
-                                () => Math.random() > 0.5
+                                () => secureRandomFloat() > 0.5
                             ),
                         },
                     };
@@ -732,13 +733,13 @@ describe("React Context Performance", () => {
                             "data",
                             "settings",
                             "user",
-                        ].filter(() => Math.random() > 0.3);
+                        ].filter(() => secureRandomFloat() > 0.3);
 
                         contextSystem.createConsumer(
                             contextId,
                             consumerComponent.id,
                             subscribedKeys,
-                            Math.random() > 0.5
+                            secureRandomFloat() > 0.5
                                 ? (value) => ({
                                       processedData: value.data?.slice(0, 5),
                                       isAdmin: value.user?.role === "admin",
@@ -770,22 +771,22 @@ describe("React Context Performance", () => {
                 name: `Context ${i}`,
                 data: Array.from({ length: 20 }, (_, j) => ({
                     id: j,
-                    value: Math.random() * 100,
+                    value: secureRandomFloat() * 100,
                     nested: {
                         deep: {
-                            value: Math.random(),
+                            value: secureRandomFloat(),
                             array: Array.from({ length: 5 }, () =>
-                                Math.random()
+                                secureRandomFloat()
                             ),
                         },
                     },
                 })),
                 metadata: {
                     created: Date.now(),
-                    version: Math.floor(Math.random() * 10),
+                    version: Math.floor(secureRandomFloat() * 10),
                     flags: Array.from(
                         { length: 10 },
-                        () => Math.random() > 0.5
+                        () => secureRandomFloat() > 0.5
                     ),
                 },
             };
@@ -812,7 +813,7 @@ describe("React Context Performance", () => {
                 settings: { notifications: true, language: "en" },
                 data: Array.from({ length: 15 }, (_, j) => ({
                     id: j,
-                    value: Math.random(),
+                    value: secureRandomFloat(),
                 })),
             };
 
@@ -827,7 +828,7 @@ describe("React Context Performance", () => {
         const consumers: string[] = [];
         for (let i = 0; i < 200; i++) {
             const contextId =
-                contextIds[Math.floor(Math.random() * contextIds.length)];
+                contextIds[Math.floor(secureRandomFloat() * contextIds.length)];
             const component = contextSystem.createComponent(`Component${i}`, 0);
 
             const subscribedKeys = [
@@ -835,13 +836,13 @@ describe("React Context Performance", () => {
                 "user",
                 "settings",
                 "data",
-            ].filter(() => Math.random() > 0.4);
+            ].filter(() => secureRandomFloat() > 0.4);
 
             const consumer = contextSystem.createConsumer(
                 contextId,
                 component.id,
                 subscribedKeys,
-                Math.random() > 0.6
+                secureRandomFloat() > 0.6
                     ? (value) => ({
                           userTheme: `${value.user?.role}-${value.theme?.primary}`,
                           hasNotifications: value.settings?.notifications,
@@ -892,7 +893,7 @@ describe("React Context Performance", () => {
         // Perform many small updates
         const updateResults: any[] = [];
         for (let i = 0; i < 300; i++) {
-            const updateType = Math.floor(Math.random() * 4);
+            const updateType = Math.floor(secureRandomFloat() * 4);
             let update: any;
 
             switch (updateType) {
@@ -907,7 +908,7 @@ describe("React Context Performance", () => {
                 case 2: {
                     update = {
                         user: {
-                            online: Math.random() > 0.5,
+                            online: secureRandomFloat() > 0.5,
                             lastActivity: Date.now(),
                         },
                     };
@@ -916,8 +917,8 @@ describe("React Context Performance", () => {
                 case 3: {
                     update = {
                         ui: {
-                            loading: Math.random() > 0.8,
-                            error: Math.random() > 0.9 ? "Error!" : null,
+                            loading: secureRandomFloat() > 0.8,
+                            error: secureRandomFloat() > 0.9 ? "Error!" : null,
                         },
                     };
                     break;
@@ -943,7 +944,7 @@ describe("React Context Performance", () => {
             items: Array.from({ length: 100 }, (_, i) => ({
                 id: i,
                 name: `Item ${i}`,
-                data: Array.from({ length: 10 }, () => Math.random()),
+                data: Array.from({ length: 10 }, () => secureRandomFloat()),
                 metadata: {
                     created: Date.now(),
                     updated: Date.now(),
@@ -1006,7 +1007,7 @@ describe("React Context Performance", () => {
             const bulkUpdate = {
                 items: largeContextValue.items.map((item) => ({
                     ...item,
-                    data: item.data.map(() => Math.random()),
+                    data: item.data.map(() => secureRandomFloat()),
                     metadata: {
                         ...item.metadata,
                         updated: Date.now(),
@@ -1019,11 +1020,11 @@ describe("React Context Performance", () => {
                         "all",
                         "category1",
                         "category2",
-                    ][Math.floor(Math.random() * 3)],
+                    ][Math.floor(secureRandomFloat() * 3)],
                 },
                 pagination: {
                     ...largeContextValue.pagination,
-                    page: Math.floor(Math.random() * 5) + 1,
+                    page: Math.floor(secureRandomFloat() * 5) + 1,
                 },
             };
 
@@ -1051,19 +1052,19 @@ describe("React Context Performance", () => {
                     "admin",
                     "user",
                     "guest",
-                ][Math.floor(Math.random() * 3)],
+                ][Math.floor(secureRandomFloat() * 3)],
                 permissions: Array.from(
                     { length: 10 },
-                    () => Math.random() > 0.5
+                    () => secureRandomFloat() > 0.5
                 ),
                 profile: {
                     avatar: `avatar${i}.jpg`,
                     bio: `Bio for user ${i}`,
                     preferences: {
-                        theme: ["light", "dark"][Math.floor(Math.random() * 2)],
+                        theme: ["light", "dark"][Math.floor(secureRandomFloat() * 2)],
                         notifications: Array.from(
                             { length: 5 },
-                            () => Math.random() > 0.5
+                            () => secureRandomFloat() > 0.5
                         ),
                     },
                 },
@@ -1072,8 +1073,8 @@ describe("React Context Performance", () => {
                 id: i,
                 name: `Team ${i}`,
                 members: Array.from(
-                    { length: Math.floor(Math.random() * 10) },
-                    () => Math.floor(Math.random() * 50)
+                    { length: Math.floor(secureRandomFloat() * 10) },
+                    () => Math.floor(secureRandomFloat() * 50)
                 ),
             })),
             projects: Array.from({ length: 20 }, (_, i) => ({
@@ -1083,10 +1084,10 @@ describe("React Context Performance", () => {
                     "active",
                     "completed",
                     "paused",
-                ][Math.floor(Math.random() * 3)],
+                ][Math.floor(secureRandomFloat() * 3)],
                 assignees: Array.from(
-                    { length: Math.floor(Math.random() * 5) },
-                    () => Math.floor(Math.random() * 50)
+                    { length: Math.floor(secureRandomFloat() * 5) },
+                    () => Math.floor(secureRandomFloat() * 50)
                 ),
             })),
         };
@@ -1104,7 +1105,7 @@ describe("React Context Performance", () => {
                 0
             );
 
-            const selectorComplexity = Math.floor(Math.random() * 4);
+            const selectorComplexity = Math.floor(secureRandomFloat() * 4);
             let selectorFunction: (value: any) => any = (value) => ({
                 default: true,
             });
@@ -1225,7 +1226,7 @@ describe("React Context Performance", () => {
                             ...user.profile.preferences,
                             notifications:
                                 user.profile.preferences.notifications.map(
-                                    () => Math.random() > 0.5
+                                    () => secureRandomFloat() > 0.5
                                 ),
                         },
                     },
@@ -1247,8 +1248,8 @@ describe("React Context Performance", () => {
             // Fast-changing data
             realTimeData: {
                 timestamp: Date.now(),
-                onlineUsers: Math.floor(Math.random() * 100),
-                systemLoad: Math.random(),
+                onlineUsers: Math.floor(secureRandomFloat() * 100),
+                systemLoad: secureRandomFloat(),
             },
 
             // Medium-changing data
@@ -1257,7 +1258,7 @@ describe("React Context Performance", () => {
                 sidebar: { collapsed: false, width: 250 },
                 notifications: Array.from({ length: 5 }, (_, i) => ({
                     id: i,
-                    read: Math.random() > 0.5,
+                    read: secureRandomFloat() > 0.5,
                     timestamp: Date.now(),
                 })),
             },
@@ -1272,7 +1273,7 @@ describe("React Context Performance", () => {
                 },
                 permissions: Array.from(
                     { length: 20 },
-                    () => Math.random() > 0.5
+                    () => secureRandomFloat() > 0.5
                 ),
             },
 
@@ -1396,7 +1397,7 @@ describe("React Context Performance", () => {
                 const updateData = {
                     timestamp: Date.now(),
                     userAction: `action-${cycle}-${contextId}`,
-                    data: Array.from({ length: 5 }, () => Math.random()),
+                    data: Array.from({ length: 5 }, () => secureRandomFloat()),
                 };
 
                 try {

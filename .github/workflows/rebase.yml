@@ -1,5 +1,7 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Automatic Rebase
+run-name: Automatic rebase
+
 on:
     issue_comment:
         types: [created]
@@ -13,6 +15,7 @@ jobs:
             pull-requests: read # for cirrus-actions/rebase to get info about PR
         name: Rebase
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         if: >-
             github.event.issue.pull_request != '' &&
             (

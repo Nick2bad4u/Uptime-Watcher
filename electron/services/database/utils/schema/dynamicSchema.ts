@@ -15,6 +15,7 @@ import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
+import { arrayFind, arrayJoin, safeCastTo   } from "ts-extras";
 
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
@@ -641,12 +642,11 @@ export function generateMonitorTableSchema(): string {
         updated_at INTEGER NOT NULL
     `;
 
-    const dynamicFields = generateDatabaseFieldDefinitions()
+    const dynamicFields = arrayJoin(generateDatabaseFieldDefinitions()
         .map((field) => {
             const escaped = escapeSqlIdentifier(field.columnName, "schema");
             return `        ${escaped} ${field.sqlType}${field.nullable ? "" : " NOT NULL"}`;
-        })
-        .join(",\n");
+        }), ",\n");
 
     return `CREATE TABLE IF NOT EXISTS monitors (
 ${staticFields}${dynamicFields ? `,\n${dynamicFields}` : ""}
@@ -693,7 +693,7 @@ export function generateSqlParameters(): SqlParameters {
     );
 
     const allColumns = [...staticColumns, ...dynamicColumns];
-    const placeholders = allColumns.map(() => "?").join(", ");
+    const placeholders = arrayJoin(allColumns.map(() => "?"), ", ");
 
     return { columns: allColumns, placeholders };
 }
@@ -781,9 +781,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     };
 
     // Dynamically map monitor type specific fields ONLY for the current monitor type
-    const monitorTypeConfig = getAllMonitorTypeConfigs().find(
-        (config) => config.type === monitor.type
-    );
+    const monitorTypeConfig = arrayFind(getAllMonitorTypeConfigs(), (config) => config.type === monitor.type);
 
     if (monitorTypeConfig) {
         // Create a mutable version for dynamic field assignment
@@ -795,7 +793,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         // Only add fields that are specifically defined for this monitor type
         for (const field of monitorTypeConfig.fields) {
             const columnName = toSnakeCase(field.name);
-            const value = row[columnName as keyof MonitorRow];
+            const value = row[safeCastTo<keyof MonitorRow>(columnName)];
 
             // Add field if value exists (dynamic fields from monitor type registry)
             if (value !== undefined) {

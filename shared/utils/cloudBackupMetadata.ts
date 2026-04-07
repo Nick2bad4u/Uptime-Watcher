@@ -4,6 +4,9 @@
 
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import { arrayAt, stringSplit  } from "ts-extras";
+
+
 /**
  * Sanitize a backup file name to a stable original-path value.
  *
@@ -17,8 +20,8 @@ export function deriveCloudBackupOriginalPath(fileName: string): string {
         return "backup.sqlite";
     }
 
-    const segments = trimmed.split(/[\\/]/u).filter(Boolean);
-    return segments.at(-1) ?? "backup.sqlite";
+    const segments = stringSplit(trimmed, /[\\/]/u).filter(Boolean);
+    return arrayAt(segments, -1) ?? "backup.sqlite";
 }
 
 /** Serialize backup metadata for storage in cloud provider sidecar files. */

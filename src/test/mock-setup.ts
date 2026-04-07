@@ -30,6 +30,7 @@ import type {
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
 import type { ElectronAPI } from "../types";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Deep-mock helper type for domain bridge objects.
@@ -530,7 +531,7 @@ const mockElectronAPI: DeepMocked<ElectronAPI> = {
                                   lastChecked: new Date(),
                                   responseTime: Math.max(
                                       10,
-                                      Math.round(Math.random() * 200)
+                                      Math.round(secureRandomFloat() * 200)
                                   ),
                                   status: "up",
                               }

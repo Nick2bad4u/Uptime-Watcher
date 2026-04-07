@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Precision Function Coverage Test
@@ -21,8 +22,8 @@ describe("Precision Function Coverage - Targeted Functions", () => {
 
         // Test random ID generation utility
         const generateRandomId = (): string =>
-            Math.random().toString(36).slice(2, 15) +
-            Math.random().toString(36).slice(2, 15);
+            secureRandomFloat().toString(36).slice(2, 15) +
+            secureRandomFloat().toString(36).slice(2, 15);
 
         const id1 = generateRandomId();
         const id2 = generateRandomId();

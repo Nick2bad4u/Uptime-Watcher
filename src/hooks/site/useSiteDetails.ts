@@ -22,6 +22,7 @@ import type { Monitor, Site } from "@shared/types";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { type ChangeEvent, useEffect, useState } from "react";
+import { arrayFind } from "ts-extras";
 
 import type { ChartTimeRange } from "../../constants";
 import type { SiteDetailsTab } from "../../stores/ui/types";
@@ -226,7 +227,7 @@ export function useSiteDetails({
     const requestConfirmation = useConfirmDialog();
 
     // Always call hooks first, use fallback for currentSite
-    const currentSite = sites.find((s) => s.identifier === site.identifier) ?? {
+    const currentSite = arrayFind(sites, (s) => s.identifier === site.identifier) ?? {
         identifier: site.identifier,
         monitoring: true, // Default to monitoring enabled
         monitors: [],

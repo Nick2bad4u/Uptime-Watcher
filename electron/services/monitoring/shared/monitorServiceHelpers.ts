@@ -11,6 +11,7 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
+import { stringSplit } from "ts-extras";
 
 import type { NormalizedMonitorConfig as NormalizedMonitorConfigType } from "../createMonitorConfig";
 import type { MonitorCheckResult } from "../types";
@@ -190,8 +191,7 @@ export function parseMonitorUrlList(value: string): string[] {
         return [];
     }
 
-    return value
-        .split(URL_LIST_SEPARATOR)
+    return stringSplit(value, URL_LIST_SEPARATOR)
         .map((entry) => entry.trim())
         .filter((entry) => entry.length > 0);
 }

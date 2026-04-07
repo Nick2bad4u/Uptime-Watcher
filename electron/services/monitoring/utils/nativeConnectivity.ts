@@ -40,8 +40,8 @@ const stripHttpScheme = (value: string): string => {
         return normalized.slice("https://".length);
     }
 
-    if (lower.startsWith("http://")) {
-        return normalized.slice("http://".length);
+    if (lower.startsWith("https://")) {
+        return normalized.slice("https://".length);
     }
 
     return normalized;

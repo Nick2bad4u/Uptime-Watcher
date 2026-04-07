@@ -15,6 +15,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { arrayFind } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -91,9 +92,8 @@ export async function checkSiteManuallyOperation(args: {
         return undefined;
     }
 
-    const firstMonitorId = site.monitors.find((monitor) =>
-        Boolean(monitor.id)
-    )?.id;
+    const firstMonitorId = arrayFind(site.monitors, (monitor) =>
+        Boolean(monitor.id))?.id;
     if (firstMonitorId) {
         return checkSiteManuallyOperation({
             dependencies,

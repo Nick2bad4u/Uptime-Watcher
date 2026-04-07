@@ -1,5 +1,6 @@
 import { createAbortError } from "@shared/utils/abortError";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
+import { isEmpty } from "ts-extras";
 
 import { calculateBackoffDelayMs } from "./backoff";
 
@@ -162,7 +163,7 @@ export function createCombinedAbortSignal(
     signals.push(...additionalSignals.filter(Boolean));
 
     // If no signals to combine, create a signal that never aborts
-    if (signals.length === 0) {
+    if (isEmpty(signals)) {
         return new AbortController().signal;
     }
 

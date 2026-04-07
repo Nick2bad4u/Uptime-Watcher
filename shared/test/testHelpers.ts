@@ -14,13 +14,93 @@ import type {
 } from "../types";
 
 /**
+ * Resolve the Web Crypto API used by shared test helpers.
+ *
+ * @returns Crypto implementation exposing `getRandomValues`.
+ */
+const getCryptoForTests = (): Crypto => {
+    if (typeof globalThis.crypto?.getRandomValues !== "function") {
+        throw new TypeError(
+            "Web Crypto getRandomValues is unavailable in the current test environment."
+        );
+    }
+
+    return globalThis.crypto;
+};
+
+/**
+ * Generate a cryptographically strong floating-point number in the range
+ * `[0, 1)`.
+ *
+ * @returns Secure pseudo-random floating-point number.
+ */
+export const secureRandomFloat = (): number => {
+    const values = new Uint32Array(1);
+
+    getCryptoForTests().getRandomValues(values);
+
+    return (values[0] ?? 0) / 0x1_00_00_00_00;
+};
+
+/**
+ * Generate a cryptographically strong integer in the range
+ * `[0, maxExclusive)`.
+ *
+ * @param maxExclusive - Exclusive upper bound.
+ *
+ * @returns Secure pseudo-random integer.
+ */
+export const secureRandomInt = (maxExclusive: number): number => {
+    if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
+        throw new RangeError(
+            "secureRandomInt requires a positive integer maxExclusive value."
+        );
+    }
+
+    return Math.floor(secureRandomFloat() * maxExclusive);
+};
+
+/**
+ * Generate a cryptographically strong boolean using the provided true
+ * probability.
+ *
+ * @param trueProbability - Probability of returning true in the range `[0, 1]`.
+ *
+ * @returns Secure pseudo-random boolean.
+ */
+export const secureRandomBoolean = (trueProbability = 0.5): boolean => {
+    if (!Number.isFinite(trueProbability)) {
+        throw new TypeError(
+            "secureRandomBoolean requires a finite probability value."
+        );
+    }
+
+    if (trueProbability < 0 || trueProbability > 1) {
+        throw new RangeError(
+            "secureRandomBoolean requires a probability between 0 and 1."
+        );
+    }
+
+    return secureRandomFloat() < trueProbability;
+};
+
+/**
  * Generates a stable monitor identifier matching the expected test format.
  *
  * @returns Monitor identifier in the form `test-monitor-XXXXXXXXX` where X is
  *   lowercase alphanumeric.
  */
 const generateMonitorIdentifier = (): string => {
-    const randomSegment = Math.random().toString(36).slice(2);
+    const values = new Uint8Array(6);
+
+    getCryptoForTests().getRandomValues(values);
+
+    const randomSegment = Array.from(
+        values,
+        (value) => value.toString(36).padStart(2, "0")
+    )
+        .join("")
+        .slice(0, 9);
     const normalizedSegment =
         randomSegment.length >= 9
             ? randomSegment.slice(0, 9)

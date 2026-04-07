@@ -12,6 +12,7 @@
  */
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
+import { safeCastTo } from "ts-extras";
 
 /**
  * Determines whether a value matches a supported monitor type.
@@ -19,6 +20,6 @@ import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 export function validateMonitorType(type: unknown): type is MonitorType {
     return (
         typeof type === "string" &&
-        (BASE_MONITOR_TYPES as readonly string[]).includes(type)
+        (safeCastTo<readonly string[]>(BASE_MONITOR_TYPES)).includes(type)
     );
 }

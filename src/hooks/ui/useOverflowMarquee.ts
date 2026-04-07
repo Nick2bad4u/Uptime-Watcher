@@ -14,6 +14,7 @@
  */
 
 import type { RefObject } from "react";
+import type { UnknownArray } from "type-fest";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 
@@ -202,7 +203,7 @@ export interface OverflowMarqueeOptions<ElementType extends HTMLElement> {
     /**
      * Optional dependency list that should trigger overflow re-evaluation.
      */
-    readonly dependencies?: readonly unknown[];
+    readonly dependencies?: Readonly<UnknownArray>;
     /**
      * Optional external ref to reuse instead of creating an internal one.
      */

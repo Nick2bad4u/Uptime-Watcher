@@ -1,11 +1,19 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Summarize new issues and pull requests
+name: Summarize New Issues And Pull Requests
+run-name: Summarize new issues and pull requests
 
 on:
     issues:
         types: [opened, edited]
     pull_request:
         types: [opened, edited, synchronize]
+    merge_group:
+        types:
+            - checks_requested
+
+concurrency:
+    group: summary-${{ github.ref || github.run_id }}
+    cancel-in-progress: false
 
 permissions:
     models: read
@@ -13,7 +21,9 @@ permissions:
 
 jobs:
     inference:
+        name: Summarize issues and pull requests
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         if: github.event_name == 'issues' || (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]')
         permissions:
             issues: write
@@ -23,6 +33,9 @@ jobs:
         concurrency:
             group: summary-${{ github.ref }}
             cancel-in-progress: false
+        defaults:
+            run:
+                shell: bash
 
         steps:
             - name: Harden the runner (Audit all outbound calls)

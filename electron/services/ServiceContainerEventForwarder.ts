@@ -12,6 +12,7 @@
 import type { EventMetadata } from "@shared/types/events";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeCastTo } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
 
@@ -94,10 +95,10 @@ export class ServiceContainerEventForwarder {
             "system:error",
         ] as const satisfies readonly UptimeEventName[];
 
-        const maybeTypedBus = managerEventBus as {
+        const maybeTypedBus = safeCastTo<{
             on?: TypedEventBus<UptimeEvents>["on"];
             onTyped?: TypedEventBus<UptimeEvents>["onTyped"];
-        };
+        }>(managerEventBus);
 
         if (typeof maybeTypedBus.onTyped === "function") {
             for (const eventName of eventsToForward) {
@@ -121,9 +122,9 @@ export class ServiceContainerEventForwarder {
         } else {
             for (const eventName of eventsToForward) {
                 const rawOn = (
-                    managerEventBus as {
+                    safeCastTo<{
                         on?: TypedEventBus<UptimeEvents>["on"];
-                    }
+                    }>(managerEventBus)
                 ).on;
 
                 if (typeof rawOn === "function") {
@@ -274,7 +275,7 @@ export class ServiceContainerEventForwarder {
             return undefined;
         }
 
-        const maybeMetadata = candidate as Partial<EventMetadata>;
+        const maybeMetadata = safeCastTo(candidate);
 
         if (
             typeof maybeMetadata.busId !== "string" ||

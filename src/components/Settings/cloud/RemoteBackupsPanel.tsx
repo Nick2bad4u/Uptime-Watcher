@@ -6,6 +6,7 @@ import {
     useCallback,
     useMemo,
 } from "react";
+import { isEmpty } from "ts-extras";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -91,7 +92,7 @@ export const RemoteBackupsPanel = ({
     );
 
     const content =
-        backups.length === 0 ? (
+        isEmpty(backups) ? (
             <ThemedText size="sm" variant="tertiary">
                 {connected
                     ? "No remote backups found."

@@ -20,6 +20,7 @@
 import type { Site } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
+import { arrayJoin } from "ts-extras";
 
 import type { SiteCardPresentation } from "../../../stores/ui/types";
 
@@ -159,7 +160,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
                 isStacked ? "site-card--stacked" : "gap-4",
                 isActiveCard ? "site-card--active" : "",
             ];
-            return classes.filter(Boolean).join(" ");
+            return arrayJoin(classes.filter(Boolean), " ");
         }, [isActiveCard, isStacked]);
 
         const metricsClassName = isStacked
@@ -329,9 +330,8 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         ) : null;
 
         const normalizedStatusLabel = statusLabel.toLowerCase();
-        const metricsSummary = siteMetrics
-            .map(({ label, value }) => `${label}: ${value}`)
-            .join(" | ");
+        const metricsSummary = arrayJoin(siteMetrics
+            .map(({ label, value }) => `${label}: ${value}`), " | ");
 
         const metricsSection = (
             <div

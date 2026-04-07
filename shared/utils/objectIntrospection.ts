@@ -10,9 +10,11 @@
  *
  * @public
  */
+import type { UnknownArray } from "type-fest";
+
 export function collectOwnPropertyValuesSafely(
     value: object
-): readonly unknown[] {
+): Readonly<UnknownArray> {
     if (Array.isArray(value)) {
         return value;
     }

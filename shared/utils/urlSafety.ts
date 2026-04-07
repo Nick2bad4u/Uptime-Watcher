@@ -13,6 +13,7 @@ import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { hasNestedHttpSchemeAfterFirstDelimiter } from "@shared/utils/urlSchemeValidation";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isValidUrl } from "@shared/validation/validatorUtils";
+import { arrayJoin, isInteger, stringSplit   } from "ts-extras";
 import validator from "validator";
 
 import { validateUrlStringCandidate } from "./urlCandidateValidation";
@@ -95,14 +96,12 @@ export type HttpUrlValidationResult =
     | HttpUrlRejectedResult;
 
 function getRedactedPathname(pathname: string): string {
-    return pathname
-        .split("/")
+    return arrayJoin(stringSplit(pathname, "/")
         .map((segment) =>
             segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
                 ? "[redacted]"
                 : segment
-        )
-        .join("/");
+        ), "/");
 }
 
 /**
@@ -324,7 +323,7 @@ function normalizeHttpUrlForExternalOpen(args: {
 function toIpvOctets(
     hostname: string
 ): [number, number, number, number] | null {
-    const parts = hostname.split(".");
+    const parts = stringSplit(hostname, ".");
     if (parts.length !== 4) {
         return null;
     }
@@ -338,7 +337,7 @@ function toIpvOctets(
     const octets = parts.map(Number);
     if (
         octets.some(
-            (value) => !Number.isInteger(value) || value < 0 || value > 255
+            (value) => !isInteger(value) || value < 0 || value > 255
         )
     ) {
         return null;
@@ -547,7 +546,7 @@ function parseIpvSixHextet(value: string): null | number {
     }
 
     const parsed = Number.parseInt(value, 16);
-    if (!Number.isInteger(parsed) || parsed < 0 || parsed > 0xff_ff) {
+    if (!isInteger(parsed) || parsed < 0 || parsed > 0xff_ff) {
         return null;
     }
 
@@ -570,7 +569,7 @@ function parseIpvFourFromMappedIpvSix(
         return toIpvOctets(mappedHostname);
     }
 
-    const parts = mappedHostname.split(":");
+    const parts = stringSplit(mappedHostname, ":");
     if (parts.length !== 2) {
         return null;
     }

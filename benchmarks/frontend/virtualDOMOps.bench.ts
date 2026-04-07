@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 interface VNode {
     type: string | Function;
@@ -302,7 +303,7 @@ function createComplexTree(depth: number, breadth: number): VNode {
             children: [
                 {
                     type: "text",
-                    props: { textContent: `Leaf ${Math.random()}` },
+                    props: { textContent: `Leaf ${secureRandomFloat()}` },
                     children: [],
                 },
             ],
@@ -318,7 +319,7 @@ function createComplexTree(depth: number, breadth: number): VNode {
         type: "div",
         props: {
             className: `level-${depth}`,
-            key: `level-${depth}-${Math.random()}`,
+            key: `level-${depth}-${secureRandomFloat()}`,
         },
         children,
     };
@@ -516,7 +517,7 @@ describe("Virtual DOM Operations Performance", () => {
                 id: `site-${i}`,
                 name: `Site ${i}`,
                 status: "online",
-                responseTime: Math.random() * 500,
+                responseTime: secureRandomFloat() * 500,
             }));
 
             vdom.render(createSiteList(initialSites));

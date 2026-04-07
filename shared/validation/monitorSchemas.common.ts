@@ -14,6 +14,7 @@ import type { BaseMonitorSchemaType } from "@shared/types/schemaTypes";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import { isEmpty, stringSplit  } from "ts-extras";
 import * as z from "zod";
 
 import { monitorIdSchema } from "./monitorFieldSchemas";
@@ -324,7 +325,7 @@ const isValidDotSeparatedPath = (
         return false;
     }
 
-    return trimmed.split(".").every((segment) => segment.length > 0);
+    return stringSplit(trimmed, ".").every((segment) => segment.length > 0);
 };
 
 const isValidJsonPath = (value: string): boolean =>
@@ -364,12 +365,11 @@ const edgeLocationListSchema = z
     .trim()
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
-        const entries = value
-            .split(/[\n\r,]+/u)
+        const entries = stringSplit(value, /[\n\r,]+/u)
             .map((entry) => entry.trim())
             .filter((entry) => entry.length > 0);
 
-        if (entries.length === 0) {
+        if (isEmpty(entries)) {
             return false;
         }
 

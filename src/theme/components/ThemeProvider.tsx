@@ -16,6 +16,7 @@ import {
     type ReactElement,
     type ReactNode,
 } from "react";
+import { isEmpty } from "ts-extras";
 
 import { useTheme } from "../useTheme";
 
@@ -56,7 +57,7 @@ const ThemeProviderComponent = ({
         isValidElement(child)
     );
 
-    if (validChildren.length === 0) {
+    if (isEmpty(validChildren)) {
         return null;
     }
 

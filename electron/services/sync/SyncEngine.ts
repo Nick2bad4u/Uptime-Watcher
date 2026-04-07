@@ -21,7 +21,7 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import { isDefined } from "ts-extras";
+import { arrayFind, isDefined, isSafeInteger, objectEntries, objectKeys, objectValues      } from "ts-extras";
 
 import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
@@ -172,7 +172,7 @@ export class SyncEngine {
             remoteManifest.devices[deviceId]?.compactedUpToOpId;
         if (
             typeof compactedUpToLocal === "number" &&
-            Number.isSafeInteger(compactedUpToLocal) &&
+            isSafeInteger(compactedUpToLocal) &&
             compactedUpToLocal >= -1
         ) {
             const minimumNext = compactedUpToLocal + 1;
@@ -301,7 +301,7 @@ export class SyncEngine {
             latestSnapshotKey: snapshotEntry.key,
         };
 
-        for (const [device, maxOpId] of Object.entries(maxOps)) {
+        for (const [device, maxOpId] of objectEntries(maxOps)) {
             const currentDevice = nextManifest.devices[device];
             const previousCompacted = currentDevice?.compactedUpToOpId ?? -1;
             nextManifest.devices[device] = {
@@ -373,8 +373,8 @@ export class SyncEngine {
             appliedRemoteOperations: remoteOps.length,
             emittedLocalOperations: localOps.length,
             mergedEntities:
-                Object.keys(sanitizedMergedState.site).length +
-                Object.keys(sanitizedMergedState.monitor).length,
+                objectKeys(sanitizedMergedState.site).length +
+                objectKeys(sanitizedMergedState.monitor).length,
             snapshotKey: snapshotEntry.key,
         };
     }
@@ -391,7 +391,7 @@ export class SyncEngine {
             state.settings
         );
 
-        const desiredSiteIdentifiers = new Set(Object.keys(desiredSites));
+        const desiredSiteIdentifiers = new Set(objectKeys(desiredSites));
 
         await this.applySettings(existingSettings, desiredSettings);
 
@@ -402,12 +402,12 @@ export class SyncEngine {
 
         const desiredSitesWithMonitors: Record<string, Site> = {};
 
-        for (const [identifier, siteConfig] of Object.entries(desiredSites)) {
+        for (const [identifier, siteConfig] of objectEntries(desiredSites)) {
             const existingMonitors =
                 currentSitesMap.get(identifier)?.monitors ?? [];
 
             const mergedMonitors: Monitor[] = [];
-            for (const monitorConfig of Object.values(desiredMonitors)) {
+            for (const monitorConfig of objectValues(desiredMonitors)) {
                 if (monitorConfig.siteIdentifier === identifier) {
                     const merged = this.mergeMonitorConfig(
                         existingMonitors,
@@ -426,7 +426,7 @@ export class SyncEngine {
         }
 
         /* eslint-disable no-await-in-loop -- Site lifecycle changes must be applied sequentially to avoid overlapping monitor start/stop operations */
-        for (const [identifier, site] of Object.entries(
+        for (const [identifier, site] of objectEntries(
             desiredSitesWithMonitors
         )) {
             const existing = currentSitesMap.get(identifier);
@@ -485,20 +485,20 @@ export class SyncEngine {
         desired: CloudSyncSettingsConfig
     ): Promise<void> {
         const existingFiltered: Record<string, string> = {};
-        for (const [key, value] of Object.entries(existing)) {
+        for (const [key, value] of objectEntries(existing)) {
             if (shouldSyncSettingKey(key)) {
                 existingFiltered[key] = value;
             }
         }
 
         /* eslint-disable no-await-in-loop -- Settings writes should be applied sequentially to avoid concurrent transactions */
-        for (const [key, value] of Object.entries(desired)) {
+        for (const [key, value] of objectEntries(desired)) {
             if (existingFiltered[key] !== value) {
                 await this.settings.set(key, value);
             }
         }
 
-        for (const key of Object.keys(existingFiltered)) {
+        for (const key of objectKeys(existingFiltered)) {
             if (!(key in desired)) {
                 await this.settings.delete(key);
             }
@@ -680,7 +680,7 @@ export class SyncEngine {
 
         const mergedValidMonitorsById = new Map<string, Monitor>();
 
-        for (const [monitorId, monitorConfig] of Object.entries(
+        for (const [monitorId, monitorConfig] of objectEntries(
             desiredMonitors
         )) {
             const { siteIdentifier } = monitorConfig;
@@ -725,7 +725,7 @@ export class SyncEngine {
         }
 
         const monitorIdsBySite = new Map<string, string[]>();
-        for (const [monitorId, monitorConfig] of Object.entries(
+        for (const [monitorId, monitorConfig] of objectEntries(
             desiredMonitors
         )) {
             const { siteIdentifier } = monitorConfig;
@@ -742,7 +742,7 @@ export class SyncEngine {
         const keepSiteIds = new Set<string>();
         const keepMonitorIds = new Set<string>();
 
-        for (const [siteId, siteConfig] of Object.entries(desiredSites)) {
+        for (const [siteId, siteConfig] of objectEntries(desiredSites)) {
             const monitorIds = monitorIdsBySite.get(siteId) ?? [];
             const monitors = monitorIds
                 .map((monitorId) => mergedValidMonitorsById.get(monitorId))
@@ -777,14 +777,14 @@ export class SyncEngine {
         }
 
         const nextSite: Record<string, CloudSyncEntityState> = {};
-        for (const [siteId, entity] of Object.entries(state.site)) {
+        for (const [siteId, entity] of objectEntries(state.site)) {
             if (entity.deleted !== undefined || keepSiteIds.has(siteId)) {
                 nextSite[siteId] = entity;
             }
         }
 
         const nextMonitor: Record<string, CloudSyncEntityState> = {};
-        for (const [monitorId, entity] of Object.entries(state.monitor)) {
+        for (const [monitorId, entity] of objectEntries(state.monitor)) {
             if (entity.deleted !== undefined || keepMonitorIds.has(monitorId)) {
                 nextMonitor[monitorId] = entity;
             }
@@ -801,7 +801,7 @@ export class SyncEngine {
         existingMonitors: Monitor[],
         config: CloudSyncMonitorConfig
     ): Monitor {
-        const existing = existingMonitors.find((m) => m.id === config.id);
+        const existing = arrayFind(existingMonitors, (m) => m.id === config.id);
 
         // `siteIdentifier` is a cloud-sync routing field (monitors are stored
         // inside their parent site locally). It must never be passed into the

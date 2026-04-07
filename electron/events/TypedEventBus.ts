@@ -29,7 +29,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { Promisable, Simplify } from "type-fest";
+import type { Primitive, Promisable, Simplify  } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import {
@@ -39,6 +39,7 @@ import {
 import { isObject } from "@shared/utils/typeGuards";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { EventEmitter } from "node:events";
+import { isEmpty } from "ts-extras";
 
 import type {
     ArrayPayload as InternalArrayPayload,
@@ -135,13 +136,7 @@ type ArrayPayload = InternalArrayPayload;
  * Primitive payload supported by the event bus.
  */
 type PrimitivePayload =
-    | bigint
-    | boolean
-    | null
-    | number
-    | string
-    | symbol
-    | undefined;
+    Primitive;
 
 /**
  * Non-array object payload shape used to distinguish plain objects from arrays.
@@ -403,7 +398,7 @@ export class TypedEventBus<
         data: EventMap[K],
         correlationId: string
     ): Promise<void> {
-        if (this.middlewares.length === 0) {
+        if (isEmpty(this.middlewares)) {
             return;
         }
 
@@ -660,7 +655,7 @@ export class TypedEventBus<
      */
     public removeMiddleware(middleware: EventMiddleware<EventMap>): boolean {
         const executors = this.middlewareExecutors.get(middleware);
-        if (!executors || executors.length === 0) {
+        if (!executors || isEmpty(executors)) {
             return false;
         }
 
@@ -675,7 +670,7 @@ export class TypedEventBus<
         }
 
         this.middlewares.splice(index, 1);
-        if (executors.length === 0) {
+        if (isEmpty(executors)) {
             this.middlewareExecutors.delete(middleware);
         }
 

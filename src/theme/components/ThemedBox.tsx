@@ -25,6 +25,7 @@ import {
     type NamedExoticComponent,
     type ReactElement,
 } from "react";
+import { arrayJoin } from "ts-extras";
 
 import type {
     BoxElement,
@@ -227,7 +228,7 @@ const ThemedBoxComponent = ({
     variant = "primary",
     ...restProps
 }: ThemedBoxProperties): ReactElement => {
-    const classNames = [
+    const classNames = arrayJoin([
         CSS_CLASSES.THEMED_BOX,
         `themed-box--background-${variant}`,
         `themed-box--surface-${surface}`,
@@ -237,8 +238,7 @@ const ThemedBoxComponent = ({
         border && "themed-box--border",
         className,
     ]
-        .filter(Boolean)
-        .join(" ");
+        .filter(Boolean), " ");
 
     const isInteractive = Boolean(onClick);
 

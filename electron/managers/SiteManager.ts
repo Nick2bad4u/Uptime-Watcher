@@ -57,6 +57,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { arrayFind, objectKeys  } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -551,9 +552,7 @@ export class SiteManager {
         const siteSnapshot =
             await this.getSiteSnapshotForMutation(siteIdentifier);
 
-        const monitorToRemove = siteSnapshot.monitors.find(
-            (monitor) => monitor.id === monitorId
-        );
+        const monitorToRemove = arrayFind(siteSnapshot.monitors, (monitor) => monitor.id === monitorId);
 
         if (!monitorToRemove) {
             throw new Error(
@@ -679,7 +678,7 @@ export class SiteManager {
             previousSite: originalSite,
             site: refreshedSite,
             timestamp,
-            updatedFields: Object.keys(updates),
+            updatedFields: objectKeys(updates),
         });
 
         return refreshedSite;

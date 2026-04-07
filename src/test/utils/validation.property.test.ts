@@ -55,6 +55,7 @@ import { validateMonitorType } from "@shared/utils/validation";
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 
 import type { MonitorType } from "@shared/types";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("Validation Utils Property-Based Tests", () => {
     describe("isNonEmptyString function", () => {
@@ -420,7 +421,7 @@ describe("Validation Utils Property-Based Tests", () => {
             fc.oneof(
                 fc.constantFrom(
                     "https://example.com",
-                    "http://test.org",
+                    "https://test.org",
                     "https://subdomain.example.com/path",
                     "http://localhost:8080",
                     "https://127.0.0.1:443"
@@ -813,7 +814,7 @@ describe("Validation Utils Property-Based Tests", () => {
                     ) as (keyof typeof fullMonitor)[];
 
                     for (const key of keys) {
-                        if (Math.random() > 0.3) {
+                        if (secureRandomFloat() > 0.3) {
                             partial[key] = fullMonitor[key];
                         }
                         // Otherwise leave undefined (not null)

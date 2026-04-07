@@ -21,6 +21,7 @@ import type { ActionButtonGroupProperties } from "../../../../components/Dashboa
 import type { StatusIndicatorProperties } from "../../../../theme/components/StatusIndicator";
 import type { MarqueeTextProperties } from "../../../../components/common/MarqueeText/MarqueeText";
 import type { UseSiteResult } from "../../../../hooks/site/useSite";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 const { ActionButtonGroupMock, MonitorSelectorMock, StatusIndicatorMock } =
     vi.hoisted(() => ({
@@ -146,7 +147,7 @@ const createMonitor = (overrides: Partial<Monitor> = {}): Monitor => {
     return {
         checkInterval: overrides.checkInterval ?? 60_000,
         history,
-        id: overrides.id ?? `monitor-${Math.random().toString(16).slice(2)}`,
+        id: overrides.id ?? `monitor-${secureRandomFloat().toString(16).slice(2)}`,
         monitoring: overrides.monitoring ?? true,
         responseTime: overrides.responseTime ?? 120,
         retryAttempts: overrides.retryAttempts ?? 0,

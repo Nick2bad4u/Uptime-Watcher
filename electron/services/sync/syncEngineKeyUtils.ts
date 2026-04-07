@@ -2,6 +2,8 @@
  * SyncEngine key parsing helpers.
  */
 
+import { isSafeInteger, stringSplit  } from "ts-extras";
+
 import { isAsciiDigits, isValidPersistedDeviceId } from "./syncEngineUtils";
 
 export const OPS_OBJECT_SUFFIX = ".ndjson" as const;
@@ -35,7 +37,7 @@ export function parseOpsObjectFileNameMetadata(
     }
 
     const stem = fileName.slice(0, -OPS_OBJECT_SUFFIX.length);
-    const parts = stem.split("-");
+    const parts = stringSplit(stem, "-");
     if (parts.length !== 3) {
         return null;
     }
@@ -62,11 +64,11 @@ export function parseOpsObjectFileNameMetadata(
     const lastOpId = Number(lastOpIdRaw);
 
     if (
-        !Number.isSafeInteger(createdAt) ||
+        !isSafeInteger(createdAt) ||
         createdAt < 0 ||
-        !Number.isSafeInteger(firstOpId) ||
+        !isSafeInteger(firstOpId) ||
         firstOpId < 0 ||
-        !Number.isSafeInteger(lastOpId) ||
+        !isSafeInteger(lastOpId) ||
         lastOpId < 0 ||
         lastOpId < firstOpId
     ) {
@@ -92,7 +94,7 @@ export function parseOpsObjectKeyMetadata(key: string): null | Readonly<{
     deviceId: string;
     lastOpId: number;
 }> {
-    const segments = key.split("/");
+    const segments = stringSplit(key, "/");
     // Expected: sync/devices/<deviceId>/ops/<createdAt>-<firstOpId>-<lastOpId>.ndjson
     if (segments.length !== 5) {
         return null;

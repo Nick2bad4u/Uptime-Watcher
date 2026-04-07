@@ -15,6 +15,10 @@
  * influence architectural behaviour (logging, test modes, user-data routing)
  * rather than attempting to mirror the entire process.env surface.
  */
+import { safeCastTo } from "ts-extras";
+import { isDefined } from "ts-extras";
+import { objectEntries } from "ts-extras";
+
 export interface KnownEnvironmentVariables {
     /** Token used by coverage reporting tooling when present. */
     readonly CODECOV_TOKEN?: string;
@@ -70,7 +74,7 @@ const getProcessSnapshot = (): ProcessSnapshot | undefined => {
     }
 
     try {
-        const candidate = (globalThis as ProcessSnapshotProvider).process;
+        const candidate = (safeCastTo<ProcessSnapshotProvider>(globalThis)).process;
         return candidate ?? undefined;
     } catch {
         return undefined;
@@ -103,7 +107,7 @@ const getProcessVersions = (): ProcessSnapshot["versions"] | undefined => {
     }
 };
 
-const hasProcessSnapshot = (): boolean => getProcessSnapshot() !== undefined;
+const hasProcessSnapshot = (): boolean => isDefined(getProcessSnapshot());
 
 /**
  * Testing-only setter for the process snapshot. Allows Vitest suites to
@@ -156,7 +160,7 @@ export function getEnvSummary(): Record<string, string> {
     }
 
     const summary: Record<string, string> = {};
-    for (const [key, value] of Object.entries(env)) {
+    for (const [key, value] of objectEntries(env)) {
         if (typeof value === "string") {
             summary[key] = value;
         }

@@ -17,6 +17,7 @@ import {
     isJsonByteBudgetExceeded,
 } from "@shared/utils/jsonByteBudget";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { isDefined, objectEntries  } from "ts-extras";
 
 import type { WindowService } from "../window/WindowService";
 
@@ -310,7 +311,7 @@ function buildStateSyncPayloadDiagnostics(
             );
 
             // Also scan monitor config string fields for obvious offenders.
-            for (const [key, value] of Object.entries(monitor)) {
+            for (const [key, value] of objectEntries(monitor)) {
                 if (typeof value === "string" && value.length > 0) {
                     const bytes = getUtfByteLength(value);
                     recordTopN(
@@ -398,7 +399,7 @@ function buildStateSyncPayloadDiagnostics(
         deltaSiteSnapshots:
             delta === undefined ? undefined : deltaSiteSnapshots,
         estimatedBytes,
-        hasDelta: delta !== undefined,
+        hasDelta: isDefined(delta),
         maxBytes,
         payloadAction,
         payloadSource,

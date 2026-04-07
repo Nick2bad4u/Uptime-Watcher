@@ -16,6 +16,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { arrayFind } from "ts-extras";
 
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { MonitorRepository } from "../database/MonitorRepository";
@@ -204,9 +205,8 @@ export class MonitorStatusUpdateService {
         try {
             // Find the site containing this monitor
             const sites = this.sites.getAll();
-            const site = sites.find((s) =>
-                s.monitors.some((m) => m.id === monitorId)
-            );
+            const site = arrayFind(sites, (s) =>
+                s.monitors.some((m) => m.id === monitorId));
 
             if (!site) {
                 logger.warn(

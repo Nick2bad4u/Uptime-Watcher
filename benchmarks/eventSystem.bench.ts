@@ -17,6 +17,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Lightweight in-memory event bus that mimics the TypedEventBus surface for
@@ -222,12 +223,12 @@ interface StatusUpdateEvent {
 function generateSiteEvent(): SiteEvent {
     return {
         site: {
-            identifier: `site-${Math.floor(Math.random() * 1000)}`,
-            name: `Site ${Math.floor(Math.random() * 1000)}`,
-            monitoring: Math.random() > 0.2,
+            identifier: `site-${Math.floor(secureRandomFloat() * 1000)}`,
+            name: `Site ${Math.floor(secureRandomFloat() * 1000)}`,
+            monitoring: secureRandomFloat() > 0.2,
         },
         timestamp: Date.now(),
-        correlationId: `corr-${Date.now()}-${Math.random()}`,
+        correlationId: `corr-${Date.now()}-${secureRandomFloat()}`,
     };
 }
 
@@ -239,17 +240,17 @@ function generateSiteEvent(): SiteEvent {
 function generateMonitorEvent(): MonitorEvent {
     return {
         monitor: {
-            id: `monitor-${Math.floor(Math.random() * 1000)}`,
-            siteIdentifier: `site-${Math.floor(Math.random() * 100)}`,
+            id: `monitor-${Math.floor(secureRandomFloat() * 1000)}`,
+            siteIdentifier: `site-${Math.floor(secureRandomFloat() * 100)}`,
             type: [
                 "http",
                 "ping",
                 "port",
-            ][Math.floor(Math.random() * 3)],
-            status: Math.random() > 0.05 ? "up" : "down",
+            ][Math.floor(secureRandomFloat() * 3)],
+            status: secureRandomFloat() > 0.05 ? "up" : "down",
         },
         timestamp: Date.now(),
-        correlationId: `corr-${Date.now()}-${Math.random()}`,
+        correlationId: `corr-${Date.now()}-${secureRandomFloat()}`,
     };
 }
 
@@ -260,11 +261,11 @@ function generateMonitorEvent(): MonitorEvent {
  */
 function generateStatusUpdateEvent(): StatusUpdateEvent {
     return {
-        monitorId: `monitor-${Math.floor(Math.random() * 1000)}`,
-        status: Math.random() > 0.05 ? "up" : "down",
-        responseTime: Math.floor(Math.random() * 1000) + 10,
+        monitorId: `monitor-${Math.floor(secureRandomFloat() * 1000)}`,
+        status: secureRandomFloat() > 0.05 ? "up" : "down",
+        responseTime: Math.floor(secureRandomFloat() * 1000) + 10,
         timestamp: Date.now(),
-        correlationId: `corr-${Date.now()}-${Math.random()}`,
+        correlationId: `corr-${Date.now()}-${secureRandomFloat()}`,
     };
 }
 
@@ -279,7 +280,7 @@ function generateStatusUpdateEvent(): StatusUpdateEvent {
 const createSyncListener = (id: string) => (data: any) => {
     // Simulate some processing
     JSON.stringify(data);
-    Math.floor(Math.random() * 100);
+    Math.floor(secureRandomFloat() * 100);
 };
 
 /**
@@ -298,7 +299,7 @@ const createAsyncListener =
         if (delay > 0) {
             await new Promise((resolve) => setTimeout(resolve, delay));
         }
-        Math.floor(Math.random() * 100);
+        Math.floor(secureRandomFloat() * 100);
     };
 
 /**
@@ -313,7 +314,7 @@ const createHeavyListener = (id: string) => (data: any) => {
     // Simulate heavy processing
     for (let i = 0; i < 1000; i++) {
         JSON.stringify(data);
-        Math.floor(Math.random() * 100);
+        Math.floor(secureRandomFloat() * 100);
     }
 };
 
@@ -655,7 +656,7 @@ describe("Event System Performance Benchmarks", () => {
                 // Add listeners that throw errors
                 for (let i = 0; i < 20; i++) {
                     eventBus.on("error:test", (data: any) => {
-                        if (Math.random() > 0.7) {
+                        if (secureRandomFloat() > 0.7) {
                             throw new Error(`Simulated error ${i}`);
                         }
                         createSyncListener(`error-test-${i}`)(data);

@@ -24,9 +24,11 @@
  *
  * @internal
  */
+import { isInteger } from "ts-extras";
+
 function isValidHttpStatus(httpStatus: number): boolean {
     return (
-        Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599
+        isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599
     );
 }
 

@@ -22,6 +22,7 @@ import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateImportData } from "@shared/validation/importExportSchemas";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
+import { arrayAt, arrayJoin, isDefined, isEmpty, safeCastTo     } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
@@ -158,12 +159,12 @@ export abstract class DatabaseCommand<
         error: Error,
         data: Partial<UptimeEvents[K]> = {}
     ): Promise<void> {
-        await this.eventEmitter.emitTyped(eventType, {
+        await this.eventEmitter.emitTyped(eventType, safeCastTo<UptimeEvents[K]>({
             error: error.message,
             success: false,
             timestamp: Date.now(),
             ...data,
-        } as UptimeEvents[K]);
+        }));
     }
 
     /**
@@ -182,11 +183,11 @@ export abstract class DatabaseCommand<
         eventType: K,
         data: Partial<UptimeEvents[K]>
     ): Promise<void> {
-        await this.eventEmitter.emitTyped(eventType, {
+        await this.eventEmitter.emitTyped(eventType, safeCastTo<UptimeEvents[K]>({
             success: true,
             timestamp: Date.now(),
             ...data,
-        } as UptimeEvents[K]);
+        }));
     }
 
     public constructor(
@@ -264,7 +265,7 @@ export class DatabaseCommandExecutor {
         const validation = await command.validate();
         if (!validation.isValid) {
             throw new Error(
-                `Command validation failed: ${validation.errors.join(", ")}`
+                `Command validation failed: ${arrayJoin(validation.errors, ", ")}`
             );
         }
 
@@ -273,7 +274,7 @@ export class DatabaseCommandExecutor {
         // either:
         // - completes successfully, or
         // - is rolled back successfully after a failure.
-        this.executedCommands.push(command as IDatabaseCommand<unknown>);
+        this.executedCommands.push(safeCastTo<IDatabaseCommand<unknown>>(command));
 
         try {
             return await command.execute();
@@ -284,7 +285,7 @@ export class DatabaseCommandExecutor {
 
                 // Rollback succeeded, so we should not attempt to rollback the
                 // same command again via `rollbackAll()`.
-                const last = this.executedCommands.at(-1);
+                const last = arrayAt(this.executedCommands, -1);
                 if (last === command) {
                     this.executedCommands.pop();
                 }
@@ -343,7 +344,7 @@ export class DatabaseCommandExecutor {
         if (errors.length > 0) {
             throw new AggregateError(
                 errors,
-                `Rollback errors: ${errors.map((e) => e.message).join(", ")}`
+                `Rollback errors: ${arrayJoin(errors.map((e) => e.message), ", ")}`
             );
         }
     }
@@ -620,7 +621,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 
         const parseResult = safeJsonParse<JsonValue>(
             this.data,
-            (value): value is JsonValue => value !== undefined
+            (value): value is JsonValue => isDefined(value)
         );
 
         if (!parseResult.success || parseResult.data === undefined) {
@@ -640,7 +641,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         await Promise.resolve();
         return {
             errors,
-            isValid: errors.length === 0,
+            isValid: isEmpty(errors),
         };
     }
 
@@ -722,12 +723,11 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         });
 
         if (invalidSites.length > 0) {
-            const formattedErrors = invalidSites
+            const formattedErrors = arrayJoin(invalidSites
                 .map(
                     ({ errors, identifier }) =>
-                        `${identifier}: ${errors.join(", ")}`
-                )
-                .join("; ");
+                        `${identifier}: ${arrayJoin(errors, ", ")}`
+                ), "; ");
 
             throw new Error(
                 `Import aborted due to invalid site configuration(s): ${formattedErrors}`
@@ -857,7 +857,7 @@ export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary
         await Promise.resolve();
         return {
             errors,
-            isValid: errors.length === 0,
+            isValid: isEmpty(errors),
         };
     }
 

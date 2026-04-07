@@ -3,6 +3,7 @@ import type {
     NotificationPreferenceUpdate,
 } from "@shared/types/notifications";
 
+import { safeCastTo } from "ts-extras";
 import * as z from "zod";
 
 /**
@@ -43,7 +44,7 @@ export const parseNotificationPreferenceUpdate = (
     // exactOptionalPropertyTypes enabled the optional array field may be
     // present with an explicit `undefined` value. The wider Zod output is
     // safe to treat as the canonical NotificationPreferenceUpdate here.
-    return parsed as NotificationPreferenceUpdate;
+    return safeCastTo(parsed);
 };
 
 /**

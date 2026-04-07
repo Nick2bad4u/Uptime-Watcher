@@ -32,6 +32,7 @@ import type { Site, Monitor, MonitorStatus, MonitorType } from "@shared/types";
 
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 import { getMonitorTypeDisplayLabel } from "../../../../utils/fallbacks";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock state for testing
 let mockSiteData: Site | null = null;
@@ -368,7 +369,7 @@ const edgeCaseSiteArbitrary = fc.record({
 const renderSiteCard = (site: any) => {
     mockSiteData = site;
     // Create a unique container for each test to avoid conflicts
-    const uniqueId = `sitecard-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    const uniqueId = `sitecard-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
     const container = document.createElement("div");
     container.id = uniqueId;
     document.body.append(container);

@@ -8,6 +8,7 @@ import type { Promisable, UnknownRecord } from "type-fest";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { withLogContext } from "@shared/utils/loggingContext";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { objectKeys } from "ts-extras";
 
 import { logger } from "../../../utils/logger";
 import { normalizeIpcErrorMessage } from "./ipcErrorUtils";
@@ -53,7 +54,7 @@ export async function executeIpcHandler<T>(
 
     if (logStart) {
         const metadata =
-            startMetadata && Object.keys(startMetadata).length > 0
+            startMetadata && objectKeys(startMetadata).length > 0
                 ? { handler: channelName, ...startMetadata }
                 : { handler: channelName };
 

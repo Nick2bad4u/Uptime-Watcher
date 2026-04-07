@@ -38,6 +38,7 @@ import type {
     HandlerDetails,
     WebPreferences,
 } from "electron";
+import type { Arrayable } from "type-fest";
 
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
@@ -48,7 +49,7 @@ import * as electron from "electron";
 import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { objectHasOwn } from "ts-extras";
+import { objectHasOwn, safeCastTo  } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -876,12 +877,12 @@ private async waitForViteServer(): Promise<void> {
                     // When Electron provides resourceType, use it to avoid
                     // mutating headers for non-document resources.
                     if (
-                        typeof (details as { resourceType?: unknown })
+                        typeof (safeCastTo<{ resourceType?: unknown }>(details))
                             .resourceType === "string"
                     ) {
-                        const { resourceType } = details as {
+                        const { resourceType } = safeCastTo<{
                             resourceType: string;
-                        };
+                        }>(details);
                         if (
                             resourceType !== "mainFrame" &&
                             resourceType !== "subFrame"
@@ -894,18 +895,17 @@ private async waitForViteServer(): Promise<void> {
 
                             callback({
                                 cancel: false,
-                                responseHeaders: responseHeaders as Record<
+                                responseHeaders: safeCastTo<Record<
                                     string,
-                                    string | string[]
-                                >,
+                                    Arrayable<string>
+                                >>(responseHeaders),
                             });
                             return;
                         }
                     }
 
-                    const headers = details.responseHeaders as
-                        | Record<string, string | string[]>
-                        | undefined;
+                    const headers = safeCastTo<| Record<string, Arrayable<string>>
+                        | undefined>(details.responseHeaders);
 
                     const responseHeaders =
                         applyProductionDocumentSecurityHeaders({

@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("Database Service Performance", () => {
     // Mock database operations to simulate performance testing
@@ -33,7 +34,7 @@ describe("Database Service Performance", () => {
                 const result = {
                     ...connectionData,
                     connected: true,
-                    connectionTime: Math.random() * 10,
+                    connectionTime: secureRandomFloat() * 10,
                 };
             }
         }
@@ -57,7 +58,7 @@ describe("Database Service Performance", () => {
             const table = queryParts.at(-1);
 
             // Simulate query execution time
-            const executionTime = Math.random() * 5;
+            const executionTime = secureRandomFloat() * 5;
 
             // Simulate result set
             const result = {
@@ -65,7 +66,7 @@ describe("Database Service Performance", () => {
                 operation,
                 table,
                 executionTime,
-                rowsAffected: Math.floor(Math.random() * 100),
+                rowsAffected: Math.floor(secureRandomFloat() * 100),
                 timestamp: Date.now(),
             };
         }
@@ -89,8 +90,8 @@ describe("Database Service Performance", () => {
             const joinCount = (query.match(/join/gi) || []).length;
 
             // Simulate increased execution time for joins
-            const baseTime = Math.random() * 5;
-            const joinPenalty = joinCount * Math.random() * 2;
+            const baseTime = secureRandomFloat() * 5;
+            const joinPenalty = joinCount * secureRandomFloat() * 2;
             const executionTime = baseTime + joinPenalty;
 
             const result = {
@@ -99,7 +100,7 @@ describe("Database Service Performance", () => {
                 joins: joinCount,
                 executionTime,
                 complexity: joinCount > 1 ? "high" : "medium",
-                rowsReturned: Math.floor(Math.random() * 500),
+                rowsReturned: Math.floor(secureRandomFloat() * 500),
             };
         }
     });
@@ -122,10 +123,10 @@ describe("Database Service Performance", () => {
                 "UNKNOWN";
 
             // Simulate processing overhead for aggregations
-            const baseTime = Math.random() * 3;
+            const baseTime = secureRandomFloat() * 3;
             const aggregationPenalty = hasGroupBy
-                ? Math.random() * 4
-                : Math.random() * 2;
+                ? secureRandomFloat() * 4
+                : secureRandomFloat() * 2;
             const executionTime = baseTime + aggregationPenalty;
 
             const result = {
@@ -134,7 +135,7 @@ describe("Database Service Performance", () => {
                 hasGroupBy,
                 executionTime,
                 processingComplexity: hasGroupBy ? "high" : "medium",
-                resultRows: hasGroupBy ? Math.floor(Math.random() * 50) : 1,
+                resultRows: hasGroupBy ? Math.floor(secureRandomFloat() * 50) : 1,
             };
         }
     });
@@ -161,19 +162,19 @@ describe("Database Service Performance", () => {
             let executionTime: number;
             switch (operation) {
                 case "BEGIN": {
-                    executionTime = Number(Math.random()) * 1;
+                    executionTime = Number(secureRandomFloat()) * 1;
                     break;
                 }
                 case "COMMIT": {
-                    executionTime = Math.random() * 3;
+                    executionTime = secureRandomFloat() * 3;
                     break;
                 }
                 case "ROLLBACK": {
-                    executionTime = Math.random() * 2;
+                    executionTime = secureRandomFloat() * 2;
                     break;
                 }
                 default: {
-                    executionTime = Number(Math.random()) * 1;
+                    executionTime = Number(secureRandomFloat()) * 1;
                 }
             }
 
@@ -182,13 +183,13 @@ describe("Database Service Performance", () => {
                 type: transactionType,
                 operation,
                 timestamp: Date.now(),
-                operations: Math.floor(Math.random() * 10) + 1,
+                operations: Math.floor(secureRandomFloat() * 10) + 1,
                 executionTime,
             };
 
             const result = {
                 ...transactionData,
-                success: operation !== "ROLLBACK" || Math.random() > 0.1,
+                success: operation !== "ROLLBACK" || secureRandomFloat() > 0.1,
                 overhead: transactionData.executionTime,
             };
         }
@@ -196,7 +197,7 @@ describe("Database Service Performance", () => {
 
     bench("transaction simulation - multi-operation transactions", () => {
         for (let i = 0; i < 100; i++) {
-            const operationCount = Math.floor(Math.random() * 20) + 5;
+            const operationCount = Math.floor(secureRandomFloat() * 20) + 5;
 
             interface TransactionOperation {
                 type: string;
@@ -220,13 +221,13 @@ describe("Database Service Performance", () => {
                         "UPDATE",
                         "DELETE",
                         "SELECT",
-                    ][Math.floor(Math.random() * 4)],
+                    ][Math.floor(secureRandomFloat() * 4)],
                     table: [
                         "sites",
                         "monitors",
                         "history",
-                    ][Math.floor(Math.random() * 3)],
-                    executionTime: Math.random() * 2,
+                    ][Math.floor(secureRandomFloat() * 3)],
+                    executionTime: secureRandomFloat() * 2,
                 };
 
                 transaction.operations.push(operation);
@@ -234,7 +235,7 @@ describe("Database Service Performance", () => {
             }
 
             // Simulate commit overhead
-            transaction.commitTime = Math.random() * 1.5;
+            transaction.commitTime = secureRandomFloat() * 1.5;
             transaction.totalTime += transaction.commitTime;
 
             const result = {
@@ -273,19 +274,19 @@ describe("Database Service Performance", () => {
             let executionTime: number;
             switch (complexity) {
                 case "low": {
-                    executionTime = Math.random() * 2;
+                    executionTime = secureRandomFloat() * 2;
                     break;
                 }
                 case "medium": {
-                    executionTime = Math.random() * 5;
+                    executionTime = secureRandomFloat() * 5;
                     break;
                 }
                 case "high": {
-                    executionTime = Math.random() * 8;
+                    executionTime = secureRandomFloat() * 8;
                     break;
                 }
                 default: {
-                    executionTime = Math.random() * 2;
+                    executionTime = secureRandomFloat() * 2;
                 }
             }
 
@@ -294,7 +295,7 @@ describe("Database Service Performance", () => {
                 operationType,
                 complexity,
                 executionTime,
-                schemaVersion: Math.floor(Math.random() * 10) + 1,
+                schemaVersion: Math.floor(secureRandomFloat() * 10) + 1,
                 migrationRequired: complexity === "high",
             };
         }
@@ -318,8 +319,8 @@ describe("Database Service Performance", () => {
                 id: `backup-${i}`,
                 timestamp: Date.now(),
                 sizeKB: backupSize,
-                compressionRatio: 0.6 + Math.random() * 0.3,
-                method: ["full", "incremental"][Math.floor(Math.random() * 2)],
+                compressionRatio: 0.6 + secureRandomFloat() * 0.3,
+                method: ["full", "incremental"][Math.floor(secureRandomFloat() * 2)],
                 executionTime: 0,
                 compressedSizeKB: 0,
                 verificationTime: 0,
@@ -327,7 +328,7 @@ describe("Database Service Performance", () => {
             };
 
             // Simulate backup time based on size
-            backup.executionTime = (backup.sizeKB / 1000) * (1 + Math.random());
+            backup.executionTime = (backup.sizeKB / 1000) * (1 + secureRandomFloat());
             backup.compressedSizeKB = backup.sizeKB * backup.compressionRatio;
 
             // Simulate verification
@@ -351,8 +352,8 @@ describe("Database Service Performance", () => {
         const connections = Array.from({ length: poolSize }, (_, i) => ({
             id: i,
             inUse: false,
-            lastUsed: Date.now() - Math.random() * 60_000,
-            queryCount: Math.floor(Math.random() * 100),
+            lastUsed: Date.now() - secureRandomFloat() * 60_000,
+            queryCount: Math.floor(secureRandomFloat() * 100),
         }));
 
         for (let i = 0; i < 300; i++) {
@@ -368,7 +369,7 @@ describe("Database Service Performance", () => {
                 connection.queryCount++;
 
                 // Simulate query execution
-                const queryTime = Math.random() * 5;
+                const queryTime = secureRandomFloat() * 5;
 
                 // Simulate releasing connection (synchronously for benchmark)
                 connection.inUse = false;
@@ -382,7 +383,7 @@ describe("Database Service Performance", () => {
                 };
             } else {
                 // Simulate waiting for connection
-                const waitTime = Math.random() * 10;
+                const waitTime = secureRandomFloat() * 10;
                 const result = {
                     waited: true,
                     waitTime,
@@ -416,12 +417,12 @@ describe("Database Service Performance", () => {
                     "INSERT",
                     "UPDATE",
                     "SELECT",
-                ][Math.floor(Math.random() * 3)],
+                ][Math.floor(secureRandomFloat() * 3)],
                 table: [
                     "sites",
                     "monitors",
                     "history",
-                ][Math.floor(Math.random() * 3)],
+                ][Math.floor(secureRandomFloat() * 3)],
                 data: {
                     id: i,
                     timestamp: Date.now(),
@@ -438,13 +439,13 @@ describe("Database Service Performance", () => {
         })[] = [];
 
         for (const operation of operations) {
-            const executionTime = Math.random() * 0.5;
+            const executionTime = secureRandomFloat() * 0.5;
             totalTime += executionTime;
 
             batchResults.push({
                 ...operation,
                 executionTime,
-                success: Math.random() > 0.01, // 99% success rate
+                success: secureRandomFloat() > 0.01, // 99% success rate
             });
         }
 
@@ -481,7 +482,7 @@ describe("Database Service Performance", () => {
             for (let i = 0; i < scenario.operations; i++) {
                 // Simulate memory allocation
                 const operationMemory =
-                    scenario.dataSize + Math.random() * scenario.dataSize;
+                    scenario.dataSize + secureRandomFloat() * scenario.dataSize;
                 memoryUsage += operationMemory;
 
                 // Simulate periodic garbage collection

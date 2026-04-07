@@ -13,6 +13,7 @@ import {
     useCallback,
     useMemo,
 } from "react";
+import { arrayJoin } from "ts-extras";
 
 import { useSite } from "../../../hooks/site/useSite";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -153,13 +154,12 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             [handleCardClick]
         );
 
-        const rowClassName = [
+        const rowClassName = arrayJoin([
             "site-table__row",
             "site-table__grid-layout",
             rowVariant ? `site-table__row--${rowVariant}` : "",
         ]
-            .filter(Boolean)
-            .join(" ");
+            .filter(Boolean), " ");
         const rowStyle = useMemo<SurfaceOrderStyle | undefined>(
             () =>
                 rowOrder === undefined

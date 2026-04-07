@@ -8,6 +8,7 @@
 import type { StatusHistory } from "@shared/types";
 
 import { useMemo } from "react";
+import { isEmpty } from "ts-extras";
 
 /**
  * Interface for site statistics data
@@ -75,7 +76,7 @@ export interface SiteStats {
 export function useSiteStats(history: StatusHistory[]): SiteStats {
     // Memoize the calculations to avoid recalculating on every render
     return useMemo(() => {
-        if (history.length === 0) {
+        if (isEmpty(history)) {
             return {
                 averageResponseTime: 0,
                 checkCount: 0,

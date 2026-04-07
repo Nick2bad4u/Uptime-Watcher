@@ -5,6 +5,7 @@
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
+import { arrayJoin } from "ts-extras";
 
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useTheme } from "../../../theme/useTheme";
@@ -35,7 +36,7 @@ export const SidebarRevealButton: NamedExoticComponent = memo(
             if (isDark) {
                 classes.push("sidebar-reveal-button--dark");
             }
-            return classes.join(" ");
+            return arrayJoin(classes, " ");
         }, [isDark]);
 
         if (hasBlockingOverlay || isSidebarOpen) {

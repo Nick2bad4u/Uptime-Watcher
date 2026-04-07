@@ -16,6 +16,7 @@
  */
 
 import { bench, describe, beforeAll } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Type definitions for benchmarking
 interface StatusHistory {
@@ -67,9 +68,9 @@ function generateHistoryEntries(count: number): StatusHistory[] {
     for (let i = 0; i < count; i++) {
         entries.push({
             timestamp: now - i * 30_000, // 30 second intervals
-            status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
-            responseTime: Math.floor(Math.random() * 1000) + 50,
-            details: Math.random() > 0.8 ? `Error details ${i}` : undefined,
+            status: secureRandomFloat() > 0.05 ? "up" : "down", // 95% uptime
+            responseTime: Math.floor(secureRandomFloat() * 1000) + 50,
+            details: secureRandomFloat() > 0.8 ? `Error details ${i}` : undefined,
         });
     }
 
@@ -108,10 +109,10 @@ function generateDatabaseRows(count: number): DatabaseMonitorRow[] {
                 3,
                 5,
             ][i % 3],
-            monitoring: Math.random() > 0.1,
-            status: Math.random() > 0.05 ? "up" : "down",
-            responseTime: Math.floor(Math.random() * 1000) + 50,
-            lastChecked: new Date(Date.now() - Math.random() * 86_400_000),
+            monitoring: secureRandomFloat() > 0.1,
+            status: secureRandomFloat() > 0.05 ? "up" : "down",
+            responseTime: Math.floor(secureRandomFloat() * 1000) + 50,
+            lastChecked: new Date(Date.now() - secureRandomFloat() * 86_400_000),
             active_operations: JSON.stringify([`op-${i}-1`, `op-${i}-2`]),
         });
     }

@@ -29,6 +29,7 @@
 import type { Site } from "@shared/types";
 
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
+import { isEmpty } from "ts-extras";
 
 import type { ValidationResult } from "./interfaces";
 
@@ -142,7 +143,7 @@ export class SiteValidator {
 
         return {
             errors,
-            success: errors.length === 0,
+            success: isEmpty(errors),
         };
     }
 

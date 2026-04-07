@@ -1,3 +1,5 @@
+import type { Constructor } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
 
 import type {
@@ -45,9 +47,7 @@ const HTTP_KEYWORD_MONITOR_BEHAVIOR: HttpMonitorBehavior<
         }),
 };
 
-type HttpKeywordMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance;
+type HttpKeywordMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
 
 const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor =
     ((): HttpKeywordMonitorConstructor => {

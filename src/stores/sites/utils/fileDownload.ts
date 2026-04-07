@@ -9,6 +9,7 @@ import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { safeCastTo, stringSplit  } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import {
@@ -219,7 +220,7 @@ export function generateBackupFileName(
     prefix = "backup",
     extension = "sqlite"
 ): string {
-    const [timestamp] = new Date().toISOString().split("T");
+    const [timestamp] = stringSplit(new Date().toISOString(), "T");
     return `${prefix}-${timestamp}.${extension}`;
 }
 
@@ -253,9 +254,7 @@ export async function handleSQLiteBackupDownload(
     );
 
     if (isPlaywrightAutomation()) {
-        const automationTarget = globalThis as typeof globalThis & {
-            playwrightLastBackup?: SerializedDatabaseBackupResult;
-        };
+        const automationTarget = safeCastTo(globalThis);
         automationTarget.playwrightLastBackup = backupResult;
         logger.info("SQLite backup captured in automation mode", {
             fileName: backupResult.fileName,

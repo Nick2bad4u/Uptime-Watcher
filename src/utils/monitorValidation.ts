@@ -14,6 +14,7 @@ import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
 } from "@shared/validation/monitorSchemas";
+import { isEmpty, safeCastTo  } from "ts-extras";
 
 import type { MonitorFormData } from "../types/monitorFormData";
 import type {
@@ -228,7 +229,7 @@ export async function validateMonitorFieldEnhanced<
 
             const finalErrors =
                 result.errors.length > 0 &&
-                filteredErrors.length === 0 &&
+                isEmpty(filteredErrors) &&
                 !result.success
                     ? [`Failed to validate field: ${fieldName}`]
                     : filteredErrors;
@@ -399,7 +400,7 @@ export function isMonitorFormData(data: unknown): data is MonitorFormData {
         return false;
     }
 
-    const candidate = data as { type?: unknown };
+    const candidate = safeCastTo(data);
 
     if (typeof candidate.type !== "string") {
         return false;

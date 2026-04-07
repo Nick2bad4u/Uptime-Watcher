@@ -181,7 +181,7 @@ describe("monitorValidation error handling", () => {
         const result = await validateMonitorFieldEnhanced(
             "http",
             "url",
-            "http://example.com"
+            "https://example.com"
         );
 
         expect(result.errors).toEqual(["url must be https"]);

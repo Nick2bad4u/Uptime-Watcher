@@ -1,4 +1,5 @@
-import type { Promisable } from "type-fest";
+import type { Promisable, UnknownArray  } from "type-fest";
+
 
 /**
  * Single-flight helper for deduplicating concurrent async work.
@@ -23,7 +24,7 @@ import type { Promisable } from "type-fest";
  * Wrap an async function so that only one invocation runs at a time. Concurrent
  * calls return the in-flight promise.
  */
-export function createSingleFlight<Args extends readonly unknown[], Result>(
+export function createSingleFlight<Args extends Readonly<UnknownArray>, Result>(
     fn: (...args: Args) => Promisable<Result>
 ): (...args: Args) => Promise<Result> {
     let inFlight: Promise<Result> | undefined = undefined;

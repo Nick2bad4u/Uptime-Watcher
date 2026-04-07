@@ -54,7 +54,12 @@
 # supported CodeQL languages.
 #
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: "CodeQL"
+name: Code Ql
+run-name: Code Ql
+
+concurrency:
+    group: codeql-${{ github.ref }}
+    cancel-in-progress: true
 
 on:
     push:
@@ -83,6 +88,10 @@ on:
             - "**/public/**"
             - "**/assets/**"
             - "**/.vscode/**"
+    merge_group:
+        types:
+            - checks_requested
+        branches: [main]
     workflow_dispatch:
     schedule:
         - cron: "44 2 * * 4" # run once a week on Thursday at 2:44 AM UTC
@@ -95,20 +104,23 @@ jobs:
     analyze:
         name: Analyze
         runs-on: ubuntu-latest
-        timeout-minutes: 120
+        timeout-minutes: 60
         permissions:
             actions: read
             contents: read
             security-events: write
+        defaults:
+            run:
+                shell: bash
 
         concurrency:
             group: codeql-${{ github.ref }}-${{ matrix.language }}
             cancel-in-progress: true
 
         strategy:
-            fail-fast: false
+            fail-fast: true
             matrix:
-                language: ["javascript", "typescript"]
+                language: ["javascript-typescript"]
                 # CodeQL supports [ $supported-codeql-languages ]
                 # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
@@ -166,7 +178,6 @@ jobs:
                   # create tarballs if CodeQL DB folders exist (Linux/macOS runner)
                   if [ -d "./codeql-databases" ]; then tar -czf codeql-databases.tgz ./codeql-databases || true; fi
                   if [ -d "./codeql-db" ]; then tar -czf codeql-db.tgz ./codeql-db || true; fi
-              shell: bash
               continue-on-error: true
 
             - name: Upload CodeQL DBs (debug)

@@ -10,6 +10,7 @@
  */
 
 import type { Event, RenderProcessGoneDetails, WebContents } from "electron";
+import type { UnknownRecord } from "type-fest";
 
 import { sleepUnref } from "@shared/utils/abortUtils";
 import { readProcessEnv } from "@shared/utils/environment";
@@ -23,6 +24,7 @@ import {
 import log from "electron-log/main";
 import { mkdirSync } from "node:fs";
 import * as path from "node:path";
+import { arrayJoin, isEmpty, safeCastTo   } from "ts-extras";
 
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
@@ -30,7 +32,7 @@ import { ServiceContainer } from "./services/ServiceContainer";
 import { fireAndForget } from "./utils/fireAndForget";
 import { logger } from "./utils/logger";
 
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
+function isPlainRecord(value: unknown): value is UnknownRecord {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
@@ -112,7 +114,7 @@ if (isDev()) {
         default: (options: ElectronDebugOptions) => void;
     }
 
-    const isRecord = (value: unknown): value is Record<string, unknown> =>
+    const isRecord = (value: unknown): value is UnknownRecord =>
         typeof value === "object" && value !== null;
 
     const isElectronDebugModule = (
@@ -190,8 +192,8 @@ const configureLogging = (): {
     } => {
         if (debugFlag) {
             const configuration = {
-                consoleLevel: "debug" as ElectronLogLevel,
-                fileLevel: "debug" as ElectronLogLevel,
+                consoleLevel: safeCastTo<ElectronLogLevel>("debug"),
+                fileLevel: safeCastTo<ElectronLogLevel>("debug"),
             };
             logger.debug(
                 "[Logging] Debug logging enabled via command line flag",
@@ -200,8 +202,8 @@ const configureLogging = (): {
             return configuration;
         } else if (productionFlag) {
             const configuration = {
-                consoleLevel: "info" as ElectronLogLevel,
-                fileLevel: "warn" as ElectronLogLevel,
+                consoleLevel: safeCastTo<ElectronLogLevel>("info"),
+                fileLevel: safeCastTo<ElectronLogLevel>("warn"),
             };
             logger.info(
                 "[Logging] Production logging level enabled via command line flag",
@@ -210,8 +212,8 @@ const configureLogging = (): {
             return configuration;
         } else if (infoFlag) {
             const configuration = {
-                consoleLevel: "info" as ElectronLogLevel,
-                fileLevel: "info" as ElectronLogLevel,
+                consoleLevel: safeCastTo<ElectronLogLevel>("info"),
+                fileLevel: safeCastTo<ElectronLogLevel>("info"),
             };
             logger.info(
                 "[Logging] Info logging level enabled via command line flag",
@@ -222,8 +224,8 @@ const configureLogging = (): {
         // Default development behavior
         const isDevMode = !app.isPackaged;
         const configuration = {
-            consoleLevel: (isDevMode ? "debug" : "info") as ElectronLogLevel,
-            fileLevel: (isDevMode ? "info" : "warn") as ElectronLogLevel,
+            consoleLevel: safeCastTo<ElectronLogLevel>(isDevMode ? "debug" : "info"),
+            fileLevel: safeCastTo<ElectronLogLevel>(isDevMode ? "info" : "warn"),
         };
         logger.debug("[Logging] Using default logging configuration", {
             ...configuration,
@@ -417,7 +419,7 @@ if (isDev()) {
             );
         }
 
-        if (!windows || windows.length === 0) {
+        if (!windows || isEmpty(windows)) {
             logger.debug(
                 "[Main] Hot reload skipped - no windows currently available"
             );
@@ -816,7 +818,7 @@ if (process.versions.electron) {
                     }
                 );
                 logger.info(
-                    `[Main] Added Extensions: ${extensions.map((ext) => ext.name).join(", ")}`
+                    `[Main] Added Extensions: ${arrayJoin(extensions.map((ext) => ext.name), ", ")}`
                 );
             } catch (error) {
                 logger.warn(

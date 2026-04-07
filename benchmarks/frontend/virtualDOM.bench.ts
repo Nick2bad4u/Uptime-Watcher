@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for Virtual DOM
 interface VNode {
@@ -494,7 +495,7 @@ class MockVirtualDOM {
 
         const endTime = performance.now();
         this.reconcilerMetrics.reconciliationTime = endTime - startTime;
-        this.reconcilerMetrics.memoryUsage = Math.random() * 1000; // Simulated
+        this.reconcilerMetrics.memoryUsage = secureRandomFloat() * 1000; // Simulated
 
         return { ...this.reconcilerMetrics };
     }
@@ -530,7 +531,7 @@ class MockVirtualDOM {
 
     private handleInsertPatch(patch: Patch): void {
         // Simulate DOM insertion
-        const insertionWork = Math.random() * 3;
+        const insertionWork = secureRandomFloat() * 3;
 
         if (patch.newNode) {
             // Create fiber node
@@ -541,7 +542,7 @@ class MockVirtualDOM {
 
     private handleDeletePatch(patch: Patch): void {
         // Simulate DOM deletion and cleanup
-        const deletionWork = Math.random() * 2;
+        const deletionWork = secureRandomFloat() * 2;
 
         if (patch.oldNode) {
             // Cleanup fiber and effects
@@ -551,18 +552,18 @@ class MockVirtualDOM {
 
     private handleUpdatePatch(patch: Patch): void {
         // Simulate DOM property updates
-        const updateWork = Math.random() * 1.5;
+        const updateWork = secureRandomFloat() * 1.5;
 
         if (patch.props) {
             // Update properties
             const propCount = Object.keys(patch.props).length;
-            const propUpdateWork = propCount * Math.random();
+            const propUpdateWork = propCount * secureRandomFloat();
         }
     }
 
     private handleMovePatch(patch: Patch): void {
         // Simulate DOM node movement
-        const moveWork = Math.random() * 2.5;
+        const moveWork = secureRandomFloat() * 2.5;
     }
 
     private handleReplacePatch(patch: Patch): void {
@@ -581,7 +582,7 @@ class MockVirtualDOM {
         node: FiberNode;
     }): void {
         // Simulate DOM node reordering
-        const moveWork = Math.random() * 3;
+        const moveWork = secureRandomFloat() * 3;
     }
 
     private createFiberNode(vnode: VNode): FiberNode {
@@ -614,7 +615,7 @@ class MockVirtualDOM {
         if (!fiber) return;
 
         // Simulate cleanup work
-        const cleanupWork = Math.random() * 2;
+        const cleanupWork = secureRandomFloat() * 2;
 
         // Cleanup children
         let child = fiber.child;
@@ -630,7 +631,7 @@ class MockVirtualDOM {
 
         // Add to work queue
         this.updateQueue.push({
-            id: `update-${Date.now()}-${Math.random()}`,
+            id: `update-${Date.now()}-${secureRandomFloat()}`,
             type: "state",
             payload: null,
             priority: this.calculatePriority(expirationTime),
@@ -664,7 +665,7 @@ class MockVirtualDOM {
             const update = this.updateQueue.shift()!;
 
             // Process update
-            const processingTime = Math.random() * 2;
+            const processingTime = secureRandomFloat() * 2;
             processed++;
         }
 
@@ -689,9 +690,9 @@ class MockVirtualDOM {
 
         // Simulate memory optimization
         for (let i = 0; i < 100; i++) {
-            const optimizationWork = Number(Math.random());
+            const optimizationWork = Number(secureRandomFloat());
             nodesOptimized++;
-            memoryFreed += Math.random() * 10;
+            memoryFreed += secureRandomFloat() * 10;
         }
 
         const endTime = performance.now();
@@ -714,7 +715,7 @@ class MockVirtualDOM {
             totalNodes: this.nodeIdCounter,
             activeUpdates: this.updateQueue.length,
             reconcilerMetrics: this.reconcilerMetrics,
-            memoryUsage: Math.random() * 2000,
+            memoryUsage: secureRandomFloat() * 2000,
         };
     }
 }
@@ -733,7 +734,7 @@ describe("React Virtual DOM Performance", () => {
                     className: "leaf",
                     "data-depth": depth,
                 },
-                `Leaf node ${Math.random()}`
+                `Leaf node ${secureRandomFloat()}`
             );
         }
 
@@ -770,9 +771,9 @@ describe("React Virtual DOM Performance", () => {
                     className: "test-element",
                     "data-index": i,
                     style: {
-                        width: `${Math.random() * 100}px`,
-                        height: `${Math.random() * 50}px`,
-                        color: `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`,
+                        width: `${secureRandomFloat() * 100}px`,
+                        height: `${secureRandomFloat() * 50}px`,
+                        color: `rgb(${Math.floor(secureRandomFloat() * 255)}, ${Math.floor(secureRandomFloat() * 255)}, ${Math.floor(secureRandomFloat() * 255)})`,
                     },
                     onClick: () => console.log(`Clicked ${i}`),
                 },
@@ -891,7 +892,7 @@ describe("React Virtual DOM Performance", () => {
             const newChildren = Array.from(oldChildren);
             // Shuffle array
             for (let i = newChildren.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+                const j = Math.floor(secureRandomFloat() * (i + 1));
                 [newChildren[i], newChildren[j]] = [
                     newChildren[j],
                     newChildren[i],
@@ -916,7 +917,7 @@ describe("React Virtual DOM Performance", () => {
 
             // Randomly modify some nodes
             const modifyTree = (node: VNode): VNode => {
-                if (Math.random() > 0.7) {
+                if (secureRandomFloat() > 0.7) {
                     return vdom.createElement(
                         node.type as string,
                         {
@@ -970,7 +971,7 @@ describe("React Virtual DOM Performance", () => {
 
             // Keep some original items
             for (let i = 0; i < 15; i++) {
-                if (Math.random() > 0.3) {
+                if (secureRandomFloat() > 0.3) {
                     // 70% chance to keep
                     newItems.push(oldItems[i]);
                 }
@@ -978,7 +979,7 @@ describe("React Virtual DOM Performance", () => {
 
             // Add new items
             for (let i = 0; i < 10; i++) {
-                if (Math.random() > 0.5) {
+                if (secureRandomFloat() > 0.5) {
                     // 50% chance to add
                     newItems.push(
                         vdom.createElement(
@@ -995,7 +996,7 @@ describe("React Virtual DOM Performance", () => {
 
             // Shuffle the new items
             for (let i = newItems.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+                const j = Math.floor(secureRandomFloat() * (i + 1));
                 [newItems[i], newItems[j]] = [newItems[j], newItems[i]];
             }
 
@@ -1032,7 +1033,7 @@ describe("React Virtual DOM Performance", () => {
         for (let i = 0; i < 200; i++) {
             const tree = createComplexTree(vdom, 2, 5);
             const fiber = vdom.createPublicFiberNode(tree);
-            vdom.scheduleWork(fiber, Date.now() + Math.random() * 1000);
+            vdom.scheduleWork(fiber, Date.now() + secureRandomFloat() * 1000);
         }
 
         // Process work in time slices
@@ -1108,7 +1109,7 @@ describe("React Virtual DOM Performance", () => {
         // Render many component instances
         for (let i = 0; i < 100; i++) {
             const items = Array.from(
-                { length: Math.floor(Math.random() * 10) + 1 },
+                { length: Math.floor(secureRandomFloat() * 10) + 1 },
                 (_, j) => ({
                     id: j,
                     label: `Item ${j}`,
@@ -1174,7 +1175,7 @@ describe("React Virtual DOM Performance", () => {
                 "create",
                 "diff",
                 "reconcile",
-            ][Math.floor(Math.random() * 3)] as "create" | "diff" | "reconcile";
+            ][Math.floor(secureRandomFloat() * 3)] as "create" | "diff" | "reconcile";
             const startTime = performance.now();
 
             switch (operationType) {

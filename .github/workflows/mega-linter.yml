@@ -1,6 +1,7 @@
 # MegaLinter workflow customized for Uptime-Watcher
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: MegaLinter
+name: Mega Linter
+run-name: Mega Linter
 
 on:
     push:
@@ -17,6 +18,9 @@ on:
             - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
+    merge_group:
+        types:
+            - checks_requested
     workflow_dispatch:
 
 permissions:
@@ -26,11 +30,13 @@ permissions:
 
 concurrency:
     group: megalinter-${{ github.ref }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 
 jobs:
     megalinter:
+        name: Run MegaLinter
         runs-on: ubuntu-latest
+        timeout-minutes: 45
         defaults:
             run:
                 working-directory: .

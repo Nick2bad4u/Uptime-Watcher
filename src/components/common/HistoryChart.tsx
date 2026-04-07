@@ -10,6 +10,7 @@ import type { StatusHistory } from "@shared/types";
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 
 import { memo, type NamedExoticComponent } from "react";
+import { isEmpty } from "ts-extras";
 
 import { MiniChartBar } from "../../theme/components/MiniChartBar";
 import { ThemedText } from "../../theme/components/ThemedText";
@@ -52,7 +53,7 @@ export const HistoryChart: NamedExoticComponent<HistoryChartProperties> = memo(
         title,
     }: HistoryChartProperties) {
         // Return null for empty history (React convention for "render nothing")
-        if (history.length === 0) {
+        if (isEmpty(history)) {
             // React components, returning null from a render function
             // is actually the correct and idiomatic way to indicate "render
             // nothing." This is a special case where null is the standard React

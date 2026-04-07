@@ -688,7 +688,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                         "https://example.com",
                         "http://localhost:3000",
                         "https://api.github.com/status",
-                        "http://192.168.1.1",
+                        "https://192.168.1.1",
                         "https://subdomain.example.co.uk"
                     )
                 ),
@@ -1052,7 +1052,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                         "https://example.com",
                         "http://localhost:3000",
                         "https://test.com",
-                        "http://api.example.org"
+                        "https://api.example.org"
                     ),
                     host: fc.constantFrom(
                         "example.com",

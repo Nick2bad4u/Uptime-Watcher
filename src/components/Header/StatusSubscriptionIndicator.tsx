@@ -7,6 +7,7 @@
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo, useState } from "react";
+import { arrayJoin } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
 
@@ -58,24 +59,23 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
 
     const triggerClassName = useMemo(
         () =>
-            [
+            arrayJoin([
                 "status-subscription-indicator",
                 `status-subscription-indicator--${health.status}`,
                 health.needsAttention
                     ? "status-subscription-indicator--requires-action"
                     : undefined,
             ]
-                .filter(Boolean)
-                .join(" "),
+                .filter(Boolean), " "),
         [health.needsAttention, health.status]
     );
 
     const dotClassName = useMemo(
         () =>
-            [
+            arrayJoin([
                 "status-subscription-indicator__dot",
                 `status-subscription-indicator__dot--${health.status}`,
-            ].join(" "),
+            ], " "),
         [health.status]
     );
 

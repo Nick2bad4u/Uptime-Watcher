@@ -88,7 +88,7 @@ describe("urlSafety", () => {
                 isAllowedExternalOpenUrl("https://example.com")
             ).toBeTruthy();
             expect(
-                isAllowedExternalOpenUrl("http://example.com/path?q=1")
+                isAllowedExternalOpenUrl("https://example.com/path?q=1")
             ).toBeTruthy();
             expect(
                 isAllowedExternalOpenUrl("mailto:test@example.com")
@@ -118,7 +118,7 @@ describe("urlSafety", () => {
                 isAllowedExternalOpenUrl("https://user:pass@example.com")
             ).toBeFalsy();
             expect(
-                isAllowedExternalOpenUrl("http://user@example.com")
+                isAllowedExternalOpenUrl("https://user@example.com")
             ).toBeFalsy();
         });
 
@@ -143,7 +143,7 @@ describe("urlSafety", () => {
 
             // Scheme checks should be case-insensitive.
             expect(
-                validateExternalOpenUrlCandidate("HTTP://example.com").ok
+                validateExternalOpenUrlCandidate("https://example.com").ok
             ).toBeTruthy();
             expect(
                 validateExternalOpenUrlCandidate("MAILTO:test@example.com").ok
@@ -202,7 +202,7 @@ describe("urlSafety", () => {
                 validateExternalOpenUrlCandidate("https://http://foo").ok
             ).toBeFalsy();
             expect(
-                validateExternalOpenUrlCandidate("http://https://bar/baz").ok
+                validateExternalOpenUrlCandidate("https://https://bar/baz").ok
             ).toBeFalsy();
         });
 

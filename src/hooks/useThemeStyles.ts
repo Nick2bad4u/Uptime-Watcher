@@ -39,6 +39,7 @@
 import type { CSSProperties } from "react";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import { arrayJoin } from "ts-extras";
 
 import {
     getPrefersDarkMode,
@@ -132,16 +133,16 @@ function getHeaderStyle(
     isDarkMode: boolean
 ): CSSProperties {
     // Layered gradients create a neutral base with restrained accent glow to avoid overpowering blues.
-    const darkGradient = [
+    const darkGradient = arrayJoin([
         "radial-gradient(circle at 18% 18%, rgba(79, 70, 229, 0.24), transparent 55%)",
         "linear-gradient(110deg, rgba(37, 99, 235, 0.22) 0%, rgba(59, 130, 246, 0.12) 42%, rgba(99, 102, 241, 0.08) 70%, rgba(14, 22, 35, 0) 100%)",
         "linear-gradient(136deg, rgba(6, 9, 16, 0.98) 0%, rgba(9, 14, 22, 0.95) 52%, rgba(14, 22, 35, 0.92) 100%)",
-    ].join(", ");
-    const lightGradient = [
+    ], ", ");
+    const lightGradient = arrayJoin([
         "radial-gradient(circle at 16% 18%, rgba(79, 70, 229, 0.12), transparent 60%)",
         "linear-gradient(110deg, rgba(59, 130, 246, 0.12) 0%, rgba(96, 165, 250, 0.06) 55%, rgba(79, 70, 229, 0) 100%)",
         "linear-gradient(135deg, rgba(245, 247, 252, 0.98) 0%, rgba(233, 239, 255, 0.94) 52%, rgba(221, 231, 255, 0.9) 100%)",
-    ].join(", ");
+    ], ", ");
 
     const darkShadow =
         "0 24px 60px -22px rgba(4, 8, 18, 0.7), 0 2px 18px -12px rgba(30, 64, 175, 0.32), inset 0 0 0 1px rgba(148, 163, 184, 0.07)";

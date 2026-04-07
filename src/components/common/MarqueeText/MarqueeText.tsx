@@ -16,8 +16,10 @@ import type {
     JSX,
     NamedExoticComponent,
 } from "react";
+import type { UnknownArray } from "type-fest";
 
 import { memo, useMemo } from "react";
+import { arrayJoin, isDefined  } from "ts-extras";
 
 import { useOverflowMarquee } from "../../../hooks/ui/useOverflowMarquee";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -43,7 +45,7 @@ export interface MarqueeTextProperties {
     /** CSS class appended to the cloned text segment. */
     readonly cloneClassName?: string;
     /** Dependency set that should trigger overflow re-evaluation. */
-    readonly dependencies?: readonly unknown[];
+    readonly dependencies?: Readonly<UnknownArray>;
     /** Duration for a single marquee loop. Defaults to `14s`. */
     readonly duration?: string;
     /** Distance between repeated segments. Defaults to `1.5rem`. */
@@ -91,8 +93,8 @@ export const MarqueeText: NamedExoticComponent<MarqueeTextProperties> = memo(
             useOverflowMarquee<HTMLDivElement>(marqueeOptions);
 
         const resolvedStyle = useMemo(() => {
-            const hasCustomGap = gap !== undefined;
-            const hasCustomDuration = duration !== undefined;
+            const hasCustomGap = isDefined(gap);
+            const hasCustomDuration = isDefined(duration);
 
             if (!hasCustomGap && !hasCustomDuration) {
                 return style;
@@ -122,25 +124,23 @@ export const MarqueeText: NamedExoticComponent<MarqueeTextProperties> = memo(
 
         const segmentClass = useMemo(
             () =>
-                [
+                arrayJoin([
                     "marquee-text__segment",
                     segmentClassName,
                     providedTextClassName,
                 ]
-                    .filter(Boolean)
-                    .join(" "),
+                    .filter(Boolean), " "),
             [providedTextClassName, segmentClassName]
         );
 
         const cloneSegmentClass = useMemo(
             () =>
-                [
+                arrayJoin([
                     segmentClass,
                     "marquee-text__segment--clone",
                     cloneClassName,
                 ]
-                    .filter(Boolean)
-                    .join(" "),
+                    .filter(Boolean), " "),
             [cloneClassName, segmentClass]
         );
 
@@ -152,7 +152,7 @@ export const MarqueeText: NamedExoticComponent<MarqueeTextProperties> = memo(
                     classes.push(activeClassName);
                 }
             }
-            return classes.filter(Boolean).join(" ");
+            return arrayJoin(classes.filter(Boolean), " ");
         }, [
             activeClassName,
             className,
@@ -161,9 +161,8 @@ export const MarqueeText: NamedExoticComponent<MarqueeTextProperties> = memo(
 
         const trackClass = useMemo(
             () =>
-                ["marquee-text__track", trackClassName]
-                    .filter(Boolean)
-                    .join(" "),
+                arrayJoin(["marquee-text__track", trackClassName]
+                    .filter(Boolean), " "),
             [trackClassName]
         );
 

@@ -65,6 +65,7 @@ import { sleepUnref } from "@shared/utils/abortUtils";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { ensureError } from "@shared/utils/errorHandling";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { safeCastTo } from "ts-extras";
 import * as z from "zod";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -81,7 +82,7 @@ interface OperationalErrorMetadata {
 }
 
 function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
-    const codeCandidate: unknown = Reflect.get(error as object, "code");
+    const codeCandidate: unknown = Reflect.get(safeCastTo<object>(error), "code");
     const errorCode =
         typeof codeCandidate === "string" ? codeCandidate : undefined;
 

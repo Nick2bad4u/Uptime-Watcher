@@ -10,6 +10,7 @@ import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 
 import { isObject } from "@shared/utils/typeGuards";
 import { validateMonitorType } from "@shared/utils/validation";
+import { isEmpty } from "ts-extras";
 
 /**
  * Shared representation of a monitor type configuration used by frontend and
@@ -443,7 +444,7 @@ export function isMonitorTypeConfig(
         return false;
     }
 
-    if (!Array.isArray(fields) || fields.length === 0) {
+    if (!Array.isArray(fields) || isEmpty(fields)) {
         return false;
     }
 

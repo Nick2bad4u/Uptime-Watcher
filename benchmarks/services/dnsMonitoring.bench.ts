@@ -7,6 +7,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock DNS resolution results for consistent benchmarking
 /**
@@ -71,11 +72,11 @@ class MockDnsMonitoringService {
 
         // Simulate DNS resolution time based on record type
         const baseTime = this.getBaseResolutionTime(recordType);
-        const networkVariance = Math.random() * 50; // 0-50ms network variance
+        const networkVariance = secureRandomFloat() * 50; // 0-50ms network variance
         const responseTime = baseTime + networkVariance;
 
         // Simulate occasional failures (5% failure rate)
-        const success = Math.random() > 0.05;
+        const success = secureRandomFloat() > 0.05;
 
         const result: MockDnsResult = {
             recordType,
@@ -326,8 +327,8 @@ function generateDnsCheckRequests(
             id: `dns-check-${i}`,
             host: `subdomain${i}.${domain}`,
             recordType,
-            timeout: Math.random() > 0.8 ? 10_000 : 5000, // Some longer timeouts
-            retryAttempts: Math.random() > 0.7 ? 3 : 1, // Some with more retries
+            timeout: secureRandomFloat() > 0.8 ? 10_000 : 5000, // Some longer timeouts
+            retryAttempts: secureRandomFloat() > 0.7 ? 3 : 1, // Some with more retries
             priority:
                 i < count * 0.2
                     ? "critical"

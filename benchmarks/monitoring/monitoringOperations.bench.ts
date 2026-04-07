@@ -16,6 +16,7 @@
  */
 
 import { bench, describe, beforeAll } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Type definitions for benchmarking
 interface MonitorConfig {
@@ -75,8 +76,8 @@ function generateStatusUpdates(count: number): BenchmarkStatusUpdate[] {
     for (let i = 0; i < count; i++) {
         updates.push({
             monitorId: `monitor-${i}`,
-            status: Math.random() > 0.05 ? "up" : "down",
-            responseTime: Math.floor(Math.random() * 1000) + 50,
+            status: secureRandomFloat() > 0.05 ? "up" : "down",
+            responseTime: Math.floor(secureRandomFloat() * 1000) + 50,
             timestamp: now - i * 1000,
             correlationId: `corr-${i}-${Date.now()}`,
         });
@@ -90,10 +91,10 @@ function generateMonitorCheckResults(count: number): MonitorCheckResult[] {
     const now = Date.now();
 
     for (let i = 0; i < count; i++) {
-        const success = Math.random() > 0.05;
+        const success = secureRandomFloat() > 0.05;
         results.push({
             success,
-            responseTime: success ? Math.floor(Math.random() * 1000) + 50 : 0,
+            responseTime: success ? Math.floor(secureRandomFloat() * 1000) + 50 : 0,
             timestamp: now - i * 1000,
             status: success ? "up" : "down",
             error: success ? undefined : `Network error ${i}`,
@@ -106,7 +107,7 @@ function generateMonitorCheckResults(count: number): MonitorCheckResult[] {
 // Benchmark implementation functions
 function simulatePingCheck(host: string, timeout: number): MonitorCheckResult {
     // Simulate network operation delay based on timeout
-    const latencyFactor = Math.random();
+    const latencyFactor = secureRandomFloat();
     const simulatedResponseTime = Math.floor(latencyFactor * timeout * 0.5);
     const success = latencyFactor > 0.05; // 95% success rate
 
@@ -121,7 +122,7 @@ function simulatePingCheck(host: string, timeout: number): MonitorCheckResult {
 
 function simulateHttpCheck(url: string, timeout: number): MonitorCheckResult {
     // Simulate HTTP request processing
-    const latencyFactor = Math.random();
+    const latencyFactor = secureRandomFloat();
     const simulatedResponseTime = Math.floor(latencyFactor * timeout * 0.3);
     const success = latencyFactor > 0.03; // 97% success rate
 

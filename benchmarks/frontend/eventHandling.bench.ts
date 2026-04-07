@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Describes the shape of the synthetic events used within the benchmarks.
@@ -114,7 +115,7 @@ class MockEventSystem {
         options?: { passive?: boolean; once?: boolean; capture?: boolean }
     ): EventHandler {
         const eventHandler: EventHandler = {
-            id: `handler-${Date.now()}-${Math.random()}`,
+            id: `handler-${Date.now()}-${secureRandomFloat()}`,
             eventType,
             handler,
             element,
@@ -168,7 +169,7 @@ class MockEventSystem {
         handler: (event: SyntheticEvent, target: Element) => void
     ): EventDelegator {
         const delegator: EventDelegator = {
-            id: `delegator-${Date.now()}-${Math.random()}`,
+            id: `delegator-${Date.now()}-${secureRandomFloat()}`,
             containerElement,
             eventType,
             selector,
@@ -231,7 +232,7 @@ class MockEventSystem {
 
         const endTime = performance.now();
         metrics.totalProcessingTime = endTime - startTime;
-        metrics.memoryUsage = Math.random() * 100; // Simulated
+        metrics.memoryUsage = secureRandomFloat() * 100; // Simulated
 
         this.eventHistory.push({ event: syntheticEvent, metrics });
         return metrics;
@@ -418,7 +419,7 @@ class MockEventSystem {
         }
         if (selector.includes("[")) {
             // Attribute selector simulation
-            return Math.random() > 0.5;
+            return secureRandomFloat() > 0.5;
         }
         return element.includes(selector);
     }
@@ -515,13 +516,13 @@ describe("React Event Handling Performance", () => {
         ];
 
         return Array.from({ length: count }, (_, i) => ({
-            element: `${elementTypes[Math.floor(Math.random() * elementTypes.length)]}-${i}`,
-            type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
+            element: `${elementTypes[Math.floor(secureRandomFloat() * elementTypes.length)]}-${i}`,
+            type: eventTypes[Math.floor(secureRandomFloat() * eventTypes.length)],
             data: {
-                detail: Math.random() * 100,
-                clientX: Math.random() * 1920,
-                clientY: Math.random() * 1080,
-                key: Math.random() > 0.5 ? "Enter" : "Escape",
+                detail: secureRandomFloat() * 100,
+                clientX: secureRandomFloat() * 1920,
+                clientY: secureRandomFloat() * 1080,
+                key: secureRandomFloat() > 0.5 ? "Enter" : "Escape",
                 value: `input-value-${i}`,
             },
         }));
@@ -540,19 +541,19 @@ describe("React Event Handling Performance", () => {
                 "click",
                 "mouseover",
                 "keydown",
-            ][Math.floor(Math.random() * 3)];
+            ][Math.floor(secureRandomFloat() * 3)];
 
             const handler = eventSystem.addEventListener(
                 element,
                 eventType,
                 (event) => {
                     // Simulate handler processing
-                    const processing = Math.random() * 5;
+                    const processing = secureRandomFloat() * 5;
                 },
                 {
-                    passive: Math.random() > 0.5,
-                    once: Math.random() > 0.8,
-                    capture: Math.random() > 0.7,
+                    passive: secureRandomFloat() > 0.5,
+                    once: secureRandomFloat() > 0.8,
+                    capture: secureRandomFloat() > 0.7,
                 }
             );
 
@@ -590,7 +591,7 @@ describe("React Event Handling Performance", () => {
                         selector,
                         (event, target) => {
                             // Simulate delegated event processing
-                            const processing = Math.random() * 3;
+                            const processing = secureRandomFloat() * 3;
                         }
                     );
                     delegators.push(delegator);
@@ -606,7 +607,7 @@ describe("React Event Handling Performance", () => {
         // Register some handlers first
         for (let i = 0; i < 100; i++) {
             eventSystem.addEventListener(`button-${i}`, "click", (event) => {
-                const result = Math.random() * event.timeStamp;
+                const result = secureRandomFloat() * event.timeStamp;
             });
         }
 
@@ -642,7 +643,7 @@ describe("React Event Handling Performance", () => {
             eventSystem.addEventListener(element, "click", (event) => {
                 // Simulate bubbling processing at each level
                 const level = index;
-                const processing = Math.random() * (level + 1);
+                const processing = secureRandomFloat() * (level + 1);
             });
         });
 
@@ -668,29 +669,29 @@ describe("React Event Handling Performance", () => {
                 "wheel",
                 "touchstart",
                 "keypress",
-            ][Math.floor(Math.random() * 5)];
+            ][Math.floor(secureRandomFloat() * 5)];
 
             const complexEventData = {
-                detail: Math.random() * 100,
-                screenX: Math.random() * 1920,
-                screenY: Math.random() * 1080,
-                clientX: Math.random() * 1920,
-                clientY: Math.random() * 1080,
-                ctrlKey: Math.random() > 0.8,
-                shiftKey: Math.random() > 0.8,
-                altKey: Math.random() > 0.9,
-                metaKey: Math.random() > 0.95,
-                button: Math.floor(Math.random() * 3),
-                buttons: Math.floor(Math.random() * 8),
-                relatedTarget: `element-${Math.floor(Math.random() * 100)}`,
-                deltaX: Math.random() * 100 - 50,
-                deltaY: Math.random() * 100 - 50,
+                detail: secureRandomFloat() * 100,
+                screenX: secureRandomFloat() * 1920,
+                screenY: secureRandomFloat() * 1080,
+                clientX: secureRandomFloat() * 1920,
+                clientY: secureRandomFloat() * 1080,
+                ctrlKey: secureRandomFloat() > 0.8,
+                shiftKey: secureRandomFloat() > 0.8,
+                altKey: secureRandomFloat() > 0.9,
+                metaKey: secureRandomFloat() > 0.95,
+                button: Math.floor(secureRandomFloat() * 3),
+                buttons: Math.floor(secureRandomFloat() * 8),
+                relatedTarget: `element-${Math.floor(secureRandomFloat() * 100)}`,
+                deltaX: secureRandomFloat() * 100 - 50,
+                deltaY: secureRandomFloat() * 100 - 50,
                 touches: Array.from(
-                    { length: Math.floor(Math.random() * 5) },
+                    { length: Math.floor(secureRandomFloat() * 5) },
                     (_, j) => ({
                         identifier: j,
-                        clientX: Math.random() * 1920,
-                        clientY: Math.random() * 1080,
+                        clientX: secureRandomFloat() * 1920,
+                        clientY: secureRandomFloat() * 1080,
                     })
                 ),
             };
@@ -735,7 +736,7 @@ describe("React Event Handling Performance", () => {
             const listeners = Array.from(
                 { length: 20 },
                 (_, i) => (event: CustomEvent) => {
-                    const processing = Math.random() * event.detail.complexity;
+                    const processing = secureRandomFloat() * event.detail.complexity;
                 }
             );
             eventListeners.set(eventType, listeners);
@@ -746,21 +747,21 @@ describe("React Event Handling Performance", () => {
             const customEvent: CustomEvent = {
                 id: `custom-${i}`,
                 type: customEventTypes[
-                    Math.floor(Math.random() * customEventTypes.length)
+                    Math.floor(secureRandomFloat() * customEventTypes.length)
                 ],
                 detail: {
-                    userId: `user-${Math.floor(Math.random() * 100)}`,
+                    userId: `user-${Math.floor(secureRandomFloat() * 100)}`,
                     action: `action-${i}`,
-                    complexity: Math.random() * 10,
+                    complexity: secureRandomFloat() * 10,
                     metadata: {
                         timestamp: Date.now(),
                         source: "benchmark",
-                        priority: Math.floor(Math.random() * 5),
+                        priority: Math.floor(secureRandomFloat() * 5),
                     },
                 },
-                bubbles: Math.random() > 0.5,
-                cancelable: Math.random() > 0.3,
-                composed: Math.random() > 0.7,
+                bubbles: secureRandomFloat() > 0.5,
+                cancelable: secureRandomFloat() > 0.3,
+                composed: secureRandomFloat() > 0.7,
                 timestamp: Date.now(),
                 source: "custom-event-system",
             };
@@ -827,7 +828,7 @@ describe("React Event Handling Performance", () => {
                 `temp-element-${i}`,
                 "click",
                 (event) => {
-                    const result = Math.random() * event.timeStamp;
+                    const result = secureRandomFloat() * event.timeStamp;
                 }
             );
             handlerIds.push(handler.id);
@@ -853,7 +854,7 @@ describe("React Event Handling Performance", () => {
                 "click",
                 (event) => {
                     const computation = Array.from({ length: 10 }, () =>
-                        Math.random()
+                        secureRandomFloat()
                     ).reduce((a, b) => a + b, 0);
                 }
             );
@@ -864,7 +865,7 @@ describe("React Event Handling Performance", () => {
                     "click",
                     ".stress-element",
                     (event, target) => {
-                        const computation = Math.random() * 100;
+                        const computation = secureRandomFloat() * 100;
                     }
                 );
             }
@@ -872,7 +873,7 @@ describe("React Event Handling Performance", () => {
 
         // Batch process many events
         const stressEvents = eventSpecs.slice(0, 500).map((spec) => ({
-            element: `stress-element-${Math.floor(Math.random() * 200)}`,
+            element: `stress-element-${Math.floor(secureRandomFloat() * 200)}`,
             type: spec.type,
             data: spec.data,
         }));
@@ -949,14 +950,14 @@ describe("React Event Handling Performance", () => {
 
         // Simulate touch gesture sequences
         for (let i = 0; i < 100; i++) {
-            const touchCount = Math.floor(Math.random() * 3) + 1;
+            const touchCount = Math.floor(secureRandomFloat() * 3) + 1;
 
             // Start touch
             eventSystem.dispatchEvent("touch-area", "touchstart", {
                 touches: Array.from({ length: touchCount }, (_, j) => ({
                     identifier: j,
-                    clientX: Math.random() * 400,
-                    clientY: Math.random() * 600,
+                    clientX: secureRandomFloat() * 400,
+                    clientY: secureRandomFloat() * 600,
                 })),
             });
 
@@ -965,8 +966,8 @@ describe("React Event Handling Performance", () => {
                 eventSystem.dispatchEvent("touch-area", "touchmove", {
                     touches: Array.from({ length: touchCount }, (_, j) => ({
                         identifier: j,
-                        clientX: Math.random() * 400,
-                        clientY: Math.random() * 600,
+                        clientX: secureRandomFloat() * 400,
+                        clientY: secureRandomFloat() * 600,
                     })),
                 });
             }
@@ -975,8 +976,8 @@ describe("React Event Handling Performance", () => {
             eventSystem.dispatchEvent("touch-area", "touchend", {
                 changedTouches: Array.from({ length: touchCount }, (_, j) => ({
                     identifier: j,
-                    clientX: Math.random() * 400,
-                    clientY: Math.random() * 600,
+                    clientX: secureRandomFloat() * 400,
+                    clientY: secureRandomFloat() * 600,
                 })),
             });
         }

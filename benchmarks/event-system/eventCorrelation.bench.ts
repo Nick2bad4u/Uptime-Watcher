@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 interface CorrelatedEvent {
     id: string;
@@ -208,7 +209,7 @@ class MockEventCorrelator {
     }
 
     private generateCorrelationId(): string {
-        return `corr-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+        return `corr-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
     }
 
     private indexEventType(eventType: string, correlationId: string): void {

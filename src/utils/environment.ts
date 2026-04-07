@@ -5,6 +5,7 @@
  */
 
 import { getEnvVar } from "@shared/utils/environment";
+import { safeCastTo } from "ts-extras";
 
 const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
 
@@ -47,7 +48,7 @@ export function isPlaywrightAutomation(): boolean {
         return true;
     }
 
-    const automationNavigator = (globalThis as MaybeNavigator).navigator;
+    const automationNavigator = (safeCastTo<MaybeNavigator>(globalThis)).navigator;
     if (
         automationNavigator &&
         PLAYWRIGHT_UA_PATTERN.test(automationNavigator.userAgent)
@@ -55,9 +56,7 @@ export function isPlaywrightAutomation(): boolean {
         return true;
     }
 
-    const automationTarget = globalThis as typeof globalThis & {
-        playwrightAutomation?: boolean;
-    };
+    const automationTarget = safeCastTo(globalThis);
 
     return automationTarget.playwrightAutomation === true;
 }
@@ -71,9 +70,7 @@ export function isPlaywrightAutomation(): boolean {
  * @public
  */
 export function setPlaywrightAutomationMarker(): void {
-    const automationTarget = globalThis as typeof globalThis & {
-        playwrightAutomation?: boolean;
-    };
+    const automationTarget = safeCastTo(globalThis);
 
     automationTarget.playwrightAutomation = true;
 }

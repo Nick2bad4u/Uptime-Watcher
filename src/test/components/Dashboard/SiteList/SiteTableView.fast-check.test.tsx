@@ -4,11 +4,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteTableView } from "../../../../components/Dashboard/SiteList/SiteTableView";
 import type { SiteTableRowProperties } from "../../../../components/Dashboard/SiteList/SiteTableRow";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 const createMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
     checkInterval: 60_000,
     history: [],
-    id: overrides.id ?? `monitor-${Math.random().toString(36).slice(2)}`,
+    id: overrides.id ?? `monitor-${secureRandomFloat().toString(36).slice(2)}`,
     monitoring: overrides.monitoring ?? true,
     responseTime: overrides.responseTime ?? 120,
     retryAttempts: overrides.retryAttempts ?? 0,

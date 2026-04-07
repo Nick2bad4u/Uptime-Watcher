@@ -8,6 +8,7 @@ import {
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { arrayAt, arrayJoin, isEmpty, safeCastTo, stringSplit     } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -75,12 +76,12 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
         return undefined;
     }
 
-    const { response } = error as { response?: unknown };
+    const { response } = safeCastTo<{ response?: unknown }>(error);
     if (typeof response !== "object" || response === null) {
         return undefined;
     }
 
-    const { status } = response as { status?: unknown };
+    const { status } = safeCastTo(response);
     return typeof status === "number" ? status : undefined;
 }
 
@@ -97,9 +98,9 @@ function splitKey(key: string): { dirSegments: string[]; fileName: string } {
 
     assertCloudObjectKey(normalized);
 
-    const parts = normalized.split("/").filter((part) => part.length > 0);
+    const parts = stringSplit(normalized, "/").filter((part) => part.length > 0);
 
-    const fileName = parts.at(-1);
+    const fileName = arrayAt(parts, -1);
     // `assertCloudObjectKey` guarantees non-empty.
     if (!fileName) {
         throw new Error("Cloud key cannot be empty");
@@ -251,8 +252,7 @@ export class GoogleDriveCloudStorageProvider
             let startFolderId = rootFolderId;
             let startPrefix = "";
             if (normalizedPrefix) {
-                const parts = normalizedPrefix
-                    .split("/")
+                const parts = stringSplit(normalizedPrefix, "/")
                     .filter((part) => part.length > 0);
 
                 const resolved = await this.resolveFolderId(drive, parts);
@@ -403,7 +403,7 @@ export class GoogleDriveCloudStorageProvider
             .map((segment) => segment.trim())
             .filter((segment) => segment.length > 0);
 
-        const cacheKey = normalizedSegments.join("/");
+        const cacheKey = arrayJoin(normalizedSegments, "/");
         const cached = this.folderCache.get(cacheKey);
         if (cached) {
             return cached;
@@ -515,12 +515,12 @@ export class GoogleDriveCloudStorageProvider
         const response = await drive.files.list({
             fields: "files(id)",
             pageSize: 1,
-            q: conditions.join(" and "),
+            q: arrayJoin(conditions, " and "),
             spaces: "appDataFolder",
         });
 
         const parsedList = parseGoogleDriveListResponse(response.data);
-        if (parsedList.files.length === 0) {
+        if (isEmpty(parsedList.files)) {
             return null;
         }
 

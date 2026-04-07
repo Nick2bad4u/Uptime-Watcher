@@ -8,6 +8,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
+import { safeCastTo } from "ts-extras";
 import * as z from "zod";
 
 const anyValueSchema = z.custom<unknown>(() => true, {
@@ -147,9 +148,8 @@ export const validateSerializedDatabaseRestoreResult = (
 ):
     | { data: SerializedDatabaseRestoreResult; success: true }
     | { error: unknown; success: false } =>
-    serializedDatabaseRestoreResultSchema.safeParse(value) as
-        | { data: SerializedDatabaseRestoreResult; success: true }
-        | { error: unknown; success: false };
+    safeCastTo<| { data: SerializedDatabaseRestoreResult; success: true }
+        | { error: unknown; success: false }>(serializedDatabaseRestoreResultSchema.safeParse(value));
 
 export const validateMonitorTypeConfigArray = (
     value: unknown

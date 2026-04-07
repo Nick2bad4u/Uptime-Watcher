@@ -5,6 +5,7 @@ import {
     useEffect,
     useMemo,
 } from "react";
+import { arrayFind } from "ts-extras";
 import { useShallow } from "zustand/react/shallow";
 
 import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
@@ -223,7 +224,7 @@ export const CloudSettingsSection = (): JSX.Element => {
         async function confirmRestoreBackupCallback(
             key: string
         ): Promise<void> {
-            const entry = backups.find((backup) => backup.key === key);
+            const entry = arrayFind(backups, (backup) => backup.key === key);
 
             const confirmed = await requestConfirmation({
                 confirmLabel: "Restore",
@@ -254,7 +255,7 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const confirmDeleteBackup = useCallback(
         async function confirmDeleteBackupCallback(key: string): Promise<void> {
-            const entry = backups.find((backup) => backup.key === key);
+            const entry = arrayFind(backups, (backup) => backup.key === key);
 
             const confirmed = await requestConfirmation({
                 confirmLabel: "Delete",

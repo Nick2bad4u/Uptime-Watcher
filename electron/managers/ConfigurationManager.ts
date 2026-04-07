@@ -58,6 +58,7 @@ import {
 } from "@shared/constants/history";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { CacheKeys } from "@shared/utils/cacheKeys";
+import { isEmpty } from "ts-extras";
 
 import type { ValidationResult } from "./validators/interfaces";
 
@@ -412,7 +413,7 @@ export class ConfigurationManager {
         }
 
         // Business rule: Only auto-start for sites that have monitors
-        if (site.monitors.length === 0) {
+        if (isEmpty(site.monitors)) {
             return false;
         }
 

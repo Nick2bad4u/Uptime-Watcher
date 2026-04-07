@@ -6,6 +6,7 @@ import {
     type ExternalOpenUrlValidationResult,
     validateExternalOpenUrlCandidate,
 } from "@shared/utils/urlSafety";
+import { safeCastTo } from "ts-extras";
 
 import { openExternalOrThrow } from "./openExternalUtils";
 
@@ -139,7 +140,7 @@ export async function tryOpenExternalValidated(args: {
     } catch (error: unknown) {
         const resolved = ensureError(error);
         const code = tryGetErrorCode(
-            (resolved as { cause?: unknown }).cause ?? resolved
+            (safeCastTo<{ cause?: unknown }>(resolved)).cause ?? resolved
         );
 
         return {

@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for List Operations
 interface ListItem {
@@ -813,7 +814,7 @@ class MockListElementFactory {
             key: this.elementId++,
             size: this.calculateElementSize(type, props, children),
             depth: this.calculateDepth(children),
-            renderTime: Math.random() * 2,
+            renderTime: secureRandomFloat() * 2,
             memoryUsage: this.calculateMemoryUsage(type, props, children),
         };
     }
@@ -1248,8 +1249,8 @@ describe("React List Operations Performance", () => {
         // Render lists with varying sizes
         for (let render = 0; render < 200; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
-            const itemCount = 50 + Math.floor(Math.random() * 150);
+                components[Math.floor(secureRandomFloat() * components.length)];
+            const itemCount = 50 + Math.floor(secureRandomFloat() * 150);
 
             const items: ListItem[] = Array.from(
                 { length: itemCount },
@@ -1257,13 +1258,13 @@ describe("React List Operations Performance", () => {
                     id: `item-${index}`,
                     value: `Item ${index}`,
                     metadata: {
-                        created: Date.now() - Math.random() * 86_400_000,
+                        created: Date.now() - secureRandomFloat() * 86_400_000,
                         modified: Date.now(),
                         tags: [`tag${index % 5}`, `category${index % 3}`],
                         category: `Category ${index % 5}`,
-                        priority: Math.random(),
-                        size: 100 + Math.floor(Math.random() * 200),
-                        complexity: 1 + Math.floor(Math.random() * 3),
+                        priority: secureRandomFloat(),
+                        size: 100 + Math.floor(secureRandomFloat() * 200),
+                        complexity: 1 + Math.floor(secureRandomFloat() * 3),
                     },
                     renderProps: {
                         key: `item-${index}`,
@@ -1302,7 +1303,7 @@ describe("React List Operations Performance", () => {
 
         for (let render = 0; render < 150; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             // Create a large dataset
             const items: ListItem[] = Array.from(
@@ -1312,18 +1313,18 @@ describe("React List Operations Performance", () => {
                     value: {
                         name: `Item ${index}`,
                         description: `Description for item ${index}`,
-                        price: Math.random() * 1000,
-                        rating: Math.random() * 5,
-                        inStock: Math.random() > 0.3,
+                        price: secureRandomFloat() * 1000,
+                        rating: secureRandomFloat() * 5,
+                        inStock: secureRandomFloat() > 0.3,
                     },
                     metadata: {
-                        created: Date.now() - Math.random() * 86_400_000,
+                        created: Date.now() - secureRandomFloat() * 86_400_000,
                         modified: Date.now(),
                         tags: [`tag${index % 10}`, `type${index % 7}`],
                         category: `Category ${index % 8}`,
-                        priority: Math.random(),
-                        size: 150 + Math.floor(Math.random() * 300),
-                        complexity: 1 + Math.floor(Math.random() * 5),
+                        priority: secureRandomFloat(),
+                        size: 150 + Math.floor(secureRandomFloat() * 300),
+                        complexity: 1 + Math.floor(secureRandomFloat() * 5),
                     },
                     renderProps: {
                         key: `item-${index}`,
@@ -1399,7 +1400,7 @@ describe("React List Operations Performance", () => {
             ];
 
             const config =
-                filterConfigs[Math.floor(Math.random() * filterConfigs.length)];
+                filterConfigs[Math.floor(secureRandomFloat() * filterConfigs.length)];
             renderer.renderList(componentId, items, config);
         }
 
@@ -1419,26 +1420,26 @@ describe("React List Operations Performance", () => {
 
         for (let render = 0; render < 100; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             const items: ListItem[] = Array.from(
                 { length: 300 },
                 (_, index) => ({
                     id: `item-${index}`,
                     value: {
-                        name: `Item ${Math.floor(Math.random() * 1000)}`,
-                        timestamp: Date.now() - Math.random() * 86_400_000,
-                        score: Math.random() * 100,
+                        name: `Item ${Math.floor(secureRandomFloat() * 1000)}`,
+                        timestamp: Date.now() - secureRandomFloat() * 86_400_000,
+                        score: secureRandomFloat() * 100,
                         category: `Category ${index % 5}`,
                     },
                     metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 30,
-                        modified: Date.now() - Math.random() * 86_400_000 * 7,
+                        created: Date.now() - secureRandomFloat() * 86_400_000 * 30,
+                        modified: Date.now() - secureRandomFloat() * 86_400_000 * 7,
                         tags: [`tag${index % 12}`],
                         category: `Category ${index % 5}`,
-                        priority: Math.random(),
-                        size: 100 + Math.floor(Math.random() * 400),
-                        complexity: 1 + Math.floor(Math.random() * 4),
+                        priority: secureRandomFloat(),
+                        size: 100 + Math.floor(secureRandomFloat() * 400),
+                        complexity: 1 + Math.floor(secureRandomFloat() * 4),
                     },
                     renderProps: {
                         key: `item-${index}`,
@@ -1476,7 +1477,7 @@ describe("React List Operations Performance", () => {
             ];
 
             const config =
-                sortConfigs[Math.floor(Math.random() * sortConfigs.length)];
+                sortConfigs[Math.floor(secureRandomFloat() * sortConfigs.length)];
             renderer.renderList(componentId, items, config);
         }
 
@@ -1496,7 +1497,7 @@ describe("React List Operations Performance", () => {
 
         for (let render = 0; render < 80; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             // Large dataset for virtualization
             const items: ListItem[] = Array.from(
@@ -1505,16 +1506,16 @@ describe("React List Operations Performance", () => {
                     id: `virtual-item-${index}`,
                     value: {
                         content: `Content for item ${index}`,
-                        data: Array.from({ length: 20 }, () => Math.random()),
+                        data: Array.from({ length: 20 }, () => secureRandomFloat()),
                     },
                     metadata: {
                         created: Date.now(),
                         modified: Date.now(),
                         tags: [`tag${index % 15}`],
                         category: `Category ${index % 10}`,
-                        priority: Math.random(),
-                        size: 200 + Math.floor(Math.random() * 300),
-                        complexity: 1 + Math.floor(Math.random() * 6),
+                        priority: secureRandomFloat(),
+                        size: 200 + Math.floor(secureRandomFloat() * 300),
+                        complexity: 1 + Math.floor(secureRandomFloat() * 6),
                     },
                     renderProps: {
                         key: `virtual-item-${index}`,
@@ -1536,26 +1537,26 @@ describe("React List Operations Performance", () => {
                     itemHeight: 50,
                     containerHeight: 400,
                     overscan: 5,
-                    scrollOffset: Math.random() * 10_000,
+                    scrollOffset: secureRandomFloat() * 10_000,
                 },
                 {
                     itemHeight: (index: number) => 40 + (index % 5) * 20, // Variable height
                     containerHeight: 600,
                     overscan: 10,
-                    scrollOffset: Math.random() * 15_000,
+                    scrollOffset: secureRandomFloat() * 15_000,
                     estimatedItemSize: 60,
                 },
                 {
                     itemHeight: 80,
                     containerHeight: 300,
                     overscan: 3,
-                    scrollOffset: Math.random() * 20_000,
+                    scrollOffset: secureRandomFloat() * 20_000,
                 },
             ];
 
             const config =
                 virtualizationConfigs[
-                    Math.floor(Math.random() * virtualizationConfigs.length)
+                    Math.floor(secureRandomFloat() * virtualizationConfigs.length)
                 ];
             renderer.renderVirtualizedList(componentId, items, config);
         }
@@ -1576,7 +1577,7 @@ describe("React List Operations Performance", () => {
 
         for (let render = 0; render < 60; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             const items: ListItem[] = Array.from(
                 { length: 400 },
@@ -1593,13 +1594,13 @@ describe("React List Operations Performance", () => {
                         ][index % 3],
                     },
                     metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 30,
+                        created: Date.now() - secureRandomFloat() * 86_400_000 * 30,
                         modified: Date.now(),
                         tags: [`tag${index % 8}`],
                         category: `Category ${index % 6}`,
-                        priority: Math.random(),
-                        size: 120 + Math.floor(Math.random() * 250),
-                        complexity: 1 + Math.floor(Math.random() * 4),
+                        priority: secureRandomFloat(),
+                        size: 120 + Math.floor(secureRandomFloat() * 250),
+                        complexity: 1 + Math.floor(secureRandomFloat() * 4),
                     },
                     renderProps: {
                         key: `grouped-item-${index}`,
@@ -1625,7 +1626,7 @@ describe("React List Operations Performance", () => {
                 {
                     groupBy: "value.status",
                     sortGroups: false,
-                    collapseGroups: Math.random() > 0.5,
+                    collapseGroups: secureRandomFloat() > 0.5,
                 },
                 {
                     groupBy: "metadata.category",
@@ -1636,7 +1637,7 @@ describe("React List Operations Performance", () => {
 
             const config =
                 groupingConfigs[
-                    Math.floor(Math.random() * groupingConfigs.length)
+                    Math.floor(secureRandomFloat() * groupingConfigs.length)
                 ];
             renderer.renderGroupedList(componentId, items, config);
         }
@@ -1657,7 +1658,7 @@ describe("React List Operations Performance", () => {
 
         for (let render = 0; render < 80; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             const items: ListItem[] = Array.from(
                 { length: 200 },
@@ -1665,24 +1666,24 @@ describe("React List Operations Performance", () => {
                     id: `selectable-item-${index}`,
                     value: {
                         name: `Selectable Item ${index}`,
-                        selectable: Math.random() > 0.1, // 90% selectable
-                        disabled: Math.random() > 0.95, // 5% disabled
+                        selectable: secureRandomFloat() > 0.1, // 90% selectable
+                        disabled: secureRandomFloat() > 0.95, // 5% disabled
                     },
                     metadata: {
                         created: Date.now(),
                         modified: Date.now(),
                         tags: [`tag${index % 6}`],
                         category: `Category ${index % 4}`,
-                        priority: Math.random(),
-                        size: 100 + Math.floor(Math.random() * 200),
-                        complexity: 1 + Math.floor(Math.random() * 3),
+                        priority: secureRandomFloat(),
+                        size: 100 + Math.floor(secureRandomFloat() * 200),
+                        complexity: 1 + Math.floor(secureRandomFloat() * 3),
                     },
                     renderProps: {
                         key: `selectable-item-${index}`,
                         eventHandlers: {},
                     },
                     state: {
-                        selected: Math.random() > 0.8, // 20% pre-selected
+                        selected: secureRandomFloat() > 0.8, // 20% pre-selected
                         visible: true,
                         expanded: false,
                         loading: false,
@@ -1726,7 +1727,7 @@ describe("React List Operations Performance", () => {
 
             const config =
                 selectionConfigs[
-                    Math.floor(Math.random() * selectionConfigs.length)
+                    Math.floor(secureRandomFloat() * selectionConfigs.length)
                 ];
             renderer.renderSelectableList(componentId, items, config);
         }
@@ -1747,7 +1748,7 @@ describe("React List Operations Performance", () => {
 
         for (let render = 0; render < 40; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             const items: ListItem[] = Array.from(
                 { length: 1000 },
@@ -1755,21 +1756,21 @@ describe("React List Operations Performance", () => {
                     id: `complex-item-${index}`,
                     value: {
                         name: `Complex Item ${index}`,
-                        price: Math.random() * 2000,
-                        rating: Math.random() * 5,
+                        price: secureRandomFloat() * 2000,
+                        rating: secureRandomFloat() * 5,
                         category: `Category ${index % 12}`,
                         brand: `Brand ${index % 8}`,
-                        inStock: Math.random() > 0.2,
-                        featured: Math.random() > 0.7,
+                        inStock: secureRandomFloat() > 0.2,
+                        featured: secureRandomFloat() > 0.7,
                     },
                     metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 365,
-                        modified: Date.now() - Math.random() * 86_400_000 * 30,
+                        created: Date.now() - secureRandomFloat() * 86_400_000 * 365,
+                        modified: Date.now() - secureRandomFloat() * 86_400_000 * 30,
                         tags: [`tag${index % 20}`, `feature${index % 15}`],
                         category: `Category ${index % 12}`,
-                        priority: Math.random(),
-                        size: 150 + Math.floor(Math.random() * 400),
-                        complexity: 1 + Math.floor(Math.random() * 8),
+                        priority: secureRandomFloat(),
+                        size: 150 + Math.floor(secureRandomFloat() * 400),
+                        complexity: 1 + Math.floor(secureRandomFloat() * 8),
                     },
                     renderProps: {
                         key: `complex-item-${index}`,
@@ -1810,13 +1811,13 @@ describe("React List Operations Performance", () => {
                 sortBy: "value.rating",
                 sortDirection: "desc",
                 pagination: {
-                    page: Math.floor(Math.random() * 10) + 1,
+                    page: Math.floor(secureRandomFloat() * 10) + 1,
                     pageSize: 20,
                     totalItems: items.length,
                     prefetchPages: 2,
                 },
                 grouping:
-                    Math.random() > 0.5
+                    secureRandomFloat() > 0.5
                         ? {
                               groupBy: "value.category",
                               sortGroups: true,
@@ -1846,7 +1847,7 @@ describe("React List Operations Performance", () => {
         for (let render = 0; render < 20; render++) {
             const componentId =
                 stressComponents[
-                    Math.floor(Math.random() * stressComponents.length)
+                    Math.floor(secureRandomFloat() * stressComponents.length)
                 ];
 
             // Very large dataset
@@ -1857,7 +1858,7 @@ describe("React List Operations Performance", () => {
                     value: {
                         title: `Stress Item ${index}`,
                         content: `Content ${index}`.repeat(10), // Large content
-                        data: Array.from({ length: 50 }, () => Math.random()), // Large data array
+                        data: Array.from({ length: 50 }, () => secureRandomFloat()), // Large data array
                         nested: {
                             level1: {
                                 level2: {
@@ -1866,7 +1867,7 @@ describe("React List Operations Performance", () => {
                                         { length: 20 },
                                         (_, j) => ({
                                             id: j,
-                                            value: Math.random(),
+                                            value: secureRandomFloat(),
                                         })
                                     ),
                                 },
@@ -1874,16 +1875,16 @@ describe("React List Operations Performance", () => {
                         },
                     },
                     metadata: {
-                        created: Date.now() - Math.random() * 86_400_000 * 365,
+                        created: Date.now() - secureRandomFloat() * 86_400_000 * 365,
                         modified: Date.now(),
                         tags: Array.from(
                             { length: 10 },
                             (_, j) => `tag${j}-${index % 50}`
                         ),
                         category: `Category ${index % 25}`,
-                        priority: Math.random(),
-                        size: 500 + Math.floor(Math.random() * 1000),
-                        complexity: 5 + Math.floor(Math.random() * 10),
+                        priority: secureRandomFloat(),
+                        size: 500 + Math.floor(secureRandomFloat() * 1000),
+                        complexity: 5 + Math.floor(secureRandomFloat() * 10),
                     },
                     renderProps: {
                         key: `stress-item-${index}`,
@@ -1893,18 +1894,18 @@ describe("React List Operations Performance", () => {
                             backgroundColor: `hsl(${index % 360}, 50%, 95%)`,
                         },
                         eventHandlers: {
-                            onClick: () => Math.random(),
-                            onHover: () => Math.random(),
-                            onFocus: () => Math.random(),
-                            onBlur: () => Math.random(),
+                            onClick: () => secureRandomFloat(),
+                            onHover: () => secureRandomFloat(),
+                            onFocus: () => secureRandomFloat(),
+                            onBlur: () => secureRandomFloat(),
                         },
                     },
                     state: {
-                        selected: Math.random() > 0.9,
-                        visible: Math.random() > 0.05,
-                        expanded: Math.random() > 0.8,
-                        loading: Math.random() > 0.95,
-                        cached: Math.random() > 0.7,
+                        selected: secureRandomFloat() > 0.9,
+                        visible: secureRandomFloat() > 0.05,
+                        expanded: secureRandomFloat() > 0.8,
+                        loading: secureRandomFloat() > 0.95,
+                        cached: secureRandomFloat() > 0.7,
                     },
                 })
             );
@@ -1943,7 +1944,7 @@ describe("React List Operations Performance", () => {
                     itemHeight: (index: number) => 50 + (index % 10) * 10,
                     containerHeight: 800,
                     overscan: 20,
-                    scrollOffset: Math.random() * 50_000,
+                    scrollOffset: secureRandomFloat() * 50_000,
                     estimatedItemSize: 75,
                 },
                 grouping: {

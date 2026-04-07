@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Metrics - Repository Stats
+name: Metrics Repository Stats
+run-name: Refresh repository stats
 
 on:
     workflow_dispatch:
@@ -13,12 +14,18 @@ on:
             - "package.json"
             - "*.md"
 
+concurrency:
+    group: repo-stats-${{ github.ref || github.run_id }}
+    cancel-in-progress: false
+
 permissions:
     contents: read
 
 jobs:
     metrics:
+        name: Generate repository metrics
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         concurrency:
             group: repo-stats-${{ github.ref }}
             cancel-in-progress: false

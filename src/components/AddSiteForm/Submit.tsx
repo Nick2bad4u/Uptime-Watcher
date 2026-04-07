@@ -8,6 +8,7 @@ import type { Simplify } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import { arrayFirst, safeCastTo  } from "ts-extras";
 
 import type { Logger } from "../../services/logger";
 import type {
@@ -227,10 +228,10 @@ async function validateMonitorType<TType extends MonitorType>(
 ): Promise<readonly string[]> {
     const builderCandidate = resolveMonitorValidationBuilder(monitorType);
     const partialData = builderCandidate(fields);
-    const formData = {
+    const formData = safeCastTo<PartialMonitorFormDataByType<TType>>({
         ...partialData,
         type: monitorType,
-    } as PartialMonitorFormDataByType<TType>;
+    });
 
     const result = await validateMonitorFormData(monitorType, formData);
     return result.errors;
@@ -366,7 +367,7 @@ export async function handleSubmit(
             },
         });
 
-        setFormError(synchronousValidationErrors[0]);
+        setFormError(arrayFirst(synchronousValidationErrors));
         return;
     }
 
@@ -412,7 +413,7 @@ export async function handleSubmit(
             },
         });
 
-        setFormError(validationErrors[0]); // Show first error
+        setFormError(arrayFirst(validationErrors)); // Show first error
 
         return;
     }

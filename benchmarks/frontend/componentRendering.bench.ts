@@ -5,6 +5,7 @@
 
 import { bench, describe } from "vitest";
 import { type CSSProperties, type ReactNode } from "react";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for component props and state
 interface ComponentProps {
@@ -130,7 +131,7 @@ describe("React Component Rendering Performance", () => {
                     },
                     {
                         type: "span",
-                        props: { children: item.value || Math.random() },
+                        props: { children: item.value || secureRandomFloat() },
                         children: [],
                     },
                 ],
@@ -168,9 +169,9 @@ describe("React Component Rendering Performance", () => {
             return Array.from({ length: count }, (_, i) => ({
                 id: `item-${i}`,
                 name: `Item ${i}`,
-                value: Math.random() * 1000,
+                value: secureRandomFloat() * 1000,
                 category: `Category ${i % 5}`,
-                isActive: Math.random() > 0.5,
+                isActive: secureRandomFloat() > 0.5,
             }));
         }
     }
@@ -181,19 +182,19 @@ describe("React Component Rendering Performance", () => {
             id: `component-${i}`,
             title: `Component ${i}`,
             data: Array.from(
-                { length: 10 + Math.floor(Math.random() * 90) },
+                { length: 10 + Math.floor(secureRandomFloat() * 90) },
                 (_, j) => ({
                     id: `item-${i}-${j}`,
                     name: `Item ${j}`,
-                    value: Math.random() * 1000,
+                    value: secureRandomFloat() * 1000,
                 })
             ),
-            isVisible: Math.random() > 0.2,
+            isVisible: secureRandomFloat() > 0.2,
             className: `component-${i % 5}`,
             style: {
-                width: Math.floor(Math.random() * 500) + 200,
-                height: Math.floor(Math.random() * 300) + 100,
-                backgroundColor: `#${Math.floor(Math.random() * 16_777_215).toString(16)}`,
+                width: Math.floor(secureRandomFloat() * 500) + 200,
+                height: Math.floor(secureRandomFloat() * 300) + 100,
+                backgroundColor: `#${Math.floor(secureRandomFloat() * 16_777_215).toString(16)}`,
             },
         }));
 
@@ -227,7 +228,7 @@ describe("React Component Rendering Performance", () => {
                 componentId: props.id,
                 renderTime: endTime - startTime,
                 nodeCount: countNodes(virtualElement),
-                memoryUsage: Math.random() * 1000, // Simulated memory usage
+                memoryUsage: secureRandomFloat() * 1000, // Simulated memory usage
                 updateCount: component.renderCount,
                 reRenderCauses: ["initial_render"],
             });
@@ -313,18 +314,18 @@ describe("React Component Rendering Performance", () => {
                     "p",
                     "button",
                     "input",
-                ][Math.floor(Math.random() * 5)],
+                ][Math.floor(secureRandomFloat() * 5)],
                 props: {
                     id: `element-${i}`,
                     className: `class-${i % 10}`,
                     style: {
-                        width: Math.random() * 200,
-                        height: Math.random() * 100,
+                        width: secureRandomFloat() * 200,
+                        height: secureRandomFloat() * 100,
                     },
                     onClick: () => console.log(`Clicked ${i}`),
                 },
                 children: Array.from(
-                    { length: Math.floor(Math.random() * 5) },
+                    { length: Math.floor(secureRandomFloat() * 5) },
                     (_, j) => ({
                         type: "span",
                         props: { children: `Child ${j}` },
@@ -453,13 +454,13 @@ describe("React Component Rendering Performance", () => {
             Array.from({ length: 500 + i * 100 }, (_, j) => ({
                 id: `large-item-${i}-${j}`,
                 name: `Large Item ${j}`,
-                value: Math.random() * 10_000,
+                value: secureRandomFloat() * 10_000,
                 category: `Category ${j % 20}`,
                 metadata: {
-                    created: Date.now() - Math.random() * 86_400_000,
-                    updated: Date.now() - Math.random() * 3_600_000,
+                    created: Date.now() - secureRandomFloat() * 86_400_000,
+                    updated: Date.now() - secureRandomFloat() * 3_600_000,
                     tags: Array.from(
-                        { length: Math.floor(Math.random() * 5) },
+                        { length: Math.floor(secureRandomFloat() * 5) },
                         (_, k) => `tag-${k}`
                     ),
                 },

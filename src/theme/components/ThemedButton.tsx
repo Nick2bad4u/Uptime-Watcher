@@ -66,6 +66,7 @@ import {
     type ReactNode,
     useCallback,
 } from "react";
+import { arrayJoin } from "ts-extras";
 
 import { renderColoredIcon } from "./iconUtils";
 import { CSS_CLASSES } from "./types";
@@ -136,7 +137,7 @@ const ThemedButtonComponent = ({
             ? { type: providedType }
             : undefined;
 
-    const classNames = [
+    const classNames = arrayJoin([
         CSS_CLASSES.THEMED_BUTTON,
         `themed-button--${variant}`,
         `themed-button--size-${size}`,
@@ -144,8 +145,7 @@ const ThemedButtonComponent = ({
         (disabled ? true : loading) && "themed-button--loading",
         className,
     ]
-        .filter(Boolean)
-        .join(" ");
+        .filter(Boolean), " ");
 
     // UseCallback handler for jsx-no-bind compliance
     const handleClick = useCallback(

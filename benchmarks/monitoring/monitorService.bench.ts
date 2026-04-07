@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock monitor types
 interface MonitorConfig {
@@ -56,12 +57,12 @@ class MockHttpMonitor {
 
         // Simulate HTTP request
         await new Promise((resolve) =>
-            setTimeout(resolve, Math.random() * config.timeout)
+            setTimeout(resolve, secureRandomFloat() * config.timeout)
         );
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
-        const success = Math.random() > 0.05; // 95% success rate
+        const success = secureRandomFloat() > 0.05; // 95% success rate
 
         return {
             monitorId: config.id,
@@ -74,7 +75,7 @@ class MockHttpMonitor {
                       404,
                       500,
                       503,
-                  ][Math.floor(Math.random() * 3)],
+                  ][Math.floor(secureRandomFloat() * 3)],
             error: success ? undefined : "HTTP request failed",
             metadata: {
                 url: config.target,
@@ -102,11 +103,11 @@ class MockPingMonitor {
         const startTime = Date.now();
 
         // Simulate ping
-        await new Promise((resolve) => setTimeout(resolve, Math.random() * 50));
+        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 50));
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
-        const success = Math.random() > 0.02; // 98% success rate
+        const success = secureRandomFloat() > 0.02; // 98% success rate
 
         return {
             monitorId: config.id,
@@ -140,11 +141,11 @@ class MockPortMonitor {
         const startTime = Date.now();
 
         // Simulate port check
-        await new Promise((resolve) => setTimeout(resolve, Math.random() * 30));
+        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 30));
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
-        const success = Math.random() > 0.03; // 97% success rate
+        const success = secureRandomFloat() > 0.03; // 97% success rate
 
         return {
             monitorId: config.id,
@@ -178,11 +179,11 @@ class MockDnsMonitor {
         const startTime = Date.now();
 
         // Simulate DNS lookup
-        await new Promise((resolve) => setTimeout(resolve, Math.random() * 20));
+        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 20));
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
-        const success = Math.random() > 0.01; // 99% success rate
+        const success = secureRandomFloat() > 0.01; // 99% success rate
 
         return {
             monitorId: config.id,

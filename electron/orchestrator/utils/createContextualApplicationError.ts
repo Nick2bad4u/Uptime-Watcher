@@ -1,4 +1,5 @@
 import type { Logger } from "@shared/utils/logger/interfaces";
+import type { UnknownRecord } from "type-fest";
 
 import {
     ApplicationError,
@@ -14,7 +15,7 @@ export interface CreateContextualApplicationErrorInput {
     /** Stable code used for grouping/telemetry. */
     readonly code: string;
     /** Additional structured metadata. */
-    readonly details?: Record<string, unknown>;
+    readonly details?: UnknownRecord;
     /** Diagnostics logger used for deeper debugging signals. */
     readonly diagnosticsLogger: Logger;
     /** Prefix included with diagnostics messages (defaults to "[Orchestrator]"). */

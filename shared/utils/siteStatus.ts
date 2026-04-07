@@ -12,7 +12,7 @@
 import type { SiteForStatus, SiteStatus } from "@shared/types";
 
 import { isMonitorStatus, STATUS_KIND } from "@shared/types";
-import { isPresent } from "ts-extras";
+import { isEmpty, isPresent, safeCastTo   } from "ts-extras";
 
 /**
  * Normalizes a site monitors collection by removing nullish entries and
@@ -29,9 +29,9 @@ const normalizeMonitors = (
         return [];
     }
 
-    const nullableMonitors = monitors as Array<
+    const nullableMonitors = safeCastTo<Array<
         null | SiteForStatus["monitors"][number] | undefined
-    >;
+    >>(monitors);
 
     return nullableMonitors.filter(isPresent);
 };
@@ -65,7 +65,7 @@ export function calculateSiteMonitoringStatus(
 ): "partial" | "running" | "stopped" {
     const monitors = normalizeMonitors(site.monitors);
 
-    if (monitors.length === 0) {
+    if (isEmpty(monitors)) {
         return "stopped";
     }
 
@@ -112,7 +112,7 @@ export function calculateSiteMonitoringStatus(
 export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
     const monitors = normalizeMonitors(site.monitors);
 
-    if (monitors.length === 0) {
+    if (isEmpty(monitors)) {
         return STATUS_KIND.UNKNOWN;
     }
 
@@ -120,7 +120,7 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
     const statuses = Array.from(new Set(monitors.map((m) => m.status)));
 
     // Handle case where no valid statuses found
-    if (statuses.length === 0) {
+    if (isEmpty(statuses)) {
         return STATUS_KIND.UNKNOWN;
     }
 
@@ -179,7 +179,7 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
     const operationalStatus = calculateSiteStatus(normalizedSite);
 
     // If no monitors exist, show as unknown
-    if (monitors.length === 0) {
+    if (isEmpty(monitors)) {
         return STATUS_KIND.UNKNOWN;
     }
 

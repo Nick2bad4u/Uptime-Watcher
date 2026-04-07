@@ -37,6 +37,7 @@ import type { CacheValue } from "@shared/types/configTypes";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { isDefined } from "ts-extras";
 
 import { logger } from "../services/logger";
 
@@ -318,7 +319,7 @@ export class TypedCache<K, V> {
      * @public
      */
     public has(key: K): boolean {
-        return this.get(key) !== undefined;
+        return isDefined(this.get(key));
     }
 
     /**

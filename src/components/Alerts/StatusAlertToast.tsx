@@ -10,6 +10,7 @@ import {
     STATUS_KIND,
 } from "@shared/types";
 import { useCallback, useEffect, useMemo } from "react";
+import { safeCastTo } from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 
@@ -119,7 +120,7 @@ export const StatusAlertToast = ({
             <div className="status-alert__indicator">
                 <StatusIndicator
                     size="sm"
-                    status={resolvedStatus as SiteStatus}
+                    status={safeCastTo<SiteStatus>(resolvedStatus)}
                 />
             </div>
             <div className="status-alert__content">

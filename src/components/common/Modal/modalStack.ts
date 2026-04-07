@@ -7,6 +7,8 @@
  * the last blocking modal closes).
  */
 
+import { arrayAt } from "ts-extras";
+
 interface AppRootInertSnapshot {
     readonly ariaHidden: null | string;
     readonly hadInert: boolean;
@@ -95,7 +97,7 @@ export function popModal(id: number): void {
  * Returns true if the provided modal id is currently the top-most open modal.
  */
 export function isTopModal(id: number): boolean {
-    const top = modalStackState.modalStack.at(-1);
+    const top = arrayAt(modalStackState.modalStack, -1);
     return top === id;
 }
 

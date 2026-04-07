@@ -11,6 +11,8 @@
 /**
  * Minimal logger shape for background task error reporting.
  */
+import type { UnknownArray } from "type-fest";
+
 export interface BackgroundTaskLogger {
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
 }
@@ -50,7 +52,7 @@ export function fireAndForget(
 export interface FireAndForgetLoggedArgs {
     logger: BackgroundTaskLogger;
     /** Optional extra logger args (structured context, etc.). */
-    loggerArgs?: readonly unknown[];
+    loggerArgs?: Readonly<UnknownArray>;
     message: string;
     task: () => Promise<void>;
 }

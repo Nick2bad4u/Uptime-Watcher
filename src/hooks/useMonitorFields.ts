@@ -43,6 +43,7 @@
 import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 
 import { useCallback, useEffect } from "react";
+import { arrayFind } from "ts-extras";
 
 import type { ErrorStore } from "../stores/error/types";
 
@@ -122,7 +123,7 @@ export function useMonitorFields(): UseMonitorFieldsResult {
     const isFieldRequired = useCallback(
         (monitorType: MonitorType, fieldName: string): boolean => {
             const fields = getFields(monitorType);
-            const field = fields.find((f) => f.name === fieldName);
+            const field = arrayFind(fields, (f) => f.name === fieldName);
             return field?.required ?? false;
         },
         [getFields]

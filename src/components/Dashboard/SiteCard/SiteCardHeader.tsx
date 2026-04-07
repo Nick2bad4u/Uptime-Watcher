@@ -14,6 +14,7 @@ import {
     useMemo,
     useState,
 } from "react";
+import { arrayFind, arrayFirst  } from "ts-extras";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
@@ -179,10 +180,8 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
 
         const selectedMonitor = useMemo(
             () =>
-                site.site.monitors.find(
-                    (monitorEntry) =>
-                        monitorEntry.id === monitoring.selectedMonitorId
-                ) ?? site.site.monitors[0],
+                arrayFind(site.site.monitors, (monitorEntry) =>
+                        monitorEntry.id === monitoring.selectedMonitorId) ?? arrayFirst(site.site.monitors),
             [monitoring.selectedMonitorId, site.site.monitors]
         );
 

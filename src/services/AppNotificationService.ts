@@ -18,6 +18,7 @@ import type { AppNotificationRequest } from "@shared/types/notifications";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { validateAppNotificationRequest } from "@shared/validation/notifications";
+import { arrayJoin } from "ts-extras";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
@@ -66,9 +67,8 @@ export const AppNotificationService: AppNotificationServiceContract = {
         async (api, request: AppNotificationRequest) => {
             const validation = validateAppNotificationRequest(request);
             if (!validation.success) {
-                const issues = validation.error.issues
-                    .map(({ message }) => message)
-                    .join(", ");
+                const issues = arrayJoin(validation.error.issues
+                    .map(({ message }) => message), ", ");
                 throw new Error(`Invalid app notification request: ${issues}`, {
                     cause: validation.error,
                 });

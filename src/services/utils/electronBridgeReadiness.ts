@@ -9,10 +9,11 @@
  * or when the application is executed outside an Electron environment.
  */
 
-import type { UnknownRecord } from "type-fest";
+import type { UnknownArray, UnknownRecord  } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { withRetry } from "@shared/utils/retry";
+import { isEmpty, safeCastTo  } from "ts-extras";
 
 const DEFAULT_MAX_ATTEMPTS = 50;
 const DEFAULT_BASE_DELAY = 100;
@@ -109,11 +110,11 @@ const getGlobalWindow = (): unknown => {
         return window;
     }
 
-    const globalObject = globalThis as { window?: unknown };
+    const globalObject = safeCastTo<{ window?: unknown }>(globalThis);
     return globalObject.window;
 };
 
-type ObjectLike = ((...args: readonly unknown[]) => unknown) | UnknownRecord;
+type ObjectLike = ((...args: Readonly<UnknownArray>) => unknown) | UnknownRecord;
 
 const isObjectLike = (value: unknown): value is ObjectLike =>
     (typeof value === "object" || typeof value === "function") &&
@@ -195,8 +196,8 @@ const evaluateContracts = (
     }
 
     const isReady =
-        missingDomains.length === 0 &&
-        missingMethods.length === 0 &&
+        isEmpty(missingDomains) &&
+        isEmpty(missingMethods) &&
         bridgeAvailable;
 
     return {

@@ -10,6 +10,7 @@
 import type { ValueOf } from "type-fest";
 
 import { useCallback } from "react";
+import { objectFromEntries, objectKeys, safeCastTo, setHas    } from "ts-extras";
 
 import type { AppSettings } from "../../stores/types";
 
@@ -70,7 +71,7 @@ export function useSettingsChangeHandlers(args: {
                 if (allowedKey in changes) {
                     const oldValue = settings[allowedKey];
                     const newValue = changes[allowedKey];
-                    const isForced = forceSettingsKeys.has(allowedKey);
+                    const isForced = setHas(forceSettingsKeys, allowedKey);
 
                     if (
                         newValue !== undefined &&
@@ -78,7 +79,7 @@ export function useSettingsChangeHandlers(args: {
                     ) {
                         updateEntries.push([
                             allowedKey,
-                            newValue as ValueOf<AppSettings>,
+                            safeCastTo<ValueOf<AppSettings>>(newValue),
                         ]);
 
                         logger.user.settingsChange(
@@ -91,7 +92,7 @@ export function useSettingsChangeHandlers(args: {
             }
 
             // Warn about invalid keys
-            for (const rawKey of Object.keys(changes)) {
+            for (const rawKey of objectKeys(changes)) {
                 if (!ALLOWED_SETTINGS_KEY_STRINGS.has(rawKey)) {
                     logger.warn(
                         "Attempted to update invalid settings key",
@@ -102,7 +103,7 @@ export function useSettingsChangeHandlers(args: {
 
             if (updateEntries.length > 0) {
                 updateSettings(
-                    Object.fromEntries(updateEntries) as Partial<AppSettings>
+                    safeCastTo(objectFromEntries(updateEntries))
                 );
             }
         },

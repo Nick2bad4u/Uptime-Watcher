@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 interface EventSubscription {
     id: string;
@@ -584,7 +585,7 @@ describe("Event Subscriptions Performance", () => {
                         // Simulate work
                         await new Promise((resolve) => setTimeout(resolve, 1));
                     },
-                    { priority: Math.floor(Math.random() * 10) }
+                    { priority: Math.floor(secureRandomFloat() * 10) }
                 );
             }
 

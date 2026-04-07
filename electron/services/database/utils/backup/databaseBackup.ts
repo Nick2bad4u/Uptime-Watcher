@@ -6,6 +6,7 @@ import { app } from "electron";
 import sqlite3 from "node-sqlite3-wasm";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
+import { arrayFirst, arrayJoin, safeCastTo   } from "ts-extras";
 
 import { BACKUP_DB_FILE_NAME } from "../../../../constants";
 import { logger } from "../../../../utils/logger";
@@ -111,7 +112,7 @@ export function readDatabaseSchemaVersionFromFile(filePath: string): number {
         const result: unknown = database.prepare("PRAGMA user_version").get();
 
         if (result && typeof result === "object" && "user_version" in result) {
-            const version = (result as UnknownRecord)["user_version"];
+            const version = (safeCastTo<UnknownRecord>(result))["user_version"];
             if (typeof version === "number") {
                 return version;
             }
@@ -171,12 +172,12 @@ export function assertSqliteDatabaseIntegrity(args: {
         const messages = extractPragmaMessages(rows, pragma);
 
         // When healthy, the pragma returns a single row with value "ok".
-        if (messages.length === 1 && messages[0]?.toLowerCase() === "ok") {
+        if (messages.length === 1 && arrayFirst(messages)?.toLowerCase() === "ok") {
             return;
         }
 
         // If SQLite returns multiple rows or non-ok messages, surface them.
-        const details = messages.length > 0 ? messages.join("; ") : "unknown";
+        const details = messages.length > 0 ? arrayJoin(messages, "; ") : "unknown";
         throw new Error(`SQLite ${pragma} failed: ${details}`);
     } finally {
         database.close();

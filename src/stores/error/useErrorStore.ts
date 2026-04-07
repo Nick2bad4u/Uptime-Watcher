@@ -33,6 +33,7 @@
  */
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { objectEntries, objectFromEntries  } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
@@ -72,8 +73,8 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                     ...state.storeErrors,
                 };
                 // Filter out the specified store error
-                const remainingErrors = Object.fromEntries(
-                    Object.entries(newStoreErrors).filter(
+                const remainingErrors = objectFromEntries(
+                    objectEntries(newStoreErrors).filter(
                         ([key]) => key !== store
                     )
                 );

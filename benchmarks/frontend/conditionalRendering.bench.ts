@@ -5,6 +5,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for Conditional Rendering
 interface RenderCondition {
@@ -156,8 +157,8 @@ class MockReactElementFactory {
             const childType = `Child${i}`;
             const childProps = {
                 id: i,
-                data: Array.from({ length: complexity }, () => Math.random()),
-                handlers: Array.from({ length: 3 }, () => () => Math.random()),
+                data: Array.from({ length: complexity }, () => secureRandomFloat()),
+                handlers: Array.from({ length: 3 }, () => () => secureRandomFloat()),
             };
 
             const grandChildren: ReactElement[] = [];
@@ -447,7 +448,7 @@ class MockConditionalRenderer {
             } catch (error) {
                 this.handleLazyLoadingError(componentId, error);
             }
-        }, Math.random() * 100);
+        }, secureRandomFloat() * 100);
 
         return placeholderElement;
     }
@@ -953,8 +954,8 @@ describe("Conditional Rendering Performance", () => {
         // Perform conditional renders with ternary operators
         for (let render = 0; render < 500; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
-            const condition = Math.random() > 0.5;
+                components[Math.floor(secureRandomFloat() * components.length)];
+            const condition = secureRandomFloat() > 0.5;
 
             renderer.renderWithTernary(
                 componentId,
@@ -986,13 +987,13 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 500; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
-            const condition = Math.random() > 0.3;
+                components[Math.floor(secureRandomFloat() * components.length)];
+            const condition = secureRandomFloat() > 0.3;
 
             renderer.renderWithLogicalAnd(componentId, condition, () =>
                 elementFactory.createElement("ConditionalComponent", {
                     id: render,
-                    data: Array.from({ length: 10 }, () => Math.random()),
+                    data: Array.from({ length: 10 }, () => secureRandomFloat()),
                 })
             );
         }
@@ -1032,10 +1033,10 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 400; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             const caseKeys = Object.keys(cases);
             const selectedCase =
-                caseKeys[Math.floor(Math.random() * caseKeys.length)];
+                caseKeys[Math.floor(secureRandomFloat() * caseKeys.length)];
 
             renderer.renderWithSwitch(componentId, selectedCase, cases, () =>
                 elementFactory.createElement("DefaultComponent", {
@@ -1061,12 +1062,12 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 300; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             const userData = {
-                isLoggedIn: Math.random() > 0.3,
-                hasPermission: Math.random() > 0.4,
-                isVerified: Math.random() > 0.2,
-                hasSubscription: Math.random() > 0.6,
+                isLoggedIn: secureRandomFloat() > 0.3,
+                hasPermission: secureRandomFloat() > 0.4,
+                isVerified: secureRandomFloat() > 0.2,
+                hasSubscription: secureRandomFloat() > 0.6,
             };
 
             const guards = [
@@ -1116,21 +1117,21 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 200; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             const state = {
-                loading: Math.random() > 0.8,
-                error: Math.random() > 0.9,
+                loading: secureRandomFloat() > 0.8,
+                error: secureRandomFloat() > 0.9,
                 data:
-                    Math.random() > 0.1
+                    secureRandomFloat() > 0.1
                         ? {
                               items: Array.from({ length: 5 }, () =>
-                                  Math.random()
+                                  secureRandomFloat()
                               ),
                           }
                         : null,
                 user:
-                    Math.random() > 0.2
-                        ? { role: Math.random() > 0.5 ? "admin" : "user" }
+                    secureRandomFloat() > 0.2
+                        ? { role: secureRandomFloat() > 0.5 ? "admin" : "user" }
                         : null,
             };
 
@@ -1207,14 +1208,14 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 300; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             // Sometimes change dependencies to test memoization effectiveness
             if (render % 10 === 0) {
                 changingValue.count++;
             }
 
-            const condition = Math.random() > 0.4;
+            const condition = secureRandomFloat() > 0.4;
             const dependencies =
                 render % 3 === 0
                     ? [...stableDeps, changingValue.count]
@@ -1244,8 +1245,8 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 150; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
-            const shouldLoad = Math.random() > 0.6;
+                components[Math.floor(secureRandomFloat() * components.length)];
+            const shouldLoad = secureRandomFloat() > 0.6;
 
             renderer.renderWithLazyLoading(
                 componentId,
@@ -1253,7 +1254,7 @@ describe("Conditional Rendering Performance", () => {
                 async () => {
                     // Simulate async component loading
                     await new Promise((resolve) => {
-                        setTimeout(resolve, Math.random() * 50);
+                        setTimeout(resolve, secureRandomFloat() * 50);
                     });
                     return elementFactory.createComplexElement(8);
                 }
@@ -1277,15 +1278,15 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 100; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             // Create a list with varying conditions
             const items = Array.from({ length: 100 }, (_, index) => ({
                 id: index,
-                value: Math.random() * 100,
-                category: Math.random() > 0.5 ? "A" : "B",
-                active: Math.random() > 0.3,
-                visible: Math.random() > 0.1,
+                value: secureRandomFloat() * 100,
+                category: secureRandomFloat() > 0.5 ? "A" : "B",
+                active: secureRandomFloat() > 0.3,
+                visible: secureRandomFloat() > 0.1,
             }));
 
             const renderTypes = [
@@ -1328,7 +1329,7 @@ describe("Conditional Rendering Performance", () => {
             ];
 
             const renderType =
-                renderTypes[Math.floor(Math.random() * renderTypes.length)];
+                renderTypes[Math.floor(secureRandomFloat() * renderTypes.length)];
             renderType();
         }
 
@@ -1348,18 +1349,18 @@ describe("Conditional Rendering Performance", () => {
 
         for (let render = 0; render < 80; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             // Large dataset
             const items = Array.from({ length: 10_000 }, (_, index) => ({
                 id: index,
                 content: `Item ${index}`,
-                data: Array.from({ length: 10 }, () => Math.random()),
+                data: Array.from({ length: 10 }, () => secureRandomFloat()),
             }));
 
             // Simulate different viewport positions
-            const viewportStart = Math.floor(Math.random() * 9900);
-            const viewportSize = 50 + Math.floor(Math.random() * 50);
+            const viewportStart = Math.floor(secureRandomFloat() * 9900);
+            const viewportSize = 50 + Math.floor(secureRandomFloat() * 50);
             const visibleRange = {
                 start: viewportStart,
                 end: viewportStart + viewportSize,
@@ -1372,7 +1373,7 @@ describe("Conditional Rendering Performance", () => {
                 (item) =>
                     elementFactory.createElement("VirtualizedItem", {
                         item,
-                        complex: Math.random() > 0.7, // Some items are complex
+                        complex: secureRandomFloat() > 0.7, // Some items are complex
                     }),
                 60 // Item height
             );
@@ -1400,15 +1401,15 @@ describe("Conditional Rendering Performance", () => {
         for (let cycle = 0; cycle < 10; cycle++) {
             for (let render = 0; render < 30; render++) {
                 const componentId =
-                    components[Math.floor(Math.random() * components.length)];
-                const scenario = Math.floor(Math.random() * 6);
+                    components[Math.floor(secureRandomFloat() * components.length)];
+                const scenario = Math.floor(secureRandomFloat() * 6);
 
                 switch (scenario) {
                     case 0: {
                         // Simple ternary
                         renderer.renderWithTernary(
                             componentId,
-                            Math.random() > 0.5,
+                            secureRandomFloat() > 0.5,
                             () => elementFactory.createElement("Simple", {}),
                             () =>
                                 elementFactory.createElement("Alternative", {})
@@ -1421,7 +1422,7 @@ describe("Conditional Rendering Performance", () => {
                         renderer.renderWithTernary(
                             componentId,
                             () =>
-                                Math.random() > 0.3 &&
+                                secureRandomFloat() > 0.3 &&
                                 Date.now() % 2 === 0 &&
                                 Math.sin(Date.now()) > 0,
                             () => elementFactory.createComplexElement(3)
@@ -1433,7 +1434,7 @@ describe("Conditional Rendering Performance", () => {
                         // Memoized rendering
                         renderer.renderWithMemoization(
                             componentId,
-                            Math.random() > 0.4,
+                            secureRandomFloat() > 0.4,
                             () => elementFactory.createComplexElement(4),
                             [cycle, render % 5] // Changing dependencies
                         );
@@ -1444,17 +1445,17 @@ describe("Conditional Rendering Performance", () => {
                         // Guard clauses
                         renderer.renderWithGuardClause(componentId, [
                             {
-                                condition: Math.random() > 0.8,
+                                condition: secureRandomFloat() > 0.8,
                                 element: () =>
                                     elementFactory.createElement("Guard1", {}),
                             },
                             {
-                                condition: Math.random() > 0.6,
+                                condition: secureRandomFloat() > 0.6,
                                 element: () =>
                                     elementFactory.createElement("Guard2", {}),
                             },
                             {
-                                condition: Math.random() > 0.4,
+                                condition: secureRandomFloat() > 0.4,
                                 element: () =>
                                     elementFactory.createElement("Guard3", {}),
                             },
@@ -1466,7 +1467,7 @@ describe("Conditional Rendering Performance", () => {
                         // Conditional list
                         const items = Array.from({ length: 50 }, (_, j) => ({
                             id: j,
-                            active: Math.random() > 0.5,
+                            active: secureRandomFloat() > 0.5,
                         }));
                         renderer.renderConditionalList(
                             componentId,
@@ -1485,12 +1486,12 @@ describe("Conditional Rendering Performance", () => {
                         // Nested conditionals
                         renderer.renderNestedConditionals(componentId, [
                             {
-                                test: Math.random() > 0.3,
+                                test: secureRandomFloat() > 0.3,
                                 render: () =>
                                     elementFactory.createElement("Parent", {}),
                                 nested: [
                                     {
-                                        test: Math.random() > 0.5,
+                                        test: secureRandomFloat() > 0.5,
                                         render: () =>
                                             elementFactory.createElement(
                                                 "Child1",
@@ -1498,7 +1499,7 @@ describe("Conditional Rendering Performance", () => {
                                             ),
                                     },
                                     {
-                                        test: Math.random() > 0.7,
+                                        test: secureRandomFloat() > 0.7,
                                         render: () =>
                                             elementFactory.createElement(
                                                 "Child2",
@@ -1546,7 +1547,7 @@ describe("Conditional Rendering Performance", () => {
         for (let render = 0; render < 200; render++) {
             const componentId =
                 stressComponents[
-                    Math.floor(Math.random() * stressComponents.length)
+                    Math.floor(secureRandomFloat() * stressComponents.length)
                 ];
 
             // Multiple conditional renders per iteration
@@ -1558,7 +1559,7 @@ describe("Conditional Rendering Performance", () => {
                         test: () => {
                             // Complex condition logic
                             const factors = Array.from({ length: 5 }, () =>
-                                Math.random()
+                                secureRandomFloat()
                             );
                             return factors.reduce(
                                 (acc, factor, i) =>
@@ -1572,7 +1573,7 @@ describe("Conditional Rendering Performance", () => {
                             index < 3
                                 ? [
                                       {
-                                          test: () => Math.random() > 0.6,
+                                          test: () => secureRandomFloat() > 0.6,
                                           render: () =>
                                               elementFactory.createElement(
                                                   `NestedChild${index}`,
@@ -1594,16 +1595,16 @@ describe("Conditional Rendering Performance", () => {
                     { length: 200 },
                     (_, index) => ({
                         id: index,
-                        value: Math.random() * 100,
+                        value: secureRandomFloat() * 100,
                         category: `cat${index % 5}`,
                         tags: Array.from(
                             { length: 3 },
-                            () => `tag${Math.floor(Math.random() * 10)}`
+                            () => `tag${Math.floor(secureRandomFloat() * 10)}`
                         ),
                         metadata: {
-                            priority: Math.random(),
-                            visible: Math.random() > 0.2,
-                            active: Math.random() > 0.1,
+                            priority: secureRandomFloat(),
+                            visible: secureRandomFloat() > 0.2,
+                            active: secureRandomFloat() > 0.1,
                         },
                     })
                 );

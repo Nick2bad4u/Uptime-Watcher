@@ -4,9 +4,11 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { performance } from "node:perf_hooks";
+import { arrayJoin } from "ts-extras";
 
 import type { IMonitorService, MonitorServiceConfig } from "./types";
 
@@ -108,7 +110,7 @@ const behavior: RemoteMonitorBehavior<
             driftSeconds <= context.maxDriftSeconds
         ) {
             return {
-                details: detailSegments.join("; "),
+                details: arrayJoin(detailSegments, "; "),
                 responseTime,
                 status: "up",
             };
@@ -116,7 +118,7 @@ const behavior: RemoteMonitorBehavior<
 
         const isStatusMismatch = statusValue !== context.expectedStatus;
         const isDriftExceeded = driftSeconds > context.maxDriftSeconds;
-        const details = detailSegments.join("; ");
+        const details = arrayJoin(detailSegments, "; ");
 
         return {
             ...(isStatusMismatch && {
@@ -199,9 +201,7 @@ const behavior: RemoteMonitorBehavior<
     type: "server-heartbeat",
 };
 
-type ServerHeartbeatMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => IMonitorService;
+type ServerHeartbeatMonitorConstructor = Constructor<IMonitorService, [config?: MonitorServiceConfig]>;
 
 const ServerHeartbeatMonitorBase: ServerHeartbeatMonitorConstructor =
     ((): ServerHeartbeatMonitorConstructor => {

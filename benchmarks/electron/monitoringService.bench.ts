@@ -9,6 +9,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface MonitorResult {
@@ -91,7 +92,7 @@ describe("Monitoring Service Benchmarks", () => {
                 siteIdentifier: `site-${i}`,
                 monitorId: `monitor-${i}`,
                 type: monitorTypes[
-                    Math.floor(Math.random() * monitorTypes.length)
+                    Math.floor(secureRandomFloat() * monitorTypes.length)
                 ],
                 timestamp: Date.now(),
                 enabled: i % 10 !== 0, // 90% enabled
@@ -103,29 +104,29 @@ describe("Monitoring Service Benchmarks", () => {
                 switch (monitorExecution.type) {
                     case "HTTP":
                     case "HTTPS": {
-                        baseExecutionTime = Math.random() * 5000 + 500; // 500ms - 5.5s
+                        baseExecutionTime = secureRandomFloat() * 5000 + 500; // 500ms - 5.5s
                         break;
                     }
                     case "PING": {
-                        baseExecutionTime = Math.random() * 1000 + 100; // 100ms - 1.1s
+                        baseExecutionTime = secureRandomFloat() * 1000 + 100; // 100ms - 1.1s
                         break;
                     }
                     case "DNS": {
-                        baseExecutionTime = Math.random() * 2000 + 200; // 200ms - 2.2s
+                        baseExecutionTime = secureRandomFloat() * 2000 + 200; // 200ms - 2.2s
                         break;
                     }
                     case "TCP":
                     case "UDP": {
-                        baseExecutionTime = Math.random() * 3000 + 300; // 300ms - 3.3s
+                        baseExecutionTime = secureRandomFloat() * 3000 + 300; // 300ms - 3.3s
                         break;
                     }
                     default: {
-                        baseExecutionTime = Math.random() * 1000 + 500;
+                        baseExecutionTime = secureRandomFloat() * 1000 + 500;
                     }
                 }
 
                 // Add jitter and potential timeouts
-                const jitter = (Math.random() - 0.5) * 200;
+                const jitter = (secureRandomFloat() - 0.5) * 200;
                 const finalExecutionTime = Math.max(
                     50,
                     baseExecutionTime + jitter
@@ -136,14 +137,14 @@ describe("Monitoring Service Benchmarks", () => {
                     monitorId: monitorExecution.monitorId,
                     type: monitorExecution.type,
                     status: statusTypes[
-                        Math.floor(Math.random() * statusTypes.length)
+                        Math.floor(secureRandomFloat() * statusTypes.length)
                     ],
                     responseTime: finalExecutionTime,
-                    statusCode: Math.random() > 0.1 ? 200 : 500, // 90% success rate
+                    statusCode: secureRandomFloat() > 0.1 ? 200 : 500, // 90% success rate
                     timestamp: monitorExecution.timestamp,
                     retryCount:
-                        Math.random() > 0.8 ? Math.floor(Math.random() * 3) : 0,
-                    success: Math.random() > 0.1,
+                        secureRandomFloat() > 0.8 ? Math.floor(secureRandomFloat() * 3) : 0,
+                    success: secureRandomFloat() > 0.1,
                 };
             }
         }
@@ -167,7 +168,7 @@ describe("Monitoring Service Benchmarks", () => {
                 monitorId: `sched-monitor-${i}`,
                 siteIdentifier: `sched-site-${i % 100}`,
                 type: monitorTypes[
-                    Math.floor(Math.random() * monitorTypes.length)
+                    Math.floor(secureRandomFloat() * monitorTypes.length)
                 ],
                 interval:
                     [
@@ -176,9 +177,9 @@ describe("Monitoring Service Benchmarks", () => {
                         300,
                         600,
                         3600,
-                    ][Math.floor(Math.random() * 5)] * 1000, // 30s to 1h
-                nextRun: Date.now() + Math.random() * 60_000, // Next run within 1 minute
-                priority: Math.floor(Math.random() * 10) + 1, // 1-10 priority
+                    ][Math.floor(secureRandomFloat() * 5)] * 1000, // 30s to 1h
+                nextRun: Date.now() + secureRandomFloat() * 60_000, // Next run within 1 minute
+                priority: Math.floor(secureRandomFloat() * 10) + 1, // 1-10 priority
                 enabled: i % 8 !== 0, // 87.5% enabled
             })
         );
@@ -187,7 +188,7 @@ describe("Monitoring Service Benchmarks", () => {
         for (const entry of scheduleEntries) {
             if (entry.enabled) {
                 // Calculate scheduling overhead
-                const schedulingOverhead = Math.random() * 2; // 0-2ms
+                const schedulingOverhead = secureRandomFloat() * 2; // 0-2ms
 
                 // Determine next execution time
                 const now = Date.now();
@@ -233,22 +234,22 @@ describe("Monitoring Service Benchmarks", () => {
 
             // Generate status change event
             const previousStatus =
-                statusTypes[Math.floor(Math.random() * statusTypes.length)];
+                statusTypes[Math.floor(secureRandomFloat() * statusTypes.length)];
             let currentStatus =
-                statusTypes[Math.floor(Math.random() * statusTypes.length)];
+                statusTypes[Math.floor(secureRandomFloat() * statusTypes.length)];
 
             // Ensure status actually changes 70% of the time
-            if (Math.random() > 0.3 && currentStatus === previousStatus) {
+            if (secureRandomFloat() > 0.3 && currentStatus === previousStatus) {
                 const otherStatuses = statusTypes.filter(
                     (s) => s !== previousStatus
                 );
                 currentStatus =
                     otherStatuses[
-                        Math.floor(Math.random() * otherStatuses.length)
+                        Math.floor(secureRandomFloat() * otherStatuses.length)
                     ];
             }
 
-            const statusDuration = Math.random() * 300_000 + 60_000; // 1-6 minutes
+            const statusDuration = secureRandomFloat() * 300_000 + 60_000; // 1-6 minutes
             const isSignificantChange =
                 (previousStatus === "UP" && currentStatus === "DOWN") ||
                 (previousStatus === "DOWN" && currentStatus === "UP");
@@ -258,24 +259,24 @@ describe("Monitoring Service Benchmarks", () => {
                 monitorId,
                 previousStatus,
                 currentStatus,
-                timestamp: Date.now() - Math.random() * 86_400_000, // Within last 24 hours
+                timestamp: Date.now() - secureRandomFloat() * 86_400_000, // Within last 24 hours
                 duration: statusDuration,
-                alertGenerated: isSignificantChange && Math.random() > 0.2, // 80% alert generation for significant changes
+                alertGenerated: isSignificantChange && secureRandomFloat() > 0.2, // 80% alert generation for significant changes
             };
 
             statusEvents.push(statusEvent);
 
             // Simulate status aggregation processing
-            const aggregationTime = Math.random() * 3;
+            const aggregationTime = secureRandomFloat() * 3;
 
             const aggregation = {
                 siteIdentifier: statusEvent.siteIdentifier,
                 totalEvents: statusEvents.filter(
                     (e) => e.siteIdentifier === statusEvent.siteIdentifier
                 ).length,
-                uptime: Math.random() * 100,
-                downtime: Math.random() * 10,
-                averageResponseTime: Math.random() * 2000 + 200,
+                uptime: secureRandomFloat() * 100,
+                downtime: secureRandomFloat() * 10,
+                averageResponseTime: secureRandomFloat() * 2000 + 200,
                 processingTime: aggregationTime,
             };
         }
@@ -404,7 +405,7 @@ describe("Monitoring Service Benchmarks", () => {
             }
 
             const validationTime =
-                Date.now() - validationStartTime + Math.random() * 3;
+                Date.now() - validationStartTime + secureRandomFloat() * 3;
 
             const result: ValidationResult = {
                 monitorId: monitorConfig.id,
@@ -436,7 +437,7 @@ describe("Monitoring Service Benchmarks", () => {
                     siteIdentifier: `bulk-site-${i}`,
                     monitorId: `bulk-monitor-${i}`,
                     type: monitorTypes[
-                        Math.floor(Math.random() * monitorTypes.length)
+                        Math.floor(secureRandomFloat() * monitorTypes.length)
                     ],
                     enabled: i % 4 !== 0,
                 })),
@@ -446,16 +447,16 @@ describe("Monitoring Service Benchmarks", () => {
             const results: BulkResult[] = [];
 
             // Simulate bulk scheduling overhead
-            const bulkOverhead = Math.random() * 15;
+            const bulkOverhead = secureRandomFloat() * 15;
             totalTime += bulkOverhead;
 
             for (const monitor of bulkOperation.monitors) {
                 if (monitor.enabled) {
                     // Simulate individual monitor setup
-                    const setupTime = Math.random() * 3;
+                    const setupTime = secureRandomFloat() * 3;
 
                     // Simulate execution
-                    const executionTime = Math.random() * 2000;
+                    const executionTime = secureRandomFloat() * 2000;
 
                     const monitorTime = setupTime + executionTime;
                     totalTime += monitorTime;
@@ -465,7 +466,7 @@ describe("Monitoring Service Benchmarks", () => {
                         setupTime,
                         executionTime,
                         totalTime: monitorTime,
-                        success: Math.random() > 0.05, // 95% success rate
+                        success: secureRandomFloat() > 0.05, // 95% success rate
                     });
                 }
             }
@@ -525,7 +526,7 @@ describe("Monitoring Service Benchmarks", () => {
             for (let j = 0; j < coordination.affectedSites; j++) {
                 const siteOperation = {
                     siteIdentifier: `coord-site-${j}`,
-                    monitors: Math.floor(Math.random() * 5) + 1,
+                    monitors: Math.floor(secureRandomFloat() * 5) + 1,
                 };
 
                 let siteTime = 0;
@@ -533,23 +534,23 @@ describe("Monitoring Service Benchmarks", () => {
                 switch (coordination.operationType) {
                     case "start_all": {
                         siteTime =
-                            siteOperation.monitors * (Math.random() * 3 + 2);
+                            siteOperation.monitors * (secureRandomFloat() * 3 + 2);
                         break;
                     }
                     case "stop_all": {
                         siteTime =
                             siteOperation.monitors *
-                            (Number(Math.random()) * 1 + 0.5);
+                            (Number(secureRandomFloat()) * 1 + 0.5);
                         break;
                     }
                     case "restart_site": {
                         siteTime =
-                            siteOperation.monitors * (Math.random() * 4 + 3);
+                            siteOperation.monitors * (secureRandomFloat() * 4 + 3);
                         break;
                     }
                     case "health_check": {
                         siteTime =
-                            siteOperation.monitors * (Math.random() * 2 + 1);
+                            siteOperation.monitors * (secureRandomFloat() * 2 + 1);
                         break;
                     }
                 }
@@ -558,7 +559,7 @@ describe("Monitoring Service Benchmarks", () => {
                 operations.push({
                     ...siteOperation,
                     operationTime: siteTime,
-                    success: Math.random() > 0.03, // 97% success rate
+                    success: secureRandomFloat() > 0.03, // 97% success rate
                 });
             }
 
@@ -615,12 +616,12 @@ describe("Monitoring Service Benchmarks", () => {
                         siteIdentifier: `vol-site-${Math.floor((batch * concurrencyLimit + i) / scenario.monitorsPerSite)}`,
                         monitorId: `vol-monitor-${batch * concurrencyLimit + i}`,
                         type: monitorTypes[
-                            Math.floor(Math.random() * monitorTypes.length)
+                            Math.floor(secureRandomFloat() * monitorTypes.length)
                         ],
-                        executionTime: Math.random() * 3000 + 200,
+                        executionTime: secureRandomFloat() * 3000 + 200,
                     };
 
-                    if (Math.random() > 0.08) {
+                    if (secureRandomFloat() > 0.08) {
                         // 92% success rate
                         successfulMonitors++;
                     } else {
@@ -628,7 +629,7 @@ describe("Monitoring Service Benchmarks", () => {
                     }
                 }
 
-                const batchTime = Date.now() - batchStart + Math.random() * 100;
+                const batchTime = Date.now() - batchStart + secureRandomFloat() * 100;
                 processingTime += batchTime;
             }
 
@@ -688,7 +689,7 @@ describe("Monitoring Service Benchmarks", () => {
                 siteIdentifier: `error-site-${i % 30}`,
                 monitorId: `error-monitor-${i}`,
                 type: monitorTypes[
-                    Math.floor(Math.random() * monitorTypes.length)
+                    Math.floor(secureRandomFloat() * monitorTypes.length)
                 ],
                 attempt: 1,
             };
@@ -698,12 +699,12 @@ describe("Monitoring Service Benchmarks", () => {
             let retriesUsed = 0;
 
             // Determine if this execution will encounter an error
-            const encountersError = Math.random() < 0.15; // 15% error rate
+            const encountersError = secureRandomFloat() < 0.15; // 15% error rate
 
             if (encountersError) {
                 const errorScenario =
                     errorScenarios[
-                        Math.floor(Math.random() * errorScenarios.length)
+                        Math.floor(secureRandomFloat() * errorScenarios.length)
                     ];
 
                 // Simulate retry attempts
@@ -738,7 +739,7 @@ describe("Monitoring Service Benchmarks", () => {
 
                     // Simulate retry attempt
                     const retrySuccess =
-                        Math.random() > errorScenario.frequency;
+                        secureRandomFloat() > errorScenario.frequency;
                     if (retrySuccess) {
                         attemptSuccessful = true;
                     }
@@ -755,7 +756,7 @@ describe("Monitoring Service Benchmarks", () => {
                 finalAttempt: retriesUsed + 1,
                 errorType: encountersError
                     ? errorScenarios[
-                          Math.floor(Math.random() * errorScenarios.length)
+                          Math.floor(secureRandomFloat() * errorScenarios.length)
                       ].errorType
                     : null,
             };

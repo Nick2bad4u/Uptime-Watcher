@@ -10,6 +10,7 @@
 import { isSiteStatus, type SiteStatus } from "@shared/types";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { stringSplit } from "ts-extras";
 import { useShallow } from "zustand/react/shallow";
 
 import type { SystemThemePreference } from "./components/types";
@@ -22,7 +23,7 @@ const resolveThemeColorPath = (
     colors: Theme["colors"],
     path: string
 ): string | undefined => {
-    const segments = path.split(".");
+    const segments = stringSplit(path, ".");
     let node: unknown = colors;
 
     for (const segment of segments) {

@@ -14,7 +14,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import deepEqual from "fast-deep-equal";
-import { objectHasOwn } from "ts-extras";
+import { arrayJoin, objectEntries, objectHasOwn, objectKeys    } from "ts-extras";
 
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
@@ -136,7 +136,7 @@ export class ThemeManager {
         this.addShadowVariables(theme, variables);
         this.addBorderRadiusVariables(theme, variables);
 
-        return `:root {\n${variables.join("\n")}\n}`;
+        return `:root {\n${arrayJoin(variables, "\n")}\n}`;
     }
 
     /**
@@ -149,7 +149,7 @@ export class ThemeManager {
      * @returns Array of available theme names including system
      */
     public getAvailableThemes(): ThemeName[] {
-        const themeNames = Object.keys(themes).filter(
+        const themeNames = objectKeys(themes).filter(
             (name): name is keyof typeof themes => this.isThemeRegistryKey(name)
         );
         return [...themeNames, "system"];
@@ -233,7 +233,7 @@ export class ThemeManager {
             return;
         }
 
-        for (const [key, value] of Object.entries(candidate)) {
+        for (const [key, value] of objectEntries(candidate)) {
             visitor(key, value);
         }
     }
@@ -269,7 +269,7 @@ export class ThemeManager {
             return;
         }
 
-        for (const [categoryKey, colorValue] of Object.entries(colorGroups)) {
+        for (const [categoryKey, colorValue] of objectEntries(colorGroups)) {
             if (isCssVariableKey(categoryKey)) {
                 const categoryToken = toCssToken(categoryKey);
                 this.emitColorValue(categoryToken, colorValue, visitor);
@@ -294,7 +294,7 @@ export class ThemeManager {
         shades: UnknownRecord,
         visitor: (property: string, value: string) => void
     ): void {
-        for (const [shadeKey, nestedValue] of Object.entries(shades)) {
+        for (const [shadeKey, nestedValue] of objectEntries(shades)) {
             if (isCssVariableKey(shadeKey) && typeof nestedValue === "string") {
                 visitor(
                     `--color-${categoryToken}-${toCssToken(shadeKey)}`,
@@ -449,7 +449,7 @@ export class ThemeManager {
         }
 
         const root = document.documentElement;
-        const availableThemes = Object.keys(themes);
+        const availableThemes = objectKeys(themes);
         const targetThemeClass = `theme-${theme.name}`;
 
         // Only remove theme classes that are different from the target

@@ -27,6 +27,7 @@ import {
     validateExportData,
     validateImportData,
 } from "@shared/validation/importExportSchemas";
+import { arrayFind, arrayJoin, isDefined, objectEntries, objectKeys, safeCastTo      } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -69,7 +70,7 @@ export interface DataImportExportConfig {
 }
 
 const acceptAnyJsonValue = (value: unknown): value is JsonValue =>
-    value !== undefined;
+    isDefined(value);
 
 type ImportValidationResult = ReturnType<typeof validateImportData>;
 type ImportValidationFailureResult = Extract<
@@ -108,7 +109,7 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
 
     if (typeof value === "object") {
         const result: Record<string, Jsonifiable> = {};
-        for (const [key, nested] of Object.entries(value)) {
+        for (const [key, nested] of objectEntries(value)) {
             if (nested !== undefined) {
                 Object.defineProperty(result, key, {
                     configurable: true,
@@ -268,7 +269,7 @@ export class DataImportExportService {
             const validation = validateImportData(parseResult.data);
             if (isImportValidationFailure(validation)) {
                 throw new Error(
-                    `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${validation.error.message} (${validation.error.issues.slice(0, 3).join("; ")})`
+                    `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${validation.error.message} (${arrayJoin(validation.error.issues.slice(0, 3), "; ")})`
                 );
             }
 
@@ -348,13 +349,13 @@ export class DataImportExportService {
                 );
 
                 this.logger.info(
-                    `Successfully imported ${normalizedSites.length} sites and ${Object.keys(safeSettings).length} settings`
+                    `Successfully imported ${normalizedSites.length} sites and ${objectKeys(safeSettings).length} settings`
                 );
             },
             "data-import-persist",
             this.eventEmitter,
             {
-                settingsCount: Object.keys(safeSettings).length,
+                settingsCount: objectKeys(safeSettings).length,
                 sitesCount: normalizedSites.length,
             }
         );
@@ -416,7 +417,7 @@ export class DataImportExportService {
         const result: Record<string, string> = {};
         const strippedKeys: string[] = [];
 
-        for (const [key, value] of Object.entries(settings)) {
+        for (const [key, value] of objectEntries(settings)) {
             if (key.startsWith(DataImportExportService.CLOUD_SETTINGS_PREFIX)) {
                 strippedKeys.push(key);
             } else {
@@ -462,10 +463,10 @@ export class DataImportExportService {
                             monitor
                         );
 
-                        return {
+                        return safeCastTo({
                             ...monitor,
                             id: newId,
-                        } as Site["monitors"][0];
+                        });
                     });
 
                     this.importHistoryForMonitors(
@@ -607,12 +608,10 @@ export class DataImportExportService {
         for (const createdMonitor of createdMonitors) {
             // Find the original monitor with matching properties to get its
             // history
-            const originalMonitor = originalMonitors.find(
-                (orig) =>
+            const originalMonitor = arrayFind(originalMonitors, (orig) =>
                     orig.type === createdMonitor.type &&
                     orig.url === createdMonitor.url &&
-                    orig.port === createdMonitor.port
-            );
+                    orig.port === createdMonitor.port);
 
             if (
                 originalMonitor?.history &&

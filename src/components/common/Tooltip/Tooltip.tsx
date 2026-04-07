@@ -29,6 +29,7 @@ import {
     useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { arrayJoin } from "ts-extras";
 
 import { useMount } from "../../../hooks/useMount";
 import "./tooltip.css";
@@ -255,14 +256,13 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         const tooltipClasses = useMemo(
             () =>
-                [
+                arrayJoin([
                     "tooltip",
                     `tooltip--${position}`,
                     isVisible ? "tooltip--visible" : "",
                     className,
                 ]
-                    .filter(Boolean)
-                    .join(" "),
+                    .filter(Boolean), " "),
             [
                 className,
                 isVisible,
@@ -291,15 +291,14 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         const containerClasses = useMemo(
             () =>
-                [
+                arrayJoin([
                     "tooltip-container",
                     wrapMode === "block"
                         ? "tooltip-container--block"
                         : "tooltip-container--inline",
                     containerClassName,
                 ]
-                    .filter(Boolean)
-                    .join(" "),
+                    .filter(Boolean), " "),
             [containerClassName, wrapMode]
         );
 

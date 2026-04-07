@@ -2,8 +2,10 @@ import type {
     CloudBackupMigrationRequest,
     CloudBackupMigrationResult,
 } from "@shared/types/cloudBackupMigration";
+import type { AsyncReturnType } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { arrayJoin, isEmpty  } from "ts-extras";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
@@ -65,9 +67,7 @@ function buildMigrationResult(args: {
     };
 }
 
-type BackupMigrationEntry = Awaited<
-    ReturnType<CloudStorageProvider["listBackups"]>
->[number];
+type BackupMigrationEntry = AsyncReturnType<CloudStorageProvider["listBackups"]>[number];
 type CloudBackupMigrationTarget = CloudBackupMigrationRequest["target"];
 
 interface SingleMigrationAttemptResult {
@@ -139,7 +139,7 @@ async function migrateSingleEntry(args: {
 
         const postMigrationWarningMessage =
             deletionErrors.length > 0
-                ? `Migration uploaded target but failed to delete source objects: ${deletionErrors.join(", ")}`
+                ? `Migration uploaded target but failed to delete source objects: ${arrayJoin(deletionErrors, ", ")}`
                 : undefined;
 
         return {
@@ -198,7 +198,7 @@ export async function migrateProviderBackups(args: {
     const selected =
         typeof limit === "number" ? backups.slice(0, limit) : backups;
 
-    if (selected.length === 0) {
+    if (isEmpty(selected)) {
         return buildMigrationResult({
             deleteSource,
             failures,

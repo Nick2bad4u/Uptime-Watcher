@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("Site Service Performance", () => {
     // Define interfaces for better typing
@@ -44,13 +45,13 @@ describe("Site Service Performance", () => {
         url: `https://example${i}.com`,
         enabled: i % 2 === 0,
         monitoringInterval: 300_000 + i * 1000,
-        lastChecked: Date.now() - Math.random() * 86_400_000,
+        lastChecked: Date.now() - secureRandomFloat() * 86_400_000,
         status: [
             "up",
             "down",
             "unknown",
-        ][Math.floor(Math.random() * 3)] as any,
-        responseTime: Math.floor(Math.random() * 2000),
+        ][Math.floor(secureRandomFloat() * 3)] as any,
+        responseTime: Math.floor(secureRandomFloat() * 2000),
     })) as any[];
 
     const mockMonitors = Array.from({ length: 200 }, (_, i) => ({
@@ -61,7 +62,7 @@ describe("Site Service Performance", () => {
             "ping",
             "dns",
             "port",
-        ][Math.floor(Math.random() * 4)],
+        ][Math.floor(secureRandomFloat() * 4)],
         name: `Monitor ${i}`,
         enabled: i % 3 !== 0,
         config: {
@@ -70,12 +71,12 @@ describe("Site Service Performance", () => {
             timeout: 30_000,
             interval: 300_000,
         },
-        lastRun: Date.now() - Math.random() * 3_600_000,
+        lastRun: Date.now() - secureRandomFloat() * 3_600_000,
         status: [
             "success",
             "failure",
             "timeout",
-        ][Math.floor(Math.random() * 3)],
+        ][Math.floor(secureRandomFloat() * 3)],
     }));
 
     const mockHistory = Array.from({ length: 1000 }, (_, i) => ({
@@ -83,13 +84,13 @@ describe("Site Service Performance", () => {
         siteIdentifier: `site-${Math.floor(i / 10)}`,
         monitorId: `monitor-${Math.floor(i / 5)}`,
         timestamp: Date.now() - i * 60_000,
-        status: ["up", "down"][Math.floor(Math.random() * 2)],
-        responseTime: Math.floor(Math.random() * 3000),
+        status: ["up", "down"][Math.floor(secureRandomFloat() * 2)],
+        responseTime: Math.floor(secureRandomFloat() * 3000),
         error: i % 10 === 0 ? `Error ${i}` : null,
         metadata: {
-            httpCode: Math.floor(Math.random() * 500) + 200,
+            httpCode: Math.floor(secureRandomFloat() * 500) + 200,
             contentType: "text/html",
-            size: Math.floor(Math.random() * 50_000),
+            size: Math.floor(secureRandomFloat() * 50_000),
         },
     }));
 
@@ -102,7 +103,7 @@ describe("Site Service Performance", () => {
             const loadOperation = {
                 siteIdentifier,
                 timestamp: Date.now(),
-                loadTime: Math.random() * 50,
+                loadTime: secureRandomFloat() * 50,
                 includeMonitors: true,
                 includeHistory: false,
             };
@@ -158,7 +159,7 @@ describe("Site Service Performance", () => {
                 .slice(0, 100);
 
             // Simulate processing time based on data volume
-            const baseLoadTime = Math.random() * 20;
+            const baseLoadTime = secureRandomFloat() * 20;
             const monitorPenalty = relatedMonitors.length * 0.5;
             const historyPenalty = relatedHistory.length * 0.1;
             const totalLoadTime =
@@ -203,7 +204,7 @@ describe("Site Service Performance", () => {
                     (m) => m.siteIdentifier === siteIdentifier
                 );
 
-                const siteLoadTime = Math.random() * 10 + monitors.length * 0.2;
+                const siteLoadTime = secureRandomFloat() * 10 + monitors.length * 0.2;
                 totalLoadTime += siteLoadTime;
 
                 if (site) {
@@ -237,18 +238,18 @@ describe("Site Service Performance", () => {
             };
 
             // Simulate validation
-            const validationTime = Math.random() * 5;
+            const validationTime = secureRandomFloat() * 5;
             const isValidUrl = newSite.url.startsWith("https://");
             const isValidInterval = newSite.monitoringInterval > 0;
             const isValid = isValidUrl && isValidInterval;
 
             if (isValid) {
                 // Simulate creation operation
-                const creationTime = Math.random() * 15;
+                const creationTime = secureRandomFloat() * 15;
                 const siteIdentifier = `new-site-${i}`;
 
                 // Simulate default monitor creation
-                const defaultMonitorTime = Math.random() * 8;
+                const defaultMonitorTime = secureRandomFloat() * 8;
 
                 const result = {
                     siteIdentifier,
@@ -296,19 +297,19 @@ describe("Site Service Performance", () => {
             const errors: SiteOperationError[] = [];
 
             // Simulate transaction overhead
-            const transactionOverhead = Math.random() * 10;
+            const transactionOverhead = secureRandomFloat() * 10;
             totalCreationTime += transactionOverhead;
 
             for (const site of bulkOperation.sites) {
-                const validationTime = Math.random() * 2;
-                const creationTime = Math.random() * 8;
-                const monitorTime = Math.random() * 5;
+                const validationTime = secureRandomFloat() * 2;
+                const creationTime = secureRandomFloat() * 8;
+                const monitorTime = secureRandomFloat() * 5;
 
                 const siteOperationTime =
                     validationTime + creationTime + monitorTime;
                 totalCreationTime += siteOperationTime;
 
-                if (Math.random() > 0.05) {
+                if (secureRandomFloat() > 0.05) {
                     // 95% success rate
                     createdSites.push({
                         site,
@@ -352,7 +353,7 @@ describe("Site Service Performance", () => {
 
             if (existingSite) {
                 // Simulate validation of updates
-                const validationTime = Math.random() * 3;
+                const validationTime = secureRandomFloat() * 3;
 
                 // Check what actually changed
                 const nameChanged = existingSite.name !== updates.name;
@@ -370,11 +371,11 @@ describe("Site Service Performance", () => {
                 ].filter(Boolean).length;
 
                 // Simulate update operation time based on changes
-                const updateTime = Math.random() * 10 + changeCount * 2;
+                const updateTime = secureRandomFloat() * 10 + changeCount * 2;
 
                 // Simulate cascade updates if needed
                 const cascadeTime =
-                    urlChanged || intervalChanged ? Math.random() * 15 : 0;
+                    urlChanged || intervalChanged ? secureRandomFloat() * 15 : 0;
 
                 const result = {
                     siteIdentifier,
@@ -392,10 +393,10 @@ describe("Site Service Performance", () => {
                     siteIdentifier,
                     updates,
                     changeCount: 0,
-                    validationTime: Math.random() * 2,
+                    validationTime: secureRandomFloat() * 2,
                     updateTime: 0,
                     cascadeTime: 0,
-                    totalTime: Math.random() * 2,
+                    totalTime: secureRandomFloat() * 2,
                     success: false,
                     error: "Site not found",
                 };
@@ -419,17 +420,17 @@ describe("Site Service Performance", () => {
 
             if (site) {
                 // Simulate deletion validation
-                const validationTime = Math.random() * 2;
+                const validationTime = secureRandomFloat() * 2;
 
                 // Simulate cascading deletes
                 const monitorDeletionTime = relatedMonitors.length * 1.5;
                 const historyDeletionTime = relatedHistory.length * 0.1;
 
                 // Simulate main site deletion
-                const siteDeletionTime = Math.random() * 5;
+                const siteDeletionTime = secureRandomFloat() * 5;
 
                 // Simulate transaction overhead
-                const transactionTime = Math.random() * 8;
+                const transactionTime = secureRandomFloat() * 8;
 
                 const totalTime =
                     validationTime +
@@ -454,8 +455,8 @@ describe("Site Service Performance", () => {
             } else {
                 const result = {
                     siteIdentifier,
-                    validationTime: Math.random() * 2,
-                    totalTime: Math.random() * 2,
+                    validationTime: secureRandomFloat() * 2,
+                    totalTime: secureRandomFloat() * 2,
                     success: false,
                     error: "Site not found",
                 };
@@ -501,7 +502,7 @@ describe("Site Service Performance", () => {
                 return nameMatch || urlMatch;
             });
 
-            const searchTime = Date.now() - searchStartTime + Math.random() * 5;
+            const searchTime = Date.now() - searchStartTime + secureRandomFloat() * 5;
 
             const result = {
                 ...searchOperation,
@@ -549,7 +550,7 @@ describe("Site Service Performance", () => {
                 return true;
             });
 
-            const filterTime = Date.now() - filterStartTime + Math.random() * 3;
+            const filterTime = Date.now() - filterStartTime + secureRandomFloat() * 3;
 
             const result = {
                 ...filterOperation,
@@ -570,7 +571,7 @@ describe("Site Service Performance", () => {
                     "health_check",
                     "status_update",
                     "config_sync",
-                ][Math.floor(Math.random() * 4)],
+                ][Math.floor(secureRandomFloat() * 4)],
                 siteIdentifier: `site-${i % 50}`,
                 timestamp: Date.now(),
             };
@@ -580,12 +581,12 @@ describe("Site Service Performance", () => {
             const steps: ProcessingStep[] = [];
 
             // Step 1: Load site data
-            const loadTime = Math.random() * 10;
+            const loadTime = secureRandomFloat() * 10;
             totalTime += loadTime;
             steps.push({ step: "load_site", time: loadTime });
 
             // Step 2: Load related monitors
-            const monitorsTime = Math.random() * 15;
+            const monitorsTime = secureRandomFloat() * 15;
             totalTime += monitorsTime;
             steps.push({ step: "load_monitors", time: monitorsTime });
 
@@ -593,7 +594,7 @@ describe("Site Service Performance", () => {
             let processingTime = 0;
             switch (operation.type) {
                 case "full_reload": {
-                    processingTime = Math.random() * 25;
+                    processingTime = secureRandomFloat() * 25;
                     steps.push(
                         { step: "reload_config", time: processingTime * 0.3 },
                         {
@@ -605,7 +606,7 @@ describe("Site Service Performance", () => {
                     break;
                 }
                 case "health_check": {
-                    processingTime = Math.random() * 20;
+                    processingTime = secureRandomFloat() * 20;
                     steps.push(
                         {
                             step: "check_connectivity",
@@ -619,12 +620,12 @@ describe("Site Service Performance", () => {
                     break;
                 }
                 case "status_update": {
-                    processingTime = Math.random() * 8;
+                    processingTime = secureRandomFloat() * 8;
                     steps.push({ step: "update_status", time: processingTime });
                     break;
                 }
                 case "config_sync": {
-                    processingTime = Math.random() * 30;
+                    processingTime = secureRandomFloat() * 30;
                     steps.push(
                         { step: "sync_monitors", time: processingTime * 0.5 },
                         {
@@ -639,7 +640,7 @@ describe("Site Service Performance", () => {
             totalTime += processingTime;
 
             // Step 4: Finalize operation
-            const finalizeTime = Math.random() * 5;
+            const finalizeTime = secureRandomFloat() * 5;
             totalTime += finalizeTime;
             steps.push({ step: "finalize", time: finalizeTime });
 
@@ -679,7 +680,7 @@ describe("Site Service Performance", () => {
                 timestamp: Date.now(),
                 operations: Array.from({ length: batchSize }, (_, i) => ({
                     type: operationTypes[
-                        Math.floor(Math.random() * operationTypes.length)
+                        Math.floor(secureRandomFloat() * operationTypes.length)
                     ],
                     siteIdentifier: `batch-site-${i}`,
                     operationId: `op-${i}`,
@@ -690,7 +691,7 @@ describe("Site Service Performance", () => {
             const results: OperationResult[] = [];
 
             // Simulate batch processing overhead
-            const batchOverhead = Math.random() * 20;
+            const batchOverhead = secureRandomFloat() * 20;
             totalTime += batchOverhead;
 
             for (const op of batchOperation.operations) {
@@ -698,19 +699,19 @@ describe("Site Service Performance", () => {
 
                 switch (op.type) {
                     case "create": {
-                        operationTime = Math.random() * 15;
+                        operationTime = secureRandomFloat() * 15;
                         break;
                     }
                     case "update": {
-                        operationTime = Math.random() * 10;
+                        operationTime = secureRandomFloat() * 10;
                         break;
                     }
                     case "delete": {
-                        operationTime = Math.random() * 12;
+                        operationTime = secureRandomFloat() * 12;
                         break;
                     }
                     case "load": {
-                        operationTime = Math.random() * 8;
+                        operationTime = secureRandomFloat() * 8;
                         break;
                     }
                 }
@@ -719,7 +720,7 @@ describe("Site Service Performance", () => {
                 results.push({
                     ...op,
                     operationTime,
-                    success: Math.random() > 0.02, // 98% success rate
+                    success: secureRandomFloat() > 0.02, // 98% success rate
                 });
             }
 

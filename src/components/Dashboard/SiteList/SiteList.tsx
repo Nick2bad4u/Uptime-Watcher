@@ -9,6 +9,7 @@ import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
+import { arrayJoin, isEmpty  } from "ts-extras";
 import { useShallow } from "zustand/react/shallow";
 
 import type {
@@ -121,14 +122,14 @@ export const SiteList = (): JSX.Element => {
         if (isDark) {
             classes.push("site-grid--dark");
         }
-        return classes.join(" ");
+        return arrayJoin(classes, " ");
     }, [
         cardPresentation,
         isDark,
         layout,
     ]);
 
-    if (sites.length === 0) {
+    if (isEmpty(sites)) {
         return <EmptyState />;
     }
 

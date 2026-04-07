@@ -9,6 +9,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface BackupOperation {
@@ -94,10 +95,10 @@ describe("Database Backup and Restore Benchmarks", () => {
 
         for (let i = 0; i < 150; i++) {
             const dataSize =
-                dataSizes[Math.floor(Math.random() * dataSizes.length)];
+                dataSizes[Math.floor(secureRandomFloat() * dataSizes.length)];
             const compressionAlg =
                 compressionAlgorithms[
-                    Math.floor(Math.random() * compressionAlgorithms.length)
+                    Math.floor(secureRandomFloat() * compressionAlgorithms.length)
                 ];
 
             const startTime = Date.now();
@@ -113,7 +114,7 @@ describe("Database Backup and Restore Benchmarks", () => {
             );
 
             // Add variance for real-world conditions
-            const variance = (Math.random() - 0.5) * 0.3;
+            const variance = (secureRandomFloat() - 0.5) * 0.3;
             const finalBackupTime = actualBackupTime * (1 + variance);
 
             const endTime = startTime + finalBackupTime;
@@ -136,7 +137,7 @@ describe("Database Backup and Restore Benchmarks", () => {
                       ? 0.02
                       : 0.01;
 
-            if (Math.random() < failureRate) {
+            if (secureRandomFloat() < failureRate) {
                 success = false;
                 const errors = [
                     "Disk space insufficient",
@@ -145,13 +146,13 @@ describe("Database Backup and Restore Benchmarks", () => {
                     "Backup storage unavailable",
                     "Compression algorithm failure",
                 ];
-                error = errors[Math.floor(Math.random() * errors.length)];
+                error = errors[Math.floor(secureRandomFloat() * errors.length)];
             }
 
             // Verification and checksum validation
-            const verificationPassed = success && Math.random() > 0.001; // 99.9% verification rate
+            const verificationPassed = success && secureRandomFloat() > 0.001; // 99.9% verification rate
             const checksumValidated =
-                verificationPassed && Math.random() > 0.0005; // 99.95% checksum rate
+                verificationPassed && secureRandomFloat() > 0.0005; // 99.95% checksum rate
 
             const backup: BackupOperation = {
                 backupId: `full-backup-${i}`,
@@ -266,10 +267,10 @@ describe("Database Backup and Restore Benchmarks", () => {
         // Create backup chains with full backup + incrementals
         for (let chain = 0; chain < 30; chain++) {
             const dataSize =
-                dataSizes[Math.floor(Math.random() * dataSizes.length)];
+                dataSizes[Math.floor(secureRandomFloat() * dataSizes.length)];
             const compressionAlg =
                 compressionAlgorithms[
-                    Math.floor(Math.random() * compressionAlgorithms.length)
+                    Math.floor(secureRandomFloat() * compressionAlgorithms.length)
                 ];
 
             // Create full backup for this chain
@@ -277,7 +278,7 @@ describe("Database Backup and Restore Benchmarks", () => {
             const fullBackupSize = dataSize.sizeBytes;
 
             // Create incremental backups
-            const incrementalCount = Math.floor(Math.random() * 10) + 5; // 5-15 incrementals
+            const incrementalCount = Math.floor(secureRandomFloat() * 10) + 5; // 5-15 incrementals
             const incrementalBackupIds: string[] = [];
 
             const chainStartTime = Date.now();
@@ -292,13 +293,13 @@ describe("Database Backup and Restore Benchmarks", () => {
 
                 // Incremental backups are typically 1-10% of full backup size
                 const incrementalDataSize = Math.floor(
-                    fullBackupSize * (0.01 + Math.random() * 0.09)
+                    fullBackupSize * (0.01 + secureRandomFloat() * 0.09)
                 );
                 cumulativeDataSize += incrementalDataSize;
 
                 const startTime =
                     chainStartTime +
-                    (inc + 1) * (Math.random() * 86_400_000 + 3_600_000); // 1-25 hours apart
+                    (inc + 1) * (secureRandomFloat() * 86_400_000 + 3_600_000); // 1-25 hours apart
 
                 // Incremental backups are faster than full backups
                 const baseIncrementalTime =
@@ -318,7 +319,7 @@ describe("Database Backup and Restore Benchmarks", () => {
                 totalCompressedSize += compressedSize;
 
                 // Incremental backups have slightly higher success rate
-                const success = Math.random() > 0.005; // 99.5% success rate
+                const success = secureRandomFloat() > 0.005; // 99.5% success rate
 
                 const incrementalBackup: BackupOperation = {
                     backupId: incrementalId,
@@ -330,9 +331,9 @@ describe("Database Backup and Restore Benchmarks", () => {
                     compressedSize,
                     compressionRatio: compressedSize / incrementalDataSize,
                     compressionAlgorithm: compressionAlg.name,
-                    verificationPassed: success && Math.random() > 0.001,
+                    verificationPassed: success && secureRandomFloat() > 0.001,
                     backupLocation: `incremental-storage-${chain}`,
-                    checksumValidated: success && Math.random() > 0.0005,
+                    checksumValidated: success && secureRandomFloat() > 0.0005,
                     error: success
                         ? undefined
                         : "Incremental backup data inconsistency",
@@ -439,15 +440,15 @@ describe("Database Backup and Restore Benchmarks", () => {
         for (let i = 0; i < 200; i++) {
             const scenario =
                 recoveryScenarios[
-                    Math.floor(Math.random() * recoveryScenarios.length)
+                    Math.floor(secureRandomFloat() * recoveryScenarios.length)
                 ];
             const dataSize =
-                dataSizes[Math.floor(Math.random() * dataSizes.length)];
+                dataSizes[Math.floor(secureRandomFloat() * dataSizes.length)];
 
             const currentTime = Date.now();
             const targetTimestamp =
                 currentTime -
-                Math.random() * scenario.timeRangeHours * 3_600_000;
+                secureRandomFloat() * scenario.timeRangeHours * 3_600_000;
             const startTime = currentTime;
 
             // Calculate recovery complexity
@@ -481,7 +482,7 @@ describe("Database Backup and Restore Benchmarks", () => {
             const recoveryTime = baseRecoveryTime * (1 + timeGapFactor);
 
             // Add variance
-            const variance = (Math.random() - 0.5) * 0.4;
+            const variance = (secureRandomFloat() - 0.5) * 0.4;
             const actualRecoveryTime = Math.max(
                 1000,
                 recoveryTime * (1 + variance)
@@ -503,7 +504,7 @@ describe("Database Backup and Restore Benchmarks", () => {
                     critical: 0.08, // Lower failure rate due to priority
                 }[scenario.complexity] ?? 0.05;
 
-            if (Math.random() < complexityFailureRate) {
+            if (secureRandomFloat() < complexityFailureRate) {
                 success = false;
                 const errors = [
                     "Transaction log corruption detected",
@@ -512,19 +513,19 @@ describe("Database Backup and Restore Benchmarks", () => {
                     "Data consistency check failed",
                     "Recovery process interrupted",
                 ];
-                error = errors[Math.floor(Math.random() * errors.length)];
-                rollbackRequired = Math.random() > 0.3; // 70% chance of rollback needed
+                error = errors[Math.floor(secureRandomFloat() * errors.length)];
+                rollbackRequired = secureRandomFloat() > 0.3; // 70% chance of rollback needed
             }
 
             // Simulate validation errors even on successful recovery
             if (success) {
                 validationErrors =
-                    Math.random() < 0.1 ? Math.floor(Math.random() * 5) : 0;
+                    secureRandomFloat() < 0.1 ? Math.floor(secureRandomFloat() * 5) : 0;
             }
 
             const dataRestored = success
                 ? dataSize.sizeBytes
-                : Math.floor(dataSize.sizeBytes * Math.random() * 0.5);
+                : Math.floor(dataSize.sizeBytes * secureRandomFloat() * 0.5);
             const integrityCheckPassed = success && validationErrors === 0;
 
             const recovery: RestoreOperation = {
@@ -822,19 +823,19 @@ describe("Database Backup and Restore Benchmarks", () => {
 
         for (let i = 0; i < 100; i++) {
             const disasterType =
-                disasterTypes[Math.floor(Math.random() * disasterTypes.length)];
+                disasterTypes[Math.floor(secureRandomFloat() * disasterTypes.length)];
 
             // Calculate data loss percentage
             const dataLoss =
                 disasterType.dataLossRange[0] +
-                Math.random() *
+                secureRandomFloat() *
                     (disasterType.dataLossRange[1] -
                         disasterType.dataLossRange[0]);
 
             // Calculate downtime
             const downtime =
                 disasterType.downtimeRange[0] +
-                Math.random() *
+                secureRandomFloat() *
                     (disasterType.downtimeRange[1] -
                         disasterType.downtimeRange[0]);
 
@@ -842,13 +843,13 @@ describe("Database Backup and Restore Benchmarks", () => {
             const recoveryMethod =
                 disasterType.recoveryMethods[
                     Math.floor(
-                        Math.random() * disasterType.recoveryMethods.length
+                        secureRandomFloat() * disasterType.recoveryMethods.length
                     )
                 ];
 
             // Determine business impact
             let businessImpact: RecoveryScenario["businessImpact"] = "low";
-            const impactRand = Math.random();
+            const impactRand = secureRandomFloat();
             let cumulativeProb = 0;
 
             for (const [impact, prob] of Object.entries(
@@ -888,7 +889,7 @@ describe("Database Backup and Restore Benchmarks", () => {
             }[businessImpact];
 
             const adjustedSuccessRate = baseSuccessRate - impactPenalty;
-            recoverySuccess = Math.random() < adjustedSuccessRate;
+            recoverySuccess = secureRandomFloat() < adjustedSuccessRate;
 
             const scenario: RecoveryScenario = {
                 scenarioId: `disaster-${i}`,

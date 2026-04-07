@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock database connection
 class MockDatabase {
@@ -88,7 +89,7 @@ class MockMonitorRepository {
                     "port",
                 ][i % 3],
                 name: `Monitor ${i}`,
-                isEnabled: Math.random() > 0.3,
+                isEnabled: secureRandomFloat() > 0.3,
                 interval: [
                     30_000,
                     60_000,
@@ -242,7 +243,7 @@ describe("Monitor Repository Performance", () => {
         "find monitor by id",
         () => {
             repository = new MockMonitorRepository();
-            repository.findById(Math.floor(Math.random() * 1000) + 1);
+            repository.findById(Math.floor(secureRandomFloat() * 1000) + 1);
         },
         { warmupIterations: 5, iterations: 10_000 }
     );
@@ -252,7 +253,7 @@ describe("Monitor Repository Performance", () => {
         () => {
             repository = new MockMonitorRepository();
             repository.findBySiteIdentifier(
-                Math.floor(Math.random() * 100) + 1
+                Math.floor(secureRandomFloat() * 100) + 1
             );
         },
         { warmupIterations: 5, iterations: 1000 }
@@ -277,7 +278,7 @@ describe("Monitor Repository Performance", () => {
                 "port",
             ];
             repository.findByType(
-                types[Math.floor(Math.random() * types.length)]
+                types[Math.floor(secureRandomFloat() * types.length)]
             );
         },
         { warmupIterations: 5, iterations: 1000 }
@@ -287,7 +288,7 @@ describe("Monitor Repository Performance", () => {
         "update monitor",
         () => {
             repository = new MockMonitorRepository();
-            const id = Math.floor(Math.random() * 1000) + 1;
+            const id = Math.floor(secureRandomFloat() * 1000) + 1;
             repository.update(id, {
                 type: "http",
                 name: "Updated Monitor",
@@ -308,7 +309,7 @@ describe("Monitor Repository Performance", () => {
         "update monitor status",
         () => {
             repository = new MockMonitorRepository();
-            const id = Math.floor(Math.random() * 1000) + 1;
+            const id = Math.floor(secureRandomFloat() * 1000) + 1;
             repository.updateStatus(id, "online", new Date().toISOString());
         },
         { warmupIterations: 5, iterations: 5000 }
@@ -320,7 +321,7 @@ describe("Monitor Repository Performance", () => {
             repository = new MockMonitorRepository();
             const updates = Array.from({ length: 100 }, (_, i) => ({
                 id: i + 1,
-                status: Math.random() > 0.5 ? "online" : "offline",
+                status: secureRandomFloat() > 0.5 ? "online" : "offline",
                 lastChecked: new Date().toISOString(),
             }));
             repository.bulkUpdateStatus(updates);
@@ -332,7 +333,7 @@ describe("Monitor Repository Performance", () => {
         "delete monitor",
         () => {
             repository = new MockMonitorRepository();
-            const id = Math.floor(Math.random() * 1000) + 1;
+            const id = Math.floor(secureRandomFloat() * 1000) + 1;
             repository.delete(id);
         },
         { warmupIterations: 5, iterations: 1000 }
@@ -342,7 +343,7 @@ describe("Monitor Repository Performance", () => {
         "delete monitors by site id",
         () => {
             repository = new MockMonitorRepository();
-            const siteIdentifier = Math.floor(Math.random() * 100) + 1;
+            const siteIdentifier = Math.floor(secureRandomFloat() * 100) + 1;
             repository.deleteBySiteIdentifier(siteIdentifier);
         },
         { warmupIterations: 5, iterations: 500 }

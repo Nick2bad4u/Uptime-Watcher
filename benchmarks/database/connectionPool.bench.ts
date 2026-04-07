@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock connection pool implementation
 class MockConnection {
@@ -25,7 +26,7 @@ class MockConnection {
     public queryCount: number = 0;
 
     constructor() {
-        this.id = Math.random().toString(36).slice(7);
+        this.id = secureRandomFloat().toString(36).slice(7);
     }
 
     async execute(sql: string, params: any[] = []) {
@@ -37,13 +38,13 @@ class MockConnection {
         this.queryCount++;
 
         // Simulate query execution time
-        await new Promise((resolve) => setTimeout(resolve, Math.random() * 5));
+        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 5));
 
         return {
             sql,
             params,
-            rows: Math.floor(Math.random() * 100),
-            executionTime: Math.random() * 10,
+            rows: Math.floor(secureRandomFloat() * 100),
+            executionTime: secureRandomFloat() * 10,
         };
     }
 

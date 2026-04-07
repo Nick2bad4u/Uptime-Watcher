@@ -8,6 +8,7 @@ import type { EventHandlers } from "@shared/types/componentProps";
 import type { MouseEvent, NamedExoticComponent } from "react";
 
 import { memo, useCallback, useId, useMemo, useRef } from "react";
+import { arrayFind, arrayJoin, isEmpty   } from "ts-extras";
 
 import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 import { AppIcons } from "../../../../utils/icons";
@@ -110,7 +111,7 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
             [rawGeneratedId]
         );
 
-        const isDisabled = (disabled ?? false) || monitors.length === 0;
+        const isDisabled = (disabled ?? false) || isEmpty(monitors);
 
         const hasSelection = useMemo(
             () => monitors.some((monitor) => monitor.id === selectedMonitorId),
@@ -120,7 +121,7 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
         const selectValue = hasSelection ? selectedMonitorId : "";
 
         const placeholderLabel =
-            monitors.length === 0
+            isEmpty(monitors)
                 ? PLACEHOLDER_LABEL_EMPTY
                 : PLACEHOLDER_LABEL_DEFAULT;
 
@@ -157,25 +158,21 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                 : monitorTypeLabel;
         }, []);
 
-        const composedClassName = ["monitor-selector", className]
-            .filter(Boolean)
-            .join(" ");
+        const composedClassName = arrayJoin(["monitor-selector", className]
+            .filter(Boolean), " ");
 
-        const wrapperClassName = [
+        const wrapperClassName = arrayJoin([
             "monitor-selector__wrapper",
             composedClassName,
             isDisabled ? "monitor-selector__wrapper--disabled" : undefined,
         ]
-            .filter(Boolean)
-            .join(" ");
+            .filter(Boolean), " ");
 
         const selectedMonitorText = useMemo(() => {
             if (!hasSelection) {
                 return placeholderLabel;
             }
-            const selectedMonitor = monitors.find(
-                (m) => m.id === selectedMonitorId
-            );
+            const selectedMonitor = arrayFind(monitors, (m) => m.id === selectedMonitorId);
             return selectedMonitor
                 ? formatMonitorOption(selectedMonitor)
                 : placeholderLabel;

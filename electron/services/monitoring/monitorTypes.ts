@@ -16,6 +16,7 @@
 import type { MonitorType } from "@shared/types";
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
+import { setHas } from "ts-extras";
 
 const baseMonitorTypeSet: ReadonlySet<string> = new Set(BASE_MONITOR_TYPES);
 
@@ -66,5 +67,5 @@ export function getBaseMonitorTypes(): MonitorType[] {
  * @see {@link electron/services/monitoring/MonitorTypeRegistry#isValidMonitorType | isValidMonitorType} for complete type checking
  */
 export function isBaseMonitorType(type: string): type is MonitorType {
-    return baseMonitorTypeSet.has(type);
+    return setHas(baseMonitorTypeSet, type);
 }

@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface ValidationRule {
@@ -233,10 +234,10 @@ describe("Database Data Validation Benchmarks", () => {
         for (let i = 0; i < 100; i++) {
             const ruleType =
                 validationRuleTypes[
-                    Math.floor(Math.random() * validationRuleTypes.length)
+                    Math.floor(secureRandomFloat() * validationRuleTypes.length)
                 ];
             const tableName =
-                tableNames[Math.floor(Math.random() * tableNames.length)];
+                tableNames[Math.floor(secureRandomFloat() * tableNames.length)];
 
             const rule: ValidationRule = {
                 ruleId: `rule-${i}`,
@@ -246,12 +247,12 @@ describe("Database Data Validation Benchmarks", () => {
                     "error",
                     "warning",
                     "info",
-                ][Math.floor(Math.random() * 3)] as ValidationRule["severity"],
+                ][Math.floor(secureRandomFloat() * 3)] as ValidationRule["severity"],
                 description: `Validates ${ruleType.type} constraints on ${tableName}`,
                 targetTable: tableName,
                 targetColumns: [
-                    `column_${Math.floor(Math.random() * 5)}`,
-                    `column_${Math.floor(Math.random() * 5) + 5}`,
+                    `column_${Math.floor(secureRandomFloat() * 5)}`,
+                    `column_${Math.floor(secureRandomFloat() * 5) + 5}`,
                 ],
                 validationQuery:
                     ruleType.type === "custom"
@@ -262,11 +263,11 @@ describe("Database Data Validation Benchmarks", () => {
                     "flexible",
                     "advisory",
                 ][
-                    Math.floor(Math.random() * 3)
+                    Math.floor(secureRandomFloat() * 3)
                 ] as ValidationRule["enforcementLevel"],
                 performanceImpact:
                     ruleType.complexity as ValidationRule["performanceImpact"],
-                isActive: Math.random() > 0.05, // 95% active rules
+                isActive: secureRandomFloat() > 0.05, // 95% active rules
             };
 
             validationRules.push(rule);
@@ -276,7 +277,7 @@ describe("Database Data Validation Benchmarks", () => {
         for (let exec = 0; exec < 500; exec++) {
             const rule =
                 validationRules[
-                    Math.floor(Math.random() * validationRules.length)
+                    Math.floor(secureRandomFloat() * validationRules.length)
                 ];
             if (!rule.isActive) continue;
 
@@ -300,11 +301,11 @@ describe("Database Data Validation Benchmarks", () => {
 
             const validationMethod =
                 validationMethods[
-                    Math.floor(Math.random() * validationMethods.length)
+                    Math.floor(secureRandomFloat() * validationMethods.length)
                 ];
             const validationScope =
                 validationScopes[
-                    Math.floor(Math.random() * validationScopes.length)
+                    Math.floor(secureRandomFloat() * validationScopes.length)
                 ];
 
             // Calculate records to validate based on scope and method
@@ -316,17 +317,17 @@ describe("Database Data Validation Benchmarks", () => {
                 }
                 case "table-level": {
                     recordsValidated =
-                        Math.floor(Math.random() * 100_000) + 1000;
+                        Math.floor(secureRandomFloat() * 100_000) + 1000;
                     break;
                 }
                 case "cross-table": {
                     recordsValidated =
-                        Math.floor(Math.random() * 500_000) + 10_000;
+                        Math.floor(secureRandomFloat() * 500_000) + 10_000;
                     break;
                 }
                 case "database-wide": {
                     recordsValidated =
-                        Math.floor(Math.random() * 2_000_000) + 100_000;
+                        Math.floor(secureRandomFloat() * 2_000_000) + 100_000;
                     break;
                 }
             }
@@ -402,7 +403,7 @@ describe("Database Data Validation Benchmarks", () => {
 
             const totalFailureRate = complexityFailureRate + scopeFailureRate;
 
-            if (Math.random() < totalFailureRate) {
+            if (secureRandomFloat() < totalFailureRate) {
                 success = false;
                 const errors = [
                     "Validation timeout exceeded",
@@ -411,7 +412,7 @@ describe("Database Data Validation Benchmarks", () => {
                     "Validation rule compilation error",
                     "Resource constraint violation",
                 ];
-                error = errors[Math.floor(Math.random() * errors.length)];
+                error = errors[Math.floor(secureRandomFloat() * errors.length)];
             }
 
             const execution: ValidationExecution = {
@@ -596,7 +597,7 @@ describe("Database Data Validation Benchmarks", () => {
                     const variance = dimension.variance;
 
                     // Add realistic variance to quality scores
-                    const scoreVariation = (Math.random() - 0.5) * variance;
+                    const scoreVariation = (secureRandomFloat() - 0.5) * variance;
                     const qualityScore = Math.max(
                         0,
                         Math.min(1, baseScore + scoreVariation)
@@ -679,7 +680,7 @@ describe("Database Data Validation Benchmarks", () => {
 
                     let trendDirection: DataQualityMetrics["trendDirection"] =
                         "stable";
-                    const trendRand = Math.random();
+                    const trendRand = secureRandomFloat();
                     let cumulativeWeight = 0;
 
                     for (const [
@@ -695,8 +696,8 @@ describe("Database Data Validation Benchmarks", () => {
 
                     // Generate column name for some metrics
                     const columnName =
-                        Math.random() < 0.7
-                            ? `${table}_column_${Math.floor(Math.random() * 10)}`
+                        secureRandomFloat() < 0.7
+                            ? `${table}_column_${Math.floor(secureRandomFloat() * 10)}`
                             : undefined;
 
                     const metric: DataQualityMetrics = {
@@ -711,7 +712,7 @@ describe("Database Data Validation Benchmarks", () => {
                         qualityGrade,
                         issuesIdentified,
                         measurementDate:
-                            Date.now() - Math.random() * 7 * 24 * 3_600_000, // Within last 7 days
+                            Date.now() - secureRandomFloat() * 7 * 24 * 3_600_000, // Within last 7 days
                         trendDirection,
                     };
 
@@ -847,14 +848,14 @@ describe("Database Data Validation Benchmarks", () => {
         for (let i = 0; i < 1000; i++) {
             const violationType =
                 violationTypes[
-                    Math.floor(Math.random() * violationTypes.length)
+                    Math.floor(secureRandomFloat() * violationTypes.length)
                 ];
             const severityLevel =
                 severityLevels[
-                    Math.floor(Math.random() * severityLevels.length)
+                    Math.floor(secureRandomFloat() * severityLevels.length)
                 ];
             const tableName =
-                tableNames[Math.floor(Math.random() * tableNames.length)];
+                tableNames[Math.floor(secureRandomFloat() * tableNames.length)];
 
             // Generate violation specifics based on type
             let violationValue: any;
@@ -909,15 +910,15 @@ describe("Database Data Validation Benchmarks", () => {
             }
 
             const detectedTime =
-                Date.now() - Math.random() * 7 * 24 * 3_600_000; // Within last 7 days
+                Date.now() - secureRandomFloat() * 7 * 24 * 3_600_000; // Within last 7 days
 
             // Determine if violation is resolved
-            const isResolved = Math.random() < 0.6; // 60% resolution rate
+            const isResolved = secureRandomFloat() < 0.6; // 60% resolution rate
             let resolvedTime: number | undefined;
             let resolutionAction: string | undefined;
 
             if (isResolved) {
-                const resolutionDelay = Math.random() * 48 * 3_600_000; // Up to 48 hours to resolve
+                const resolutionDelay = secureRandomFloat() * 48 * 3_600_000; // Up to 48 hours to resolve
                 resolvedTime = detectedTime + resolutionDelay;
 
                 const resolutionActions = [
@@ -930,16 +931,16 @@ describe("Database Data Validation Benchmarks", () => {
                 ];
                 resolutionAction =
                     resolutionActions[
-                        Math.floor(Math.random() * resolutionActions.length)
+                        Math.floor(secureRandomFloat() * resolutionActions.length)
                     ];
             }
 
             const violation: ValidationViolation = {
                 violationId: `violation-${i}`,
-                ruleId: `rule-${Math.floor(Math.random() * 100)}`,
+                ruleId: `rule-${Math.floor(secureRandomFloat() * 100)}`,
                 tableName,
-                recordId: `record-${Math.floor(Math.random() * 10_000)}`,
-                columnName: `column_${Math.floor(Math.random() * 10)}`,
+                recordId: `record-${Math.floor(secureRandomFloat() * 10_000)}`,
+                columnName: `column_${Math.floor(secureRandomFloat() * 10)}`,
                 violationType,
                 violationValue,
                 expectedValue,
@@ -1088,7 +1089,7 @@ describe("Database Data Validation Benchmarks", () => {
 
         for (let i = 0; i < 50; i++) {
             const pipelineName = `validation-pipeline-${i}`;
-            const stageCount = Math.floor(Math.random() * 6) + 3; // 3-8 stages
+            const stageCount = Math.floor(secureRandomFloat() * 6) + 3; // 3-8 stages
 
             const stages: ValidationStage[] = [];
             let totalPipelineTime = 0;
@@ -1108,7 +1109,7 @@ describe("Database Data Validation Benchmarks", () => {
                 const stageType = stageTypes[Math.min(stage, 3)]; // Follow logical order
 
                 const recordsProcessed =
-                    Math.floor(Math.random() * 50_000) + 10_000;
+                    Math.floor(secureRandomFloat() * 50_000) + 10_000;
                 const baseExecutionTime = recordsProcessed * 0.1; // 0.1ms per record
 
                 // Stage complexity affects time
@@ -1134,9 +1135,9 @@ describe("Database Data Validation Benchmarks", () => {
                     dependsOnStages.push(`stage-${i}-${stage - 1}`);
 
                     // Sometimes depend on earlier stages too
-                    if (stage > 1 && Math.random() < 0.3) {
+                    if (stage > 1 && secureRandomFloat() < 0.3) {
                         dependsOnStages.push(
-                            `stage-${i}-${Math.floor(Math.random() * (stage - 1))}`
+                            `stage-${i}-${Math.floor(secureRandomFloat() * (stage - 1))}`
                         );
                     }
                 }
@@ -1152,7 +1153,7 @@ describe("Database Data Validation Benchmarks", () => {
                     cleanup: 0.01,
                 }[stageType];
 
-                if (Math.random() < stageFailureRate) {
+                if (secureRandomFloat() < stageFailureRate) {
                     stageSuccess = false;
                     pipelineSuccess = false;
                     failurePoint = `stage-${i}-${stage}`;
@@ -1166,7 +1167,7 @@ describe("Database Data Validation Benchmarks", () => {
                     ];
                     stageError =
                         stageErrors[
-                            Math.floor(Math.random() * stageErrors.length)
+                            Math.floor(secureRandomFloat() * stageErrors.length)
                         ];
                 }
 
@@ -1207,8 +1208,8 @@ describe("Database Data Validation Benchmarks", () => {
             // Determine retry count and rollback requirement
             const retryCount = pipelineSuccess
                 ? 0
-                : Math.floor(Math.random() * 3);
-            const rollbackRequired = !pipelineSuccess && Math.random() < 0.7; // 70% of failures need rollback
+                : Math.floor(secureRandomFloat() * 3);
+            const rollbackRequired = !pipelineSuccess && secureRandomFloat() < 0.7; // 70% of failures need rollback
 
             const pipeline: ValidationPipeline = {
                 pipelineId: `pipeline-${i}`,
@@ -1338,14 +1339,14 @@ describe("Database Data Validation Benchmarks", () => {
             for (let constraint = 0; constraint < 8; constraint++) {
                 const constraintType =
                     constraintTypes[
-                        Math.floor(Math.random() * constraintTypes.length)
+                        Math.floor(secureRandomFloat() * constraintTypes.length)
                     ];
 
                 // Generate constraint characteristics
                 const columnCount =
                     constraintType === "primary-key" ||
                     constraintType === "unique"
-                        ? Math.floor(Math.random() * 3) + 1
+                        ? Math.floor(secureRandomFloat() * 3) + 1
                         : 1; // 1-3 columns for PK/unique, 1 for others
 
                 const columnNames: string[] = [];
@@ -1412,11 +1413,11 @@ describe("Database Data Validation Benchmarks", () => {
                 }
 
                 // Add variance to values
-                validationOverhead *= 1 + (Math.random() - 0.5) * 0.3;
-                violationRate *= 1 + (Math.random() - 0.5) * 0.5;
-                enforcementCost *= 1 + (Math.random() - 0.5) * 0.2;
-                maintenanceCost *= 1 + (Math.random() - 0.5) * 0.4;
-                businessValue *= 1 + (Math.random() - 0.5) * 0.2;
+                validationOverhead *= 1 + (secureRandomFloat() - 0.5) * 0.3;
+                violationRate *= 1 + (secureRandomFloat() - 0.5) * 0.5;
+                enforcementCost *= 1 + (secureRandomFloat() - 0.5) * 0.2;
+                maintenanceCost *= 1 + (secureRandomFloat() - 0.5) * 0.4;
+                businessValue *= 1 + (secureRandomFloat() - 0.5) * 0.2;
 
                 // Calculate validation latency
                 const validationLatency = validationOverhead * 10; // Convert to milliseconds

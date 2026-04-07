@@ -19,6 +19,7 @@ import type {
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { MONITOR_STATUS } from "@shared/types";
+import { arrayFind, safeCastTo  } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -148,9 +149,7 @@ const getMonitorOrWarn = (
     identifier: string,
     monitorId: string
 ): Monitor | null => {
-    const monitor = site.monitors.find(
-        (candidate) => candidate.id === monitorId
-    );
+    const monitor = arrayFind(site.monitors, (candidate) => candidate.id === monitorId);
     if (!monitor) {
         config.logger.warn(
             `Monitor ${monitorId} not found in site ${identifier}`
@@ -167,9 +166,7 @@ const getMonitorsWithIds = (
 ): ReadonlyArray<Monitor & { id: string }> => {
     const { requireMonitoring = false } = options ?? {};
 
-    const rawMonitors = (
-        Array.isArray(site.monitors) ? site.monitors : []
-    ) as Array<Monitor | undefined>;
+    const rawMonitors = safeCastTo<Array<Monitor | undefined>>(Array.isArray(site.monitors) ? site.monitors : []);
 
     return rawMonitors.filter(
         (candidate): candidate is Monitor & { id: string } => {
@@ -230,9 +227,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
     );
 
     await runSequentially(sites, async (site) => {
-        const monitors = (
-            Array.isArray(site.monitors) ? site.monitors : []
-        ) as Array<Site["monitors"][0] | undefined>;
+        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(Array.isArray(site.monitors) ? site.monitors : []);
         const siteStarted: { current: boolean } = { current: false };
 
         await runSequentially(monitors, async (candidate) => {
@@ -379,9 +374,7 @@ export async function stopAllMonitoringEnhancedFlow(params: {
     config.logger.info("Stopping all monitoring operations (enhanced system)");
 
     await runSequentially(sites, async (site) => {
-        const monitors = (
-            Array.isArray(site.monitors) ? site.monitors : []
-        ) as Array<Site["monitors"][0] | undefined>;
+        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(Array.isArray(site.monitors) ? site.monitors : []);
 
         await runSequentially(monitors, async (candidate) => {
             if (!candidate) {

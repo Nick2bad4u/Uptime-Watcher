@@ -7,6 +7,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Core event system interfaces
 /**
@@ -168,7 +169,7 @@ class MockTypedEventBus {
         } = {}
     ): string {
         const subscription: EventSubscription = {
-            id: `sub-${Date.now()}-${Math.random()}`,
+            id: `sub-${Date.now()}-${secureRandomFloat()}`,
             eventType,
             handler: handler as EventHandler,
             priority: options.priority ?? 0,
@@ -495,26 +496,26 @@ function generateSiteStatusEvents(
 
     for (let i = 0; i < count; i++) {
         const siteIdentifier =
-            siteIds[Math.floor(Math.random() * siteIds.length)];
+            siteIds[Math.floor(secureRandomFloat() * siteIds.length)];
         const currentStatus =
-            statuses[Math.floor(Math.random() * statuses.length)];
+            statuses[Math.floor(secureRandomFloat() * statuses.length)];
         const previousStatus =
-            statuses[Math.floor(Math.random() * statuses.length)];
+            statuses[Math.floor(secureRandomFloat() * statuses.length)];
 
         events.push({
             id: `status-event-${i}`,
             type: "site-status-changed",
-            timestamp: Date.now() - Math.random() * 86_400_000, // Last 24 hours
+            timestamp: Date.now() - secureRandomFloat() * 86_400_000, // Last 24 hours
             source: "monitoring-service",
             correlationId:
-                Math.random() > 0.7 ? `corr-${Math.floor(i / 5)}` : undefined,
+                secureRandomFloat() > 0.7 ? `corr-${Math.floor(i / 5)}` : undefined,
             payload: {
                 siteIdentifier,
                 previousStatus,
                 currentStatus,
-                responseTime: Math.random() * 2000,
+                responseTime: secureRandomFloat() * 2000,
                 monitorId: `${siteIdentifier}-monitor-${Math.floor(
-                    Math.random() * 5
+                    secureRandomFloat() * 5
                 )}`,
             },
         });
@@ -539,25 +540,25 @@ function generateMonitorCheckEvents(
 
     for (let i = 0; i < count; i++) {
         const siteIdentifier =
-            siteIds[Math.floor(Math.random() * siteIds.length)];
-        const status = statuses[Math.floor(Math.random() * statuses.length)];
+            siteIds[Math.floor(secureRandomFloat() * siteIds.length)];
+        const status = statuses[Math.floor(secureRandomFloat() * statuses.length)];
 
         events.push({
             id: `check-event-${i}`,
             type: "monitor-check-completed",
-            timestamp: Date.now() - Math.random() * 3_600_000, // Last hour
+            timestamp: Date.now() - secureRandomFloat() * 3_600_000, // Last hour
             source: "monitor-checker",
             correlationId:
-                Math.random() > 0.8
+                secureRandomFloat() > 0.8
                     ? `check-corr-${Math.floor(i / 3)}`
                     : undefined,
             payload: {
                 monitorId: `${siteIdentifier}-monitor-${Math.floor(
-                    Math.random() * 10
+                    secureRandomFloat() * 10
                 )}`,
                 siteIdentifier,
                 status,
-                responseTime: status === "down" ? 0 : Math.random() * 1500,
+                responseTime: status === "down" ? 0 : secureRandomFloat() * 1500,
                 details: status === "down" ? "Connection timeout" : undefined,
                 error: status === "down" ? "ECONNREFUSED" : undefined,
             },
@@ -584,16 +585,16 @@ function generateAlertEvents(
 
     for (let i = 0; i < count; i++) {
         const severity =
-            severities[Math.floor(Math.random() * severities.length)];
+            severities[Math.floor(secureRandomFloat() * severities.length)];
         const affectedSites = siteIds.slice(
             0,
-            Math.floor(Math.random() * 3) + 1
+            Math.floor(secureRandomFloat() * 3) + 1
         );
 
         events.push({
             id: `alert-event-${i}`,
             type: "alert-triggered",
-            timestamp: Date.now() - Math.random() * 7_200_000, // Last 2 hours
+            timestamp: Date.now() - secureRandomFloat() * 7_200_000, // Last 2 hours
             source: "alert-manager",
             correlationId: `alert-corr-${Math.floor(i / 2)}`,
             payload: {
@@ -630,24 +631,24 @@ function generateDatabaseEvents(count: number): DatabaseOperationEvent[] {
 
     for (let i = 0; i < count; i++) {
         const operation =
-            operations[Math.floor(Math.random() * operations.length)];
-        const table = tables[Math.floor(Math.random() * tables.length)];
-        const success = Math.random() > 0.05; // 95% success rate
+            operations[Math.floor(secureRandomFloat() * operations.length)];
+        const table = tables[Math.floor(secureRandomFloat() * tables.length)];
+        const success = secureRandomFloat() > 0.05; // 95% success rate
 
         events.push({
             id: `db-event-${i}`,
             type: "database-operation",
-            timestamp: Date.now() - Math.random() * 1_800_000, // Last 30 minutes
+            timestamp: Date.now() - secureRandomFloat() * 1_800_000, // Last 30 minutes
             source: "database-service",
             correlationId:
-                Math.random() > 0.6
+                secureRandomFloat() > 0.6
                     ? `db-corr-${Math.floor(i / 4)}`
                     : undefined,
             payload: {
                 operation,
                 table,
-                recordCount: Math.floor(Math.random() * 1000) + 1,
-                duration: Math.random() * 500,
+                recordCount: Math.floor(secureRandomFloat() * 1000) + 1,
+                duration: secureRandomFloat() * 500,
                 success,
                 error: success ? undefined : "Constraint violation",
             },
@@ -759,7 +760,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                     handler: async () => {
                         // Handler logic
                     },
-                    options: { priority: Math.floor(Math.random() * 10) },
+                    options: { priority: Math.floor(secureRandomFloat() * 10) },
                 }));
 
                 eventBus.bulkSubscribe(subscriptions);
@@ -853,7 +854,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                     event.metadata = {
                         ...event.metadata,
                         processed: true,
-                        validationScore: Math.random(),
+                        validationScore: secureRandomFloat(),
                         transformedAt: Date.now(),
                     };
 
@@ -1143,7 +1144,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
 
                         // Simulate async work
                         await new Promise((resolve) =>
-                            setTimeout(resolve, Math.random() * 5)
+                            setTimeout(resolve, secureRandomFloat() * 5)
                         );
                     },
                     { priority: 10 }
@@ -1154,7 +1155,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                     async (event) => {
                         // Simulate database write
                         await new Promise((resolve) =>
-                            setTimeout(resolve, Math.random() * 10)
+                            setTimeout(resolve, secureRandomFloat() * 10)
                         );
 
                         // Type-safe check for monitor event
@@ -1174,7 +1175,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                     async (event) => {
                         // Simulate notification sending
                         await new Promise((resolve) =>
-                            setTimeout(resolve, Math.random() * 15)
+                            setTimeout(resolve, secureRandomFloat() * 15)
                         );
                     },
                     { priority: 1 }
@@ -1251,10 +1252,10 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                             eventType,
                             async () => {
                                 await new Promise((resolve) =>
-                                    setTimeout(resolve, Math.random() * 3)
+                                    setTimeout(resolve, secureRandomFloat() * 3)
                                 );
                             },
-                            { priority: Math.floor(Math.random() * 10) }
+                            { priority: Math.floor(secureRandomFloat() * 10) }
                         );
                         subscriptionIds.push(id);
                     }

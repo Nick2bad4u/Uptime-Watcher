@@ -17,6 +17,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Type definitions for file operations benchmarking
 interface FileOperationTestData {
@@ -79,8 +80,8 @@ function generateFileOperationTestData(): FileOperationTestData {
                 timeout: 5000,
                 history: Array.from({ length: 100 }, (_, k) => ({
                     timestamp: Date.now() - k * 60_000,
-                    status: Math.random() > 0.1 ? "up" : "down",
-                    responseTime: Math.random() * 1000,
+                    status: secureRandomFloat() > 0.1 ? "up" : "down",
+                    responseTime: secureRandomFloat() * 1000,
                 })),
             })),
         })),
@@ -103,8 +104,8 @@ function generateFileOperationTestData(): FileOperationTestData {
         const timestamp = Date.now() - i * 60_000;
         const siteIdentifier = `site-${i % 100}`;
         const monitorId = `monitor-${i % 500}`;
-        const status = Math.random() > 0.1 ? "up" : "down";
-        const responseTime = status === "up" ? Math.random() * 1000 : 0;
+        const status = secureRandomFloat() > 0.1 ? "up" : "down";
+        const responseTime = status === "up" ? secureRandomFloat() * 1000 : 0;
         const errorMessage = status === "down" ? "Connection timeout" : "";
         return `${timestamp},${siteIdentifier},${monitorId},${status},${responseTime},"${errorMessage}"`;
     });
@@ -137,7 +138,7 @@ audit_logging = true
     // Binary-like data (simulated database backup)
     const binaryLikeData = new Uint8Array(1024 * 1024); // 1MB
     for (let i = 0; i < binaryLikeData.length; i++) {
-        binaryLikeData[i] = Math.floor(Math.random() * 256);
+        binaryLikeData[i] = Math.floor(secureRandomFloat() * 256);
     }
 
     return {
@@ -159,7 +160,7 @@ function simulateFileWrite(data: string | Uint8Array): Promise<void> {
         const iterations = Math.floor(size / 1000);
         for (let i = 0; i < iterations; i++) {
             // Simulate write operations
-            Math.random();
+            secureRandomFloat();
         }
     });
 }
@@ -236,7 +237,7 @@ function generateBackupData(): BackupData {
             id: `history-${i}`,
             monitorId: `monitor-${i % 1500}`,
             timestamp: Date.now() - i * 60_000,
-            status: Math.random() > 0.1 ? "up" : "down",
+            status: secureRandomFloat() > 0.1 ? "up" : "down",
         })),
         settings: {
             theme: "dark",
@@ -350,7 +351,7 @@ describe("File Operations Performance Benchmarks", () => {
                     .slice(0, 1000)
                     .map(
                         (h) =>
-                            `${h.timestamp},${h.monitorId},${h.status},${Math.random() * 1000}`
+                            `${h.timestamp},${h.monitorId},${h.status},${secureRandomFloat() * 1000}`
                     );
                 const csv = `${headers}\n${rows.join("\n")}`;
                 // Simulate processing the CSV data

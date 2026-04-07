@@ -1,4 +1,7 @@
+import type { Constructor, UnknownRecord  } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
+import { objectEntries } from "ts-extras";
 
 import type {
     HttpMonitorBehavior,
@@ -29,11 +32,11 @@ function isStringArray(value: unknown): value is string[] {
 }
 
 function toStringHeaderRecord(
-    headers: Record<string, unknown>
+    headers: UnknownRecord
 ): Record<string, string | string[] | undefined> {
     const normalizedHeaders: Record<string, string | string[] | undefined> = {};
 
-    for (const [key, value] of Object.entries(headers)) {
+    for (const [key, value] of objectEntries(headers)) {
         if (
             typeof value === "string" ||
             value === undefined ||
@@ -111,9 +114,7 @@ const HTTP_HEADER_MONITOR_BEHAVIOR: HttpMonitorBehavior<
     },
 };
 
-type HttpHeaderMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance;
+type HttpHeaderMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
 
 const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor =
     ((): HttpHeaderMonitorConstructor => {

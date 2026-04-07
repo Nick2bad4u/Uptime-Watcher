@@ -1,6 +1,7 @@
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
+import { stringSplit } from "ts-extras";
 
 import { isValidSnapshotFileName } from "./snapshotKeyUtils";
 import {
@@ -72,7 +73,7 @@ export function assertSafeProviderKey(key: string): void {
         throw new Error("Invalid key: ':' tokens are not allowed");
     }
 
-    const segments = key.split("/");
+    const segments = stringSplit(key, "/");
     if (
         segments.some(
             (segment) =>
@@ -93,7 +94,7 @@ export function assertSafeProviderKey(key: string): void {
 export function assertOpsObjectKey(key: string): void {
     assertSafeProviderKey(key);
 
-    const segments = key.split("/");
+    const segments = stringSplit(key, "/");
     if (segments.length !== 5) {
         throw new Error(
             `Invalid sync operations object key (expected ${OPS_PREFIX}/<deviceId>/ops/<file>.ndjson): ${key}`
@@ -166,7 +167,7 @@ export function isValidOpsObjectKey(key: string): boolean {
 export function assertSnapshotKey(key: string): void {
     assertSafeProviderKey(key);
 
-    const segments = key.split("/");
+    const segments = stringSplit(key, "/");
     if (segments.length !== 4) {
         throw new Error(`Invalid snapshot key: ${key}`);
     }

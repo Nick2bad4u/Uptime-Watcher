@@ -40,6 +40,8 @@
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import { isEmpty } from "ts-extras";
+
 import type { DatabaseService } from "./DatabaseService";
 
 import { isDev } from "../../electronUtils";
@@ -188,7 +190,7 @@ export class HistoryRepository {
         monitorId: string,
         historyEntries: StatusHistory[]
     ): Promise<void> {
-        if (historyEntries.length === 0) {
+        if (isEmpty(historyEntries)) {
             return;
         }
 

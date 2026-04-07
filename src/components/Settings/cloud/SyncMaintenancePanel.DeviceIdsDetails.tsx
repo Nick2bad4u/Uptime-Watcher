@@ -1,5 +1,7 @@
 import type { JSX } from "react";
 
+import { arrayJoin } from "ts-extras";
+
 import { ThemedText } from "../../../theme/components/ThemedText";
 
 /**
@@ -34,6 +36,6 @@ export const SyncMaintenanceDeviceIdsDetails = ({
             </span>
         </summary>
 
-        <pre className="settings-mono-block">{deviceIds.join("\n")}</pre>
+        <pre className="settings-mono-block">{arrayJoin(deviceIds, "\n")}</pre>
     </details>
 );

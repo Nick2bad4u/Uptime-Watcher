@@ -3,6 +3,7 @@ import type { NamedExoticComponent, SyntheticEvent } from "react";
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
 import { memo, useCallback, useMemo, useState } from "react";
+import { arrayFind, setHas  } from "ts-extras";
 
 import { CHECK_INTERVALS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
@@ -63,7 +64,7 @@ const SITE_NAME_REQUIRED_MESSAGE = "Site name is required";
  * @returns True if the value is a valid {@link MonitorType}.
  */
 const isValidMonitorType = (value: string): value is MonitorType =>
-    MONITOR_TYPE_SET.has(value);
+    setHas(MONITOR_TYPE_SET, value);
 
 /**
  * Type guard verifying whether the provided string matches a supported form
@@ -226,9 +227,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         const helpTexts = useDynamicHelpText(monitorType);
 
         const checkIntervalLabel = useMemo(() => {
-            const match = CHECK_INTERVALS.find(
-                (interval) => interval.value === checkIntervalMs
-            );
+            const match = arrayFind(CHECK_INTERVALS, (interval) => interval.value === checkIntervalMs);
             return (
                 match?.label ?? `${Math.round(checkIntervalMs / 60_000)} min`
             );

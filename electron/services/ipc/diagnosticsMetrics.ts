@@ -11,6 +11,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { withLogContext } from "@shared/utils/loggingContext";
 import log from "electron-log/main";
+import { safeCastTo } from "ts-extras";
 
 import * as loggerModule from "../../utils/logger";
 
@@ -58,10 +59,10 @@ const fallbackDiagnosticsLogger: Logger = {
 };
 
 function resolveDiagnosticsLogger(): Logger {
-    const moduleWithDiagnostics = loggerModule as Partial<{
+    const moduleWithDiagnostics = safeCastTo<Partial<{
         diagnosticsLogger: Logger;
         logger: Logger;
-    }>;
+    }>>(loggerModule);
 
     if (moduleWithDiagnostics.diagnosticsLogger) {
         return moduleWithDiagnostics.diagnosticsLogger;

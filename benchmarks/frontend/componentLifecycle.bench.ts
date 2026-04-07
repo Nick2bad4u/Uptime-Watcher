@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for component lifecycle
 
@@ -183,7 +184,7 @@ class MockComponentLifecycle {
      */
     mountComponent(component: ComponentInstance): LifecycleMetrics {
         const startTime = performance.now();
-        const startMemory = Math.random() * 1000; // Simulated memory usage
+        const startMemory = secureRandomFloat() * 1000; // Simulated memory usage
 
         // Constructor phase
         component.lifecyclePhase = "constructing";
@@ -208,7 +209,7 @@ class MockComponentLifecycle {
         this.componentTree.mountedComponents.set(component.id, component);
 
         const endTime = performance.now();
-        const endMemory = Math.random() * 1000;
+        const endMemory = secureRandomFloat() * 1000;
 
         const metrics: LifecycleMetrics = {
             phase: "mounted",
@@ -233,7 +234,7 @@ class MockComponentLifecycle {
         newState?: Partial<ComponentState>
     ): LifecycleMetrics {
         const startTime = performance.now();
-        const startMemory = Math.random() * 1000;
+        const startMemory = secureRandomFloat() * 1000;
 
         component.lifecyclePhase = "updating";
         component.updateCount++;
@@ -277,7 +278,7 @@ class MockComponentLifecycle {
         }
 
         const endTime = performance.now();
-        const endMemory = Math.random() * 1000;
+        const endMemory = secureRandomFloat() * 1000;
 
         const metrics: LifecycleMetrics = {
             phase: "updated",
@@ -296,7 +297,7 @@ class MockComponentLifecycle {
     /** Executes the unmount lifecycle and cleans up descendants. */
     unmountComponent(component: ComponentInstance): LifecycleMetrics {
         const startTime = performance.now();
-        const startMemory = Math.random() * 1000;
+        const startMemory = secureRandomFloat() * 1000;
 
         component.lifecyclePhase = "unmounting";
 
@@ -329,7 +330,7 @@ class MockComponentLifecycle {
         this.componentTree.componentCount--;
 
         const endTime = performance.now();
-        const endMemory = Math.random() * 1000;
+        const endMemory = secureRandomFloat() * 1000;
 
         const metrics: LifecycleMetrics = {
             phase: "unmounted",
@@ -365,12 +366,12 @@ class MockComponentLifecycle {
         // Simulate rendering work
         const complexity = Math.max(
             1,
-            component.children.length * Math.random() * 10
+            component.children.length * secureRandomFloat() * 10
         );
         let renderWork = 0;
 
         for (let i = 0; i < complexity; i++) {
-            renderWork += Math.sqrt(Math.random() * 1000);
+            renderWork += Math.sqrt(secureRandomFloat() * 1000);
         }
 
         // Simulate virtual DOM operations
@@ -393,36 +394,36 @@ class MockComponentLifecycle {
             "updateText",
         ];
 
-        const operationCount = Math.floor(Math.random() * 20) + 1;
+        const operationCount = Math.floor(secureRandomFloat() * 20) + 1;
 
         for (let i = 0; i < operationCount; i++) {
             const operation =
-                operations[Math.floor(Math.random() * operations.length)];
+                operations[Math.floor(secureRandomFloat() * operations.length)];
 
             // Simulate operation work
             switch (operation) {
                 case "createElement": {
-                    const elementCreation = Math.random() * 2;
+                    const elementCreation = secureRandomFloat() * 2;
                     break;
                 }
                 case "updateElement": {
-                    const elementUpdate = Math.random() * 1.5;
+                    const elementUpdate = secureRandomFloat() * 1.5;
                     break;
                 }
                 case "removeElement": {
-                    const elementRemoval = Number(Math.random()) * 1;
+                    const elementRemoval = Number(secureRandomFloat()) * 1;
                     break;
                 }
                 case "moveElement": {
-                    const elementMove = Math.random() * 3;
+                    const elementMove = secureRandomFloat() * 3;
                     break;
                 }
                 case "updateProps": {
-                    const propsUpdate = Math.random() * 2.5;
+                    const propsUpdate = secureRandomFloat() * 2.5;
                     break;
                 }
                 case "updateText": {
-                    const textUpdate = Math.random() * 0.5;
+                    const textUpdate = secureRandomFloat() * 0.5;
                     break;
                 }
             }
@@ -435,7 +436,7 @@ class MockComponentLifecycle {
         args?: any
     ): any {
         // Simulate lifecycle method execution
-        const executionTime = Math.random() * 5; // Random execution time
+        const executionTime = secureRandomFloat() * 5; // Random execution time
 
         switch (method) {
             case "constructor": {
@@ -449,13 +450,13 @@ class MockComponentLifecycle {
             case "componentDidMount": {
                 // Post-mount work simulation
                 this.scheduleEffect(() => {
-                    const postMountWork = Math.random() * 10;
+                    const postMountWork = secureRandomFloat() * 10;
                 });
                 break;
             }
             case "shouldComponentUpdate": {
                 // Return random decision for simulation
-                return Math.random() > 0.1;
+                return secureRandomFloat() > 0.1;
             } // 90% update rate
             case "componentWillUpdate": {
                 // Pre-update work simulation
@@ -464,14 +465,14 @@ class MockComponentLifecycle {
             case "componentDidUpdate": {
                 // Post-update work simulation
                 this.scheduleEffect(() => {
-                    const postUpdateWork = Math.random() * 8;
+                    const postUpdateWork = secureRandomFloat() * 8;
                 });
                 break;
             }
             case "componentWillUnmount": {
                 // Cleanup work simulation
                 component.effectCleanups.forEach((cleanup) => {
-                    const cleanupWork = Math.random() * 3;
+                    const cleanupWork = secureRandomFloat() * 3;
                 });
                 break;
             }
@@ -490,15 +491,15 @@ class MockComponentLifecycle {
             "useContext",
         ];
 
-        const hookCount = Math.floor(Math.random() * 8) + 1;
+        const hookCount = Math.floor(secureRandomFloat() * 8) + 1;
 
         for (let i = 0; i < hookCount; i++) {
             const hook: HookState = {
                 id: `hook-${component.id}-${i}`,
-                type: hookTypes[Math.floor(Math.random() * hookTypes.length)],
+                type: hookTypes[Math.floor(secureRandomFloat() * hookTypes.length)],
                 value: this.generateHookValue(),
                 dependencies:
-                    Math.random() > 0.5
+                    secureRandomFloat() > 0.5
                         ? this.generateDependencies()
                         : undefined,
                 hasChanged: false,
@@ -506,7 +507,7 @@ class MockComponentLifecycle {
 
             if (hook.type === "useEffect") {
                 hook.cleanup = () => {
-                    const cleanupWork = Math.random() * 2;
+                    const cleanupWork = secureRandomFloat() * 2;
                 };
                 component.effectCleanups.push(hook.cleanup);
             }
@@ -522,7 +523,7 @@ class MockComponentLifecycle {
             // Simulate hook updates based on type
             switch (hook.type) {
                 case "useState": {
-                    if (Math.random() > 0.7) {
+                    if (secureRandomFloat() > 0.7) {
                         hook.value = this.generateHookValue();
                         hook.hasChanged = true;
                     }
@@ -537,7 +538,7 @@ class MockComponentLifecycle {
                 }
                 case "useCallback": {
                     if (this.dependenciesChanged(hook.dependencies)) {
-                        hook.value = () => Math.random();
+                        hook.value = () => secureRandomFloat();
                         hook.hasChanged = true;
                     }
                     break;
@@ -546,7 +547,7 @@ class MockComponentLifecycle {
                     if (this.dependenciesChanged(hook.dependencies)) {
                         // Schedule effect
                         this.scheduleEffect(() => {
-                            const effectWork = Math.random() * 5;
+                            const effectWork = secureRandomFloat() * 5;
                         });
                     }
                     break;
@@ -557,34 +558,34 @@ class MockComponentLifecycle {
 
     private generateHookValue(): any {
         const valueTypes = [
-            () => Math.random() * 100,
-            () => `string-${Math.random().toString(36).slice(2, 11)}`,
-            () => ({ key: Math.random(), nested: { value: Math.random() } }),
+            () => secureRandomFloat() * 100,
+            () => `string-${secureRandomFloat().toString(36).slice(2, 11)}`,
+            () => ({ key: secureRandomFloat(), nested: { value: secureRandomFloat() } }),
             () =>
-                Array.from({ length: Math.floor(Math.random() * 10) }, () =>
-                    Math.random()
+                Array.from({ length: Math.floor(secureRandomFloat() * 10) }, () =>
+                    secureRandomFloat()
                 ),
             () => new Date(),
-            () => Math.random() > 0.5,
+            () => secureRandomFloat() > 0.5,
         ];
 
-        return valueTypes[Math.floor(Math.random() * valueTypes.length)]();
+        return valueTypes[Math.floor(secureRandomFloat() * valueTypes.length)]();
     }
 
     private generateDependencies(): any[] {
-        const depCount = Math.floor(Math.random() * 5) + 1;
-        return Array.from({ length: depCount }, () => Math.random());
+        const depCount = Math.floor(secureRandomFloat() * 5) + 1;
+        return Array.from({ length: depCount }, () => secureRandomFloat());
     }
 
     private dependenciesChanged(dependencies?: any[]): boolean {
-        return !dependencies || Math.random() > 0.6;
+        return !dependencies || secureRandomFloat() > 0.6;
     }
 
     private computeMemoizedValue(): any {
         // Simulate expensive computation
         let result = 0;
         for (let i = 0; i < 100; i++) {
-            result += Math.sqrt(Math.random() * 1000);
+            result += Math.sqrt(secureRandomFloat() * 1000);
         }
         return result;
     }
@@ -645,7 +646,7 @@ class MockComponentLifecycle {
         this.callLifecycleMethod(component, "componentDidCatch", { error });
 
         // Error recovery or unmounting
-        if (Math.random() > 0.5) {
+        if (secureRandomFloat() > 0.5) {
             // Recover
             component.lifecyclePhase = "mounted";
         } else {
@@ -729,7 +730,7 @@ class MockComponentLifecycle {
             avgUnmountTime:
                 unmountCount > 0 ? totalUnmountTime / unmountCount : 0,
             phaseDistribution,
-            memoryUsage: Math.random() * 1000, // Simulated
+            memoryUsage: secureRandomFloat() * 1000, // Simulated
         };
     }
 }
@@ -745,14 +746,14 @@ describe("React Component Lifecycle Performance", () => {
                 id: `test-${i}`,
                 className: "test-class",
                 data: {
-                    value: Math.random() * 100,
+                    value: secureRandomFloat() * 100,
                     items: Array.from(
-                        { length: Math.floor(Math.random() * 10) },
+                        { length: Math.floor(secureRandomFloat() * 10) },
                         (_, j) => `item-${j}`
                     ),
                     config: {
-                        enabled: Math.random() > 0.5,
-                        threshold: Math.random() * 50,
+                        enabled: secureRandomFloat() > 0.5,
+                        threshold: secureRandomFloat() * 50,
                     },
                 },
             });
@@ -775,10 +776,10 @@ describe("React Component Lifecycle Performance", () => {
 
             // Add children at multiple levels
             let currentParent = rootComponent;
-            const maxDepth = Math.floor(Math.random() * 5) + 2;
+            const maxDepth = Math.floor(secureRandomFloat() * 5) + 2;
 
             for (let depth = 1; depth < maxDepth; depth++) {
-                const childrenCount = Math.floor(Math.random() * 4) + 1;
+                const childrenCount = Math.floor(secureRandomFloat() * 4) + 1;
 
                 for (let j = 0; j < childrenCount; j++) {
                     const child = lifecycle.createComponent(
@@ -813,7 +814,7 @@ describe("React Component Lifecycle Performance", () => {
         for (let i = 0; i < 100; i++) {
             const component = lifecycle.createComponent("UpdatableComponent", {
                 id: `updatable-${i}`,
-                value: Math.random() * 100,
+                value: secureRandomFloat() * 100,
                 items: Array.from({ length: 5 }, (_, j) => `item-${j}`),
             });
             lifecycle.mountComponent(component);
@@ -823,18 +824,18 @@ describe("React Component Lifecycle Performance", () => {
         // Perform many updates
         for (let update = 0; update < 300; update++) {
             const component =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             const newProps = {
-                value: Math.random() * 100,
+                value: secureRandomFloat() * 100,
                 timestamp: Date.now(),
                 items: Array.from(
-                    { length: Math.floor(Math.random() * 10) },
+                    { length: Math.floor(secureRandomFloat() * 10) },
                     (_, j) => `updated-item-${j}`
                 ),
                 metadata: {
                     updateCount: update,
-                    random: Math.random(),
+                    random: secureRandomFloat(),
                 },
             };
 
@@ -858,11 +859,11 @@ describe("React Component Lifecycle Performance", () => {
             component.state = {
                 ...component.state,
                 counter: 0,
-                data: Array.from({ length: 20 }, () => Math.random()),
+                data: Array.from({ length: 20 }, () => secureRandomFloat()),
                 nested: {
                     flags: Array.from(
                         { length: 10 },
-                        () => Math.random() > 0.5
+                        () => secureRandomFloat() > 0.5
                     ),
                     cache: new Map(),
                     history: [],
@@ -877,17 +878,17 @@ describe("React Component Lifecycle Performance", () => {
         // Perform state updates
         for (let update = 0; update < 500; update++) {
             const component =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             const newState = {
                 counter: component.state.counter + 1,
                 data: component.state.data.map(
-                    (val: number) => val + Math.random() - 0.5
+                    (val: number) => val + secureRandomFloat() - 0.5
                 ),
                 nested: {
                     ...component.state.nested,
                     flags: component.state.nested.flags.map(
-                        () => Math.random() > 0.5
+                        () => secureRandomFloat() > 0.5
                     ),
                     history: [
                         ...component.state.nested.history,
@@ -931,14 +932,14 @@ describe("React Component Lifecycle Performance", () => {
 
         // Perform batch updates
         for (let batch = 0; batch < 20; batch++) {
-            const batchSize = Math.floor(Math.random() * 20) + 5;
+            const batchSize = Math.floor(secureRandomFloat() * 20) + 5;
             const updates = Array.from({ length: batchSize }, () => {
                 const component =
-                    components[Math.floor(Math.random() * components.length)];
+                    components[Math.floor(secureRandomFloat() * components.length)];
                 return {
                     component,
                     props: {
-                        value: Math.random() * 1000,
+                        value: secureRandomFloat() * 1000,
                         batchId: batch,
                         timestamp: Date.now(),
                     },
@@ -969,7 +970,7 @@ describe("React Component Lifecycle Performance", () => {
             for (let j = 0; j < 10; j++) {
                 component.effectCleanups.push(() => {
                     // Simulate cleanup work
-                    const cleanupWork = Math.random() * 5;
+                    const cleanupWork = secureRandomFloat() * 5;
                 });
             }
 
@@ -1002,7 +1003,7 @@ describe("React Component Lifecycle Performance", () => {
             ) => {
                 if (depth >= maxDepth) return;
 
-                const childrenCount = Math.floor(Math.random() * 3) + 2;
+                const childrenCount = Math.floor(secureRandomFloat() * 3) + 2;
                 for (let i = 0; i < childrenCount; i++) {
                     const child = lifecycle.createComponent(
                         `TreeNode${depth}`,
@@ -1016,7 +1017,7 @@ describe("React Component Lifecycle Performance", () => {
 
                     // Add some effects
                     child.effectCleanups.push(() => {
-                        const work = Math.random() * 2;
+                        const work = secureRandomFloat() * 2;
                     });
 
                     buildTree(child, depth + 1, maxDepth);
@@ -1049,9 +1050,9 @@ describe("React Component Lifecycle Performance", () => {
                 component.hooks.push({
                     id: `hook-${i}-${j}`,
                     type: j % 2 === 0 ? "useState" : "useEffect",
-                    value: Math.random(),
+                    value: secureRandomFloat(),
                     dependencies: Array.from({ length: 3 }, () =>
-                        Math.random()
+                        secureRandomFloat()
                     ),
                     hasChanged: false,
                 });
@@ -1064,11 +1065,11 @@ describe("React Component Lifecycle Performance", () => {
         // Trigger hook updates
         for (let update = 0; update < 300; update++) {
             const component =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
 
             // Simulate props/state change that affects hooks
             const metrics = lifecycle.updateComponent(component, {
-                hookTrigger: Math.random(),
+                hookTrigger: secureRandomFloat(),
                 updateId: update,
             });
             updateMetrics.push(metrics);
@@ -1085,7 +1086,7 @@ describe("React Component Lifecycle Performance", () => {
         for (let i = 0; i < 50; i++) {
             const component = lifecycle.createComponent("ErrorProneComponent", {
                 id: `error-prone-${i}`,
-                errorRate: Math.random(),
+                errorRate: secureRandomFloat(),
             });
             lifecycle.mountComponent(component);
             components.push(component);
@@ -1094,7 +1095,7 @@ describe("React Component Lifecycle Performance", () => {
         // Simulate errors and recovery
         for (let i = 0; i < 100; i++) {
             const component =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             const error = new Error(`Simulated error ${i}`);
 
             const metrics = lifecycle.handleComponentError(component, error);

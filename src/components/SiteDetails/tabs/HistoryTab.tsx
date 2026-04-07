@@ -44,6 +44,7 @@ import {
     useRef,
     useState,
 } from "react";
+import { isEmpty, safeCastTo  } from "ts-extras";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -326,7 +327,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         // Ensure we always have at least one valid option, even for small history
         // counts
-        if (showOptions.length === 0) {
+        if (isEmpty(showOptions)) {
             if (historyLength > 0) {
                 showOptions.push(historyLength);
             } else {
@@ -632,9 +633,8 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 <ThemedCard icon={historyIcon} title="Check History">
                     <div className="history-tab__list">
                         {filteredHistoryRecords.map((record, index) => {
-                            const rawStatus = record.status as
-                                | SiteStatus
-                                | undefined;
+                            const rawStatus = safeCastTo<| SiteStatus
+                                | undefined>(record.status);
                             const resolvedStatus: SiteStatus =
                                 rawStatus ?? "unknown";
 
@@ -720,7 +720,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                             );
                         })}
 
-                        {filteredHistoryRecords.length === 0 && (
+                        {Boolean(isEmpty(filteredHistoryRecords)) && (
                             <div className="flex flex-col items-center justify-center py-12 text-center">
                                 <InboxIcon className="mb-4 text-4xl opacity-50" />
                                 <ThemedText

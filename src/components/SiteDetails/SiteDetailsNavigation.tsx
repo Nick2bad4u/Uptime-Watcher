@@ -16,6 +16,7 @@ import {
     useCallback,
     useMemo,
 } from "react";
+import { arrayFind } from "ts-extras";
 
 import type { SiteDetailsTab } from "../../stores/ui/types";
 
@@ -156,9 +157,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         // Find selected monitor to get its type for better labeling
         const selectedMonitor = useMemo(
             () =>
-                currentSite.monitors.find(
-                    (monitor) => monitor.id === selectedMonitorId
-                ),
+                arrayFind(currentSite.monitors, (monitor) => monitor.id === selectedMonitorId),
             [currentSite.monitors, selectedMonitorId]
         );
         const monitorTypeLabel = useMemo(() => {

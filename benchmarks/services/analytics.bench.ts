@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /** Represents a single metric sample. */
 interface MetricPoint {
@@ -692,7 +693,7 @@ class MockAnalyticsService {
         const trends: Record<string, number> = {};
         for (const metric of result.metrics) {
             // Simulate trend calculation
-            trends[metric.name] = Math.random() * 20 - 10; // -10% to +10%
+            trends[metric.name] = secureRandomFloat() * 20 - 10; // -10% to +10%
         }
 
         const summary = {
@@ -775,7 +776,7 @@ function generateMetricData(
         );
         data.push({
             name: metricName,
-            value: Math.random() * 1000 + 100,
+            value: secureRandomFloat() * 1000 + 100,
             timestamp,
             metadata: {
                 siteIdentifier: `site-${Math.floor(i / 10) + 1}`,
@@ -944,7 +945,7 @@ describe("Analytics Service Performance", () => {
             service = new MockAnalyticsService();
             const statusMetrics = Array.from({ length: 60 }, (_, i) => ({
                 name: "site.test-site.status",
-                value: Math.random() > 0.1 ? 1 : 0, // 90% uptime
+                value: secureRandomFloat() > 0.1 ? 1 : 0, // 90% uptime
                 timestamp: new Date(Date.now() - (60 - i) * 60 * 1000),
                 metadata: { siteIdentifier: "test-site" },
             }));
@@ -965,7 +966,7 @@ describe("Analytics Service Performance", () => {
             service = new MockAnalyticsService();
             const responseTimeMetrics = Array.from({ length: 100 }, (_, i) => ({
                 name: "site.test-site.response_time",
-                value: Math.random() * 500 + 50, // 50-550ms
+                value: secureRandomFloat() * 500 + 50, // 50-550ms
                 timestamp: new Date(Date.now() - (100 - i) * 30 * 1000), // Every 30 seconds
                 metadata: { siteIdentifier: "test-site" },
             }));

@@ -12,6 +12,8 @@
  * @remarks
  * Zod paths can contain strings, numbers, and (rarely) symbols.
  */
+import { arrayJoin } from "ts-extras";
+
 export type ZodIssuePathPart = number | string | symbol;
 
 /**
@@ -67,7 +69,7 @@ export function formatZodIssues(
     }
 
     return issues.map((issue) => {
-        const renderedPath = (issue.path ?? []).map(String).join(pathSeparator);
+        const renderedPath = arrayJoin((issue.path ?? []).map(String), pathSeparator);
 
         return renderedPath.length > 0
             ? `${renderedPath}: ${issue.message}`

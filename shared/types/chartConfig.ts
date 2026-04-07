@@ -9,7 +9,9 @@
  * @packageDocumentation
  */
 
-import type { UnknownRecord } from "type-fest";
+import type { Arrayable, UnknownRecord  } from "type-fest";
+
+import { safeCastTo } from "ts-extras";
 
 /**
  * Chart.js animation easing function values.
@@ -203,9 +205,9 @@ export interface ChartDataPoint {
  */
 export interface ChartDatasetConfig {
     /** Background color */
-    backgroundColor?: string | string[];
+    backgroundColor?: Arrayable<string>;
     /** Border color */
-    borderColor?: string | string[];
+    borderColor?: Arrayable<string>;
     /** Border width */
     borderWidth?: number;
     /** Dataset data points */
@@ -215,11 +217,11 @@ export interface ChartDatasetConfig {
     /** Dataset label */
     label?: string;
     /** Point background color */
-    pointBackgroundColor?: string | string[];
+    pointBackgroundColor?: Arrayable<string>;
     /** Point border color */
-    pointBorderColor?: string | string[];
+    pointBorderColor?: Arrayable<string>;
     /** Point radius */
-    pointRadius?: number | number[];
+    pointRadius?: Arrayable<number>;
     /** Tension for line charts */
     tension?: number;
 }
@@ -395,7 +397,7 @@ export interface ChartTitleConfig {
     /** Title position */
     position?: ChartAlignment;
     /** Title text */
-    text?: string | string[];
+    text?: Arrayable<string>;
 }
 
 /**
@@ -503,8 +505,8 @@ export function hasPlugins(
         typeof config === "object" &&
         config !== null &&
         "plugins" in config &&
-        typeof (config as UnknownRecord)["plugins"] === "object" &&
-        (config as UnknownRecord)["plugins"] !== null
+        typeof (safeCastTo<UnknownRecord>(config))["plugins"] === "object" &&
+        (safeCastTo<UnknownRecord>(config))["plugins"] !== null
     );
 }
 
@@ -525,8 +527,8 @@ export function hasScales(
         typeof config === "object" &&
         config !== null &&
         "scales" in config &&
-        typeof (config as UnknownRecord)["scales"] === "object" &&
-        (config as UnknownRecord)["scales"] !== null
+        typeof (safeCastTo<UnknownRecord>(config))["scales"] === "object" &&
+        (safeCastTo<UnknownRecord>(config))["scales"] !== null
     );
 }
 

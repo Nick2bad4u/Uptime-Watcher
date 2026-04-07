@@ -4,6 +4,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { performance } from "node:perf_hooks";
@@ -186,9 +187,7 @@ const behavior: RemoteMonitorBehavior<
     type: "replication",
 };
 
-type ReplicationMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => IMonitorService;
+type ReplicationMonitorConstructor = Constructor<IMonitorService, [config?: MonitorServiceConfig]>;
 
 const ReplicationMonitorBase: ReplicationMonitorConstructor =
     ((): ReplicationMonitorConstructor => {

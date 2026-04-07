@@ -19,6 +19,7 @@
 
 import { describe, expect, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for IPC Messages
@@ -372,7 +373,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                         try {
                             new URL(monitorConfig.url);
                             if (
-                                !monitorConfig.url.startsWith("http://") &&
+                                !monitorConfig.url.startsWith("https://") &&
                                 !monitorConfig.url.startsWith("https://")
                             ) {
                                 errors.push(
@@ -410,7 +411,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                         errors,
                         monitorId:
                             errors.length === 0
-                                ? Math.floor(Math.random() * 1000) + 1
+                                ? Math.floor(secureRandomFloat() * 1000) + 1
                                 : null,
                     };
                 };
@@ -794,7 +795,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                             id: processedMessages.length + 1,
                             channel: message.channel,
                             processed: true,
-                            processingTime: Math.random() * 5, // Simulate variable processing time
+                            processingTime: secureRandomFloat() * 5, // Simulate variable processing time
                         };
                         processedMessages.push(processed);
                     }

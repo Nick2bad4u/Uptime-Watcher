@@ -2,6 +2,7 @@ import type { Database } from "node-sqlite3-wasm";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { isEmpty } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
 import { getRegisteredMonitorTypes } from "../../../monitoring/MonitorTypeRegistry";
@@ -305,7 +306,7 @@ export function setupMonitorTypeValidation(): void {
         // Get all currently registered monitor types
         const validTypes = getRegisteredMonitorTypes();
 
-        if (validTypes.length === 0) {
+        if (isEmpty(validTypes)) {
             logger.warn(
                 LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_MISSING
             );

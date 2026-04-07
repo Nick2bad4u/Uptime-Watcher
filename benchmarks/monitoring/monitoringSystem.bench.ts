@@ -6,6 +6,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Simulate monitoring operation registry
 class MockMonitorOperationRegistry {
@@ -231,10 +232,10 @@ async function simulateMonitorCheck(): Promise<void> {
             // Simulate some CPU work
             let result = 0;
             for (let i = 0; i < 1000; i++) {
-                result += Math.random();
+                result += secureRandomFloat();
             }
             resolve();
-        }, Math.random() * 10); // 0-10ms delay
+        }, secureRandomFloat() * 10); // 0-10ms delay
     });
 }
 
@@ -431,7 +432,7 @@ describe("Monitoring System Performance Benchmarks", () => {
             // Cancel half of them randomly
             for (let i = 0; i < 500; i++) {
                 const randomIndex = Math.floor(
-                    Math.random() * operations.length
+                    secureRandomFloat() * operations.length
                 );
                 registry.cancelOperation(operations[randomIndex]);
             }

@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock site monitoring service
 class MockSiteMonitor {
@@ -33,7 +34,7 @@ class MockSiteMonitor {
                 id: siteIdentifier,
                 url: `https://site${i}.example.com`,
                 name: `Site ${i}`,
-                isActive: Math.random() > 0.1,
+                isActive: secureRandomFloat() > 0.1,
                 checkInterval: [
                     30_000,
                     60_000,
@@ -58,12 +59,12 @@ class MockSiteMonitor {
 
         // Simulate HTTP request
         await new Promise((resolve) =>
-            setTimeout(resolve, Math.random() * 100)
+            setTimeout(resolve, secureRandomFloat() * 100)
         );
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
-        const isHealthy = Math.random() > 0.1; // 90% uptime simulation
+        const isHealthy = secureRandomFloat() > 0.1; // 90% uptime simulation
 
         const result = {
             siteIdentifier,
@@ -75,7 +76,7 @@ class MockSiteMonitor {
                       404,
                       500,
                       503,
-                  ][Math.floor(Math.random() * 3)],
+                  ][Math.floor(secureRandomFloat() * 3)],
             isHealthy,
             error: isHealthy ? null : "Simulated error",
         };

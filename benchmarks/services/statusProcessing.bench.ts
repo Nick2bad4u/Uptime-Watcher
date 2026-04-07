@@ -7,6 +7,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Core interfaces for status processing
 /**
@@ -545,7 +546,7 @@ class MockStatusProcessingService {
         entry: StatusEntry
     ): Promise<void> {
         // Simulate individual processing
-        const processingTime = Math.random() * 5;
+        const processingTime = secureRandomFloat() * 5;
         await new Promise((resolve) => setTimeout(resolve, processingTime));
     }
 
@@ -652,13 +653,13 @@ function generateStatusEntries(
 
     for (let i = 0; i < count; i++) {
         const siteIdentifier =
-            siteIdentifiers[Math.floor(Math.random() * siteIdentifiers.length)];
-        const monitorId = `${siteIdentifier}-monitor-${Math.floor(Math.random() * monitorsPerSite)}`;
-        const timestamp = now - Math.random() * timeSpan;
+            siteIdentifiers[Math.floor(secureRandomFloat() * siteIdentifiers.length)];
+        const monitorId = `${siteIdentifier}-monitor-${Math.floor(secureRandomFloat() * monitorsPerSite)}`;
+        const timestamp = now - secureRandomFloat() * timeSpan;
 
         // Simulate realistic failure patterns (5% down, 2% degraded)
         let status: "up" | "down" | "degraded" = "up";
-        const rand = Math.random();
+        const rand = secureRandomFloat();
         if (rand < 0.05) status = "down";
         else if (rand < 0.07) status = "degraded";
 
@@ -666,11 +667,11 @@ function generateStatusEntries(
         let responseTime: number;
         switch (status) {
             case "up": {
-                responseTime = Math.random() * 1000 + 100; // 100-1100ms
+                responseTime = secureRandomFloat() * 1000 + 100; // 100-1100ms
                 break;
             }
             case "degraded": {
-                responseTime = Math.random() * 2000 + 1000; // 1000-3000ms
+                responseTime = secureRandomFloat() * 2000 + 1000; // 1000-3000ms
                 break;
             }
             case "down": {

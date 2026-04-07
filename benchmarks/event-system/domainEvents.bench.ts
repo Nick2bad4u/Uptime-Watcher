@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 interface BaseDomainEvent {
     id: string;
@@ -123,7 +124,7 @@ class MockDomainEventFactory {
     }
 
     private generateCorrelationId(): string {
-        return `corr-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+        return `corr-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
     }
 
     private createMetadata(): Record<string, any> {
@@ -131,7 +132,7 @@ class MockDomainEventFactory {
             source: "uptime-watcher",
             version: "1.0.0",
             environment: "test",
-            userId: `user-${Math.floor(Math.random() * 100)}`,
+            userId: `user-${Math.floor(secureRandomFloat() * 100)}`,
         };
     }
 }
@@ -370,7 +371,7 @@ describe("Domain Events Performance", () => {
                     factory.createSiteStatusChangedEvent(`site-${i}`, {
                         previousStatus: "online",
                         newStatus: "offline",
-                        responseTime: Math.random() * 1000,
+                        responseTime: secureRandomFloat() * 1000,
                     })
                 );
             }
@@ -430,7 +431,7 @@ describe("Domain Events Performance", () => {
                     factory.createSiteStatusChangedEvent(`site-${i % 10}`, {
                         previousStatus: "online",
                         newStatus: "offline",
-                        responseTime: Math.random() * 1000,
+                        responseTime: secureRandomFloat() * 1000,
                     }),
                 ];
                 eventStore.append(`site-${i % 10}`, events);
@@ -451,7 +452,7 @@ describe("Domain Events Performance", () => {
                     factory.createSiteStatusChangedEvent(`site-${i}`, {
                         previousStatus: "online",
                         newStatus: "offline",
-                        responseTime: Math.random() * 1000,
+                        responseTime: secureRandomFloat() * 1000,
                     }),
                 ];
                 eventStore.append(`site-${i}`, events);
@@ -494,7 +495,7 @@ describe("Domain Events Performance", () => {
                     factory.createSiteStatusChangedEvent(`site-${i}`, {
                         previousStatus: "unknown",
                         newStatus: "online",
-                        responseTime: Math.random() * 500,
+                        responseTime: secureRandomFloat() * 500,
                     })
                 );
             }

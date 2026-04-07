@@ -1,6 +1,7 @@
 import { normalizePathSeparatorsToWindows } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { isEmpty } from "ts-extras";
 
 /**
  * Shared filesystem base-directory validation.
@@ -137,7 +138,6 @@ export function isFilesystemBaseDirectoryValid(
     } = {}
 ): boolean {
     return (
-        validateFilesystemBaseDirectoryCandidate(candidate, options).length ===
-        0
+        isEmpty(validateFilesystemBaseDirectoryCandidate(candidate, options))
     );
 }

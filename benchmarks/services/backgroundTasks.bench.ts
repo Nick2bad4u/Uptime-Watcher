@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /** Represents a queued background task. */
 interface Task {
@@ -900,7 +901,7 @@ function createMockProcessor(
         await new Promise((resolve) => setTimeout(resolve, processingTime));
 
         // Simulate occasional failures
-        if (Math.random() < 0.1) {
+        if (secureRandomFloat() < 0.1) {
             // 10% failure rate
             throw new Error(`Simulated failure for ${type} task`);
         }

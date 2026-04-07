@@ -16,6 +16,7 @@ import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { validateNotificationPreferenceUpdate } from "@shared/validation/notifications";
+import { arrayJoin } from "ts-extras";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
@@ -67,9 +68,8 @@ export const NotificationPreferenceService: NotificationPreferenceServiceContrac
                     validateNotificationPreferenceUpdate(preferences);
 
                 if (!validation.success) {
-                    const issues = validation.error.issues
-                        .map(({ message }) => message)
-                        .join(", ");
+                    const issues = arrayJoin(validation.error.issues
+                        .map(({ message }) => message), ", ");
                     throw new Error(
                         `Invalid notification preferences: ${issues}`,
                         {

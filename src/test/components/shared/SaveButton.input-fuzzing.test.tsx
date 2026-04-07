@@ -36,6 +36,7 @@ import type { JSX } from "react/jsx-runtime";
 import { SaveButton } from "../../../components/shared/SaveButton";
 import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 import { createMockFunction } from "../../utils/mockFactories";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock ThemedButton component
 vi.mock("../../../theme/components/ThemedButton", () => ({
@@ -142,7 +143,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (config) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -188,7 +189,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         })("should handle all size variants correctly", async (size) => {
             // Create unique container for this test instance
             const container = document.createElement("div");
-            container.id = `savebutton-size-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            container.id = `savebutton-size-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
             document.body.append(container);
 
             try {
@@ -212,7 +213,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (ariaLabel) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-aria-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-aria-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -250,7 +251,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (disabled, isLoading) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-state-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-state-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -288,7 +289,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         })("should handle rapid state transitions", async (transitionCount) => {
             // Create unique container for this test instance
             const container = document.createElement("div");
-            container.id = `savebutton-rapid-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            container.id = `savebutton-rapid-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
             document.body.append(container);
 
             try {
@@ -331,7 +332,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
         })("should handle click interactions correctly", async (scenario) => {
             // Create unique container for this test instance
             const container = document.createElement("div");
-            container.id = `savebutton-click-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+            container.id = `savebutton-click-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
             document.body.append(container);
 
             // Create a fresh mock for this specific test instance
@@ -373,7 +374,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (clickCount) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-disabled-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-disabled-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -424,7 +425,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (config) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-a11y-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-a11y-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -467,7 +468,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (keyPressCount) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-keyboard-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-keyboard-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -502,7 +503,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (config) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-icon-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-icon-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -540,7 +541,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (className) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-class-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-class-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -600,7 +601,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
 
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-perf-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-perf-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -666,7 +667,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (invalidHandler) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-error-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-error-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -697,7 +698,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (invalidProp1, invalidProp2) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-invalid-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-invalid-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {
@@ -737,7 +738,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             async (rerenderCount) => {
                 // Create unique container for this test instance
                 const container = document.createElement("div");
-                container.id = `savebutton-memo-test-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+                container.id = `savebutton-memo-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
                 document.body.append(container);
 
                 try {

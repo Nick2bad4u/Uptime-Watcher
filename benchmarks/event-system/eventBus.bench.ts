@@ -20,6 +20,7 @@
 import { bench, describe } from "vitest";
 import { TypedEventBus } from "../../electron/events/TypedEventBus";
 import type { UptimeEvents } from "../../electron/events/eventTypes";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Real event interfaces from the actual codebase
 interface TestEventTypes extends UptimeEvents {
@@ -136,7 +137,7 @@ describe("Event Bus Performance", () => {
                 eventBus.emitTyped("benchmark:heavy", {
                     data: Array.from({ length: 10 }, (_, idx) => ({
                         index: idx,
-                        value: Math.random(),
+                        value: secureRandomFloat(),
                     })),
                     processing: i % 2 === 0,
                 });

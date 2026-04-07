@@ -1,4 +1,5 @@
 import { isObject } from "@shared/utils/typeGuards";
+import { safeCastTo } from "ts-extras";
 
 /**
  * Attempts to extract a stable string error code from an unknown error value.
@@ -18,6 +19,6 @@ export function tryGetErrorCode(error: unknown): string | undefined {
         return undefined;
     }
 
-    const { code } = error as { code?: unknown };
+    const { code } = safeCastTo(error);
     return typeof code === "string" && code.length > 0 ? code : undefined;
 }

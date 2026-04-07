@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 class MockResponseTimeAnalyzer {
     calculateStats(responseTimes: number[]): any {
@@ -75,7 +76,7 @@ describe("Response Time Analyzer Performance", () => {
             analyzer = new MockResponseTimeAnalyzer();
             const responseTimes = Array.from(
                 { length: 1000 },
-                () => Math.random() * 2000
+                () => secureRandomFloat() * 2000
             );
             analyzer.calculateStats(responseTimes);
         },
@@ -88,7 +89,7 @@ describe("Response Time Analyzer Performance", () => {
             analyzer = new MockResponseTimeAnalyzer();
             const responseTimes = Array.from(
                 { length: 1000 },
-                () => Math.random() * 1000 + 200
+                () => secureRandomFloat() * 1000 + 200
             );
             analyzer.detectAnomalies(responseTimes);
         },
@@ -101,7 +102,7 @@ describe("Response Time Analyzer Performance", () => {
             analyzer = new MockResponseTimeAnalyzer();
             const data = Array.from({ length: 100 }, (_, i) => ({
                 timestamp: Date.now() - i * 60_000,
-                value: Math.random() * 1000 + 200,
+                value: secureRandomFloat() * 1000 + 200,
             }));
             analyzer.getTrend(data);
         },

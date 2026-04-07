@@ -22,6 +22,7 @@ import { bench, describe, beforeAll } from "vitest";
 import { StandardizedCache } from "../../electron/utils/cache/StandardizedCache";
 import { TypedEventBus } from "../../electron/events/TypedEventBus";
 import type { UptimeEvents } from "../../electron/events/eventTypes";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Types for cache testing
 interface TestCacheData {
@@ -46,7 +47,7 @@ function generateCacheValues(count: number): TestCacheData[] {
         id: `id-${i}`,
         data: `value-${i}`,
         timestamp: Date.now(),
-        size: Math.floor(Math.random() * 1000),
+        size: Math.floor(secureRandomFloat() * 1000),
     }));
 }
 
@@ -203,9 +204,9 @@ describe("Cache Operations Performance Benchmarks", () => {
         () => {
             for (let i = 0; i < 1000; i++) {
                 const key =
-                    Math.random() < 0.8
+                    secureRandomFloat() < 0.8
                         ? mediumKeys[
-                              Math.floor(Math.random() * mediumKeys.length)
+                              Math.floor(secureRandomFloat() * mediumKeys.length)
                           ]
                         : `miss-key-${i}`;
                 mediumCache.get(key);
@@ -265,7 +266,7 @@ describe("Cache Operations Performance Benchmarks", () => {
 
             // Mix of sets, gets, and deletes
             for (let i = 0; i < 1000; i++) {
-                const operation = Math.random();
+                const operation = secureRandomFloat();
                 const key = `bulk-key-${i % 100}`;
 
                 if (operation < 0.6) {

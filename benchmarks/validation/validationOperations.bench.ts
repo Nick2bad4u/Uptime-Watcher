@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Type definitions for benchmarking
 interface ValidationTestData {
@@ -76,7 +77,7 @@ function generateValidationTestData(): ValidationTestData {
                     level3: {
                         data: Array.from({ length: 50 }, (_, j) => ({
                             id: j,
-                            value: Math.random() * 1000,
+                            value: secureRandomFloat() * 1000,
                             timestamp: Date.now() - j * 1000,
                         })),
                     },
@@ -84,7 +85,7 @@ function generateValidationTestData(): ValidationTestData {
             },
         },
         arrays: {
-            numbers: Array.from({ length: 100 }, () => Math.random()),
+            numbers: Array.from({ length: 100 }, () => secureRandomFloat()),
             strings: Array.from({ length: 100 }, (_, j) => `string-${j}`),
             booleans: Array.from({ length: 100 }, (_, j) => j % 2 === 0),
         },

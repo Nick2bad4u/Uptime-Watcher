@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock query executor
 class MockQueryExecutor {
@@ -31,43 +32,43 @@ class MockQueryExecutor {
             id: i + 1,
             name: `Site ${i + 1}`,
             url: `https://site${i + 1}.com`,
-            isActive: Math.random() > 0.2,
-            createdAt: Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000,
+            isActive: secureRandomFloat() > 0.2,
+            createdAt: Date.now() - secureRandomFloat() * 365 * 24 * 60 * 60 * 1000,
         }));
         this.data.set("sites", sites);
 
         // Monitors table
         const monitors = Array.from({ length: 3000 }, (_, i) => ({
             id: i + 1,
-            siteIdentifier: Math.floor(Math.random() * 1000) + 1,
+            siteIdentifier: Math.floor(secureRandomFloat() * 1000) + 1,
             type: [
                 "http",
                 "ping",
                 "port",
             ][i % 3],
             name: `Monitor ${i + 1}`,
-            isEnabled: Math.random() > 0.1,
+            isEnabled: secureRandomFloat() > 0.1,
             interval: [
                 30_000,
                 60_000,
                 120_000,
             ][i % 3],
-            lastChecked: Date.now() - Math.random() * 24 * 60 * 60 * 1000,
+            lastChecked: Date.now() - secureRandomFloat() * 24 * 60 * 60 * 1000,
         }));
         this.data.set("monitors", monitors);
 
         // History table
         const history = Array.from({ length: 50_000 }, (_, i) => ({
             id: i + 1,
-            monitorId: Math.floor(Math.random() * 3000) + 1,
-            siteIdentifier: Math.floor(Math.random() * 1000) + 1,
+            monitorId: Math.floor(secureRandomFloat() * 3000) + 1,
+            siteIdentifier: Math.floor(secureRandomFloat() * 1000) + 1,
             status: [
                 "online",
                 "offline",
                 "degraded",
             ][i % 3],
-            responseTime: Math.floor(Math.random() * 2000),
-            timestamp: Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000,
+            responseTime: Math.floor(secureRandomFloat() * 2000),
+            timestamp: Date.now() - secureRandomFloat() * 30 * 24 * 60 * 60 * 1000,
             eventType: [
                 "status_change",
                 "check_result",

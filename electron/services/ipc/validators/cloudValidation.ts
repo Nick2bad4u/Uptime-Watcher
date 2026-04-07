@@ -13,6 +13,7 @@ import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
+import { isInteger, stringSplit  } from "ts-extras";
 
 import type { IpcParameterValidator } from "../types";
 import type { ParameterValueValidationResult } from "./utils/parameterValidation";
@@ -158,7 +159,7 @@ export const validateCloudBackupMigrationRequest: IpcParameterValidator =
                     errors.push(limitError);
                 } else if (
                     typeof limit === "number" &&
-                    (!Number.isInteger(limit) || limit <= 0)
+                    (!isInteger(limit) || limit <= 0)
                 ) {
                     errors.push("limit must be a positive integer");
                 }
@@ -270,7 +271,7 @@ export function createBackupKeyValidator(
                 );
             }
 
-            const segments = key.split("/");
+            const segments = stringSplit(key, "/");
             if (segments.some((segment) => segment.length === 0)) {
                 return toValidationResult(
                     `${paramName} must not contain empty path segments`

@@ -12,6 +12,7 @@ import {
     mergeMonitorSnapshots,
 } from "@shared/utils/siteSnapshots";
 import { isObject } from "@shared/utils/typeGuards";
+import { arrayFind, safeCastTo  } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { EventKey } from "../events/TypedEventBus";
@@ -69,9 +70,7 @@ export class SnapshotSyncCoordinator {
             return undefined;
         }
 
-        const { monitor } = resultCandidate as Partial<StatusUpdate> & {
-            monitor?: unknown;
-        };
+        const { monitor } = safeCastTo(resultCandidate);
         return isMonitorSnapshot(monitor) ? monitor : undefined;
     }
 
@@ -87,9 +86,7 @@ export class SnapshotSyncCoordinator {
             return undefined;
         }
 
-        const { site } = resultCandidate as Partial<StatusUpdate> & {
-            site?: unknown;
-        };
+        const { site } = safeCastTo(resultCandidate);
         return isSiteSnapshot(site) ? site : undefined;
     }
 
@@ -267,9 +264,7 @@ export class SnapshotSyncCoordinator {
                     );
                 }
 
-                const monitorFromCache = siteFromCache?.monitors.find(
-                    (candidate) => candidate.id === monitorId
-                );
+                const monitorFromCache = arrayFind(siteFromCache?.monitors, (candidate) => candidate.id === monitorId);
 
                 if (siteFromCache && !monitorFromCache) {
                     logger.warn(

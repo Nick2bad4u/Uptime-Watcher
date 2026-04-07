@@ -22,7 +22,7 @@ import type { Jsonify, UnknownRecord, ValueOf } from "type-fest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
-import { objectHasOwn } from "ts-extras";
+import { arrayAt, objectHasOwn  } from "ts-extras";
 import * as z from "zod";
 
 import {
@@ -70,7 +70,7 @@ function normalizeMissingRequiredFieldIssues(
     };
 
     return issues.map((issue) => {
-        const lastPathSegment = issue.path.at(-1);
+        const lastPathSegment = arrayAt(issue.path, -1);
         if (typeof lastPathSegment !== "string") {
             return issue;
         }

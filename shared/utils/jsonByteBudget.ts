@@ -10,6 +10,7 @@
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { objectKeys } from "ts-extras";
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
 
@@ -112,7 +113,7 @@ function addJsonBytesForObject(
     addBytes(state, 2);
 
     const record = value;
-    const keys = Object.keys(record);
+    const keys = objectKeys(record);
 
     if (keys.length > 1) {
         addBytes(state, keys.length - 1);

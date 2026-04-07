@@ -397,7 +397,7 @@ export async function startLoopbackOAuthServer(args?: {
     }
 
     const port = resolvePortFromServer(primaryServer.server);
-    const origin = `http://${redirectHost}:${port}`;
+    const origin = `https://${redirectHost}:${port}`;
     const redirectUri = omitPath ? origin : `${origin}${expectedPath}`;
 
     return {

@@ -9,6 +9,7 @@
 
 import type { EffectCallback as ReactEffectCallback } from "react";
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for React Hooks
 
@@ -921,11 +922,11 @@ describe("React Hook Performance", () => {
         // Perform state updates
         for (let update = 0; update < 500; update++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             hookSystem.setCurrentComponent(componentId);
 
             // Simulate different types of state updates
-            const updateType = Math.floor(Math.random() * 3);
+            const updateType = Math.floor(secureRandomFloat() * 3);
             switch (updateType) {
                 case 0: {
                     hookSystem.renderComponent(componentId);
@@ -965,7 +966,7 @@ describe("React Hook Performance", () => {
                             theme: "light",
                             notifications: Array.from(
                                 { length: 10 },
-                                () => Math.random() > 0.5
+                                () => secureRandomFloat() > 0.5
                             ),
                         },
                     },
@@ -978,7 +979,7 @@ describe("React Hook Performance", () => {
                 data: {
                     items: Array.from({ length: 20 }, (_, j) => ({
                         id: j,
-                        value: Math.random() * 100,
+                        value: secureRandomFloat() * 100,
                         metadata: { created: Date.now(), tags: [`tag${j}`] },
                     })),
                     filters: { category: "all", sortBy: "name" },
@@ -992,7 +993,7 @@ describe("React Hook Performance", () => {
         // Complex state updates
         for (let update = 0; update < 200; update++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             hookSystem.renderComponent(componentId);
         }
 
@@ -1047,7 +1048,7 @@ describe("React Hook Performance", () => {
         // Trigger re-renders to test effect optimization
         for (let render = 0; render < 300; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             hookSystem.renderComponent(componentId);
         }
 
@@ -1072,23 +1073,23 @@ describe("React Hook Performance", () => {
                 const intervalId = {} as NodeJS.Timeout; // Mock interval ID
 
                 const subscription = {
-                    unsubscribe: () => Math.random() * 100, // Simulate cleanup work
+                    unsubscribe: () => secureRandomFloat() * 100, // Simulate cleanup work
                 };
 
-                const eventListener = () => Math.random() * 50; // Simulate event work
+                const eventListener = () => secureRandomFloat() * 50; // Simulate event work
 
                 return () => {
                     // Simulate cleanup work without real timers
-                    void (Math.random() * 1000); // Simulate clearInterval work
+                    void (secureRandomFloat() * 1000); // Simulate clearInterval work
                     subscription.unsubscribe();
-                    void (Math.random() * 5); // Simulate work
+                    void (secureRandomFloat() * 5); // Simulate work
                 };
             }, [isActive]);
 
             hookSystem.useEffect(() => {
                 // Another effect with cleanup
                 const observers = Array.from({ length: 5 }, () => ({
-                    disconnect: () => Math.random() * 2, // Cleanup work
+                    disconnect: () => secureRandomFloat() * 2, // Cleanup work
                 }));
 
                 return () => {
@@ -1102,7 +1103,7 @@ describe("React Hook Performance", () => {
         // Trigger many re-renders to test cleanup
         for (let render = 0; render < 250; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             hookSystem.renderComponent(componentId);
         }
 
@@ -1125,7 +1126,7 @@ describe("React Hook Performance", () => {
             const [items, setItems] = hookSystem.useState(
                 Array.from({ length: 100 }, (_, j) => ({
                     id: j,
-                    value: Math.random() * 100,
+                    value: secureRandomFloat() * 100,
                 }))
             );
             const [filter, setFilter] = hookSystem.useState("");
@@ -1135,7 +1136,7 @@ describe("React Hook Performance", () => {
             const expensiveComputation = () => {
                 let result = 0;
                 for (let k = 0; k < 1000; k++) {
-                    result += Math.sqrt(k * Math.random());
+                    result += Math.sqrt(k * secureRandomFloat());
                 }
                 return result;
             };
@@ -1186,7 +1187,7 @@ describe("React Hook Performance", () => {
         // Trigger renders to test memoization
         for (let render = 0; render < 200; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             hookSystem.renderComponent(componentId);
         }
 
@@ -1215,7 +1216,7 @@ describe("React Hook Performance", () => {
             const handleSubmit = hookSystem.useCallback((formData: any) => {
                 console.log("Submitting:", formData);
                 // Simulate form processing
-                const processing = Math.random() * 3;
+                const processing = secureRandomFloat() * 3;
             }, []);
 
             const handleDataUpdate = hookSystem.useCallback(
@@ -1228,7 +1229,7 @@ describe("React Hook Performance", () => {
             );
 
             const handleCalculation = hookSystem.useCallback(
-                (value: number) => value * config.multiplier * Math.random(),
+                (value: number) => value * config.multiplier * secureRandomFloat(),
                 [config.multiplier]
             );
 
@@ -1251,7 +1252,7 @@ describe("React Hook Performance", () => {
         // Trigger renders to test callback memoization
         for (let render = 0; render < 250; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             hookSystem.renderComponent(componentId);
         }
 
@@ -1292,7 +1293,7 @@ describe("React Hook Performance", () => {
             const setStoredValue = hookSystem.useCallback((newValue: any) => {
                 setValue(newValue);
                 // Simulate localStorage write
-                const writeWork = Number(Math.random());
+                const writeWork = Number(secureRandomFloat());
             }, []);
 
             return [value, setStoredValue];
@@ -1307,8 +1308,8 @@ describe("React Hook Performance", () => {
                 setLoading(true);
                 try {
                     // Simulate API call
-                    const fetchWork = Math.random() * 10;
-                    const result = { id: Math.random(), data: "fetched data" };
+                    const fetchWork = secureRandomFloat() * 10;
+                    const result = { id: secureRandomFloat(), data: "fetched data" };
                     setData(result);
                     setError(null);
                 } catch (error_) {
@@ -1355,7 +1356,7 @@ describe("React Hook Performance", () => {
         // Trigger renders to test custom hooks
         for (let render = 0; render < 150; render++) {
             const componentId =
-                components[Math.floor(Math.random() * components.length)];
+                components[Math.floor(secureRandomFloat() * components.length)];
             hookSystem.renderComponent(componentId);
         }
 
@@ -1384,7 +1385,7 @@ describe("React Hook Performance", () => {
             const [items, setItems] = hookSystem.useState(
                 Array.from({ length: 50 }, (_, j) => ({
                     id: j,
-                    value: Math.random(),
+                    value: secureRandomFloat(),
                 }))
             );
 
@@ -1427,7 +1428,7 @@ describe("React Hook Performance", () => {
             // Trigger many renders
             for (let render = 0; render < 50; render++) {
                 const componentId =
-                    components[Math.floor(Math.random() * components.length)];
+                    components[Math.floor(secureRandomFloat() * components.length)];
                 hookSystem.renderComponent(componentId);
             }
 
@@ -1462,8 +1463,8 @@ describe("React Hook Performance", () => {
             for (let j = 0; j < 20; j++) {
                 const [state, setState] = hookSystem.useState({
                     id: j,
-                    value: Math.random() * 100,
-                    data: Array.from({ length: 10 }, () => Math.random()),
+                    value: secureRandomFloat() * 100,
+                    data: Array.from({ length: 10 }, () => secureRandomFloat()),
                 });
                 states.push([state, setState]);
             }
@@ -1474,7 +1475,7 @@ describe("React Hook Performance", () => {
                     // Expensive computation
                     let result = 0;
                     for (let k = 0; k < 100; k++) {
-                        result += Math.sqrt(k * Math.random());
+                        result += Math.sqrt(k * secureRandomFloat());
                     }
                     return result + j;
                 }, [states[j % states.length][0].value]);
@@ -1484,7 +1485,7 @@ describe("React Hook Performance", () => {
             for (let j = 0; j < 10; j++) {
                 const callback = hookSystem.useCallback(() => {
                     console.log(`Callback ${j}`);
-                    return Math.random() * j;
+                    return secureRandomFloat() * j;
                 }, [states[j % states.length][0].id]);
             }
 
@@ -1492,10 +1493,10 @@ describe("React Hook Performance", () => {
             for (let j = 0; j < 8; j++) {
                 hookSystem.useEffect(() => {
                     console.log(`Effect ${j}`);
-                    const work = Math.random() * 2;
+                    const work = secureRandomFloat() * 2;
 
                     return () => {
-                        const cleanup = Number(Math.random());
+                        const cleanup = Number(secureRandomFloat());
                     };
                 }, [states[j % states.length][0].value]);
             }
@@ -1507,7 +1508,7 @@ describe("React Hook Performance", () => {
         for (let render = 0; render < 100; render++) {
             const componentId =
                 stressComponents[
-                    Math.floor(Math.random() * stressComponents.length)
+                    Math.floor(secureRandomFloat() * stressComponents.length)
                 ];
             hookSystem.renderComponent(componentId);
         }

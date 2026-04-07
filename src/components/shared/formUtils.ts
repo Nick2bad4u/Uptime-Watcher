@@ -40,6 +40,7 @@
 import type React from "react";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { arrayIncludes } from "ts-extras";
 
 // ============================================================================
 // Form Utility Functions
@@ -190,7 +191,7 @@ export const validationPatterns = {
     oneOfNumbers:
         (allowedValues: number[]): ((value: number) => boolean) =>
         (value: number): boolean =>
-            allowedValues.includes(value),
+            arrayIncludes(allowedValues, value),
 
     /**
      * Validates that a value is one of the allowed options
@@ -198,5 +199,5 @@ export const validationPatterns = {
     oneOfStrings:
         (allowedValues: string[]): ((value: string) => boolean) =>
         (value: string): boolean =>
-            allowedValues.includes(value),
+            arrayIncludes(allowedValues, value),
 } as const;

@@ -51,6 +51,7 @@ import {
     parseUptimeValue,
     safeGetHostname,
 } from "../../../src/utils/monitoring/dataValidation";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for Domain Objects
@@ -161,9 +162,9 @@ const comprehensiveUrls = fc.oneof(
         "https://example.com",
         "http://localhost:8080",
         "https://subdomain.example.com/path?query=value#fragment",
-        "http://192.168.1.1:3000",
+        "https://192.168.1.1:3000",
         "https://[::1]:8080",
-        "http://user:pass@example.com:8080/path",
+        "https://user:pass@example.com:8080/path",
         "https://xn--n3h.com" // IDN domain
     ),
     // Invalid URLs that should be rejected
@@ -173,7 +174,7 @@ const comprehensiveUrls = fc.oneof(
         "javascript:alert('xss')",
         "data:text/html,<script>alert('xss')</script>",
         "//example.com", // Protocol relative
-        "http://", // Missing domain
+        "https://", // Missing domain
         "https://", // Missing domain
         "not-a-url",
         "example.com", // Missing protocol
@@ -185,11 +186,11 @@ const comprehensiveUrls = fc.oneof(
     ),
     // Edge case URLs
     fc.constantFrom(
-        "http://a.b", // Minimal valid URL
+        "https://a.b", // Minimal valid URL
         `https://${"a".repeat(253)}.com`, // Long domain
-        `http://example.com/${"a".repeat(2000)}`, // Long path
+        `https://example.com/${"a".repeat(2000)}`, // Long path
         `https://example.com?${"a".repeat(2000)}`, // Long query
-        `http://example.com#${"a".repeat(2000)}` // Long fragment
+        `https://example.com#${"a".repeat(2000)}` // Long fragment
     )
 );
 
@@ -532,7 +533,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
             (validUrl) => {
                 // Only test HTTP/HTTPS URLs since that's what the validator accepts
                 if (
-                    validUrl.startsWith("http://") ||
+                    validUrl.startsWith("https://") ||
                     validUrl.startsWith("https://")
                 ) {
                     const result = measureValidation(
@@ -1032,7 +1033,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                 // Property: Valid URLs should extract hostname
                 if (
                     typeof url === "string" &&
-                    (url.startsWith("http://") || url.startsWith("https://"))
+                    (url.startsWith("https://") || url.startsWith("https://"))
                 ) {
                     try {
                         const urlObj = new URL(url);
@@ -1053,7 +1054,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
             "URL validation consistency across different validators",
             (url) => {
                 // Only test valid HTTP/HTTPS URLs
-                if (url.startsWith("http://") || url.startsWith("https://")) {
+                if (url.startsWith("https://") || url.startsWith("https://")) {
                     const validationResult = measureValidation(
                         isValidUrl,
                         "isValidUrl",
@@ -1083,7 +1084,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
             (monitorType) => {
                 // Generate a complete, valid monitor object for the given type
                 const monitorObj = {
-                    id: `test-${Math.random().toString(36).slice(2)}`,
+                    id: `test-${secureRandomFloat().toString(36).slice(2)}`,
                     type: monitorType,
                     status: "up" as const,
                     monitoring: true,

@@ -673,7 +673,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         it("should not call SystemService for invalid URLs in mixed batches", () => {
             const urls = [
                 "https://02k.qhppdpoxnoh.fq/nOFn%F3%98%A9%80p'4I",
-                "http://de1nssl6ui3.s2.rml/RDHtH4aN",
+                "https://de1nssl6ui3.s2.rml/RDHtH4aN",
             ];
 
             mockOpenExternal.mockClear();
@@ -1013,7 +1013,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             ];
             const urls = [
                 "https://02k.qhppdpoxnoh.fq/nOFn%F3%98%A9%80p'4I",
-                "http://de1nssl6ui3.s2.rml/RDHtH4aN",
+                "https://de1nssl6ui3.s2.rml/RDHtH4aN",
             ];
 
             mockOpenExternal.mockClear();

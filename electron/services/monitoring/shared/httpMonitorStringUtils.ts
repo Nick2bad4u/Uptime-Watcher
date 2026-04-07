@@ -1,3 +1,7 @@
+import type { UnknownRecord } from "type-fest";
+
+import { arrayJoin, objectEntries  } from "ts-extras";
+
 import type { MonitorCheckResult } from "../types";
 
 import { createMonitorErrorResult } from "./monitorServiceHelpers";
@@ -19,7 +23,7 @@ export function normalizeHeaderValue(value: string): string {
  * @returns Header string value if found, otherwise null.
  */
 export function resolveHeaderValue(
-    headers: Record<string, unknown>,
+    headers: UnknownRecord,
     headerName: string
 ): null | string {
     const direct = headers[headerName];
@@ -29,19 +33,19 @@ export function resolveHeaderValue(
     }
 
     if (Array.isArray(direct)) {
-        return direct.join(", ");
+        return arrayJoin(direct, ", ");
     }
 
     const lowerName = headerName.toLowerCase();
 
-    for (const [key, value] of Object.entries(headers)) {
+    for (const [key, value] of objectEntries(headers)) {
         if (key.toLowerCase() === lowerName) {
             if (typeof value === "string") {
                 return value;
             }
 
             if (Array.isArray(value)) {
-                return value.join(", ");
+                return arrayJoin(value, ", ");
             }
         }
     }

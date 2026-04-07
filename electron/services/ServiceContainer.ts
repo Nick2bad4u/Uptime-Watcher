@@ -12,6 +12,8 @@
  */
 import type { UnknownRecord } from "type-fest";
 
+import { isDefined, objectEntries  } from "ts-extras";
+
 import type { UptimeEvents } from "../events/eventTypes";
 
 import { TypedEventBus } from "../events/TypedEventBus";
@@ -529,21 +531,21 @@ export class ServiceContainer {
      */
     public getInitializationStatus(): Record<string, boolean> {
         return {
-            AutoUpdaterService: this.autoUpdaterService !== undefined,
-            CloudService: this.cloudService !== undefined,
-            ConfigurationManager: this.configurationManager !== undefined,
-            DatabaseManager: this.databaseManager !== undefined,
-            DatabaseService: this.databaseService !== undefined,
-            HistoryRepository: this.historyRepository !== undefined,
-            IpcService: this.ipcService !== undefined,
-            MonitorManager: this.monitorManager !== undefined,
-            MonitorRepository: this.monitorRepository !== undefined,
-            NotificationService: this.notificationService !== undefined,
-            SettingsRepository: this.settingsRepository !== undefined,
-            SiteManager: this.siteManager !== undefined,
-            SiteRepository: this.siteRepository !== undefined,
-            UptimeOrchestrator: this.uptimeOrchestrator !== undefined,
-            WindowService: this.windowService !== undefined,
+            AutoUpdaterService: isDefined(this.autoUpdaterService),
+            CloudService: isDefined(this.cloudService),
+            ConfigurationManager: isDefined(this.configurationManager),
+            DatabaseManager: isDefined(this.databaseManager),
+            DatabaseService: isDefined(this.databaseService),
+            HistoryRepository: isDefined(this.historyRepository),
+            IpcService: isDefined(this.ipcService),
+            MonitorManager: isDefined(this.monitorManager),
+            MonitorRepository: isDefined(this.monitorRepository),
+            NotificationService: isDefined(this.notificationService),
+            SettingsRepository: isDefined(this.settingsRepository),
+            SiteManager: isDefined(this.siteManager),
+            SiteRepository: isDefined(this.siteRepository),
+            UptimeOrchestrator: isDefined(this.uptimeOrchestrator),
+            WindowService: isDefined(this.windowService),
         };
     }
 
@@ -576,7 +578,7 @@ export class ServiceContainer {
             UptimeOrchestrator: this.uptimeOrchestrator,
             WindowService: this.windowService,
         };
-        for (const [serviceName, serviceInstance] of Object.entries(
+        for (const [serviceName, serviceInstance] of objectEntries(
             serviceMap
         )) {
             if (serviceInstance !== undefined) {

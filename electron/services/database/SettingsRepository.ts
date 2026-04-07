@@ -49,6 +49,7 @@ import type { SettingsRow as DatabaseSettingsRow } from "@shared/types/database"
 import type { Database } from "node-sqlite3-wasm";
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { isEmpty, objectEntries  } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
 
@@ -151,8 +152,8 @@ export class SettingsRepository {
      * @throws Error if the database operation fails.
      */
     public async bulkInsert(settings: Record<string, string>): Promise<void> {
-        const entries = Object.entries(settings);
-        if (entries.length === 0) {
+        const entries = objectEntries(settings);
+        if (isEmpty(entries)) {
             return;
         }
 
@@ -394,8 +395,8 @@ export class SettingsRepository {
         db: Database,
         settings: Record<string, string>
     ): void {
-        const entries = Object.entries(settings);
-        if (entries.length === 0) {
+        const entries = objectEntries(settings);
+        if (isEmpty(entries)) {
             return;
         }
 

@@ -13,6 +13,8 @@
  * Returns true when the candidate only contains a scheme delimiter (for example
  * `https://`) without any authority/path information.
  */
+import { arrayJoin } from "ts-extras";
+
 export function isSchemeOnlyUrl(value: string): boolean {
     return /^[a-z][\d+.a-z-]*:\/\/$/iu.test(value);
 }
@@ -83,8 +85,8 @@ export function hasNestedHttpSchemeAfterFirstDelimiter(value: string): boolean {
 
     const remainder = value.slice(firstSchemeSeparator + 3).toLowerCase();
     // Avoid a literal "http://" string to satisfy @microsoft/sdl/no-insecure-url.
-    const httpPrefix = ["http", "://"].join("");
-    const httpsPrefix = ["https", "://"].join("");
+    const httpPrefix = arrayJoin(["http", "://"], "");
+    const httpsPrefix = arrayJoin(["https", "://"], "");
     return (
         remainder.startsWith(httpPrefix) || remainder.startsWith(httpsPrefix)
     );

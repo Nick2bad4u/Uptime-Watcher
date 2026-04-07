@@ -1,5 +1,6 @@
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { Dropbox, DropboxAuth } from "dropbox";
+import { safeCastTo } from "ts-extras";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
@@ -19,7 +20,7 @@ function isThenable(value: unknown): value is PromiseLike<unknown> {
         typeof value === "object" &&
         value !== null &&
         "then" in value &&
-        typeof (value as { then?: unknown }).then === "function"
+        typeof (safeCastTo<{ then?: unknown }>(value)).then === "function"
     );
 }
 

@@ -13,6 +13,7 @@ import type { MonitorType } from "@shared/types";
 import type * as z from "zod";
 
 import { MONITOR_STATUS } from "@shared/types";
+import { arrayJoin } from "ts-extras";
 
 import type {
     BaseMonitorConfig,
@@ -133,7 +134,7 @@ function validateMonitorTypeInternal(
     if (!isValidMonitorType(type)) {
         const validTypes = getRegisteredMonitorTypes();
         return {
-            error: `Invalid monitor type: ${type}. Valid types: ${validTypes.join(", ")}`,
+            error: `Invalid monitor type: ${type}. Valid types: ${arrayJoin(validTypes, ", ")}`,
             success: false,
         };
     }

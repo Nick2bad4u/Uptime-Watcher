@@ -47,6 +47,7 @@ import {
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { ensureError } from "@shared/utils/errorHandling";
+import { objectEntries, objectKeys  } from "ts-extras";
 
 import {
     DEFAULT_CHECK_INTERVAL,
@@ -104,7 +105,7 @@ function normalizeCloudSyncFieldValue<
  */
 export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
     const nextSite: Record<string, CloudSyncEntityState> = {};
-    for (const [siteId, entity] of Object.entries(state.site)) {
+    for (const [siteId, entity] of objectEntries(state.site)) {
         const fields: Record<string, CloudSyncFieldValue> = {
             ...entity.fields,
         };
@@ -128,7 +129,7 @@ export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
     }
 
     const nextMonitor: Record<string, CloudSyncEntityState> = {};
-    for (const [monitorId, entity] of Object.entries(state.monitor)) {
+    for (const [monitorId, entity] of objectEntries(state.monitor)) {
         const fields: Record<string, CloudSyncFieldValue> = {
             ...entity.fields,
         };
@@ -188,7 +189,7 @@ export function shouldSyncSettingKey(key: string): boolean {
 
 function removeUndefinedEntries(value: UnknownRecord): UnknownRecord {
     const result: UnknownRecord = {};
-    for (const [key, entryValue] of Object.entries(value)) {
+    for (const [key, entryValue] of objectEntries(value)) {
         if (entryValue !== undefined) {
             result[key] = entryValue;
         }
@@ -267,7 +268,7 @@ function toSettingsConfig(
     settings: Record<string, string>
 ): CloudSyncSettingsConfig {
     const filtered: Record<string, string> = {};
-    for (const [key, value] of Object.entries(settings)) {
+    for (const [key, value] of objectEntries(settings)) {
         if (shouldSyncSettingKey(key)) {
             filtered[key] = value;
         }
@@ -337,7 +338,7 @@ export function buildDesiredSitesFromSyncState(
 ): Record<string, CloudSyncSiteConfig> {
     const desiredSites: Record<string, CloudSyncSiteConfig> = {};
 
-    for (const [siteId, entity] of Object.entries(siteState)) {
+    for (const [siteId, entity] of objectEntries(siteState)) {
         if (entity.deleted === undefined) {
             const nameValue = entity.fields["name"]?.value;
             const monitoringValue = entity.fields["monitoring"]?.value;
@@ -377,10 +378,10 @@ export function buildDesiredMonitorsFromSyncState(
 ): Record<string, CloudSyncMonitorConfig> {
     const desiredMonitors: Record<string, CloudSyncMonitorConfig> = {};
 
-    for (const [monitorId, entity] of Object.entries(monitorState)) {
+    for (const [monitorId, entity] of objectEntries(monitorState)) {
         if (entity.deleted === undefined) {
             const candidate: UnknownRecord = { id: monitorId };
-            for (const [field, fieldValue] of Object.entries(entity.fields)) {
+            for (const [field, fieldValue] of objectEntries(entity.fields)) {
                 if (field !== "id" && fieldValue.value !== null) {
                     candidate[field] = fieldValue.value;
                 }
@@ -421,7 +422,7 @@ export function buildDesiredSettingsFromSyncState(
 ): CloudSyncSettingsConfig {
     const desiredSettings: CloudSyncSettingsConfig = {};
 
-    for (const [key, entity] of Object.entries(settingsState)) {
+    for (const [key, entity] of objectEntries(settingsState)) {
         if (shouldSyncSettingKey(key) && entity.deleted === undefined) {
             const value = entity.fields["value"]?.value;
             if (typeof value === "string") {
@@ -597,7 +598,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
         });
     };
 
-    for (const [siteId, config] of Object.entries(args.current.sites)) {
+    for (const [siteId, config] of objectEntries(args.current.sites)) {
         const baselineConfig = baselineSites[siteId];
 
         if (!areJsonValuesEqual(baselineConfig?.name ?? null, config.name)) {
@@ -614,13 +615,13 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
         }
     }
 
-    for (const [siteId] of Object.entries(baselineSites)) {
+    for (const [siteId] of objectEntries(baselineSites)) {
         if (!(siteId in args.current.sites)) {
             emitDelete("site", siteId);
         }
     }
 
-    for (const [monitorId, config] of Object.entries(args.current.monitors)) {
+    for (const [monitorId, config] of objectEntries(args.current.monitors)) {
         const baselineConfig = baselineMonitors[monitorId];
 
         for (const field of monitorFields) {
@@ -633,15 +634,15 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
         }
     }
 
-    for (const [monitorId] of Object.entries(baselineMonitors)) {
+    for (const [monitorId] of objectEntries(baselineMonitors)) {
         if (!(monitorId in args.current.monitors)) {
             emitDelete("monitor", monitorId);
         }
     }
 
     const settingsKeys = new Set<string>([
-        ...Object.keys(args.current.settings),
-        ...Object.keys(baselineSettings),
+        ...objectKeys(args.current.settings),
+        ...objectKeys(baselineSettings),
     ]);
 
     for (const key of settingsKeys) {

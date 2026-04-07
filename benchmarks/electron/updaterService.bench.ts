@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface UpdateInfo {
@@ -132,7 +133,7 @@ describe("Updater Service Benchmarks", () => {
 
         for (let i = 0; i < 500; i++) {
             // Determine scenario based on probability
-            const rand = Math.random();
+            const rand = secureRandomFloat();
             let cumulativeProbability = 0;
             let selectedScenario = updateScenarios[0];
 
@@ -144,19 +145,19 @@ describe("Updater Service Benchmarks", () => {
                 }
             }
 
-            const currentVersion = `1.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 20)}`;
+            const currentVersion = `1.${Math.floor(secureRandomFloat() * 10)}.${Math.floor(secureRandomFloat() * 20)}`;
             const channel =
                 updateChannels[
-                    Math.floor(Math.random() * updateChannels.length)
+                    Math.floor(secureRandomFloat() * updateChannels.length)
                 ];
             const checkStartTime = Date.now();
 
             // Simulate network latency
-            const isCacheHit = Math.random() < selectedScenario.cacheHitRate;
+            const isCacheHit = secureRandomFloat() < selectedScenario.cacheHitRate;
             const networkLatency = isCacheHit
                 ? 10
                 : selectedScenario.networkDelay.min +
-                  Math.random() *
+                  secureRandomFloat() *
                       (selectedScenario.networkDelay.max -
                           selectedScenario.networkDelay.min);
 
@@ -191,19 +192,19 @@ describe("Updater Service Benchmarks", () => {
 
                 const newVersion = versionParts.join(".");
                 const updateSize =
-                    Math.floor(Math.random() * 100_000_000) + 10_000_000; // 10MB - 110MB
+                    Math.floor(secureRandomFloat() * 100_000_000) + 10_000_000; // 10MB - 110MB
 
                 updateInfo = {
                     version: newVersion,
                     releaseDate: new Date(
-                        Date.now() - Math.random() * 86_400_000 * 7
+                        Date.now() - secureRandomFloat() * 86_400_000 * 7
                     ).toISOString(), // Within last week
                     downloadUrl: `https://releases.example.com/v${newVersion}/update.zip`,
                     size: updateSize,
-                    checksum: `sha256:${Math.random().toString(36).slice(2, 66)}`, // Mock checksum
+                    checksum: `sha256:${secureRandomFloat().toString(36).slice(2, 66)}`, // Mock checksum
                     signature:
-                        Math.random() > 0.2
-                            ? `sig_${Math.random().toString(36).slice(2, 20)}`
+                        secureRandomFloat() > 0.2
+                            ? `sig_${secureRandomFloat().toString(36).slice(2, 20)}`
                             : undefined,
                     releaseNotes: `Release notes for version ${newVersion}`,
                     critical:
@@ -218,7 +219,7 @@ describe("Updater Service Benchmarks", () => {
             }
 
             // Simulate check success/failure
-            const success = Math.random() > 0.02; // 98% success rate
+            const success = secureRandomFloat() > 0.02; // 98% success rate
 
             const updateCheck: UpdateCheck = {
                 checkId: `check-${i}`,
@@ -283,18 +284,18 @@ describe("Updater Service Benchmarks", () => {
         for (let i = 0; i < 300; i++) {
             const scenario =
                 downloadScenarios[
-                    Math.floor(Math.random() * downloadScenarios.length)
+                    Math.floor(secureRandomFloat() * downloadScenarios.length)
                 ];
 
             // Generate download parameters
             const totalBytes = Math.floor(
                 scenario.size.min +
-                    Math.random() * (scenario.size.max - scenario.size.min)
+                    secureRandomFloat() * (scenario.size.max - scenario.size.min)
             );
 
             const baseSpeed = Math.floor(
                 scenario.speed.min +
-                    Math.random() * (scenario.speed.max - scenario.speed.min)
+                    secureRandomFloat() * (scenario.speed.max - scenario.speed.min)
             );
 
             const startTime = Date.now();
@@ -308,17 +309,17 @@ describe("Updater Service Benchmarks", () => {
 
             while (downloadedBytes < totalBytes) {
                 // Simulate speed variations (±30%)
-                const speedVariation = (Math.random() - 0.5) * 0.6;
+                const speedVariation = (secureRandomFloat() - 0.5) * 0.6;
                 currentSpeed = Math.max(
                     100_000,
                     baseSpeed * (1 + speedVariation)
                 ); // Minimum 100 KB/s
 
                 // Simulate potential pauses (5% chance)
-                if (Math.random() < 0.05 && !paused) {
+                if (secureRandomFloat() < 0.05 && !paused) {
                     paused = true;
                     currentSpeed = 0;
-                } else if (paused && Math.random() < 0.3) {
+                } else if (paused && secureRandomFloat() < 0.3) {
                     paused = false;
                 }
 
@@ -339,7 +340,7 @@ describe("Updater Service Benchmarks", () => {
                         : 0;
 
                 // Simulate download failures
-                const shouldFail = Math.random() > scenario.reliabilityRate;
+                const shouldFail = secureRandomFloat() > scenario.reliabilityRate;
 
                 const progressSnapshot: DownloadProgress = {
                     downloadId: `download-${i}`,
@@ -445,34 +446,34 @@ describe("Updater Service Benchmarks", () => {
         for (let i = 0; i < 400; i++) {
             const scenario =
                 verificationScenarios[
-                    Math.floor(Math.random() * verificationScenarios.length)
+                    Math.floor(secureRandomFloat() * verificationScenarios.length)
                 ];
 
             const filePath = `./downloads/update-${i}.zip`;
-            const hasSignature = Math.random() < scenario.hasSignature;
+            const hasSignature = secureRandomFloat() < scenario.hasSignature;
 
             // Generate checksums
-            const expectedChecksum = `${scenario.checksumAlgorithm}:${Math.random().toString(36).slice(2, 66)}`;
+            const expectedChecksum = `${scenario.checksumAlgorithm}:${secureRandomFloat().toString(36).slice(2, 66)}`;
 
             // Simulate verification process
             const verificationStartTime = Date.now();
             const verificationTime = Math.floor(
                 scenario.verificationTime.min +
-                    Math.random() *
+                    secureRandomFloat() *
                         (scenario.verificationTime.max -
                             scenario.verificationTime.min)
             );
 
             // Determine verification results
-            const checksumValid = Math.random() < scenario.checksumValidRate;
+            const checksumValid = secureRandomFloat() < scenario.checksumValidRate;
             const signatureValid = hasSignature
-                ? Math.random() < scenario.signatureValidRate
+                ? secureRandomFloat() < scenario.signatureValidRate
                 : true;
 
             // Generate actual checksum (same as expected if valid)
             const actualChecksum = checksumValid
                 ? expectedChecksum
-                : `${scenario.checksumAlgorithm}:${Math.random().toString(36).slice(2, 66)}`;
+                : `${scenario.checksumAlgorithm}:${secureRandomFloat().toString(36).slice(2, 66)}`;
 
             const success = checksumValid && signatureValid;
 
@@ -584,7 +585,7 @@ describe("Updater Service Benchmarks", () => {
         for (let i = 0; i < 200; i++) {
             const scenario =
                 installationScenarios[
-                    Math.floor(Math.random() * installationScenarios.length)
+                    Math.floor(secureRandomFloat() * installationScenarios.length)
                 ];
 
             const installId = `install-${i}`;
@@ -622,7 +623,7 @@ describe("Updater Service Benchmarks", () => {
 
                     // Simulate phase failures (rare)
                     const phaseSuccess =
-                        Math.random() < scenario.successRate ||
+                        secureRandomFloat() < scenario.successRate ||
                         phaseIndex === 0; // First phase always succeeds
                     if (!phaseSuccess && progressStep === 5) {
                         // Fail mid-phase
@@ -747,7 +748,7 @@ describe("Updater Service Benchmarks", () => {
 
         for (let i = 0; i < 150; i++) {
             // Determine rollback trigger
-            const rand = Math.random();
+            const rand = secureRandomFloat();
             let cumulativeProbability = 0;
             let selectedTrigger = rollbackTriggers[0];
 
@@ -770,19 +771,19 @@ describe("Updater Service Benchmarks", () => {
                 case "low": {
                     baseDuration = 5000; // 5 seconds
                     successRate = 0.99;
-                    filesRestored = Math.floor(Math.random() * 50) + 10;
+                    filesRestored = Math.floor(secureRandomFloat() * 50) + 10;
                     break;
                 }
                 case "medium": {
                     baseDuration = 15_000; // 15 seconds
                     successRate = 0.95;
-                    filesRestored = Math.floor(Math.random() * 200) + 50;
+                    filesRestored = Math.floor(secureRandomFloat() * 200) + 50;
                     break;
                 }
                 case "high": {
                     baseDuration = 45_000; // 45 seconds
                     successRate = 0.9;
-                    filesRestored = Math.floor(Math.random() * 500) + 100;
+                    filesRestored = Math.floor(secureRandomFloat() * 500) + 100;
                     break;
                 }
                 default: {
@@ -793,7 +794,7 @@ describe("Updater Service Benchmarks", () => {
             }
 
             // Add variance to duration
-            const variance = (Math.random() - 0.5) * 0.4;
+            const variance = (secureRandomFloat() - 0.5) * 0.4;
             const rollbackDuration = Math.max(
                 1000,
                 baseDuration * (1 + variance)
@@ -801,9 +802,9 @@ describe("Updater Service Benchmarks", () => {
             const endTime = startTime + rollbackDuration;
 
             // Determine operation success
-            const success = Math.random() < successRate;
-            const configRestored = success && Math.random() > 0.05; // 95% config restoration rate
-            const dataIntact = success && Math.random() > 0.02; // 98% data integrity rate
+            const success = secureRandomFloat() < successRate;
+            const configRestored = success && secureRandomFloat() > 0.05; // 95% config restoration rate
+            const dataIntact = success && secureRandomFloat() > 0.02; // 98% data integrity rate
 
             let error: string | undefined;
             if (!success) {
@@ -814,7 +815,7 @@ describe("Updater Service Benchmarks", () => {
                     "Registry restoration failed",
                     "Permission denied during file restoration",
                 ];
-                error = errors[Math.floor(Math.random() * errors.length)];
+                error = errors[Math.floor(secureRandomFloat() * errors.length)];
             }
 
             const rollbackOperation: RollbackOperation = {
@@ -936,11 +937,11 @@ describe("Updater Service Benchmarks", () => {
         for (let i = 0; i < 300; i++) {
             const schedule =
                 updateSchedules[
-                    Math.floor(Math.random() * updateSchedules.length)
+                    Math.floor(secureRandomFloat() * updateSchedules.length)
                 ];
 
             // Generate scheduled update time
-            const baseTime = Date.now() + Math.random() * 86_400_000 * 7; // Within next week
+            const baseTime = Date.now() + secureRandomFloat() * 86_400_000 * 7; // Within next week
             const windowStart = new Date(baseTime);
             windowStart.setHours(schedule.installationWindow.start, 0, 0, 0);
             const windowEnd = new Date(baseTime);
@@ -948,7 +949,7 @@ describe("Updater Service Benchmarks", () => {
 
             const plannedTime =
                 windowStart.getTime() +
-                Math.random() * (windowEnd.getTime() - windowStart.getTime());
+                secureRandomFloat() * (windowEnd.getTime() - windowStart.getTime());
 
             // Simulate actual execution
             let actualStartTime = plannedTime;
@@ -957,7 +958,7 @@ describe("Updater Service Benchmarks", () => {
 
             // Check if user interaction affects timing
             if (schedule.userInteractionRequired) {
-                userApproved = Math.random() > 0.2; // 80% user approval rate
+                userApproved = secureRandomFloat() > 0.2; // 80% user approval rate
                 if (!userApproved && !schedule.forceInstall) {
                     skippedReason = "User declined update";
                 }
@@ -965,11 +966,11 @@ describe("Updater Service Benchmarks", () => {
 
             // Check for system conditions that might delay update
             if (!skippedReason) {
-                const systemBusy = Math.random() < 0.1; // 10% chance system is busy
-                const networkIssue = Math.random() < 0.05; // 5% chance of network issues
+                const systemBusy = secureRandomFloat() < 0.1; // 10% chance system is busy
+                const networkIssue = secureRandomFloat() < 0.05; // 5% chance of network issues
 
                 if (systemBusy) {
-                    actualStartTime += Math.random() * 3_600_000; // Delay up to 1 hour
+                    actualStartTime += secureRandomFloat() * 3_600_000; // Delay up to 1 hour
                 }
 
                 if (networkIssue) {
@@ -1012,23 +1013,23 @@ describe("Updater Service Benchmarks", () => {
 
                         switch (phase) {
                             case "check": {
-                                phaseDuration = Math.random() * 5000 + 1000; // 1-6 seconds
+                                phaseDuration = secureRandomFloat() * 5000 + 1000; // 1-6 seconds
                                 phaseSuccessRate = 0.98;
                                 break;
                             }
                             case "download": {
                                 phaseDuration =
-                                    Math.random() * 120_000 + 30_000; // 30s-2.5min
+                                    secureRandomFloat() * 120_000 + 30_000; // 30s-2.5min
                                 phaseSuccessRate = 0.92;
                                 break;
                             }
                             case "verify": {
-                                phaseDuration = Math.random() * 10_000 + 2000; // 2-12 seconds
+                                phaseDuration = secureRandomFloat() * 10_000 + 2000; // 2-12 seconds
                                 phaseSuccessRate = 0.99;
                                 break;
                             }
                             case "install": {
-                                phaseDuration = Math.random() * 60_000 + 20_000; // 20s-1.3min
+                                phaseDuration = secureRandomFloat() * 60_000 + 20_000; // 20s-1.3min
                                 phaseSuccessRate = 0.95;
                                 break;
                             }
@@ -1040,7 +1041,7 @@ describe("Updater Service Benchmarks", () => {
 
                         actualEndTime += phaseDuration;
 
-                        const phaseSuccess = Math.random() < phaseSuccessRate;
+                        const phaseSuccess = secureRandomFloat() < phaseSuccessRate;
                         if (!phaseSuccess) {
                             currentPhase = phaseIndex; // Resume from this phase on retry
                             break;

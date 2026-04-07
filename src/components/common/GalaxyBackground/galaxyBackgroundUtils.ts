@@ -7,6 +7,8 @@
  * easy to test and reuse.
  */
 
+import { stringSplit } from "ts-extras";
+
 const SEEDED_RANDOM_MODULUS = 2_147_483_647;
 const SEEDED_RANDOM_MULTIPLIER = 16_807;
 
@@ -83,7 +85,7 @@ export function normalizeReactSvgIdPrefix(reactId: string): string {
  * Derives a stable numeric seed from a string prefix.
  */
 export function deriveNumericSeedFromPrefix(prefix: string): number {
-    const characters = prefix.split("");
+    const characters = stringSplit(prefix, "");
     let total = 1;
 
     for (const [index, character] of characters.entries()) {

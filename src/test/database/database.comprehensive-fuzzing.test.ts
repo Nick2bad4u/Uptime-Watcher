@@ -11,6 +11,7 @@
 
 import { describe, expect, test } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Custom arbitraries for database testing
 const arbitraryString = fc.string({ minLength: 1, maxLength: 100 });
@@ -591,11 +592,11 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Simulate retry logic
                 let attempts = 0;
-                let shouldSucceed = Math.random() > 0.3; // 70% success rate
+                let shouldSucceed = secureRandomFloat() > 0.3; // 70% success rate
 
                 while (attempts < maxRetries && !shouldSucceed) {
                     attempts++;
-                    shouldSucceed = Math.random() > 0.3; // Re-evaluate on each attempt
+                    shouldSucceed = secureRandomFloat() > 0.3; // Re-evaluate on each attempt
                 }
 
                 expect(attempts).toBeLessThanOrEqual(maxRetries);

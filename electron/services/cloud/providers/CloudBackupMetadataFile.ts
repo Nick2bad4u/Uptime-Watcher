@@ -3,6 +3,7 @@ import type { CloudBackupEntry } from "@shared/types/cloud";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import { validateCloudBackupEntry } from "@shared/validation/cloudBackupSchemas";
+import { arrayJoin } from "ts-extras";
 
 /**
  * Parses a provider-stored backup metadata file.
@@ -16,7 +17,7 @@ export function parseCloudBackupMetadataFile(
     }
 
     const issues = formatZodIssues(result.error.issues);
-    const excerpt = issues.slice(0, 3).join("; ");
+    const excerpt = arrayJoin(issues.slice(0, 3), "; ");
     throw new TypeError(
         `Backup metadata file did not match the expected format: ${excerpt || "unknown error"}`
     );

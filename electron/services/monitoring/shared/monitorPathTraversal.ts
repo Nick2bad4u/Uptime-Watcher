@@ -1,3 +1,5 @@
+import { isEmpty, setHas, stringSplit   } from "ts-extras";
+
 import type { MonitorPathTraversalOptions } from "./monitorPathTraversalOptions";
 
 import {
@@ -46,7 +48,7 @@ function expandArrayIndexTokens(segment: string): string[] | undefined {
         }
     }
 
-    if (consumedLength !== segment.length || expandedTokens.length === 0) {
+    if (consumedLength !== segment.length || isEmpty(expandedTokens)) {
         return undefined;
     }
 
@@ -57,8 +59,7 @@ function normalizePathSegments(
     path: string,
     options: MonitorPathTraversalOptions
 ): string[] | undefined {
-    const rawSegments = path
-        .split(".")
+    const rawSegments = stringSplit(path, ".")
         .map((segment) => segment.trim())
         .filter((segment) => segment.length > 0);
 
@@ -92,7 +93,7 @@ function normalizePathSegments(
 
     if (
         options.blockPrototypeAccess &&
-        normalizedSegments.some((segment) => BLOCKED_PATH_SEGMENTS.has(segment))
+        normalizedSegments.some((segment) => setHas(BLOCKED_PATH_SEGMENTS, segment))
     ) {
         return undefined;
     }
@@ -118,7 +119,7 @@ export function extractMonitorValueAtPath(
     const normalizedOptions = normalizeMonitorPathTraversalOptions(options);
     const segments = normalizePathSegments(path, normalizedOptions);
 
-    if (!segments || segments.length === 0) {
+    if (!segments || isEmpty(segments)) {
         return undefined;
     }
 

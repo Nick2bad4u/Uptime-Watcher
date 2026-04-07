@@ -5,6 +5,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isEmpty } from "ts-extras";
 
 import { isDev } from "../../../../electronUtils";
 import { logger } from "../../../../utils/logger";
@@ -113,7 +114,7 @@ export function bulkInsertHistory(
     monitorId: string,
     historyEntries: StatusHistory[]
 ): void {
-    if (historyEntries.length === 0) {
+    if (isEmpty(historyEntries)) {
         return;
     }
 
@@ -252,7 +253,7 @@ export function pruneHistoryForMonitor(
             [monitorId, normalizedLimit]
         );
 
-        if (excessProbe.length === 0) {
+        if (isEmpty(excessProbe)) {
             return;
         }
 

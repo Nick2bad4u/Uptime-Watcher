@@ -3,12 +3,14 @@
  */
 
 import type { CorrelationId } from "@shared/types/events";
+import type { UnknownArray } from "type-fest";
 
 import { isIpcCorrelationEnvelope } from "@shared/types/ipc";
+import { arrayAt } from "ts-extras";
 
 /** Parsed correlation context extracted from an IPC invoke argument list. */
 export interface ExtractedIpcContext {
-    readonly args: readonly unknown[];
+    readonly args: Readonly<UnknownArray>;
     readonly correlationId?: CorrelationId;
 }
 
@@ -16,9 +18,9 @@ export interface ExtractedIpcContext {
  * Extracts correlation metadata from the final IPC argument when present.
  */
 export function extractIpcCorrelationContext(
-    args: readonly unknown[]
+    args: Readonly<UnknownArray>
 ): ExtractedIpcContext {
-    const correlationEnvelope = args.at(-1);
+    const correlationEnvelope = arrayAt(args, -1);
 
     if (isIpcCorrelationEnvelope(correlationEnvelope)) {
         const envelope = correlationEnvelope;

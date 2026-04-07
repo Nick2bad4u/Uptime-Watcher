@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Show Release Stats
+run-name: Show release stats
 
 on:
     workflow_dispatch:
@@ -7,15 +8,25 @@ on:
         - cron: "47 4 * * 0" # weekly
     workflow_run:
         workflows: ["Build and Release Electron App"]
+    branches: [main]
         types:
             - completed
+
+concurrency:
+  group: release-stats-${{ github.event.workflow_run.head_branch || github.ref || github.run_id }}
+  cancel-in-progress: false
 
 permissions:
     contents: read
 
 jobs:
     release-stats:
+        name: Show release stats
         runs-on: ubuntu-latest
+        timeout-minutes: 20
+        defaults:
+            run:
+                shell: bash
 
         steps:
             - name: Harden the runner (Audit all outbound calls)

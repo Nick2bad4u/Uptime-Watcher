@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Synthetic notification channel configuration used in benchmarks.
@@ -387,7 +388,7 @@ class MockChannelProvider {
 
         // Simulate sending with various success rates
         const successRate = this.getChannelSuccessRate(channel.type);
-        const success = Math.random() < successRate;
+        const success = secureRandomFloat() < successRate;
 
         // Update rate limit counters
         this.updateRateLimitCounters(channelId);

@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 class MockNotificationSystem {
     private queue: any[] = [];
@@ -26,7 +27,7 @@ class MockNotificationSystem {
         message: string;
         recipients: string[];
     }): Promise<void> {
-        await new Promise((resolve) => setTimeout(resolve, Math.random() * 20));
+        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 20));
         this.sent.push({ ...notification, sentAt: Date.now() });
     }
 

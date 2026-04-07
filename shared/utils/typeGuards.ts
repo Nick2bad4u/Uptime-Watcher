@@ -1,6 +1,6 @@
 import type { UnknownRecord } from "type-fest";
 
-import { objectHasOwn } from "ts-extras";
+import { isInteger, objectHasOwn  } from "ts-extras";
 
 import type { PortNumber } from "../types/units";
 
@@ -272,7 +272,7 @@ export function isNonEmptyString(value: unknown): value is string {
  * @returns `true` when the value is an integer between 1 and 65,535.
  */
 const isValidPortNumber = (value: number): value is PortNumber =>
-    Number.isInteger(value) && value >= 1 && value <= 65_535;
+    isInteger(value) && value >= 1 && value <= 65_535;
 
 /**
  * Checks whether a value falls within the valid TCP/UDP port range.

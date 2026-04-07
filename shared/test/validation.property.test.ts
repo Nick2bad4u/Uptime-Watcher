@@ -258,7 +258,7 @@ describe("Validation Utils Property-Based Tests", () => {
         test("should accept URLs containing protocol-like sequences in the path", () => {
             expect(isValidUrl("https://95.ud//////a/)/://T")).toBeTruthy();
             expect(
-                isValidUrl("http://example.com/path/with/ftp://reference")
+                isValidUrl("https://example.com/path/with/ftp://reference")
             ).toBeTruthy();
         });
 

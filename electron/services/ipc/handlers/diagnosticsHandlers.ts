@@ -15,6 +15,7 @@ import {
     withLogContext,
 } from "@shared/utils/loggingContext";
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+import { setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
@@ -145,7 +146,7 @@ export function registerDiagnosticsHandlers({
 
             const registeredHandlerSet: ReadonlySet<string> =
                 registeredHandlers;
-            const isRegistered = registeredHandlerSet.has(channelRaw);
+            const isRegistered = setHas(registeredHandlerSet, channelRaw);
 
             const availableChannels = includeInventory
                 ? Array.from(registeredHandlers).toSorted((left, right) =>

@@ -20,6 +20,7 @@ import { bench, describe } from "vitest";
 
 // Import production types
 import type { Site, Monitor, StatusHistory } from "../../shared/types";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock data generators for benchmarking
 function generateSites(count: number): Site[] {
@@ -54,7 +55,7 @@ function generateMonitors(count: number, siteIdentifier: string): Monitor[] {
             timeout: 5000,
             retryAttempts: 3,
             status: (i % 4 === 0 ? "down" : "up") as "up" | "down",
-            responseTime: Math.floor(Math.random() * 1000),
+            responseTime: Math.floor(secureRandomFloat() * 1000),
             lastChecked: new Date(),
             history: [],
             activeOperations: [],
@@ -96,7 +97,7 @@ function generateStatusHistory(count: number): StatusHistory[] {
         history.push({
             timestamp: now - i * 60_000, // One minute intervals
             status: (i % 5 === 0 ? "down" : "up") as "up" | "down",
-            responseTime: Math.floor(Math.random() * 500),
+            responseTime: Math.floor(secureRandomFloat() * 500),
             details: i % 10 === 0 ? `Error detail for entry ${i}` : undefined,
         });
     }
@@ -215,7 +216,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
             const updates = monitors.map((monitor) => ({
                 ...monitor,
                 status: monitor.status === "up" ? "down" : "up",
-                responseTime: Math.floor(Math.random() * 1000),
+                responseTime: Math.floor(secureRandomFloat() * 1000),
                 lastChecked: new Date(),
             }));
 
@@ -375,7 +376,7 @@ describe("Bulk Transaction Performance Benchmarks", () => {
                     {
                         ...monitor,
                         status: monitor.status === "up" ? "down" : "up",
-                        responseTime: Math.floor(Math.random() * 1000),
+                        responseTime: Math.floor(secureRandomFloat() * 1000),
                         lastChecked: new Date(),
                     },
                 ])
@@ -425,8 +426,8 @@ describe("Bulk Transaction Performance Benchmarks", () => {
                 // Simulate processing large dataset in memory
                 const updates = monitors.map((monitor) => ({
                     ...monitor,
-                    status: Math.random() > 0.9 ? "down" : "up",
-                    responseTime: Math.floor(Math.random() * 2000),
+                    status: secureRandomFloat() > 0.9 ? "down" : "up",
+                    responseTime: Math.floor(secureRandomFloat() * 2000),
                     lastChecked: new Date(),
                 }));
 

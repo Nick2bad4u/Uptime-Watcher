@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock React-like implementation for benchmarking
 interface ReactElement {
@@ -491,8 +492,8 @@ describe("React Component Rendering Performance", () => {
                 id: `site-${i}`,
                 name: `Site ${i}`,
                 status: ["online", "offline"][i % 2],
-                responseTime: Math.random() * 1000,
-                lastCheck: Date.now() - Math.random() * 3_600_000,
+                responseTime: secureRandomFloat() * 1000,
+                lastCheck: Date.now() - secureRandomFloat() * 3_600_000,
             }));
             const element = renderer.createElement(MockSiteList, {
                 sites: sitesData,
@@ -546,7 +547,7 @@ describe("React Component Rendering Performance", () => {
                         "offline",
                         "degraded",
                     ][i % 3],
-                    responseTime: Math.random() * 1000,
+                    responseTime: secureRandomFloat() * 1000,
                 })),
                 recentActivity: Array.from({ length: 10 }, (_, i) => ({
                     id: `activity-${i}`,
@@ -602,7 +603,7 @@ describe("React Component Rendering Performance", () => {
             const items = Array.from({ length: 50 }, (_, i) => ({
                 id: `key-item-${i}`,
                 name: `Item ${i}`,
-                value: Math.random() * 100,
+                value: secureRandomFloat() * 100,
             }));
 
             const listElement = renderer.createElement(
@@ -635,8 +636,8 @@ describe("React Component Rendering Performance", () => {
         "conditional rendering",
         () => {
             renderer = new MockReactRenderer();
-            const showError = Math.random() > 0.5;
-            const hasData = Math.random() > 0.3;
+            const showError = secureRandomFloat() > 0.5;
+            const hasData = secureRandomFloat() > 0.3;
 
             const element = renderer.createElement(
                 "div",
@@ -713,7 +714,7 @@ describe("React Component Rendering Performance", () => {
                 if (depth === 0) {
                     return renderer.createElement("span", {}, {
                         type: "text",
-                        props: { content: `Leaf ${Math.random()}` },
+                        props: { content: `Leaf ${secureRandomFloat()}` },
                         children: [],
                     } as ReactElement);
                 }

@@ -1,5 +1,7 @@
 import type { Monitor } from "@shared/types";
 
+import { arrayJoin } from "ts-extras";
+
 /**
  * Creates a stable signature representing a monitor's configuration.
  *
@@ -8,7 +10,7 @@ import type { Monitor } from "@shared/types";
  * runtime properties like status/lastChecked/responseTime.
  */
 export function createMonitorSignature(monitor: Monitor): string {
-    return [
+    return arrayJoin([
         `type:${monitor.type}`,
         `host:${monitor.host ?? ""}`,
         `port:${monitor.port ?? ""}`,
@@ -16,7 +18,7 @@ export function createMonitorSignature(monitor: Monitor): string {
         `checkInterval:${monitor.checkInterval}`,
         `timeout:${monitor.timeout}`,
         `retryAttempts:${monitor.retryAttempts}`,
-    ].join("|");
+    ], "|");
 }
 
 /**

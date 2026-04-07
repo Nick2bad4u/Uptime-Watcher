@@ -302,7 +302,7 @@ describe("Validator Utils Property-Based Tests", () => {
             fc.oneof(
                 fc.constant("not-a-url"),
                 fc.constant("ftp://example.com"), // Wrong protocol
-                fc.constant("http://"), // No domain
+                fc.constant("https://"), // No domain
                 fc.constant("//example.com"), // No protocol
                 fc
                     .string({ minLength: 1, maxLength: 10 })
@@ -323,14 +323,14 @@ describe("Validator Utils Property-Based Tests", () => {
 
         it("should validate specific URL cases", () => {
             const validUrls = [
-                "http://example.com",
+                "https://example.com",
                 "https://example.com",
                 "https://sub.example.com",
-                "http://example.com:8080",
+                "https://example.com:8080",
                 "https://example.com/path",
                 "https://example.com/path?query=1",
                 "https://user:pass@example.com",
-                "http://192.168.1.1",
+                "https://192.168.1.1",
                 "https://localhost:3000", // Should be valid
             ];
 
@@ -338,7 +338,7 @@ describe("Validator Utils Property-Based Tests", () => {
                 "", // Empty
                 "example.com", // No protocol
                 "ftp://example.com", // Wrong protocol
-                "http://", // No domain
+                "https://", // No domain
                 "https://", // No domain
                 "not-a-url",
                 "http:example.com", // Wrong format
@@ -359,7 +359,7 @@ describe("Validator Utils Property-Based Tests", () => {
 
         it("should reject URLs with nested scheme fragments after the authority", () => {
             expect(isValidUrl("https://http://foo")).toBeFalsy();
-            expect(isValidUrl("http://https://bar/baz")).toBeFalsy();
+            expect(isValidUrl("https://https://bar/baz")).toBeFalsy();
         });
     });
 

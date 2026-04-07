@@ -15,6 +15,7 @@ import type {
 
 import { compareCloudSyncWriteKey } from "@shared/types/cloudSync";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
+import { objectEntries, objectValues  } from "ts-extras";
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
@@ -169,11 +170,11 @@ function cloneState(
         "settings",
         "site",
     ] as const) {
-        for (const [entityId, entity] of Object.entries(
+        for (const [entityId, entity] of objectEntries(
             initialState[entityType]
         )) {
             const nextFields: Record<string, CloudSyncFieldValue> = {};
-            for (const [field, fieldValue] of Object.entries(entity.fields)) {
+            for (const [field, fieldValue] of objectEntries(entity.fields)) {
                 nextFields[field] = {
                     value: fieldValue.value,
                     write: fieldValue.write,
@@ -216,7 +217,7 @@ function getLatestEntityWrite(
 ): CloudSyncWriteKey | undefined {
     let latest = entity.deleted;
 
-    for (const fieldValue of Object.values(entity.fields)) {
+    for (const fieldValue of objectValues(entity.fields)) {
         if (!latest || compareCloudSyncWriteKey(latest, fieldValue.write) < 0) {
             latest = fieldValue.write;
         }

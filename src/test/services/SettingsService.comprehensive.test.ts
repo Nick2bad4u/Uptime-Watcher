@@ -19,6 +19,7 @@ import {
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { SettingsService } from "../../services/SettingsService";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock dependencies using vi.hoisted for proper initialization order
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -808,7 +809,7 @@ describe("SettingsService", () => {
                 () => SettingsService.getHistoryLimit(),
                 () =>
                     SettingsService.updateHistoryLimit(
-                        Math.floor(Math.random() * 1000)
+                        Math.floor(secureRandomFloat() * 1000)
                     ),
                 () => SettingsService.resetSettings(),
             ];

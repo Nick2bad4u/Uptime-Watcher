@@ -6,17 +6,21 @@
  * orchestration. Keep this behavior stable because tests assert the exact
  * output formatting.
  */
+import { isEmpty } from "ts-extras";
+import { arrayFirst } from "ts-extras";
+import { arrayJoin } from "ts-extras";
+
 export function formatSiteValidationErrors(
     errors: readonly string[] | undefined
 ): string {
-    if (!errors || errors.length === 0) {
+    if (!errors || isEmpty(errors)) {
         return "";
     }
 
     if (errors.length === 1) {
         // Ensure fallback to empty string if errors[0] is undefined
-        return errors[0] ?? "";
+        return arrayFirst(errors) ?? "";
     }
 
-    return `\n  - ${errors.join("\n  - ")}`;
+    return `\n  - ${arrayJoin(errors, "\n  - ")}`;
 }

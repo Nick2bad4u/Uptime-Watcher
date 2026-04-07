@@ -13,6 +13,8 @@
  * don't drift across transports/migrations/tests.
  */
 
+import { stringSplit } from "ts-extras";
+
 import { isAsciiDigits } from "./syncEngineUtils";
 
 /** Minimum hex chars used for snapshot nonce suffix. */
@@ -67,7 +69,7 @@ export function isValidSnapshotFileName(fileName: string): boolean {
         createdAtRaw,
         nonceRaw,
         ...rest
-    ] = stem.split("-");
+    ] = stringSplit(stem, "-");
 
     if (!createdAtRaw || rest.length > 0) {
         return false;

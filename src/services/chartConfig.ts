@@ -27,6 +27,8 @@
 
 import type { ChartData, ChartOptions, FontSpec } from "chart.js";
 
+import { arrayJoin } from "ts-extras";
+
 import type { Theme } from "../theme/types";
 
 /**
@@ -426,9 +428,7 @@ export class ChartConfigService {
                     labels: {
                         color: this.theme.colors.text.primary,
                         font: {
-                            family: this.theme.typography.fontFamily.sans.join(
-                                ", "
-                            ),
+                            family: arrayJoin(this.theme.typography.fontFamily.sans, ", "),
                             size: 12,
                         },
                     },
@@ -460,7 +460,7 @@ export class ChartConfigService {
             ticks: {
                 color: this.theme.colors.text.secondary,
                 font: {
-                    family: this.theme.typography.fontFamily.sans.join(", "),
+                    family: arrayJoin(this.theme.typography.fontFamily.sans, ", "),
                     size: 11,
                 },
             },
@@ -482,7 +482,7 @@ export class ChartConfigService {
         weight: FontSpec["weight"] = "normal"
     ): ChartFontConfig {
         return {
-            family: this.theme.typography.fontFamily.sans.join(", "),
+            family: arrayJoin(this.theme.typography.fontFamily.sans, ", "),
             size,
             weight,
         };

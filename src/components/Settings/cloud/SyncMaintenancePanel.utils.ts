@@ -2,6 +2,8 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
+import { arrayAt, arrayJoin, stringSplit   } from "ts-extras";
+
 import type {
     DiagnosticsPayload,
     DiagnosticsText,
@@ -99,7 +101,7 @@ export function buildPreviewViewModel(
         preview.operationObjectCount > 0 &&
         (devicesOnlyInManifest.length > 0 || devicesOnlyInOps.length > 0)
     ) {
-        mismatchText = `Device mismatch: manifest-only [${devicesOnlyInManifest.join(", ") || "—"}], ops-only [${devicesOnlyInOps.join(", ") || "—"}].`;
+        mismatchText = `Device mismatch: manifest-only [${arrayJoin(devicesOnlyInManifest, ", ") || "—"}], ops-only [${arrayJoin(devicesOnlyInOps, ", ") || "—"}].`;
     }
 
     const otherObjectsText =
@@ -143,8 +145,8 @@ export async function copyTextToClipboard(text: string): Promise<void> {
 
 function extractBasenameForDiagnostics(path: string): string {
     const normalized = path.replaceAll("\\", "/");
-    const parts = normalized.split("/").filter((part) => part.length > 0);
-    return parts.at(-1) ?? path;
+    const parts = stringSplit(normalized, "/").filter((part) => part.length > 0);
+    return arrayAt(parts, -1) ?? path;
 }
 
 function buildProviderDetailsForDiagnostics(
@@ -272,5 +274,5 @@ export function buildDiagnosticsText(args: {
         json,
     ];
 
-    return { json, text: lines.join("\n") };
+    return { json, text: arrayJoin(lines, "\n") };
 }

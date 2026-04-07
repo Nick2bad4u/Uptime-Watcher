@@ -7,6 +7,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Core monitor management interfaces (synthetic benchmark shapes)
 /**
@@ -369,8 +370,8 @@ class MockMonitorServiceManager {
             averageResponseTime,
             successRate,
             resourceUtilization: {
-                cpu: Math.random() * 100, // Simulated
-                memory: Math.random() * 100,
+                cpu: secureRandomFloat() * 100, // Simulated
+                memory: secureRandomFloat() * 100,
                 networkConnections: this.activeChecks.size,
             },
             queueMetrics: {
@@ -554,8 +555,8 @@ class MockMonitorServiceManager {
             averageResponseTime,
             peakConcurrency,
             resourceUsage: {
-                cpu: Math.random() * 100,
-                memory: Math.random() * 100,
+                cpu: secureRandomFloat() * 100,
+                memory: secureRandomFloat() * 100,
             },
         };
     }
@@ -573,11 +574,11 @@ class MockMonitorServiceManager {
             ping: 50,
         }[monitor.type];
 
-        const checkDuration = baseDuration + Math.random() * 100;
+        const checkDuration = baseDuration + secureRandomFloat() * 100;
         await new Promise((resolve) => setTimeout(resolve, checkDuration));
 
         // Simulate success/failure (95% success rate)
-        const success = Math.random() > 0.05;
+        const success = secureRandomFloat() > 0.05;
 
         return {
             monitorId: monitor.id,
@@ -739,14 +740,14 @@ function generateMonitors(
                 60_000,
                 120_000,
                 300_000,
-            ][Math.floor(Math.random() * 4)],
+            ][Math.floor(secureRandomFloat() * 4)],
             timeout: [
                 3000,
                 5000,
                 10_000,
-            ][Math.floor(Math.random() * 3)],
-            retryAttempts: Math.floor(Math.random() * 3) + 1,
-            enabled: Math.random() > 0.1, // 90% enabled
+            ][Math.floor(secureRandomFloat() * 3)],
+            retryAttempts: Math.floor(secureRandomFloat() * 3) + 1,
+            enabled: secureRandomFloat() > 0.1, // 90% enabled
             status: "pending",
             metadata: {
                 priority: [
@@ -754,7 +755,7 @@ function generateMonitors(
                     "high",
                     "normal",
                     "low",
-                ][Math.floor(Math.random() * 4)],
+                ][Math.floor(secureRandomFloat() * 4)],
                 tags: [`tag-${i % 5}`, type],
             },
         });
@@ -1059,7 +1060,7 @@ describe("Monitor Service Management Benchmarks", () => {
                             break;
                         }
                         default: {
-                            monitor.type = Math.random() > 0.5 ? "http" : "dns";
+                            monitor.type = secureRandomFloat() > 0.5 ? "http" : "dns";
                             monitor.interval = 300_000; // 5 minutes
                         }
                     }

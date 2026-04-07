@@ -6,6 +6,7 @@ import {
     useCallback,
     useRef,
 } from "react";
+import { arrayAt, arrayFind, arrayFirst, arrayJoin    } from "ts-extras";
 
 import {
     CLOUD_PROVIDER_SETUP_PANEL_TABS,
@@ -72,9 +73,7 @@ export const CloudProviderSetupPanelProviderTabList = ({
                 return;
             }
 
-            const match = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(
-                (tab) => tab.key === rawKey
-            );
+            const match = arrayFind(CLOUD_PROVIDER_SETUP_PANEL_TABS, (tab) => tab.key === rawKey);
             if (!match) {
                 return;
             }
@@ -118,11 +117,11 @@ export const CloudProviderSetupPanelProviderTabList = ({
                     break;
                 }
                 case "End": {
-                    nextKey = keys.at(-1) ?? selectedKey;
+                    nextKey = arrayAt(keys, -1) ?? selectedKey;
                     break;
                 }
                 case "Home": {
-                    nextKey = keys[0] ?? selectedKey;
+                    nextKey = arrayFirst(keys) ?? selectedKey;
                     break;
                 }
                 default: {
@@ -162,9 +161,7 @@ export const CloudProviderSetupPanelProviderTabList = ({
             return;
         }
 
-        const match = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(
-            (tab) => tab.key === rawKey
-        );
+        const match = arrayFind(CLOUD_PROVIDER_SETUP_PANEL_TABS, (tab) => tab.key === rawKey);
         if (!match) {
             return;
         }
@@ -202,11 +199,11 @@ export const CloudProviderSetupPanelProviderTabList = ({
                         aria-controls={`cloud-provider-panel-${tab.key}`}
                         aria-disabled={isLocked || !tab.isAvailable}
                         aria-selected={isSelected}
-                        className={[
+                        className={arrayJoin([
                             "themed-button themed-button--size-sm",
                             variantClass,
                             stateClass,
-                        ].join(" ")}
+                        ], " ")}
                         data-provider-key={tab.key}
                         id={`cloud-provider-tab-${tab.key}`}
                         key={tab.key}

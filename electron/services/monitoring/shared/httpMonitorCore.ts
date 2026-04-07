@@ -11,7 +11,7 @@
 
 import type { Site } from "@shared/types";
 import type { AxiosResponse } from "axios";
-import type { Promisable } from "type-fest";
+import type { Constructor, Promisable  } from "type-fest";
 
 import { createAbortError } from "@shared/utils/abortError";
 import {
@@ -21,7 +21,7 @@ import {
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { objectHasOwn } from "ts-extras";
+import { objectHasOwn, safeCastTo  } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -125,7 +125,7 @@ export function createHttpMonitorService<
     TContext,
 >(
     behavior: HttpMonitorBehavior<TType, TContext>
-): new (config?: MonitorServiceConfig) => HttpMonitorServiceInstance {
+): Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]> {
     const rateLimiter = getSharedHttpRateLimiter();
 
     interface SingleCheckParams {
@@ -378,7 +378,7 @@ export function createHttpMonitorService<
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {
             const nextConfig: MonitorServiceConfig = { ...this.config };
-            const remaining = { ...config } as Partial<MonitorServiceConfig>;
+            const remaining = safeCastTo({ ...config });
             delete remaining.timeout;
             delete remaining.userAgent;
 

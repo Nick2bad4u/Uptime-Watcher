@@ -14,10 +14,11 @@
 #     - ActionLint: Uses the devops-actions/actionlint action to lint the workflow files.
 #       - Continues on error and sets the ID to action-lint.
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: ActionLint
+name: Action Lint
+run-name: Action Lint
 concurrency:
     group: actionlint-${{ github.ref }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 on:
     push:
         paths:
@@ -25,6 +26,9 @@ on:
     pull_request:
         paths:
             - ".github/**"
+    merge_group:
+        types:
+            - checks_requested
     workflow_dispatch:
 
 permissions:
@@ -33,20 +37,25 @@ permissions:
 
 jobs:
     job-1:
+        name: Run actionlint
         runs-on: ubuntu-latest
+        timeout-minutes: 10
         steps:
             - name: Harden Runner
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
               with:
                   egress-policy: audit
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-            - uses: devops-actions/actionlint@467e2ce19b2310e93c9ffa0b50fe31f86b5a7f23 # v0.1.10
+            - name: Checkout repository
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - name: Run actionlint
+              uses: devops-actions/actionlint@467e2ce19b2310e93c9ffa0b50fe31f86b5a7f23 # v0.1.10
               continue-on-error: true
               id: action-lint
               with:
                   shellcheck_opts: "-e SC2129"
 
-            - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+            - name: Upload actionlint results
+              uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
               with:
                   name: actionlint-results
                   path: ${{ steps.action-lint.outputs.results-file }}

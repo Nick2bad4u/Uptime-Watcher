@@ -1,12 +1,20 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Greetings
+run-name: Greetings
 
 # Define the events that trigger this workflow
 on:
     pull_request_target: # Trigger on pull request events targeting the repository
+        branches:
+            - main
+        types:
+            - opened
     issues: # Trigger on issue events
+        types:
+            - opened
     discussion: # Trigger on discussion events
-    project: # Trigger on project events
+        types:
+            - created
     fork: # Trigger on fork events
     workflow_dispatch: # Allow manual triggering of the workflow
 
@@ -15,11 +23,13 @@ permissions:
     contents: read # Required to fetch repository contents
 
 concurrency:
-    group: greetings-${{ github.ref }}
-    cancel-in-progress: false
+    group: greetings-${{ github.workflow }}-${{ github.event.pull_request.number || github.event.issue.number || github.event.discussion.number || github.run_id }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request_target' || github.event_name == 'workflow_dispatch' }}
 
 jobs:
     greeting:
+        name: Send greeting
+        timeout-minutes: 10
         # Specify the runner to use (ubuntu-latest)
         runs-on: ubuntu-latest
 

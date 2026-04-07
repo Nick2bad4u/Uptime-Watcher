@@ -25,6 +25,7 @@ import type {
 } from "type-fest";
 
 import { siteSchema } from "@shared/validation/siteSchemas";
+import { isEmpty, objectValues, safeCastTo   } from "ts-extras";
 import * as z from "zod";
 
 import {
@@ -314,7 +315,7 @@ const deleteStateSyncEventDataSchema = baseEventDataSchema
             });
         }
 
-        if (value.delta.removedSiteIdentifiers.length === 0) {
+        if (isEmpty(value.delta.removedSiteIdentifiers)) {
             ctx.addIssue({
                 code: "custom",
                 message: "delete events must include removedSiteIdentifiers",
@@ -425,7 +426,7 @@ export type CacheInvalidationType = ValueOf<typeof CACHE_INVALIDATION_TYPE>;
  */
 export const CACHE_INVALIDATION_REASON_VALUES: readonly CacheInvalidationReason[] =
     Object.freeze(
-        Object.values(CACHE_INVALIDATION_REASON) as CacheInvalidationReason[]
+        safeCastTo(objectValues(CACHE_INVALIDATION_REASON))
     );
 
 /**
@@ -435,7 +436,7 @@ export const CACHE_INVALIDATION_REASON_VALUES: readonly CacheInvalidationReason[
  */
 export const CACHE_INVALIDATION_TYPE_VALUES: readonly CacheInvalidationType[] =
     Object.freeze(
-        Object.values(CACHE_INVALIDATION_TYPE) as CacheInvalidationType[]
+        safeCastTo(objectValues(CACHE_INVALIDATION_TYPE))
     );
 
 /**
@@ -728,7 +729,7 @@ export type MonitoringControlReason = ValueOf<typeof MONITORING_CONTROL_REASON>;
  */
 export const MONITORING_CONTROL_REASON_VALUES: readonly MonitoringControlReason[] =
     Object.freeze(
-        Object.values(MONITORING_CONTROL_REASON) as MonitoringControlReason[]
+        safeCastTo(objectValues(MONITORING_CONTROL_REASON))
     );
 
 /**
@@ -863,7 +864,7 @@ export type UpdateStatus = ValueOf<typeof UPDATE_STATUS>;
  * @public
  */
 export const UPDATE_STATUS_VALUES: readonly UpdateStatus[] = Object.freeze(
-    Object.values(UPDATE_STATUS) as UpdateStatus[]
+    safeCastTo(objectValues(UPDATE_STATUS))
 );
 /**
  * Payload for update status change events.

@@ -43,6 +43,7 @@ import type {
 import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
 import { memo } from "react";
+import { arrayJoin } from "ts-extras";
 
 import type { TextAlign, TextSize, TextVariant, TextWeight } from "./types";
 
@@ -105,7 +106,7 @@ export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
         weight = "normal",
         ...accessibilityProps
     }: ThemedTextProperties): JSX.Element {
-        const classNames = [
+        const classNames = arrayJoin([
             "themed-text",
             `themed-text--${variant}`,
             `themed-text--size-${size}`,
@@ -113,8 +114,7 @@ export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
             `themed-text--align-${align}`,
             className,
         ]
-            .filter(Boolean)
-            .join(" ");
+            .filter(Boolean), " ");
 
         const {
             "aria-describedby": ariaDescribedBy,

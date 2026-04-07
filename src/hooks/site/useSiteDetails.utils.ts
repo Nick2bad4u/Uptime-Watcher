@@ -1,6 +1,7 @@
 import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { arrayJoin } from "ts-extras";
 
 import { RETRY_CONSTRAINTS } from "../../constants";
 import { logger } from "../../services/logger";
@@ -112,7 +113,7 @@ export async function validateMonitorFieldOrThrow(args: {
     }
 
     const validationError = new Error(
-        `Validation failed: ${validationResult.errors.join(", ")}`
+        `Validation failed: ${arrayJoin(validationResult.errors, ", ")}`
     );
     logger.site.error(siteIdentifier, validationError);
     throw validationError;

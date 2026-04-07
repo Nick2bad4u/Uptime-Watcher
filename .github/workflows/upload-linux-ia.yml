@@ -1,10 +1,12 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Upload Linux Distributables to Archive.org
+name: Upload Linux Distributables To Archive Org
+run-name: Upload Linux distributables to Archive.org
 
 on:
     workflow_dispatch:
     workflow_run:
         workflows: ["Build and Release Electron App"]
+        branches: [main]
         types:
             - completed
 
@@ -17,7 +19,9 @@ permissions:
 
 jobs:
     upload-linux:
+        name: Upload Linux distributables to Archive.org
         runs-on: ubuntu-latest
+        timeout-minutes: 20
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1

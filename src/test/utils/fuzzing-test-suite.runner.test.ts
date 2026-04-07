@@ -19,6 +19,7 @@
 
 import { describe, expect, beforeAll, afterAll } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
     let suiteStartTime: number;
@@ -530,14 +531,14 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
 
                         const results = modules.map((module) => {
                             const testCount =
-                                Math.floor(Math.random() * 50) + 20; // 20-70 tests per module
-                            let coverage = Math.random() * 20 + 80; // 80-100% coverage
+                                Math.floor(secureRandomFloat() * 50) + 20; // 20-70 tests per module
+                            let coverage = secureRandomFloat() * 20 + 80; // 80-100% coverage
                             // Ensure state-management gets higher coverage to pass the test
                             if (module.includes("state-management")) {
                                 coverage = Math.max(coverage, 85);
                             }
                             const edgeCases =
-                                Math.floor(Math.random() * 20) + 5; // 5-25 edge cases
+                                Math.floor(secureRandomFloat() * 20) + 5; // 5-25 edge cases
 
                             return {
                                 module,
@@ -545,7 +546,7 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                                 coverage,
                                 edgeCases,
                                 passed: coverage >= 85,
-                                executionTime: Math.random() * 5000 + 1000, // 1-6 seconds
+                                executionTime: secureRandomFloat() * 5000 + 1000, // 1-6 seconds
                             };
                         });
 

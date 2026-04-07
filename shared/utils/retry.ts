@@ -7,6 +7,7 @@
  */
 
 import { sleep, sleepUnref } from "@shared/utils/abortUtils";
+import { arrayAt } from "ts-extras";
 
 const RETRY_NON_ERROR_THROWN_MARKER: unique symbol = Symbol(
     "shared.utils.retry.nonErrorThrown"
@@ -263,7 +264,7 @@ export async function withRetry<T>(
         }
     }
 
-    const lastError = errors.at(-1);
+    const lastError = arrayAt(errors, -1);
     if (lastError === undefined) {
         throw new Error("[withRetry] Operation failed without an error");
     }

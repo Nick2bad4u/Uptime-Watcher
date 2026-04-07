@@ -34,6 +34,12 @@
  *
  * @internal
  */
+import { arrayJoin } from "ts-extras";
+import { stringSplit } from "ts-extras";
+import { objectValues } from "ts-extras";
+import { safeCastTo } from "ts-extras";
+import { arrayIncludes } from "ts-extras";
+
 const CACHE_PREFIXES = {
     CONFIG: "config",
     MONITOR: "monitor",
@@ -65,13 +71,13 @@ function createCacheKey(
     operation?: string
 ): string {
     if (operation) {
-        return [
+        return arrayJoin([
             prefix,
             operation,
             identifier,
-        ].join(KEY_SEPARATOR);
+        ], KEY_SEPARATOR);
     }
-    return [prefix, identifier].join(KEY_SEPARATOR);
+    return arrayJoin([prefix, identifier], KEY_SEPARATOR);
 }
 
 /**
@@ -323,7 +329,7 @@ export type StandardizedCacheKey = ReturnType<
 export function isStandardizedCacheKey(
     key: string
 ): key is StandardizedCacheKey {
-    const parts = key.split(KEY_SEPARATOR);
+    const parts = stringSplit(key, KEY_SEPARATOR);
     if (parts.length < 2 || parts.length > 3) {
         return false;
     }
@@ -338,8 +344,8 @@ export function isStandardizedCacheKey(
         return false;
     }
 
-    const validPrefixes = Object.values(CACHE_PREFIXES) as string[];
-    return validPrefixes.includes(prefix);
+    const validPrefixes = safeCastTo<string[]>(objectValues(CACHE_PREFIXES));
+    return arrayIncludes(validPrefixes, prefix);
 }
 
 /**
@@ -363,7 +369,7 @@ export function parseCacheKey(key: StandardizedCacheKey): {
     operation?: string;
     prefix: string;
 } {
-    const parts = key.split(KEY_SEPARATOR);
+    const parts = stringSplit(key, KEY_SEPARATOR);
 
     // Only allow 2-part or 3-part keys
     if (parts.length < 2 || parts.length > 3) {

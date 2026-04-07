@@ -6,6 +6,10 @@
  * log output regardless of execution environment.
  */
 
+import type { UnknownArray } from "type-fest";
+
+import { safeCastTo } from "ts-extras";
+
 import { normalizeLogValue } from "../loggingContext";
 
 /**
@@ -70,7 +74,7 @@ function safeSerializeErrorInternal(
         ...("cause" in error
             ? {
                   cause: safeSerializeCause(
-                      (error as { cause?: unknown }).cause
+                      (safeCastTo<{ cause?: unknown }>(error)).cause
                   ),
               }
             : {}),
@@ -117,8 +121,8 @@ export const serializeError = (error: unknown): null | SerializedError => {
 export const buildLogArguments = (
     prefix: string,
     message: string,
-    args: readonly unknown[]
-): readonly unknown[] => [
+    args: Readonly<UnknownArray>
+): Readonly<UnknownArray> => [
     formatLogMessage(prefix, message),
     ...args.map((arg) => safeNormalizeLogValue(arg)),
 ];
@@ -137,8 +141,8 @@ export const buildErrorLogArguments = (
     prefix: string,
     message: string,
     error: unknown,
-    args: readonly unknown[]
-): readonly unknown[] => {
+    args: Readonly<UnknownArray>
+): Readonly<UnknownArray> => {
     const baseMessage = formatLogMessage(prefix, message);
     const normalizedArgs = args.map((arg) => safeNormalizeLogValue(arg));
 

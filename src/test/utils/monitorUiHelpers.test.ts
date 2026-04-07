@@ -10,6 +10,7 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { AppCaches } from "../../utils/cache";
 import { getMonitorTypeConfig } from "../../utils/monitorTypeHelper";
 import { installElectronApiMock } from "./electronApiMock";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 const MONITOR_TYPES_UNDER_TEST = [
     "http",
@@ -838,8 +839,8 @@ describe("Monitor UI Helpers", () => {
                     // Create a proper partial object that satisfies exactOptionalPropertyTypes
                     const partial: { primary?: string; secondary?: string } =
                         {};
-                    if (Math.random() > 0.3) partial.primary = full.primary;
-                    if (Math.random() > 0.3) partial.secondary = full.secondary;
+                    if (secureRandomFloat() > 0.3) partial.primary = full.primary;
+                    if (secureRandomFloat() > 0.3) partial.secondary = full.secondary;
                     return partial;
                 }),
         ])(

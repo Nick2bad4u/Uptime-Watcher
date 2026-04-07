@@ -9,6 +9,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface AppEvent {
@@ -255,14 +256,14 @@ describe("Application Service Benchmarks", () => {
 
             // Add some variance to timing
             const duration =
-                baseDuration + (Math.random() - 0.5) * (baseDuration * 0.3);
+                baseDuration + (secureRandomFloat() - 0.5) * (baseDuration * 0.3);
 
             const lifecyclePhase: LifecyclePhase = {
                 phase,
                 startTime: Date.now(),
                 duration,
                 operations,
-                success: Math.random() > 0.02, // 98% success rate
+                success: secureRandomFloat() > 0.02, // 98% success rate
                 resourcesInitialized,
                 memoryAllocated,
             };
@@ -304,7 +305,7 @@ describe("Application Service Benchmarks", () => {
         // Generate events
         for (let i = 0; i < 1000; i++) {
             const eventType =
-                eventTypes[Math.floor(Math.random() * eventTypes.length)];
+                eventTypes[Math.floor(secureRandomFloat() * eventTypes.length)];
 
             // Assign priority based on event type
             let priority: number;
@@ -334,7 +335,7 @@ describe("Application Service Benchmarks", () => {
             const event: AppEvent = {
                 type: eventType,
                 timestamp: Date.now() + i * 10,
-                data: { eventId: `evt-${i}`, payload: Math.random() },
+                data: { eventId: `evt-${i}`, payload: secureRandomFloat() },
                 source: `source-${i % 10}`,
                 priority,
                 processed: false,
@@ -380,16 +381,16 @@ describe("Application Service Benchmarks", () => {
                 } // Average events
             }
 
-            const processingTime = baseProcessingTime + Math.random() * 10;
+            const processingTime = baseProcessingTime + secureRandomFloat() * 10;
             currentTime += processingTime;
 
             // Simulate processing success/failure
-            const success = Math.random() > 0.01; // 99% success rate
+            const success = secureRandomFloat() > 0.01; // 99% success rate
             let retryCount = 0;
 
-            if (!success && Math.random() > 0.5) {
+            if (!success && secureRandomFloat() > 0.5) {
                 // Some events get retried
-                retryCount = Math.floor(Math.random() * 3) + 1;
+                retryCount = Math.floor(secureRandomFloat() * 3) + 1;
                 currentTime += retryCount * (processingTime * 0.5); // Retry overhead
             }
 
@@ -442,23 +443,23 @@ describe("Application Service Benchmarks", () => {
         ): MenuTemplate[] => {
             if (depth >= maxDepth) return [];
 
-            const menuCount = Math.floor(Math.random() * 8) + 2;
+            const menuCount = Math.floor(secureRandomFloat() * 8) + 2;
             const templates: MenuTemplate[] = [];
 
             for (let i = 0; i < menuCount; i++) {
-                const hasSubmenu = depth < maxDepth - 1 && Math.random() > 0.7;
+                const hasSubmenu = depth < maxDepth - 1 && secureRandomFloat() > 0.7;
 
                 const template: MenuTemplate = {
                     label: `Menu Item ${depth}-${i}`,
-                    type: Math.random() > 0.8 ? "separator" : "normal",
+                    type: secureRandomFloat() > 0.8 ? "separator" : "normal",
                     accelerator:
-                        Math.random() > 0.7
+                        secureRandomFloat() > 0.7
                             ? `CmdOrCtrl+${String.fromCodePoint(65 + i)}`
                             : undefined,
-                    enabled: Math.random() > 0.1,
-                    visible: Math.random() > 0.05,
+                    enabled: secureRandomFloat() > 0.1,
+                    visible: secureRandomFloat() > 0.05,
                     checked:
-                        Math.random() > 0.8 ? Math.random() > 0.5 : undefined,
+                        secureRandomFloat() > 0.8 ? secureRandomFloat() > 0.5 : undefined,
                     id: `menu-${depth}-${i}`,
                     submenu: hasSubmenu
                         ? generateMenuTemplate(depth + 1, maxDepth)
@@ -483,14 +484,14 @@ describe("Application Service Benchmarks", () => {
         for (let i = 0; i < 200; i++) {
             const operationType =
                 operationTypes[
-                    Math.floor(Math.random() * operationTypes.length)
+                    Math.floor(secureRandomFloat() * operationTypes.length)
                 ];
             const targetMenu = [
                 "main",
                 "context",
                 "tray",
                 "dock",
-            ][Math.floor(Math.random() * 4)];
+            ][Math.floor(secureRandomFloat() * 4)];
 
             // Generate menu template
             const menuTemplate = generateMenuTemplate();
@@ -514,33 +515,33 @@ describe("Application Service Benchmarks", () => {
 
             switch (operationType) {
                 case "build": {
-                    buildTime = complexity * 0.5 + Math.random() * 5;
-                    renderTime = complexity * 0.3 + Math.random() * 3;
-                    bindingTime = complexity * 0.2 + Math.random() * 2;
+                    buildTime = complexity * 0.5 + secureRandomFloat() * 5;
+                    renderTime = complexity * 0.3 + secureRandomFloat() * 3;
+                    bindingTime = complexity * 0.2 + secureRandomFloat() * 2;
                     break;
                 }
                 case "update": {
-                    buildTime = complexity * 0.1 + Math.random() * 2;
-                    renderTime = complexity * 0.2 + Math.random() * 2;
-                    bindingTime = complexity * 0.1 + Number(Math.random()) * 1;
+                    buildTime = complexity * 0.1 + secureRandomFloat() * 2;
+                    renderTime = complexity * 0.2 + secureRandomFloat() * 2;
+                    bindingTime = complexity * 0.1 + Number(secureRandomFloat()) * 1;
                     break;
                 }
                 case "rebuild": {
-                    buildTime = complexity * 0.4 + Math.random() * 4;
-                    renderTime = complexity * 0.3 + Math.random() * 3;
-                    bindingTime = complexity * 0.2 + Math.random() * 2;
+                    buildTime = complexity * 0.4 + secureRandomFloat() * 4;
+                    renderTime = complexity * 0.3 + secureRandomFloat() * 3;
+                    bindingTime = complexity * 0.2 + secureRandomFloat() * 2;
                     break;
                 }
                 case "localize": {
-                    buildTime = complexity * 0.3 + Math.random() * 3;
-                    renderTime = complexity * 0.1 + Number(Math.random()) * 1;
-                    bindingTime = complexity * 0.05 + Math.random() * 0.5;
+                    buildTime = complexity * 0.3 + secureRandomFloat() * 3;
+                    renderTime = complexity * 0.1 + Number(secureRandomFloat()) * 1;
+                    bindingTime = complexity * 0.05 + secureRandomFloat() * 0.5;
                     break;
                 }
                 case "theme-change": {
-                    buildTime = complexity * 0.2 + Math.random() * 2;
-                    renderTime = complexity * 0.4 + Math.random() * 4;
-                    bindingTime = complexity * 0.1 + Number(Math.random()) * 1;
+                    buildTime = complexity * 0.2 + secureRandomFloat() * 2;
+                    renderTime = complexity * 0.4 + secureRandomFloat() * 4;
+                    bindingTime = complexity * 0.1 + Number(secureRandomFloat()) * 1;
                     break;
                 }
                 default: {
@@ -558,7 +559,7 @@ describe("Application Service Benchmarks", () => {
                 buildTime,
                 renderTime,
                 bindingTime,
-                success: Math.random() > 0.005, // 99.5% success rate
+                success: secureRandomFloat() > 0.005, // 99.5% success rate
             };
 
             menuOperations.push(operation);
@@ -625,10 +626,10 @@ describe("Application Service Benchmarks", () => {
         for (let i = 0; i < 300; i++) {
             const component =
                 integrationComponents[
-                    Math.floor(Math.random() * integrationComponents.length)
+                    Math.floor(secureRandomFloat() * integrationComponents.length)
                 ];
             const operation =
-                operations[Math.floor(Math.random() * operations.length)];
+                operations[Math.floor(secureRandomFloat() * operations.length)];
 
             const startTime = Date.now() + i * 20;
 
@@ -688,10 +689,10 @@ describe("Application Service Benchmarks", () => {
             // Add variance
             const systemResponse =
                 baseSystemResponse +
-                (Math.random() - 0.5) * (baseSystemResponse * 0.4);
+                (secureRandomFloat() - 0.5) * (baseSystemResponse * 0.4);
             const resourceUsage =
                 baseResourceUsage +
-                (Math.random() - 0.5) * (baseResourceUsage * 0.3);
+                (secureRandomFloat() - 0.5) * (baseResourceUsage * 0.3);
 
             const endTime = startTime + systemResponse;
 
@@ -713,7 +714,7 @@ describe("Application Service Benchmarks", () => {
                 }
             }
 
-            const success = Math.random() < successRate;
+            const success = secureRandomFloat() < successRate;
             const errorCode = success
                 ? undefined
                 : [
@@ -721,7 +722,7 @@ describe("Application Service Benchmarks", () => {
                       "EACCES",
                       "ENOENT",
                       "ETIMEDOUT",
-                  ][Math.floor(Math.random() * 4)];
+                  ][Math.floor(secureRandomFloat() * 4)];
 
             const integrationOperation: IntegrationOperation = {
                 operationId: `integration-${i}`,
@@ -823,8 +824,8 @@ describe("Application Service Benchmarks", () => {
             const stateChanges: Partial<AppState> = {};
 
             // Memory usage changes
-            if (Math.random() > 0.3) {
-                const memoryDelta = (Math.random() - 0.5) * 20_000_000; // ±20MB
+            if (secureRandomFloat() > 0.3) {
+                const memoryDelta = (secureRandomFloat() - 0.5) * 20_000_000; // ±20MB
                 stateChanges.memoryUsage = {
                     ...currentState.memoryUsage,
                     rss: Math.max(
@@ -839,8 +840,8 @@ describe("Application Service Benchmarks", () => {
             }
 
             // CPU usage changes
-            if (Math.random() > 0.4) {
-                const cpuDelta = (Math.random() - 0.5) * 10; // ±10%
+            if (secureRandomFloat() > 0.4) {
+                const cpuDelta = (secureRandomFloat() - 0.5) * 10; // ±10%
                 stateChanges.cpuUsage = {
                     ...currentState.cpuUsage,
                     percentCPUUsage: Math.max(
@@ -853,14 +854,14 @@ describe("Application Service Benchmarks", () => {
                     idleWakeupsPerSecond: Math.max(
                         0,
                         currentState.cpuUsage.idleWakeupsPerSecond +
-                            (Math.random() - 0.5) * 10
+                            (secureRandomFloat() - 0.5) * 10
                     ),
                 };
             }
 
             // Window count changes
-            if (Math.random() > 0.8) {
-                const windowDelta = Math.floor((Math.random() - 0.5) * 3); // ±1-2 windows
+            if (secureRandomFloat() > 0.8) {
+                const windowDelta = Math.floor((secureRandomFloat() - 0.5) * 3); // ±1-2 windows
                 stateChanges.windowCount = Math.max(
                     0,
                     currentState.windowCount + windowDelta
@@ -868,12 +869,12 @@ describe("Application Service Benchmarks", () => {
             }
 
             // Focus changes
-            if (Math.random() > 0.9) {
+            if (secureRandomFloat() > 0.9) {
                 stateChanges.isFocused = !currentState.isFocused;
             }
 
             // Hidden state changes
-            if (Math.random() > 0.95) {
+            if (secureRandomFloat() > 0.95) {
                 stateChanges.isHidden = !currentState.isHidden;
             }
 
@@ -881,7 +882,7 @@ describe("Application Service Benchmarks", () => {
             currentState = { ...currentState, ...stateChanges };
 
             // Calculate monitoring overhead
-            const monitoringOverhead = Math.random() * 5 + 2; // 2-7ms
+            const monitoringOverhead = secureRandomFloat() * 5 + 2; // 2-7ms
 
             // Check for alerts
             const alertsTriggered: string[] = [];

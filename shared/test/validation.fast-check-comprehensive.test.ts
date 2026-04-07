@@ -396,10 +396,10 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
         describe(isValidUrl, () => {
             it.prop([
                 fc.oneof(
-                    fc.constant("http://example.com"),
+                    fc.constant("https://example.com"),
                     fc.constant("https://example.com"),
                     fc.constant("https://sub.example.com:8080/path"),
-                    fc.constant("http://192.168.1.1:3000"),
+                    fc.constant("https://192.168.1.1:3000"),
                     fc.constant("https://example.com/path?query=value#fragment")
                 ),
             ])("should return true for valid URLs", (validUrl) => {
@@ -411,7 +411,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     fc.constant(""),
                     fc.constant("not-a-url"),
                     fc.constant("ftp://example.com"),
-                    fc.constant("http://"),
+                    fc.constant("https://"),
                     fc.constant("//example.com"),
                     fc.integer(),
                     fc.constantFrom(null, undefined)

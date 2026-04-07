@@ -1,6 +1,7 @@
 import type { Monitor } from "@shared/types";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { safeCastTo } from "ts-extras";
 
 import type { MonitorCheckContext } from "../checkContext";
 import type {
@@ -56,7 +57,7 @@ export function createMonitorStrategyRegistry(
                 monitorType: monitor.type,
             });
             return {
-                details: `Unknown monitor type: ${monitor.type as string}`,
+                details: `Unknown monitor type: ${safeCastTo(monitor.type)}`,
                 responseTime: 0,
                 status: "down",
             } satisfies ServiceMonitorCheckResult;

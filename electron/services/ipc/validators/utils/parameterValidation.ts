@@ -1,3 +1,5 @@
+import type { UnknownArray } from "type-fest";
+
 import type { IpcParameterValidator } from "../../types";
 
 /**
@@ -60,7 +62,7 @@ export function createParamValidator(
         countMessage = `Expected exactly ${expectedCount} parameter${suffix}`;
     }
 
-    return (params: readonly unknown[]): null | string[] => {
+    return (params: Readonly<UnknownArray>): null | string[] => {
         const errors: string[] = [];
         const { length: paramsLength } = params;
 

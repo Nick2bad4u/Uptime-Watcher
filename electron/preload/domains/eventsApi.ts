@@ -28,6 +28,7 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 import type { EventsDomainBridge } from "@shared/types/eventsBridge";
+import type { UnknownArray } from "type-fest";
 
 import {
     RENDERER_EVENT_CHANNELS,
@@ -47,6 +48,7 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
+import { objectValues, safeCastTo  } from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {
@@ -70,9 +72,9 @@ export type EventsApi = EventsDomainBridge;
 type EventManager = ReturnType<typeof createEventManager>;
 type EventGuard<TPayload> = (payload: unknown) => payload is TPayload;
 
-const RENDERER_EVENT_CHANNEL_VALUES = Object.values(
+const RENDERER_EVENT_CHANNEL_VALUES = safeCastTo<readonly RendererEventChannel[]>(objectValues(
     RENDERER_EVENT_CHANNELS
-) as readonly RendererEventChannel[];
+));
 
 const isRendererEventChannel = createStringUnionGuard(
     RENDERER_EVENT_CHANNEL_VALUES
@@ -711,11 +713,11 @@ export function createEventsApi(): EventsApi {
                     guardName: "isUpdateStatusEventDataPayload",
                 }
             ),
-        removeAllListeners: (...args: readonly unknown[]): void => {
+        removeAllListeners: (...args: Readonly<UnknownArray>): void => {
             const [candidate] = args;
 
             if (candidate === undefined) {
-                for (const manager of Object.values(managers)) {
+                for (const manager of objectValues(managers)) {
                     manager.removeAll();
                 }
                 return;

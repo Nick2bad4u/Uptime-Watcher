@@ -1,5 +1,7 @@
 import type { Monitor, Site } from "@shared/types";
 
+import { isEmpty } from "ts-extras";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { MonitorManager } from "../managers/MonitorManager";
 import type { SiteManager } from "../managers/SiteManager";
@@ -191,7 +193,7 @@ export class SiteLifecycleCoordinator {
                 `[SiteLifecycleCoordinator] Site ${identifier} deletion failed after monitoring shutdown; attempting compensation`
             );
 
-            if (activeMonitorIds.length === 0) {
+            if (isEmpty(activeMonitorIds)) {
                 logger.info(
                     `[SiteLifecycleCoordinator] No active monitors recorded for ${identifier}; skipping restart after failed removal`
                 );

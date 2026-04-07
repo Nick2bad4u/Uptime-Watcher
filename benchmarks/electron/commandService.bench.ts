@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface Command {
@@ -127,7 +128,7 @@ describe("Command Service Benchmarks", () => {
 
         for (let i = 0; i < 800; i++) {
             const input =
-                commandInputs[Math.floor(Math.random() * commandInputs.length)];
+                commandInputs[Math.floor(secureRandomFloat() * commandInputs.length)];
 
             // Simulate parsing complexity based on input
             const tokens = input.split(/\s+/);
@@ -145,11 +146,11 @@ describe("Command Service Benchmarks", () => {
             if (input.includes("=")) complexity += 1; // Key-value pairs
 
             // Simulate parsing time based on complexity
-            const parseTime = Math.max(1, complexity * 0.5 + Math.random() * 3);
+            const parseTime = Math.max(1, complexity * 0.5 + secureRandomFloat() * 3);
 
             // Simulate syntax errors (5% error rate)
             const syntaxErrors: string[] = [];
-            if (Math.random() < 0.05) {
+            if (secureRandomFloat() < 0.05) {
                 const possibleErrors = [
                     "Unmatched quotes",
                     "Invalid option format",
@@ -159,7 +160,7 @@ describe("Command Service Benchmarks", () => {
                 ];
                 syntaxErrors.push(
                     possibleErrors[
-                        Math.floor(Math.random() * possibleErrors.length)
+                        Math.floor(secureRandomFloat() * possibleErrors.length)
                     ]
                 );
             }
@@ -328,7 +329,7 @@ describe("Command Service Benchmarks", () => {
         for (let i = 0; i < 500; i++) {
             const definition =
                 commandDefinitions[
-                    Math.floor(Math.random() * commandDefinitions.length)
+                    Math.floor(secureRandomFloat() * commandDefinitions.length)
                 ];
 
             // Generate test command based on definition
@@ -339,9 +340,9 @@ describe("Command Service Benchmarks", () => {
                 options: {},
                 timestamp: Date.now(),
                 source: sourceTypes[
-                    Math.floor(Math.random() * sourceTypes.length)
+                    Math.floor(secureRandomFloat() * sourceTypes.length)
                 ],
-                priority: Math.floor(Math.random() * 5) + 1,
+                priority: Math.floor(secureRandomFloat() * 5) + 1,
             };
 
             // Generate args and options (some valid, some invalid for testing)
@@ -352,7 +353,7 @@ describe("Command Service Benchmarks", () => {
 
             // Validate arguments
             for (const argDef of definition.args) {
-                if (Math.random() > 0.1) {
+                if (secureRandomFloat() > 0.1) {
                     // 90% chance to provide argument
                     let value: unknown;
 
@@ -362,11 +363,11 @@ describe("Command Service Benchmarks", () => {
                             break;
                         }
                         case "number": {
-                            value = Math.floor(Math.random() * 1000);
+                            value = Math.floor(secureRandomFloat() * 1000);
                             break;
                         }
                         case "boolean": {
-                            value = Math.random() > 0.5;
+                            value = secureRandomFloat() > 0.5;
                             break;
                         }
                         default: {
@@ -383,7 +384,7 @@ describe("Command Service Benchmarks", () => {
 
             // Validate options
             for (const optDef of definition.options) {
-                if (Math.random() > 0.3) {
+                if (secureRandomFloat() > 0.3) {
                     // 70% chance to provide option
                     let value: unknown;
 
@@ -394,7 +395,7 @@ describe("Command Service Benchmarks", () => {
                         }
                         case "url": {
                             value =
-                                Math.random() > 0.1
+                                secureRandomFloat() > 0.1
                                     ? "https://example.com"
                                     : "invalid-url"; // 10% invalid URLs
                             if (value === "invalid-url")
@@ -406,7 +407,7 @@ describe("Command Service Benchmarks", () => {
                             break;
                         }
                         case "number": {
-                            value = Math.floor(Math.random() * 1000);
+                            value = Math.floor(secureRandomFloat() * 1000);
                             if (
                                 optDef.name === "interval" &&
                                 (value as number) < 60
@@ -418,7 +419,7 @@ describe("Command Service Benchmarks", () => {
                             break;
                         }
                         case "boolean": {
-                            value = Math.random() > 0.5;
+                            value = secureRandomFloat() > 0.5;
                             break;
                         }
                         default: {
@@ -436,7 +437,7 @@ describe("Command Service Benchmarks", () => {
             }
 
             // Additional validation checks
-            if (definition.rateLimited && Math.random() < 0.05) {
+            if (definition.rateLimited && secureRandomFloat() < 0.05) {
                 errors.push("Rate limit exceeded");
             }
 
@@ -456,7 +457,7 @@ describe("Command Service Benchmarks", () => {
                 definition.permissions.length;
             const validationTime = Math.max(
                 0.5,
-                validationComplexity * 0.3 + Math.random() * 2
+                validationComplexity * 0.3 + secureRandomFloat() * 2
             );
 
             const validationResult: ValidationResult = {
@@ -550,18 +551,18 @@ describe("Command Service Benchmarks", () => {
         for (let i = 0; i < 400; i++) {
             const scenario =
                 executionScenarios[
-                    Math.floor(Math.random() * executionScenarios.length)
+                    Math.floor(secureRandomFloat() * executionScenarios.length)
                 ];
             const startTime = Date.now();
 
             // Calculate execution duration with variance
-            const variance = (Math.random() - 0.5) * scenario.variance;
+            const variance = (secureRandomFloat() - 0.5) * scenario.variance;
             const duration = Math.max(100, scenario.baseTime * (1 + variance));
 
             const endTime = startTime + duration;
 
             // Determine success/failure
-            const success = Math.random() < scenario.successRate;
+            const success = secureRandomFloat() < scenario.successRate;
 
             // Simulate different types of results
             let result: unknown;
@@ -581,17 +582,17 @@ describe("Command Service Benchmarks", () => {
                     }
                     case "status-check": {
                         result = {
-                            totalSites: Math.floor(Math.random() * 50) + 10,
-                            activeSites: Math.floor(Math.random() * 40) + 8,
-                            upSites: Math.floor(Math.random() * 35) + 5,
+                            totalSites: Math.floor(secureRandomFloat() * 50) + 10,
+                            activeSites: Math.floor(secureRandomFloat() * 40) + 8,
+                            upSites: Math.floor(secureRandomFloat() * 35) + 5,
                         };
                         break;
                     }
                     case "export-data": {
                         result = {
-                            exported: Math.floor(Math.random() * 1000) + 100,
+                            exported: Math.floor(secureRandomFloat() * 1000) + 100,
                             fileSize:
-                                Math.floor(Math.random() * 10_000_000) +
+                                Math.floor(secureRandomFloat() * 10_000_000) +
                                 1_000_000,
                             format: "json",
                         };
@@ -613,7 +614,7 @@ describe("Command Service Benchmarks", () => {
                     130,
                 ];
                 exitCode =
-                    errorCodes[Math.floor(Math.random() * errorCodes.length)];
+                    errorCodes[Math.floor(secureRandomFloat() * errorCodes.length)];
 
                 const errorMessages = [
                     "Operation failed: insufficient permissions",
@@ -628,18 +629,18 @@ describe("Command Service Benchmarks", () => {
 
                 error =
                     errorMessages[
-                        Math.floor(Math.random() * errorMessages.length)
+                        Math.floor(secureRandomFloat() * errorMessages.length)
                     ];
             }
 
             // Calculate resource usage
-            const memoryVariance = (Math.random() - 0.5) * 0.3;
+            const memoryVariance = (secureRandomFloat() - 0.5) * 0.3;
             const memoryUsed = Math.max(
                 256,
                 scenario.memoryUsage * (1 + memoryVariance)
             );
 
-            const cpuTime = duration * (0.3 + Math.random() * 0.4); // 30-70% of wall time
+            const cpuTime = duration * (0.3 + secureRandomFloat() * 0.4); // 30-70% of wall time
 
             const execution: CommandExecution = {
                 commandId: `exec-${i}`,
@@ -713,22 +714,22 @@ describe("Command Service Benchmarks", () => {
 
         // Generate command history
         for (let i = 0; i < 1000; i++) {
-            const isCommonCommand = Math.random() < 0.7;
+            const isCommonCommand = secureRandomFloat() < 0.7;
             const command = isCommonCommand
                 ? commonCommands[
-                      Math.floor(Math.random() * commonCommands.length)
+                      Math.floor(secureRandomFloat() * commonCommands.length)
                   ]
-                : `custom-command-${Math.floor(Math.random() * 100)}`;
+                : `custom-command-${Math.floor(secureRandomFloat() * 100)}`;
 
             const historyEntry: HistoryEntry = {
                 id: `hist-${i}`,
                 command,
-                timestamp: Date.now() - Math.random() * 86_400_000 * 30, // Last 30 days
-                duration: Math.random() * 5000 + 100, // 100ms to 5s
-                success: Math.random() > 0.1, // 90% success rate
+                timestamp: Date.now() - secureRandomFloat() * 86_400_000 * 30, // Last 30 days
+                duration: secureRandomFloat() * 5000 + 100, // 100ms to 5s
+                success: secureRandomFloat() > 0.1, // 90% success rate
                 userId:
-                    Math.random() > 0.3
-                        ? `user-${Math.floor(Math.random() * 10)}`
+                    secureRandomFloat() > 0.3
+                        ? `user-${Math.floor(secureRandomFloat() * 10)}`
                         : undefined,
                 sessionId: `session-${Math.floor(i / 50)}`, // ~50 commands per session
             };
@@ -751,9 +752,9 @@ describe("Command Service Benchmarks", () => {
         for (let i = 0; i < 200; i++) {
             const dataType =
                 cacheableDataTypes[
-                    Math.floor(Math.random() * cacheableDataTypes.length)
+                    Math.floor(secureRandomFloat() * cacheableDataTypes.length)
                 ];
-            const key = `${dataType}-${Math.floor(Math.random() * 20)}`; // Allow duplicates for access patterns
+            const key = `${dataType}-${Math.floor(secureRandomFloat() * 20)}`; // Allow duplicates for access patterns
 
             // Check if key already exists
             const existingEntry = cacheEntries.find((e) => e.key === key);
@@ -776,7 +777,7 @@ describe("Command Service Benchmarks", () => {
                 };
 
                 const size =
-                    (baseSize[dataType] || 1024) + Math.random() * 1024;
+                    (baseSize[dataType] || 1024) + secureRandomFloat() * 1024;
 
                 const cacheEntry: CacheEntry = {
                     key,
@@ -784,7 +785,7 @@ describe("Command Service Benchmarks", () => {
                     timestamp: Date.now(),
                     accessCount: 1,
                     lastAccessed: Date.now(),
-                    ttl: Math.random() * 3_600_000 + 300_000, // 5 minutes to 1 hour
+                    ttl: secureRandomFloat() * 3_600_000 + 300_000, // 5 minutes to 1 hour
                     size,
                 };
 
@@ -803,7 +804,7 @@ describe("Command Service Benchmarks", () => {
 
         for (let i = 0; i < 100; i++) {
             const queryType =
-                queryTypes[Math.floor(Math.random() * queryTypes.length)];
+                queryTypes[Math.floor(secureRandomFloat() * queryTypes.length)];
             const queryStartTime = Date.now();
 
             let resultsCount: number;
@@ -812,43 +813,43 @@ describe("Command Service Benchmarks", () => {
             switch (queryType) {
                 case "recent": {
                     resultsCount = Math.min(50, historyEntries.length);
-                    queryTime = Math.random() * 10 + 2; // 2-12ms
+                    queryTime = secureRandomFloat() * 10 + 2; // 2-12ms
                     break;
                 }
                 case "by-user": {
                     resultsCount = historyEntries.filter(
                         (h) =>
                             h.userId ===
-                            `user-${Math.floor(Math.random() * 10)}`
+                            `user-${Math.floor(secureRandomFloat() * 10)}`
                     ).length;
-                    queryTime = Math.random() * 25 + 5; // 5-30ms
+                    queryTime = secureRandomFloat() * 25 + 5; // 5-30ms
                     break;
                 }
                 case "by-command": {
                     const searchCommand =
                         commonCommands[
-                            Math.floor(Math.random() * commonCommands.length)
+                            Math.floor(secureRandomFloat() * commonCommands.length)
                         ];
                     resultsCount = historyEntries.filter((h) =>
                         h.command.includes(searchCommand)
                     ).length;
-                    queryTime = Math.random() * 15 + 3; // 3-18ms
+                    queryTime = secureRandomFloat() * 15 + 3; // 3-18ms
                     break;
                 }
                 case "by-session": {
                     resultsCount = historyEntries.filter(
                         (h) =>
                             h.sessionId ===
-                            `session-${Math.floor(Math.random() * 20)}`
+                            `session-${Math.floor(secureRandomFloat() * 20)}`
                     ).length;
-                    queryTime = Math.random() * 20 + 4; // 4-24ms
+                    queryTime = secureRandomFloat() * 20 + 4; // 4-24ms
                     break;
                 }
                 case "failed-only": {
                     resultsCount = historyEntries.filter(
                         (h) => !h.success
                     ).length;
-                    queryTime = Math.random() * 30 + 8; // 8-38ms (slower due to filtering)
+                    queryTime = secureRandomFloat() * 30 + 8; // 8-38ms (slower due to filtering)
                     break;
                 }
                 default: {
@@ -861,7 +862,7 @@ describe("Command Service Benchmarks", () => {
                 queryType,
                 resultsCount,
                 queryTime,
-                cacheHit: Math.random() > 0.7, // 30% cache hit rate
+                cacheHit: secureRandomFloat() > 0.7, // 30% cache hit rate
             };
         }
 
@@ -993,7 +994,7 @@ describe("Command Service Benchmarks", () => {
         for (let i = 0; i < 150; i++) {
             const template =
                 pipelineTemplates[
-                    Math.floor(Math.random() * pipelineTemplates.length)
+                    Math.floor(secureRandomFloat() * pipelineTemplates.length)
                 ];
             const stages: PipelineStage[] = [];
             let totalDuration = 0;
@@ -1006,11 +1007,11 @@ describe("Command Service Benchmarks", () => {
                 const baseTime = template.baseTime[j];
 
                 // Calculate stage duration with variance
-                const variance = (Math.random() - 0.5) * 0.4;
+                const variance = (secureRandomFloat() - 0.5) * 0.4;
                 const stageDuration = Math.max(10, baseTime * (1 + variance));
 
                 // Simulate stage success/failure
-                const stageSuccess = Math.random() > 0.02; // 98% success rate per stage
+                const stageSuccess = secureRandomFloat() > 0.02; // 98% success rate per stage
 
                 if (!stageSuccess) {
                     pipelineSuccess = false;

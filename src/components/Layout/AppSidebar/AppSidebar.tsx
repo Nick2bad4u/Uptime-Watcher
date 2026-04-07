@@ -16,6 +16,7 @@ import {
     useMemo,
     useState,
 } from "react";
+import { arrayFirst, isEmpty  } from "ts-extras";
 
 import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from "../../../constants/layout";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
@@ -123,7 +124,7 @@ export const AppSidebar: NamedExoticComponent = memo(
         useEffect(
             function selectInitialSite(): void {
                 if (!selectedSiteIdentifier && filteredSites.length > 0) {
-                    selectSite(filteredSites[0]);
+                    selectSite(arrayFirst(filteredSites));
                 }
             },
             [
@@ -322,7 +323,7 @@ export const AppSidebar: NamedExoticComponent = memo(
                         className="app-sidebar__list"
                         data-testid="sidebar-site-list"
                     >
-                        {filteredSites.length === 0 ? (
+                        {isEmpty(filteredSites) ? (
                             <ThemedText
                                 className="app-sidebar__empty"
                                 size="sm"

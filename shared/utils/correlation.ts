@@ -1,9 +1,10 @@
 import type { CorrelationId } from "@shared/types/events";
 
 import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
+import { arrayJoin, safeCastTo  } from "ts-extras";
 
 const resolveWebCrypto = (): Crypto | null => {
-    const candidate = Reflect.get(globalThis, "crypto") as Crypto | undefined;
+    const candidate = safeCastTo<Crypto | undefined>(Reflect.get(globalThis, "crypto"));
     if (candidate && typeof candidate.getRandomValues === "function") {
         return candidate;
     }
@@ -26,7 +27,7 @@ const convertBytesToHex = (bytes: Uint8Array): string => {
     bytes.forEach((byte, index) => {
         hexFragments[index] = byte.toString(16).padStart(2, "0");
     });
-    return hexFragments.join("");
+    return arrayJoin(hexFragments, "");
 };
 
 export const isCorrelationId = (value: unknown): value is CorrelationId =>

@@ -5,6 +5,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("Database Performance Monitoring", () => {
     // Interface definitions for type safety
@@ -140,18 +141,18 @@ describe("Database Performance Monitoring", () => {
             id: `metric-${i}`,
             timestamp: Date.now() - i * 1000,
             metricType:
-                metricTypes[Math.floor(Math.random() * metricTypes.length)],
-            value: Math.random() * 1000,
-            source: sources[Math.floor(Math.random() * sources.length)],
+                metricTypes[Math.floor(secureRandomFloat() * metricTypes.length)],
+            value: secureRandomFloat() * 1000,
+            source: sources[Math.floor(secureRandomFloat() * sources.length)],
             tags: {
-                environment: Math.random() > 0.5 ? "production" : "staging",
-                region: Math.random() > 0.5 ? "us-east-1" : "us-west-2",
+                environment: secureRandomFloat() > 0.5 ? "production" : "staging",
+                region: secureRandomFloat() > 0.5 ? "us-east-1" : "us-west-2",
                 service: `service-${i % 10}`,
             },
             metadata: {
                 unit: "ms",
-                aggregationType: Math.random() > 0.5 ? "avg" : "sum",
-                samplingRate: Math.random() * 100,
+                aggregationType: secureRandomFloat() > 0.5 ? "avg" : "sum",
+                samplingRate: secureRandomFloat() * 100,
             },
         }));
     };
@@ -184,12 +185,12 @@ describe("Database Performance Monitoring", () => {
         return Array.from({ length: count }, (_, i) => ({
             id: `threshold-${i}`,
             metricType:
-                metricTypes[Math.floor(Math.random() * metricTypes.length)],
-            operator: operators[Math.floor(Math.random() * operators.length)],
-            value: Math.random() * 1000,
-            severity: severities[Math.floor(Math.random() * severities.length)],
+                metricTypes[Math.floor(secureRandomFloat() * metricTypes.length)],
+            operator: operators[Math.floor(secureRandomFloat() * operators.length)],
+            value: secureRandomFloat() * 1000,
+            severity: severities[Math.floor(secureRandomFloat() * severities.length)],
             description: `Threshold ${i} for performance monitoring`,
-            enabled: Math.random() > 0.2,
+            enabled: secureRandomFloat() > 0.2,
         }));
     };
 
@@ -200,29 +201,29 @@ describe("Database Performance Monitoring", () => {
         Array.from({ length: count }, (_, i) => ({
             id: `alert-rule-${i}`,
             name: `Alert Rule ${i}`,
-            condition: `metric_value ${thresholds[i % thresholds.length]?.operator || ">"} ${Math.random() * 100}`,
+            condition: `metric_value ${thresholds[i % thresholds.length]?.operator || ">"} ${secureRandomFloat() * 100}`,
             thresholds: thresholds.slice(i % 5, (i % 5) + 3),
-            cooldownPeriod: Math.floor(Math.random() * 3_600_000), // Up to 1 hour
+            cooldownPeriod: Math.floor(secureRandomFloat() * 3_600_000), // Up to 1 hour
             notificationChannels: [
                 `email-${i}`,
                 `slack-${i}`,
                 `webhook-${i}`,
             ],
-            enabled: Math.random() > 0.1,
-            triggerCount: Math.floor(Math.random() * 100),
+            enabled: secureRandomFloat() > 0.1,
+            triggerCount: Math.floor(secureRandomFloat() * 100),
             lastTriggered:
-                Math.random() > 0.5
-                    ? Date.now() - Math.random() * 86_400_000
+                secureRandomFloat() > 0.5
+                    ? Date.now() - secureRandomFloat() * 86_400_000
                     : undefined,
         }));
 
     const generateMonitoringSessions = (count: number): MonitoringSession[] =>
         Array.from({ length: count }, (_, i) => {
-            const startTime = Date.now() - Math.random() * 86_400_000; // Random time in last 24 hours
-            const duration = Math.random() * 3_600_000; // Up to 1 hour
+            const startTime = Date.now() - secureRandomFloat() * 86_400_000; // Random time in last 24 hours
+            const duration = secureRandomFloat() * 3_600_000; // Up to 1 hour
             const endTime = startTime + duration;
             const metrics = generatePerformanceMetrics(
-                50 + Math.floor(Math.random() * 200)
+                50 + Math.floor(secureRandomFloat() * 200)
             );
             const thresholds = generatePerformanceThresholds(10);
             const alerts = generateAlertRules(5, thresholds);
@@ -236,10 +237,10 @@ describe("Database Performance Monitoring", () => {
                 alerts,
                 summary: {
                     totalMetrics: metrics.length,
-                    alertsTriggered: Math.floor(Math.random() * alerts.length),
-                    avgResponseTime: Math.random() * 500,
-                    peakMemoryUsage: Math.random() * 1000,
-                    errorRate: Math.random() * 5,
+                    alertsTriggered: Math.floor(secureRandomFloat() * alerts.length),
+                    avgResponseTime: secureRandomFloat() * 500,
+                    peakMemoryUsage: secureRandomFloat() * 1000,
+                    errorRate: secureRandomFloat() * 5,
                 },
             };
         });
@@ -264,14 +265,14 @@ describe("Database Performance Monitoring", () => {
                     ...metric,
                     timestamp: Date.now(),
                     processed: true,
-                    ingestionLatency: Math.random() * 10,
+                    ingestionLatency: secureRandomFloat() * 10,
                 };
 
                 ingestedMetrics.push(processedMetric as PerformanceMetric);
             }
 
             // Simulate batch commit
-            const batchProcessingTime = Math.random() * 5;
+            const batchProcessingTime = secureRandomFloat() * 5;
         }
     });
 
@@ -422,45 +423,45 @@ describe("Database Performance Monitoring", () => {
                     errorRate:
                         errorRates.reduce((sum, val) => sum + val, 0) /
                             errorRates.length || 0,
-                    memoryUtilization: Math.random() * 100,
-                    cpuUtilization: Math.random() * 100,
+                    memoryUtilization: secureRandomFloat() * 100,
+                    cpuUtilization: secureRandomFloat() * 100,
                 },
                 trends: {
                     latencyTrend:
-                        Math.random() > 0.33
+                        secureRandomFloat() > 0.33
                             ? "increasing"
-                            : Math.random() > 0.5
+                            : secureRandomFloat() > 0.5
                               ? "decreasing"
                               : "stable",
                     throughputTrend:
-                        Math.random() > 0.33
+                        secureRandomFloat() > 0.33
                             ? "increasing"
-                            : Math.random() > 0.5
+                            : secureRandomFloat() > 0.5
                               ? "decreasing"
                               : "stable",
                     errorTrend:
-                        Math.random() > 0.33
+                        secureRandomFloat() > 0.33
                             ? "increasing"
-                            : Math.random() > 0.5
+                            : secureRandomFloat() > 0.5
                               ? "decreasing"
                               : "stable",
                 },
                 anomalies: Array.from(
-                    { length: Math.floor(Math.random() * 5) },
+                    { length: Math.floor(secureRandomFloat() * 5) },
                     (_, i) => ({
                         timestamp:
                             timeRange.start +
-                            Math.random() * (timeRange.end - timeRange.start),
+                            secureRandomFloat() * (timeRange.end - timeRange.start),
                         type: [
                             "latency_spike",
                             "throughput_drop",
                             "error_burst",
-                        ][Math.floor(Math.random() * 3)],
+                        ][Math.floor(secureRandomFloat() * 3)],
                         severity: [
                             "low",
                             "medium",
                             "high",
-                        ][Math.floor(Math.random() * 3)],
+                        ][Math.floor(secureRandomFloat() * 3)],
                         description: `Anomaly ${i} detected in session ${session.id}`,
                     })
                 ),
@@ -642,21 +643,21 @@ describe("Database Performance Monitoring", () => {
                 const operation = {
                     timestamp: Date.now(),
                     operation: `${component}_operation_${i}`,
-                    duration: Math.random() * 10,
+                    duration: secureRandomFloat() * 10,
                 };
 
                 // Simulate some processing work
-                const processingOverhead = Math.random() * 0.1;
+                const processingOverhead = secureRandomFloat() * 0.1;
             }
 
             const endTime = Date.now();
 
             overheadMetrics.push({
                 component,
-                cpuUsage: Math.random() * 10, // Percentage of CPU used by monitoring
-                memoryUsage: Math.random() * 100, // MB of memory used
-                networkUsage: Math.random() * 1000, // KB/s of network usage
-                storageUsage: Math.random() * 50, // MB of storage used per hour
+                cpuUsage: secureRandomFloat() * 10, // Percentage of CPU used by monitoring
+                memoryUsage: secureRandomFloat() * 100, // MB of memory used
+                networkUsage: secureRandomFloat() * 1000, // KB/s of network usage
+                storageUsage: secureRandomFloat() * 50, // MB of storage used per hour
             });
         }
     });
@@ -738,7 +739,7 @@ describe("Database Performance Monitoring", () => {
                 recordsScanned += batchSize;
 
                 // Simulate identifying old records
-                const oldRecords = Math.floor(Math.random() * batchSize * 0.1);
+                const oldRecords = Math.floor(secureRandomFloat() * batchSize * 0.1);
                 recordsDeleted += oldRecords;
 
                 // Simulate deletion overhead

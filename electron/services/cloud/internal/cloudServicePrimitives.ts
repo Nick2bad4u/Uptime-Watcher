@@ -2,6 +2,7 @@ import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 
 import { normalizeCloudObjectKey } from "@shared/utils/cloudKeyNormalization";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import { stringSplit } from "ts-extras";
 
 const BACKUP_KEY_PREFIX = "backups/" as const;
 const MAX_BACKUP_KEY_BYTES = 2048;
@@ -66,7 +67,7 @@ export function assertBackupObjectKey(rawKey: string): string {
         throw new Error("Backup key must be a relative provider key");
     }
 
-    const segments = key.split("/");
+    const segments = stringSplit(key, "/");
     if (segments.some((segment) => segment.length === 0)) {
         throw new Error("Backup key must not contain empty path segments");
     }

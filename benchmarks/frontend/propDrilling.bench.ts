@@ -4,6 +4,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Interface definitions for prop drilling
 interface ComponentProps {
@@ -132,10 +133,10 @@ class MockPropDrillingSystem {
             { pattern: /^feature/, inherit: true },
 
             // Event handlers (selective inheritance)
-            { pattern: /^on[A-Z]/, inherit: Math.random() > 0.7 },
+            { pattern: /^on[A-Z]/, inherit: secureRandomFloat() > 0.7 },
 
             // Data props
-            { pattern: /^data/, inherit: Math.random() > 0.5 },
+            { pattern: /^data/, inherit: secureRandomFloat() > 0.5 },
         ];
 
         for (const [propName, propValue] of Object.entries(parent.props)) {
@@ -189,13 +190,13 @@ class MockPropDrillingSystem {
             const transformations: PropTransformation[] = [];
 
             // Simulate prop transformations
-            if (Math.random() > 0.8) {
+            if (secureRandomFloat() > 0.8) {
                 // 20% chance of transformation
                 transformations.push({
-                    type: Math.random() > 0.5 ? "rename" : "compute",
+                    type: secureRandomFloat() > 0.5 ? "rename" : "compute",
                     input: propValue,
                     output: propValue,
-                    processingTime: Math.random() * 0.5,
+                    processingTime: secureRandomFloat() * 0.5,
                 });
             }
 
@@ -243,19 +244,19 @@ class MockPropDrillingSystem {
 
         // Simulate prop memoization checks
         for (let i = 0; i < component.totalProps; i++) {
-            const memoCheck = Math.random() * 0.1;
+            const memoCheck = secureRandomFloat() * 0.1;
         }
 
         // Simulate computed prop derivations
         const computedProps = Math.floor(component.totalProps * 0.3);
         for (let i = 0; i < computedProps; i++) {
-            const computation = Math.random() * 0.5;
+            const computation = secureRandomFloat() * 0.5;
         }
     }
 
     private validateProp(propName: string, propValue: any): boolean {
         // Simulate prop validation overhead
-        const validationWork = Math.random() * 0.1;
+        const validationWork = secureRandomFloat() * 0.1;
 
         // Simple validation rules
         if (propName.includes("id") && typeof propValue !== "string") {
@@ -273,7 +274,7 @@ class MockPropDrillingSystem {
 
     private simulateRenderWork(component: ComponentInstance): number {
         // Base render work
-        let renderWork = Math.random() * 2;
+        let renderWork = secureRandomFloat() * 2;
 
         // Additional work based on prop count
         renderWork += component.totalProps * 0.1;
@@ -287,7 +288,7 @@ class MockPropDrillingSystem {
     // Prop optimization strategies
     memoizeComponent(component: ComponentInstance): ComponentInstance {
         // Simulate memoization setup overhead
-        const memoizationWork = Number(Math.random());
+        const memoizationWork = Number(secureRandomFloat());
 
         // Create memoized version
         const memoizedComponent = {
@@ -602,11 +603,11 @@ describe("React Prop Drilling Performance", () => {
         // Add additional random props
         for (let i = 0; i < propsCount; i++) {
             rootProps[`prop${i}`] = {
-                value: Math.random() * 100,
+                value: secureRandomFloat() * 100,
                 metadata: {
                     id: i,
                     timestamp: Date.now(),
-                    data: Array.from({ length: 10 }, () => Math.random()),
+                    data: Array.from({ length: 10 }, () => secureRandomFloat()),
                 },
             };
         }
@@ -624,7 +625,7 @@ describe("React Prop Drilling Performance", () => {
                 const childProps: ComponentProps = {
                     id: `child-${currentDepth}-${i}`,
                     depth: currentDepth + 1,
-                    localState: Math.random() * 50,
+                    localState: secureRandomFloat() * 50,
                     onClick: () =>
                         console.log(`Clicked child ${currentDepth}-${i}`),
                     onHover: () =>
@@ -632,12 +633,12 @@ describe("React Prop Drilling Performance", () => {
                 };
 
                 // Add some child-specific props that will be inherited
-                if (Math.random() > 0.5) {
+                if (secureRandomFloat() > 0.5) {
                     childProps.dataItems = Array.from(
                         { length: 5 },
                         (_, j) => ({
                             id: j,
-                            value: Math.random(),
+                            value: secureRandomFloat(),
                         })
                     );
                 }
@@ -813,7 +814,7 @@ describe("React Prop Drilling Performance", () => {
 
             // Memoize random components
             const componentsToMemoize = allComponents.filter(
-                () => Math.random() > 0.7
+                () => secureRandomFloat() > 0.7
             );
             const memoizedComponents = componentsToMemoize.map((c) =>
                 system.memoizeComponent(c)

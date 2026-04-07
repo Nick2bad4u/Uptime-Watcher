@@ -25,6 +25,7 @@ import {
     validateMonitorExists,
 } from "../../stores/sites/utils/monitorOperations";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Test data generators using fast-check
 const arbitraryMonitorType = (): fc.Arbitrary<MonitorType> =>
@@ -218,7 +219,7 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
             };
 
             for (const key of keys) {
-                if (Math.random() > 0.5) {
+                if (secureRandomFloat() > 0.5) {
                     // Randomly include ~50% of properties
                     copyField(key);
                 }

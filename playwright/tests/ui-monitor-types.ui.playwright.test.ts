@@ -167,7 +167,7 @@ const normalizeFieldValue = (
 
     if (field.type === "url") {
         if (
-            candidate.startsWith("http://") ||
+            candidate.startsWith("https://") ||
             candidate.startsWith("https://")
         ) {
             return candidate;

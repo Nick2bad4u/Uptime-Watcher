@@ -3,21 +3,31 @@
 
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Build Flatpak
+run-name: Build Flatpak · ${{ github.event_name }}
 
 on:
     workflow_dispatch:
     workflow_run:
         workflows: ["Build and Release Electron App"]
+        branches: ["main"]
         types:
             - completed
 
+permissions:
+    contents: write
+
 concurrency:
     group: flatpak-build-${{ github.ref }}
-    cancel-in-progress: false
+    cancel-in-progress: ${{ false }}
 
 jobs:
     build-flatpak:
+        name: Build Flatpak bundle
         runs-on: ubuntu-latest
+        timeout-minutes: 60
+        defaults:
+            run:
+                shell: bash
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1

@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 class MockDashboardDataProvider {
     private sites: any[] = [];
@@ -35,7 +36,7 @@ class MockDashboardDataProvider {
                 "offline",
                 "degraded",
             ][i % 3],
-            lastChecked: Date.now() - Math.random() * 3_600_000,
+            lastChecked: Date.now() - secureRandomFloat() * 3_600_000,
         }));
 
         this.monitors = Array.from({ length: 300 }, (_, i) => ({
@@ -47,7 +48,7 @@ class MockDashboardDataProvider {
                 "port",
             ][i % 3],
             status: ["online", "offline"][i % 2],
-            responseTime: Math.random() * 1000,
+            responseTime: secureRandomFloat() * 1000,
         }));
 
         this.history = Array.from({ length: 10_000 }, (_, i) => ({
@@ -55,7 +56,7 @@ class MockDashboardDataProvider {
             monitorId: `monitor-${i % 300}`,
             timestamp: Date.now() - i * 60_000,
             status: ["online", "offline"][i % 2],
-            responseTime: Math.random() * 1000,
+            responseTime: secureRandomFloat() * 1000,
         }));
     }
 

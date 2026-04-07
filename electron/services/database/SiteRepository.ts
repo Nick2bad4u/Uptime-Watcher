@@ -53,6 +53,7 @@ import {
     assertValidSiteIdentifier,
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
+import { isDefined, isEmpty  } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
 
@@ -185,7 +186,7 @@ export class SiteRepository {
      * @throws Error When the database operation fails.
      */
     public async bulkInsert(sites: SiteRow[]): Promise<void> {
-        if (sites.length === 0) {
+        if (isEmpty(sites)) {
             return;
         }
 
@@ -282,7 +283,7 @@ export class SiteRepository {
         }
         return this.runSiteReadOperation(
             "site-exists",
-            (db) => this.findByIdentifierInternal(db, identifier) !== undefined,
+            (db) => isDefined(this.findByIdentifierInternal(db, identifier)),
             { identifier }
         );
     }
@@ -521,7 +522,7 @@ export class SiteRepository {
      * @throws Error When the underlying SQLite driver reports a failure.
      */
     private bulkInsertInternal(db: Database, sites: SiteRow[]): void {
-        if (sites.length === 0) {
+        if (isEmpty(sites)) {
             return;
         }
 

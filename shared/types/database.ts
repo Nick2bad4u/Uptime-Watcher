@@ -9,6 +9,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { stringSplit } from "ts-extras";
 
 /**
  * Base interface for all database row types.
@@ -392,7 +393,7 @@ export function safeGetRowProperty<T>(
 
     // Handle nested property access with dot notation
     if (property.includes(".")) {
-        const parts = property.split(".");
+        const parts = stringSplit(property, ".");
         // Use unknown instead of any for type safety
         let current: unknown = row;
 

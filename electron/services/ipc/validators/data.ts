@@ -17,6 +17,7 @@ import {
     validateSerializedDatabaseBackupSaveResult,
     validateSerializedDatabaseRestoreResult,
 } from "@shared/validation/dataSchemas";
+import { safeCastTo } from "ts-extras";
 
 import type { IpcParameterValidator, IpcResultValidator } from "../types";
 
@@ -39,12 +40,12 @@ function formatSafeParseError(error: unknown): string[] {
         return ["Invalid response"];
     }
 
-    const { issues } = error as { readonly issues?: unknown };
+    const { issues } = safeCastTo<{ readonly issues?: unknown }>(error);
     if (!Array.isArray(issues)) {
         return ["Invalid response"];
     }
 
-    return formatZodIssues(issues as readonly ZodIssueLike[]);
+    return formatZodIssues(safeCastTo<readonly ZodIssueLike[]>(issues));
 }
 
 function getSafeParseError(validation: unknown): unknown {
@@ -56,7 +57,7 @@ function getSafeParseError(validation: unknown): unknown {
         return undefined;
     }
 
-    return (validation as { readonly error?: unknown }).error;
+    return (safeCastTo<{ readonly error?: unknown }>(validation)).error;
 }
 
 /**

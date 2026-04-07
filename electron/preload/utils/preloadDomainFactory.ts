@@ -1,3 +1,5 @@
+import type { UnknownArray } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { preloadLogger } from "./preloadLogger";
@@ -38,7 +40,7 @@ export interface PreloadDomainFactoryOptions<T> {
  * (unused vars, function scoping) without relying on the `void` operator.
  */
 export function acceptUnusedPreloadArguments(
-    ...args: readonly unknown[]
+    ...args: Readonly<UnknownArray>
 ): number {
     return args.length;
 }

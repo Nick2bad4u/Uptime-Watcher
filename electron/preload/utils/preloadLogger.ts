@@ -9,7 +9,7 @@
 
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { UnknownRecord } from "type-fest";
+import type { UnknownArray, UnknownRecord  } from "type-fest";
 
 import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
@@ -23,6 +23,7 @@ import { isObject } from "@shared/utils/typeGuards";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { ipcRenderer } from "electron";
 import log from "electron-log/renderer";
+import { objectKeys } from "ts-extras";
 
 const PRELOAD_PREFIX = "PRELOAD";
 const DIAGNOSTICS_PREFIX = "PRELOAD:DIAGNOSTICS";
@@ -45,7 +46,7 @@ function isSensitiveKeyName(candidate: string): boolean {
 
 const safeInvoke = (
     invoke: (...arguments_: unknown[]) => void,
-    args: readonly unknown[]
+    args: Readonly<UnknownArray>
 ): void => {
     try {
         invoke(...args);
@@ -181,7 +182,7 @@ const serializeValue = (value: unknown): unknown => {
 
     if (isObject(value)) {
         const record = value;
-        const keys = Object.keys(record);
+        const keys = objectKeys(record);
 
         if (keys.length <= MAX_PREVIEW_OBJECT_KEYS) {
             return record;

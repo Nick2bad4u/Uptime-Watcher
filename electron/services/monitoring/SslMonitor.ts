@@ -14,6 +14,7 @@ import type { PeerCertificate } from "node:tls";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
+import { arrayFind, isEmpty, objectKeys   } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -240,7 +241,7 @@ export class SslMonitor implements IMonitorService {
 
                 const peerCertificate = socket.getPeerCertificate(true);
                 // Node returns an empty object when the peer omits a certificate.
-                if (Object.keys(peerCertificate).length === 0) {
+                if (isEmpty(objectKeys(peerCertificate))) {
                     handleFailure(
                         new Error(
                             "TLS connection succeeded but no certificate was provided"
@@ -359,10 +360,8 @@ export class SslMonitor implements IMonitorService {
             subject["O"],
             subject["OU"],
         ];
-        const name = candidates.find(
-            (value): value is string =>
-                typeof value === "string" && value.trim().length > 0
-        );
+        const name = arrayFind(candidates, (value): value is string =>
+                typeof value === "string" && value.trim().length > 0);
 
         return name ?? "unknown subject";
     }

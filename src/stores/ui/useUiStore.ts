@@ -35,6 +35,7 @@ import type { Promisable } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
+import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -222,7 +223,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         // Prefer logging the underlying cause when we wrap an
                         // error for user-facing messaging.
                         const underlyingError = ensureError(
-                            (normalizedError as { cause?: unknown }).cause ??
+                            (safeCastTo<{ cause?: unknown }>(normalizedError)).cause ??
                                 normalizedError
                         );
 
@@ -345,7 +346,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             siteCardPresentation: "stacked",
             siteDetailsChartTimeRange: "24h",
             siteDetailsHeaderCollapsedState: {},
-            siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
+            siteDetailsTabState: safeCastTo<Record<string, SiteDetailsTab>>({}),
             siteListLayout: "card-large",
             siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
             surfaceDensity: "comfortable",

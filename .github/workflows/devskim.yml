@@ -4,14 +4,15 @@
 # documentation.
 
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: DevSkim
+name: Dev Skim
+run-name: Dev Skim
 
 on:
     workflow_dispatch:
 
 concurrency:
     group: devskim-${{ github.ref }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 
 permissions:
     contents: read
@@ -20,6 +21,10 @@ jobs:
     lint:
         name: DevSkim
         runs-on: ubuntu-latest
+        timeout-minutes: 30
+        defaults:
+            run:
+                shell: bash
         permissions:
             actions: read
             contents: read

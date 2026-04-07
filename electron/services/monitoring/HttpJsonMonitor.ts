@@ -1,3 +1,5 @@
+import type { Constructor } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
 
 import type {
@@ -99,9 +101,7 @@ const HTTP_JSON_MONITOR_BEHAVIOR: HttpMonitorBehavior<
     },
 };
 
-type HttpJsonMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance;
+type HttpJsonMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
 
 const HttpJsonMonitorBase: HttpJsonMonitorConstructor =
     ((): HttpJsonMonitorConstructor => {

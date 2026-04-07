@@ -22,7 +22,7 @@ describe("validatedExternalOpen", () => {
         } = await import("@electron/services/shell/validatedExternalOpen");
 
         const result = validateExternalOpenUrlCandidateWithPolicy(
-            "http://example.com/path?token=secret",
+            "https://example.com/path?token=secret",
             { requireHttps: true }
         );
 
@@ -33,7 +33,7 @@ describe("validatedExternalOpen", () => {
         }
 
         expect(result.reason).toBe(EXTERNAL_OPEN_HTTPS_REQUIRED_REASON);
-        expect(result.safeUrlForLogging).toContain("http://example.com");
+        expect(result.safeUrlForLogging).toContain("https://example.com");
         expect(result.safeUrlForLogging).not.toContain("token=secret");
     });
 

@@ -1,4 +1,5 @@
 import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
+import { arrayJoin } from "ts-extras";
 
 import type { GoogleTokenResponse } from "./googleDriveTokenSchemas";
 
@@ -57,13 +58,13 @@ export class GoogleDriveAuthFlow {
             authorizationUrl.searchParams.set("response_type", "code");
             authorizationUrl.searchParams.set(
                 "scope",
-                [
+                arrayJoin([
                     "openid",
                     "email",
                     "profile",
                     // App-private storage.
                     "https://www.googleapis.com/auth/drive.appdata",
-                ].join(" ")
+                ], " ")
             );
             authorizationUrl.searchParams.set("state", state);
             authorizationUrl.searchParams.set(

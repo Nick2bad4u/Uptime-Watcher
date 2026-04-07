@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Codacy Coverage Reporter
+run-name: Codacy Coverage Reporter
 
 # Prevent multiple coverage runs from conflicting
 concurrency:
@@ -16,8 +17,12 @@ permissions: # added using https://github.com/step-security/secure-repo
 
 jobs:
     codacy-coverage-reporter:
-        runs-on: ubuntu-latest
         name: codacy-coverage-reporter
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        defaults:
+            run:
+                shell: bash
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
@@ -92,6 +97,7 @@ jobs:
                   find coverage/shared/ -name "*.info" -o -name "lcov.info" || echo "No lcov files found in coverage/shared/"
                   echo "=== Test report files ==="
                   find coverage/ -name "*.junit.xml" || echo "No junit files"
+
             - name: Run codacy-coverage-reporter
               uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
               with:

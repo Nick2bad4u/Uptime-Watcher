@@ -29,6 +29,7 @@ import { isAbortError } from "@shared/utils/abortUtils";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { validateMonitorType } from "@shared/utils/validation";
+import { arrayFirst } from "ts-extras";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
@@ -203,7 +204,7 @@ export function clearConfigCache(): void {
  * @public
  */
 export function getDefaultMonitorId(monitorIds: readonly string[]): string {
-    return monitorIds[0] ?? "";
+    return arrayFirst(monitorIds) ?? "";
 }
 
 /**

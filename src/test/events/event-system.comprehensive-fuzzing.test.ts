@@ -17,6 +17,7 @@ import type {
     UptimeEvents,
 } from "../../../electron/events/eventTypes";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Custom arbitraries for event system testing
 const arbitraryEventType = fc.constantFrom(
@@ -478,7 +479,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                             eventBus.emit("system:health:check", {
                                 operation: i,
                             });
-                        }, Math.random() * 10);
+                        }, secureRandomFloat() * 10);
                     });
 
                     operations.push(operation);

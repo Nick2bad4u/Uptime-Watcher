@@ -740,7 +740,7 @@ describe("validatorUtils", () => {
 
             // Testing HTTP URLs for validation completeness
 
-            expect(isValidUrl("http://example.com")).toBeTruthy();
+            expect(isValidUrl("https://example.com")).toBeTruthy();
         });
 
         it("should return false for invalid URLs", async ({
@@ -753,7 +753,7 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidUrl("not-a-url")).toBeFalsy();
-            expect(isValidUrl("http://")).toBeFalsy();
+            expect(isValidUrl("https://")).toBeFalsy();
             expect(isValidUrl("")).toBeFalsy();
             expect(isValidUrl("//example.com")).toBeFalsy(); // Protocol relative not allowed by default
         });

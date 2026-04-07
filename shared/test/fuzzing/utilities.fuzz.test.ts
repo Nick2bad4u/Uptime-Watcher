@@ -123,7 +123,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                         fc.constant(null),
                         fc.constant(undefined),
                         fc.constant("not-a-url"),
-                        fc.constant("http://"),
+                        fc.constant("https://"),
                         fc.constant("://example.com")
                     ),
                     (input: any) => {

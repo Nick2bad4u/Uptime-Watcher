@@ -11,6 +11,7 @@ import {
     useRef,
 } from "react";
 import { createPortal } from "react-dom";
+import { arrayAt, arrayFirst, arrayJoin, isEmpty    } from "ts-extras";
 
 import { AppIcons } from "../../../utils/icons";
 import {
@@ -427,14 +428,14 @@ export const Modal = ({
                 }
 
                 const focusable = getFocusableElements(modalElement);
-                if (focusable.length === 0) {
+                if (isEmpty(focusable)) {
                     event.preventDefault();
                     modalElement.focus();
                     return;
                 }
 
                 const [first] = focusable;
-                const last = focusable.at(-1);
+                const last = arrayAt(focusable, -1);
                 if (!first || !last) {
                     return;
                 }
@@ -495,7 +496,7 @@ export const Modal = ({
             );
             const focusable = getFocusableElements(element);
 
-            (closeButton ?? focusable[0] ?? element).focus();
+            (closeButton ?? arrayFirst(focusable) ?? element).focus();
 
             return () => {};
         },
@@ -526,31 +527,28 @@ export const Modal = ({
         return null;
     }
 
-    const shellClassNames = [
+    const shellClassNames = arrayJoin([
         "modal-shell",
         resolveModalShellAccentClass(accent),
         resolveModalShellSizeClass(size),
         resolveModalShellVariantClass(variant),
         shellClassName ?? "",
     ]
-        .filter(Boolean)
-        .join(" ");
+        .filter(Boolean), " ");
 
-    const overlayClassNames = [
+    const overlayClassNames = arrayJoin([
         "modal-overlay",
         "modal-overlay--frosted",
         resolveOverlayVariantClass(overlayVariant),
         overlayClassName ?? "",
     ]
-        .filter(Boolean)
-        .join(" ");
+        .filter(Boolean), " ");
 
-    const bodyClassNames = [
+    const bodyClassNames = arrayJoin([
         "modal-shell__body",
         isBodyScrollable ? "modal-shell__body-scrollable" : "",
     ]
-        .filter(Boolean)
-        .join(" ");
+        .filter(Boolean), " ");
 
     return createPortal(
         <div className={overlayClassNames} data-testid={overlayTestId}>

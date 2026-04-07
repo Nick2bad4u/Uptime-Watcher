@@ -1,6 +1,7 @@
 import type { StoreApi } from "zustand";
 
 import { safeNumberConversion } from "@shared/utils/safeConversions";
+import { safeCastTo } from "ts-extras";
 
 /**
  * Basic state slice for the settings store.
@@ -88,10 +89,10 @@ export const normalizeAppSettings = (
 ): AppSettings => {
     const rest = candidate;
 
-    const merged: AppSettings = {
+    const merged: AppSettings = safeCastTo({
         ...defaultSettings,
         ...rest,
-    } as AppSettings;
+    });
 
     merged.inAppAlertVolume = clampInAppAlertVolume(
         rest.inAppAlertVolume,

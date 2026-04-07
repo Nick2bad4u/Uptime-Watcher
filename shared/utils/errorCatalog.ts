@@ -33,6 +33,7 @@
 import type { ValueOf } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { arrayIncludes, objectEntries, objectValues   } from "ts-extras";
 
 /**
  * Site-related error messages.
@@ -388,7 +389,7 @@ export function formatErrorMessage(
     params: Record<string, number | string>
 ): string {
     let result = template;
-    for (const [key, value] of Object.entries(params)) {
+    for (const [key, value] of objectEntries(params)) {
         // Skip dangerous keys for security (prevent prototype pollution)
         const isDangerousKey =
             key === "__proto__" || key === "constructor" || key === "prototype";
@@ -431,11 +432,11 @@ export function formatErrorMessage(
  * @public
  */
 export function isKnownErrorMessage(message: string): message is ErrorMessage {
-    const allMessages = Object.values(ERROR_CATALOG).flatMap((category) =>
-        Object.values(castUnchecked<Record<string, string>>(category))
+    const allMessages = objectValues(ERROR_CATALOG).flatMap((category) =>
+        objectValues(castUnchecked<Record<string, string>>(category))
     );
 
-    return allMessages.includes(castUnchecked<ErrorMessage>(message));
+    return arrayIncludes(allMessages, castUnchecked<ErrorMessage>(message));
 }
 
 /**

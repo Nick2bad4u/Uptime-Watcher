@@ -15,6 +15,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isEmpty } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 
@@ -50,7 +51,7 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
     }
 
     // Only process sites that have monitors
-    if (site.monitors.length === 0) {
+    if (isEmpty(site.monitors)) {
         logger.debug(
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.MONITOR_MANAGER_NO_MONITORS_FOUND,

@@ -8,6 +8,8 @@
 
 import type { CSSProperties, JSX } from "react";
 
+import { arrayJoin } from "ts-extras";
+
 import { AppIcons } from "../../utils/icons";
 import {
     Tooltip,
@@ -55,12 +57,11 @@ export const HeaderControls = ({
     const AddIcon = AppIcons.actions.add;
     const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;
     const SettingsIcon = AppIcons.settings.gear;
-    const rootClassName = [
+    const rootClassName = arrayJoin([
         "header-controls",
         orientation === "vertical" ? "header-controls--vertical" : "",
     ]
-        .filter(Boolean)
-        .join(" ");
+        .filter(Boolean), " ");
 
     return (
         <div className={rootClassName} data-testid="header-controls">

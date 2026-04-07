@@ -20,7 +20,7 @@ import type {
     VoidIpcInvokeChannel,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
-import type { UnknownRecord } from "type-fest";
+import type { UnknownArray, UnknownRecord  } from "type-fest";
 
 import {
     MAX_IPC_JSON_IMPORT_BYTES,
@@ -44,6 +44,7 @@ import {
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
+import { isInteger, safeCastTo  } from "ts-extras";
 
 import {
     buildPayloadPreview,
@@ -210,7 +211,7 @@ export function safeParseNonNegativeIntResult(
     if (
         typeof candidate === "number" &&
         Number.isFinite(candidate) &&
-        Number.isInteger(candidate) &&
+        isInteger(candidate) &&
         candidate >= 0
     ) {
         return { data: candidate, success: true };
@@ -396,7 +397,7 @@ async function withTimeout<T>(args: {
             throw onTimeout();
         }
 
-        return raced as T;
+        return safeCastTo<T>(raced);
     } finally {
         clearTimeout(timeoutId);
     }
@@ -418,7 +419,7 @@ function getInvokeArgsByteBudget(channel: string): number {
 
 function assertInvokeArgsWithinBudget(
     channel: string,
-    args: readonly unknown[]
+    args: Readonly<UnknownArray>
 ): void {
     const maxBytes = getInvokeArgsByteBudget(channel);
 

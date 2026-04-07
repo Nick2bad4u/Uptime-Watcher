@@ -1,6 +1,7 @@
 import type { MonitorType } from "@shared/types";
 
 import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/monitorSchemas";
+import { isEmpty, isInteger  } from "ts-extras";
 
 import type {
     MonitorFieldName,
@@ -28,7 +29,7 @@ export function validateRequiredStringField<
     const result = sharedValidateMonitorField(type, fieldName, value);
     const errors = Array.from(result.errors);
 
-    if (value.trim().length === 0 && errors.length === 0) {
+    if (value.trim().length === 0 && isEmpty(errors)) {
         errors.push(missingMessage);
     }
 
@@ -71,7 +72,7 @@ export function validateRequiredIntegerField<
     value: OptionalMonitorFieldValue<TType, TField>,
     missingMessage: string
 ): string[] {
-    if (typeof value !== "number" || !Number.isInteger(value)) {
+    if (typeof value !== "number" || !isInteger(value)) {
         return [missingMessage];
     }
 

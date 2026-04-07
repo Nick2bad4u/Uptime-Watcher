@@ -9,6 +9,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface ServiceDefinition {
@@ -124,18 +125,18 @@ describe("Service Container Benchmarks", () => {
             for (let i = 0; i < scenario.count; i++) {
                 const category =
                     serviceCategories[
-                        Math.floor(Math.random() * serviceCategories.length)
+                        Math.floor(secureRandomFloat() * serviceCategories.length)
                     ];
                 const serviceType =
                     serviceTypes[
-                        Math.floor(Math.random() * serviceTypes.length)
+                        Math.floor(secureRandomFloat() * serviceTypes.length)
                     ];
 
                 // Generate dependencies
                 const dependencies: string[] = [];
-                if (Math.random() < scenario.dependencyProbability) {
+                if (secureRandomFloat() < scenario.dependencyProbability) {
                     const depCount =
-                        Math.floor(Math.random() * scenario.maxDependencies) +
+                        Math.floor(secureRandomFloat() * scenario.maxDependencies) +
                         1;
                     const availableServices = serviceDefinitions.slice(
                         -Math.min(10, serviceDefinitions.length)
@@ -149,7 +150,7 @@ describe("Service Container Benchmarks", () => {
                         const depService =
                             availableServices[
                                 Math.floor(
-                                    Math.random() * availableServices.length
+                                    secureRandomFloat() * availableServices.length
                                 )
                             ];
                         if (!dependencies.includes(depService.id)) {
@@ -163,14 +164,14 @@ describe("Service Container Benchmarks", () => {
                     name: `${category.charAt(0).toUpperCase() + category.slice(1)} Service ${i}`,
                     type: serviceType,
                     dependencies,
-                    factory: Math.random() < scenario.factoryProbability,
-                    lazy: Math.random() < scenario.lazyProbability,
-                    priority: Math.floor(Math.random() * 100),
+                    factory: secureRandomFloat() < scenario.factoryProbability,
+                    lazy: secureRandomFloat() < scenario.lazyProbability,
+                    priority: Math.floor(secureRandomFloat() * 100),
                     metadata: {
                         category,
                         scenario: scenario.name,
                         registrationTime: Date.now(),
-                        version: `1.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}`,
+                        version: `1.${Math.floor(secureRandomFloat() * 10)}.${Math.floor(secureRandomFloat() * 10)}`,
                     },
                 };
 
@@ -268,11 +269,11 @@ describe("Service Container Benchmarks", () => {
             registeredServices.push({
                 id: additional.id,
                 name: `${additional.id.charAt(0).toUpperCase() + additional.id.slice(1)} Service`,
-                type: Math.random() > 0.5 ? "singleton" : "transient",
+                type: secureRandomFloat() > 0.5 ? "singleton" : "transient",
                 dependencies: additional.dependencies,
-                factory: Math.random() > 0.7,
-                lazy: Math.random() > 0.6,
-                priority: Math.floor(Math.random() * 50) + 50,
+                factory: secureRandomFloat() > 0.7,
+                lazy: secureRandomFloat() > 0.6,
+                priority: Math.floor(secureRandomFloat() * 50) + 50,
                 metadata: { category: "business" },
             });
         }
@@ -284,7 +285,7 @@ describe("Service Container Benchmarks", () => {
         for (let i = 0; i < 500; i++) {
             const targetService =
                 registeredServices[
-                    Math.floor(Math.random() * registeredServices.length)
+                    Math.floor(secureRandomFloat() * registeredServices.length)
                 ];
             const resolutionStartTime = Date.now();
 
@@ -394,7 +395,7 @@ describe("Service Container Benchmarks", () => {
             const dependencyTime = dependencyCount * 5; // 5ms per dependency
             const factoryTime = targetService.factory ? 50 : 0; // 50ms for factory
             const lazyTime = targetService.lazy && !fromCache ? 20 : 0; // 20ms for lazy initialization
-            const errorTime = error ? Math.random() * 100 : 0; // Up to 100ms for error handling
+            const errorTime = error ? secureRandomFloat() * 100 : 0; // Up to 100ms for error handling
 
             const totalResolutionTime =
                 baseResolutionTime +
@@ -487,14 +488,14 @@ describe("Service Container Benchmarks", () => {
             for (const config of serviceConfigs) {
                 const shouldCreate =
                     config.type === "transient" ||
-                    (config.type === "scoped" && Math.random() > 0.7) ||
+                    (config.type === "scoped" && secureRandomFloat() > 0.7) ||
                     (config.type === "singleton" &&
                         !managedInstances.some(
                             (i) => i.serviceId === config.id
                         ));
 
                 if (shouldCreate) {
-                    const instanceId = `${config.id}-instance-${cycle}-${Math.random().toString(36).slice(7)}`;
+                    const instanceId = `${config.id}-instance-${cycle}-${secureRandomFloat().toString(36).slice(7)}`;
 
                     // Create instance
                     const instance: ServiceInstance = {
@@ -503,7 +504,7 @@ describe("Service Container Benchmarks", () => {
                         createdAt: currentTime,
                         lastAccessedAt: currentTime,
                         accessCount: 0,
-                        memoryUsage: Math.floor(Math.random() * 10_000) + 1000, // 1-11KB
+                        memoryUsage: Math.floor(secureRandomFloat() * 10_000) + 1000, // 1-11KB
                         state: "initializing",
                         dependencies: [],
                         children: [],
@@ -529,9 +530,9 @@ describe("Service Container Benchmarks", () => {
                             serviceId: config.id,
                             instanceId,
                             eventType: "initialized",
-                            timestamp: currentTime + Math.random() * 1000,
+                            timestamp: currentTime + secureRandomFloat() * 1000,
                             metadata: {
-                                initializationTime: Math.random() * 1000,
+                                initializationTime: secureRandomFloat() * 1000,
                             },
                         });
                     }, 0);
@@ -542,7 +543,7 @@ describe("Service Container Benchmarks", () => {
             const accessibleInstances = managedInstances.filter(
                 (i) => i.state === "active"
             );
-            const accessCount = Math.floor(Math.random() * 20) + 5;
+            const accessCount = Math.floor(secureRandomFloat() * 20) + 5;
 
             for (
                 let i = 0;
@@ -551,7 +552,7 @@ describe("Service Container Benchmarks", () => {
             ) {
                 const instance =
                     accessibleInstances[
-                        Math.floor(Math.random() * accessibleInstances.length)
+                        Math.floor(secureRandomFloat() * accessibleInstances.length)
                     ];
                 instance.lastAccessedAt = currentTime;
                 instance.accessCount++;
@@ -600,7 +601,7 @@ describe("Service Container Benchmarks", () => {
                 }
 
                 // Singleton services rarely dispose unless explicitly requested
-                if (config.type === "singleton" && Math.random() < 0.001) {
+                if (config.type === "singleton" && secureRandomFloat() < 0.001) {
                     return true;
                 }
 
@@ -631,8 +632,8 @@ describe("Service Container Benchmarks", () => {
                         serviceId: instance.serviceId,
                         instanceId: instance.instanceId,
                         eventType: "disposed",
-                        timestamp: currentTime + Math.random() * 500,
-                        metadata: { disposalTime: Math.random() * 500 },
+                        timestamp: currentTime + secureRandomFloat() * 500,
+                        metadata: { disposalTime: secureRandomFloat() * 500 },
                     });
                 }, 0);
             }
@@ -646,7 +647,7 @@ describe("Service Container Benchmarks", () => {
             }
 
             // Advance time
-            currentTime += Math.random() * 10_000 + 5000; // 5-15 seconds
+            currentTime += secureRandomFloat() * 10_000 + 5000; // 5-15 seconds
         }
 
         // Calculate lifecycle metrics
@@ -728,7 +729,7 @@ describe("Service Container Benchmarks", () => {
 
         // Simulate scope operations
         for (let operation = 0; operation < 300; operation++) {
-            const operationType = Math.random();
+            const operationType = secureRandomFloat();
             let opType: "create" | "resolve" | "dispose" | "inherit";
             let targetScope: ServiceScope;
 
@@ -737,7 +738,7 @@ describe("Service Container Benchmarks", () => {
                 opType = "create";
                 const parentScope =
                     serviceScopes[
-                        Math.floor(Math.random() * serviceScopes.length)
+                        Math.floor(secureRandomFloat() * serviceScopes.length)
                     ];
 
                 const newScope: ServiceScope = {
@@ -758,10 +759,10 @@ describe("Service Container Benchmarks", () => {
                 const activeScopes = serviceScopes.filter((s) => !s.disposed);
                 targetScope =
                     activeScopes[
-                        Math.floor(Math.random() * activeScopes.length)
+                        Math.floor(secureRandomFloat() * activeScopes.length)
                     ];
 
-                const serviceId = `scoped-service-${Math.floor(Math.random() * 10)}`;
+                const serviceId = `scoped-service-${Math.floor(secureRandomFloat() * 10)}`;
 
                 // Check if service already exists in scope hierarchy
                 let existingInstance: ServiceInstance | undefined;
@@ -791,7 +792,7 @@ describe("Service Container Benchmarks", () => {
                         createdAt: currentTime,
                         lastAccessedAt: currentTime,
                         accessCount: 1,
-                        memoryUsage: Math.floor(Math.random() * 5000) + 1000,
+                        memoryUsage: Math.floor(secureRandomFloat() * 5000) + 1000,
                         state: "active",
                         dependencies: [],
                         children: [],
@@ -808,7 +809,7 @@ describe("Service Container Benchmarks", () => {
                 if (childScopes.length > 0) {
                     targetScope =
                         childScopes[
-                            Math.floor(Math.random() * childScopes.length)
+                            Math.floor(secureRandomFloat() * childScopes.length)
                         ];
 
                     const parentScope = serviceScopes.find(
@@ -821,7 +822,7 @@ describe("Service Container Benchmarks", () => {
                         const inheritedService =
                             parentScope.serviceInstances[
                                 Math.floor(
-                                    Math.random() *
+                                    secureRandomFloat() *
                                         parentScope.serviceInstances.length
                                 )
                             ];
@@ -857,7 +858,7 @@ describe("Service Container Benchmarks", () => {
                 if (disposableScopes.length > 0) {
                     targetScope =
                         disposableScopes[
-                            Math.floor(Math.random() * disposableScopes.length)
+                            Math.floor(secureRandomFloat() * disposableScopes.length)
                         ];
 
                     // Dispose all service instances in scope
@@ -865,7 +866,7 @@ describe("Service Container Benchmarks", () => {
                         instance.state = "disposing";
                         setTimeout(() => {
                             instance.state = "disposed";
-                        }, Math.random() * 100);
+                        }, secureRandomFloat() * 100);
                     }
 
                     targetScope.disposed = true;
@@ -894,21 +895,21 @@ describe("Service Container Benchmarks", () => {
             let duration: number;
             switch (opType) {
                 case "create": {
-                    duration = Math.random() * 50 + 10; // 10-60ms
+                    duration = secureRandomFloat() * 50 + 10; // 10-60ms
                     break;
                 }
                 case "resolve": {
                     const scopeDepth = targetScope.parentScopeId ? 2 : 1;
-                    duration = Math.random() * 30 * scopeDepth + 5; // 5-65ms based on depth
+                    duration = secureRandomFloat() * 30 * scopeDepth + 5; // 5-65ms based on depth
                     break;
                 }
                 case "inherit": {
-                    duration = Math.random() * 20 + 5; // 5-25ms
+                    duration = secureRandomFloat() * 20 + 5; // 5-25ms
                     break;
                 }
                 case "dispose": {
                     const instanceCount = targetScope.serviceInstances.length;
-                    duration = Math.random() * 10 * instanceCount + 10; // 10ms + 10ms per instance
+                    duration = secureRandomFloat() * 10 * instanceCount + 10; // 10ms + 10ms per instance
                     break;
                 }
                 default: {
@@ -916,7 +917,7 @@ describe("Service Container Benchmarks", () => {
                 }
             }
 
-            const success = Math.random() > 0.02; // 98% success rate
+            const success = secureRandomFloat() > 0.02; // 98% success rate
 
             scopeOperations.push({
                 operationId: `scope-op-${operation}`,
@@ -928,7 +929,7 @@ describe("Service Container Benchmarks", () => {
                 success,
             });
 
-            currentTime += Math.random() * 1000 + 100; // 100ms - 1.1s between operations
+            currentTime += secureRandomFloat() * 1000 + 100; // 100ms - 1.1s between operations
         }
 
         // Calculate scope metrics
@@ -1011,11 +1012,11 @@ describe("Service Container Benchmarks", () => {
             const intervalStart = currentTime;
 
             // Simulate various operations during this interval
-            const operationCount = Math.floor(Math.random() * 50) + 20; // 20-70 operations
+            const operationCount = Math.floor(secureRandomFloat() * 50) + 20; // 20-70 operations
             const intervalOperations: typeof operationHistory = [];
 
             for (let i = 0; i < operationCount; i++) {
-                const operationType = Math.random();
+                const operationType = secureRandomFloat();
                 let operation: string;
                 let operationDuration: number;
                 let memoryDelta: number;
@@ -1024,34 +1025,34 @@ describe("Service Container Benchmarks", () => {
                 if (operationType < 0.4) {
                     // Service resolution
                     operation = "resolve";
-                    operationDuration = Math.random() * 50 + 5; // 5-55ms
-                    memoryDelta = Math.random() * 1024 * 10; // 0-10KB
+                    operationDuration = secureRandomFloat() * 50 + 5; // 5-55ms
+                    memoryDelta = secureRandomFloat() * 1024 * 10; // 0-10KB
                     successRate = 0.98;
                 } else if (operationType < 0.6) {
                     // Service creation
                     operation = "create";
-                    operationDuration = Math.random() * 100 + 20; // 20-120ms
-                    memoryDelta = Math.random() * 1024 * 50 + 1024 * 10; // 10-60KB
+                    operationDuration = secureRandomFloat() * 100 + 20; // 20-120ms
+                    memoryDelta = secureRandomFloat() * 1024 * 50 + 1024 * 10; // 10-60KB
                     successRate = 0.95;
                 } else if (operationType < 0.8) {
                     // Service disposal
                     operation = "dispose";
-                    operationDuration = Math.random() * 30 + 10; // 10-40ms
-                    memoryDelta = -(Math.random() * 1024 * 30 + 1024 * 5); // Free 5-35KB
+                    operationDuration = secureRandomFloat() * 30 + 10; // 10-40ms
+                    memoryDelta = -(secureRandomFloat() * 1024 * 30 + 1024 * 5); // Free 5-35KB
                     successRate = 0.99;
                 } else if (operationType < 0.9) {
                     // Cache operation
                     operation = "cache";
-                    operationDuration = Math.random() * 10 + 1; // 1-11ms
-                    memoryDelta = Math.random() * 1024 * 5; // 0-5KB
+                    operationDuration = secureRandomFloat() * 10 + 1; // 1-11ms
+                    memoryDelta = secureRandomFloat() * 1024 * 5; // 0-5KB
                     successRate = 0.999;
                 } else {
                     // GC operation
                     operation = "gc";
-                    operationDuration = Math.random() * 200 + 50; // 50-250ms
+                    operationDuration = secureRandomFloat() * 200 + 50; // 50-250ms
                     memoryDelta = -(
                         currentMemory * 0.1 +
-                        Math.random() * currentMemory * 0.2
+                        secureRandomFloat() * currentMemory * 0.2
                     ); // Free 10-30%
                     successRate = 0.99;
                     totalGcCollections++;
@@ -1059,7 +1060,7 @@ describe("Service Container Benchmarks", () => {
 
                 const opStartTime = currentTime + i * 10;
                 const memoryBefore = currentMemory;
-                const success = Math.random() < successRate;
+                const success = secureRandomFloat() < successRate;
 
                 if (success) {
                     currentMemory = Math.max(0, currentMemory + memoryDelta);
@@ -1080,8 +1081,8 @@ describe("Service Container Benchmarks", () => {
 
             // Calculate interval metrics
             const intervalEnd = currentTime + 60_000; // 1-minute intervals
-            const activeServices = Math.floor(Math.random() * 50) + 10; // 10-60 active services
-            const totalInstances = Math.floor(Math.random() * 200) + 50; // 50-250 instances
+            const activeServices = Math.floor(secureRandomFloat() * 50) + 10; // 10-60 active services
+            const totalInstances = Math.floor(secureRandomFloat() * 200) + 50; // 50-250 instances
 
             // Calculate resolution time P95
             const resolutions = intervalOperations.filter(
@@ -1099,7 +1100,7 @@ describe("Service Container Benchmarks", () => {
                 (op) => op.operation === "cache"
             );
             const cacheHitRate =
-                cacheOperations.length > 0 ? Math.random() * 0.3 + 0.6 : 0.8; // 60-90% hit rate
+                cacheOperations.length > 0 ? secureRandomFloat() * 0.3 + 0.6 : 0.8; // 60-90% hit rate
 
             // Calculate error rate
             const failedOperations = intervalOperations.filter(
@@ -1125,9 +1126,9 @@ describe("Service Container Benchmarks", () => {
 
             // Simulate memory pressure and trigger GC if needed
             const memoryPressure = currentMemory / (200 * 1024 * 1024); // Pressure at 200MB
-            if (memoryPressure > 0.8 && Math.random() < 0.5) {
+            if (memoryPressure > 0.8 && secureRandomFloat() < 0.5) {
                 // Force GC
-                const gcAmount = currentMemory * (0.2 + Math.random() * 0.3);
+                const gcAmount = currentMemory * (0.2 + secureRandomFloat() * 0.3);
                 currentMemory = Math.max(
                     currentMemory * 0.3,
                     currentMemory - gcAmount

@@ -20,6 +20,11 @@
 import { describe, expect, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import type { MonitorType } from "@shared/types";
+import {
+    secureRandomBoolean,
+    secureRandomFloat,
+    secureRandomInt,
+} from "@shared/test/testHelpers";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for Database Operations
@@ -807,7 +812,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                         success: true,
                                         insertTime: performance.now(),
                                     });
-                                }, Math.random() * 10);
+                                }, secureRandomFloat() * 10);
                             })
                     );
 
@@ -864,7 +869,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                     url: `https://example-${id}.com`,
                                     readTime: performance.now(),
                                 });
-                            }, Math.random() * 5);
+                            }, secureRandomFloat() * 5);
                         })
                 );
 
@@ -1231,29 +1236,29 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     // Simulate isolation level behavior
                     switch (config.isolationLevel) {
                         case "READ_UNCOMMITTED": {
-                            dirtyReads = Math.floor(
-                                Math.random() * config.concurrentUsers
+                            dirtyReads = secureRandomInt(
+                                config.concurrentUsers
                             );
-                            phantomReads = Math.floor(
-                                Math.random() * config.concurrentUsers
+                            phantomReads = secureRandomInt(
+                                config.concurrentUsers
                             );
-                            nonRepeatableReads = Math.floor(
-                                Math.random() * config.concurrentUsers
+                            nonRepeatableReads = secureRandomInt(
+                                config.concurrentUsers
                             );
                             break;
                         }
                         case "READ_COMMITTED": {
-                            phantomReads = Math.floor(
-                                Math.random() * config.concurrentUsers
+                            phantomReads = secureRandomInt(
+                                config.concurrentUsers
                             );
-                            nonRepeatableReads = Math.floor(
-                                Math.random() * config.concurrentUsers
+                            nonRepeatableReads = secureRandomInt(
+                                config.concurrentUsers
                             );
                             break;
                         }
                         case "REPEATABLE_READ": {
-                            phantomReads = Math.floor(
-                                Math.random() * config.concurrentUsers
+                            phantomReads = secureRandomInt(
+                                config.concurrentUsers
                             );
                             break;
                         }
@@ -1276,8 +1281,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         isolationLevel: config.isolationLevel,
                         consistencyIssues,
                         deadlockDetected:
-                            config.deadlockDetection && Math.random() < 0.1,
-                        lockWaitTime: config.lockTimeout * Math.random(),
+                            config.deadlockDetection &&
+                            secureRandomBoolean(0.1),
+                        lockWaitTime: config.lockTimeout * secureRandomFloat(),
                         transactionSuccess:
                             consistencyIssues.length === 0 ||
                             config.isolationLevel !== "SERIALIZABLE",
@@ -1327,12 +1333,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     const hasDeadlock =
                         configs.some((c) => c.deadlockDetection) &&
                         configs.length > 2 &&
-                        Math.random() < 0.3;
+                        secureRandomBoolean(0.3);
 
                     if (hasDeadlock) {
                         // Simulate deadlock resolution by aborting one transaction
-                        const victimIndex = Math.floor(
-                            Math.random() * transactions.length
+                        const victimIndex = secureRandomInt(
+                            transactions.length
                         );
                         transactions[victimIndex]!.deadlocked = true;
                     }
@@ -1353,7 +1359,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             (t) => t.deadlocked
                         ).length,
                         deadlockDetected: hasDeadlock,
-                        resolutionTime: hasDeadlock ? Math.random() * 1000 : 0,
+                        resolutionTime: hasDeadlock
+                            ? secureRandomFloat() * 1000
+                            : 0,
                     };
                 };
 
@@ -1387,8 +1395,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     const violations: string[] = [];
 
                     // Simulate foreign key validation
-                    const parentExists = Math.random() > 0.1; // 90% parent records exist
-                    const childHasParent = Math.random() > 0.05; // 95% children have valid parents
+                    const parentExists = secureRandomBoolean(0.9); // 90% parent records exist
+                    const childHasParent = secureRandomBoolean(0.95); // 95% children have valid parents
 
                     if (!parentExists && rel.referentialIntegrity) {
                         violations.push("Parent record does not exist");
@@ -1406,7 +1414,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         updateCascaded: rel.cascadeUpdate && parentExists,
                         orphanedRecords:
                             !rel.cascadeDelete && !parentExists
-                                ? Math.floor(Math.random() * 10)
+                                ? secureRandomInt(10)
                                 : 0,
                     };
 
@@ -1552,7 +1560,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         }
 
                         // Simulate step execution time
-                        const stepTime = Math.random() * 1000;
+                        const stepTime = secureRandomFloat() * 1000;
                         migrationLog.push(
                             `${step} completed in ${stepTime.toFixed(2)}ms`
                         );
@@ -1679,8 +1687,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     if (ctx.requiresAuthentication) {
                         const authSuccess =
                             ctx.authenticationMethod === "JWT"
-                                ? Math.random() > 0.05 // 95% success for JWT
-                                : Math.random() > 0.1; // 90% success for other methods
+                                ? secureRandomBoolean(0.95) // 95% success for JWT
+                                : secureRandomBoolean(0.9); // 90% success for other methods
 
                         if (authSuccess) {
                             securityEvents.push(
@@ -1850,7 +1858,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     // Simulate different failure types
                     switch (scenario.failureType) {
                         case "CORRUPTION": {
-                            const corruptionLevel = Math.random();
+                            const corruptionLevel = secureRandomFloat();
                             if (corruptionLevel < 0.3) {
                                 recoveryLog.push(
                                     "Minor corruption detected - auto-repair successful"
@@ -1892,7 +1900,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             recoveryLog.push(
                                 "Network partition detected - attempting reconnection"
                             );
-                            recoverySuccessful = Math.random() > 0.2; // 80% success rate
+                            recoverySuccessful = secureRandomBoolean(0.8); // 80% success rate
                             dataIntegrityMaintained = true; // Network issues don't corrupt data
                             break;
                         }
@@ -1910,7 +1918,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         dataIntegrityMaintained,
                         recoveryTimeActual:
                             scenario.recoveryPointObjective *
-                            (0.5 + Math.random()),
+                            (0.5 + secureRandomFloat()),
                         recoveryLog,
                         backupUsed:
                             scenario.backupAvailable &&
@@ -1961,7 +1969,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         case "JSON": {
                             const complexity = type.size / 1000; // Size in KB
                             processingTime =
-                                complexity * 10 + Math.random() * 50;
+                                complexity * 10 + secureRandomFloat() * 50;
                             memoryUsage = type.size * 1.5; // JSON overhead
                             processingMetrics.push(
                                 `JSON parsing completed in ${processingTime.toFixed(2)}ms`
@@ -1970,7 +1978,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         }
                         case "BLOB": {
                             processingTime =
-                                type.size * 0.1 + Math.random() * 100;
+                                type.size * 0.1 + secureRandomFloat() * 100;
                             memoryUsage = type.size * 2; // Binary data overhead
                             processingMetrics.push(
                                 `BLOB processing: ${type.size} bytes`
@@ -1980,7 +1988,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         case "ARRAY": {
                             const arrayComplexity = Math.log10(type.size);
                             processingTime =
-                                arrayComplexity * 20 + Math.random() * 30;
+                                arrayComplexity * 20 + secureRandomFloat() * 30;
                             memoryUsage = type.size * 8; // Pointer overhead
                             processingMetrics.push(
                                 `Array processing: ${type.size} elements`
@@ -1990,7 +1998,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         case "XML": {
                             const xmlComplexity = type.size / 500; // XML is verbose
                             processingTime =
-                                xmlComplexity * 25 + Math.random() * 75;
+                                xmlComplexity * 25 + secureRandomFloat() * 75;
                             memoryUsage = type.size * 3; // DOM overhead
                             processingMetrics.push(
                                 `XML parsing and validation completed`
@@ -2207,7 +2215,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     switch (operation.operationType) {
                         case "VACUUM": {
                             const spaceReclaimed =
-                                Math.random() *
+                                secureRandomFloat() *
                                 operation.estimatedDuration *
                                 100; // MB
                             performanceImprovement = spaceReclaimed / 1000; // Performance gain percentage
@@ -2218,7 +2226,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             break;
                         }
                         case "REINDEX": {
-                            performanceImprovement = Math.random() * 25 + 10; // 10-35% improvement
+                            performanceImprovement =
+                                secureRandomFloat() * 25 + 10; // 10-35% improvement
                             maintenanceLog.push(
                                 `REINDEX completed - ${performanceImprovement.toFixed(1)}% performance improvement`
                             );
@@ -2226,7 +2235,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             break;
                         }
                         case "BACKUP": {
-                            const backupSize = Math.random() * 10_000 + 1000; // MB
+                            const backupSize =
+                                secureRandomFloat() * 10_000 + 1000; // MB
                             maintenanceLog.push(
                                 `Backup completed - ${backupSize.toFixed(2)}MB backed up`
                             );
@@ -2235,7 +2245,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             break;
                         }
                         case "STATISTICS_UPDATE": {
-                            performanceImprovement = Math.random() * 15 + 5; // 5-20% improvement
+                            performanceImprovement =
+                                secureRandomFloat() * 15 + 5; // 5-20% improvement
                             maintenanceLog.push(
                                 `Statistics updated for query optimization`
                             );
@@ -2262,7 +2273,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         performanceImprovement,
                         actualDuration:
                             operation.estimatedDuration *
-                            (0.8 + Math.random() * 0.4),
+                            (0.8 + secureRandomFloat() * 0.4),
                         maintenanceLog,
                     };
                 };
@@ -2389,7 +2400,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     const operationSuccess =
                         operation.operationType !== "DROP_INDEX" ||
-                        Math.random() > 0.1; // 90% success rate for drops
+                        secureRandomBoolean(0.9); // 90% success rate for drops
 
                     const performanceImprovement =
                         baselinePerformance / indexedPerformance;
@@ -2410,7 +2421,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         maintenanceRequired,
                         indexHealthy: operationSuccess && !maintenanceRequired,
                         cardinality: operation.expectedRows,
-                        selectivity: Math.random(),
+                        selectivity: secureRandomFloat(),
                     };
                 };
 
@@ -2486,7 +2497,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Simulate execution
                     for (const [index, op] of ops.entries()) {
-                        const executionTime = Math.random() * 1000 + 100; // 100-1100ms
+                        const executionTime =
+                            secureRandomFloat() * 1000 + 100; // 100-1100ms
                         const lockRequired = [
                             "CREATE_INDEX",
                             "DROP_INDEX",
@@ -2504,7 +2516,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             executionTime,
                             lockRequired,
                             success:
-                                conflicts.length === 0 || Math.random() > 0.3,
+                                conflicts.length === 0 ||
+                                secureRandomBoolean(0.7),
                         });
                     }
 
@@ -2649,9 +2662,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Simulate failure injection
                     const failureOccurred =
-                        Math.random() < operation.failureRate;
+                        secureRandomBoolean(operation.failureRate);
                     const failureBatch = failureOccurred
-                        ? Math.floor(Math.random() * totalBatches)
+                        ? secureRandomInt(totalBatches)
                         : -1;
 
                     let successfulRecords = processedRecords;
@@ -2694,7 +2707,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                                     operation.totalRecords
                                 );
                                 successfulRecords =
-                                    Math.random() > 0.3
+                                    secureRandomBoolean(0.7)
                                         ? processedRecords
                                         : Math.max(
                                               0,
@@ -3182,7 +3195,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         resourcePressure > 0.3;
 
                     const recoveryTime = automaticRecoveryTriggered
-                        ? Math.random() * 5000 + 1000
+                        ? secureRandomFloat() * 5000 + 1000
                         : 0; // 1-6 seconds
 
                     return {

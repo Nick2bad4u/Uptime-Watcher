@@ -9,6 +9,7 @@ import type { Monitor, Site, StatusHistory } from "../../shared/types";
 import type { SiteRow } from "../../electron/services/database/utils/mappers/siteMapper";
 
 import { bench, describe, beforeAll, afterAll } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("Enhanced Database Operations Benchmarks", () => {
     let databaseService: DatabaseService;
@@ -42,7 +43,7 @@ describe("Enhanced Database Operations Benchmarks", () => {
         return {
             identifier: `benchmark-site-${id}`,
             name: `Benchmark Site ${id}`,
-            monitoring: Math.random() > 0.2, // 80% monitoring
+            monitoring: secureRandomFloat() > 0.2, // 80% monitoring
         };
     }
 
@@ -82,10 +83,10 @@ describe("Enhanced Database Operations Benchmarks", () => {
                 3,
                 5,
             ][monitorId % 3],
-            monitoring: Math.random() > 0.1, // 90% active
-            status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
-            responseTime: Math.floor(Math.random() * 500) + 10,
-            lastChecked: new Date(Date.now() - Math.random() * 3_600_000),
+            monitoring: secureRandomFloat() > 0.1, // 90% active
+            status: secureRandomFloat() > 0.05 ? "up" : "down", // 95% uptime
+            responseTime: Math.floor(secureRandomFloat() * 500) + 10,
+            lastChecked: new Date(Date.now() - secureRandomFloat() * 3_600_000),
             history: [],
         };
     }
@@ -100,9 +101,9 @@ describe("Enhanced Database Operations Benchmarks", () => {
         for (let i = 0; i < count; i++) {
             history.push({
                 timestamp: now - i * 30_000, // 30-second intervals in milliseconds
-                status: Math.random() > 0.05 ? "up" : "down",
-                responseTime: Math.floor(Math.random() * 1000) + 10,
-                details: Math.random() > 0.9 ? `Error ${i}` : undefined,
+                status: secureRandomFloat() > 0.05 ? "up" : "down",
+                responseTime: Math.floor(secureRandomFloat() * 1000) + 10,
+                details: secureRandomFloat() > 0.9 ? `Error ${i}` : undefined,
             });
         }
 

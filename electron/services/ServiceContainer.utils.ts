@@ -10,6 +10,8 @@
 
 import type { EventMetadata } from "@shared/types/events";
 
+import { safeCastTo } from "ts-extras";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { EnhancedEventPayload, EventKey } from "../events/TypedEventBus";
 
@@ -35,7 +37,7 @@ export function hasInitializeMethod(
         return false;
     }
 
-    const candidate = value as PossiblyInitializableService;
+    const candidate = safeCastTo(value);
     return typeof candidate.initialize === "function";
 }
 
@@ -102,6 +104,6 @@ export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
         return false;
     }
 
-    const { then } = value as { then?: unknown };
+    const { then } = safeCastTo(value);
     return typeof then === "function";
 }

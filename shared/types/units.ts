@@ -1,6 +1,8 @@
 /**
  * Unique symbol used to brand PortNumber values.
  */
+import { isInteger } from "ts-extras";
+
 declare const portNumberBrand: unique symbol;
 
 /**
@@ -34,7 +36,7 @@ export const MIN_TIMEOUT_MILLISECONDS: number = 0;
 export const MAX_TIMEOUT_MILLISECONDS: number = Number.MAX_SAFE_INTEGER;
 
 function assertValidPortNumber(value: number): asserts value is PortNumber {
-    if (!Number.isInteger(value)) {
+    if (!isInteger(value)) {
         throw new RangeError("Port number must be an integer");
     }
 

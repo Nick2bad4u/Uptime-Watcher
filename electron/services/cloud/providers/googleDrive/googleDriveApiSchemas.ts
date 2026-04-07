@@ -1,4 +1,5 @@
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
+import { arrayJoin } from "ts-extras";
 import * as z from "zod";
 
 /**
@@ -62,7 +63,7 @@ export function parseGoogleDriveCreateResponse(
     if (!parsed.success) {
         const issues = formatZodIssues(parsed.error.issues);
         throw new TypeError(
-            `Google Drive create response did not match the expected format: ${issues.slice(0, 3).join("; ")}`
+            `Google Drive create response did not match the expected format: ${arrayJoin(issues.slice(0, 3), "; ")}`
         );
     }
 
@@ -86,7 +87,7 @@ export function parseGoogleDriveFileMetadata(
     if (!parsed.success) {
         const issues = formatZodIssues(parsed.error.issues);
         throw new TypeError(
-            `Google Drive metadata response did not match the expected format: ${issues.slice(0, 3).join("; ")}`
+            `Google Drive metadata response did not match the expected format: ${arrayJoin(issues.slice(0, 3), "; ")}`
         );
     }
 
@@ -126,7 +127,7 @@ export function parseGoogleDriveListResponse(
     if (!parsed.success) {
         const issues = formatZodIssues(parsed.error.issues);
         throw new TypeError(
-            `Google Drive list response did not match the expected format: ${issues.slice(0, 3).join("; ")}`
+            `Google Drive list response did not match the expected format: ${arrayJoin(issues.slice(0, 3), "; ")}`
         );
     }
 

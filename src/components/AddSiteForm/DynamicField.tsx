@@ -48,10 +48,11 @@ import type { MonitorFieldDefinition } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
+import { safeCastTo } from "ts-extras";
 
 import { logger } from "../../services/logger";
 import { ThemedText } from "../../theme/components/ThemedText";
-import { SelectField, type SelectOption } from "./SelectField";
+import { SelectField } from "./SelectField";
 import { TextField } from "./TextField";
 
 /**
@@ -147,7 +148,7 @@ export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
         );
 
         const selectOptions = useMemo(
-            () => (field.options ?? []) as SelectOption[],
+            () => safeCastTo(field.options ?? []),
             [field.options]
         );
 

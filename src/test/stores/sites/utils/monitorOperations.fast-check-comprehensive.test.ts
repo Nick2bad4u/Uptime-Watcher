@@ -21,6 +21,7 @@ import {
 // Import types
 import type { Monitor, Site, MonitorType } from "@shared/types";
 import { BASE_MONITOR_TYPES, DEFAULT_MONITOR_STATUS } from "@shared/types";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () => {
     // Helper generators for fast-check
@@ -275,7 +276,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     (site) => {
                         // Pick a random monitor from the site
                         const randomIndex = Math.floor(
-                            Math.random() * site.monitors.length
+                            secureRandomFloat() * site.monitors.length
                         );
                         const targetMonitor = site.monitors[randomIndex];
                         expect(targetMonitor).toBeDefined(); // Assert it exists

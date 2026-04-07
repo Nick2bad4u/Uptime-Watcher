@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface DatabaseConnection {
@@ -135,14 +136,14 @@ describe("Database Connection Pooling Benchmarks", () => {
 
         // Simulate connection pool operations
         for (let cycle = 0; cycle < 1000; cycle++) {
-            const operationType = Math.random();
+            const operationType = secureRandomFloat();
 
             if (operationType < 0.6) {
                 // Connection acquisition
                 const priority =
-                    Math.random() < 0.1
+                    secureRandomFloat() < 0.1
                         ? "high"
-                        : Math.random() < 0.3
+                        : secureRandomFloat() < 0.3
                           ? "medium"
                           : "low";
 
@@ -173,7 +174,7 @@ describe("Database Connection Pooling Benchmarks", () => {
                         operationId: `acquire-${operationCounter++}`,
                         operationType: "acquire",
                         startTime: currentTime,
-                        endTime: currentTime + Math.random() * 10 + 2, // 2-12ms acquire time
+                        endTime: currentTime + secureRandomFloat() * 10 + 2, // 2-12ms acquire time
                         success: true,
                         connectionId: availableConnection.connectionId,
                         waitTime: 0,
@@ -195,7 +196,7 @@ describe("Database Connection Pooling Benchmarks", () => {
                     };
 
                     // Simulate connection creation time
-                    const creationTime = Math.random() * 100 + 50; // 50-150ms
+                    const creationTime = secureRandomFloat() * 100 + 50; // 50-150ms
 
                     connections.push(newConnection);
                     request.fulfilled = true;
@@ -207,7 +208,7 @@ describe("Database Connection Pooling Benchmarks", () => {
                         operationType: "create",
                         startTime: currentTime,
                         endTime: currentTime + creationTime,
-                        success: Math.random() > 0.02, // 98% success rate
+                        success: secureRandomFloat() > 0.02, // 98% success rate
                         connectionId: newConnection.connectionId,
                         waitTime: 0,
                     };
@@ -264,13 +265,13 @@ describe("Database Connection Pooling Benchmarks", () => {
                 if (activeConnections.length > 0) {
                     const connToRelease =
                         activeConnections[
-                            Math.floor(Math.random() * activeConnections.length)
+                            Math.floor(secureRandomFloat() * activeConnections.length)
                         ];
                     connToRelease.state = "idle";
                     connToRelease.lastUsedAt = currentTime;
 
                     // Simulate query execution time
-                    const queryTime = Math.random() * 100 + 10; // 10-110ms
+                    const queryTime = secureRandomFloat() * 100 + 10; // 10-110ms
                     connToRelease.queryCount++;
                     connToRelease.totalQueryTime += queryTime;
 
@@ -278,7 +279,7 @@ describe("Database Connection Pooling Benchmarks", () => {
                         operationId: `release-${operationCounter++}`,
                         operationType: "release",
                         startTime: currentTime,
-                        endTime: currentTime + Math.random() * 5 + 1, // 1-6ms release time
+                        endTime: currentTime + secureRandomFloat() * 5 + 1, // 1-6ms release time
                         success: true,
                         connectionId: connToRelease.connectionId,
                         waitTime: 0,
@@ -326,13 +327,13 @@ describe("Database Connection Pooling Benchmarks", () => {
                 if (validationTargets.length > 0) {
                     const connToValidate =
                         validationTargets[
-                            Math.floor(Math.random() * validationTargets.length)
+                            Math.floor(secureRandomFloat() * validationTargets.length)
                         ];
                     connToValidate.state = "validating";
 
                     // Simulate validation
-                    const validationTime = Math.random() * 20 + 5; // 5-25ms
-                    const validationSuccess = Math.random() > 0.05; // 95% success rate
+                    const validationTime = secureRandomFloat() * 20 + 5; // 5-25ms
+                    const validationSuccess = secureRandomFloat() > 0.05; // 95% success rate
 
                     if (validationSuccess) {
                         connToValidate.state = "idle";
@@ -394,7 +395,7 @@ describe("Database Connection Pooling Benchmarks", () => {
                     operationId: `destroy-${operationCounter++}`,
                     operationType: "destroy",
                     startTime: currentTime,
-                    endTime: currentTime + Math.random() * 10 + 2, // 2-12ms destroy time
+                    endTime: currentTime + secureRandomFloat() * 10 + 2, // 2-12ms destroy time
                     success: true,
                     connectionId: brokenConn.connectionId,
                     waitTime: 0,
@@ -412,7 +413,7 @@ describe("Database Connection Pooling Benchmarks", () => {
             }
 
             // Advance time
-            currentTime += Math.random() * 100 + 50; // 50-150ms between operations
+            currentTime += secureRandomFloat() * 100 + 50; // 50-150ms between operations
         }
 
         // Calculate pool metrics
@@ -518,10 +519,10 @@ describe("Database Connection Pooling Benchmarks", () => {
 
         for (let cycle = 0; cycle < 100; cycle++) {
             const pattern =
-                loadPatterns[Math.floor(Math.random() * loadPatterns.length)];
+                loadPatterns[Math.floor(secureRandomFloat() * loadPatterns.length)];
             const targetUtilization =
                 pattern.utilizationRange[0] +
-                Math.random() *
+                secureRandomFloat() *
                     (pattern.utilizationRange[1] - pattern.utilizationRange[0]);
 
             // Calculate required connections for target utilization
@@ -582,10 +583,10 @@ describe("Database Connection Pooling Benchmarks", () => {
             }
 
             // Simulate load spikes
-            if (Math.random() < 0.1) {
+            if (secureRandomFloat() < 0.1) {
                 // 10% chance of load spike
-                const spikeUtilization = 0.95 + Math.random() * 0.05; // 95-100% utilization
-                const spikeDuration = Math.random() * 10_000 + 5000; // 5-15 second spike
+                const spikeUtilization = 0.95 + secureRandomFloat() * 0.05; // 95-100% utilization
+                const spikeDuration = secureRandomFloat() * 10_000 + 5000; // 5-15 second spike
 
                 const spikeEvent: ScalingEvent = {
                     eventId: `spike-${eventCounter++}`,
@@ -622,7 +623,7 @@ describe("Database Connection Pooling Benchmarks", () => {
             // Regular state recording
             const currentUtilization = Math.min(
                 1,
-                targetUtilization + (Math.random() - 0.5) * 0.1
+                targetUtilization + (secureRandomFloat() - 0.5) * 0.1
             );
             const pendingRequests = Math.max(
                 0,
@@ -767,7 +768,7 @@ describe("Database Connection Pooling Benchmarks", () => {
 
                 // Determine check type based on probability and connection state
                 let checkType: HealthCheck["checkType"];
-                const checkRand = Math.random();
+                const checkRand = secureRandomFloat();
 
                 if (checkRand < 0.4) {
                     checkType = "heartbeat";
@@ -817,20 +818,20 @@ describe("Database Connection Pooling Benchmarks", () => {
 
                 // Add response time variance
                 const responseTime =
-                    baseResponseTime * (0.5 + Math.random() * 1.5);
+                    baseResponseTime * (0.5 + secureRandomFloat() * 1.5);
 
                 // Determine check result
                 let result: HealthCheck["result"];
-                const success = Math.random() < successProbability;
+                const success = secureRandomFloat() < successProbability;
 
                 if (success) {
                     result =
                         responseTime > baseResponseTime * 2
                             ? "degraded"
                             : "healthy";
-                } else if (Math.random() < 0.3) {
+                } else if (secureRandomFloat() < 0.3) {
                     result = "timeout";
-                } else if (Math.random() < 0.6) {
+                } else if (secureRandomFloat() < 0.6) {
                     result = "degraded";
                 } else {
                     result = "unhealthy";
@@ -882,9 +883,9 @@ describe("Database Connection Pooling Benchmarks", () => {
                         break;
                     }
                     case "resource-check": {
-                        details.memoryUsage = Math.random() * 100 + 50; // 50-150MB
+                        details.memoryUsage = secureRandomFloat() * 100 + 50; // 50-150MB
                         details.openTransactions = Math.floor(
-                            Math.random() * 10
+                            secureRandomFloat() * 10
                         );
 
                         break;
@@ -918,7 +919,7 @@ describe("Database Connection Pooling Benchmarks", () => {
             );
 
             for (const unhealthyConn of unhealthyConnections) {
-                if (Math.random() < 0.1) {
+                if (secureRandomFloat() < 0.1) {
                     // 10% chance of recovery attempt
                     // Simulate connection reset/recovery
                     unhealthyConn.healthScore = 0.6; // Partial recovery
@@ -943,7 +944,7 @@ describe("Database Connection Pooling Benchmarks", () => {
             }
 
             // Advance time
-            currentTime += Math.random() * 5000 + 10_000; // 10-15 seconds between monitoring cycles
+            currentTime += secureRandomFloat() * 5000 + 10_000; // 10-15 seconds between monitoring cycles
         }
 
         // Calculate health monitoring metrics
@@ -1038,9 +1039,9 @@ describe("Database Connection Pooling Benchmarks", () => {
             for (let i = 0; i < sessionsToCreate; i++) {
                 const session: ConcurrentSession = {
                     sessionId: `session-${sessionCounter++}`,
-                    startTime: currentTime + Math.random() * 1000, // Stagger start times within 1 second
+                    startTime: currentTime + secureRandomFloat() * 1000, // Stagger start times within 1 second
                     endTime: 0,
-                    operationCount: Math.floor(Math.random() * 20) + 5, // 5-25 operations per session
+                    operationCount: Math.floor(secureRandomFloat() * 20) + 5, // 5-25 operations per session
                     averageOperationTime: 0,
                     concurrencyLevel,
                     waitingTime: 0,
@@ -1086,7 +1087,7 @@ describe("Database Connection Pooling Benchmarks", () => {
 
                 for (const session of activeSessions) {
                     // Simulate operation execution
-                    const operationTime = 20 + Math.random() * 80; // 20-100ms per operation
+                    const operationTime = 20 + secureRandomFloat() * 80; // 20-100ms per operation
                     const operationsThisStep = Math.min(
                         3,
                         session.operationCount
@@ -1099,7 +1100,7 @@ describe("Database Connection Pooling Benchmarks", () => {
                     // Check if session is complete
                     if (session.operationCount <= 0) {
                         session.endTime = batchCurrentTime + operationTime;
-                        session.success = Math.random() > 0.02; // 98% success rate
+                        session.success = secureRandomFloat() > 0.02; // 98% success rate
                         completedSessions.push(session);
                     }
                 }

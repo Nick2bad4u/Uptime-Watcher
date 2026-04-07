@@ -10,7 +10,7 @@ import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 import { isObject } from "@shared/utils/typeGuards";
-import { objectHasOwn } from "ts-extras";
+import { isEmpty, objectHasOwn  } from "ts-extras";
 
 /**
  * Result tuple produced by the safe JSON helpers.
@@ -131,7 +131,7 @@ const hasSerializableContent = (
     const entries = collectObjectValues(target);
 
     try {
-        if (entries.length === 0) {
+        if (isEmpty(entries)) {
             return true;
         }
 

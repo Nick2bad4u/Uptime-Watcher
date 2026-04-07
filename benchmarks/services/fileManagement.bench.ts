@@ -7,6 +7,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Represents file metadata data in the file management benchmark.
@@ -417,7 +418,7 @@ class MockBackupService {
                 mimeType: "text/plain",
                 createdAt: backup.timestamp,
                 modifiedAt: new Date(),
-                checksum: Math.random().toString(16),
+                checksum: secureRandomFloat().toString(16),
                 permissions: {
                     read: true,
                     write: true,
@@ -756,7 +757,7 @@ function generateTestFiles(
     return Array.from({ length: count }, (_, i) => ({
         path: `${directory}/file_${i}.txt`,
         content: `Test content for file ${i}\n`.repeat(
-            Math.floor(Math.random() * 100) + 10
+            Math.floor(secureRandomFloat() * 100) + 10
         ),
         options: {
             tags: [`tag${i % 5}`, "test"],

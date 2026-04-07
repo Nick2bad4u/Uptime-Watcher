@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 # yamllint disable rule:line-length
-name: Build and Release Electron App
+name: Build And Release Electron App
 
 run-name: Build and Release Electron App
 
@@ -15,12 +15,14 @@ permissions:
     contents: read
 jobs:
     bump-version:
-        if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]') }}
+        name: Bump version and create tag
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         permissions:
             contents: write
         defaults:
             run:
+                shell: bash
                 working-directory: .
         outputs:
             new_version: ${{ steps.bump.outputs.new_version }}
@@ -114,8 +116,10 @@ jobs:
                   git push origin "v${{ steps.bump.outputs.new_version }}"
 
     build:
+        name: Build release artifacts
         needs: bump-version
         runs-on: ${{ matrix.os }}
+        timeout-minutes: 60
         env:
             # Vite (and vite-plugin-electron) can run multiple builds in the same
             # Node process (renderer + main + preload). With sourcemaps and build
@@ -160,10 +164,6 @@ jobs:
                     # Exclude Windows with ia32 (if not supported, uncomment)
                     # - os: windows-latest
                     #   arch: ia32
-        defaults:
-            run:
-                working-directory: .
-
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
@@ -187,6 +187,7 @@ jobs:
             - name: Install Linux build dependencies
               id: install_linux_deps
               if: runner.os == 'Linux'
+              shell: bash
               run: |
                   sudo apt-get update
                   sudo apt-get install -y rpm dpkg fakeroot xz-utils flatpak flatpak-builder ruby ruby-dev build-essential zlib1g-dev
@@ -199,18 +200,21 @@ jobs:
             - name: Install macOS build dependencies
               id: install_macos_deps
               if: runner.os == 'macOS'
+              shell: bash
               run: |
                   brew install rpm dpkg xz gnu-tar
 
             - name: Install dmg-license workaround for Mac Builder
               id: install_dmg_license
               if: runner.os == 'macOS'
+              shell: bash
               run: npm install --force --no-save --no-audit --no-fund dmg-license
               working-directory: .
 
             - name: Install Windows build dependencies (Chocolatey)
               id: install_windows_deps
               if: runner.os == 'Windows'
+              shell: pwsh
               run: |
                   choco install -y 7zip.install
 
@@ -255,6 +259,7 @@ jobs:
 
             - name: Build Vite Frontend and Electron Backend
               id: build_vite_electron
+              shell: bash
               run: npm run build
 
             - name: Build Electron app (debug)
@@ -368,11 +373,18 @@ jobs:
                   echo "| ${{ needs.bump-version.outputs.new_version }} | ${{ matrix.os }} | ${{ matrix.arch }} | Build Status: $STATUS |" >> "$GITHUB_STEP_SUMMARY"
 
     release:
+        name: Publish release and update changelogs
         needs: [build, bump-version]
         if: ${{ needs.build.result == 'success' && needs.bump-version.result == 'success' }}
         runs-on: ubuntu-latest
+        timeout-minutes: 45
         permissions:
+            checks: write
             contents: write
+        defaults:
+            run:
+                shell: bash
+                working-directory: .
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
@@ -988,39 +1000,11 @@ jobs:
                   make_latest: true
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            - name: Add Job Summary
-              if: always()
-              run: |
-                  {
-                    echo "## 🏗️ Build and Release Electron App Workflow Summary"
-                    echo ""
-                    echo "See above for the full build matrix results."
-                    echo "---"
-                    echo "- **Version bump and tagging** performed for .."
-                    echo "- **Builds executed** for multiple OS and architectures."
-                    echo "- **Build artifacts uploaded** for each platform."
-                    echo "- **Release created** if build and version bump succeeded."
-                    echo "- **Changelogs will be updated** and committed directly to the repository."
-                    echo "- Workflow completed with status: ${{ job.status }}"
-                  } >> "$GITHUB_STEP_SUMMARY"
 
-    update-changelogs:
-        needs: [release, bump-version]
-        if: ${{ needs.release.result == 'success' && needs.bump-version.result == 'success' }}
-        runs-on: ubuntu-latest
-        permissions:
-            checks: write
-            contents: write
-        steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
-              with:
-                  egress-policy: audit
-
-            - name: Checkout repository
+            - name: Checkout repository branch for changelog updates
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
-                  ref: main
+                  ref: ${{ github.ref_name }}
                   fetch-depth: 0
                   fetch-tags: true
 
@@ -1156,4 +1140,20 @@ jobs:
                     echo "- \`/config/CHANGELOG.md\`"
                     echo "- \`/docs/CHANGELOG.md\`"
                     echo "- \`/electron/CHANGELOG.md\`"
+                  } >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Add release job summary
+              if: always()
+              run: |
+                  {
+                    echo "## 🏗️ Build and Release Electron App Workflow Summary"
+                    echo ""
+                    echo "See above for the full build matrix results."
+                    echo "---"
+                    echo "- **Version bump and tagging** completed for v${{ needs.bump-version.outputs.new_version }}."
+                    echo "- **Builds executed** for multiple OS and architectures."
+                    echo "- **Build artifacts uploaded** for each platform."
+                    echo "- **Release creation/update** was attempted after artifact verification."
+                    echo "- **Changelogs were generated** and any resulting changes were pushed directly to the repository."
+                    echo "- Workflow completed with status: ${{ job.status }}"
                   } >> "$GITHUB_STEP_SUMMARY"

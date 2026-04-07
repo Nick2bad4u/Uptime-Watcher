@@ -12,6 +12,7 @@ import type { StatusUpdate } from "@shared/types";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeCastTo } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
 
@@ -164,12 +165,12 @@ export async function runAppBootstrap(
 
         if (typeof subscribeToStatusUpdates === "function") {
             logger.debug("[App:init] subscribing to status updates");
-            const subscriptionResult = (await subscribeToStatusUpdates(
+            const subscriptionResult = safeCastTo<StatusUpdateSubscriptionSummary | undefined>(await subscribeToStatusUpdates(
                 (update: StatusUpdate) => {
                     enqueueAlertFromStatusUpdate(update);
                     logStatusUpdateDebugInfo(update);
                 }
-            )) as StatusUpdateSubscriptionSummary | undefined;
+            ));
 
             reportSubscriptionDiagnostics(subscriptionResult);
             logger.debug("[App:init] status updates subscription completed");

@@ -11,6 +11,7 @@
  */
 
 import { useMemo } from "react";
+import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 /**
@@ -125,16 +126,7 @@ const shouldExposeConfirmDialogAutomationHooks =
     typeof window !== "undefined" && import.meta.env.MODE !== "production";
 
 if (shouldExposeConfirmDialogAutomationHooks) {
-    const automationTarget = globalThis as typeof globalThis & {
-        playwrightConfirmDialog?: {
-            cancel: () => void;
-            confirm: () => void;
-            getState: () => ConfirmDialogStoreState;
-            subscribe: (
-                listener: (state: ConfirmDialogStoreState) => void
-            ) => () => void;
-        };
-    };
+    const automationTarget = safeCastTo(globalThis);
 
     automationTarget.playwrightConfirmDialog = {
         cancel: (): void => {

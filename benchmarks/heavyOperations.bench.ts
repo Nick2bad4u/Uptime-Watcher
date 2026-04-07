@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Synthetic site representation used by heavy-operation benchmarks.
@@ -89,13 +90,13 @@ function generateSites(
 
         for (let j = 0; j < monitorsPerSite; j++) {
             const history: StatusEntry[] = [];
-            const historyCount = Math.floor(Math.random() * 1000) + 100; // 100-1100 entries
+            const historyCount = Math.floor(secureRandomFloat() * 1000) + 100; // 100-1100 entries
 
             for (let k = 0; k < historyCount; k++) {
                 history.push({
                     timestamp: Date.now() - k * 30_000, // 30-second intervals
-                    status: Math.random() > 0.05 ? "up" : "down", // 95% uptime
-                    responseTime: Math.floor(Math.random() * 500) + 10,
+                    status: secureRandomFloat() > 0.05 ? "up" : "down", // 95% uptime
+                    responseTime: Math.floor(secureRandomFloat() * 500) + 10,
                 });
             }
 
@@ -106,10 +107,10 @@ function generateSites(
                     "ping",
                     "port",
                 ][j % 3] as any,
-                status: Math.random() > 0.05 ? "up" : "down",
-                responseTime: Math.floor(Math.random() * 500) + 10,
+                status: secureRandomFloat() > 0.05 ? "up" : "down",
+                responseTime: Math.floor(secureRandomFloat() * 500) + 10,
                 history,
-                monitoring: Math.random() > 0.1, // 90% active
+                monitoring: secureRandomFloat() > 0.1, // 90% active
                 checkInterval:
                     [
                         30,
@@ -134,7 +135,7 @@ function generateSites(
             identifier: `site-${i}`,
             name: `Site ${i}`,
             monitors,
-            monitoring: Math.random() > 0.2, // 80% monitoring
+            monitoring: secureRandomFloat() > 0.2, // 80% monitoring
         });
     }
 
@@ -155,8 +156,8 @@ function generateStatusUpdates(count: number): StatusEntry[] {
     for (let i = 0; i < count; i++) {
         updates.push({
             timestamp: now - i * 1000,
-            status: Math.random() > 0.05 ? "up" : "down",
-            responseTime: Math.floor(Math.random() * 1000) + 10,
+            status: secureRandomFloat() > 0.05 ? "up" : "down",
+            responseTime: Math.floor(secureRandomFloat() * 1000) + 10,
         });
     }
 
@@ -643,7 +644,7 @@ describe("Heavy Computational Operations Benchmarks", () => {
                         timestamp: Date.now() - i * 1000,
                         status:
                             i % 2 === 0 ? ("up" as const) : ("down" as const),
-                        responseTime: Math.floor(Math.random() * 100),
+                        responseTime: Math.floor(secureRandomFloat() * 100),
                     }));
 
                 const stats = calculateUptimeStatistics(rapidChanges);

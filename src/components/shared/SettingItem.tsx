@@ -6,6 +6,8 @@ import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { FC, ReactNode } from "react";
 import type { IconType } from "react-icons";
 
+import { safeCastTo } from "ts-extras";
+
 import { ThemedText } from "../../theme/components/ThemedText";
 
 /**
@@ -77,7 +79,7 @@ export const SettingItem: FC<SettingItemProperties> = ({
 }) => {
     const resolvedControl =
         typeof control === "function"
-            ? (control as () => ReactNode)()
+            ? (safeCastTo<() => ReactNode>(control))()
             : control;
 
     const resolvedIconNode = IconComponent ? (

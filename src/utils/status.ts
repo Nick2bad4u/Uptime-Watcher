@@ -16,6 +16,7 @@ import type { CamelCase, Tagged } from "type-fest";
 
 import { isSiteStatus, STATUS_KIND } from "@shared/types";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { arrayJoin, stringSplit  } from "ts-extras";
 
 import { AppIcons } from "./icons";
 
@@ -184,12 +185,11 @@ export function createStatusIdentifier<T extends string>(
     statusText: T
 ): StatusIdentifier<T> {
     // Simple camelCase conversion avoiding complex regex patterns
-    const words = statusText.toLowerCase().split(/[\s_-]+/u);
-    const camelCased = words
+    const words = stringSplit(statusText.toLowerCase(), /[\s_-]+/u);
+    const camelCased = arrayJoin(words
         .map((word, index) =>
             index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
-        )
-        .join("");
+        ), "");
 
     return castUnchecked<StatusIdentifier<T>>(camelCased);
 }

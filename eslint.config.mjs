@@ -521,6 +521,17 @@ export default defineConfig([
             "electron/**/*.{ts,tsx,mts,cts}",
             "shared/**/*.{ts,tsx,mts,cts}",
         ],
+        ignores: [
+            "src/**/*.{spec,test}.{ts,tsx,mts,cts}",
+            "src/test/**/*.{ts,tsx,mts,cts}",
+            "src/tests/**/*.{ts,tsx,mts,cts}",
+            "electron/**/*.{spec,test}.{ts,tsx,mts,cts}",
+            "electron/test/**/*.{ts,tsx,mts,cts}",
+            "electron/tests/**/*.{ts,tsx,mts,cts}",
+            "shared/**/*.{spec,test}.{ts,tsx,mts,cts}",
+            "shared/test/**/*.{ts,tsx,mts,cts}",
+            "shared/tests/**/*.{ts,tsx,mts,cts}",
+        ],
         name: "Typefest Rules for source folders",
         plugins: {
             typefest,

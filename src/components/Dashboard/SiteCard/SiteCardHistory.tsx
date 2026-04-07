@@ -6,6 +6,7 @@
 import type { Monitor, StatusHistory } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
+import { arrayFind, arrayFirst  } from "ts-extras";
 
 import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
@@ -39,8 +40,8 @@ function areHistoryPropsEqual(
     if (previous.filteredHistory.length !== next.filteredHistory.length) {
         return false;
     }
-    const prevTimestamp = previous.filteredHistory[0]?.timestamp;
-    const nextTimestamp = next.filteredHistory[0]?.timestamp;
+    const prevTimestamp = arrayFirst(previous.filteredHistory)?.timestamp;
+    const nextTimestamp = arrayFirst(next.filteredHistory)?.timestamp;
     if (prevTimestamp !== nextTimestamp) {
         return false;
     }
@@ -112,9 +113,7 @@ export const SiteCardHistory: NamedExoticComponent<SiteCardHistoryProperties> =
                 }
 
                 // Get display name from monitor type options
-                const monitorTypeOption = options.find(
-                    (option) => option.value === monitor.type
-                );
+                const monitorTypeOption = arrayFind(options, (option) => option.value === monitor.type);
                 const displayName = monitorTypeOption?.label ?? monitor.type;
 
                 // Get type-specific suffix using dynamic formatter

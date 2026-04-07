@@ -23,6 +23,7 @@ import type {
     MonitorType,
     SiteStatus,
 } from "../../shared/types";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Performs a deep clone of the provided structure for benchmark datasets.
@@ -247,7 +248,7 @@ describe("Shared Type Utilities Performance", () => {
         history: Array.from({ length: 10 }, (_, i) => ({
             timestamp: Date.now() - i * 60_000,
             status: i % 2 === 0 ? "up" : "down",
-            responseTime: 100 + Math.random() * 200,
+            responseTime: 100 + secureRandomFloat() * 200,
             details: `Check result ${i}`,
         })),
     };

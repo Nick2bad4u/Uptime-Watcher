@@ -19,6 +19,7 @@ import type {
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeCastTo } from "ts-extras";
 
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
@@ -291,7 +292,7 @@ export const createSiteOperationsActions = (
                                   id: crypto.randomUUID(),
                                   monitoring: true,
                                   status: "pending" as const,
-                                  type: "http" as MonitorType,
+                                  type: safeCastTo<MonitorType>("http"),
                               },
                           ]
                 ).map((monitor) =>

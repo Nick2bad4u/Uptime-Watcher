@@ -1,8 +1,14 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: npm audit
+name: npm Audit
+
+run-name: npm Audit
 
 on:
     workflow_dispatch:
+
+concurrency:
+    group: npm-audit-${{ github.ref }}
+    cancel-in-progress: true
 
 permissions:
     contents: read
@@ -12,11 +18,10 @@ jobs:
     scan:
         name: npm audit
         runs-on: ubuntu-latest
-        concurrency:
-            group: npm-audit-${{ github.ref }}
-            cancel-in-progress: false
+        timeout-minutes: 20
         defaults:
             run:
+                shell: bash
                 working-directory: .
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -24,7 +29,8 @@ jobs:
               with:
                   egress-policy: audit
 
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+            - name: Checkout repository
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
             - name: Cache node modules
               uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
               with:
@@ -33,9 +39,10 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-.-node-modules-
 
-            - name: install dependencies
+            - name: Install dependencies
               run: npm install --force
-            - uses: oke-py/npm-audit-action@6ec7878c81d7dfe2b3295a63e1a608e9c952f46a # v3.0.0
+            - name: Run npm audit action
+              uses: oke-py/npm-audit-action@6ec7878c81d7dfe2b3295a63e1a608e9c952f46a # v3.0.0
               with:
                   audit_level: moderate
                   github_token: ${{ secrets.GITHUB_TOKEN }}

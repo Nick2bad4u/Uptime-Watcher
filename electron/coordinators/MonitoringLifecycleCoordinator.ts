@@ -4,6 +4,8 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 
+import { isEmpty } from "ts-extras";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { EventKey } from "../events/TypedEventBus";
 import type { MonitorManager } from "../managers/MonitorManager";
@@ -114,7 +116,7 @@ export class MonitoringLifecycleCoordinator {
                 (site) => site.monitoring
             ).length;
 
-            if (monitorsToResume.length === 0) {
+            if (isEmpty(monitorsToResume)) {
                 logger.info(
                     "[MonitoringLifecycleCoordinator] No monitors require monitoring resumption"
                 );

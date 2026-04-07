@@ -16,7 +16,7 @@ import type { Simplify, UnknownRecord, ValueOf } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
-import { objectHasOwn } from "ts-extras";
+import { objectHasOwn, safeCastTo, stringSplit   } from "ts-extras";
 
 /**
  * Type-safe scale configuration result describing lookup outcomes.
@@ -59,7 +59,7 @@ export function getScaleConfigSafe(
         // Validate that the scale is actually an object (handle runtime type safety)
         if (typeof scale === "object" && scale !== null) {
             return {
-                config: scale as ValueOf<ChartScalesConfig>,
+                config: safeCastTo<ValueOf<ChartScalesConfig>>(scale),
                 exists: true,
             };
         }
@@ -130,7 +130,7 @@ export function getNestedScalePropertySafe(
         };
     }
 
-    const pathParts = path.split(".");
+    const pathParts = stringSplit(path, ".");
     let current: unknown = scaleResult.config;
     const validPath: string[] = [];
 

@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock database service
 class MockDatabaseService {
@@ -38,7 +39,7 @@ class MockDatabaseService {
     getConnection(name: string = "default") {
         if (!this.connections.has(name)) {
             this.connections.set(name, {
-                id: Math.random().toString(36),
+                id: secureRandomFloat().toString(36),
                 created: Date.now(),
                 queries: 0,
             });
@@ -54,15 +55,15 @@ class MockDatabaseService {
         }
 
         // Simulate query execution
-        await this.sleep(Math.random() * 5);
+        await this.sleep(secureRandomFloat() * 5);
 
         const result = {
             rows: Array.from(
-                { length: Math.floor(Math.random() * 100) },
+                { length: Math.floor(secureRandomFloat() * 100) },
                 (_, i) => ({ id: i, data: `row${i}` })
             ),
-            rowCount: Math.floor(Math.random() * 100),
-            executionTime: Math.random() * 100,
+            rowCount: Math.floor(secureRandomFloat() * 100),
+            executionTime: secureRandomFloat() * 100,
         };
 
         if (useCache) {
@@ -92,8 +93,8 @@ class MockDatabaseService {
         return {
             tableStats: Array.from({ length: 10 }, (_, i) => ({
                 name: `table${i}`,
-                rows: Math.floor(Math.random() * 10_000),
-                size: Math.floor(Math.random() * 1_000_000),
+                rows: Math.floor(secureRandomFloat() * 10_000),
+                size: Math.floor(secureRandomFloat() * 1_000_000),
             })),
         };
     }
@@ -103,7 +104,7 @@ class MockDatabaseService {
         return {
             success: true,
             path,
-            size: Math.floor(Math.random() * 10_000_000),
+            size: Math.floor(secureRandomFloat() * 10_000_000),
         };
     }
 
@@ -111,7 +112,7 @@ class MockDatabaseService {
         await this.sleep(150);
         return {
             success: true,
-            recordsRestored: Math.floor(Math.random() * 100_000),
+            recordsRestored: Math.floor(secureRandomFloat() * 100_000),
         };
     }
 
@@ -145,7 +146,7 @@ class MockDatabaseService {
             status: "healthy",
             connections: this.connections.size,
             uptime: Date.now() - (this.isInitialized ? 0 : Date.now()),
-            memoryUsage: Math.floor(Math.random() * 1_000_000),
+            memoryUsage: Math.floor(secureRandomFloat() * 1_000_000),
         };
     }
 
@@ -252,7 +253,7 @@ describe("Database Service Performance", () => {
             service = new MockDatabaseService();
             await service.executeQuery(
                 "SELECT * FROM users WHERE id = ?",
-                [Math.random()],
+                [secureRandomFloat()],
                 false
             );
         },

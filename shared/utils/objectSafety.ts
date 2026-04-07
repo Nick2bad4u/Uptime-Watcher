@@ -8,7 +8,7 @@
 
 import type { UnknownRecord, ValueOf } from "type-fest";
 
-import { objectHasOwn } from "ts-extras";
+import { objectEntries, objectHasOwn, objectKeys, objectValues, safeCastTo     } from "ts-extras";
 
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";
@@ -26,7 +26,7 @@ export function createNullPrototypeObject<T extends object>(shape?: T): T {
     if (shape) {
         // Touch the phantom parameter in a side-effect-free way so lints do not
         // treat it as unused.
-        Object.keys(shape);
+        objectKeys(shape);
     }
 
     return castUnchecked<T>(Object.create(null));
@@ -106,7 +106,7 @@ export function safeObjectIteration(
     }
 
     try {
-        for (const [key, value] of Object.entries(obj)) {
+        for (const [key, value] of objectEntries(obj)) {
             visitor(key, value);
         }
     } catch (error) {
@@ -186,7 +186,7 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
     const record = castUnchecked<UnknownRecord>(obj);
 
     // Copy enumerable string/number properties
-    for (const [key, value] of Object.entries(record)) {
+    for (const [key, value] of objectEntries(record)) {
         if (!stringKeysToOmit.has(key)) {
             Object.defineProperty(result, key, {
                 configurable: true,
@@ -213,7 +213,7 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
 }
 
 export const safeObjectOmit: SafeObjectOmit =
-    safeObjectOmitImpl as SafeObjectOmit;
+    safeCastTo<SafeObjectOmit>(safeObjectOmitImpl);
 
 /**
  * Create a type-safe subset of an object with only specified keys.
@@ -283,7 +283,7 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
 export function typedObjectEntries<T extends UnknownRecord>(
     obj: T
 ): Array<[keyof T, ValueOf<T>]> {
-    return castUnchecked<Array<[keyof T, ValueOf<T>]>>(Object.entries(obj));
+    return castUnchecked<Array<[keyof T, ValueOf<T>]>>(objectEntries(obj));
 }
 
 /**
@@ -311,7 +311,7 @@ export function typedObjectEntries<T extends UnknownRecord>(
 export function typedObjectKeys<T extends UnknownRecord>(
     obj: T
 ): Array<keyof T> {
-    return Object.keys(obj) as Array<keyof T>;
+    return safeCastTo<Array<keyof T>>(objectKeys(obj));
 }
 
 /**
@@ -339,5 +339,5 @@ export function typedObjectKeys<T extends UnknownRecord>(
 export function typedObjectValues<T extends UnknownRecord>(
     obj: T
 ): Array<ValueOf<T>> {
-    return castUnchecked<Array<ValueOf<T>>>(Object.values(obj));
+    return castUnchecked<Array<ValueOf<T>>>(objectValues(obj));
 }

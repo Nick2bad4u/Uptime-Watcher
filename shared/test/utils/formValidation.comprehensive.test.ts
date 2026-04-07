@@ -197,7 +197,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result = validateUrl("http://example.com");
+            const result = validateUrl("https://example.com");
 
             expect(result.isValid).toBeTruthy();
             expect(result.error).toBeUndefined();

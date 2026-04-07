@@ -28,6 +28,7 @@ import {
 } from "@shared/utils/logger/common";
 import { extractLogContext } from "@shared/utils/loggingContext";
 import log from "electron-log/main";
+import { arrayFirst } from "ts-extras";
 
 /**
  * Creates a logger with a specific prefix for categorization.
@@ -58,7 +59,7 @@ function createLogger(prefix: string): Logger {
             const logArguments = buildLogArguments(prefix, message, remaining);
             const finalArgs = context
                 ? [
-                      logArguments[0],
+                      arrayFirst(logArguments),
                       context,
                       ...logArguments.slice(1),
                   ]
@@ -75,7 +76,7 @@ function createLogger(prefix: string): Logger {
             );
             const finalArgs = context
                 ? [
-                      logArguments[0],
+                      arrayFirst(logArguments),
                       context,
                       ...logArguments.slice(1),
                   ]
@@ -87,7 +88,7 @@ function createLogger(prefix: string): Logger {
             const logArguments = buildLogArguments(prefix, message, remaining);
             const finalArgs = context
                 ? [
-                      logArguments[0],
+                      arrayFirst(logArguments),
                       context,
                       ...logArguments.slice(1),
                   ]
@@ -99,7 +100,7 @@ function createLogger(prefix: string): Logger {
             const logArguments = buildLogArguments(prefix, message, remaining);
             const finalArgs = context
                 ? [
-                      logArguments[0],
+                      arrayFirst(logArguments),
                       context,
                       ...logArguments.slice(1),
                   ]

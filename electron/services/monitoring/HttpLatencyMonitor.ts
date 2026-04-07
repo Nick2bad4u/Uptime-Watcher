@@ -3,6 +3,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -74,9 +75,7 @@ const behavior: HttpMonitorBehavior<"http-latency", { threshold: number }> = {
     },
 };
 
-type HttpLatencyMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance;
+type HttpLatencyMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
 
 const HttpLatencyMonitorBase: HttpLatencyMonitorConstructor =
     ((): HttpLatencyMonitorConstructor => {

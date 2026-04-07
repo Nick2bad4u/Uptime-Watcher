@@ -13,6 +13,7 @@ import type { Monitor } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, type NamedExoticComponent } from "react";
+import { isEmpty } from "ts-extras";
 
 import { ThemedBadge } from "../../theme/components/ThemedBadge";
 import { ThemedBox } from "../../theme/components/ThemedBox";
@@ -46,7 +47,7 @@ export const MonitoringStatusDisplay: NamedExoticComponent<MonitoringStatusDispl
     memo(function MonitoringStatusDisplayComponent({
         monitors,
     }: MonitoringStatusDisplayProperties): JSX.Element {
-        if (monitors.length === 0) {
+        if (isEmpty(monitors)) {
             return (
                 <ThemedBox
                     data-testid="monitoring-status-display"

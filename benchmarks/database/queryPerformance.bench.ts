@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface QueryOperation {
@@ -115,10 +116,10 @@ describe("Database Query Performance Benchmarks", () => {
         for (let i = 0; i < 800; i++) {
             const scenario =
                 selectScenarios[
-                    Math.floor(Math.random() * selectScenarios.length)
+                    Math.floor(secureRandomFloat() * selectScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(Math.random() * tableConfigs.length)];
+                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
 
             const startTime = Date.now();
 
@@ -138,19 +139,19 @@ describe("Database Query Performance Benchmarks", () => {
             baseExecutionTime += rowCountFactor;
 
             // Index usage impact
-            const indexUsed = Math.random() < scenario.indexHitRate;
+            const indexUsed = secureRandomFloat() < scenario.indexHitRate;
             if (!indexUsed) {
                 baseExecutionTime *= 2.5; // Table scan penalty
             }
 
             // Cache hit simulation
-            const cacheHit = Math.random() < 0.3; // 30% cache hit rate
+            const cacheHit = secureRandomFloat() < 0.3; // 30% cache hit rate
             if (cacheHit) {
                 baseExecutionTime *= 0.1; // Cache dramatically reduces time
             }
 
             // Add variance
-            const variance = (Math.random() - 0.5) * 0.4;
+            const variance = (secureRandomFloat() - 0.5) * 0.4;
             const actualExecutionTime = Math.max(
                 1,
                 baseExecutionTime * (1 + variance)
@@ -166,7 +167,7 @@ describe("Database Query Performance Benchmarks", () => {
                 successRate = 0.97;
             }
 
-            const success = Math.random() < successRate;
+            const success = secureRandomFloat() < successRate;
             const rowsAffected = success ? effectiveRowCount : 0;
 
             // Calculate memory usage
@@ -186,7 +187,7 @@ describe("Database Query Performance Benchmarks", () => {
                 filterOperations: scenario.whereClauseComplexity,
                 subqueryCount:
                     scenario.complexity === "high"
-                        ? Math.floor(Math.random() * 3)
+                        ? Math.floor(secureRandomFloat() * 3)
                         : 0,
             };
 
@@ -283,10 +284,10 @@ describe("Database Query Performance Benchmarks", () => {
         for (let i = 0; i < 600; i++) {
             const scenario =
                 insertScenarios[
-                    Math.floor(Math.random() * insertScenarios.length)
+                    Math.floor(secureRandomFloat() * insertScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(Math.random() * tableConfigs.length)];
+                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
 
             const startTime = Date.now();
 
@@ -317,7 +318,7 @@ describe("Database Query Performance Benchmarks", () => {
             baseExecutionTime *= indexMaintenanceFactor;
 
             // Add variance for real-world conditions
-            const variance = (Math.random() - 0.5) * 0.3;
+            const variance = (secureRandomFloat() - 0.5) * 0.3;
             const actualExecutionTime = Math.max(
                 1,
                 baseExecutionTime * (1 + variance)
@@ -333,10 +334,10 @@ describe("Database Query Performance Benchmarks", () => {
                 successRate = 0.94;
             }
 
-            const success = Math.random() < successRate;
+            const success = secureRandomFloat() < successRate;
             const rowsAffected = success
                 ? scenario.batchSize
-                : Math.floor(scenario.batchSize * Math.random() * 0.5);
+                : Math.floor(scenario.batchSize * secureRandomFloat() * 0.5);
 
             // Calculate memory usage
             const memoryUsage =
@@ -467,10 +468,10 @@ describe("Database Query Performance Benchmarks", () => {
         for (let i = 0; i < 500; i++) {
             const scenario =
                 updateScenarios[
-                    Math.floor(Math.random() * updateScenarios.length)
+                    Math.floor(secureRandomFloat() * updateScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(Math.random() * tableConfigs.length)];
+                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
 
             const startTime = Date.now();
 
@@ -499,7 +500,7 @@ describe("Database Query Performance Benchmarks", () => {
             }
 
             // Add variance
-            const variance = (Math.random() - 0.5) * 0.4;
+            const variance = (secureRandomFloat() - 0.5) * 0.4;
             const actualExecutionTime = Math.max(
                 1,
                 baseExecutionTime * (1 + variance)
@@ -513,7 +514,7 @@ describe("Database Query Performance Benchmarks", () => {
                 successRate = 0.92; // Large updates more likely to fail
             }
 
-            const success = Math.random() < successRate;
+            const success = secureRandomFloat() < successRate;
             const rowsAffected = success ? affectedRows : 0;
 
             // Calculate memory usage
@@ -614,10 +615,10 @@ describe("Database Query Performance Benchmarks", () => {
         for (let i = 0; i < 400; i++) {
             const scenario =
                 deleteScenarios[
-                    Math.floor(Math.random() * deleteScenarios.length)
+                    Math.floor(secureRandomFloat() * deleteScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(Math.random() * tableConfigs.length)];
+                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
 
             const startTime = Date.now();
 
@@ -643,7 +644,7 @@ describe("Database Query Performance Benchmarks", () => {
 
             // Cascade delete impact
             if (scenario.cascadeDeletes) {
-                const cascadeRows = affectedRows * (1 + Math.random() * 3); // 1-4x cascade multiplier
+                const cascadeRows = affectedRows * (1 + secureRandomFloat() * 3); // 1-4x cascade multiplier
                 baseExecutionTime += cascadeRows * 0.2;
             }
 
@@ -653,7 +654,7 @@ describe("Database Query Performance Benchmarks", () => {
             }
 
             // Add variance
-            const variance = (Math.random() - 0.5) * 0.5;
+            const variance = (secureRandomFloat() - 0.5) * 0.5;
             const actualExecutionTime = Math.max(
                 1,
                 baseExecutionTime * (1 + variance)
@@ -667,7 +668,7 @@ describe("Database Query Performance Benchmarks", () => {
                 successRate = 0.88; // Cascade deletes more likely to fail
             }
 
-            const success = Math.random() < successRate;
+            const success = secureRandomFloat() < successRate;
             const rowsAffected = success ? affectedRows : 0;
 
             // Calculate memory usage
@@ -760,10 +761,10 @@ describe("Database Query Performance Benchmarks", () => {
 
         for (let i = 0; i < 200; i++) {
             // Generate a complex query scenario
-            const joinCount = Math.floor(Math.random() * 5) + 2; // 2-6 joins
-            const whereConditions = Math.floor(Math.random() * 8) + 3; // 3-10 conditions
-            const subqueryCount = Math.floor(Math.random() * 3); // 0-2 subqueries
-            const aggregationCount = Math.floor(Math.random() * 4); // 0-3 aggregations
+            const joinCount = Math.floor(secureRandomFloat() * 5) + 2; // 2-6 joins
+            const whereConditions = Math.floor(secureRandomFloat() * 8) + 3; // 3-10 conditions
+            const subqueryCount = Math.floor(secureRandomFloat() * 3); // 0-2 subqueries
+            const aggregationCount = Math.floor(secureRandomFloat() * 4); // 0-3 aggregations
 
             // Calculate original execution time (unoptimized)
             let originalTime = 50; // Base complex query time
@@ -773,17 +774,17 @@ describe("Database Query Performance Benchmarks", () => {
             originalTime += aggregationCount * 15; // 15ms per aggregation
 
             // Add table scan penalties (unoptimized queries)
-            originalTime *= 1.5 + Math.random(); // 1.5-2.5x penalty for lack of optimization
+            originalTime *= 1.5 + secureRandomFloat(); // 1.5-2.5x penalty for lack of optimization
 
             // Select optimization techniques to apply
-            const techniqueCount = Math.floor(Math.random() * 4) + 1; // 1-4 techniques
+            const techniqueCount = Math.floor(secureRandomFloat() * 4) + 1; // 1-4 techniques
             const appliedTechniques: string[] = [];
 
             for (let t = 0; t < techniqueCount; t++) {
                 const technique =
                     optimizationTechniques[
                         Math.floor(
-                            Math.random() * optimizationTechniques.length
+                            secureRandomFloat() * optimizationTechniques.length
                         )
                     ];
                 if (!appliedTechniques.includes(technique)) {
@@ -835,7 +836,7 @@ describe("Database Query Performance Benchmarks", () => {
             optimizedTime = originalTime * optimizationFactor;
 
             // Add some variance to make it realistic
-            const variance = (Math.random() - 0.5) * 0.2;
+            const variance = (secureRandomFloat() - 0.5) * 0.2;
             optimizedTime *= 1 + variance;
 
             const improvementPercentage =

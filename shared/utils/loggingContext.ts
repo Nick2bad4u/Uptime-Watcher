@@ -1,7 +1,8 @@
-import type { UnknownRecord } from "type-fest";
+import type { UnknownArray, UnknownRecord  } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { isEmpty, objectEntries, safeCastTo, setHas    } from "ts-extras";
 
 /** Supported logging severity levels emitted by the structured logger. */
 export type LogSeverity = "debug" | "error" | "info" | "warn";
@@ -110,7 +111,7 @@ const toCanonicalSecretKey = (key: string): string =>
     key.toLowerCase().replaceAll(/[^\da-z]/gu, "");
 
 const isSecretMetadataKey = (key: string): boolean =>
-    SECRET_METADATA_KEYS.has(toCanonicalSecretKey(key));
+    setHas(SECRET_METADATA_KEYS, toCanonicalSecretKey(key));
 
 type SecretReplacement = Readonly<{
     endIndex: number;
@@ -192,7 +193,7 @@ const applySecretReplacements = (
     value: string,
     replacements: readonly SecretReplacement[]
 ): string => {
-    if (replacements.length === 0) {
+    if (isEmpty(replacements)) {
         return value;
     }
 
@@ -293,7 +294,7 @@ function normalizeNonPlainObject(
     }
 
     if (candidate instanceof Error) {
-        const errorWithCause = candidate as Error & { cause?: unknown };
+        const errorWithCause = safeCastTo(candidate);
         return {
             kind: "normalized",
             value: {
@@ -369,7 +370,7 @@ export const normalizeLogValue = (value: unknown): unknown => {
 
         if (isRecord(candidate)) {
             const sanitizedRecord: UnknownRecord = {};
-            for (const [key, entry] of Object.entries(candidate)) {
+            for (const [key, entry] of objectEntries(candidate)) {
                 if (isSecretMetadataKey(key)) {
                     sanitizedRecord[key] = SECRET_PLACEHOLDER;
                 } else {
@@ -459,14 +460,14 @@ export const normalizeLogContext = (
 /** Tuple containing an optional context and remaining log arguments. */
 export interface ExtractedLogContext {
     readonly context?: SanitizedLogContext;
-    readonly remaining: readonly unknown[];
+    readonly remaining: Readonly<UnknownArray>;
 }
 
 export const extractLogContext = (
-    args: readonly unknown[],
+    args: Readonly<UnknownArray>,
     severity: LogSeverity
 ): ExtractedLogContext => {
-    if (args.length === 0) {
+    if (isEmpty(args)) {
         return { remaining: args };
     }
 

@@ -24,6 +24,7 @@ import type { Site } from "@shared/types";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
+import { arrayJoin, isEmpty  } from "ts-extras";
 
 import type { ValidationResult } from "./interfaces";
 
@@ -106,7 +107,7 @@ export class MonitorValidator {
         const errors = this.validateMonitorTypeSpecific(monitor);
         return {
             errors,
-            success: errors.length === 0,
+            success: isEmpty(errors),
         };
     }
 
@@ -147,7 +148,7 @@ export class MonitorValidator {
     ): readonly string[] {
         // Validate monitor type using registry
         if (!isValidMonitorType(monitor.type)) {
-            const availableTypes = getRegisteredMonitorTypes().join(", ");
+            const availableTypes = arrayJoin(getRegisteredMonitorTypes(), ", ");
             return [
                 `Invalid monitor type \`${monitor.type}\`. Available types: \`${availableTypes}\``,
             ];

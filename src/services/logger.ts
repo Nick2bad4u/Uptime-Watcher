@@ -22,6 +22,7 @@ import type {
     UserLogger,
 } from "@shared/utils/logger/interfaces";
 import type { RendererLogger } from "electron-log";
+import type { UnknownArray } from "type-fest";
 
 import {
     buildErrorLogArguments,
@@ -30,6 +31,7 @@ import {
 import { extractLogContext } from "@shared/utils/loggingContext";
 import { isRecord } from "@shared/utils/typeHelpers";
 import log from "electron-log/renderer";
+import { arrayFirst, safeCastTo  } from "ts-extras";
 
 /**
  * Interface for the logger configuration.
@@ -143,7 +145,7 @@ function getLogTransport<K extends keyof LogTransports>(
 // logging 3. Avoids direct file access conflicts that would occur with main
 // process logging Check if we're in production mode (Vite sets MODE to
 // 'production' in production builds)
-const metaEnv = import.meta as { env?: { MODE?: string } };
+const metaEnv = safeCastTo<{ env?: { MODE?: string } }>(import.meta);
 const isProduction = metaEnv.env?.MODE === "production";
 log.transports.console.level = isProduction ? "info" : "debug";
 log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
@@ -159,7 +161,7 @@ const RENDERER_LOG_PREFIX = "UPTIME-WATCHER";
 
 const safeInvoke = (
     invoke: (...arguments_: unknown[]) => void,
-    args: readonly unknown[]
+    args: Readonly<UnknownArray>
 ): void => {
     try {
         invoke(...args);
@@ -169,12 +171,12 @@ const safeInvoke = (
 };
 
 const buildFinalArgs = (
-    logArgs: readonly unknown[],
+    logArgs: Readonly<UnknownArray>,
     context: unknown
-): readonly unknown[] =>
+): Readonly<UnknownArray> =>
     context
         ? [
-              logArgs[0],
+              arrayFirst(logArgs),
               context,
               ...logArgs.slice(1),
           ]
@@ -279,7 +281,7 @@ const loggerInstance: LoggerInterface = {
     info: baseLoggerMethods.info,
 
     // Raw access to the underlying electron-log instance
-    raw: log as RendererLogger & { default: RendererLogger },
+    raw: safeCastTo(log),
 
     silly: baseLoggerMethods.silly,
 

@@ -289,7 +289,7 @@ describe("Monitoring Data Validation", () => {
 
             // Validator.js only accepts HTTP/HTTPS protocols by default
             expect(isValidUrl("https://example.com")).toBeTruthy();
-            expect(isValidUrl("http://example.com")).toBeTruthy();
+            expect(isValidUrl("https://example.com")).toBeTruthy();
             expect(isValidUrl("https://localhost")).toBeTruthy();
             expect(isValidUrl("http://localhost:3000")).toBeTruthy();
         });

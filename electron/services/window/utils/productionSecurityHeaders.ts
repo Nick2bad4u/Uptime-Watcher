@@ -5,7 +5,11 @@
 /**
  * Electron response header bag used by webRequest callbacks.
  */
-export type ElectronResponseHeaders = Record<string, string | string[]>;
+import type { Arrayable } from "type-fest";
+
+import { arrayJoin } from "ts-extras";
+
+export type ElectronResponseHeaders = Record<string, Arrayable<string>>;
 
 /**
  * Build the production Content-Security-Policy header value.
@@ -15,7 +19,7 @@ export type ElectronResponseHeaders = Record<string, string | string[]>;
  * requires expanding it, do so intentionally and with a targeted allow-list.
  */
 export function getProductionCspHeaderValue(): string {
-    return [
+    return arrayJoin([
         "default-src 'self'",
         "base-uri 'none'",
         "form-action 'none'",
@@ -28,7 +32,7 @@ export function getProductionCspHeaderValue(): string {
         "connect-src 'self'",
         "worker-src 'self' blob:",
         "media-src 'self' blob:",
-    ].join("; ");
+    ], "; ");
 }
 
 /**

@@ -10,13 +10,14 @@ import type {
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
 } from "@shared/types/ipc";
-import type { Promisable, UnknownRecord } from "type-fest";
+import type { Promisable, UnknownArray, UnknownRecord  } from "type-fest";
 
 import { IPC_INVOKE_CHANNEL_PARAM_COUNTS } from "@shared/types/ipc";
 import { ensureError } from "@shared/utils/errorHandling";
 import { withLogContext } from "@shared/utils/loggingContext";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
+import { arrayJoin, safeCastTo  } from "ts-extras";
 
 import type {
     IpcParameterValidator,
@@ -92,7 +93,7 @@ export interface WithIpcHandlerOptions<TResult = unknown> {
 
 function assertChannelParams<TChannel extends IpcInvokeChannel>(
     channelName: TChannel,
-    params: readonly unknown[]
+    params: Readonly<UnknownArray>
 ): asserts params is ChannelParams<TChannel> {
     if (!Array.isArray(params)) {
         throw new TypeError(
@@ -315,7 +316,7 @@ export async function withIpcHandler<T>(
  */
 export async function withIpcHandlerValidation<
     T,
-    TParams extends readonly unknown[],
+    TParams extends Readonly<UnknownArray>,
 >(
     channelName: string,
     handler: (...validatedParams: TParams) => Promisable<T>,
@@ -348,9 +349,7 @@ export async function withIpcHandlerValidation<
             );
         }
 
-        const errorMessage = `Parameter validation failed: ${validationErrors.join(
-            ", "
-        )}`;
+        const errorMessage = `Parameter validation failed: ${arrayJoin(validationErrors, ", ")}`;
 
         const responseMetadata = {
             ...metadata,
@@ -596,7 +595,7 @@ export function registerStandardizedIpcHandler<
 export function createStandardizedIpcRegistrar(
     registeredHandlers: Set<IpcInvokeChannel>
 ): StandardizedIpcRegistrar {
-    return (<TChannel extends IpcInvokeChannel>(
+    return safeCastTo<StandardizedIpcRegistrar>(<TChannel extends IpcInvokeChannel>(
         channelName: TChannel,
         handler: StrictIpcInvokeHandler<TChannel>,
         validateParams?: IpcParameterValidator | null,
@@ -611,5 +610,5 @@ export function createStandardizedIpcRegistrar(
             registeredHandlers,
             validateResult ?? null
         );
-    }) as StandardizedIpcRegistrar;
+    });
 }

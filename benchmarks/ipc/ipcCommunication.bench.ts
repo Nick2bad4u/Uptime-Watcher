@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Type definitions for benchmarking (synthetic shapes)
 interface BenchmarkSite {
@@ -66,7 +67,7 @@ function generateTestMonitors(count: number): BenchmarkMonitor[] {
         checkInterval: 30_000,
         timeout: 5000,
         retryAttempts: 3,
-        responseTime: Math.random() * 1000,
+        responseTime: secureRandomFloat() * 1000,
         status: "up" as const,
         history: [],
         url: `https://example${i}.com`,
@@ -77,8 +78,8 @@ function generateTestHistory(count: number): StatusHistory[] {
     return Array.from({ length: count }, (_, i) => ({
         id: `history-${i}`,
         monitorId: `monitor-${i % 500}`,
-        status: Math.random() > 0.1 ? "up" : ("down" as const),
-        responseTime: Math.random() * 1000,
+        status: secureRandomFloat() > 0.1 ? "up" : ("down" as const),
+        responseTime: secureRandomFloat() * 1000,
         timestamp: Date.now() - i * 60_000,
     }));
 }

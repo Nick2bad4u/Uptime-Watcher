@@ -23,6 +23,7 @@ import type { DatabaseService } from "../../electron/services/database/DatabaseS
 import type { SiteRow } from "../../electron/services/database/utils/mappers/siteMapper";
 import type { Database } from "node-sqlite3-wasm";
 import { randomUUID } from "node:crypto";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock database that simulates real database operations but with in-memory performance
 class MockDatabase {
@@ -76,7 +77,7 @@ function generateSiteData(index: number): SiteRow {
     return {
         identifier: `site-${index}-${randomUUID()}`,
         name: `Performance Test Site ${index}`,
-        monitoring: Math.random() > 0.3, // 70% enabled
+        monitoring: secureRandomFloat() > 0.3, // 70% enabled
     };
 }
 
@@ -129,7 +130,7 @@ describe("Site Repository Performance", () => {
 
             // Benchmark lookup
             const randomSite =
-                testSites[Math.floor(Math.random() * testSites.length)];
+                testSites[Math.floor(secureRandomFloat() * testSites.length)];
             await repository.findByIdentifier(randomSite.identifier);
         },
         { warmupIterations: 10, iterations: 50_000 }
@@ -144,7 +145,7 @@ describe("Site Repository Performance", () => {
 
             // Benchmark existence check
             const randomSite =
-                testSites[Math.floor(Math.random() * testSites.length)];
+                testSites[Math.floor(secureRandomFloat() * testSites.length)];
             await repository.exists(randomSite.identifier);
         },
         { warmupIterations: 10, iterations: 50_000 }
@@ -227,12 +228,12 @@ describe("Site Repository Performance", () => {
 
             // Perform mixed upsert operations
             for (let i = 0; i < 100; i++) {
-                const isUpdate = Math.random() < 0.5;
+                const isUpdate = secureRandomFloat() < 0.5;
                 if (isUpdate) {
                     // 50% updates to existing sites
                     const existingSite =
                         initialSites[
-                            Math.floor(Math.random() * initialSites.length)
+                            Math.floor(secureRandomFloat() * initialSites.length)
                         ];
                     await repository.upsert({
                         identifier: existingSite.identifier,
@@ -259,7 +260,7 @@ describe("Site Repository Performance", () => {
 
             // Benchmark deletion
             const randomSite =
-                testSites[Math.floor(Math.random() * testSites.length)];
+                testSites[Math.floor(secureRandomFloat() * testSites.length)];
             await repository.delete(randomSite.identifier);
         },
         { warmupIterations: 5, iterations: 10_000 }
@@ -410,7 +411,7 @@ describe("Site Repository Performance", () => {
             // Perform rapid lookups
             for (let i = 0; i < 100; i++) {
                 const randomSite =
-                    testSites[Math.floor(Math.random() * testSites.length)];
+                    testSites[Math.floor(secureRandomFloat() * testSites.length)];
                 await repository.findByIdentifier(randomSite.identifier);
             }
         },

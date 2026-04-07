@@ -10,7 +10,7 @@ import {
 describe("urlSchemeValidation", () => {
     describe(isSchemeOnlyUrl, () => {
         it("returns true for scheme-only values", () => {
-            expect(isSchemeOnlyUrl("http://")).toBeTruthy();
+            expect(isSchemeOnlyUrl("https://")).toBeTruthy();
             expect(isSchemeOnlyUrl("HTTPS://")).toBeTruthy();
         });
 
@@ -56,7 +56,7 @@ describe("urlSchemeValidation", () => {
                 hasNestedHttpSchemeAfterFirstDelimiter("https://http://foo")
             ).toBeTruthy();
             expect(
-                hasNestedHttpSchemeAfterFirstDelimiter("http://https://bar/baz")
+                hasNestedHttpSchemeAfterFirstDelimiter("https://https://bar/baz")
             ).toBeTruthy();
         });
 

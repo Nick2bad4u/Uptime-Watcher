@@ -9,6 +9,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface IndexDefinition {
@@ -213,34 +214,34 @@ describe("Database Index Operations Benchmarks", () => {
 
         for (let i = 0; i < 150; i++) {
             const tableType =
-                tableTypes[Math.floor(Math.random() * tableTypes.length)];
+                tableTypes[Math.floor(secureRandomFloat() * tableTypes.length)];
             const indexType =
-                indexTypes[Math.floor(Math.random() * indexTypes.length)];
+                indexTypes[Math.floor(secureRandomFloat() * indexTypes.length)];
 
             // Generate realistic column configuration
-            const columnCount = Math.floor(Math.random() * 4) + 1; // 1-4 columns
+            const columnCount = Math.floor(secureRandomFloat() * 4) + 1; // 1-4 columns
             const columns: string[] = [];
             for (let col = 0; col < columnCount; col++) {
                 columns.push(
-                    `column_${Math.floor(Math.random() * tableType.columnCount)}`
+                    `column_${Math.floor(secureRandomFloat() * tableType.columnCount)}`
                 );
             }
 
             // Determine index characteristics
-            const isUnique = Math.random() < 0.2; // 20% chance of unique index
-            const isPrimaryKey = Math.random() < 0.05; // 5% chance of primary key
+            const isUnique = secureRandomFloat() < 0.2; // 20% chance of unique index
+            const isPrimaryKey = secureRandomFloat() < 0.05; // 5% chance of primary key
             const isClustered =
                 indexType.type === "clustered" ||
-                (isPrimaryKey && Math.random() < 0.8);
-            const fillFactor = Math.floor(Math.random() * 20) + 80; // 80-100%
+                (isPrimaryKey && secureRandomFloat() < 0.8);
+            const fillFactor = Math.floor(secureRandomFloat() * 20) + 80; // 80-100%
 
             const includeColumns =
-                Math.random() < 0.3
-                    ? [`include_col_${Math.floor(Math.random() * 5)}`]
+                secureRandomFloat() < 0.3
+                    ? [`include_col_${Math.floor(secureRandomFloat() * 5)}`]
                     : undefined;
 
             const whereClause =
-                Math.random() < 0.15 ? `WHERE status = 'active'` : undefined;
+                secureRandomFloat() < 0.15 ? `WHERE status = 'active'` : undefined;
 
             // Calculate estimated index size
             const avgRowSize = tableType.avgRowSize;
@@ -270,9 +271,9 @@ describe("Database Index Operations Benchmarks", () => {
             let creationMethod: IndexCreationOperation["creationMethod"] =
                 "offline";
             if (tableType.rowCount > 10_000_000) {
-                creationMethod = Math.random() < 0.6 ? "online" : "parallel";
+                creationMethod = secureRandomFloat() < 0.6 ? "online" : "parallel";
             } else if (tableType.rowCount > 1_000_000) {
-                creationMethod = Math.random() < 0.4 ? "online" : "concurrent";
+                creationMethod = secureRandomFloat() < 0.4 ? "online" : "concurrent";
             }
 
             const startTime = Date.now();
@@ -299,7 +300,7 @@ describe("Database Index Operations Benchmarks", () => {
                 (1 + columnComplexity + uniquenessOverhead + clusteredOverhead);
 
             // Add variance for real-world conditions
-            const variance = (Math.random() - 0.5) * 0.4;
+            const variance = (secureRandomFloat() - 0.5) * 0.4;
             const actualCreationTime = Math.max(
                 1000,
                 totalCreationTime * (1 + variance)
@@ -338,7 +339,7 @@ describe("Database Index Operations Benchmarks", () => {
                 clusteredOverhead;
             const failureRate = Math.min(0.15, complexityScore * 0.02);
 
-            if (Math.random() < failureRate) {
+            if (secureRandomFloat() < failureRate) {
                 success = false;
                 const errors = [
                     "Insufficient disk space for index creation",
@@ -347,14 +348,14 @@ describe("Database Index Operations Benchmarks", () => {
                     "Duplicate key constraint violation",
                     "Index key size exceeds maximum limit",
                 ];
-                error = errors[Math.floor(Math.random() * errors.length)];
+                error = errors[Math.floor(secureRandomFloat() * errors.length)];
             }
 
             // Calculate blocked queries for online operations
             blockedQueries =
                 creationMethod === "online" || creationMethod === "concurrent"
-                    ? Math.floor(Math.random() * 10) // 0-9 blocked queries
-                    : Math.floor(Math.random() * 50) + 10; // 10-59 blocked queries
+                    ? Math.floor(secureRandomFloat() * 10) // 0-9 blocked queries
+                    : Math.floor(secureRandomFloat() * 50) + 10; // 10-59 blocked queries
 
             const operation: IndexCreationOperation = {
                 operationId: `create-op-${i}`,
@@ -475,9 +476,9 @@ describe("Database Index Operations Benchmarks", () => {
 
         for (let i = 0; i < 200; i++) {
             const tableType =
-                tableTypes[Math.floor(Math.random() * tableTypes.length)];
+                tableTypes[Math.floor(secureRandomFloat() * tableTypes.length)];
             const indexType =
-                indexTypes[Math.floor(Math.random() * indexTypes.length)];
+                indexTypes[Math.floor(secureRandomFloat() * indexTypes.length)];
 
             const operationTypes = [
                 "rebuild",
@@ -488,7 +489,7 @@ describe("Database Index Operations Benchmarks", () => {
             ] as const;
             const operationType =
                 operationTypes[
-                    Math.floor(Math.random() * operationTypes.length)
+                    Math.floor(secureRandomFloat() * operationTypes.length)
                 ];
 
             // Generate realistic fragmentation levels
@@ -496,23 +497,23 @@ describe("Database Index Operations Benchmarks", () => {
 
             switch (operationType) {
                 case "rebuild": {
-                    fragmentationBefore = 30 + Math.random() * 60; // 30-90% for rebuilds
+                    fragmentationBefore = 30 + secureRandomFloat() * 60; // 30-90% for rebuilds
                     break;
                 }
                 case "reorganize": {
-                    fragmentationBefore = 10 + Math.random() * 30; // 10-40% for reorganize
+                    fragmentationBefore = 10 + secureRandomFloat() * 30; // 10-40% for reorganize
                     break;
                 }
                 case "defragment": {
-                    fragmentationBefore = 15 + Math.random() * 45; // 15-60% for defragment
+                    fragmentationBefore = 15 + secureRandomFloat() * 45; // 15-60% for defragment
                     break;
                 }
                 case "update-statistics": {
-                    fragmentationBefore = Math.random() * 20; // 0-20% for stats update
+                    fragmentationBefore = secureRandomFloat() * 20; // 0-20% for stats update
                     break;
                 }
                 case "analyze": {
-                    fragmentationBefore = Math.random() * 100; // Any level for analyze
+                    fragmentationBefore = secureRandomFloat() * 100; // Any level for analyze
                     break;
                 }
             }
@@ -526,17 +527,17 @@ describe("Database Index Operations Benchmarks", () => {
             switch (operationType) {
                 case "rebuild": {
                     baseTime = (tableType.rowCount / 100_000) * 30_000; // 30s per 100k rows
-                    fragmentationImprovement = 0.85 + Math.random() * 0.1; // 85-95% improvement
+                    fragmentationImprovement = 0.85 + secureRandomFloat() * 0.1; // 85-95% improvement
                     break;
                 }
                 case "reorganize": {
                     baseTime = (tableType.rowCount / 100_000) * 15_000; // 15s per 100k rows
-                    fragmentationImprovement = 0.4 + Math.random() * 0.3; // 40-70% improvement
+                    fragmentationImprovement = 0.4 + secureRandomFloat() * 0.3; // 40-70% improvement
                     break;
                 }
                 case "defragment": {
                     baseTime = (tableType.rowCount / 100_000) * 20_000; // 20s per 100k rows
-                    fragmentationImprovement = 0.6 + Math.random() * 0.25; // 60-85% improvement
+                    fragmentationImprovement = 0.6 + secureRandomFloat() * 0.25; // 60-85% improvement
                     break;
                 }
                 case "update-statistics": {
@@ -556,7 +557,7 @@ describe("Database Index Operations Benchmarks", () => {
             const actualTime = baseTime * fragmentationFactor * indexType.cost;
 
             // Add variance
-            const variance = (Math.random() - 0.5) * 0.3;
+            const variance = (secureRandomFloat() - 0.5) * 0.3;
             const finalTime = Math.max(1000, actualTime * (1 + variance));
 
             const endTime = startTime + finalTime;
@@ -581,8 +582,8 @@ describe("Database Index Operations Benchmarks", () => {
 
             // Calculate compression ratio for applicable operations
             let compressionRatio: number | undefined;
-            if (operationType === "rebuild" && Math.random() < 0.3) {
-                compressionRatio = 0.6 + Math.random() * 0.3; // 60-90% compression
+            if (operationType === "rebuild" && secureRandomFloat() < 0.3) {
+                compressionRatio = 0.6 + secureRandomFloat() * 0.3; // 60-90% compression
             }
 
             // Calculate performance gain
@@ -597,7 +598,7 @@ describe("Database Index Operations Benchmarks", () => {
                 fragmentationGain * 0.7 + pageSplitGain * 0.3;
 
             // Determine if operation was during maintenance window
-            const maintenanceWindow = Math.random() < 0.6; // 60% during maintenance window
+            const maintenanceWindow = secureRandomFloat() < 0.6; // 60% during maintenance window
 
             // Determine success
             let success = true;
@@ -619,7 +620,7 @@ describe("Database Index Operations Benchmarks", () => {
                 fragmentationPenalty +
                 maintenanceWindowBonus;
 
-            if (Math.random() < failureRate) {
+            if (secureRandomFloat() < failureRate) {
                 success = false;
                 const errors = [
                     "Lock timeout during maintenance operation",
@@ -628,12 +629,12 @@ describe("Database Index Operations Benchmarks", () => {
                     "Index corruption detected during operation",
                     "Operation cancelled due to system load",
                 ];
-                error = errors[Math.floor(Math.random() * errors.length)];
+                error = errors[Math.floor(secureRandomFloat() * errors.length)];
             }
 
             const operation: IndexMaintenanceOperation = {
                 maintenanceId: `maint-${i}`,
-                indexId: `idx-${Math.floor(Math.random() * 100)}`,
+                indexId: `idx-${Math.floor(secureRandomFloat() * 100)}`,
                 operationType,
                 startTime,
                 endTime,
@@ -785,11 +786,11 @@ describe("Database Index Operations Benchmarks", () => {
 
         for (let i = 0; i < 300; i++) {
             const queryPattern =
-                queryPatterns[Math.floor(Math.random() * queryPatterns.length)];
+                queryPatterns[Math.floor(secureRandomFloat() * queryPatterns.length)];
             const tableType =
-                tableTypes[Math.floor(Math.random() * tableTypes.length)];
+                tableTypes[Math.floor(secureRandomFloat() * tableTypes.length)];
             const scanType =
-                scanTypes[Math.floor(Math.random() * scanTypes.length)];
+                scanTypes[Math.floor(secureRandomFloat() * scanTypes.length)];
 
             // Generate original query characteristics
             const originalQuery = `SELECT * FROM ${tableType.name} WHERE condition_${i % 10} = value_${i}`;
@@ -802,7 +803,7 @@ describe("Database Index Operations Benchmarks", () => {
             const executionTimeBefore = Math.max(
                 100,
                 baseExecutionTime +
-                    (Math.random() - 0.5) * baseExecutionTime * 0.3
+                    (secureRandomFloat() - 0.5) * baseExecutionTime * 0.3
             );
 
             // Calculate original cost
@@ -821,10 +822,10 @@ describe("Database Index Operations Benchmarks", () => {
                 "subquery-flattening",
             ];
 
-            const techniqueCount = Math.floor(Math.random() * 4) + 1;
+            const techniqueCount = Math.floor(secureRandomFloat() * 4) + 1;
             for (let t = 0; t < techniqueCount; t++) {
                 const technique =
-                    techniques[Math.floor(Math.random() * techniques.length)];
+                    techniques[Math.floor(secureRandomFloat() * techniques.length)];
                 if (!optimizationTechniques.includes(technique)) {
                     optimizationTechniques.push(technique);
                 }
@@ -834,12 +835,12 @@ describe("Database Index Operations Benchmarks", () => {
             const indexesUsed: string[] = [];
             const indexesRecommended: string[] = [];
 
-            const usedIndexCount = Math.floor(Math.random() * 3);
+            const usedIndexCount = Math.floor(secureRandomFloat() * 3);
             for (let idx = 0; idx < usedIndexCount; idx++) {
                 indexesUsed.push(`idx_${tableType.name}_${idx}`);
             }
 
-            const recommendedIndexCount = Math.floor(Math.random() * 2) + 1;
+            const recommendedIndexCount = Math.floor(secureRandomFloat() * 2) + 1;
             for (let idx = 0; idx < recommendedIndexCount; idx++) {
                 indexesRecommended.push(`recommended_idx_${i}_${idx}`);
             }
@@ -879,7 +880,7 @@ describe("Database Index Operations Benchmarks", () => {
 
             // Estimate cardinality
             const cardinalityEstimate = Math.floor(
-                tableType.rowCount * (0.1 + Math.random() * 0.4)
+                tableType.rowCount * (0.1 + secureRandomFloat() * 0.4)
             );
 
             const result: QueryOptimizationResult = {
@@ -997,9 +998,9 @@ describe("Database Index Operations Benchmarks", () => {
         // Generate usage patterns for different types of indexes
         for (let i = 0; i < 100; i++) {
             const indexType =
-                indexTypes[Math.floor(Math.random() * indexTypes.length)];
+                indexTypes[Math.floor(secureRandomFloat() * indexTypes.length)];
             const tableType =
-                tableTypes[Math.floor(Math.random() * tableTypes.length)];
+                tableTypes[Math.floor(secureRandomFloat() * tableTypes.length)];
 
             // Generate realistic usage patterns based on index type
             let userSeeks = 0;
@@ -1010,38 +1011,38 @@ describe("Database Index Operations Benchmarks", () => {
             // Different index types have different usage patterns
             switch (indexType.type) {
                 case "btree": {
-                    userSeeks = Math.floor(Math.random() * 100_000) + 1000;
-                    userScans = Math.floor(Math.random() * 10_000);
-                    userLookups = Math.floor(Math.random() * 50_000);
-                    userUpdates = Math.floor(Math.random() * 5000);
+                    userSeeks = Math.floor(secureRandomFloat() * 100_000) + 1000;
+                    userScans = Math.floor(secureRandomFloat() * 10_000);
+                    userLookups = Math.floor(secureRandomFloat() * 50_000);
+                    userUpdates = Math.floor(secureRandomFloat() * 5000);
                     break;
                 }
                 case "hash": {
-                    userSeeks = Math.floor(Math.random() * 150_000) + 5000; // Hash indexes excel at seeks
-                    userScans = Math.floor(Math.random() * 1000); // Poor scan performance
-                    userLookups = Math.floor(Math.random() * 80_000);
-                    userUpdates = Math.floor(Math.random() * 3000);
+                    userSeeks = Math.floor(secureRandomFloat() * 150_000) + 5000; // Hash indexes excel at seeks
+                    userScans = Math.floor(secureRandomFloat() * 1000); // Poor scan performance
+                    userLookups = Math.floor(secureRandomFloat() * 80_000);
+                    userUpdates = Math.floor(secureRandomFloat() * 3000);
                     break;
                 }
                 case "clustered": {
-                    userSeeks = Math.floor(Math.random() * 50_000);
-                    userScans = Math.floor(Math.random() * 50_000) + 10_000; // Good for scans
-                    userLookups = Math.floor(Math.random() * 30_000);
-                    userUpdates = Math.floor(Math.random() * 15_000) + 2000; // Higher updates on clustered
+                    userSeeks = Math.floor(secureRandomFloat() * 50_000);
+                    userScans = Math.floor(secureRandomFloat() * 50_000) + 10_000; // Good for scans
+                    userLookups = Math.floor(secureRandomFloat() * 30_000);
+                    userUpdates = Math.floor(secureRandomFloat() * 15_000) + 2000; // Higher updates on clustered
                     break;
                 }
                 case "covering": {
-                    userSeeks = Math.floor(Math.random() * 80_000) + 2000;
-                    userScans = Math.floor(Math.random() * 20_000);
-                    userLookups = Math.floor(Math.random() * 100_000) + 5000; // Excellent for lookups
-                    userUpdates = Math.floor(Math.random() * 1000); // Lower updates on covering
+                    userSeeks = Math.floor(secureRandomFloat() * 80_000) + 2000;
+                    userScans = Math.floor(secureRandomFloat() * 20_000);
+                    userLookups = Math.floor(secureRandomFloat() * 100_000) + 5000; // Excellent for lookups
+                    userUpdates = Math.floor(secureRandomFloat() * 1000); // Lower updates on covering
                     break;
                 }
                 default: {
-                    userSeeks = Math.floor(Math.random() * 75_000);
-                    userScans = Math.floor(Math.random() * 15_000);
-                    userLookups = Math.floor(Math.random() * 40_000);
-                    userUpdates = Math.floor(Math.random() * 8000);
+                    userSeeks = Math.floor(secureRandomFloat() * 75_000);
+                    userScans = Math.floor(secureRandomFloat() * 15_000);
+                    userLookups = Math.floor(secureRandomFloat() * 40_000);
+                    userUpdates = Math.floor(secureRandomFloat() * 8000);
                 }
             }
 
@@ -1055,19 +1056,19 @@ describe("Database Index Operations Benchmarks", () => {
             const now = Date.now();
             const lastUserSeek =
                 userSeeks > 0
-                    ? now - Math.floor(Math.random() * 7 * 24 * 3_600_000)
+                    ? now - Math.floor(secureRandomFloat() * 7 * 24 * 3_600_000)
                     : undefined; // Within 7 days
             const lastUserScan =
                 userScans > 0
-                    ? now - Math.floor(Math.random() * 30 * 24 * 3_600_000)
+                    ? now - Math.floor(secureRandomFloat() * 30 * 24 * 3_600_000)
                     : undefined; // Within 30 days
             const lastUserLookup =
                 userLookups > 0
-                    ? now - Math.floor(Math.random() * 3 * 24 * 3_600_000)
+                    ? now - Math.floor(secureRandomFloat() * 3 * 24 * 3_600_000)
                     : undefined; // Within 3 days
             const lastUserUpdate =
                 userUpdates > 0
-                    ? now - Math.floor(Math.random() * 24 * 3_600_000)
+                    ? now - Math.floor(secureRandomFloat() * 24 * 3_600_000)
                     : undefined; // Within 1 day
 
             // Calculate efficiency score
@@ -1200,16 +1201,16 @@ describe("Database Index Operations Benchmarks", () => {
 
         for (let i = 0; i < 120; i++) {
             const tableType =
-                tableTypes[Math.floor(Math.random() * tableTypes.length)];
+                tableTypes[Math.floor(secureRandomFloat() * tableTypes.length)];
             const indexType =
-                indexTypes[Math.floor(Math.random() * indexTypes.length)];
+                indexTypes[Math.floor(secureRandomFloat() * indexTypes.length)];
             const compressionType =
                 compressionTypes[
-                    Math.floor(Math.random() * compressionTypes.length)
+                    Math.floor(secureRandomFloat() * compressionTypes.length)
                 ];
             const fragmentationType =
                 fragmentationTypes[
-                    Math.floor(Math.random() * fragmentationTypes.length)
+                    Math.floor(secureRandomFloat() * fragmentationTypes.length)
                 ];
 
             // Generate realistic fragmentation based on table size and age
@@ -1229,7 +1230,7 @@ describe("Database Index Operations Benchmarks", () => {
                       ? 1
                       : 0.8;
 
-            const baseFragmentation = Math.random() * 60; // 0-60% base
+            const baseFragmentation = secureRandomFloat() * 60; // 0-60% base
             const fragmentationPercent = Math.min(
                 95,
                 baseFragmentation * tableSizeFactor * indexTypeFactor
@@ -1259,10 +1260,10 @@ describe("Database Index Operations Benchmarks", () => {
 
             // Calculate hotspot and cold pages
             const hotspotPages = Math.floor(
-                pageCount * (0.05 + Math.random() * 0.1)
+                pageCount * (0.05 + secureRandomFloat() * 0.1)
             ); // 5-15% hotspots
             const coldPages = Math.floor(
-                pageCount * (0.2 + Math.random() * 0.3)
+                pageCount * (0.2 + secureRandomFloat() * 0.3)
             ); // 20-50% cold pages
 
             // Determine recommended maintenance based on fragmentation level

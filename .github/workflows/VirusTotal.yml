@@ -2,12 +2,14 @@
 # It uses the crazy-max/ghaction-virustotal action and your provided API key (should be stored as a secret in production).
 
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: VirusTotal Scan
+name: Virus Total Scan
+run-name: Virus Total Scan
 
 on:
     workflow_dispatch:
     workflow_run:
         workflows: ["Build and Release Electron App"]
+        branches: ["main"]
         types:
             - completed
     schedule:
@@ -18,11 +20,17 @@ permissions:
 
 concurrency:
     group: virustotal-${{ github.ref }}
-    cancel-in-progress: false
+    cancel-in-progress: ${{ false }}
+
+defaults:
+    run:
+        shell: bash
 
 jobs:
     virustotal:
+        name: Scan release assets with VirusTotal
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1

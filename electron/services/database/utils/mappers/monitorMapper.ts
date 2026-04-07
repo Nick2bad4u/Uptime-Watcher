@@ -21,6 +21,7 @@ import {
     isValidIdentifierArray,
     safeInteger,
 } from "@shared/validation/validatorUtils";
+import { objectEntries } from "ts-extras";
 
 import type { MonitorRowSource } from "../schema/dynamicSchema";
 
@@ -69,7 +70,7 @@ function copyDynamicFields(
         "Expected monitor to be record-like"
     );
 
-    for (const [key, value] of Object.entries(dynamicMonitor)) {
+    for (const [key, value] of objectEntries(dynamicMonitor)) {
         if (!excludedFields.has(key)) {
             // Dynamic field assignment for monitor type system
             // Key is validated from dynamicMonitor which comes from typed database mapping

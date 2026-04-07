@@ -2,7 +2,9 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
+import { arrayFirst, arrayJoin  } from "ts-extras";
 import * as z from "zod";
+
 
 /**
  * Minimal subset of the Google API error shape returned by Drive endpoints.
@@ -108,11 +110,11 @@ export function tryDescribeGoogleDriveApiError(
         suffixParts.push(apiStatus);
     }
 
-    const prefix = suffixParts.length > 0 ? `${suffixParts.join("/")}: ` : "";
+    const prefix = suffixParts.length > 0 ? `${arrayJoin(suffixParts, "/")}: ` : "";
 
     if (apiMessage) {
         const reasonSuffix =
-            reasons.length > 0 ? ` (reason: ${reasons[0]})` : "";
+            reasons.length > 0 ? ` (reason: ${arrayFirst(reasons)})` : "";
         return `${prefix}${apiMessage}${reasonSuffix}`;
     }
 

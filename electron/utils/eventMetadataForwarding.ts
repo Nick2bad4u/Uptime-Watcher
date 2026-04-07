@@ -4,9 +4,10 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { UnknownRecord } from "type-fest";
+import type { UnknownArray, UnknownRecord  } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { safeCastTo } from "ts-extras";
 
 import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
 import { ORIGINAL_METADATA_SYMBOL } from "../events/TypedEventBus";
@@ -29,7 +30,7 @@ type ForwardedMetadataKey =
     | typeof ORIGINAL_METADATA_PROPERTY_KEY;
 
 type StrippedForwardedEventMetadata<TPayload> =
-    TPayload extends readonly unknown[]
+    TPayload extends Readonly<UnknownArray>
         ? TPayload
         : TPayload extends object
           ? Omit<TPayload, ForwardedMetadataKey>
@@ -148,7 +149,7 @@ export function attachForwardedMetadata<TPayload extends object>(
  *   to strip metadata from primitives usually indicates a programming error.
  */
 export function stripForwardedEventMetadata<
-    TPayload extends object | readonly unknown[],
+    TPayload extends object | Readonly<UnknownArray>,
 >(payload: TPayload): StrippedForwardedEventMetadata<TPayload> {
     if (Array.isArray(payload)) {
         const clonedArray = Array.from(payload);
@@ -174,7 +175,7 @@ export function stripForwardedEventMetadata<
     // strip well-known metadata keys while preserving the remaining shape.
 
     const clonedPayload: UnknownRecord = {
-        ...(payload as object),
+        ...(safeCastTo(payload)),
     };
 
     if (Reflect.has(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY)) {

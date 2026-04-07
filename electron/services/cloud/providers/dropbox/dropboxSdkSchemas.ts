@@ -1,4 +1,5 @@
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
+import { arrayJoin } from "ts-extras";
 import * as z from "zod";
 
 /**
@@ -37,7 +38,7 @@ export function parseDropboxFilesUploadResult(
     if (!parsed.success) {
         const issues = formatZodIssues(parsed.error.issues);
         throw new TypeError(
-            `Dropbox returned an unexpected upload response: ${issues.slice(0, 3).join("; ")}`
+            `Dropbox returned an unexpected upload response: ${arrayJoin(issues.slice(0, 3), "; ")}`
         );
     }
 
@@ -89,7 +90,7 @@ export function parseDropboxFilesDownloadResult(
     if (!parsed.success) {
         const issues = formatZodIssues(parsed.error.issues);
         throw new TypeError(
-            `Dropbox download result did not match the expected format: ${issues.slice(0, 3).join("; ")}`
+            `Dropbox download result did not match the expected format: ${arrayJoin(issues.slice(0, 3), "; ")}`
         );
     }
 
@@ -179,7 +180,7 @@ export function parseDropboxCurrentAccount(
     if (!parsed.success) {
         const issues = formatZodIssues(parsed.error.issues);
         throw new TypeError(
-            `Dropbox returned an unexpected current account response: ${issues.slice(0, 3).join("; ")}`
+            `Dropbox returned an unexpected current account response: ${arrayJoin(issues.slice(0, 3), "; ")}`
         );
     }
 

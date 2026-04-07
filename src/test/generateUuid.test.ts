@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
 import { generateUuid } from "../utils/data/generateUuid";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("UUID Generation", () => {
     describe("with crypto.randomUUID available", () => {
@@ -59,11 +60,11 @@ describe("UUID Generation", () => {
             // Restore the crypto mock from setup
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
-                    () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
+                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(Math.random() * 256);
+                        arr[i] = Math.floor(secureRandomFloat() * 256);
                     }
                     return arr;
                 }),
@@ -145,11 +146,11 @@ describe("UUID Generation", () => {
             // Restore the crypto mock from setup
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
-                    () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
+                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(Math.random() * 256);
+                        arr[i] = Math.floor(secureRandomFloat() * 256);
                     }
                     return arr;
                 }),
@@ -186,11 +187,11 @@ describe("UUID Generation", () => {
             // Restore the crypto mock from setup
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
-                    () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
+                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(Math.random() * 256);
+                        arr[i] = Math.floor(secureRandomFloat() * 256);
                     }
                     return arr;
                 }),
@@ -276,11 +277,11 @@ describe("UUID Generation", () => {
             // Restore the crypto mock from setup
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
-                    () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
+                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
                 ),
                 getRandomValues: vi.fn((arr) => {
                     for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(Math.random() * 256);
+                        arr[i] = Math.floor(secureRandomFloat() * 256);
                     }
                     return arr;
                 }),
@@ -361,7 +362,7 @@ describe("UUID Generation", () => {
             // Restore crypto mock
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
-                    () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
+                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
                 ),
                 getRandomValues: vi.fn(),
             });
@@ -454,7 +455,7 @@ describe("UUID Generation", () => {
             // Restore crypto mock
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
-                    () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
+                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
                 ),
                 getRandomValues: vi.fn(),
             });
@@ -485,7 +486,7 @@ describe("UUID Generation", () => {
             // Restore crypto mock
             vi.stubGlobal("crypto", {
                 randomUUID: vi.fn(
-                    () => `mock-uuid-${Math.random().toString(36).slice(2, 15)}`
+                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
                 ),
                 getRandomValues: vi.fn(),
             });
@@ -554,7 +555,7 @@ describe("UUID Generation", () => {
                 vi.stubGlobal("crypto", {
                     randomUUID: vi.fn(
                         () =>
-                            `mock-uuid-${Date.now()}-${Math.random().toString(36).slice(2, 15)}`
+                            `mock-uuid-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 15)}`
                     ),
                     getRandomValues: vi.fn(),
                 });

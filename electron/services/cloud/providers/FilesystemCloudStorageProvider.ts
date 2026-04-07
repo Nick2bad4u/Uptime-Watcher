@@ -12,7 +12,7 @@ import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import * as crypto from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { isPresent } from "ts-extras";
+import { isPresent, stringSplit  } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -136,7 +136,7 @@ export class FilesystemCloudStorageProvider
             return;
         }
 
-        const segments = relative.split(path.sep).filter(Boolean);
+        const segments = stringSplit(relative, path.sep).filter(Boolean);
         let cursor = root;
 
         // Check every existing component; refuse to traverse through symlinks
@@ -163,8 +163,7 @@ export class FilesystemCloudStorageProvider
         assertSubpath(root, resolved);
 
         const relative = path.relative(root, resolved);
-        const segments = relative
-            .split(path.sep)
+        const segments = stringSplit(relative, path.sep)
             .filter((segment) => segment.length > 0);
 
         let cursor = root;
@@ -501,7 +500,7 @@ export class FilesystemCloudStorageProvider
             FilesystemCloudStorageProvider.normalizeObjectKey(key);
 
         const root = await this.getAppRootRealPath();
-        const absolutePath = path.resolve(root, ...normalizedKey.split("/"));
+        const absolutePath = path.resolve(root, ...stringSplit(normalizedKey, "/"));
         assertSubpath(root, absolutePath);
         await this.assertNoSymlinkPathComponents(root, absolutePath);
         return absolutePath;

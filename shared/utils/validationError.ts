@@ -12,11 +12,13 @@
  *
  * @public
  */
+import { arrayJoin } from "ts-extras";
+
 export class ValidationError extends Error {
     public readonly errors: readonly string[];
 
     public constructor(errors: readonly string[]) {
-        super(`Validation failed: ${errors.join(", ")}`);
+        super(`Validation failed: ${arrayJoin(errors, ", ")}`);
         this.name = "ValidationError";
         this.errors = errors;
     }

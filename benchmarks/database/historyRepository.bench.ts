@@ -16,6 +16,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock database connection
 class MockDatabase {
@@ -110,7 +111,7 @@ class MockHistoryRepository {
                 ][i % 3],
                 message: `Test event ${i}`,
                 metadata: JSON.stringify({
-                    responseTime: Math.floor(Math.random() * 1000),
+                    responseTime: Math.floor(secureRandomFloat() * 1000),
                     statusCode: [
                         200,
                         404,
@@ -294,7 +295,7 @@ describe("History Repository Performance", () => {
         "find record by id",
         () => {
             repository = new MockHistoryRepository();
-            repository.findById(Math.floor(Math.random() * 10_000) + 1);
+            repository.findById(Math.floor(secureRandomFloat() * 10_000) + 1);
         },
         { warmupIterations: 5, iterations: 10_000 }
     );
@@ -312,7 +313,7 @@ describe("History Repository Performance", () => {
         "find records by monitor",
         () => {
             repository = new MockHistoryRepository();
-            repository.findByMonitor(Math.floor(Math.random() * 1000) + 1, 100);
+            repository.findByMonitor(Math.floor(secureRandomFloat() * 1000) + 1, 100);
         },
         { warmupIterations: 5, iterations: 1000 }
     );
@@ -321,7 +322,7 @@ describe("History Repository Performance", () => {
         "find records by site",
         () => {
             repository = new MockHistoryRepository();
-            repository.findBySite(Math.floor(Math.random() * 100) + 1, 100);
+            repository.findBySite(Math.floor(secureRandomFloat() * 100) + 1, 100);
         },
         { warmupIterations: 5, iterations: 1000 }
     );
@@ -347,7 +348,7 @@ describe("History Repository Performance", () => {
                 "recovery",
             ];
             repository.findByEventType(
-                types[Math.floor(Math.random() * types.length)]
+                types[Math.floor(secureRandomFloat() * types.length)]
             );
         },
         { warmupIterations: 5, iterations: 1000 }
@@ -361,10 +362,10 @@ describe("History Repository Performance", () => {
                 siteIdentifier: (i % 10) + 1,
                 monitorId: (i % 50) + 1,
                 eventType: "check_result",
-                status: Math.random() > 0.5 ? "online" : "offline",
+                status: secureRandomFloat() > 0.5 ? "online" : "offline",
                 message: `Bulk event ${i}`,
                 metadata: JSON.stringify({
-                    responseTime: Math.floor(Math.random() * 1000),
+                    responseTime: Math.floor(secureRandomFloat() * 1000),
                 }),
                 timestamp: Date.now() - i * 1000,
             }));
@@ -406,7 +407,7 @@ describe("History Repository Performance", () => {
         () => {
             repository = new MockHistoryRepository();
             repository.getResponseTimeStats(
-                Math.floor(Math.random() * 1000) + 1,
+                Math.floor(secureRandomFloat() * 1000) + 1,
                 24
             );
         },

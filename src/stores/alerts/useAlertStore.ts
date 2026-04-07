@@ -9,6 +9,7 @@
 
 import type { MonitorStatus } from "@shared/types";
 
+import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 /** Maximum number of alerts retained in memory. */
@@ -36,9 +37,8 @@ const nextFallbackAlertCounter = (() => {
  * falling back to a deterministic counter otherwise.
  */
 const generateAlertId = (): string => {
-    const cryptoObject = globalThis.crypto as
-        | (Crypto & { randomUUID?: () => string })
-        | undefined;
+    const cryptoObject = safeCastTo<| (Crypto & { randomUUID?: () => string })
+        | undefined>(globalThis.crypto);
     if (cryptoObject?.randomUUID) {
         return cryptoObject.randomUUID();
     }

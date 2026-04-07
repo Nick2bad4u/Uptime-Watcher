@@ -15,6 +15,7 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
+import { arrayFind, isEmpty, objectEntries, objectFromEntries, safeCastTo     } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
 
@@ -47,7 +48,7 @@ const collectActiveLockEntries = (
 ): OptimisticLockEntry[] => {
     const entries: OptimisticLockEntry[] = [];
 
-    for (const [rawKey, lock] of Object.entries(locks)) {
+    for (const [rawKey, lock] of objectEntries(locks)) {
         if (isOptimisticLockKey(rawKey) && lock !== undefined) {
             entries.push([rawKey, lock]);
         }
@@ -63,7 +64,7 @@ const collectSelectedMonitorEntries = (
 ): SelectedMonitorEntry[] => {
     const entries: SelectedMonitorEntry[] = [];
 
-    for (const [siteId, monitorId] of Object.entries(selectedMonitorIds)) {
+    for (const [siteId, monitorId] of objectEntries(selectedMonitorIds)) {
         if (typeof monitorId === "string") {
             entries.push([siteId, monitorId]);
         }
@@ -265,7 +266,7 @@ export const createSitesStateActions = (
             siteIdentifier: Site["identifier"],
             monitorIds: ReadonlyArray<Monitor["id"]>
         ): void => {
-            if (monitorIds.length === 0) {
+            if (isEmpty(monitorIds)) {
                 return;
             }
 
@@ -313,9 +314,7 @@ export const createSitesStateActions = (
                 return undefined;
             }
             return (
-                sites.find(
-                    (site) => site.identifier === selectedSiteIdentifier
-                ) ?? undefined
+                arrayFind(sites, (site) => site.identifier === selectedSiteIdentifier) ?? undefined
             );
         },
         recordSiteSyncDelta: (delta: SiteSyncDelta | undefined): void => {
@@ -332,7 +331,7 @@ export const createSitesStateActions = (
             monitoring: boolean,
             durationMs: number
         ): void => {
-            if (monitorIds.length === 0) {
+            if (isEmpty(monitorIds)) {
                 return;
             }
 
@@ -372,11 +371,11 @@ export const createSitesStateActions = (
             set((state) => {
                 const currentMonitorIds = state.selectedMonitorIds;
 
-                const remainingMonitorIds = Object.fromEntries(
-                    Object.entries(currentMonitorIds).filter(
+                const remainingMonitorIds = safeCastTo(objectFromEntries(
+                    objectEntries(currentMonitorIds).filter(
                         ([key]) => key !== identifier
                     )
-                ) as SitesState["selectedMonitorIds"];
+                ));
                 return {
                     selectedMonitorIds: remainingMonitorIds,
                     selectedSiteIdentifier:
@@ -454,7 +453,7 @@ export const createSitesStateActions = (
             let mutatedSiteCount = 0;
 
             const normalizedSites =
-                lockEntries.length === 0
+                isEmpty(lockEntries)
                     ? sites
                     : sites.map((site) => {
                           let siteMutated = false;

@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /** Describes a synthetic user entity used in tests. */
 interface User {
@@ -85,7 +86,7 @@ class MockPasswordService {
     /** Generates a pseudo bcrypt hash for benchmark purposes. */
     async hash(password: string): Promise<string> {
         // Simulate bcrypt-like hashing
-        const salt = Math.random().toString(36).slice(2, 15);
+        const salt = secureRandomFloat().toString(36).slice(2, 15);
         return `$2b$10$${salt}$${this.simpleHash(password + salt)}`;
     }
 
@@ -134,7 +135,7 @@ class MockTokenService {
     /** Produces a random refresh token value. */
     generateRefreshToken(): string {
         return Array.from({ length: 64 }, () =>
-            Math.random().toString(36).charAt(2)
+            secureRandomFloat().toString(36).charAt(2)
         ).join("");
     }
 
@@ -795,8 +796,8 @@ function createLoginRequest(username: string, password: string): LoginRequest {
     return {
         username,
         password,
-        rememberMe: Math.random() > 0.5,
-        ipAddress: `192.168.1.${Math.floor(Math.random() * 255)}`,
+        rememberMe: secureRandomFloat() > 0.5,
+        ipAddress: `192.168.1.${Math.floor(secureRandomFloat() * 255)}`,
         userAgent: "Test User Agent",
     };
 }

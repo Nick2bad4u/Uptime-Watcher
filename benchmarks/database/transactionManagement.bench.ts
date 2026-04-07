@@ -8,6 +8,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Define comprehensive interfaces for type safety
 interface TransactionOperation {
@@ -208,11 +209,11 @@ describe("Database Transaction Management Benchmarks", () => {
             for (let txn = 0; txn < transactionsPerSession; txn++) {
                 const isolation =
                     isolationLevels[
-                        Math.floor(Math.random() * isolationLevels.length)
+                        Math.floor(secureRandomFloat() * isolationLevels.length)
                     ];
                 const operation =
                     operationTypes[
-                        Math.floor(Math.random() * operationTypes.length)
+                        Math.floor(secureRandomFloat() * operationTypes.length)
                     ];
 
                 const transactionId = `txn-${session}-${txn}`;
@@ -220,7 +221,7 @@ describe("Database Transaction Management Benchmarks", () => {
 
                 // Transaction timing
                 const baseStartTime = Date.now() + session * 100 + txn * 50;
-                const jitter = (Math.random() - 0.5) * 200;
+                const jitter = (secureRandomFloat() - 0.5) * 200;
                 const startTime = baseStartTime + jitter;
 
                 // Calculate transaction duration based on operation type and isolation level
@@ -230,7 +231,7 @@ describe("Database Transaction Management Benchmarks", () => {
                 const transactionDuration = baseDuration + isolationOverhead;
 
                 // Add variance for real-world conditions
-                const variance = (Math.random() - 0.5) * 0.4;
+                const variance = (secureRandomFloat() - 0.5) * 0.4;
                 const actualDuration = Math.max(
                     50,
                     transactionDuration * (1 + variance)
@@ -239,12 +240,12 @@ describe("Database Transaction Management Benchmarks", () => {
                 const endTime = startTime + actualDuration;
 
                 // Determine affected tables and rows
-                const tableCount = Math.floor(Math.random() * 3) + 1; // 1-3 tables
+                const tableCount = Math.floor(secureRandomFloat() * 3) + 1; // 1-3 tables
                 const affectedTables: string[] = [];
                 for (let i = 0; i < tableCount; i++) {
                     const table =
                         tableNames[
-                            Math.floor(Math.random() * tableNames.length)
+                            Math.floor(secureRandomFloat() * tableNames.length)
                         ];
                     if (!affectedTables.includes(table)) {
                         affectedTables.push(table);
@@ -255,23 +256,23 @@ describe("Database Transaction Management Benchmarks", () => {
                 let affectedRows = 0;
                 switch (operation.type) {
                     case "select": {
-                        affectedRows = Math.floor(Math.random() * 10_000) + 1;
+                        affectedRows = Math.floor(secureRandomFloat() * 10_000) + 1;
                         break;
                     }
                     case "insert": {
-                        affectedRows = Math.floor(Math.random() * 100) + 1;
+                        affectedRows = Math.floor(secureRandomFloat() * 100) + 1;
                         break;
                     }
                     case "update": {
-                        affectedRows = Math.floor(Math.random() * 1000) + 1;
+                        affectedRows = Math.floor(secureRandomFloat() * 1000) + 1;
                         break;
                     }
                     case "delete": {
-                        affectedRows = Math.floor(Math.random() * 500) + 1;
+                        affectedRows = Math.floor(secureRandomFloat() * 500) + 1;
                         break;
                     }
                     case "mixed": {
-                        affectedRows = Math.floor(Math.random() * 2000) + 10;
+                        affectedRows = Math.floor(secureRandomFloat() * 2000) + 10;
                         break;
                     }
                 }
@@ -318,9 +319,9 @@ describe("Database Transaction Management Benchmarks", () => {
                     concurrencyFactor;
 
                 // Small chance of active transaction (ongoing)
-                if (Math.random() < 0.01) {
+                if (secureRandomFloat() < 0.01) {
                     status = "active";
-                } else if (Math.random() < totalFailureRate) {
+                } else if (secureRandomFloat() < totalFailureRate) {
                     const failureTypes = [
                         {
                             status: "rolled-back" as const,
@@ -338,7 +339,7 @@ describe("Database Transaction Management Benchmarks", () => {
 
                     const failure =
                         failureTypes[
-                            Math.floor(Math.random() * failureTypes.length)
+                            Math.floor(secureRandomFloat() * failureTypes.length)
                         ];
                     status = failure.status;
                     error = failure.error;
@@ -492,7 +493,7 @@ describe("Database Transaction Management Benchmarks", () => {
 
         // Simulate various deadlock scenarios
         for (let i = 0; i < 50; i++) {
-            const transactionCount = Math.floor(Math.random() * 4) + 2; // 2-5 transactions in deadlock
+            const transactionCount = Math.floor(secureRandomFloat() * 4) + 2; // 2-5 transactions in deadlock
             const involvedTransactions: string[] = [];
 
             for (let j = 0; j < transactionCount; j++) {
@@ -508,7 +509,7 @@ describe("Database Transaction Management Benchmarks", () => {
             for (let j = 0; j < transactionCount; j++) {
                 const fromTxn = involvedTransactions[j];
                 const toTxn = involvedTransactions[(j + 1) % transactionCount];
-                const resource = `resource-${Math.floor(Math.random() * 5)}`;
+                const resource = `resource-${Math.floor(secureRandomFloat() * 5)}`;
 
                 edges.push({ from: fromTxn, to: toTxn, resource });
 
@@ -518,16 +519,16 @@ describe("Database Transaction Management Benchmarks", () => {
             }
 
             // Add additional edges for complex deadlocks
-            if (transactionCount > 2 && Math.random() < 0.3) {
-                const additionalEdges = Math.floor(Math.random() * 2) + 1;
+            if (transactionCount > 2 && secureRandomFloat() < 0.3) {
+                const additionalEdges = Math.floor(secureRandomFloat() * 2) + 1;
                 for (let j = 0; j < additionalEdges; j++) {
                     const fromIdx = Math.floor(
-                        Math.random() * transactionCount
+                        secureRandomFloat() * transactionCount
                     );
-                    const toIdx = Math.floor(Math.random() * transactionCount);
+                    const toIdx = Math.floor(secureRandomFloat() * transactionCount);
 
                     if (fromIdx !== toIdx) {
-                        const resource = `resource-${Math.floor(Math.random() * 5)}`;
+                        const resource = `resource-${Math.floor(secureRandomFloat() * 5)}`;
                         edges.push({
                             from: involvedTransactions[fromIdx],
                             to: involvedTransactions[toIdx],
@@ -542,12 +543,12 @@ describe("Database Transaction Management Benchmarks", () => {
             }
 
             // Calculate detection and resolution times
-            const detectionTime = Date.now() + Math.random() * 5000; // 0-5 seconds to detect
+            const detectionTime = Date.now() + secureRandomFloat() * 5000; // 0-5 seconds to detect
 
             // Resolution time depends on deadlock complexity
             const complexityFactor = transactionCount + edges.length;
             const baseResolutionTime = 100 + complexityFactor * 50; // Base resolution time
-            const resolutionVariance = (Math.random() - 0.5) * 0.4;
+            const resolutionVariance = (secureRandomFloat() - 0.5) * 0.4;
             const resolutionTime =
                 baseResolutionTime * (1 + resolutionVariance);
 
@@ -560,7 +561,7 @@ describe("Database Transaction Management Benchmarks", () => {
             ] as const;
             const resolutionMethod =
                 victimSelectionMethods[
-                    Math.floor(Math.random() * victimSelectionMethods.length)
+                    Math.floor(secureRandomFloat() * victimSelectionMethods.length)
                 ];
 
             let victimTransaction: string;
@@ -583,7 +584,7 @@ describe("Database Transaction Management Benchmarks", () => {
                     victimTransaction =
                         involvedTransactions[
                             Math.floor(
-                                Math.random() * involvedTransactions.length
+                                secureRandomFloat() * involvedTransactions.length
                             )
                         ];
                     break;
@@ -607,10 +608,10 @@ describe("Database Transaction Management Benchmarks", () => {
                 "timeout-based",
             ];
             const preventionMechanism =
-                Math.random() < 0.3
+                secureRandomFloat() < 0.3
                     ? preventionMechanisms[
                           Math.floor(
-                              Math.random() * preventionMechanisms.length
+                              secureRandomFloat() * preventionMechanisms.length
                           )
                       ]
                     : undefined;
@@ -736,36 +737,36 @@ describe("Database Transaction Management Benchmarks", () => {
 
         for (let i = 0; i < 500; i++) {
             const resourceType =
-                resourceTypes[Math.floor(Math.random() * resourceTypes.length)];
+                resourceTypes[Math.floor(secureRandomFloat() * resourceTypes.length)];
             const lockMode =
-                lockModes[Math.floor(Math.random() * lockModes.length)];
+                lockModes[Math.floor(secureRandomFloat() * lockModes.length)];
 
             // Generate realistic lock duration based on resource type and mode
             let baseDuration = 0;
 
             switch (resourceType) {
                 case "database": {
-                    baseDuration = 10_000 + Math.random() * 50_000; // 10-60 seconds
+                    baseDuration = 10_000 + secureRandomFloat() * 50_000; // 10-60 seconds
                     break;
                 }
                 case "table": {
-                    baseDuration = 1000 + Math.random() * 10_000; // 1-11 seconds
+                    baseDuration = 1000 + secureRandomFloat() * 10_000; // 1-11 seconds
                     break;
                 }
                 case "extent": {
-                    baseDuration = 500 + Math.random() * 2000; // 0.5-2.5 seconds
+                    baseDuration = 500 + secureRandomFloat() * 2000; // 0.5-2.5 seconds
                     break;
                 }
                 case "page": {
-                    baseDuration = 100 + Math.random() * 1000; // 0.1-1.1 seconds
+                    baseDuration = 100 + secureRandomFloat() * 1000; // 0.1-1.1 seconds
                     break;
                 }
                 case "row": {
-                    baseDuration = 10 + Math.random() * 200; // 0.01-0.21 seconds
+                    baseDuration = 10 + secureRandomFloat() * 200; // 0.01-0.21 seconds
                     break;
                 }
                 case "key": {
-                    baseDuration = 5 + Math.random() * 100; // 0.005-0.105 seconds
+                    baseDuration = 5 + secureRandomFloat() * 100; // 0.005-0.105 seconds
                     break;
                 }
             }
@@ -792,9 +793,9 @@ describe("Database Transaction Management Benchmarks", () => {
                 key: 0.9,
             }[resourceType];
 
-            const isContended = Math.random() < contentionProbability;
+            const isContended = secureRandomFloat() < contentionProbability;
             const waitersCount = isContended
-                ? Math.floor(Math.random() * 10) + 1
+                ? Math.floor(secureRandomFloat() * 10) + 1
                 : 0;
 
             // Calculate wait times
@@ -806,7 +807,7 @@ describe("Database Transaction Management Benchmarks", () => {
             }
 
             // Timing
-            const grantedTime = Date.now() + Math.random() * 1000;
+            const grantedTime = Date.now() + secureRandomFloat() * 1000;
             const releasedTime = grantedTime + lockDuration;
 
             // Lock escalation (more likely for fine-grained locks under high contention)
@@ -814,11 +815,11 @@ describe("Database Transaction Management Benchmarks", () => {
                 resourceType === "row" || resourceType === "key"
                     ? contentionProbability * 0.3
                     : 0.05;
-            const lockEscalation = Math.random() < escalationProbability;
+            const lockEscalation = secureRandomFloat() < escalationProbability;
 
             // Lock conversions (upgrade/downgrade)
             const conversionCount = isContended
-                ? Math.floor(Math.random() * 3)
+                ? Math.floor(secureRandomFloat() * 3)
                 : 0;
 
             // Calculate contention score
@@ -954,30 +955,30 @@ describe("Database Transaction Management Benchmarks", () => {
         for (let i = 0; i < 1000; i++) {
             const operationType =
                 operationTypes[
-                    Math.floor(Math.random() * operationTypes.length)
+                    Math.floor(secureRandomFloat() * operationTypes.length)
                 ];
 
             // Calculate log entry size based on operation type
             let sizeBytes = 0;
             switch (operationType) {
                 case "begin": {
-                    sizeBytes = 100 + Math.random() * 50; // 100-150 bytes
+                    sizeBytes = 100 + secureRandomFloat() * 50; // 100-150 bytes
                     break;
                 }
                 case "commit": {
-                    sizeBytes = 80 + Math.random() * 40; // 80-120 bytes
+                    sizeBytes = 80 + secureRandomFloat() * 40; // 80-120 bytes
                     break;
                 }
                 case "rollback": {
-                    sizeBytes = 120 + Math.random() * 80; // 120-200 bytes
+                    sizeBytes = 120 + secureRandomFloat() * 80; // 120-200 bytes
                     break;
                 }
                 case "checkpoint": {
-                    sizeBytes = 500 + Math.random() * 1000; // 500-1500 bytes
+                    sizeBytes = 500 + secureRandomFloat() * 1000; // 500-1500 bytes
                     break;
                 }
                 case "data-change": {
-                    sizeBytes = 200 + Math.random() * 2000; // 200-2200 bytes
+                    sizeBytes = 200 + secureRandomFloat() * 2000; // 200-2200 bytes
                     break;
                 }
             }
@@ -988,7 +989,7 @@ describe("Database Transaction Management Benchmarks", () => {
 
             // Calculate flush time based on entry size and system load
             const baseFlushTime = sizeBytes / (100 * 1024); // 100KB/ms flush rate
-            const systemLoadFactor = 1 + Math.random() * 0.5; // 1-1.5x system load
+            const systemLoadFactor = 1 + secureRandomFloat() * 0.5; // 1-1.5x system load
             const flushTime = baseFlushTime * systemLoadFactor;
 
             // Determine if backup is required
@@ -1002,7 +1003,7 @@ describe("Database Transaction Management Benchmarks", () => {
 
             // Determine if truncation is pending
             const truncationPending =
-                operationType === "checkpoint" && Math.random() < 0.3;
+                operationType === "checkpoint" && secureRandomFloat() < 0.3;
 
             if (truncationPending) {
                 // Truncate log (reset space usage)
@@ -1094,7 +1095,7 @@ describe("Database Transaction Management Benchmarks", () => {
                 "light",
                 "medium",
                 "heavy",
-            ][Math.floor(Math.random() * 3)];
+            ][Math.floor(secureRandomFloat() * 3)];
 
             let maxConcurrentTransactions = 0;
             let throughputTPS = 0;
@@ -1107,47 +1108,47 @@ describe("Database Transaction Management Benchmarks", () => {
             switch (sessionType) {
                 case "light": {
                     maxConcurrentTransactions =
-                        Math.floor(Math.random() * 5) + 1; // 1-5
-                    throughputTPS = 10 + Math.random() * 20; // 10-30 TPS
-                    averageWaitTime = Math.random() * 100; // 0-100ms
-                    blockingChainLength = Math.floor(Math.random() * 2); // 0-1
-                    errorRate = Math.random() * 0.01; // 0-1%
-                    retryCount = Math.floor(Math.random() * 3); // 0-2
-                    timeoutCount = Math.floor(Math.random() * 2); // 0-1
+                        Math.floor(secureRandomFloat() * 5) + 1; // 1-5
+                    throughputTPS = 10 + secureRandomFloat() * 20; // 10-30 TPS
+                    averageWaitTime = secureRandomFloat() * 100; // 0-100ms
+                    blockingChainLength = Math.floor(secureRandomFloat() * 2); // 0-1
+                    errorRate = secureRandomFloat() * 0.01; // 0-1%
+                    retryCount = Math.floor(secureRandomFloat() * 3); // 0-2
+                    timeoutCount = Math.floor(secureRandomFloat() * 2); // 0-1
                     break;
                 }
                 case "medium": {
                     maxConcurrentTransactions =
-                        Math.floor(Math.random() * 10) + 5; // 5-14
-                    throughputTPS = 30 + Math.random() * 40; // 30-70 TPS
-                    averageWaitTime = 50 + Math.random() * 200; // 50-250ms
-                    blockingChainLength = Math.floor(Math.random() * 4) + 1; // 1-4
-                    errorRate = 0.01 + Math.random() * 0.03; // 1-4%
-                    retryCount = Math.floor(Math.random() * 5) + 1; // 1-5
-                    timeoutCount = Math.floor(Math.random() * 3); // 0-2
+                        Math.floor(secureRandomFloat() * 10) + 5; // 5-14
+                    throughputTPS = 30 + secureRandomFloat() * 40; // 30-70 TPS
+                    averageWaitTime = 50 + secureRandomFloat() * 200; // 50-250ms
+                    blockingChainLength = Math.floor(secureRandomFloat() * 4) + 1; // 1-4
+                    errorRate = 0.01 + secureRandomFloat() * 0.03; // 1-4%
+                    retryCount = Math.floor(secureRandomFloat() * 5) + 1; // 1-5
+                    timeoutCount = Math.floor(secureRandomFloat() * 3); // 0-2
                     break;
                 }
                 case "heavy": {
                     maxConcurrentTransactions =
-                        Math.floor(Math.random() * 20) + 10; // 10-29
-                    throughputTPS = 50 + Math.random() * 100; // 50-150 TPS
-                    averageWaitTime = 200 + Math.random() * 500; // 200-700ms
-                    blockingChainLength = Math.floor(Math.random() * 8) + 2; // 2-9
-                    errorRate = 0.03 + Math.random() * 0.07; // 3-10%
-                    retryCount = Math.floor(Math.random() * 10) + 2; // 2-11
-                    timeoutCount = Math.floor(Math.random() * 5) + 1; // 1-5
+                        Math.floor(secureRandomFloat() * 20) + 10; // 10-29
+                    throughputTPS = 50 + secureRandomFloat() * 100; // 50-150 TPS
+                    averageWaitTime = 200 + secureRandomFloat() * 500; // 200-700ms
+                    blockingChainLength = Math.floor(secureRandomFloat() * 8) + 2; // 2-9
+                    errorRate = 0.03 + secureRandomFloat() * 0.07; // 3-10%
+                    retryCount = Math.floor(secureRandomFloat() * 10) + 2; // 2-11
+                    timeoutCount = Math.floor(secureRandomFloat() * 5) + 1; // 1-5
                     break;
                 }
             }
 
             // Current concurrent transactions (snapshot)
             const concurrentTransactions =
-                Math.floor(Math.random() * maxConcurrentTransactions) + 1;
+                Math.floor(secureRandomFloat() * maxConcurrentTransactions) + 1;
 
             // Calculate latency percentiles
             const baseLatency = averageWaitTime;
-            const latencyP95 = baseLatency * (1.5 + Math.random() * 0.5); // 1.5-2x average
-            const latencyP99 = baseLatency * (2.5 + Math.random() * 1.5); // 2.5-4x average
+            const latencyP95 = baseLatency * (1.5 + secureRandomFloat() * 0.5); // 1.5-2x average
+            const latencyP99 = baseLatency * (2.5 + secureRandomFloat() * 1.5); // 2.5-4x average
 
             const metrics: ConcurrencyMetrics = {
                 sessionId: `session-${session}`,
@@ -1302,7 +1303,7 @@ describe("Database Transaction Management Benchmarks", () => {
 
                     // Determine transaction count for test
                     const transactionsInvolved =
-                        Math.floor(Math.random() * 5) + 1; // 1-5 transactions
+                        Math.floor(secureRandomFloat() * 5) + 1; // 1-5 transactions
 
                     // Calculate test duration based on complexity
                     const baseTestDuration = {
@@ -1348,7 +1349,7 @@ describe("Database Transaction Management Benchmarks", () => {
                     const finalComplianceRate =
                         baseComplianceRate * scenarioComplexity;
                     const compliancePassed =
-                        Math.random() < finalComplianceRate;
+                        secureRandomFloat() < finalComplianceRate;
 
                     // Generate violation details if compliance failed
                     let violationDetails: string | undefined;
@@ -1380,7 +1381,7 @@ describe("Database Transaction Management Benchmarks", () => {
                         violationDetails =
                             violationsOfType[
                                 Math.floor(
-                                    Math.random() * violationsOfType.length
+                                    secureRandomFloat() * violationsOfType.length
                                 )
                             ];
                     }
@@ -1388,13 +1389,13 @@ describe("Database Transaction Management Benchmarks", () => {
                     // Calculate recovery time for durability tests
                     let recoveryTime: number | undefined;
                     if (testType.testType === "durability") {
-                        recoveryTime = 1000 + Math.random() * 5000; // 1-6 seconds
+                        recoveryTime = 1000 + secureRandomFloat() * 5000; // 1-6 seconds
                     }
 
                     // Calculate data integrity score
                     const dataIntegrityScore = compliancePassed
-                        ? 95 + Math.random() * 5 // 95-100% if passed
-                        : Math.random() * 70; // 0-70% if failed
+                        ? 95 + secureRandomFloat() * 5 // 95-100% if passed
+                        : secureRandomFloat() * 70; // 0-70% if failed
 
                     // Calculate performance impact
                     const performanceImpact = testDuration / baseTestDuration; // 1.0 = no impact

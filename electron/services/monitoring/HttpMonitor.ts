@@ -3,6 +3,8 @@
  * shared HTTP monitor core.
  */
 
+import type { Constructor } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
 import { determineMonitorStatus } from "@shared/utils/httpStatusUtils";
 
@@ -35,9 +37,7 @@ const behavior: HttpMonitorBehavior<"http", undefined> = {
     }),
 };
 
-type HttpMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance;
+type HttpMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
 
 const HttpMonitorBase: HttpMonitorConstructor = ((): HttpMonitorConstructor => {
     try {

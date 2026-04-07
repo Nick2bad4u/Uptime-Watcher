@@ -3,6 +3,7 @@ import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
+import { safeCastTo } from "ts-extras";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
@@ -20,9 +21,9 @@ function hasAccountLabel(
     }
 
     const candidate = (
-        provider as CloudStorageProvider & {
+        safeCastTo<CloudStorageProvider & {
             readonly getAccountLabel?: unknown;
-        }
+        }>(provider)
     ).getAccountLabel;
 
     return typeof candidate === "function";

@@ -5,6 +5,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -106,7 +107,7 @@ export function createRemoteMonitorService<
     TContext,
 >(
     behavior: RemoteMonitorBehavior<TType, TContext>
-): new (config?: MonitorServiceConfig) => IMonitorService {
+): Constructor<IMonitorService, [config?: MonitorServiceConfig]> {
     return class RemoteMonitorServiceAdapter extends MonitorServiceAdapterBase<TType> {
         public async check(
             monitor: Site["monitors"][0],

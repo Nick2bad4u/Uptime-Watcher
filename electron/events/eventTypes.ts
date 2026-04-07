@@ -13,6 +13,8 @@
  * @see {@link UptimeEvents}
  */
 
+import { safeCastTo } from "ts-extras";
+
 import type { EventPayloadValue } from "./TypedEventBus";
 
 /**
@@ -483,17 +485,17 @@ export function getEventPriority(
     // Check each priority level using string-based comparison to avoid type
     // assertion issues
     if (
-        (EVENT_PRIORITIES.CRITICAL as readonly string[]).includes(eventNameStr)
+        (safeCastTo<readonly string[]>(EVENT_PRIORITIES.CRITICAL)).includes(eventNameStr)
     ) {
         return "CRITICAL";
     }
-    if ((EVENT_PRIORITIES.HIGH as readonly string[]).includes(eventNameStr)) {
+    if ((safeCastTo<readonly string[]>(EVENT_PRIORITIES.HIGH)).includes(eventNameStr)) {
         return "HIGH";
     }
-    if ((EVENT_PRIORITIES.LOW as readonly string[]).includes(eventNameStr)) {
+    if ((safeCastTo<readonly string[]>(EVENT_PRIORITIES.LOW)).includes(eventNameStr)) {
         return "LOW";
     }
-    if ((EVENT_PRIORITIES.MEDIUM as readonly string[]).includes(eventNameStr)) {
+    if ((safeCastTo<readonly string[]>(EVENT_PRIORITIES.MEDIUM)).includes(eventNameStr)) {
         return "MEDIUM";
     }
 
@@ -540,72 +542,72 @@ export function isEventOfCategory(
     // Type-safe category checking using string-based comparison
     switch (category) {
         case "CACHE": {
-            return (EVENT_CATEGORIES.CACHE as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.CACHE)).includes(
                 eventNameStr
             );
         }
         case "CONFIG": {
-            return (EVENT_CATEGORIES.CONFIG as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.CONFIG)).includes(
                 eventNameStr
             );
         }
         case "DATABASE": {
-            return (EVENT_CATEGORIES.DATABASE as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.DATABASE)).includes(
                 eventNameStr
             );
         }
         case "DIAGNOSTICS": {
-            return (EVENT_CATEGORIES.DIAGNOSTICS as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.DIAGNOSTICS)).includes(
                 eventNameStr
             );
         }
         case "INTERNAL_CACHE": {
             return (
-                EVENT_CATEGORIES.INTERNAL_CACHE as readonly string[]
+                safeCastTo<readonly string[]>(EVENT_CATEGORIES.INTERNAL_CACHE)
             ).includes(eventNameStr);
         }
         case "INTERNAL_DATABASE": {
             return (
-                EVENT_CATEGORIES.INTERNAL_DATABASE as readonly string[]
+                safeCastTo<readonly string[]>(EVENT_CATEGORIES.INTERNAL_DATABASE)
             ).includes(eventNameStr);
         }
         case "INTERNAL_MONITOR": {
             return (
-                EVENT_CATEGORIES.INTERNAL_MONITOR as readonly string[]
+                safeCastTo<readonly string[]>(EVENT_CATEGORIES.INTERNAL_MONITOR)
             ).includes(eventNameStr);
         }
         case "INTERNAL_SITE": {
             return (
-                EVENT_CATEGORIES.INTERNAL_SITE as readonly string[]
+                safeCastTo<readonly string[]>(EVENT_CATEGORIES.INTERNAL_SITE)
             ).includes(eventNameStr);
         }
         case "MONITOR": {
-            return (EVENT_CATEGORIES.MONITOR as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.MONITOR)).includes(
                 eventNameStr
             );
         }
         case "MONITORING": {
-            return (EVENT_CATEGORIES.MONITORING as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.MONITORING)).includes(
                 eventNameStr
             );
         }
         case "PERFORMANCE": {
-            return (EVENT_CATEGORIES.PERFORMANCE as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.PERFORMANCE)).includes(
                 eventNameStr
             );
         }
         case "SETTINGS": {
-            return (EVENT_CATEGORIES.SETTINGS as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.SETTINGS)).includes(
                 eventNameStr
             );
         }
         case "SITE": {
-            return (EVENT_CATEGORIES.SITE as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.SITE)).includes(
                 eventNameStr
             );
         }
         case "SYSTEM": {
-            return (EVENT_CATEGORIES.SYSTEM as readonly string[]).includes(
+            return (safeCastTo<readonly string[]>(EVENT_CATEGORIES.SYSTEM)).includes(
                 eventNameStr
             );
         }

@@ -17,6 +17,7 @@
 
 import { bench, describe } from "vitest";
 import type { UnknownRecord } from "type-fest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 interface IpcMessage {
     id: string;
@@ -127,7 +128,7 @@ class MockIpcService {
                         new Error(`No handler for channel: ${channel}`)
                     );
                 }
-            }, Math.random() * 10);
+            }, secureRandomFloat() * 10);
         });
     }
 
@@ -178,7 +179,7 @@ class MockIpcService {
     }
 
     private generateMessageId(): string {
-        return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+        return `msg-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
     }
 
     private logMessage(message: IpcMessage): void {
@@ -239,7 +240,7 @@ class MockIpcService {
             id: `history-${i}`,
             timestamp: Date.now() - i * 60_000,
             status: ["online", "offline"][i % 2] as SiteStatus,
-            responseTime: Math.random() * 1000,
+            responseTime: secureRandomFloat() * 1000,
         }));
     }
 

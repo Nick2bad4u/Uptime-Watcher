@@ -3,6 +3,7 @@ import type { SerializedError } from "@shared/utils/logger/common";
 import { ensureError } from "@shared/utils/errorHandling";
 import { serializeError } from "@shared/utils/logger/common";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { objectEntries } from "ts-extras";
 
 type ExtendedError = Error & SerializedError;
 
@@ -47,7 +48,7 @@ const cloneSerializedError = (payload: SerializedError): ExtendedError => {
         });
     }
 
-    for (const [key, value] of Object.entries(payload)) {
+    for (const [key, value] of objectEntries(payload)) {
         const isCoreKey =
             key === "message" || key === "name" || key === "stack";
 

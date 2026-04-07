@@ -3,8 +3,10 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isInteger } from "ts-extras";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -47,7 +49,7 @@ const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
             const expectedStatus = Number(monitor.expectedStatusCode);
 
             if (
-                !Number.isInteger(expectedStatus) ||
+                !isInteger(expectedStatus) ||
                 expectedStatus < 100 ||
                 expectedStatus > 599
             ) {
@@ -67,9 +69,7 @@ const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
         },
     };
 
-type HttpStatusMonitorConstructor = new (
-    config?: MonitorServiceConfig
-) => HttpMonitorServiceInstance;
+type HttpStatusMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
 
 const HttpStatusMonitorBase: HttpStatusMonitorConstructor =
     ((): HttpStatusMonitorConstructor => {

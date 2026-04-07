@@ -15,6 +15,7 @@
  */
 
 import { bench, describe } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock React hooks for benchmarking
 interface HookState<T> {
@@ -275,9 +276,9 @@ class MockDashboardComponent {
             setTimeout(() => {
                 setDashboardData({
                     summary: {
-                        totalSites: Math.floor(Math.random() * 100),
-                        onlineSites: Math.floor(Math.random() * 80),
-                        uptime: 90 + Math.random() * 10,
+                        totalSites: Math.floor(secureRandomFloat() * 100),
+                        onlineSites: Math.floor(secureRandomFloat() * 80),
+                        uptime: 90 + secureRandomFloat() * 10,
                     },
                     recentActivity: Array.from({ length: 10 }, (_, i) => ({
                         id: `activity-${i}`,
@@ -533,7 +534,7 @@ describe("Component State Management Performance", () => {
                 // Simulate expensive calculation
                 let result = 0;
                 for (let i = 0; i < 100; i++) {
-                    result += Math.random();
+                    result += secureRandomFloat();
                 }
                 return result;
             }, []);
@@ -578,7 +579,7 @@ describe("Component State Management Performance", () => {
                 id: `site-${i}`,
                 name: `Site ${i}`,
                 status: ["online", "offline"][i % 2],
-                responseTime: Math.random() * 1000,
+                responseTime: secureRandomFloat() * 1000,
             }));
 
             const component = new MockSiteListComponent({
@@ -645,7 +646,7 @@ describe("Component State Management Performance", () => {
                     "offline",
                     "degraded",
                 ][i % 3],
-                responseTime: Math.random() * 1000,
+                responseTime: secureRandomFloat() * 1000,
             }));
 
             const component = new MockSiteListComponent({

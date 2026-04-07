@@ -28,7 +28,7 @@ const fallbackIdentifierArbitrary = fc
     .filter((value) => value.trim().length > 0);
 const httpUrlArbitrary = fc
     .webUrl()
-    .filter((url) => url.startsWith("http://") || url.startsWith("https://"));
+    .filter((url) => url.startsWith("https://") || url.startsWith("https://"));
 const hostIdentifierArbitrary = fc.oneof(fc.domain(), fc.constant("localhost"));
 const portArbitrary = fc.integer({ min: 1, max: 65_535 });
 const dnsRecordTypeArbitrary = fc.constantFrom(

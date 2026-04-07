@@ -11,6 +11,7 @@ import type { StoreApi } from "zustand";
 
 // Mock vitest for imports
 import { vi } from "vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Simple test store for comparative benchmarking
 interface SimpleCounterState {
@@ -76,7 +77,7 @@ function createComplexStore(): StoreApi<ComplexState & ComplexActions> {
             set((state) => {
                 const newItem = {
                     ...item,
-                    id: `item-${Date.now()}-${Math.random()}`,
+                    id: `item-${Date.now()}-${secureRandomFloat()}`,
                 };
                 return {
                     items: [...state.items, newItem],
@@ -154,7 +155,7 @@ function createComplexStore(): StoreApi<ComplexState & ComplexActions> {
 function generateComplexItem(index: number) {
     return {
         name: `Item ${index}`,
-        value: Math.floor(Math.random() * 1000),
+        value: Math.floor(secureRandomFloat() * 1000),
         nested: {
             data: Array.from({ length: 5 }, (_, i) => `nested-${index}-${i}`),
         },

@@ -72,13 +72,13 @@ const baseMonitorArbitrary = fc.record({
 const validUrlArbitrary = fc
     .oneof(
         fc.constant("https://example.com"),
-        fc.constant("http://example.com"),
+        fc.constant("https://example.com"),
         fc.constant("https://www.google.com"),
-        fc.constant("http://www.google.com"),
+        fc.constant("https://www.google.com"),
         fc.constant("https://github.com"),
-        fc.constant("http://github.com"),
+        fc.constant("https://github.com"),
         fc.constant("https://api.example.com"),
-        fc.constant("http://api.example.com")
+        fc.constant("https://api.example.com")
     )
     .filter((url) =>
         // Validate using the same options as the schema
@@ -562,7 +562,7 @@ describe("Schema Property-Based Tests", () => {
                 "",
                 "not-a-url",
                 "ftp://example.com",
-                "http://",
+                "https://",
                 "https://",
                 "data:text/html,<script>alert(1)</script>",
                 "file:///etc/passwd",

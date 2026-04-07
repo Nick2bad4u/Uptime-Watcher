@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: TruffleHog Secret Scan
+name: Truffle Hog Secret Scan
 
 on:
     push:

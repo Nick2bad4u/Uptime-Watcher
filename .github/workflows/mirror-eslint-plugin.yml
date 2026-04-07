@@ -1,6 +1,7 @@
 # Mirror the internal uptime-watcher ESLint plugin folder to a separate GitHub repo
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Mirror ESLint Plugin Repo
+run-name: Mirror ESLint Plugin Repo
 
 on:
     push:
@@ -19,14 +20,14 @@ concurrency:
     group: "eslint-plugin-mirror"
     cancel-in-progress: true
 
-env:
-    SOURCE_DIR: "config/linting/plugins/uptime-watcher"
-
 jobs:
     mirror:
         name: Mirror plugin folder
         runs-on: ubuntu-latest
         if: github.repository == 'Nick2bad4u/Uptime-Watcher'
+        timeout-minutes: 20
+        env:
+            SOURCE_DIR: "config/linting/plugins/uptime-watcher"
         steps:
             - name: Harden the runner (Audit all outbound calls)
               uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1

@@ -14,6 +14,7 @@ import type { RequireAtLeastOne, UnknownRecord } from "type-fest";
 
 import { isMonitorStatus } from "@shared/types";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
+import { isDefined, objectValues, safeCastTo   } from "ts-extras";
 
 import { calculateSiteSyncDelta } from "./siteSyncDelta";
 import {
@@ -176,8 +177,8 @@ const normalizeDateValue = (value: unknown): Date | undefined => {
 const hasOverlayValues = <TOverlay extends object>(
     overlay: Partial<TOverlay>
 ): overlay is TOverlay =>
-    Object.values(overlay).some((entry) =>
-        Array.isArray(entry) ? entry.length > 0 : entry !== undefined
+    objectValues(overlay).some((entry) =>
+        Array.isArray(entry) ? entry.length > 0 : isDefined(entry)
     );
 
 /**
@@ -209,7 +210,7 @@ export const isStatusHistoryEntry = (
     }
 
     const { responseTime, status, timestamp } =
-        value as Partial<StatusHistory> & UnknownRecord;
+        safeCastTo(value);
 
     return (
         isFiniteNumber(responseTime) &&
@@ -237,7 +238,7 @@ export const isMonitorSnapshot = (candidate: unknown): candidate is Monitor => {
         status,
         timeout,
         type,
-    } = candidate as Partial<Monitor> & UnknownRecord;
+    } = safeCastTo(candidate);
 
     return (
         isNonEmptyString(id ?? undefined) &&
@@ -259,7 +260,7 @@ export const isSiteSnapshot = (candidate: unknown): candidate is Site => {
     }
 
     const { identifier, monitoring, monitors, name } =
-        candidate as Partial<Site> & UnknownRecord;
+        safeCastTo(candidate);
 
     if (
         !isNonEmptyString(identifier ?? undefined) ||
@@ -297,9 +298,7 @@ export function toMonitorSnapshotOverlay(
         monitoring,
         responseTime,
         status,
-    } = source as Partial<Monitor> &
-        Partial<MonitorSnapshotOverlay> &
-        UnknownRecord;
+    } = safeCastTo(source);
 
     // Empty history arrays are treated as "no overlay" so that callers that
     // occasionally omit history (or emit an empty array) do not accidentally
@@ -352,9 +351,7 @@ export function toSiteSnapshotOverlay(
     }
 
     const overlay: Partial<SiteSnapshotOverlay> = {};
-    const { monitoring, monitors } = source as Partial<Site> &
-        Partial<SiteSnapshotOverlay> &
-        UnknownRecord;
+    const { monitoring, monitors } = safeCastTo(source);
 
     if (isBoolean(monitoring)) {
         overlay.monitoring = monitoring;

@@ -9,6 +9,7 @@
 import type { Monitor, MonitorStatus } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
+import { isEmpty } from "ts-extras";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
@@ -155,7 +156,7 @@ export const SiteCardMonitorList: NamedExoticComponent<SiteCardMonitorListProper
             [monitors, selectedMonitorId]
         );
 
-        if (monitorItems.length === 0) {
+        if (isEmpty(monitorItems)) {
             return (
                 <div className="site-card__monitor-panel">
                     <ThemedText

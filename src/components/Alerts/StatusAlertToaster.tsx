@@ -1,6 +1,7 @@
 import type { JSX } from "react";
 
 import { useCallback } from "react";
+import { isEmpty } from "ts-extras";
 
 import type {
     AlertStore,
@@ -45,7 +46,7 @@ export const StatusAlertToaster = (): JSX.Element | null => {
         [dismissToast]
     );
 
-    if (alerts.length === 0 && toasts.length === 0) {
+    if (isEmpty(alerts) && isEmpty(toasts)) {
         return null;
     }
 

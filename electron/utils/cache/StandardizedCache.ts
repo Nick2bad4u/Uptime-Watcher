@@ -12,6 +12,8 @@
 
 import type { Promisable } from "type-fest";
 
+import { isEmpty, safeCastTo  } from "ts-extras";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
@@ -243,7 +245,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
     public bulkUpdate(items: Iterable<CacheItemInput<TValue, TKey>>): void {
         const entries = Array.from(items);
 
-        if (entries.length === 0) {
+        if (isEmpty(entries)) {
             logger.debug(
                 `[Cache:${this.config.name}] Bulk update skipped (no items)`
             );
@@ -281,7 +283,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
 
         const entries = Array.from(items);
 
-        if (entries.length === 0) {
+        if (isEmpty(entries)) {
             this.emitEvent("internal:cache:bulk-updated", { itemCount: 0 });
             return;
         }
@@ -363,7 +365,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      */
     public entries(): IterableIterator<[TKey, TValue]> {
         const entries = this.cleanupAndExtract(
-            (key, entry) => [key, entry.data] as [TKey, TValue]
+            (key, entry) => safeCastTo([key, entry.data])
         );
 
         // Workaround for ESLint plugin bug: avoid direct [Symbol.iterator]()

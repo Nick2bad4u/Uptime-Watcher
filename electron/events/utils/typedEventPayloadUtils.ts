@@ -9,8 +9,10 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
+import type { UnknownArray, UnknownRecord  } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { arrayFind } from "ts-extras";
 
 import { isEventMetadata } from "../eventMetadataGuards";
 import { tryStructuredClone } from "./structuredClone";
@@ -28,14 +30,14 @@ interface OriginalMetaCarrier {
  *
  * @internal
  */
-export type ArrayPayload = readonly unknown[] | unknown[];
+export type ArrayPayload = Readonly<UnknownArray> | unknown[];
 
 /**
  * Non-array object payload shape used to distinguish plain objects from arrays.
  *
  * @internal
  */
-export type NonArrayObjectPayload = Record<string, unknown> & {
+export type NonArrayObjectPayload = UnknownRecord & {
     readonly length?: never;
 };
 
@@ -44,9 +46,9 @@ export type NonArrayObjectPayload = Record<string, unknown> & {
  * values.
  */
 export function resolveOriginalMetadata(
-    ...candidates: readonly unknown[]
+    ...candidates: Readonly<UnknownArray>
 ): EventMetadata | undefined {
-    return candidates.find(isEventMetadata);
+    return arrayFind(candidates, isEventMetadata);
 }
 
 /**

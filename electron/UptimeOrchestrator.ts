@@ -91,6 +91,7 @@ import {
     type StateSyncAction,
     type StateSyncSource,
 } from "@shared/types/stateSync";
+import { objectKeys } from "ts-extras";
 
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
@@ -725,7 +726,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             () => this.siteManager.updateSite(identifier, updates),
             {
                 code: "ORCHESTRATOR_UPDATE_SITE_FAILED",
-                details: { identifier, updatedFields: Object.keys(updates) },
+                details: { identifier, updatedFields: objectKeys(updates) },
                 message: `Failed to update site ${identifier}`,
                 operation: "orchestrator.updateSite",
             }

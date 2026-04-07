@@ -8,6 +8,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { ChangeEvent, JSX } from "react";
 
 import { useCallback, useMemo } from "react";
+import { arrayIncludes } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
@@ -143,7 +144,7 @@ export const SettingsTab = ({
     ]);
 
     const isSiteMuted = useMemo(
-        () => mutedSiteNotificationIdentifiers.includes(currentSite.identifier),
+        () => arrayIncludes(mutedSiteNotificationIdentifiers, currentSite.identifier),
         [currentSite.identifier, mutedSiteNotificationIdentifiers]
     );
 
