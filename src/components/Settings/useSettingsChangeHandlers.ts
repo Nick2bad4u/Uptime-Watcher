@@ -7,14 +7,14 @@
  * high-level orchestration.
  */
 
-import type { ValueOf } from "type-fest";
-
 import { useCallback } from "react";
-import { objectFromEntries, objectKeys, safeCastTo, setHas    } from "ts-extras";
+import { objectKeys, safeCastTo, setHas  } from "ts-extras";
 
 import type { AppSettings } from "../../stores/types";
 
 import { logger } from "../../services/logger";
+
+type AllowedSettingsKey = (typeof ALLOWED_SETTINGS_KEY_LIST)[number];
 
 const ALLOWED_SETTINGS_KEY_LIST = [
     "autoStart",
@@ -59,12 +59,15 @@ export function useSettingsChangeHandlers(args: {
             changes: Partial<AppSettings>,
             options?: ApplySettingChangesOptions
         ) => {
-            const forceSettingsKeys = new Set(options?.forceKeys);
+            const forceSettingsKeys = new Set<AllowedSettingsKey>(
+                (options?.forceKeys ?? []).filter(
+                    (key): key is AllowedSettingsKey =>
+                        ALLOWED_SETTINGS_KEY_STRINGS.has(key)
+                )
+            );
 
             // Create a safe update object with validated keys
-            const updateEntries: Array<
-                [keyof AppSettings, ValueOf<AppSettings>]
-            > = [];
+            const nextSettings = safeCastTo<Partial<AppSettings>>({});
 
             // Log and apply changes for allowed keys
             for (const allowedKey of ALLOWED_SETTINGS_KEY_LIST) {
@@ -77,10 +80,7 @@ export function useSettingsChangeHandlers(args: {
                         newValue !== undefined &&
                         (oldValue !== newValue || isForced)
                     ) {
-                        updateEntries.push([
-                            allowedKey,
-                            safeCastTo<ValueOf<AppSettings>>(newValue),
-                        ]);
+                        Reflect.set(nextSettings, allowedKey, newValue);
 
                         logger.user.settingsChange(
                             allowedKey,
@@ -101,10 +101,8 @@ export function useSettingsChangeHandlers(args: {
                 }
             }
 
-            if (updateEntries.length > 0) {
-                updateSettings(
-                    safeCastTo(objectFromEntries(updateEntries))
-                );
+            if (objectKeys(nextSettings).length > 0) {
+                updateSettings(nextSettings);
             }
         },
         [settings, updateSettings]

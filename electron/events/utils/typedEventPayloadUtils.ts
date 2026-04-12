@@ -12,7 +12,7 @@ import type { EventMetadata } from "@shared/types/events";
 import type { UnknownArray, UnknownRecord  } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { arrayFind } from "ts-extras";
+import { isDefined, objectHasIn } from "ts-extras";
 
 import { isEventMetadata } from "../eventMetadataGuards";
 import { tryStructuredClone } from "./structuredClone";
@@ -48,7 +48,7 @@ export type NonArrayObjectPayload = UnknownRecord & {
 export function resolveOriginalMetadata(
     ...candidates: Readonly<UnknownArray>
 ): EventMetadata | undefined {
-    return arrayFind(candidates, isEventMetadata);
+    return candidates.find(isEventMetadata);
 }
 
 /**
@@ -75,7 +75,7 @@ export function getHiddenProperty(
     target: NonArrayObjectPayload,
     key: string | symbol
 ): unknown {
-    if (!Reflect.has(target, key)) {
+    if (!objectHasIn(target, key)) {
         return undefined;
     }
 
@@ -115,7 +115,7 @@ export function cloneArrayPayload<TPayload extends ArrayPayload>(
     payload: TPayload
 ): TPayload {
     const structuredCloneResult = tryStructuredClone(payload);
-    if (structuredCloneResult !== undefined) {
+    if (isDefined(structuredCloneResult)) {
         return structuredCloneResult;
     }
 
@@ -135,7 +135,7 @@ export function cloneObjectPayload<TPayload extends NonArrayObjectPayload>(
     payload: TPayload
 ): TPayload {
     const structuredCloneResult = tryStructuredClone(payload);
-    if (structuredCloneResult !== undefined) {
+    if (isDefined(structuredCloneResult)) {
         return structuredCloneResult;
     }
 

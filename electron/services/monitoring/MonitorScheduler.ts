@@ -861,7 +861,7 @@ export class MonitorScheduler {
 
         if (checkInterval < MIN_CHECK_INTERVAL) {
             this.logger.warn(
-                `[MonitorScheduler] Check interval ${checkInterval}ms is below minimum ${MIN_CHECK_INTERVAL}ms; clamping to minimum`
+                `[MonitorScheduler] Check interval ${String(checkInterval)}ms is below minimum ${String(MIN_CHECK_INTERVAL)}ms; clamping to minimum`
             );
             return MIN_CHECK_INTERVAL;
         }

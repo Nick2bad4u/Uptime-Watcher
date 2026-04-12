@@ -305,7 +305,8 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         // entry, clamped to the resolved backend limit and the available
         // history length.
         const maxShow = Math.min(backendLimit, historyLength);
-        const showOptions = [
+        const showOptions: number[] = [];
+        for (const option of [
             10,
             25,
             50,
@@ -314,7 +315,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             500,
             1000,
             10_000,
-        ].filter((opt) => opt <= maxShow);
+        ] as const) {
+            if (option <= maxShow) {
+                showOptions.push(option);
+            }
+        }
 
         // Always include 'All' if there are fewer than backendLimit
         if (

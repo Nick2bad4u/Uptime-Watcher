@@ -10,7 +10,7 @@ import type { Monitor, Site } from "@shared/types";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { useEffect, useState } from "react";
-import { arrayFind, arrayFirst  } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 
 import {
     getMonitorDisplayIdentifier,
@@ -81,13 +81,16 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
         async () => {
             const config = await getMonitorTypeConfig(selectedMonitor.type);
             if (config?.fields) {
-                const primaryField = arrayFind(config.fields, (field) => field.required);
+                const primaryField = config.fields.find(
+                    (field) => field.required
+                );
                 if (primaryField) {
                     return primaryField.label;
                 }
 
-                if (config.fields.length > 0 && arrayFirst(config.fields)) {
-                    return arrayFirst(config.fields).label;
+                const firstField = arrayFirst(config.fields);
+                if (config.fields.length > 0 && firstField) {
+                    return firstField.label;
                 }
             }
 

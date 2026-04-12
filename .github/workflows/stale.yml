@@ -1,32 +1,8 @@
-# This GitHub Actions workflow is designed to automatically mark issues and pull requests as stale
-# if they have had no activity for a specified amount of time. It uses the `actions/stale` action
-# to perform this task. The workflow is scheduled to run daily at 07:38 AM (UTC) as specified by
-# the cron expression.
-#
-# The workflow has the following permissions:
-# - Read access to repository contents.
-# - Write access to issues and pull requests.
-#
-# The workflow consists of a single job named `stale` that runs on the latest Ubuntu runner.
-# The job includes the following steps:
-# 1. Harden Runner: Uses the `step-security/harden-runner` action to enhance the security of the
-#    runner by auditing egress traffic.
-# 2. Mark Stale Issues and PRs: Uses the `actions/stale` action to mark issues and pull requests
-#    as stale. The action is configured with the following parameters:
-#    - `repo-token`: The GitHub token used to authenticate the action.
-#    - `stale-issue-message`: The message to post on stale issues.
-#    - `stale-pr-message`: The message to post on stale pull requests.
-#    - `stale-issue-label`: The label to apply to stale issues.
-#    - `stale-pr-label`: The label to apply to stale pull requests.
-#
-# For more information on configuring the `actions/stale` action, visit:
-# https://github.com/actions/stale
-
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Mark Stale Issues And Pull Requests
 run-name: Mark stale issues and pull requests
 
-on:
+"on":
     schedule:
         - cron: "38 7 * * *"
     pull_request_target:
@@ -44,7 +20,7 @@ on:
 
 concurrency:
     group: stale-${{ github.ref || github.run_id }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 
 permissions:
     contents: read
@@ -59,7 +35,7 @@ jobs:
             pull-requests: write
         concurrency:
             group: stale-${{ github.ref }}
-            cancel-in-progress: false
+            cancel-in-progress: true
 
         steps:
             - name: Harden Runner
@@ -67,8 +43,8 @@ jobs:
               with:
                   egress-policy: audit
 
-                        - name: Mark stale issues and pull requests
-                            uses: actions/stale@997185467fa4f803885201cee163a9f38240193d # v10.1.1
+            - name: Mark stale issues and pull requests
+              uses: actions/stale@997185467fa4f803885201cee163a9f38240193d # v10.1.1
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   stale-issue-message: "Stale issue"

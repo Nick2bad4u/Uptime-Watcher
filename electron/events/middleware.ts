@@ -15,6 +15,7 @@ import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { arrayIncludes, isDefined, isPresent } from "ts-extras";
 
 import type { EventKey, EventMiddleware, TypedEventMap } from "./TypedEventBus";
 
@@ -109,7 +110,7 @@ const cloneObjectForLogging = (
  * @internal
  */
 function safeSerialize(data: unknown): string {
-    if (data === null || data === undefined) {
+    if (!isPresent(data)) {
         return "";
     }
 
@@ -146,7 +147,7 @@ function safeSerialize(data: unknown): string {
 }
 
 const formatLoggableData = (data: unknown): unknown => {
-    if (data === null || data === undefined) {
+    if (!isPresent(data)) {
         return data;
     }
 
@@ -180,7 +181,7 @@ const formatLoggableData = (data: unknown): unknown => {
             return cloneObjectForLogging(data);
         } catch {
             const cloned = tryStructuredClone(data);
-            if (cloned !== undefined) {
+            if (isDefined(cloned)) {
                 return cloned;
             }
             return safeSerialize(data);
@@ -424,14 +425,14 @@ export function createFilterMiddleware<
     return (event, data, next) => {
         const typedEvent = event as EventKey<EventMap>;
 
-        if (allowList && !allowList.includes(typedEvent)) {
+        if (isPresent(allowList) && !arrayIncludes(allowList, typedEvent)) {
             baseLogger.debug(
-                `[EventBus] Event '${typedEvent}' blocked by allow list`
+                `[EventBus] Event '${String(typedEvent)}' blocked by allow list`
             );
             return Promise.resolve();
         }
 
-        if (blockList?.includes(typedEvent)) {
+        if (isPresent(blockList) && arrayIncludes(blockList, typedEvent)) {
             baseLogger.debug(
                 `[EventBus] Event '${typedEvent}' blocked by block list`
             );

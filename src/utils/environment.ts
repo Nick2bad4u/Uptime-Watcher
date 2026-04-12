@@ -20,6 +20,11 @@ interface MaybeNavigator {
     readonly navigator?: Navigator;
 }
 
+interface PlaywrightAutomationTarget {
+    readonly navigator?: Navigator;
+    playwrightAutomation?: boolean;
+}
+
 /**
  * Reads an environment variable from the ambient Node.js process if available.
  *

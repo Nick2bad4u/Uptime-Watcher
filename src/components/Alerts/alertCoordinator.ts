@@ -112,7 +112,10 @@ const ensureAudioContext = (): AudioContext | null => {
         return audioContextRef.current;
     }
 
-    const globalObject = safeCastTo(globalThis);
+    const globalObject = safeCastTo<{
+        AudioContext?: typeof AudioContext;
+        webkitAudioContext?: typeof AudioContext;
+    }>(globalThis);
 
     let context: AudioContext | null = null;
 

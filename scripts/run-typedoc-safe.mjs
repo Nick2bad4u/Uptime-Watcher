@@ -5,11 +5,22 @@ import * as path from "node:path";
 import process from "node:process";
 
 const repositoryRootPath = path.resolve(import.meta.dirname, "..");
-const docusaurusWorkspacePath = path.join(repositoryRootPath, "docs", "docusaurus");
+const docusaurusWorkspacePath = path.join(
+    repositoryRootPath,
+    "docs",
+    "docusaurus"
+);
 const configPathFromRepositoryRoot = process.argv[2];
 const additionalArguments = process.argv.slice(3);
 
-const windowsSafePathProblemCharacters = ["(", ")", "[", "]", "{", "}"];
+const windowsSafePathProblemCharacters = [
+    "(",
+    ")",
+    "[",
+    "]",
+    "{",
+    "}",
+];
 
 const npmInvocation = (() => {
     const execPathCandidate = process.env["npm_execpath"];

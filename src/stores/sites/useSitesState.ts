@@ -15,7 +15,7 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
-import { arrayFind, isEmpty, objectEntries, objectFromEntries, safeCastTo     } from "ts-extras";
+import { isEmpty, objectEntries, objectFromEntries, safeCastTo } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
 
@@ -313,8 +313,8 @@ export const createSitesStateActions = (
             if (!selectedSiteIdentifier) {
                 return undefined;
             }
-            return (
-                arrayFind(sites, (site) => site.identifier === selectedSiteIdentifier) ?? undefined
+            return sites.find(
+                (site) => site.identifier === selectedSiteIdentifier
             );
         },
         recordSiteSyncDelta: (delta: SiteSyncDelta | undefined): void => {

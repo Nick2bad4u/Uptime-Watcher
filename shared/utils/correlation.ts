@@ -19,7 +19,9 @@ const getRandomBytes = (length: number): Uint8Array => {
         );
     }
 
-    return cryptoInstance.getRandomValues(new Uint8Array(length));
+    const bytes = new Uint8Array(length);
+    cryptoInstance.getRandomValues(bytes);
+    return bytes;
 };
 
 const convertBytesToHex = (bytes: Uint8Array): string => {

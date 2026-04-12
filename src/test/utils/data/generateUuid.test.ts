@@ -2,6 +2,7 @@
  * @file Tests for generateUuid utility function
  */
 
+import { webcrypto } from "node:crypto";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { generateUuid } from "../../../utils/data/generateUuid";
 
@@ -142,7 +143,10 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.crypto = {} as any;
+            vi.stubGlobal("crypto", {
+                getRandomValues: webcrypto.getRandomValues.bind(webcrypto),
+                randomUUID: undefined,
+            });
 
             const result = generateUuid();
 
@@ -363,10 +367,10 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Fallback Behavior", "type");
 
-            Reflect.deleteProperty(
-                globalThis.crypto as unknown as Record<string, unknown>,
-                "randomUUID"
-            );
+            vi.stubGlobal("crypto", {
+                getRandomValues: webcrypto.getRandomValues.bind(webcrypto),
+                randomUUID: undefined,
+            });
 
             const result = generateUuid();
             expect(result).toMatch(/^site-[\da-z]+-\d+$/);

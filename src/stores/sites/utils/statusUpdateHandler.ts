@@ -15,7 +15,7 @@ import type { Site, StatusUpdate } from "@shared/types";
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isEnrichedMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
-import { arrayFind, isEmpty  } from "ts-extras";
+import { isEmpty } from "ts-extras";
 
 import type { ListenerAttachmentState } from "../baseTypes";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
@@ -229,7 +229,9 @@ export class StatusUpdateManager {
             );
             this.setSites(updatedSites);
 
-            const updatedSite = arrayFind(updatedSites, (site) => site.identifier === event.siteIdentifier);
+            const updatedSite = updatedSites.find(
+                (site) => site.identifier === event.siteIdentifier
+            );
 
             // Call optional update callback
             if (this.onUpdate && updatedSite) {

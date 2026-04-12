@@ -12,7 +12,6 @@ import type { Monitor, Site } from "@shared/types";
 
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { type ChangeEvent, useCallback } from "react";
-import { arrayFind } from "ts-extras";
 
 import type { SiteDetailsTab } from "../../stores/ui/types";
 import type { ConfirmDialogOptions } from "../ui/useConfirmDialog";
@@ -171,7 +170,9 @@ export function useSiteDetailsMonitoringHandlers(
             async () => {
                 logger.user.action("Manual site check initiated", {
                     monitorId: selectedMonitorId,
-                    monitorType: arrayFind(currentSite.monitors, (m) => m.id === selectedMonitorId)?.type,
+                    monitorType: currentSite.monitors.find(
+                        (m) => m.id === selectedMonitorId
+                    )?.type,
                     siteIdentifier: currentSite.identifier,
                     siteName: currentSite.name,
                 });

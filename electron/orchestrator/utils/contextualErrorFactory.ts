@@ -2,6 +2,8 @@ import type { ApplicationError } from "@shared/utils/errorHandling";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type { UnknownRecord } from "type-fest";
 
+import { isDefined } from "ts-extras";
+
 import { createContextualApplicationError } from "./createContextualApplicationError";
 
 /**
@@ -49,9 +51,9 @@ export function createContextualErrorFactory(
         createContextualApplicationError({
             ...input,
             diagnosticsLogger: options.diagnosticsLogger,
-            ...(options.diagnosticsPrefix === undefined
-                ? {}
-                : { diagnosticsPrefix: options.diagnosticsPrefix }),
+            ...(isDefined(options.diagnosticsPrefix)
+                ? { diagnosticsPrefix: options.diagnosticsPrefix }
+                : {}),
             logger: options.logger,
         });
 }

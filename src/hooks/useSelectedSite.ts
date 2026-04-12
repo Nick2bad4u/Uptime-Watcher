@@ -34,7 +34,6 @@ import type { Site } from "@shared/types";
 
 import * as React from "react";
 import { useCallback } from "react";
-import { arrayFind } from "ts-extras";
 
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
@@ -62,6 +61,8 @@ export function useSelectedSite(): Site | undefined {
         if (!selectedSiteIdentifier) {
             return undefined;
         }
-        return arrayFind(sites, (site) => site.identifier === selectedSiteIdentifier);
+        return sites.find(
+            (site) => site.identifier === selectedSiteIdentifier
+        );
     }, [selectedSiteIdentifier, sites]);
 }

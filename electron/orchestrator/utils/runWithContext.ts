@@ -1,3 +1,5 @@
+import type { Except } from "type-fest";
+
 import type {
     ContextualErrorFactory,
     ContextualErrorInput,
@@ -6,7 +8,7 @@ import type {
 /**
  * Options for a contextual run wrapper (excludes the thrown cause).
  */
-export type RunWithContextOptions = Omit<ContextualErrorInput, "cause">;
+export type RunWithContextOptions = Except<ContextualErrorInput, "cause">;
 
 /**
  * Signature for executing an async operation with contextual error wrapping.

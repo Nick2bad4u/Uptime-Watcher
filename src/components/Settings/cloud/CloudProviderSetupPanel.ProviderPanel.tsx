@@ -1,8 +1,6 @@
 import type { ChangeEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
-import { arrayFind } from "ts-extras";
-
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -158,7 +156,9 @@ export const CloudProviderSetupPanelProviderPanel = ({
         configured && isSelectedProviderActive;
     const connectedForSelectedProvider = connected && isSelectedProviderActive;
 
-    const tab = arrayFind(CLOUD_PROVIDER_SETUP_PANEL_TABS, (entry) => entry.key === selectedProviderTab);
+    const tab = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(
+        (entry) => entry.key === selectedProviderTab
+    );
     if (!tab) {
         return <div />;
     }

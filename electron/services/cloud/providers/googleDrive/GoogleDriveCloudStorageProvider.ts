@@ -8,7 +8,7 @@ import {
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
-import { arrayAt, arrayJoin, isEmpty, safeCastTo, stringSplit     } from "ts-extras";
+import { arrayAt, arrayJoin, isEmpty, safeCastTo, stringSplit } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -76,12 +76,12 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
         return undefined;
     }
 
-    const { response } = safeCastTo<{ response?: unknown }>(error);
+    const { response }: { response?: unknown } = safeCastTo(error);
     if (typeof response !== "object" || response === null) {
         return undefined;
     }
 
-    const { status } = safeCastTo(response);
+    const { status }: { status?: unknown } = safeCastTo(response);
     return typeof status === "number" ? status : undefined;
 }
 

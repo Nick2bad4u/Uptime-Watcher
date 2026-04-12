@@ -1,4 +1,4 @@
-import type { Constructor, UnknownRecord  } from "type-fest";
+import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { objectEntries } from "ts-extras";
@@ -32,16 +32,12 @@ function isStringArray(value: unknown): value is string[] {
 }
 
 function toStringHeaderRecord(
-    headers: UnknownRecord
+    headers: object
 ): Record<string, string | string[] | undefined> {
     const normalizedHeaders: Record<string, string | string[] | undefined> = {};
 
     for (const [key, value] of objectEntries(headers)) {
-        if (
-            typeof value === "string" ||
-            value === undefined ||
-            isStringArray(value)
-        ) {
+        if (typeof value === "string" || isStringArray(value)) {
             normalizedHeaders[key] = value;
         }
     }

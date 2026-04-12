@@ -15,7 +15,7 @@ import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
-import { arrayFind, arrayJoin, safeCastTo   } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
@@ -781,7 +781,9 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     };
 
     // Dynamically map monitor type specific fields ONLY for the current monitor type
-    const monitorTypeConfig = arrayFind(getAllMonitorTypeConfigs(), (config) => config.type === monitor.type);
+    const monitorTypeConfig = getAllMonitorTypeConfigs().find(
+        (config) => config.type === monitor.type
+    );
 
     if (monitorTypeConfig) {
         // Create a mutable version for dynamic field assignment

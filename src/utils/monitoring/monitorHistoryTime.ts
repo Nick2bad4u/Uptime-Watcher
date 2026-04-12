@@ -22,7 +22,7 @@ export function getLatestHistoryTimestamp(
         if (
             typeof timestamp === "number" &&
             isFiniteNumber(timestamp) &&
-            (!hasLatestTimestamp || timestamp > latestTimestamp)
+            (!hasLatestTimestamp || timestamp > (latestTimestamp ?? timestamp))
         ) {
             latestTimestamp = timestamp;
         }

@@ -3,7 +3,7 @@ import type { NamedExoticComponent, SyntheticEvent } from "react";
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
 import { memo, useCallback, useMemo, useState } from "react";
-import { arrayFind, setHas  } from "ts-extras";
+import { setHas } from "ts-extras";
 
 import { CHECK_INTERVALS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
@@ -227,7 +227,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         const helpTexts = useDynamicHelpText(monitorType);
 
         const checkIntervalLabel = useMemo(() => {
-            const match = arrayFind(CHECK_INTERVALS, (interval) => interval.value === checkIntervalMs);
+            const match = CHECK_INTERVALS.find(
+                (interval) => interval.value === checkIntervalMs
+            );
             return (
                 match?.label ?? `${Math.round(checkIntervalMs / 60_000)} min`
             );

@@ -14,7 +14,7 @@ import type { PeerCertificate } from "node:tls";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
-import { arrayFind, isEmpty, objectKeys   } from "ts-extras";
+import { isEmpty, objectKeys } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -360,8 +360,10 @@ export class SslMonitor implements IMonitorService {
             subject["O"],
             subject["OU"],
         ];
-        const name = arrayFind(candidates, (value): value is string =>
-                typeof value === "string" && value.trim().length > 0);
+        const name = candidates.find(
+            (value): value is string =>
+            typeof value === "string" && value.trim().length > 0
+        );
 
         return name ?? "unknown subject";
     }

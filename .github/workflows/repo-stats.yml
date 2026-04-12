@@ -2,7 +2,7 @@
 name: Metrics Repository Stats
 run-name: Refresh repository stats
 
-on:
+"on":
     workflow_dispatch:
     schedule:
         - cron: "53 4 * * 1" # Runs weekly on Monday at 4:53 AM (UTC)
@@ -16,7 +16,7 @@ on:
 
 concurrency:
     group: repo-stats-${{ github.ref || github.run_id }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 
 permissions:
     contents: read
@@ -28,7 +28,7 @@ jobs:
         timeout-minutes: 30
         concurrency:
             group: repo-stats-${{ github.ref }}
-            cancel-in-progress: false
+            cancel-in-progress: true
         permissions:
             contents: write
         steps:

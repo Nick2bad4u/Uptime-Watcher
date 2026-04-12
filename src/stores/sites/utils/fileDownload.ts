@@ -254,7 +254,8 @@ export async function handleSQLiteBackupDownload(
     );
 
     if (isPlaywrightAutomation()) {
-        const automationTarget = safeCastTo(globalThis);
+        const automationTarget =
+            safeCastTo(globalThis);
         automationTarget.playwrightLastBackup = backupResult;
         logger.info("SQLite backup captured in automation mode", {
             fileName: backupResult.fileName,

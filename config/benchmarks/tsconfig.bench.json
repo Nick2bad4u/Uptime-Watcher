@@ -23,6 +23,9 @@
             ],
             "@shared/*": [
                 "shared/*"
+            ],
+            "@shared/test/testHelpers": [
+                "benchmarks/shared/testHelpers.ts"
             ]
         },
         "rootDir": "../..",

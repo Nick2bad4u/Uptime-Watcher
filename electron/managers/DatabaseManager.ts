@@ -53,6 +53,7 @@ import { normalizeHistoryLimit } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -90,11 +91,11 @@ function isHistoryRetentionConfig(
     return (
         isRecord(value) &&
         typeof value["defaultLimit"] === "number" &&
-        Number.isFinite(value["defaultLimit"]) &&
+        isFiniteNumber(value["defaultLimit"]) &&
         typeof value["maxLimit"] === "number" &&
-        Number.isFinite(value["maxLimit"]) &&
+        isFiniteNumber(value["maxLimit"]) &&
         typeof value["minLimit"] === "number" &&
-        Number.isFinite(value["minLimit"])
+        isFiniteNumber(value["minLimit"])
     );
 }
 
@@ -426,11 +427,7 @@ export class DatabaseManager {
                             "historyLimit"
                         );
 
-                    if (rawHistoryLimit === undefined) {
-                        monitorLogger.info(
-                            `[DatabaseManager] No history limit in database, using default: ${this.historyLimit}`
-                        );
-                    } else {
+                    if (isDefined(rawHistoryLimit)) {
                         const parsedHistoryLimit = Number(rawHistoryLimit);
 
                         try {
@@ -456,6 +453,10 @@ export class DatabaseManager {
                                 }
                             );
                         }
+                    } else {
+                        monitorLogger.info(
+                            `[DatabaseManager] No history limit in database, using default: ${this.historyLimit}`
+                        );
                     }
                 } catch (error) {
                     const normalizedError = ensureError(error);

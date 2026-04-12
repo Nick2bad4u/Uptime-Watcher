@@ -12,7 +12,7 @@
 
 import type { Promisable } from "type-fest";
 
-import { isEmpty, safeCastTo  } from "ts-extras";
+import { isEmpty } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -365,13 +365,14 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      */
     public entries(): IterableIterator<[TKey, TValue]> {
         const entries = this.cleanupAndExtract(
-            (key, entry) => safeCastTo([key, entry.data])
+            (key, entry): [TKey, TValue] => [key, entry.data]
         );
 
-        // Workaround for ESLint plugin bug: avoid direct [Symbol.iterator]()
-        // call
-        const iteratorFn = entries[Symbol.iterator];
-        return iteratorFn.call(entries);
+        return (function* (): IterableIterator<[TKey, TValue]> {
+            for (const entry of entries) {
+                yield entry;
+            }
+        })();
     }
 
     /**

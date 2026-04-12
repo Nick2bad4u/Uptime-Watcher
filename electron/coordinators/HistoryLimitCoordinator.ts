@@ -13,6 +13,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { DatabaseManager } from "../managers/DatabaseManager";
@@ -87,7 +88,7 @@ export class HistoryLimitCoordinator {
             return;
         }
 
-        if (!Number.isFinite(limit) || limit < 0) {
+        if (!isFiniteNumber(limit) || limit < 0) {
             logger.warn(
                 "[HistoryLimitCoordinator] Ignoring history limit update with invalid value",
                 { limit, timestamp }
@@ -173,7 +174,7 @@ export class HistoryLimitCoordinator {
 
             if (
                 typeof limit === "number" &&
-                Number.isFinite(limit) &&
+                isFiniteNumber(limit) &&
                 limit >= 0
             ) {
                 return limit;

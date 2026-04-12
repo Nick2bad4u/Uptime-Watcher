@@ -19,7 +19,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { logger } from "@app/services/logger";
 import { memo, type NamedExoticComponent, useCallback, useEffect } from "react";
-import { arrayFind } from "ts-extras";
 
 import type { ErrorStore } from "../../stores/error/types";
 
@@ -125,7 +124,7 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
         const monitorTypes = useMonitorTypesStore(selectMonitorTypes);
 
         // Find the config for the current monitor type
-        const config = arrayFind(monitorTypes, (type) => type.type === monitorType);
+        const config = monitorTypes.find((type) => type.type === monitorType);
 
         // Load monitor types when component mounts
         useEffect(

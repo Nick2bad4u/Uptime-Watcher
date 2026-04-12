@@ -2,19 +2,19 @@
 name: Show Release Stats
 run-name: Show release stats
 
-on:
+"on":
     workflow_dispatch:
     schedule:
         - cron: "47 4 * * 0" # weekly
     workflow_run:
         workflows: ["Build and Release Electron App"]
-    branches: [main]
+        branches: [main]
         types:
             - completed
 
 concurrency:
-  group: release-stats-${{ github.event.workflow_run.head_branch || github.ref || github.run_id }}
-  cancel-in-progress: false
+    group: release-stats-${{ github.event.workflow_run.head_branch || github.ref || github.run_id }}
+    cancel-in-progress: true
 
 permissions:
     contents: read
@@ -41,7 +41,6 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  # Get latest release info
                   latest_json=$(gh release view --json tagName,name,publishedAt,assets,url)
                   latest_tag=$(echo "$latest_json" | jq -r .tagName)
                   latest_name=$(echo "$latest_json" | jq -r .name)
@@ -56,10 +55,8 @@ jobs:
                   fi
                   asset_total_mb=$(echo "scale=2; $asset_total_size/1024/1024" | bc)
 
-                  # Get total number of releases
                   total_releases=$(gh release list --limit 1000 | wc -l)
 
-                  # Get total asset size for ALL releases
                   all_asset_total=0
                   for tag in $(gh release list --limit 1000 --json tagName -q '.[].tagName'); do
                     for s in $(gh release view "$tag" --json assets -q '.assets[].size'); do
@@ -68,7 +65,6 @@ jobs:
                   done
                   all_asset_total_mb=$(echo "scale=2; $all_asset_total/1024/1024" | bc)
 
-                  # Output summary markdown (fancy!)
                   {
                     echo "## 🚀 Release Stats"
                     echo ""

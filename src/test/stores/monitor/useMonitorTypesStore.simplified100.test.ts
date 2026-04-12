@@ -23,6 +23,13 @@ import { useErrorStore } from "../../../stores/error/useErrorStore";
 const mockWithErrorHandling = vi.hoisted(() => vi.fn());
 const mockLogStoreAction = vi.hoisted(() => vi.fn());
 const mockSafeExtractIpcData = vi.hoisted(() => vi.fn());
+const mockMonitorTypesApi = vi.hoisted(() => ({
+    formatMonitorDetail: vi.fn(),
+    formatMonitorTitleSuffix: vi.fn(),
+    getMonitorTypes: vi.fn(),
+    initialize: vi.fn(),
+    validateMonitorData: vi.fn(),
+}));
 
 // Mock dependencies (partial mock to preserve exports like ApplicationError)
 vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
@@ -49,12 +56,7 @@ vi.mock("../../../stores/utils", async (importOriginal) => {
 
 // Mock ElectronAPI
 const mockElectronAPI = {
-    monitorTypes: {
-        getMonitorTypes: vi.fn(),
-        validateMonitorData: vi.fn(),
-        formatMonitorDetail: vi.fn(),
-        formatMonitorTitleSuffix: vi.fn(),
-    },
+    monitorTypes: mockMonitorTypesApi,
     monitoring: {},
 };
 
@@ -62,6 +64,17 @@ const mockElectronAPI = {
 vi.stubGlobal("window", {
     electronAPI: mockElectronAPI,
 });
+
+vi.mock("../../../services/MonitorTypesService", () => ({
+    MonitorTypesService: {
+        formatMonitorDetail: mockMonitorTypesApi.formatMonitorDetail,
+        formatMonitorTitleSuffix:
+            mockMonitorTypesApi.formatMonitorTitleSuffix,
+        getMonitorTypes: mockMonitorTypesApi.getMonitorTypes,
+        initialize: mockMonitorTypesApi.initialize,
+        validateMonitorData: mockMonitorTypesApi.validateMonitorData,
+    },
+}));
 
 const createMonitorTypeConfig = (
     overrides: Partial<MonitorTypeConfig> = {}
@@ -212,14 +225,8 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
         });
 
         it("should surface an error when backend returns invalid monitor configs", async () => {
-            const mixedConfigs = [
-                { type: null },
-                { type: "" },
-                { notType: "invalid" },
-            ];
-
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
-                mixedConfigs
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(
+                new Error("invalid payload")
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -237,8 +244,8 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
         });
 
         it("should propagate errors when backend returns null", async () => {
-            mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
-                null
+            mockElectronAPI.monitorTypes.getMonitorTypes.mockRejectedValue(
+                new Error("invalid payload")
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());

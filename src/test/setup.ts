@@ -9,6 +9,7 @@ import { beforeEach, expect, vi, type MockInstance } from "vitest";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 
 import { EventEmitter } from "node:events";
+import { webcrypto } from "node:crypto";
 
 import { useErrorStore } from "../stores/error/useErrorStore";
 
@@ -349,19 +350,9 @@ Object.defineProperty(globalThis, "matchMedia", {
     })),
 });
 
-// Mock crypto API for UUID generation
 Object.defineProperty(globalThis, "crypto", {
-    value: {
-        randomUUID: vi.fn(
-            () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-        ),
-        getRandomValues: vi.fn((arr) => {
-            for (let i = 0; i < arr.length; i++) {
-                arr[i] = Math.floor(secureRandomFloat() * 256);
-            }
-            return arr;
-        }),
-    },
+    configurable: true,
+    value: webcrypto,
     writable: true,
 });
 
@@ -648,7 +639,6 @@ export { mockTheme };
 // Custom test context setup for task and annotate properties
 // Note: The actual type definitions are in src/types/vitest-context.d.ts
 import "./vitest-context-setup";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Provide global fail function if not already defined
 if ((globalThis as any).fail === undefined) {

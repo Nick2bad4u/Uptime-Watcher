@@ -11,7 +11,7 @@
 import { isMonitorStatus, type Monitor, type Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayFind, safeCastTo  } from "ts-extras";
+import { safeCastTo } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import { normalizeMonitorInternal } from "./monitorOperations.normalize";
@@ -35,7 +35,7 @@ export function findMonitorInSite(
     site: Site,
     monitorId: string
 ): Monitor | undefined {
-    return arrayFind(site.monitors, (monitor) => monitor.id === monitorId);
+    return site.monitors.find((monitor) => monitor.id === monitorId);
 }
 
 /**

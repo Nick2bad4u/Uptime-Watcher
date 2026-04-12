@@ -10,6 +10,7 @@
  */
 
 
+
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
@@ -279,13 +280,14 @@ function filterMonitorFieldsByType(
 ): Partial<Monitor> {
     const allowedFields = getAllowedFieldsForMonitorType(type);
     const filtered: Partial<Monitor> = {};
+    const filteredRecord = safeCastTo(filtered);
 
     // Only include fields that are allowed for this monitor type. We keep
     // the external signature strongly typed while using a local record cast
     // to perform dynamic key assignment.
     for (const [key, value] of objectEntries(monitor)) {
         if (allowedFields.has(key)) {
-            (safeCastTo(filtered))[key] = value;
+            filteredRecord[key] = value;
         }
     }
 

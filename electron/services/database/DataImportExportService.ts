@@ -8,7 +8,7 @@
 
 import type { Site, StatusHistory } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { Jsonifiable, JsonValue, Promisable } from "type-fest";
+import type { Jsonifiable, JsonValue, Promisable, UnknownRecord  } from "type-fest";
 
 import { MAX_IPC_JSON_EXPORT_BYTES } from "@shared/constants/backup";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
@@ -27,7 +27,7 @@ import {
     validateExportData,
     validateImportData,
 } from "@shared/validation/importExportSchemas";
-import { arrayFind, arrayJoin, isDefined, objectEntries, objectKeys, safeCastTo      } from "ts-extras";
+import { arrayJoin, isDefined, objectEntries, objectKeys, safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -109,7 +109,9 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
 
     if (typeof value === "object") {
         const result: Record<string, Jsonifiable> = {};
-        for (const [key, nested] of objectEntries(value)) {
+        for (const [key, nested] of objectEntries(
+            safeCastTo<UnknownRecord>(value)
+        )) {
             if (nested !== undefined) {
                 Object.defineProperty(result, key, {
                     configurable: true,
@@ -608,10 +610,12 @@ export class DataImportExportService {
         for (const createdMonitor of createdMonitors) {
             // Find the original monitor with matching properties to get its
             // history
-            const originalMonitor = arrayFind(originalMonitors, (orig) =>
+            const originalMonitor = originalMonitors.find(
+                (orig) =>
                     orig.type === createdMonitor.type &&
                     orig.url === createdMonitor.url &&
-                    orig.port === createdMonitor.port);
+                    orig.port === createdMonitor.port
+            );
 
             if (
                 originalMonitor?.history &&

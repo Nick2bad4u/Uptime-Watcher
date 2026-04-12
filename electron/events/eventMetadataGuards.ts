@@ -5,7 +5,7 @@
 
 import type { EventMetadata } from "@shared/types/events";
 
-import { safeCastTo } from "ts-extras";
+import { isRecord } from "@shared/utils/typeHelpers";
 
 /**
  * Determines whether the provided value conforms to {@link EventMetadata}.
@@ -13,16 +13,14 @@ import { safeCastTo } from "ts-extras";
  * @public
  */
 export function isEventMetadata(value: unknown): value is EventMetadata {
-    if (!value || typeof value !== "object") {
+    if (!isRecord(value)) {
         return false;
     }
 
-    const candidate = safeCastTo(value);
-
     return (
-        typeof candidate.busId === "string" &&
-        typeof candidate.correlationId === "string" &&
-        typeof candidate.eventName === "string" &&
-        typeof candidate.timestamp === "number"
+        typeof value["busId"] === "string" &&
+        typeof value["correlationId"] === "string" &&
+        typeof value["eventName"] === "string" &&
+        typeof value["timestamp"] === "number"
     );
 }

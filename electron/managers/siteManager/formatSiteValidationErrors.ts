@@ -6,9 +6,7 @@
  * orchestration. Keep this behavior stable because tests assert the exact
  * output formatting.
  */
-import { isEmpty } from "ts-extras";
-import { arrayFirst } from "ts-extras";
-import { arrayJoin } from "ts-extras";
+import { arrayFirst, arrayJoin, isEmpty } from "ts-extras";
 
 export function formatSiteValidationErrors(
     errors: readonly string[] | undefined

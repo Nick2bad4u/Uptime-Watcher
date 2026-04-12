@@ -2,11 +2,35 @@
  * Tests for UUID generation utility.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { webcrypto } from "node:crypto";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
 import { generateUuid } from "../utils/data/generateUuid";
 import { secureRandomFloat } from "@shared/test/testHelpers";
+
+const cryptoBaseline = webcrypto;
+
+let uniqueCryptoCounter = 0;
+
+const createUniqueCryptoMock = () => ({
+    randomUUID: vi.fn(() => {
+        uniqueCryptoCounter += 1;
+        return `mock-uuid-${Date.now()}-${uniqueCryptoCounter.toString(36).padStart(8, "0")}`;
+    }),
+    getRandomValues: vi.fn((arr: Uint8Array | Uint32Array) => {
+        for (let i = 0; i < arr.length; i++) {
+            arr[i] = (uniqueCryptoCounter + i) % 256;
+        }
+
+        uniqueCryptoCounter += arr.length;
+        return arr;
+    }),
+});
+
+afterEach(() => {
+    vi.stubGlobal("crypto", cryptoBaseline);
+});
 
 describe("UUID Generation", () => {
     describe("with crypto.randomUUID available", () => {
@@ -56,20 +80,6 @@ describe("UUID Generation", () => {
             vi.stubGlobal("crypto", undefined);
         });
 
-        afterEach(() => {
-            // Restore the crypto mock from setup
-            vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(
-                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-                ),
-                getRandomValues: vi.fn((arr) => {
-                    for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(secureRandomFloat() * 256);
-                    }
-                    return arr;
-                }),
-            });
-        });
 
         it("should use fallback implementation when crypto is undefined", async ({
             task,
@@ -142,20 +152,6 @@ describe("UUID Generation", () => {
             });
         });
 
-        afterEach(() => {
-            // Restore the crypto mock from setup
-            vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(
-                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-                ),
-                getRandomValues: vi.fn((arr) => {
-                    for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(secureRandomFloat() * 256);
-                    }
-                    return arr;
-                }),
-            });
-        });
 
         it("should use fallback when randomUUID method is not available", async ({
             task,
@@ -183,20 +179,6 @@ describe("UUID Generation", () => {
             });
         });
 
-        afterEach(() => {
-            // Restore the crypto mock from setup
-            vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(
-                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-                ),
-                getRandomValues: vi.fn((arr) => {
-                    for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(secureRandomFloat() * 256);
-                    }
-                    return arr;
-                }),
-            });
-        });
 
         it("should use fallback when randomUUID throws an error", async ({
             task,
@@ -273,20 +255,6 @@ describe("UUID Generation", () => {
             });
         });
 
-        afterEach(() => {
-            // Restore the crypto mock from setup
-            vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(
-                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-                ),
-                getRandomValues: vi.fn((arr) => {
-                    for (let i = 0; i < arr.length; i++) {
-                        arr[i] = Math.floor(secureRandomFloat() * 256);
-                    }
-                    return arr;
-                }),
-            });
-        });
 
         it("should use fallback when randomUUID is not a function", async ({
             task,
@@ -359,13 +327,6 @@ describe("UUID Generation", () => {
             const uniqueRandomParts = new Set(randomParts);
             expect(uniqueRandomParts.size).toBeGreaterThan(1);
 
-            // Restore crypto mock
-            vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(
-                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-                ),
-                getRandomValues: vi.fn(),
-            });
         });
     });
 
@@ -375,6 +336,12 @@ describe("UUID Generation", () => {
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
+
+            Object.defineProperty(globalThis, "crypto", {
+                configurable: true,
+                value: cryptoBaseline,
+                writable: true,
+            });
 
             const uuid = generateUuid();
             expect(typeof uuid).toBe("string");
@@ -396,6 +363,12 @@ describe("UUID Generation", () => {
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
+
+            Object.defineProperty(globalThis, "crypto", {
+                configurable: true,
+                value: cryptoBaseline,
+                writable: true,
+            });
 
             const uuid = generateUuid();
             expect(uuid).not.toMatch(/\s/);
@@ -452,13 +425,6 @@ describe("UUID Generation", () => {
                 expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
             }
 
-            // Restore crypto mock
-            vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(
-                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-                ),
-                getRandomValues: vi.fn(),
-            });
         });
 
         it("should generate fallback IDs with correct structure", async ({
@@ -483,13 +449,6 @@ describe("UUID Generation", () => {
             expect(parts[2]).toMatch(/^\d+$/);
             expect(Number.parseInt(parts[2] ?? "0", 10)).toBeGreaterThan(0);
 
-            // Restore crypto mock
-            vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(
-                    () => `mock-uuid-${secureRandomFloat().toString(36).slice(2, 15)}`
-                ),
-                getRandomValues: vi.fn(),
-            });
         });
     });
 
@@ -497,6 +456,8 @@ describe("UUID Generation", () => {
         test.prop([fc.integer({ min: 1, max: 1000 })])(
             "should generate unique UUIDs for any number of iterations",
             (iterations) => {
+                vi.stubGlobal("crypto", undefined);
+
                 const uuids = new Set<string>();
 
                 for (let i = 0; i < iterations; i++) {
@@ -512,6 +473,12 @@ describe("UUID Generation", () => {
         test.prop([fc.constant(undefined)])(
             "should always return a non-empty string",
             () => {
+                Object.defineProperty(globalThis, "crypto", {
+                    configurable: true,
+                    value: cryptoBaseline,
+                    writable: true,
+                });
+
                 const uuid = generateUuid();
 
                 expect(typeof uuid).toBe("string");
@@ -551,14 +518,9 @@ describe("UUID Generation", () => {
         test.prop([fc.integer({ min: 10, max: 30 })])(
             "should maintain uniqueness under realistic concurrent generation",
             async (numRequests) => {
-                // Ensure crypto.randomUUID is available for better uniqueness
-                vi.stubGlobal("crypto", {
-                    randomUUID: vi.fn(
-                        () =>
-                            `mock-uuid-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 15)}`
-                    ),
-                    getRandomValues: vi.fn(),
-                });
+                // Force the deterministic fallback path and verify that it
+                // still maintains a high uniqueness ratio under concurrent use.
+                vi.stubGlobal("crypto", undefined);
 
                 // Generate UUIDs in a more realistic concurrent pattern
                 // Simulate small delays that might occur in real usage

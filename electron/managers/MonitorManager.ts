@@ -18,6 +18,7 @@ import type {
 } from "@shared/types";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
+import { isDefined } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -442,8 +443,8 @@ export class MonitorManager {
             config,
             host: this.createEnhancedLifecycleHost(),
             identifier,
-            ...(monitorId === undefined ? {} : { monitorId }),
-            ...(monitorAction === undefined ? {} : { monitorAction }),
+            ...(isDefined(monitorId) ? { monitorId } : {}),
+            ...(isDefined(monitorAction) ? { monitorAction } : {}),
         });
     }
 
@@ -499,8 +500,8 @@ export class MonitorManager {
             config,
             host: this.createEnhancedLifecycleHost(),
             identifier,
-            ...(monitorId === undefined ? {} : { monitorId }),
-            ...(monitorAction === undefined ? {} : { monitorAction }),
+            ...(isDefined(monitorId) ? { monitorId } : {}),
+            ...(isDefined(monitorAction) ? { monitorAction } : {}),
         });
     }
 

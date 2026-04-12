@@ -891,7 +891,6 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
             },
             environment: "jsdom", // Default for React components
-            restoreMocks: true,
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/coverage/**",
@@ -913,7 +912,8 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 shouldClearNativeTimers: true,
             },
             fileParallelism: true,
-            globals: false, // Prefer explicit Vitest imports for clearer test dependencies
+            globals: true, // The existing frontend suite still relies on Vitest globals across many legacy tests.
+            hookTimeout: 15_000,
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
                 "tests/strictTests/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
@@ -960,8 +960,8 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 // "junit",
                 // "html",
             ],
+            restoreMocks: true,
             retry: 0, // No retries to surface issues immediately
-            hookTimeout: 15_000,
             sequence: {
                 // Run projects sequentially to avoid resource contention
                 concurrent: false,
@@ -988,8 +988,11 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 spawnTimeout: 10_000,
                 tsconfig: "./tsconfig.json",
             },
+            unstubGlobals: true,
         },
     };
 };
 
-export default defineConfig(viteConfig);
+const definedViteConfig: UserConfigFnObject = defineConfig(viteConfig);
+
+export default definedViteConfig;

@@ -30,10 +30,15 @@
 # policy, and support documentation.
 
 name: Scorecard Supply Chain Security
-on:
+run-name: Scorecard analysis (${{ github.event_name }})
+"on":
     # For Branch-Protection check. Only the default branch is supported. See
     # https://github.com/ossf/scorecard/blob/main/docs/checks.md#branch-protection
     branch_protection_rule:
+        types:
+            - created
+            - deleted
+            - edited
     # To guarantee Maintained check is occasionally updated. See
     # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
     schedule:
@@ -53,6 +58,10 @@ on:
             - "!src/**"
             - "**/CHANGELOG.md"
             - "CHANGELOG.md"
+    merge_group:
+        branches: ["main"]
+        types:
+            - checks_requested
     workflow_dispatch:
 
 # Declare minimal default permissions; the analysis job grants only what it needs.
@@ -61,12 +70,13 @@ permissions:
 
 concurrency:
     group: scorecards-${{ github.ref }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 
 jobs:
     analysis:
         name: Scorecard analysis
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         permissions:
             # Needed to upload the results to code-scanning dashboard.
             security-events: write

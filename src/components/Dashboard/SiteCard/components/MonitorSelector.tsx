@@ -8,7 +8,7 @@ import type { EventHandlers } from "@shared/types/componentProps";
 import type { MouseEvent, NamedExoticComponent } from "react";
 
 import { memo, useCallback, useId, useMemo, useRef } from "react";
-import { arrayFind, arrayJoin, isEmpty   } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 import { AppIcons } from "../../../../utils/icons";
@@ -172,7 +172,9 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
             if (!hasSelection) {
                 return placeholderLabel;
             }
-            const selectedMonitor = arrayFind(monitors, (m) => m.id === selectedMonitorId);
+            const selectedMonitor = monitors.find(
+                (m) => m.id === selectedMonitorId
+            );
             return selectedMonitor
                 ? formatMonitorOption(selectedMonitor)
                 : placeholderLabel;

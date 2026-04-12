@@ -37,8 +37,9 @@
 # see https://google.github.io/osv-scanner/github-action/
 
 name: Osv Scanner
+run-name: OSV scan (${{ github.event_name }})
 
-on:
+"on":
     pull_request:
         paths-ignore:
             - "*"
@@ -48,6 +49,8 @@ on:
             - "CHANGELOG.md"
     merge_group:
         branches: ["main"]
+        types:
+            - checks_requested
     schedule:
         - cron: "39 12 * * 1" # Runs every Monday at 12:39 PM UTC; https://crontab.guru/#39_12_*_*_1
     push:
@@ -67,17 +70,62 @@ permissions:
     actions: read
 
 concurrency:
-    group: osv-scanner-${{ github.ref }}
-    cancel-in-progress: false
+    group: "osv-scanner-${{ github.ref }}"
+    cancel-in-progress: true
 
 jobs:
     scan-scheduled:
+        name: OSV scheduled scan
         if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
-        uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@2a387edfbe02a11d856b89172f6e978100177eb4" # v2.3.2
-        with:
-            scan-args: .package-lock.json
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - name: Harden the runner (Audit all outbound calls)
+              uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
+              with:
+                  egress-policy: audit
+
+            - name: Checkout repository
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+            - name: Run OSV scanner
+              uses: google/osv-scanner-action/osv-scanner-action@2a387edfbe02a11d856b89172f6e978100177eb4 # v2.3.2
+              with:
+                  scan-args: |-
+                      --recursive
+                      ./
+                      --format=sarif
+                      --output=results.sarif
+
+            - name: Upload SARIF results
+              uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v2.27.0
+              with:
+                  sarif_file: results.sarif
+
     scan-pr:
+        name: OSV pull request scan
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
-        uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@2a387edfbe02a11d856b89172f6e978100177eb4" # v2.3.2
-        with:
-            scan-args: .package-lock.json
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - name: Harden the runner (Audit all outbound calls)
+              uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
+              with:
+                  egress-policy: audit
+
+            - name: Checkout repository
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+            - name: Run OSV scanner
+              uses: google/osv-scanner-action/osv-scanner-action@2a387edfbe02a11d856b89172f6e978100177eb4 # v2.3.2
+              with:
+                  scan-args: |-
+                      --recursive
+                      ./
+                      --format=sarif
+                      --output=results.sarif
+
+            - name: Upload SARIF results
+              uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v2.27.0
+              with:
+                  sarif_file: results.sarif

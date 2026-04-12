@@ -31,6 +31,7 @@ export async function openExternalOrThrow(args: {
     readonly safeUrlForLogging: string;
 }): Promise<void> {
     try {
+        // eslint-disable-next-line sdl/no-electron-untrusted-open-external -- Callers pass a URL that has already been validated and normalized by the shared URL safety helpers.
         await shell.openExternal(args.normalizedUrl);
     } catch (error: unknown) {
         const codeSuffix = getElectronErrorCodeSuffix(error);

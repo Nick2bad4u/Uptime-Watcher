@@ -125,7 +125,7 @@ export async function getMonitorTypeConfig(
     type: string
 ): Promise<MonitorTypeConfig | undefined> {
     const configs = await getAvailableMonitorTypes();
-    // eslint-disable-next-line typefest/prefer-ts-extras-array-find -- The installed ts-extras package version in this repository does not expose arrayFind; native Array#find preserves correct typing here.
+     
     return configs.find((config) => config.type === type);
 }
 

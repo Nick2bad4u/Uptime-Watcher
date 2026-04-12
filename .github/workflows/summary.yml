@@ -2,7 +2,7 @@
 name: Summarize New Issues And Pull Requests
 run-name: Summarize new issues and pull requests
 
-on:
+"on":
     issues:
         types: [opened, edited]
     pull_request:
@@ -13,7 +13,7 @@ on:
 
 concurrency:
     group: summary-${{ github.ref || github.run_id }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 
 permissions:
     models: read
@@ -32,7 +32,7 @@ jobs:
             models: read
         concurrency:
             group: summary-${{ github.ref }}
-            cancel-in-progress: false
+            cancel-in-progress: true
         defaults:
             run:
                 shell: bash

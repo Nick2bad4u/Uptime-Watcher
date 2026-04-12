@@ -24,7 +24,7 @@ import {
 import log from "electron-log/main";
 import { mkdirSync } from "node:fs";
 import * as path from "node:path";
-import { arrayJoin, isEmpty, safeCastTo   } from "ts-extras";
+import { arrayIncludes, arrayJoin, isEmpty, safeCastTo, setHas } from "ts-extras";
 
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
@@ -178,12 +178,12 @@ const configureLogging = (): {
     // Check for log level flags in command line arguments
     const args = new Set(process.argv.slice(2));
 
-    const debugFlag = args.has("--debug") || args.has("--log-debug");
+    const debugFlag = setHas(args, "--debug") || setHas(args, "--log-debug");
     const productionFlag =
-        args.has("--production") ||
-        args.has("--log-production") ||
-        args.has("--log-prod");
-    const infoFlag = args.has("--info") || args.has("--log-info");
+        setHas(args, "--production") ||
+        setHas(args, "--log-production") ||
+        setHas(args, "--log-prod");
+    const infoFlag = setHas(args, "--info") || setHas(args, "--log-info");
 
     // Determine log level based on flags and environment
     return ((): {
@@ -264,7 +264,7 @@ log.transports.console.format = LOG_CONSOLE_FORMAT;
 // Configure remote debugging for MCP electron server support
 // Only enable remote debugging if not running in headless mode (tests)
 if (
-    (isDev() || process.argv.includes("--enable-mcp-debugging")) &&
+    (isDev() || arrayIncludes(process.argv, "--enable-mcp-debugging")) &&
     !readProcessEnv("HEADLESS")
 ) {
     try {

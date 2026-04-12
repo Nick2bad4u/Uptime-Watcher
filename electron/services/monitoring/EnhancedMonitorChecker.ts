@@ -32,7 +32,6 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
-import { arrayFind } from "ts-extras";
 
 import type { MonitorCheckContext } from "./checkContext";
 import type { MonitorOperationCoordinator } from "./coordinators/MonitorOperationCoordinator";
@@ -302,7 +301,7 @@ export class EnhancedMonitorChecker {
         isManualCheck = false,
         signal?: AbortSignal
     ): Promise<StatusUpdate | undefined> {
-        const monitor = arrayFind(site.monitors, (m) => m.id === monitorId);
+        const monitor = site.monitors.find((m) => m.id === monitorId);
 
         if (!this.validateMonitorForCheck(monitor, site, monitorId)) {
             return undefined;

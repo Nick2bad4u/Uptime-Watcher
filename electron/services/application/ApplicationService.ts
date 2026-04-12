@@ -58,7 +58,7 @@ import {
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 import { app } from "electron";
-import { arrayFind, arrayJoin, isEmpty, safeCastTo    } from "ts-extras";
+import { arrayJoin, isEmpty, safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type {
@@ -84,11 +84,18 @@ import { ServiceContainer } from "../ServiceContainer";
  */
 const hasCloseFunction = (
     candidate: unknown
-): candidate is { close: () => void } =>
-    typeof candidate === "object" &&
-    candidate !== null &&
-    "close" in candidate &&
-    typeof (safeCastTo<{ close?: unknown }>(candidate)).close === "function";
+): candidate is { close: () => void } => {
+    if (typeof candidate !== "object" || candidate === null) {
+        return false;
+    }
+
+    if (!("close" in candidate)) {
+        return false;
+    }
+
+    const closeCandidate: { close?: unknown } = safeCastTo(candidate);
+    return typeof closeCandidate.close === "function";
+};
 
 /**
  * High-level coordinator responsible for wiring Electron application lifecycle
@@ -201,10 +208,7 @@ export class ApplicationService {
             // NOTE: Currently synchronous, but designed to be
             // future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
-            if (
-                "cleanup" in ipcService &&
-                typeof ipcService.cleanup === "function"
-            ) {
+            if ("cleanup" in ipcService && typeof ipcService.cleanup === "function") {
                 ipcService.cleanup();
             }
 
@@ -217,7 +221,9 @@ export class ApplicationService {
             // future-compatible with async closure
             this.serviceContainer.getWindowService().closeMainWindow();
 
-            const databaseServiceEntry = arrayFind(services, ({ name }) => name === "DatabaseService");
+            const databaseServiceEntry = services.find(
+                ({ name }) => name === "DatabaseService"
+            );
 
             if (databaseServiceEntry) {
                 const serviceCandidate = databaseServiceEntry.service;

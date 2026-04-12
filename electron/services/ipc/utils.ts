@@ -465,6 +465,7 @@ export function registerStandardizedIpcHandler<
     registeredHandlers.add(channelName);
 
     try {
+
         ipcMain.handle(
             channelName,
             async (_event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {

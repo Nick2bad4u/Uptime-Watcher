@@ -15,8 +15,6 @@ import type {
 } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import { safeCastTo } from "ts-extras";
-
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { EnhancedLifecycleConfig } from "../MonitorManagerEnhancedLifecycle";
@@ -66,9 +64,7 @@ export async function startMonitoringAllOperation(args: {
         );
 
         // Attach summary for upstream error handling and diagnostics.
-        (safeCastTo(error)).summary =
-            summary;
-        throw error;
+        throw Object.assign(error, { summary });
     }
 
     if (summary.isMonitoring || summary.alreadyActive) {
@@ -119,9 +115,7 @@ export async function stopMonitoringAllOperation(args: {
             "Failed to stop monitoring: one or more monitors remain active"
         );
 
-        (safeCastTo(error)).summary =
-            summary;
-        throw error;
+        throw Object.assign(error, { summary });
     }
 
     await eventEmitter.emitTyped("internal:monitor:stopped", {

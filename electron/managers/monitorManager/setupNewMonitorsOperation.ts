@@ -14,7 +14,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
-import { isEmpty } from "ts-extras";
+import { arrayIncludes, isEmpty } from "ts-extras";
 
 import { logger } from "../../utils/logger";
 
@@ -44,7 +44,7 @@ export async function setupNewMonitorsOperation(args: {
     );
 
     const newMonitors = site.monitors.filter(
-        (monitor) => monitor.id && newMonitorIds.includes(monitor.id)
+        (monitor) => monitor.id && arrayIncludes(newMonitorIds, monitor.id)
     );
 
     if (isEmpty(newMonitors)) {

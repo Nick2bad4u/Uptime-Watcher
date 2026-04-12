@@ -6,7 +6,7 @@ import {
     useCallback,
     useRef,
 } from "react";
-import { arrayAt, arrayFind, arrayFirst, arrayJoin    } from "ts-extras";
+import { arrayAt, arrayFirst, arrayJoin } from "ts-extras";
 
 import {
     CLOUD_PROVIDER_SETUP_PANEL_TABS,
@@ -73,7 +73,9 @@ export const CloudProviderSetupPanelProviderTabList = ({
                 return;
             }
 
-            const match = arrayFind(CLOUD_PROVIDER_SETUP_PANEL_TABS, (tab) => tab.key === rawKey);
+            const match = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(
+                (tab) => tab.key === rawKey
+            );
             if (!match) {
                 return;
             }
@@ -161,7 +163,9 @@ export const CloudProviderSetupPanelProviderTabList = ({
             return;
         }
 
-        const match = arrayFind(CLOUD_PROVIDER_SETUP_PANEL_TABS, (tab) => tab.key === rawKey);
+        const match = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(
+            (tab) => tab.key === rawKey
+        );
         if (!match) {
             return;
         }

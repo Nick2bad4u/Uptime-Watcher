@@ -1,20 +1,24 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: Sonar Cloud Analysis
+run-name: SonarCloud analysis (${{ github.event_name }})
 
-# Prevent multiple SonarCloud analyses from running simultaneously
 concurrency:
-    group: "sonarcloud-${{ github.ref }}"
+    group: sonarcloud-${{ github.ref }}
     cancel-in-progress: true
 
-on:
+"on":
     push:
         branches:
             - main
             - master
     pull_request:
         types: [opened, synchronize, reopened]
+    merge_group:
+        branches:
+            - main
+        types:
+            - checks_requested
 
-# Permissions required for SonarCloud analysis
 permissions:
     contents: read
 
@@ -22,12 +26,13 @@ jobs:
     sonarcloud:
         name: SonarCloud Code Quality Analysis
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         if: ${{ github.repository == 'Nick2bad4u/Uptime-Watcher' }}
+        defaults:
+            run:
+                shell: bash
         env:
-            # SonarCloud requires a SonarCloud "analysis token".
-            # Do NOT fall back to other secrets (e.g., a GitHub PAT), because
-            # that produces confusing 403 errors.
-            SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -38,14 +43,13 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
-                  # Shallow clones should be disabled for better analysis
                   fetch-depth: 0
 
             - name: Setup Node.js
               uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
               with:
                   node-version-file: .node-version
-                  cache: "npm"
+                  cache: npm
                   cache-dependency-path: package-lock.json
 
             - name: Install dependencies
@@ -55,8 +59,6 @@ jobs:
               run: npm run build
 
             - name: Run tests with coverage
-              # Generate coverage reports for SonarCloud analysis
-              # Continue even if some tests fail so SonarCloud can still analyze coverage
               run: npm run test:all:coverage || true
 
             - name: Verify coverage files exist
@@ -80,5 +82,5 @@ jobs:
               if: ${{ env.SONAR_TOKEN != '' }}
               uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7.0.0
               env:
-                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" # For PR information
-                  SONAR_TOKEN: "${{ env.SONAR_TOKEN }}" # SonarCloud auth
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ env.SONAR_TOKEN }}

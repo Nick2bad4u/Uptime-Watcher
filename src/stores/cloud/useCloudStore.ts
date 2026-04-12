@@ -5,7 +5,7 @@ import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview"
 import type { StoreApi, UseBoundStore } from "zustand";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { arrayFind, arrayJoin  } from "ts-extras";
+import { arrayJoin } from "ts-extras";
 import { create } from "zustand";
 
 import { CloudService } from "../../services/CloudService";
@@ -542,7 +542,8 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 set({ restoringBackupKey: key });
 
                 try {
-                    const entryName = arrayFind(get().backups, (backup) => backup.key === key)?.fileName ?? key;
+                    const entryName =
+                        get().backups.find((backup) => backup.key === key)?.fileName ?? key;
 
                     const startedToastId = enqueueCloudOperationStartedToast({
                         message: `Restoring ${entryName}`,

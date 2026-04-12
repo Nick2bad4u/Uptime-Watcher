@@ -11,7 +11,6 @@
  */
 
 import { type SetStateAction, useCallback, useEffect, useState } from "react";
-import { arrayFind } from "ts-extras";
 
 /**
  * Type for a state setter function.
@@ -70,7 +69,9 @@ export function useEscapeKeyModalHandler(
                         (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
                     );
 
-                    const openModal = arrayFind(sortedConfigs, (config) => config.isOpen);
+                    const openModal = sortedConfigs.find(
+                        (config) => config.isOpen
+                    );
                     if (openModal) {
                         event.preventDefault();
                         openModal.onClose();

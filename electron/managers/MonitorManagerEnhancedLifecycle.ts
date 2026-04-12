@@ -19,7 +19,7 @@ import type {
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { MONITOR_STATUS } from "@shared/types";
-import { arrayFind, safeCastTo  } from "ts-extras";
+import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -149,7 +149,9 @@ const getMonitorOrWarn = (
     identifier: string,
     monitorId: string
 ): Monitor | null => {
-    const monitor = arrayFind(site.monitors, (candidate) => candidate.id === monitorId);
+    const monitor = site.monitors.find(
+        (candidate) => candidate.id === monitorId
+    );
     if (!monitor) {
         config.logger.warn(
             `Monitor ${monitorId} not found in site ${identifier}`

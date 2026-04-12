@@ -21,6 +21,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Except } from "type-fest";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
@@ -144,7 +145,9 @@ export class MonitorValidator {
      * @internal
      */
     private validateMonitorTypeSpecific(
-        monitor: Omit<Site["monitors"][number], "type"> & { type: string }
+        monitor: Except<Site["monitors"][number], "type"> & {
+            type: string;
+        }
     ): readonly string[] {
         // Validate monitor type using registry
         if (!isValidMonitorType(monitor.type)) {

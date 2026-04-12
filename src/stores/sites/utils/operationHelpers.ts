@@ -14,7 +14,7 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
-import { arrayFind, keyIn, safeCastTo   } from "ts-extras";
+import { keyIn, safeCastTo } from "ts-extras";
 
 import type { SiteOperationsDependencies } from "../types";
 
@@ -273,7 +273,7 @@ export const getSiteByIdentifier = (
     deps: SiteOperationsDependencies
 ): Site => {
     const sites = safeCastTo<Array<null | Site | undefined>>(deps.getSites());
-    const site = arrayFind(sites, (s) => s?.identifier === siteIdentifier);
+    const site = sites.find((s) => s?.identifier === siteIdentifier);
     if (!site) {
         throw new Error(safeCastTo(ERROR_CATALOG.sites.NOT_FOUND));
     }

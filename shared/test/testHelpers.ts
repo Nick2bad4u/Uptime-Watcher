@@ -13,19 +13,25 @@ import type {
     StatusHistory,
 } from "../types";
 
+import { webcrypto } from "node:crypto";
+
 /**
  * Resolve the Web Crypto API used by shared test helpers.
  *
  * @returns Crypto implementation exposing `getRandomValues`.
  */
 const getCryptoForTests = (): Crypto => {
-    if (typeof globalThis.crypto?.getRandomValues !== "function") {
-        throw new TypeError(
-            "Web Crypto getRandomValues is unavailable in the current test environment."
-        );
+    if (typeof globalThis.crypto?.getRandomValues === "function") {
+        return globalThis.crypto;
     }
 
-    return globalThis.crypto;
+    if (typeof webcrypto.getRandomValues === "function") {
+        return webcrypto;
+    }
+
+    throw new TypeError(
+        "Web Crypto getRandomValues is unavailable in the current test environment."
+    );
 };
 
 /**

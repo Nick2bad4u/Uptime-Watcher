@@ -31,7 +31,6 @@ import * as htmlParser from "@html-eslint/parser";
 import implicitDependencies from "@jcoreio/eslint-plugin-implicit-dependencies";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import * as pluginDesignTokens from "@metamask/eslint-plugin-design-tokens";
-// @ts-expect-error -- plugin types are not yet aligned with strict ESM import typing
 import rushStackSecurityRaw from "@rushstack/eslint-plugin-security";
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "@typescript-eslint/eslint-plugin";
@@ -241,6 +240,7 @@ const jsonSchemaValidatorRules = enableJsonSchemaValidation
     : {};
 
 const rushStackSecurityPlugin = {
+    // @ts-expect-error -- Legacy plugin typing is narrower than the ESLint 10 compat wrapper surface.
     "@rushstack/security": fixupPluginRules(rushStackSecurityRaw),
 };
 
@@ -267,6 +267,73 @@ const pluginSecurity = fixupPluginRules(pluginSecurityRaw);
 const pluginSortClassMembers = fixupPluginRules(pluginSortClassMembersRaw);
 const styledA11y = fixupPluginRules(styledA11yRaw);
 const pluginWriteGood = fixupPluginRules(pluginWriteGoodRaw);
+
+/**
+ * Safely extracts a `rules` record from a config-like object.
+ *
+ * @param {unknown} configEntry - Potential ESLint config entry.
+ *
+ * @returns {Record<string, unknown>} Normalized rules record.
+ */
+const getConfigRuleMap = (configEntry) => {
+    if (
+        !configEntry ||
+        Array.isArray(configEntry) ||
+        typeof configEntry !== "object"
+    ) {
+        return {};
+    }
+
+    const rules = Reflect.get(configEntry, "rules");
+
+    return rules && typeof rules === "object"
+        ? /** @type {Record<string, unknown>} */ (rules)
+        : {};
+};
+
+/**
+ * Safely reads rules from a plugin `configs` entry.
+ *
+ * @param {unknown} plugin - ESLint plugin-like object.
+ * @param {string} configName - Named config key.
+ *
+ * @returns {Record<string, unknown>} Normalized rules record.
+ */
+const getPluginConfigRules = (plugin, configName) => {
+    if (!plugin || typeof plugin !== "object") {
+        return {};
+    }
+
+    const configs = Reflect.get(plugin, "configs");
+
+    if (!configs || typeof configs !== "object") {
+        return {};
+    }
+
+    return getConfigRuleMap(Reflect.get(configs, configName));
+};
+
+/**
+ * Safely reads rules from a plugin `flatConfigs` entry.
+ *
+ * @param {unknown} plugin - ESLint plugin-like object.
+ * @param {string} configName - Named flat config key.
+ *
+ * @returns {Record<string, unknown>} Normalized rules record.
+ */
+const getPluginFlatConfigRules = (plugin, configName) => {
+    if (!plugin || typeof plugin !== "object") {
+        return {};
+    }
+
+    const flatConfigs = Reflect.get(plugin, "flatConfigs");
+
+    if (!flatConfigs || typeof flatConfigs !== "object") {
+        return {};
+    }
+
+    return getConfigRuleMap(Reflect.get(flatConfigs, configName));
+};
 // @dword-design/eslint-plugin-import-alias
 // @dword-design/import-alias
 // @ospm/eslint-plugin-react-signals-hooks
@@ -538,6 +605,32 @@ export default defineConfig([
         },
         rules: {
             ...typefest.configs.experimental.rules,
+            // The currently installed ts-extras version exports helpers like
+            // `isDefined` and `isFinite`, but does not export `arrayFind`.
+            // Requiring it would force invalid imports across the codebase.
+            "typefest/prefer-ts-extras-array-find": "off",
+            // The experimental Typefest preset includes a large number of
+            // micro-preference rules for `ts-extras` and Type-Fest aliases.
+            // In this repository they create disproportionate churn, interact
+            // poorly with third-party typings, and in one case (`arrayFind`)
+            // even required a helper that the installed package does not
+            // export. We keep the broader experimental preset, but opt out of
+            // the low-signal preference rules that do not materially improve
+            // correctness over the native equivalents already used here.
+            "typefest/prefer-ts-extras-array-first": "off",
+            "typefest/prefer-ts-extras-array-includes": "off",
+            "typefest/prefer-ts-extras-assert-defined": "off",
+            "typefest/prefer-ts-extras-assert-present": "off",
+            "typefest/prefer-ts-extras-is-defined": "off",
+            "typefest/prefer-ts-extras-is-finite": "off",
+            "typefest/prefer-ts-extras-is-infinite": "off",
+            "typefest/prefer-ts-extras-is-present": "off",
+            "typefest/prefer-ts-extras-key-in": "off",
+            "typefest/prefer-ts-extras-not": "off",
+            "typefest/prefer-ts-extras-object-has-in": "off",
+            "typefest/prefer-ts-extras-set-has": "off",
+            "typefest/prefer-type-fest-except": "off",
+            "typefest/prefer-type-fest-writable": "off",
         },
     },
     fileProgressOverridesConfig,
@@ -603,6 +696,39 @@ export default defineConfig([
             "import-x/no-extraneous-dependencies": "off",
             "n/no-extraneous-import": "off",
             "sonarjs/no-implicit-dependencies": "off",
+        },
+    },
+    {
+        files: ["vite.config.ts"],
+        name: "Vite config: allow vitest globals",
+        rules: {
+            "vite/no-vitest-globals": "off",
+        },
+    },
+    {
+        files: [
+            "benchmarks/**/*.{ts,tsx,mts,cts}",
+            "electron/test/**/*.{ts,tsx,mts,cts}",
+            "playwright/**/*.{ts,tsx,mts,cts}",
+            "shared/test/**/*.{ts,tsx,mts,cts}",
+            "src/test/**/*.{ts,tsx,mts,cts}",
+            "tests/**/*.{ts,tsx,mts,cts}",
+        ],
+        name: "Tests and benchmarks: relax SDL data fixtures",
+        rules: {
+            "sdl/no-inner-html": "off",
+            "sdl/no-insecure-random": "off",
+            "sdl/no-insecure-url": "off",
+        },
+    },
+    {
+        files: [
+            "playwright/**/*.{ts,tsx,mts,cts,mjs}",
+            "scripts/**/*.{ts,tsx,mts,cts,mjs}",
+        ],
+        name: "Tooling scripts: allow explicit process launch helpers",
+        rules: {
+            "sdl/no-child-process-exec": "off",
         },
     },
     {
@@ -779,18 +905,18 @@ export default defineConfig([
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
+            ...getPluginConfigRules(pluginSecurity, "recommended"),
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...comments.recommended.rules,
-            ...pluginCanonical.configs.recommended.rules,
-            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...getPluginConfigRules(pluginCanonical, "recommended"),
+            ...getPluginConfigRules(pluginSortClassMembers, "flat/recommended"),
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
-            ...pluginRegexLook.configs.recommended.rules,
+            ...getPluginConfigRules(pluginRegexLook, "recommended"),
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...etc.configs.recommended.rules,
@@ -2126,34 +2252,34 @@ export default defineConfig([
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...eslintPluginUnicorn.configs.all.rules,
-            ...pluginReact.configs.all.rules,
+            ...getPluginConfigRules(pluginReact, "all"),
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
+            ...getPluginConfigRules(pluginSecurity, "recommended"),
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
-            ...pluginCanonical.configs.recommended.rules,
+            ...getPluginConfigRules(pluginCanonical, "recommended"),
             ...eslintReactX.configs["recommended-type-checked"].rules,
             ...eslintReactDom.configs.recommended.rules,
             ...eslintReactWeb.configs.recommended.rules,
             ...eslintReactHooksExtra.configs.recommended.rules,
             ...eslintReactNamingConvention.configs.recommended.rules,
-            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...getPluginConfigRules(pluginSortClassMembers, "flat/recommended"),
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
-            ...pluginRegexLook.configs.recommended.rules,
+            ...getPluginConfigRules(pluginRegexLook, "recommended"),
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
-            ...styledA11y.flatConfigs.strict.rules,
+            ...getPluginFlatConfigRules(styledA11y, "strict"),
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
@@ -3584,36 +3710,36 @@ export default defineConfig([
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...eslintPluginUnicorn.configs.all.rules,
-            ...pluginReact.configs.all.rules,
+            ...getPluginConfigRules(pluginReact, "all"),
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
+            ...getPluginConfigRules(pluginSecurity, "recommended"),
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
-            ...pluginCanonical.configs.recommended.rules,
+            ...getPluginConfigRules(pluginCanonical, "recommended"),
             ...eslintReactX.configs["recommended-type-checked"].rules,
             ...eslintReactDom.configs.recommended.rules,
             ...eslintReactWeb.configs.recommended.rules,
             ...eslintReactHooksExtra.configs.recommended.rules,
             ...eslintReactNamingConvention.configs.recommended.rules,
-            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...getPluginConfigRules(pluginSortClassMembers, "flat/recommended"),
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
-            ...pluginRegexLook.configs.recommended.rules,
+            ...getPluginConfigRules(pluginRegexLook, "recommended"),
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
-            ...styledA11y.flatConfigs.strict.rules,
+            ...getPluginFlatConfigRules(styledA11y, "strict"),
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
@@ -5244,35 +5370,35 @@ export default defineConfig([
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...eslintPluginUnicorn.configs.all.rules,
-            ...pluginReact.configs.all.rules,
+            ...getPluginConfigRules(pluginReact, "all"),
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
+            ...getPluginConfigRules(pluginSecurity, "recommended"),
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
-            ...pluginCanonical.configs.recommended.rules,
+            ...getPluginConfigRules(pluginCanonical, "recommended"),
             ...eslintReactX.configs["recommended-type-checked"].rules,
             ...eslintReactDom.configs.recommended.rules,
             ...eslintReactWeb.configs.recommended.rules,
             ...eslintReactHooksExtra.configs.recommended.rules,
             ...eslintReactNamingConvention.configs.recommended.rules,
-            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...getPluginConfigRules(pluginSortClassMembers, "flat/recommended"),
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
-            ...pluginRegexLook.configs.recommended.rules,
+            ...getPluginConfigRules(pluginRegexLook, "recommended"),
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
-            ...styledA11y.flatConfigs.strict.rules,
+            ...getPluginFlatConfigRules(styledA11y, "strict"),
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
@@ -6684,36 +6810,36 @@ export default defineConfig([
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...eslintPluginUnicorn.configs.all.rules,
-            ...pluginReact.configs.all.rules,
+            ...getPluginConfigRules(pluginReact, "all"),
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginBoundaries.configs.recommended.rules,
             ...pluginRedos.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
+            ...getPluginConfigRules(pluginSecurity, "recommended"),
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
-            ...pluginCanonical.configs.recommended.rules,
+            ...getPluginConfigRules(pluginCanonical, "recommended"),
             ...eslintReactX.configs["recommended-type-checked"].rules,
             ...eslintReactDom.configs.recommended.rules,
             ...eslintReactWeb.configs.recommended.rules,
             ...eslintReactHooksExtra.configs.recommended.rules,
             ...eslintReactNamingConvention.configs.recommended.rules,
-            ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            ...getPluginConfigRules(pluginSortClassMembers, "flat/recommended"),
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
             ...pluginJSDoc.rules,
             ...eslintPluginCommentLength.configs["flat/recommended"].rules,
-            ...pluginRegexLook.configs.recommended.rules,
+            ...getPluginConfigRules(pluginRegexLook, "recommended"),
             ...pluginJsxPlus.configs.all.rules,
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
-            ...styledA11y.flatConfigs.strict.rules,
+            ...getPluginFlatConfigRules(styledA11y, "strict"),
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
@@ -9460,12 +9586,12 @@ export default defineConfig([
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
+            ...getPluginConfigRules(pluginSecurity, "recommended"),
             ...nodePlugin.configs["flat/all"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             ...css.configs.recommended.rules,
             ...comments.recommended.rules,
-            ...pluginCanonical.configs.recommended.rules,
+            ...getPluginConfigRules(pluginCanonical, "recommended"),
             "@typescript-eslint/array-type": [
                 "error",
                 { default: "array-simple" },
@@ -10395,13 +10521,13 @@ export default defineConfig([
             ...importX.flatConfigs.typescript.rules,
             ...pluginPromise.configs["flat/recommended"].rules,
             ...eslintPluginUnicorn.configs.all.rules,
-            ...pluginReact.configs.all.rules,
+            ...getPluginConfigRules(pluginReact, "all"),
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...sonarjsConfigs.recommended.rules,
             ...pluginPerfectionist.configs["recommended-natural"].rules,
             ...pluginRedos.configs.recommended.rules,
-            ...pluginSecurity.configs.recommended.rules,
+            ...getPluginConfigRules(pluginSecurity, "recommended"),
             ...nodePlugin.configs["flat/recommended"].rules,
             ...eslintPluginMath.configs.recommended.rules,
             camelcase: "off",

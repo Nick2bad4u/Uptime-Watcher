@@ -39,7 +39,7 @@ import {
 import { isObject } from "@shared/utils/typeGuards";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { EventEmitter } from "node:events";
-import { isEmpty } from "ts-extras";
+import { isDefined, isEmpty, objectHasIn } from "ts-extras";
 
 import type {
     ArrayPayload as InternalArrayPayload,
@@ -793,15 +793,15 @@ export class TypedEventBus<
 
         const clonedPayload = cloneObjectPayload(data);
 
-        if (Reflect.has(clonedPayload, "_meta")) {
+        if (objectHasIn(clonedPayload, "_meta")) {
             Reflect.deleteProperty(clonedPayload, "_meta");
         }
 
-        if (Reflect.has(clonedPayload, "_originalMeta")) {
+        if (objectHasIn(clonedPayload, "_originalMeta")) {
             Reflect.deleteProperty(clonedPayload, "_originalMeta");
         }
 
-        if (Reflect.has(clonedPayload, ORIGINAL_METADATA_SYMBOL)) {
+        if (objectHasIn(clonedPayload, ORIGINAL_METADATA_SYMBOL)) {
             Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
         }
 
@@ -824,9 +824,9 @@ export class TypedEventBus<
 
         attachMetadata(clonedPayload, metadata);
 
-        if (resolvedOriginalMeta !== undefined) {
+        if (isDefined(resolvedOriginalMeta)) {
             attachOriginalMetadata(clonedPayload, resolvedOriginalMeta);
-        } else if (rawOriginalMetaCandidate !== undefined) {
+        } else if (isDefined(rawOriginalMetaCandidate)) {
             defineHiddenProperty(
                 clonedPayload,
                 "_originalMeta",

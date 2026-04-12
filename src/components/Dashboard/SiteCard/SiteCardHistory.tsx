@@ -6,7 +6,7 @@
 import type { Monitor, StatusHistory } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
-import { arrayFind, arrayFirst  } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 
 import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
@@ -113,7 +113,9 @@ export const SiteCardHistory: NamedExoticComponent<SiteCardHistoryProperties> =
                 }
 
                 // Get display name from monitor type options
-                const monitorTypeOption = arrayFind(options, (option) => option.value === monitor.type);
+                const monitorTypeOption = options.find(
+                    (option) => option.value === monitor.type
+                );
                 const displayName = monitorTypeOption?.label ?? monitor.type;
 
                 // Get type-specific suffix using dynamic formatter

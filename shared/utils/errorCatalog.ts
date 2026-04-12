@@ -433,7 +433,9 @@ export function formatErrorMessage(
  */
 export function isKnownErrorMessage(message: string): message is ErrorMessage {
     const allMessages = objectValues(ERROR_CATALOG).flatMap((category) =>
-        objectValues(castUnchecked<Record<string, string>>(category))
+        objectValues(castUnchecked<Record<string, string>>(category)).map(
+            (entry) => castUnchecked<ErrorMessage>(entry)
+        )
     );
 
     return arrayIncludes(allMessages, castUnchecked<ErrorMessage>(message));

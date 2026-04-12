@@ -570,7 +570,7 @@ export function isHttpLatencyFormData(
 export function isDnsFormData(
     data: Partial<MonitorFormData>
 ): data is DnsFormData {
-    const hostCandidate: unknown = (safeCastTo(data)).host;
+    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -594,7 +594,7 @@ export function isDnsFormData(
 export function isPingFormData(
     data: Partial<MonitorFormData>
 ): data is PingFormData {
-    const hostCandidate: unknown = (safeCastTo(data)).host;
+    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -616,7 +616,7 @@ export function isPingFormData(
 export function isPortFormData(
     data: Partial<MonitorFormData>
 ): data is PortFormData {
-    const hostCandidate: unknown = (safeCastTo(data)).host;
+    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -640,7 +640,7 @@ export function isPortFormData(
 export function isSslFormData(
     data: Partial<MonitorFormData>
 ): data is SslFormData {
-    const hostCandidate: unknown = (safeCastTo(data)).host;
+    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
     const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
 
     return (
@@ -795,20 +795,13 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
 
     const monitorType = formData.type;
 
-    // Use type-safe access with proper typing
-    const validator = (
-        safeCastTo<Partial<
-            Record<
-                MonitorType,
-                ((data: Partial<MonitorFormData>) => boolean) | undefined
-            >
-        >>(FORM_DATA_VALIDATORS)
-    )[monitorType];
+    const validator = FORM_DATA_VALIDATORS[monitorType];
     if (!validator) {
         return false;
     }
 
-    return validator(formData);
+    const typedFormData = safeCastTo(data);
+    return validator(typedFormData);
 }
 
 /**

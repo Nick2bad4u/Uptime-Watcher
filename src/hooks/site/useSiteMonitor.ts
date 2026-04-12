@@ -14,7 +14,7 @@ import type { ChangeEvent } from "react";
 
 import { DEFAULT_MONITOR_STATUS } from "@shared/types";
 import { useCallback, useMemo } from "react";
-import { arrayFind, objectHasOwn  } from "ts-extras";
+import { objectHasOwn } from "ts-extras";
 
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { getDefaultMonitorId } from "../../utils/monitorUiHelpers";
@@ -76,7 +76,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     );
 
     const latestSite = useMemo(
-        () => arrayFind(sites, (s) => s.identifier === site.identifier) ?? site,
+        () => sites.find((s) => s.identifier === site.identifier) ?? site,
         [site, sites]
     );
 

@@ -3,7 +3,7 @@ import type { AppNotificationRequest } from "@shared/types/notifications";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { Notification } from "electron";
-import { arrayFind, setHas  } from "ts-extras";
+import { setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -301,7 +301,7 @@ export class NotificationService {
             return undefined;
         }
 
-        const monitor = arrayFind(site.monitors, (m) => m.id === monitorId);
+        const monitor = site.monitors.find((m) => m.id === monitorId);
         if (!monitor) {
             logger.error(
                 status === "down"

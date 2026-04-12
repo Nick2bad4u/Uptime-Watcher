@@ -21,7 +21,7 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import { arrayFind, isDefined, isSafeInteger, objectEntries, objectKeys, objectValues      } from "ts-extras";
+import { isDefined, isSafeInteger, objectEntries, objectKeys, objectValues } from "ts-extras";
 
 import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
@@ -175,7 +175,7 @@ export class SyncEngine {
             isSafeInteger(compactedUpToLocal) &&
             compactedUpToLocal >= -1
         ) {
-            const minimumNext = compactedUpToLocal + 1;
+            const minimumNext = Number(compactedUpToLocal) + 1;
             if (minimumNext > nextOpId) {
                 nextOpId = minimumNext;
                 await this.settings.set(
@@ -801,7 +801,7 @@ export class SyncEngine {
         existingMonitors: Monitor[],
         config: CloudSyncMonitorConfig
     ): Monitor {
-        const existing = arrayFind(existingMonitors, (m) => m.id === config.id);
+        const existing = existingMonitors.find((m) => m.id === config.id);
 
         // `siteIdentifier` is a cloud-sync routing field (monitors are stored
         // inside their parent site locally). It must never be passed into the

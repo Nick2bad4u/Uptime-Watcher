@@ -15,7 +15,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Promisable } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import { arrayFind, isEmpty  } from "ts-extras";
+import { isEmpty } from "ts-extras";
 
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { DatabaseService } from "./DatabaseService";
@@ -352,7 +352,9 @@ export class SiteWriterService {
 
         try {
             for (const newMonitor of newMonitors) {
-                const originalMonitor = arrayFind(originalSite.monitors, (m) => m.id === newMonitor.id);
+                const originalMonitor = originalSite.monitors.find(
+                    (m) => m.id === newMonitor.id
+                );
 
                 const intervalChanged =
                     originalMonitor?.checkInterval !== newMonitor.checkInterval;
@@ -723,7 +725,9 @@ export class SiteWriterService {
         newMonitor: Monitor,
         existingMonitors: Site["monitors"]
     ): void {
-        const existingMonitor = arrayFind(existingMonitors, (m) => m.id === newMonitor.id);
+        const existingMonitor = existingMonitors.find(
+            (m) => m.id === newMonitor.id
+        );
 
         if (existingMonitor) {
             this.updateExistingMonitor(

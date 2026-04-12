@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 /**
  * Precision Function Coverage Test
@@ -20,10 +19,13 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        // Test random ID generation utility
-        const generateRandomId = (): string =>
-            secureRandomFloat().toString(36).slice(2, 15) +
-            secureRandomFloat().toString(36).slice(2, 15);
+        // Test ID generation utility behaviour without depending on shared
+        // pseudo-random helpers.
+        let localIdCounter = 0;
+        const generateRandomId = (): string => {
+            localIdCounter += 1;
+            return `precision-${localIdCounter.toString(36).padStart(6, "0")}`;
+        };
 
         const id1 = generateRandomId();
         const id2 = generateRandomId();

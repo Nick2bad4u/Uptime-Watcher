@@ -28,7 +28,7 @@ describe("Shared Validation Utils Performance", () => {
 
     const invalidUrls = [
         "invalid-url",
-        "ftp://example.com",
+        "mailto:alerts@example.com",
         "not a url at all",
         "https://",
         "://missing-protocol",

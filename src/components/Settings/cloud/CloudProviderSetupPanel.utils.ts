@@ -1,7 +1,5 @@
 import type { CloudStatusSummary } from "@shared/types/cloud";
 
-import { arrayFind } from "ts-extras";
-
 import {
     CLOUD_PROVIDER_SETUP_PANEL_TABS,
     type CloudProviderSetupPanelConnectionSiteStatus,
@@ -88,7 +86,9 @@ export function resolveActiveProviderTab(
 export function resolveCloudProviderTabLabel(
     tab: CloudProviderSetupPanelTabKey
 ): string {
-    const match = arrayFind(CLOUD_PROVIDER_SETUP_PANEL_TABS, (entry) => entry.key === tab);
+    const match = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(
+        (entry) => entry.key === tab
+    );
     return match ? match.label : tab;
 }
 

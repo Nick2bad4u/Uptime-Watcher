@@ -10,6 +10,7 @@
 
 import type { EventMetadata } from "@shared/types/events";
 
+import { isRecord } from "@shared/utils/typeHelpers";
 import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -33,12 +34,11 @@ export function hasInitializeMethod(
 ): value is PossiblyInitializableService & {
     initialize: () => unknown;
 } {
-    if (typeof value !== "object" || value === null) {
+    if (!isRecord(value)) {
         return false;
     }
 
-    const candidate = safeCastTo(value);
-    return typeof candidate.initialize === "function";
+    return typeof value["initialize"] === "function";
 }
 
 /**

@@ -578,10 +578,8 @@ export class ServiceContainer {
             UptimeOrchestrator: this.uptimeOrchestrator,
             WindowService: this.windowService,
         };
-        for (const [serviceName, serviceInstance] of objectEntries(
-            serviceMap
-        )) {
-            if (serviceInstance !== undefined) {
+        for (const [serviceName, serviceInstance] of objectEntries(serviceMap)) {
+            if (isDefined(serviceInstance)) {
                 services.push({ name: serviceName, service: serviceInstance });
             }
         }

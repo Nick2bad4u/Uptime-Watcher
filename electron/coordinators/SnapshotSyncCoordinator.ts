@@ -12,7 +12,7 @@ import {
     mergeMonitorSnapshots,
 } from "@shared/utils/siteSnapshots";
 import { isObject } from "@shared/utils/typeGuards";
-import { arrayFind, safeCastTo  } from "ts-extras";
+import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { EventKey } from "../events/TypedEventBus";
@@ -264,7 +264,9 @@ export class SnapshotSyncCoordinator {
                     );
                 }
 
-                const monitorFromCache = arrayFind(siteFromCache?.monitors, (candidate) => candidate.id === monitorId);
+                const monitorFromCache = siteFromCache?.monitors.find(
+                    (candidate) => candidate.id === monitorId
+                );
 
                 if (siteFromCache && !monitorFromCache) {
                     logger.warn(

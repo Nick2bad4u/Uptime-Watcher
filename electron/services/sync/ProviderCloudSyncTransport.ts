@@ -16,7 +16,7 @@ import {
 import { readNumberEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isEmpty, isSafeInteger, stringSplit    } from "ts-extras";
+import { arrayJoin, isEmpty, isSafeInteger, stringSplit  } from "ts-extras";
 
 import type {
     CloudObjectEntry,
