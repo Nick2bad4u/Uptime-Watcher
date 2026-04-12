@@ -5,7 +5,7 @@ argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
 target: vscode
 disable-model-invocation: false
 user-invocable: true
-agents: "*"
+agents: ["*"]
 handoffs:
  - label: Consistency
    agent: BeastMode
@@ -53,7 +53,7 @@ handoffs:
    agent: BeastMode
    prompt: "As an autonomous agent, conduct a comprehensive review of my codebase for improvements, bugs, and architectural optimization. Execute a dynamic, iterative plan with a strong focus on refactoring: actively identify inline utility functions and generic logic embedded in larger files, moving them to appropriate utility modules to reduce file size and enhance modularity. Categorize findings into high-priority bugs (e.g., security, crashes), medium-priority enhancements (e.g., performance, readability, utility extraction), and low-priority tweaks. Rigorously check for duplicate logic. Make sure we always are checking for duplicate code paths and legacy code paths to remove. Always adhere to modern best practices. Each iteration, target a different code section or pattern. Prioritize novel discoveries and adapt based on previous insights. Implement all fixes directly—including code movement,etc—and summarize the specific refactoring and corrections achieved in this iteration."
    send: true
-tools: ['vscode/*', 'execute/*', 'read/*', 'agent', 'edit/*', 'search/*', 'web/*', 'sqlite/*', 'vscode-mcp/*', 'tavily-remote-mcp-system/*', 'todo/*']
+tools: [vscode, execute, read, agent, edit, search, web, 'tavily-remote-mcp-system/*', 'vscode-mcp/*', browser, todo]
 ---
 
 <instructions>
@@ -95,7 +95,6 @@ tools: ['vscode/*', 'execute/*', 'read/*', 'agent', 'edit/*', 'search/*', 'web/*
 - Use the `Test`, `Test:Coverage` and `Test:Playwright` task to run the full test suites.
 - To see code coverage for all areas, use the following: `npm run test:coverage` for frontend, `npm run test:coverage:electron` for electron, and `npm run test:coverage:shared` for shared code.
 - Use the `Type-check:all` task to check for TypeScript type or compile errors.
-- The `runSubagent` tool lets you spawn your own "dumb" LLM agent to help you with easy or repetitive tasks. It can also be used to review your work in case you need a second opinion. This helps you save your context for meaningful data. Use it wisely. For example, use it to quickly rename variables or functions across multiple files, or to search for specific patterns in the codebase. Only use it for small, well-defined tasks. You must give as much detail as possible in your instructions when you use it. The more detailed you are, the bettter the results will be. It can be especially useful with editing files. For example, you can use it to make systematic changes across multiple files, or multiple edits to the same file without having to manually track your context and do it youself. However - do not use it for large or complex tasks that require deep understanding of the codebase. Always show the user the response if applicable.
 - `vscode-mcp/get_diagnostics` lets you quickly see any errors or warnings in the current file. Use it often to check for issues. This can be faster than running the full lint or type-check tasks, but it may not catch everything.
 - You should always try and edit files directly using the edit tools. Only use the search tools to find files or information you need to complete your task. Using the terminal for editing files or searching isn't a good idea. Using scripts to edit files is not allowed. Always use the edit tools.
 - Terminal commands should only be used for things you cannot do with the available tools or tasks. Use the `runCommands/runInTerminal` tool to run terminal commands.
