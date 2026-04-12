@@ -11,6 +11,9 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
+import type { Except } from "type-fest";
+
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Discrete monitor status counters used by the UI.
@@ -116,7 +119,7 @@ export function calculateGlobalMonitoringMetrics(
             }
         }
 
-        if (Number.isFinite(monitor.responseTime) && monitor.responseTime > 0) {
+        if (isFiniteNumber(monitor.responseTime) && monitor.responseTime > 0) {
             responseTimeAccumulator += monitor.responseTime;
             responseTimeSamples++;
         }
@@ -136,7 +139,7 @@ export function calculateGlobalMonitoringMetrics(
         ? Math.round(responseTimeAccumulator / responseTimeSamples)
         : undefined;
 
-    const baseMetrics: Omit<GlobalMonitoringMetrics, "averageResponseTime"> = {
+    const baseMetrics: Except<GlobalMonitoringMetrics, "averageResponseTime"> = {
         activeMonitors,
         incidentCount: down + degraded,
         monitorStatusCounts: {
@@ -152,10 +155,12 @@ export function calculateGlobalMonitoringMetrics(
         uptimePercentage,
     };
 
-    return averageResponseTime === undefined
-        ? baseMetrics
-        : {
-              ...baseMetrics,
-              averageResponseTime,
-          };
+    if (isDefined(averageResponseTime)) {
+        return {
+            ...baseMetrics,
+            averageResponseTime,
+        };
+    }
+
+    return baseMetrics;
 }

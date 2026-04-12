@@ -6,8 +6,10 @@
  * lists). Keeping it in a shared utility prevents drift in rounding and unit
  * selection.
  */
+import { isFinite as isFiniteNumber } from "ts-extras";
+
 export function formatByteSize(bytes: number): string {
-    if (!Number.isFinite(bytes) || bytes < 0) {
+    if (!isFiniteNumber(bytes) || bytes < 0) {
         // Preserve the historical Settings behavior: surface the raw value when
         // the input is invalid rather than silently clamping.
         return `${bytes}`;

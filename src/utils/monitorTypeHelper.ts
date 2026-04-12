@@ -13,7 +13,7 @@ import type {
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { arrayFind, safeCastTo  } from "ts-extras";
+import { isDefined, safeCastTo } from "ts-extras";
 
 import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
@@ -67,7 +67,7 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
         return cached;
     }
 
-    if (cached !== undefined) {
+    if (isDefined(cached)) {
         logger.warn(
             "Monitor type cache contained unexpected value; clearing cache entry",
             {
@@ -125,7 +125,8 @@ export async function getMonitorTypeConfig(
     type: string
 ): Promise<MonitorTypeConfig | undefined> {
     const configs = await getAvailableMonitorTypes();
-    return arrayFind(configs, (config) => config.type === type);
+    // eslint-disable-next-line typefest/prefer-ts-extras-array-find -- The installed ts-extras package version in this repository does not expose arrayFind; native Array#find preserves correct typing here.
+    return configs.find((config) => config.type === type);
 }
 
 /**

@@ -9,12 +9,13 @@ import type { Monitor, MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 import type { UnknownRecord } from "type-fest";
 
+import { isRecord } from "@shared/utils/typeHelpers";
 import { validateMonitorType } from "@shared/utils/validation";
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
 } from "@shared/validation/monitorSchemas";
-import { isEmpty, safeCastTo  } from "ts-extras";
+import { isEmpty } from "ts-extras";
 
 import type { MonitorFormData } from "../types/monitorFormData";
 import type {
@@ -396,21 +397,21 @@ export async function validateMonitorFormData<TType extends MonitorType>(
  * @public
  */
 export function isMonitorFormData(data: unknown): data is MonitorFormData {
-    if (typeof data !== "object" || data === null) {
+    if (!isRecord(data)) {
         return false;
     }
 
-    const candidate = safeCastTo(data);
+    const candidateType = data["type"];
 
-    if (typeof candidate.type !== "string") {
+    if (typeof candidateType !== "string") {
         return false;
     }
 
-    if (!isKnownMonitorType(candidate.type)) {
+    if (!isKnownMonitorType(candidateType)) {
         return false;
     }
 
-    const result = sharedValidateMonitorData(candidate.type, data);
+    const result = sharedValidateMonitorData(candidateType, data);
 
     return result.success;
 }

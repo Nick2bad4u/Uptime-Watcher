@@ -3,9 +3,9 @@
  * components.
  */
 
-import { beforeEach, vi, type MockInstance } from "vitest";
-import "@testing-library/jest-dom";
+import * as matchers from "@testing-library/jest-dom/matchers";
 import fc from "fast-check";
+import { beforeEach, expect, vi, type MockInstance } from "vitest";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 
 import { EventEmitter } from "node:events";
@@ -24,6 +24,8 @@ vi.mock("aria-query/lib/etc/roles/ariaLiteralRoles.js", () => ({
     __esModule: true as const,
     default: [] as const,
 }));
+
+expect.extend(matchers);
 
 Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
 

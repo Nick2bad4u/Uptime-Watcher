@@ -1,5 +1,7 @@
 import type { Monitor, StatusHistory } from "@shared/types";
 
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+
 /**
  * Computes the most recent monitor history timestamp from an arbitrary history
  * ordering.
@@ -15,11 +17,12 @@ export function getLatestHistoryTimestamp(
 
     for (const record of history) {
         const { timestamp } = record;
+        const hasLatestTimestamp = isDefined(latestTimestamp);
 
         if (
             typeof timestamp === "number" &&
-            Number.isFinite(timestamp) &&
-            (latestTimestamp === undefined || timestamp > latestTimestamp)
+            isFiniteNumber(timestamp) &&
+            (!hasLatestTimestamp || timestamp > latestTimestamp)
         ) {
             latestTimestamp = timestamp;
         }

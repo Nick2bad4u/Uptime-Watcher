@@ -35,14 +35,13 @@ const runtimeEnv = globalThis.process.env;
  */
 const lintingVitestConfig: ViteUserConfigExport = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-linting",
-    esbuild: {
-        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
-        keepNames: true,
-        target: "esnext",
-    },
     json: {
         namedExports: true,
         stringify: true,
+    },
+    oxc: {
+        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
+        target: "esnext",
     },
     plugins: [
         tsconfigPaths({

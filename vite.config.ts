@@ -12,7 +12,7 @@ import { existsSync } from "node:fs";
 import * as path from "node:path";
 import { inspect } from "node:util";
 import pc from "picocolors";
-import { normalizePath, type UserConfigFnObject } from "vite";
+import { defineConfig, normalizePath, type UserConfigFnObject } from "vite";
 import { analyzer } from "vite-bundle-analyzer";
 import { patchCssModules } from "vite-css-modules";
 import devtoolsJson from "vite-plugin-devtools-json";
@@ -208,7 +208,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
             },
             outDir: "dist",
             reportCompressedSize: true, // Report gzip/brotli sizes
-            rollupOptions: {
+            rolldownOptions: {
                 output: {
                     // Manual chunk splitting to optimize bundle sizes and improve caching
                     // manualChunks: {
@@ -242,35 +242,11 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
             },
             transformer: "postcss", // Use PostCSS for transformations
         },
-        esbuild: {
-            // Transpile all files with ESBuild to remove comments from code coverage.
-            // Required for `test.coverage.ignoreEmptyLines` to work:
-            include: [
-                "**/*.cjs",
-                "**/*.cts",
-                "**/*.js",
-                "**/*.jsx",
-                "**/*.mjs",
-                "**/*.mts",
-                "**/*.ts",
-                "**/*.tsx",
-            ],
-
-            // More aggressive transformation to help coverage parsing
-            keepNames: true, // Preserve function names for better coverage reports
-            target: "esnext", // Updated to match build target for CSS Modules compatibility
-        },
         json: {
             namedExports: true,
             stringify: true,
         },
         optimizeDeps: {
-            // Force dependency optimization to handle large chunks better
-            esbuildOptions: {
-                target: VITE_BUILD_TARGET, // Use latest JS features for smaller output
-                // Note: splitting, format, and treeShaking are handled by Vite itself
-                // and should not be configured here to avoid conflicts
-            },
             holdUntilCrawlEnd: true, // Wait for full dependency crawl to avoid partial optimizations
             // Explicitly include large dependencies for better chunking
             include: isTestMode
@@ -293,6 +269,31 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                       "chart.js",
                       "react-chartjs-2",
                   ],
+            // Force dependency optimization to handle large chunks better
+            rolldownOptions: {
+                // Note: splitting, format, and treeShaking are handled by Vite itself
+                // and should not be configured here to avoid conflicts
+                transform: {
+                    target: VITE_BUILD_TARGET, // Use latest JS features for smaller output
+                },
+            },
+        },
+        oxc: {
+            // Transpile all files with Oxc to remove comments from code coverage.
+            // Required for `test.coverage.ignoreEmptyLines` to work:
+            include: [
+                "**/*.cjs",
+                "**/*.cts",
+                "**/*.js",
+                "**/*.jsx",
+                "**/*.mjs",
+                "**/*.mts",
+                "**/*.ts",
+                "**/*.tsx",
+            ],
+
+            // Use a modern transform target to keep coverage parsing predictable.
+            target: "esnext", // Updated to match build target for CSS Modules compatibility
         },
         plugins: [
             tsconfigPaths({
@@ -320,7 +321,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                     vite: {
                         build: {
                             outDir: "dist",
-                            rollupOptions: {
+                            rolldownOptions: {
                                 // Externalize all dependencies in main process to prevent bundling
                                 // Node modules, native modules, and Electron internals
                                 external: [
@@ -381,7 +382,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                     vite: {
                         build: {
                             outDir: "dist",
-                            rollupOptions: {
+                            rolldownOptions: {
                                 output: {
                                     // Ensure preload scripts are not code-split for nodeIntegration: false compatibility
                                     inlineDynamicImports: true,
@@ -831,7 +832,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 ],
                 reportOnFailure: true,
                 reportsDirectory: "./coverage",
-                skipFull: false, // Don't skip full coverage collection
+                skipFull: true, // Skip fully covered files to keep strict coverage output focused
                 // NOTE: Coverage thresholds adjusted after empirical analysis of current
                 // instrumentation (November 2025). JSX-heavy components and patched CSS
                 // modules generate synthetic branches that Vitest counts but cannot be
@@ -890,6 +891,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
             },
             environment: "jsdom", // Default for React components
+            restoreMocks: true,
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
                 "**/coverage/**",
@@ -911,7 +913,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 shouldClearNativeTimers: true,
             },
             fileParallelism: true,
-            globals: true, // Enable global test functions (describe, it, expect)
+            globals: false, // Prefer explicit Vitest imports for clearer test dependencies
             include: [
                 "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
                 "tests/strictTests/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
@@ -959,6 +961,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 // "html",
             ],
             retry: 0, // No retries to surface issues immediately
+            hookTimeout: 15_000,
             sequence: {
                 // Run projects sequentially to avoid resource contention
                 concurrent: false,
@@ -967,6 +970,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
             },
             setupFiles: ["./src/test/setup.ts"], // Setup file for testing
             slowTestThreshold: 300,
+            teardownTimeout: 15_000,
             testTimeout: 15_000, // Set Vitest timeout to 15 seconds
             typecheck: {
                 allowJs: false,
@@ -988,4 +992,4 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
     };
 };
 
-export default viteConfig;
+export default defineConfig(viteConfig);

@@ -24,15 +24,14 @@ const dirname = import.meta.dirname;
  */
 const vitestElectronConfig: ViteUserConfigExport = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-backend",
-    esbuild: {
-        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
-        keepNames: true,
-        target: "esnext",
-    },
     // Parity: json handling consistent (important if backend loads JSON fixtures)
     json: {
         namedExports: true,
         stringify: true,
+    },
+    oxc: {
+        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
+        target: "esnext",
     },
     plugins: [
         tsconfigPaths({

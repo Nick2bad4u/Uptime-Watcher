@@ -1,7 +1,7 @@
 import type { MonitorType } from "@shared/types";
 
 import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/monitorSchemas";
-import { isEmpty, isInteger  } from "ts-extras";
+import { isInteger } from "ts-extras";
 
 import type {
     MonitorFieldName,
@@ -29,7 +29,8 @@ export function validateRequiredStringField<
     const result = sharedValidateMonitorField(type, fieldName, value);
     const errors = Array.from(result.errors);
 
-    if (value.trim().length === 0 && isEmpty(errors)) {
+    // eslint-disable-next-line typefest/prefer-ts-extras-is-empty -- The installed ts-extras typings trigger no-unsafe-call here, while a direct length check remains fully type-safe.
+    if (value.trim().length === 0 && errors.length === 0) {
         errors.push(missingMessage);
     }
 

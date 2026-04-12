@@ -34,10 +34,13 @@ export default defineConfig((configEnv) => {
         defineConfig({
             cacheDir: "./.cache/vitest/", // Separate cache to avoid conflicts
             test: {
+                environment: "jsdom",
                 name: {
                     color: "cyan",
                     label: "Frontend",
                 }, // Custom project name and color for Vitest
+                restoreMocks: true,
+                slowTestThreshold: 300,
             },
         })
     ) as ViteUserConfig;

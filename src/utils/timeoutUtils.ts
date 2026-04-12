@@ -11,6 +11,8 @@
  * @packageDocumentation
  */
 
+import { isFinite as isFiniteNumber } from "ts-extras";
+
 import {
     DEFAULT_REQUEST_TIMEOUT_SECONDS,
     TIMEOUT_CONSTRAINTS,
@@ -122,7 +124,7 @@ export function timeoutMsToSeconds(timeoutMs: number): number {
 export function getTimeoutSeconds(monitorTimeout?: number): number {
     if (
         typeof monitorTimeout !== "number" ||
-        !Number.isFinite(monitorTimeout) ||
+        !isFiniteNumber(monitorTimeout) ||
         monitorTimeout <= 0
     ) {
         return DEFAULT_REQUEST_TIMEOUT_SECONDS;

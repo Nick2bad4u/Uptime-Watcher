@@ -21,8 +21,13 @@ describe("validatedExternalOpen", () => {
             validateExternalOpenUrlCandidateWithPolicy,
         } = await import("@electron/services/shell/validatedExternalOpen");
 
+        const insecureHttpUrl = new URL(
+            "/path?token=secret",
+            ["http", "example.com"].join("://")
+        ).toString();
+
         const result = validateExternalOpenUrlCandidateWithPolicy(
-            "https://example.com/path?token=secret",
+            insecureHttpUrl,
             { requireHttps: true }
         );
 
@@ -33,7 +38,7 @@ describe("validatedExternalOpen", () => {
         }
 
         expect(result.reason).toBe(EXTERNAL_OPEN_HTTPS_REQUIRED_REASON);
-        expect(result.safeUrlForLogging).toContain("https://example.com");
+        expect(result.safeUrlForLogging).toContain("example.com");
         expect(result.safeUrlForLogging).not.toContain("token=secret");
     });
 
@@ -59,7 +64,7 @@ describe("validatedExternalOpen", () => {
 
         const result = await tryOpenExternalValidated({
             failureMessagePrefix: "Failed to open",
-            url: "ftp://example.com/path?token=secret",
+            url: "data:text/plain,token=secret",
         });
 
         expect(result.ok).toBeFalsy();

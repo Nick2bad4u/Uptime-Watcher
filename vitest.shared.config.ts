@@ -25,16 +25,15 @@ const dirname = import.meta.dirname;
  */
 const vitestSharedConfig: ViteUserConfigExport = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-shared",
-    esbuild: {
-        // Combine JS/TS and module variants into a single glob for brevity.
-        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
-        keepNames: true,
-        target: "esnext",
-    },
     // Parity: json handling
     json: {
         namedExports: true,
         stringify: true,
+    },
+    oxc: {
+        // Combine JS/TS and module variants into a single glob for brevity.
+        include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
+        target: "esnext",
     },
     plugins: [
         tsconfigPaths({
