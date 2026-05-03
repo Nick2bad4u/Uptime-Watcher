@@ -74,6 +74,37 @@ export interface DowntimePeriod {
     start: number;
 }
 
+const createDowntimePeriod = (start: number, end: number): DowntimePeriod => ({
+    duration: end - start,
+    end,
+    start,
+});
+
+const isActiveDowntimeWindow = (args: {
+    downtimeEnd: number | undefined;
+    downtimeStart: number | undefined;
+}): args is {
+    downtimeEnd: number;
+    downtimeStart: number;
+} => isDefined(args.downtimeEnd) && isDefined(args.downtimeStart);
+
+const startOrExtendDowntimeWindow = (args: {
+    downtimeEnd: number | undefined;
+    record: StatusHistory;
+}): {
+    downtimeEnd: number;
+    downtimeStart: number;
+} =>
+    isDefined(args.downtimeEnd)
+        ? {
+              downtimeEnd: args.downtimeEnd,
+              downtimeStart: args.record.timestamp,
+          }
+        : {
+              downtimeEnd: args.record.timestamp,
+              downtimeStart: args.record.timestamp,
+          };
+
 /**
  * Comprehensive analytics data for a site monitor.
  *
@@ -149,40 +180,39 @@ function calculateDowntimePeriods(
     for (let i = filteredHistory.length - 1; i >= 0; i--) {
         const record = filteredHistory[i];
         if (record) {
-            // Process only if record is defined
             if (record.status === "down") {
-                if (isDefined(downtimeEnd)) {
-                    // We're extending the downtime period backwards
-                    downtimeStart = record.timestamp;
-                } else {
-                    // This is the first "down" we've encountered, so it's the
-                    // END of the period
-                    downtimeEnd = record.timestamp;
-                    downtimeStart = record.timestamp;
-                }
-            } else if (isDefined(downtimeEnd) && isDefined(downtimeStart)) {
-                // We hit an "up" status, so the downtime period is complete
-                const period: DowntimePeriod = {
-                    duration: downtimeEnd - downtimeStart,
-                    end: downtimeEnd,
-                    start: downtimeStart,
-                };
-                downtimePeriods.push(period);
+                const { downtimeEnd: nextDowntimeEnd, downtimeStart: nextDowntimeStart } =
+                    startOrExtendDowntimeWindow({
+                        downtimeEnd,
+                        record,
+                    });
+                downtimeEnd = nextDowntimeEnd;
+                downtimeStart = nextDowntimeStart;
+            } else {
+                const activeDowntimeWindow = { downtimeEnd, downtimeStart };
+                if (isActiveDowntimeWindow(activeDowntimeWindow)) {
+                    downtimePeriods.push(
+                        createDowntimePeriod(
+                            activeDowntimeWindow.downtimeStart,
+                            activeDowntimeWindow.downtimeEnd
+                        )
+                    );
 
-                // Reset for next period
-                downtimeEnd = undefined;
-                downtimeStart = undefined;
+                    // Reset for next period
+                    downtimeEnd = undefined;
+                    downtimeStart = undefined;
+                }
             }
         }
     }
 
     // Handle ongoing downtime (reached end of history while in downtime)
-    if (isDefined(downtimeEnd) && isDefined(downtimeStart)) {
-        const period: DowntimePeriod = {
-            duration: downtimeEnd - downtimeStart,
-            end: downtimeEnd,
-            start: downtimeStart,
-        };
+    const remainingDowntimeWindow = { downtimeEnd, downtimeStart };
+    if (isActiveDowntimeWindow(remainingDowntimeWindow)) {
+        const period = createDowntimePeriod(
+            remainingDowntimeWindow.downtimeStart,
+            remainingDowntimeWindow.downtimeEnd
+        );
         downtimePeriods.push(period);
     }
 

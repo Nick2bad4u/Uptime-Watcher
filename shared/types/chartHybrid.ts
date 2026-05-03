@@ -34,7 +34,8 @@
 import type { ChartData, ChartOptions } from "chart.js";
 import type { UnknownRecord, ValueOf } from "type-fest";
 
-import { objectHasIn, safeCastTo } from "ts-extras";
+import { castUnchecked } from "@shared/utils/typeHelpers";
+import { objectHasIn } from "ts-extras";
 
 // Import our custom business logic types
 import type {
@@ -295,11 +296,14 @@ export interface UptimeChartDataPoint extends ChartDataPoint {
 export function isUptimeChartOptions(
     options: unknown
 ): options is UptimeChartOptions {
+    if (typeof options !== "object" || options === null) {
+        return false;
+    }
+
+    const optionsRecord = castUnchecked<UnknownRecord>(options);
     return (
-        typeof options === "object" &&
-        options !== null &&
-        (objectHasIn(safeCastTo<UnknownRecord>(options), "scales") ||
-            objectHasIn(safeCastTo<UnknownRecord>(options), "plugins"))
+        objectHasIn(optionsRecord, "scales") ||
+        objectHasIn(optionsRecord, "plugins")
     );
 }
 
@@ -313,10 +317,13 @@ export function isUptimeChartOptions(
  * @public
  */
 export function isUptimeChartData(data: unknown): data is UptimeChartData {
+    if (typeof data !== "object" || data === null) {
+        return false;
+    }
+
+    const dataRecord = castUnchecked<UnknownRecord>(data);
     return (
-        typeof data === "object" &&
-        data !== null &&
-        objectHasIn(safeCastTo<UnknownRecord>(data), "datasets") &&
-        Array.isArray(safeCastTo<UnknownRecord>(data).datasets)
+        objectHasIn(dataRecord, "datasets") &&
+        Array.isArray(dataRecord.datasets)
     );
 }

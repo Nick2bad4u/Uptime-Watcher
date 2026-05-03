@@ -28,8 +28,8 @@ const ALLOWED_SETTINGS_KEY_LIST = [
     "theme",
 ] as const satisfies ReadonlyArray<keyof AppSettings>;
 
-const ALLOWED_SETTINGS_KEY_STRINGS = new Set(
-    ALLOWED_SETTINGS_KEY_LIST.map(String)
+const ALLOWED_SETTINGS_KEYS: ReadonlySet<AllowedSettingsKey> = new Set(
+    ALLOWED_SETTINGS_KEY_LIST
 );
 
 interface ApplySettingChangesOptions {
@@ -62,7 +62,10 @@ export function useSettingsChangeHandlers(args: {
             const forceSettingsKeys = new Set<AllowedSettingsKey>(
                 (options?.forceKeys ?? []).filter(
                     (key): key is AllowedSettingsKey =>
-                        setHas(ALLOWED_SETTINGS_KEY_STRINGS, key)
+                        setHas<AllowedSettingsKey, keyof AppSettings>(
+                            ALLOWED_SETTINGS_KEYS,
+                            key
+                        )
                 )
             );
 
@@ -93,7 +96,12 @@ export function useSettingsChangeHandlers(args: {
 
             // Warn about invalid keys
             for (const rawKey of objectKeys(changes)) {
-                if (!setHas(ALLOWED_SETTINGS_KEY_STRINGS, rawKey)) {
+                if (
+                    !setHas<AllowedSettingsKey, keyof AppSettings>(
+                        ALLOWED_SETTINGS_KEYS,
+                        rawKey
+                    )
+                ) {
                     logger.warn(
                         "Attempted to update invalid settings key",
                         rawKey

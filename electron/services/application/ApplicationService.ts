@@ -59,6 +59,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { app } from "electron";
 import { arrayJoin, isEmpty, objectHasIn, safeCastTo } from "ts-extras";
 
@@ -91,7 +92,7 @@ const hasCloseFunction = (
         return false;
     }
 
-    if (!objectHasIn(safeCastTo<UnknownRecord>(candidate), "close")) {
+    if (!objectHasIn(castUnchecked<UnknownRecord>(candidate), "close")) {
         return false;
     }
 
@@ -211,7 +212,7 @@ export class ApplicationService {
             // future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
             if (
-                objectHasIn(safeCastTo<UnknownRecord>(ipcService), "cleanup") &&
+                objectHasIn(castUnchecked<UnknownRecord>(ipcService), "cleanup") &&
                 typeof ipcService.cleanup === "function"
             ) {
                 ipcService.cleanup();

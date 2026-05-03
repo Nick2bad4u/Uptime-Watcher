@@ -87,7 +87,11 @@ function assertNoUndefined<T>(
     values: Array<T | undefined>,
     message: string
 ): asserts values is T[] {
-    if (arrayIncludes(values)) {
+    const undefinedValue: undefined = undefined;
+    const undefinedEntries = values.filter(
+        (value): value is undefined => value === undefined
+    );
+    if (arrayIncludes(undefinedEntries, undefinedValue)) {
         throw new Error(message);
     }
 }

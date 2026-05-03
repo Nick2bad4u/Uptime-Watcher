@@ -33,7 +33,7 @@ type StrippedForwardedEventMetadata<TPayload> =
     TPayload extends Readonly<UnknownArray>
         ? TPayload
         : TPayload extends object
-                    ? Except<TPayload, ForwardedMetadataKey>
+          ? Except<TPayload, Extract<ForwardedMetadataKey, keyof TPayload>>
           : never;
 
 /**

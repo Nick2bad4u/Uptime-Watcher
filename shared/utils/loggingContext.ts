@@ -1,7 +1,7 @@
 import type { UnknownArray, UnknownRecord, Writable } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 import { isDefined, isEmpty, objectEntries, objectHasIn, safeCastTo, setHas } from "ts-extras";
 
 /** Supported logging severity levels emitted by the structured logger. */
@@ -301,7 +301,7 @@ function normalizeNonPlainObject(
                 ...(candidate.stack
                     ? { stack: normalizeLogString(candidate.stack) }
                     : {}),
-                ...(objectHasIn(safeCastTo<UnknownRecord>(errorWithCause), "cause")
+                ...(objectHasIn(castUnchecked<UnknownRecord>(errorWithCause), "cause")
                     ? { cause: normalize(errorWithCause.cause) }
                     : {}),
             } satisfies UnknownRecord,
@@ -442,7 +442,7 @@ export const isStructuredLogContext = (
 ): value is StructuredLogContext =>
     typeof value === "object" &&
     value !== null &&
-    objectHasIn(safeCastTo<UnknownRecord>(value), LOG_CONTEXT_SYMBOL);
+    objectHasIn(castUnchecked<UnknownRecord>(value), LOG_CONTEXT_SYMBOL);
 
 export const normalizeLogContext = (
     context: StructuredLogContext | undefined,

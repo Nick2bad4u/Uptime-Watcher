@@ -15,6 +15,7 @@ import type { Promisable, UnknownArray, UnknownRecord } from "type-fest";
 import { IPC_INVOKE_CHANNEL_PARAM_COUNTS } from "@shared/types/ipc";
 import { ensureError } from "@shared/utils/errorHandling";
 import { withLogContext } from "@shared/utils/loggingContext";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import { arrayJoin, isDefined, safeCastTo, setHas } from "ts-extras";
@@ -445,8 +446,8 @@ export function registerStandardizedIpcHandler<
     }
 
     if (
-        setHas(
-            safeCastTo<ReadonlySet<IpcInvokeChannel>>(registeredHandlers),
+        setHas<TChannel, TChannel>(
+            castUnchecked<ReadonlySet<TChannel>>(registeredHandlers),
             channelName
         )
     ) {
@@ -556,19 +557,25 @@ export function registerStandardizedIpcHandler<
                 }
 
                 if (validateParams === null) {
+                    const handlerArgs = castUnchecked<ChannelParams<TChannel>>(
+                        [...args]
+                    );
                     return withIpcHandler(
                         channelName,
-                        () => handler(...args),
+                        () => handler(...handlerArgs),
                         handlerOptions
                     );
                 }
 
+                const validatedArgs = castUnchecked<ChannelParams<TChannel>>(
+                    [...args]
+                );
                 return withIpcHandlerValidation(
                     channelName,
                     (...validatedParams: ChannelParams<TChannel>) =>
                         handler(...validatedParams),
                     validateParams,
-                    args,
+                    validatedArgs,
                     handlerOptions
                 );
             }

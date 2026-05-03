@@ -126,7 +126,9 @@ const ConfigPropertyValidator = {
         ]);
 
         const unexpectedProperties = objectFromEntries(
-            objectEntries(rest).filter(([key]) => !setHas(knownProperties, key))
+            objectEntries(rest).filter(
+                ([key]) => !setHas<string, string>(knownProperties, key)
+            )
         );
 
         return {

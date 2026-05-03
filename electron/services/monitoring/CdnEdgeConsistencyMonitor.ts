@@ -12,10 +12,11 @@ import type { MonitorType, Site } from "@shared/types";
 import type { AxiosInstance } from "axios";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
-import { arrayJoin, isEmpty, isFinite as isFiniteNumber, objectHasIn, safeCastTo } from "ts-extras";
+import { arrayJoin, isEmpty, isFinite as isFiniteNumber, objectHasIn } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -134,7 +135,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         if (!baselineResult.success) {
             const baselineError =
                 objectHasIn(
-                    safeCastTo<Record<PropertyKey, unknown>>(baselineResult),
+                    castUnchecked<Record<PropertyKey, unknown>>(baselineResult),
                     "error"
                 )
                     ? baselineResult.error
@@ -270,9 +271,12 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             if (
                 typeof error === "object" &&
                 error !== null &&
-                objectHasIn(safeCastTo<Record<PropertyKey, unknown>>(error), "responseTime")
+                objectHasIn(
+                    castUnchecked<Record<PropertyKey, unknown>>(error),
+                    "responseTime"
+                )
             ) {
-                const candidate = Reflect.get(error, "responseTime");
+                const candidate: unknown = Reflect.get(error, "responseTime");
                 if (
                     typeof candidate === "number" &&
                     isFiniteNumber(candidate)

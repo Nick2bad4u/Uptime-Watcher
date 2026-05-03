@@ -790,7 +790,7 @@ export class WindowService {
                 permission,
                 grantPermission
             ) => {
-                if (!setHas(this.loggedDeniedPermissions, permission)) {
+                if (!setHas<string, string>(this.loggedDeniedPermissions, permission)) {
                     this.loggedDeniedPermissions.add(permission);
                     logger.warn("[WindowService] Denied permission request", {
                         permission,

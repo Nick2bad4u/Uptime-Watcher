@@ -9,6 +9,7 @@ import type {
 } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import {
     formatZodIssues,
     type ZodIssueLike,
@@ -37,7 +38,7 @@ function formatSafeParseError(error: unknown): string[] {
         return ["Invalid response"];
     }
 
-    if (!objectHasIn(safeCastTo<UnknownRecord>(error), "issues")) {
+    if (!objectHasIn(castUnchecked<UnknownRecord>(error), "issues")) {
         return ["Invalid response"];
     }
 
@@ -54,7 +55,7 @@ function getSafeParseError(validation: unknown): unknown {
         return undefined;
     }
 
-    if (!objectHasIn(safeCastTo<UnknownRecord>(validation), "error")) {
+    if (!objectHasIn(castUnchecked<UnknownRecord>(validation), "error")) {
         return undefined;
     }
 

@@ -493,7 +493,7 @@ export function getEventPriority(
         return "CRITICAL";
     }
     if (
-        arrayIncludes(
+        arrayIncludes<string, string>(
             safeCastTo<readonly string[]>(EVENT_PRIORITIES.HIGH),
             eventNameStr
         )
@@ -501,7 +501,7 @@ export function getEventPriority(
         return "HIGH";
     }
     if (
-        arrayIncludes(
+        arrayIncludes<string, string>(
             safeCastTo<readonly string[]>(EVENT_PRIORITIES.LOW),
             eventNameStr
         )
@@ -509,7 +509,7 @@ export function getEventPriority(
         return "LOW";
     }
     if (
-        arrayIncludes(
+        arrayIncludes<string, string>(
             safeCastTo<readonly string[]>(EVENT_PRIORITIES.MEDIUM),
             eventNameStr
         )

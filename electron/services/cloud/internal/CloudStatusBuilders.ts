@@ -3,6 +3,7 @@ import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 import type { UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
 import { objectHasIn, safeCastTo } from "ts-extras";
 
@@ -17,7 +18,7 @@ type CloudProviderWithAccountLabel = CloudStorageProvider & {
 function hasAccountLabel(
     provider: CloudStorageProvider
 ): provider is CloudProviderWithAccountLabel {
-    if (!objectHasIn(safeCastTo<UnknownRecord>(provider), "getAccountLabel")) {
+    if (!objectHasIn(castUnchecked<UnknownRecord>(provider), "getAccountLabel")) {
         return false;
     }
 

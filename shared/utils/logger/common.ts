@@ -8,6 +8,7 @@
 
 import type { UnknownArray, UnknownRecord } from "type-fest";
 
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isDefined, objectHasIn, safeCastTo } from "ts-extras";
 
 import { normalizeLogValue } from "../loggingContext";
@@ -71,7 +72,7 @@ function safeSerializeErrorInternal(
         message: safeNormalizeLogString(error.message),
         name: safeNormalizeLogString(error.name),
         ...(error.stack ? { stack: safeNormalizeLogString(error.stack) } : {}),
-        ...(objectHasIn(safeCastTo<UnknownRecord>(error), "cause")
+        ...(objectHasIn(castUnchecked<UnknownRecord>(error), "cause")
             ? {
                   cause: safeSerializeCause(
                       safeCastTo<{ cause?: unknown }>(error).cause

@@ -285,7 +285,7 @@ function filterMonitorFieldsByType(
     // the external signature strongly typed while using a local record cast
     // to perform dynamic key assignment.
     for (const [key, value] of objectEntries(monitor)) {
-        if (setHas(allowedFields, key)) {
+        if (setHas<string, string>(allowedFields, key)) {
             filteredRecord[key] = value;
         }
     }

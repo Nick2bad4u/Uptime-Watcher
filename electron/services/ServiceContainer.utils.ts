@@ -53,7 +53,12 @@ export function hasInitializeMethod(
  * preserving type safety.
  */
 export type ForwardablePayloadBase<EventName extends EventKey<UptimeEvents>> =
-    Except<UptimeEvents[EventName], "_meta" | "_originalMeta">;
+    UptimeEvents[EventName] extends object
+        ? Except<
+              UptimeEvents[EventName],
+              Extract<"_meta" | "_originalMeta", keyof UptimeEvents[EventName]>
+          >
+        : UptimeEvents[EventName];
 
 /**
  * Event payload shape accepted by the event-forwarding layer.

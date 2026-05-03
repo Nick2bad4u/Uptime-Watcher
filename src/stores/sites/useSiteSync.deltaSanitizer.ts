@@ -44,23 +44,25 @@ export const buildSanitizedIncomingSiteSyncDelta = (
         delta.removedSiteIdentifiers
     );
 
-    const removedIdentifiers = new Set(removedSiteIdentifiers);
+    const removedIdentifiers: ReadonlySet<string> = new Set(
+        removedSiteIdentifiers
+    );
 
     const addedSnapshot = deriveSiteSnapshot(delta.addedSites);
     const updatedSnapshot = deriveSiteSnapshot(delta.updatedSites);
 
-    const updatedIdentifiers = new Set(
+    const updatedIdentifiers: ReadonlySet<string> = new Set(
         updatedSnapshot.sanitizedSites.map((site) => site.identifier)
     );
 
     const overlapIdentifiers: string[] = [];
 
     const addedSites = addedSnapshot.sanitizedSites.filter((site) => {
-        if (setHas(removedIdentifiers, site.identifier)) {
+        if (setHas<string, string>(removedIdentifiers, site.identifier)) {
             return false;
         }
 
-        if (setHas(updatedIdentifiers, site.identifier)) {
+        if (setHas<string, string>(updatedIdentifiers, site.identifier)) {
             overlapIdentifiers.push(site.identifier);
             return false;
         }

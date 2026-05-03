@@ -38,11 +38,14 @@ export const createMonitorTypesOperationsSlice = (
                     type,
                     details
                 );
-                const candidate = result as unknown;
-                assertPresent(
-                    candidate,
-                    `formatMonitorDetail returned null for type: ${type}`
-                );
+                try {
+                    assertPresent(result);
+                } catch (error) {
+                    throw new Error(
+                        `formatMonitorDetail returned null for type: ${type}`,
+                        { cause: error }
+                    );
+                }
 
                 logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
                     resultLength: result.length,
@@ -73,11 +76,14 @@ export const createMonitorTypesOperationsSlice = (
                         type,
                         monitor
                     );
-                const candidate = result as unknown;
-                assertPresent(
-                    candidate,
-                    `formatMonitorTitleSuffix returned null for type: ${type}`
-                );
+                try {
+                    assertPresent(result);
+                } catch (error) {
+                    throw new Error(
+                        `formatMonitorTitleSuffix returned null for type: ${type}`,
+                        { cause: error }
+                    );
+                }
 
                 logStoreAction(
                     "MonitorTypesStore",

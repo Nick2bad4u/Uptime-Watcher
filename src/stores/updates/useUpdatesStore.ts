@@ -37,7 +37,7 @@
  */
 
 import type { UpdateStatusEventData } from "@shared/types/events";
-import type { Except, Merge, Promisable } from "type-fest";
+import type { Merge, Promisable } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
@@ -57,7 +57,7 @@ import { createRefCountedAsyncSubscription } from "../utils/refCountedAsyncSubsc
  */
 type UpdatesStoreWithPersist = UseBoundStore<
     Merge<
-        Except<StoreApi<UpdatesStore>, "persist">,
+        StoreApi<UpdatesStore>,
         {
             persist: {
                 clearStorage: () => void;

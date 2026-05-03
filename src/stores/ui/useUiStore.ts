@@ -31,7 +31,7 @@
  */
 
 import type { Site } from "@shared/types";
-import type { Except, Promisable } from "type-fest";
+import type { Promisable } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
@@ -97,7 +97,7 @@ export const DEFAULT_SITE_TABLE_COLUMN_WIDTHS: Record<
  * Interface for the UI store with persistence capabilities.
  */
 type UIStoreWithPersist = UseBoundStore<
-    Except<StoreApi<UIStore>, "persist"> & {
+    StoreApi<UIStore> & {
         persist: {
             clearStorage: () => void;
             getOptions: () => Partial<

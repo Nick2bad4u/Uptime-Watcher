@@ -27,7 +27,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { isDefined, objectHasIn, safeCastTo } from "ts-extras";
+import { castUnchecked } from "@shared/utils/typeHelpers";
+import { isDefined, objectHasIn } from "ts-extras";
 
 /**
  * Options for constructing an {@link ApplicationError} instance.
@@ -411,12 +412,15 @@ async function handleFrontendOperation<T>(
 function isFrontendStoreContext(
     candidate: unknown
 ): candidate is ErrorHandlingFrontendStore {
+    if (typeof candidate !== "object" || candidate === null) {
+        return false;
+    }
+
+    const candidateRecord = castUnchecked<UnknownRecord>(candidate);
     return (
-        typeof candidate === "object" &&
-        candidate !== null &&
-        objectHasIn(safeCastTo<UnknownRecord>(candidate), "setError") &&
-        objectHasIn(safeCastTo<UnknownRecord>(candidate), "clearError") &&
-        objectHasIn(safeCastTo<UnknownRecord>(candidate), "setLoading")
+        objectHasIn(candidateRecord, "setError") &&
+        objectHasIn(candidateRecord, "clearError") &&
+        objectHasIn(candidateRecord, "setLoading")
     );
 }
 

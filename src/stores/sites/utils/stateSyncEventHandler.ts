@@ -57,6 +57,7 @@ const applyDeltaToSites = (
 
     const nextSites: Site[] = [];
     const seenIdentifiers = new Set<string>();
+    const seenIdentifierSet: ReadonlySet<string> = seenIdentifiers;
 
     for (const site of currentSites) {
         const { identifier } = site;
@@ -69,8 +70,8 @@ const applyDeltaToSites = (
     for (const site of addedSites) {
         const { identifier } = site;
         if (
-            !setHas(removedIdentifiers, identifier) &&
-            !setHas(seenIdentifiers, identifier)
+            !setHas<string, string>(removedIdentifiers, identifier) &&
+            !setHas<string, string>(seenIdentifierSet, identifier)
         ) {
             nextSites.push(site);
             seenIdentifiers.add(identifier);
@@ -81,8 +82,8 @@ const applyDeltaToSites = (
     for (const site of updatedSites) {
         const { identifier } = site;
         if (
-            !setHas(removedIdentifiers, identifier) &&
-            !setHas(seenIdentifiers, identifier)
+            !setHas<string, string>(removedIdentifiers, identifier) &&
+            !setHas<string, string>(seenIdentifierSet, identifier)
         ) {
             nextSites.push(site);
             seenIdentifiers.add(identifier);

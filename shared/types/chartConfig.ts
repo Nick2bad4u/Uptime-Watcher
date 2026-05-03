@@ -11,7 +11,8 @@
 
 import type { Arrayable, UnknownRecord } from "type-fest";
 
-import { objectHasIn, safeCastTo } from "ts-extras";
+import { castUnchecked } from "@shared/utils/typeHelpers";
+import { objectHasIn } from "ts-extras";
 
 /**
  * Chart.js animation easing function values.
@@ -501,13 +502,17 @@ export interface DefaultChartThemes {
 export function hasPlugins(
     config: unknown
 ): config is { plugins: ChartPluginsConfig } {
-    return (
-        typeof config === "object" &&
-        config !== null &&
-        objectHasIn(safeCastTo<UnknownRecord>(config), "plugins") &&
-        typeof safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["plugins"]) === "object" &&
-        safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["plugins"]) !== null
-    );
+    if (typeof config !== "object" || config === null) {
+        return false;
+    }
+
+    const configRecord = castUnchecked<UnknownRecord>(config);
+    if (!objectHasIn(configRecord, "plugins")) {
+        return false;
+    }
+
+    const {plugins} = configRecord;
+    return typeof plugins === "object" && plugins !== null;
 }
 
 /**
@@ -523,13 +528,17 @@ export function hasPlugins(
 export function hasScales(
     config: unknown
 ): config is { scales: ChartScalesConfig } {
-    return (
-        typeof config === "object" &&
-        config !== null &&
-        objectHasIn(safeCastTo<UnknownRecord>(config), "scales") &&
-        typeof safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["scales"]) === "object" &&
-        safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["scales"]) !== null
-    );
+    if (typeof config !== "object" || config === null) {
+        return false;
+    }
+
+    const configRecord = castUnchecked<UnknownRecord>(config);
+    if (!objectHasIn(configRecord, "scales")) {
+        return false;
+    }
+
+    const {scales} = configRecord;
+    return typeof scales === "object" && scales !== null;
 }
 
 /**
