@@ -57,16 +57,16 @@
         "test:watch": "cd ../../../../ && vitest --config vitest.linting.config.ts"
     },
     "dependencies": {
-        "eslint": "^10.2.0",
-        "ts-extras": "^0.19.0",
-        "type-fest": "^5.5.0"
+        "eslint": "^10.3.0",
+        "ts-extras": "^1.0.0",
+        "type-fest": "^5.6.0"
     },
     "devDependencies": {
-        "@typescript-eslint/parser": "^8.58.0",
-        "@typescript-eslint/rule-tester": "^8.58.0",
-        "@typescript-eslint/utils": "^8.58.0",
-        "typescript": "^6.0.2",
-        "vitest": "^4.1.2"
+        "@typescript-eslint/parser": "^8.59.1",
+        "@typescript-eslint/rule-tester": "^8.59.1",
+        "@typescript-eslint/utils": "^8.59.1",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.5"
     },
     "engines": {
         "node": ">=20.19.0"

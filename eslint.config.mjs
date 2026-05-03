@@ -611,32 +611,6 @@ export default defineConfig([
         },
         rules: {
             ...typefest.configs.experimental.rules,
-            // The currently installed ts-extras version exports helpers like
-            // `isDefined` and `isFinite`, but does not export `arrayFind`.
-            // Requiring it would force invalid imports across the codebase.
-            "typefest/prefer-ts-extras-array-find": "off",
-            // The experimental Typefest preset includes a large number of
-            // micro-preference rules for `ts-extras` and Type-Fest aliases.
-            // In this repository they create disproportionate churn, interact
-            // poorly with third-party typings, and in one case (`arrayFind`)
-            // even required a helper that the installed package does not
-            // export. We keep the broader experimental preset, but opt out of
-            // the low-signal preference rules that do not materially improve
-            // correctness over the native equivalents already used here.
-            "typefest/prefer-ts-extras-array-first": "off",
-            "typefest/prefer-ts-extras-array-includes": "off",
-            "typefest/prefer-ts-extras-assert-defined": "off",
-            "typefest/prefer-ts-extras-assert-present": "off",
-            "typefest/prefer-ts-extras-is-defined": "off",
-            "typefest/prefer-ts-extras-is-finite": "off",
-            "typefest/prefer-ts-extras-is-infinite": "off",
-            "typefest/prefer-ts-extras-is-present": "off",
-            "typefest/prefer-ts-extras-key-in": "off",
-            "typefest/prefer-ts-extras-not": "off",
-            "typefest/prefer-ts-extras-object-has-in": "off",
-            "typefest/prefer-ts-extras-set-has": "off",
-            "typefest/prefer-type-fest-except": "off",
-            "typefest/prefer-type-fest-writable": "off",
         },
     },
     fileProgressOverridesConfig,
