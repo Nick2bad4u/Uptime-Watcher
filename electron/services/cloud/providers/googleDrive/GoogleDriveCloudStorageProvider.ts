@@ -8,7 +8,13 @@ import {
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
-import { arrayAt, arrayJoin, isEmpty, safeCastTo, stringSplit } from "ts-extras";
+import {
+    arrayAt,
+    arrayJoin,
+    isEmpty,
+    safeCastTo,
+    stringSplit,
+} from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -98,7 +104,9 @@ function splitKey(key: string): { dirSegments: string[]; fileName: string } {
 
     assertCloudObjectKey(normalized);
 
-    const parts = stringSplit(normalized, "/").filter((part) => part.length > 0);
+    const parts = stringSplit(normalized, "/").filter(
+        (part) => part.length > 0
+    );
 
     const fileName = arrayAt(parts, -1);
     // `assertCloudObjectKey` guarantees non-empty.
@@ -252,8 +260,9 @@ export class GoogleDriveCloudStorageProvider
             let startFolderId = rootFolderId;
             let startPrefix = "";
             if (normalizedPrefix) {
-                const parts = stringSplit(normalizedPrefix, "/")
-                    .filter((part) => part.length > 0);
+                const parts = stringSplit(normalizedPrefix, "/").filter(
+                    (part) => part.length > 0
+                );
 
                 const resolved = await this.resolveFolderId(drive, parts);
                 if (!resolved) {

@@ -16,7 +16,7 @@ import type { Simplify, UnknownRecord, ValueOf } from "type-fest";
 
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
-import { objectHasOwn, safeCastTo, stringSplit   } from "ts-extras";
+import { objectHasOwn, safeCastTo, stringSplit } from "ts-extras";
 
 /**
  * Type-safe scale configuration result describing lookup outcomes.

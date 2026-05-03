@@ -266,7 +266,10 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     }
                     rejectOnce(
                         createAbortError({
-                            cause: Reflect.get(safeCastTo<object>(signal), "reason"),
+                            cause: Reflect.get(
+                                safeCastTo<object>(signal),
+                                "reason"
+                            ),
                         })
                     );
                 };

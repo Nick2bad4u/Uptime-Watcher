@@ -119,7 +119,9 @@ describe("Database Query Performance Benchmarks", () => {
                     Math.floor(secureRandomFloat() * selectScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
+                tableConfigs[
+                    Math.floor(secureRandomFloat() * tableConfigs.length)
+                ];
 
             const startTime = Date.now();
 
@@ -287,7 +289,9 @@ describe("Database Query Performance Benchmarks", () => {
                     Math.floor(secureRandomFloat() * insertScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
+                tableConfigs[
+                    Math.floor(secureRandomFloat() * tableConfigs.length)
+                ];
 
             const startTime = Date.now();
 
@@ -471,7 +475,9 @@ describe("Database Query Performance Benchmarks", () => {
                     Math.floor(secureRandomFloat() * updateScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
+                tableConfigs[
+                    Math.floor(secureRandomFloat() * tableConfigs.length)
+                ];
 
             const startTime = Date.now();
 
@@ -618,7 +624,9 @@ describe("Database Query Performance Benchmarks", () => {
                     Math.floor(secureRandomFloat() * deleteScenarios.length)
                 ];
             const table =
-                tableConfigs[Math.floor(secureRandomFloat() * tableConfigs.length)];
+                tableConfigs[
+                    Math.floor(secureRandomFloat() * tableConfigs.length)
+                ];
 
             const startTime = Date.now();
 
@@ -644,7 +652,8 @@ describe("Database Query Performance Benchmarks", () => {
 
             // Cascade delete impact
             if (scenario.cascadeDeletes) {
-                const cascadeRows = affectedRows * (1 + secureRandomFloat() * 3); // 1-4x cascade multiplier
+                const cascadeRows =
+                    affectedRows * (1 + secureRandomFloat() * 3); // 1-4x cascade multiplier
                 baseExecutionTime += cascadeRows * 0.2;
             }
 

@@ -362,7 +362,7 @@ export class SslMonitor implements IMonitorService {
         ];
         const name = candidates.find(
             (value): value is string =>
-            typeof value === "string" && value.trim().length > 0
+                typeof value === "string" && value.trim().length > 0
         );
 
         return name ?? "unknown subject";

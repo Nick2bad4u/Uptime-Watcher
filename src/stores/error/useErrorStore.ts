@@ -33,7 +33,7 @@
  */
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { objectEntries, objectFromEntries  } from "ts-extras";
+import { objectEntries, objectFromEntries } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";

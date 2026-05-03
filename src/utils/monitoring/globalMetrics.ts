@@ -139,21 +139,22 @@ export function calculateGlobalMonitoringMetrics(
         ? Math.round(responseTimeAccumulator / responseTimeSamples)
         : undefined;
 
-    const baseMetrics: Except<GlobalMonitoringMetrics, "averageResponseTime"> = {
-        activeMonitors,
-        incidentCount: down + degraded,
-        monitorStatusCounts: {
-            degraded,
-            down,
-            paused,
-            pending,
-            total: totalMonitors,
-            up,
-        },
-        totalMonitors,
-        totalSites: sites.length,
-        uptimePercentage,
-    };
+    const baseMetrics: Except<GlobalMonitoringMetrics, "averageResponseTime"> =
+        {
+            activeMonitors,
+            incidentCount: down + degraded,
+            monitorStatusCounts: {
+                degraded,
+                down,
+                paused,
+                pending,
+                total: totalMonitors,
+                up,
+            },
+            totalMonitors,
+            totalSites: sites.length,
+            uptimePercentage,
+        };
 
     if (isDefined(averageResponseTime)) {
         return {

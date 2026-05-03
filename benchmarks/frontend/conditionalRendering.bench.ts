@@ -157,8 +157,13 @@ class MockReactElementFactory {
             const childType = `Child${i}`;
             const childProps = {
                 id: i,
-                data: Array.from({ length: complexity }, () => secureRandomFloat()),
-                handlers: Array.from({ length: 3 }, () => () => secureRandomFloat()),
+                data: Array.from({ length: complexity }, () =>
+                    secureRandomFloat()
+                ),
+                handlers: Array.from(
+                    { length: 3 },
+                    () => () => secureRandomFloat()
+                ),
             };
 
             const grandChildren: ReactElement[] = [];
@@ -1329,7 +1334,9 @@ describe("Conditional Rendering Performance", () => {
             ];
 
             const renderType =
-                renderTypes[Math.floor(secureRandomFloat() * renderTypes.length)];
+                renderTypes[
+                    Math.floor(secureRandomFloat() * renderTypes.length)
+                ];
             renderType();
         }
 
@@ -1401,7 +1408,9 @@ describe("Conditional Rendering Performance", () => {
         for (let cycle = 0; cycle < 10; cycle++) {
             for (let render = 0; render < 30; render++) {
                 const componentId =
-                    components[Math.floor(secureRandomFloat() * components.length)];
+                    components[
+                        Math.floor(secureRandomFloat() * components.length)
+                    ];
                 const scenario = Math.floor(secureRandomFloat() * 6);
 
                 switch (scenario) {

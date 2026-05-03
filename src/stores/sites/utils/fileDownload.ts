@@ -6,10 +6,11 @@
  */
 
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import type { UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { safeCastTo, stringSplit  } from "ts-extras";
+import { safeCastTo, stringSplit } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import {
@@ -254,9 +255,8 @@ export async function handleSQLiteBackupDownload(
     );
 
     if (isPlaywrightAutomation()) {
-        const automationTarget =
-            safeCastTo(globalThis);
-        automationTarget.playwrightLastBackup = backupResult;
+        const automationTarget = safeCastTo<UnknownRecord>(globalThis);
+        automationTarget["playwrightLastBackup"] = backupResult;
         logger.info("SQLite backup captured in automation mode", {
             fileName: backupResult.fileName,
             sizeBytes: backupResult.metadata.sizeBytes,

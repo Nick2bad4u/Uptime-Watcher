@@ -8,7 +8,13 @@
 
 import type { UnknownRecord, ValueOf } from "type-fest";
 
-import { objectEntries, objectHasOwn, objectKeys, objectValues, safeCastTo     } from "ts-extras";
+import {
+    objectEntries,
+    objectHasOwn,
+    objectKeys,
+    objectValues,
+    safeCastTo,
+} from "ts-extras";
 
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";

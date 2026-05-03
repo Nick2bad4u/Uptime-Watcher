@@ -653,7 +653,9 @@ function generateStatusEntries(
 
     for (let i = 0; i < count; i++) {
         const siteIdentifier =
-            siteIdentifiers[Math.floor(secureRandomFloat() * siteIdentifiers.length)];
+            siteIdentifiers[
+                Math.floor(secureRandomFloat() * siteIdentifiers.length)
+            ];
         const monitorId = `${siteIdentifier}-monitor-${Math.floor(secureRandomFloat() * monitorsPerSite)}`;
         const timestamp = now - secureRandomFloat() * timeSpan;
 

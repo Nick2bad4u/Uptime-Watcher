@@ -37,7 +37,10 @@ const behavior: HttpMonitorBehavior<"http", undefined> = {
     }),
 };
 
-type HttpMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
+type HttpMonitorConstructor = Constructor<
+    HttpMonitorServiceInstance,
+    [config?: MonitorServiceConfig]
+>;
 
 const HttpMonitorBase: HttpMonitorConstructor = ((): HttpMonitorConstructor => {
     try {

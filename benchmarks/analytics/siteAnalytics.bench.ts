@@ -59,7 +59,9 @@ function generateLargeDataset(count: number): StatusHistory[] {
         history.push({
             timestamp: now - i * 30_000, // 30 second intervals
             status: isDown ? "down" : "up",
-            responseTime: isDown ? 0 : Math.floor(secureRandomFloat() * 500) + 100,
+            responseTime: isDown
+                ? 0
+                : Math.floor(secureRandomFloat() * 500) + 100,
         });
     }
 

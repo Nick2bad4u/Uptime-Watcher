@@ -14,7 +14,7 @@ import type { RequireAtLeastOne, UnknownRecord } from "type-fest";
 
 import { isMonitorStatus } from "@shared/types";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
-import { isDefined, objectValues, safeCastTo   } from "ts-extras";
+import { isDefined, objectValues, safeCastTo } from "ts-extras";
 
 import { calculateSiteSyncDelta } from "./siteSyncDelta";
 import {
@@ -209,8 +209,7 @@ export const isStatusHistoryEntry = (
         return false;
     }
 
-    const { responseTime, status, timestamp } =
-        safeCastTo(value);
+    const { responseTime, status, timestamp } = safeCastTo(value);
 
     return (
         isFiniteNumber(responseTime) &&
@@ -259,8 +258,7 @@ export const isSiteSnapshot = (candidate: unknown): candidate is Site => {
         return false;
     }
 
-    const { identifier, monitoring, monitors, name } =
-        safeCastTo(candidate);
+    const { identifier, monitoring, monitors, name } = safeCastTo(candidate);
 
     if (
         !isNonEmptyString(identifier ?? undefined) ||

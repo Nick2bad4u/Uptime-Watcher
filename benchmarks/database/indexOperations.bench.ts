@@ -241,7 +241,9 @@ describe("Database Index Operations Benchmarks", () => {
                     : undefined;
 
             const whereClause =
-                secureRandomFloat() < 0.15 ? `WHERE status = 'active'` : undefined;
+                secureRandomFloat() < 0.15
+                    ? `WHERE status = 'active'`
+                    : undefined;
 
             // Calculate estimated index size
             const avgRowSize = tableType.avgRowSize;
@@ -271,9 +273,11 @@ describe("Database Index Operations Benchmarks", () => {
             let creationMethod: IndexCreationOperation["creationMethod"] =
                 "offline";
             if (tableType.rowCount > 10_000_000) {
-                creationMethod = secureRandomFloat() < 0.6 ? "online" : "parallel";
+                creationMethod =
+                    secureRandomFloat() < 0.6 ? "online" : "parallel";
             } else if (tableType.rowCount > 1_000_000) {
-                creationMethod = secureRandomFloat() < 0.4 ? "online" : "concurrent";
+                creationMethod =
+                    secureRandomFloat() < 0.4 ? "online" : "concurrent";
             }
 
             const startTime = Date.now();
@@ -786,7 +790,9 @@ describe("Database Index Operations Benchmarks", () => {
 
         for (let i = 0; i < 300; i++) {
             const queryPattern =
-                queryPatterns[Math.floor(secureRandomFloat() * queryPatterns.length)];
+                queryPatterns[
+                    Math.floor(secureRandomFloat() * queryPatterns.length)
+                ];
             const tableType =
                 tableTypes[Math.floor(secureRandomFloat() * tableTypes.length)];
             const scanType =
@@ -825,7 +831,9 @@ describe("Database Index Operations Benchmarks", () => {
             const techniqueCount = Math.floor(secureRandomFloat() * 4) + 1;
             for (let t = 0; t < techniqueCount; t++) {
                 const technique =
-                    techniques[Math.floor(secureRandomFloat() * techniques.length)];
+                    techniques[
+                        Math.floor(secureRandomFloat() * techniques.length)
+                    ];
                 if (!optimizationTechniques.includes(technique)) {
                     optimizationTechniques.push(technique);
                 }
@@ -840,7 +848,8 @@ describe("Database Index Operations Benchmarks", () => {
                 indexesUsed.push(`idx_${tableType.name}_${idx}`);
             }
 
-            const recommendedIndexCount = Math.floor(secureRandomFloat() * 2) + 1;
+            const recommendedIndexCount =
+                Math.floor(secureRandomFloat() * 2) + 1;
             for (let idx = 0; idx < recommendedIndexCount; idx++) {
                 indexesRecommended.push(`recommended_idx_${i}_${idx}`);
             }
@@ -1011,14 +1020,16 @@ describe("Database Index Operations Benchmarks", () => {
             // Different index types have different usage patterns
             switch (indexType.type) {
                 case "btree": {
-                    userSeeks = Math.floor(secureRandomFloat() * 100_000) + 1000;
+                    userSeeks =
+                        Math.floor(secureRandomFloat() * 100_000) + 1000;
                     userScans = Math.floor(secureRandomFloat() * 10_000);
                     userLookups = Math.floor(secureRandomFloat() * 50_000);
                     userUpdates = Math.floor(secureRandomFloat() * 5000);
                     break;
                 }
                 case "hash": {
-                    userSeeks = Math.floor(secureRandomFloat() * 150_000) + 5000; // Hash indexes excel at seeks
+                    userSeeks =
+                        Math.floor(secureRandomFloat() * 150_000) + 5000; // Hash indexes excel at seeks
                     userScans = Math.floor(secureRandomFloat() * 1000); // Poor scan performance
                     userLookups = Math.floor(secureRandomFloat() * 80_000);
                     userUpdates = Math.floor(secureRandomFloat() * 3000);
@@ -1026,15 +1037,18 @@ describe("Database Index Operations Benchmarks", () => {
                 }
                 case "clustered": {
                     userSeeks = Math.floor(secureRandomFloat() * 50_000);
-                    userScans = Math.floor(secureRandomFloat() * 50_000) + 10_000; // Good for scans
+                    userScans =
+                        Math.floor(secureRandomFloat() * 50_000) + 10_000; // Good for scans
                     userLookups = Math.floor(secureRandomFloat() * 30_000);
-                    userUpdates = Math.floor(secureRandomFloat() * 15_000) + 2000; // Higher updates on clustered
+                    userUpdates =
+                        Math.floor(secureRandomFloat() * 15_000) + 2000; // Higher updates on clustered
                     break;
                 }
                 case "covering": {
                     userSeeks = Math.floor(secureRandomFloat() * 80_000) + 2000;
                     userScans = Math.floor(secureRandomFloat() * 20_000);
-                    userLookups = Math.floor(secureRandomFloat() * 100_000) + 5000; // Excellent for lookups
+                    userLookups =
+                        Math.floor(secureRandomFloat() * 100_000) + 5000; // Excellent for lookups
                     userUpdates = Math.floor(secureRandomFloat() * 1000); // Lower updates on covering
                     break;
                 }
@@ -1060,7 +1074,8 @@ describe("Database Index Operations Benchmarks", () => {
                     : undefined; // Within 7 days
             const lastUserScan =
                 userScans > 0
-                    ? now - Math.floor(secureRandomFloat() * 30 * 24 * 3_600_000)
+                    ? now -
+                      Math.floor(secureRandomFloat() * 30 * 24 * 3_600_000)
                     : undefined; // Within 30 days
             const lastUserLookup =
                 userLookups > 0

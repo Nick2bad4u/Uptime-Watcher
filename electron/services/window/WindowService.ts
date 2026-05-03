@@ -33,11 +33,7 @@
  * @packageDocumentation
  */
 
-import type {
-    Event,
-    HandlerDetails,
-    WebPreferences,
-} from "electron";
+import type { Event, HandlerDetails, WebPreferences } from "electron";
 import type { Arrayable } from "type-fest";
 
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
@@ -49,7 +45,7 @@ import * as electron from "electron";
 import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { objectHasOwn, safeCastTo  } from "ts-extras";
+import { objectHasOwn, safeCastTo } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -72,6 +68,7 @@ type UnknownMethod = (this: object, ...args: never[]) => unknown;
  * Determines whether a value is a callable method.
  *
  * @param value - Candidate value.
+ *
  * @returns True when the value can be invoked like a function.
  */
 const isUnknownMethod = (value: unknown): value is UnknownMethod =>
@@ -161,7 +158,8 @@ const tryResolveElectronAppPath = (): string | undefined => {
     }
 };
 
-const resolveAppPath = (): string => tryResolveElectronAppPath() ?? process.cwd();
+const resolveAppPath = (): string =>
+    tryResolveElectronAppPath() ?? process.cwd();
 
 const resolveProductionDistDirectory = (): string => {
     const appPath = resolveAppPath();
@@ -396,7 +394,7 @@ export class WindowService {
         });
     }
 
-/**
+    /**
      * Load development content after waiting for Vite server.
      *
      * @remarks
@@ -428,7 +426,7 @@ export class WindowService {
      *
      * @returns Promise that resolves when content is loaded or rejects on error
      */
-private async loadDevelopmentContent(): Promise<void> {
+    private async loadDevelopmentContent(): Promise<void> {
         return withErrorHandling(
             async () => {
                 const targetWindow = this.mainWindow;
@@ -487,7 +485,7 @@ private async loadDevelopmentContent(): Promise<void> {
         );
     }
 
-/**
+    /**
      * Wait for Vite dev server to be ready with exponential backoff.
      *
      * @remarks
@@ -505,7 +503,7 @@ private async loadDevelopmentContent(): Promise<void> {
      *
      * @throws When server doesn't become available within timeout
      */
-private async waitForViteServer(): Promise<void> {
+    private async waitForViteServer(): Promise<void> {
         const isFetchMock =
             typeof fetch === "function" && objectHasOwn(fetch, "mock");
 
@@ -618,7 +616,7 @@ private async waitForViteServer(): Promise<void> {
         }
     }
 
-/**
+    /**
      * Determines whether a window load failure is expected during teardown.
      *
      * @param error - Unknown load failure.
@@ -631,8 +629,8 @@ private async waitForViteServer(): Promise<void> {
         targetWindow: BrowserWindowInstance
     ): boolean {
         const normalizedError = ensureError(error);
-        const {message} = normalizedError;
-        const {webContents} = targetWindow;
+        const { message } = normalizedError;
+        const { webContents } = targetWindow;
         const isAbortLikeError =
             message.includes("ERR_ABORTED") ||
             message.includes("ERR_FAILED") ||
@@ -649,14 +647,6 @@ private async waitForViteServer(): Promise<void> {
             webContents.isDestroyed()
         );
     }
-
-
-
-
-
-
-
-
 
     /**
      * Determines whether a navigation target should be allowed inside the app
@@ -802,10 +792,9 @@ private async waitForViteServer(): Promise<void> {
             ) => {
                 if (!this.loggedDeniedPermissions.has(permission)) {
                     this.loggedDeniedPermissions.add(permission);
-                    logger.warn(
-                        "[WindowService] Denied permission request",
-                        { permission }
-                    );
+                    logger.warn("[WindowService] Denied permission request", {
+                        permission,
+                    });
                 }
 
                 // Electron expects a boolean "grant" flag here, not an
@@ -877,7 +866,7 @@ private async waitForViteServer(): Promise<void> {
                     // When Electron provides resourceType, use it to avoid
                     // mutating headers for non-document resources.
                     if (
-                        typeof (safeCastTo<{ resourceType?: unknown }>(details))
+                        typeof safeCastTo<{ resourceType?: unknown }>(details)
                             .resourceType === "string"
                     ) {
                         const { resourceType } = safeCastTo<{
@@ -895,17 +884,18 @@ private async waitForViteServer(): Promise<void> {
 
                             callback({
                                 cancel: false,
-                                responseHeaders: safeCastTo<Record<
-                                    string,
-                                    Arrayable<string>
-                                >>(responseHeaders),
+                                responseHeaders:
+                                    safeCastTo<
+                                        Record<string, Arrayable<string>>
+                                    >(responseHeaders),
                             });
                             return;
                         }
                     }
 
-                    const headers = safeCastTo<| Record<string, Arrayable<string>>
-                        | undefined>(details.responseHeaders);
+                    const headers = safeCastTo<
+                        Record<string, Arrayable<string>> | undefined
+                    >(details.responseHeaders);
 
                     const responseHeaders =
                         applyProductionDocumentSecurityHeaders({

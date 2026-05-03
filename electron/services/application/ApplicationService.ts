@@ -208,7 +208,10 @@ export class ApplicationService {
             // NOTE: Currently synchronous, but designed to be
             // future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
-            if ("cleanup" in ipcService && typeof ipcService.cleanup === "function") {
+            if (
+                "cleanup" in ipcService &&
+                typeof ipcService.cleanup === "function"
+            ) {
                 ipcService.cleanup();
             }
 
@@ -727,7 +730,10 @@ export class ApplicationService {
                         LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
                         {
                             identifier: payload.site.identifier,
-                            updatedFields: arrayJoin(payload.updatedFields, ", "),
+                            updatedFields: arrayJoin(
+                                payload.updatedFields,
+                                ", "
+                            ),
                         }
                     );
                     this.emitRendererEvent(

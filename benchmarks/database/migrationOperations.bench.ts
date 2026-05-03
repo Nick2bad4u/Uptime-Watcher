@@ -138,10 +138,14 @@ describe("Database Migration Operations Benchmarks", () => {
         for (let i = 0; i < 100; i++) {
             const scenario =
                 schemaMigrationTypes[
-                    Math.floor(secureRandomFloat() * schemaMigrationTypes.length)
+                    Math.floor(
+                        secureRandomFloat() * schemaMigrationTypes.length
+                    )
                 ];
             const dbSize =
-                databaseSizes[Math.floor(secureRandomFloat() * databaseSizes.length)];
+                databaseSizes[
+                    Math.floor(secureRandomFloat() * databaseSizes.length)
+                ];
 
             const operations: MigrationOperation[] =
                 scenario.operationTypes.map((opType, index) => ({
@@ -379,10 +383,14 @@ describe("Database Migration Operations Benchmarks", () => {
         for (let i = 0; i < 80; i++) {
             const scenario =
                 dataMigrationScenarios[
-                    Math.floor(secureRandomFloat() * dataMigrationScenarios.length)
+                    Math.floor(
+                        secureRandomFloat() * dataMigrationScenarios.length
+                    )
                 ];
             const dbSize =
-                databaseSizes[Math.floor(secureRandomFloat() * databaseSizes.length)];
+                databaseSizes[
+                    Math.floor(secureRandomFloat() * databaseSizes.length)
+                ];
 
             const recordsToProcess = Math.floor(
                 dbSize.totalRows * (0.1 + secureRandomFloat() * 0.4)

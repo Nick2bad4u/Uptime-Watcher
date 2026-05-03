@@ -546,7 +546,8 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                                 coverage,
                                 edgeCases,
                                 passed: coverage >= 85,
-                                executionTime: secureRandomFloat() * 5000 + 1000, // 1-6 seconds
+                                executionTime:
+                                    secureRandomFloat() * 5000 + 1000, // 1-6 seconds
                             };
                         });
 

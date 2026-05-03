@@ -69,7 +69,10 @@ export function formatZodIssues(
     }
 
     return issues.map((issue) => {
-        const renderedPath = arrayJoin((issue.path ?? []).map(String), pathSeparator);
+        const renderedPath = arrayJoin(
+            (issue.path ?? []).map(String),
+            pathSeparator
+        );
 
         return renderedPath.length > 0
             ? `${renderedPath}: ${issue.message}`

@@ -245,8 +245,6 @@ export function registerDiagnosticsHandlers({
                 ...(report.reason ? { reason: report.reason } : {}),
                 timestamp: report.timestamp,
             });
-
-            
         },
         SystemHandlerValidators.reportPreloadGuard
     );

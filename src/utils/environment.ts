@@ -4,6 +4,8 @@
  * @public
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { getEnvVar } from "@shared/utils/environment";
 import { safeCastTo } from "ts-extras";
 
@@ -18,11 +20,6 @@ const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iu;
  */
 interface MaybeNavigator {
     readonly navigator?: Navigator;
-}
-
-interface PlaywrightAutomationTarget {
-    readonly navigator?: Navigator;
-    playwrightAutomation?: boolean;
 }
 
 /**
@@ -53,7 +50,8 @@ export function isPlaywrightAutomation(): boolean {
         return true;
     }
 
-    const automationNavigator = (safeCastTo<MaybeNavigator>(globalThis)).navigator;
+    const automationNavigator =
+        safeCastTo<MaybeNavigator>(globalThis).navigator;
     if (
         automationNavigator &&
         PLAYWRIGHT_UA_PATTERN.test(automationNavigator.userAgent)
@@ -61,9 +59,9 @@ export function isPlaywrightAutomation(): boolean {
         return true;
     }
 
-    const automationTarget = safeCastTo(globalThis);
+    const automationTarget = safeCastTo<UnknownRecord>(globalThis);
 
-    return automationTarget.playwrightAutomation === true;
+    return automationTarget["playwrightAutomation"] === true;
 }
 
 /**
@@ -75,7 +73,7 @@ export function isPlaywrightAutomation(): boolean {
  * @public
  */
 export function setPlaywrightAutomationMarker(): void {
-    const automationTarget = safeCastTo(globalThis);
+    const automationTarget = safeCastTo<UnknownRecord>(globalThis);
 
-    automationTarget.playwrightAutomation = true;
+    automationTarget["playwrightAutomation"] = true;
 }

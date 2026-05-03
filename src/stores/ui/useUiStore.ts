@@ -223,8 +223,8 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         // Prefer logging the underlying cause when we wrap an
                         // error for user-facing messaging.
                         const underlyingError = ensureError(
-                            (safeCastTo<{ cause?: unknown }>(normalizedError)).cause ??
-                                normalizedError
+                            safeCastTo<{ cause?: unknown }>(normalizedError)
+                                .cause ?? normalizedError
                         );
 
                         logOpenExternalFailure(underlyingError);

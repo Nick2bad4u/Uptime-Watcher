@@ -154,12 +154,14 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             [handleCardClick]
         );
 
-        const rowClassName = arrayJoin([
-            "site-table__row",
-            "site-table__grid-layout",
-            rowVariant ? `site-table__row--${rowVariant}` : "",
-        ]
-            .filter(Boolean), " ");
+        const rowClassName = arrayJoin(
+            [
+                "site-table__row",
+                "site-table__grid-layout",
+                rowVariant ? `site-table__row--${rowVariant}` : "",
+            ].filter(Boolean),
+            " "
+        );
         const rowStyle = useMemo<SurfaceOrderStyle | undefined>(
             () =>
                 rowOrder === undefined

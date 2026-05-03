@@ -2,8 +2,6 @@
  * Local baseline snapshot used to compute device-local diffs between sync runs.
  */
 
-/* eslint-disable zod/prefer-string-schema-with-trim -- Cloud sync protocol parsing must preserve payload strings/keys exactly and avoid lossy normalization. */
-
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     type CloudSyncMonitorConfig,
@@ -46,5 +44,3 @@ export const cloudSyncBaselineSchema: z.ZodType<CloudSyncBaseline> = z
 export function parseCloudSyncBaseline(candidate: unknown): CloudSyncBaseline {
     return cloudSyncBaselineSchema.parse(candidate);
 }
-
-/* eslint-enable zod/prefer-string-schema-with-trim -- End protocol-preserving no-trim exception scope. */

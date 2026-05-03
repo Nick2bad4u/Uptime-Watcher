@@ -16,7 +16,7 @@ import {
     useMemo,
     useState,
 } from "react";
-import { arrayFirst, isEmpty  } from "ts-extras";
+import { arrayFirst, isEmpty } from "ts-extras";
 
 import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from "../../../constants/layout";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";

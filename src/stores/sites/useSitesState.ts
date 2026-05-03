@@ -15,7 +15,12 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
-import { isEmpty, objectEntries, objectFromEntries, safeCastTo } from "ts-extras";
+import {
+    isEmpty,
+    objectEntries,
+    objectFromEntries,
+    safeCastTo,
+} from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
 
@@ -371,11 +376,13 @@ export const createSitesStateActions = (
             set((state) => {
                 const currentMonitorIds = state.selectedMonitorIds;
 
-                const remainingMonitorIds = safeCastTo(objectFromEntries(
-                    objectEntries(currentMonitorIds).filter(
-                        ([key]) => key !== identifier
+                const remainingMonitorIds = safeCastTo(
+                    objectFromEntries(
+                        objectEntries(currentMonitorIds).filter(
+                            ([key]) => key !== identifier
+                        )
                     )
-                ));
+                );
                 return {
                     selectedMonitorIds: remainingMonitorIds,
                     selectedSiteIdentifier:
@@ -452,48 +459,45 @@ export const createSitesStateActions = (
             const expiredLockKeys: OptimisticLockKey[] = [];
             let mutatedSiteCount = 0;
 
-            const normalizedSites =
-                isEmpty(lockEntries)
-                    ? sites
-                    : sites.map((site) => {
-                          let siteMutated = false;
-                          const normalizedMonitors: Monitor[] = [];
+            const normalizedSites = isEmpty(lockEntries)
+                ? sites
+                : sites.map((site) => {
+                      let siteMutated = false;
+                      const normalizedMonitors: Monitor[] = [];
 
-                          for (const monitor of site.monitors) {
-                              const lockKey = buildMonitoringLockKey(
-                                  site.identifier,
-                                  monitor.id
-                              );
-                              const lock = locks[lockKey];
+                      for (const monitor of site.monitors) {
+                          const lockKey = buildMonitoringLockKey(
+                              site.identifier,
+                              monitor.id
+                          );
+                          const lock = locks[lockKey];
 
-                              if (!lock) {
-                                  normalizedMonitors.push(monitor);
-                              } else if (lock.expiresAt <= now) {
-                                  expiredLockKeys.push(lockKey);
-                                  normalizedMonitors.push(monitor);
-                              } else if (
-                                  monitor.monitoring === lock.monitoring
-                              ) {
-                                  normalizedMonitors.push(monitor);
-                              } else {
-                                  siteMutated = true;
-                                  normalizedMonitors.push({
-                                      ...monitor,
-                                      monitoring: lock.monitoring,
-                                  });
-                              }
+                          if (!lock) {
+                              normalizedMonitors.push(monitor);
+                          } else if (lock.expiresAt <= now) {
+                              expiredLockKeys.push(lockKey);
+                              normalizedMonitors.push(monitor);
+                          } else if (monitor.monitoring === lock.monitoring) {
+                              normalizedMonitors.push(monitor);
+                          } else {
+                              siteMutated = true;
+                              normalizedMonitors.push({
+                                  ...monitor,
+                                  monitoring: lock.monitoring,
+                              });
                           }
+                      }
 
-                          if (!siteMutated) {
-                              return site;
-                          }
+                      if (!siteMutated) {
+                          return site;
+                      }
 
-                          mutatedSiteCount += 1;
-                          return {
-                              ...site,
-                              monitors: normalizedMonitors,
-                          } satisfies Site;
-                      });
+                      mutatedSiteCount += 1;
+                      return {
+                          ...site,
+                          monitors: normalizedMonitors,
+                      } satisfies Site;
+                  });
 
             let sitesForState = sites;
             if (mutatedSiteCount > 0) {

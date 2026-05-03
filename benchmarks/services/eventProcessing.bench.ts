@@ -508,7 +508,9 @@ function generateSiteStatusEvents(
             timestamp: Date.now() - secureRandomFloat() * 86_400_000, // Last 24 hours
             source: "monitoring-service",
             correlationId:
-                secureRandomFloat() > 0.7 ? `corr-${Math.floor(i / 5)}` : undefined,
+                secureRandomFloat() > 0.7
+                    ? `corr-${Math.floor(i / 5)}`
+                    : undefined,
             payload: {
                 siteIdentifier,
                 previousStatus,
@@ -541,7 +543,8 @@ function generateMonitorCheckEvents(
     for (let i = 0; i < count; i++) {
         const siteIdentifier =
             siteIds[Math.floor(secureRandomFloat() * siteIds.length)];
-        const status = statuses[Math.floor(secureRandomFloat() * statuses.length)];
+        const status =
+            statuses[Math.floor(secureRandomFloat() * statuses.length)];
 
         events.push({
             id: `check-event-${i}`,
@@ -558,7 +561,8 @@ function generateMonitorCheckEvents(
                 )}`,
                 siteIdentifier,
                 status,
-                responseTime: status === "down" ? 0 : secureRandomFloat() * 1500,
+                responseTime:
+                    status === "down" ? 0 : secureRandomFloat() * 1500,
                 details: status === "down" ? "Connection timeout" : undefined,
                 error: status === "down" ? "ECONNREFUSED" : undefined,
             },

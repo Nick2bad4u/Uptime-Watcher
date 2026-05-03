@@ -144,7 +144,11 @@ export const SettingsTab = ({
     ]);
 
     const isSiteMuted = useMemo(
-        () => arrayIncludes(mutedSiteNotificationIdentifiers, currentSite.identifier),
+        () =>
+            arrayIncludes(
+                mutedSiteNotificationIdentifiers,
+                currentSite.identifier
+            ),
         [currentSite.identifier, mutedSiteNotificationIdentifiers]
     );
 

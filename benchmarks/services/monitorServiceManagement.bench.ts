@@ -1060,7 +1060,8 @@ describe("Monitor Service Management Benchmarks", () => {
                             break;
                         }
                         default: {
-                            monitor.type = secureRandomFloat() > 0.5 ? "http" : "dns";
+                            monitor.type =
+                                secureRandomFloat() > 0.5 ? "http" : "dns";
                             monitor.interval = 300_000; // 5 minutes
                         }
                     }

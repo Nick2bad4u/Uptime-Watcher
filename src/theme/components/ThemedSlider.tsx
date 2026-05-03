@@ -114,6 +114,7 @@ const ThemedSliderComponent = ({
     return (
         <input
             aria-describedby={ariaDescribedBy}
+            // eslint-disable-next-line react-hooks/invariant -- ariaLabel is provided by typed props and may intentionally be undefined.
             aria-label={ariaLabel}
             aria-valuetext={ariaValueText}
             className={`themed-slider ${className}`.trim()}

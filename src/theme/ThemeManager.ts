@@ -14,7 +14,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import deepEqual from "fast-deep-equal";
-import { arrayJoin, objectEntries, objectHasOwn, objectKeys    } from "ts-extras";
+import { arrayJoin, objectEntries, objectHasOwn, objectKeys } from "ts-extras";
 
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";

@@ -120,7 +120,11 @@ describe("googleDriveHttpClient (strict coverage)", () => {
             _url,
             _requestBody,
             config,
-        ] = api.post.mock.calls[0] as [string, unknown, { params?: unknown }];
+        ] = api.post.mock.calls[0] as [
+            string,
+            unknown,
+            { params?: unknown },
+        ];
 
         expect(config.params).toBeUndefined();
     });

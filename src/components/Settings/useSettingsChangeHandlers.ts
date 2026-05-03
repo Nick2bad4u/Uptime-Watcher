@@ -8,7 +8,7 @@
  */
 
 import { useCallback } from "react";
-import { objectKeys, safeCastTo, setHas  } from "ts-extras";
+import { objectKeys, safeCastTo, setHas } from "ts-extras";
 
 import type { AppSettings } from "../../stores/types";
 
@@ -84,8 +84,8 @@ export function useSettingsChangeHandlers(args: {
 
                         logger.user.settingsChange(
                             allowedKey,
-                            oldValue as unknown,
-                            newValue as unknown
+                            oldValue,
+                            newValue
                         );
                     }
                 }

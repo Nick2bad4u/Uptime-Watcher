@@ -5,7 +5,7 @@ import {
 } from "@shared/validation/guards";
 import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
-import { isEmpty, objectKeys  } from "ts-extras";
+import { isEmpty, objectKeys } from "ts-extras";
 
 import type { IpcParameterValidator } from "../../types";
 import type { ParameterValueValidationResult } from "./parameterValidation";

@@ -19,7 +19,7 @@ import type {
 import type { UnknownArray } from "type-fest";
 
 import { memo, useMemo } from "react";
-import { arrayJoin, isDefined  } from "ts-extras";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import { useOverflowMarquee } from "../../../hooks/ui/useOverflowMarquee";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -124,23 +124,27 @@ export const MarqueeText: NamedExoticComponent<MarqueeTextProperties> = memo(
 
         const segmentClass = useMemo(
             () =>
-                arrayJoin([
-                    "marquee-text__segment",
-                    segmentClassName,
-                    providedTextClassName,
-                ]
-                    .filter(Boolean), " "),
+                arrayJoin(
+                    [
+                        "marquee-text__segment",
+                        segmentClassName,
+                        providedTextClassName,
+                    ].filter(Boolean),
+                    " "
+                ),
             [providedTextClassName, segmentClassName]
         );
 
         const cloneSegmentClass = useMemo(
             () =>
-                arrayJoin([
-                    segmentClass,
-                    "marquee-text__segment--clone",
-                    cloneClassName,
-                ]
-                    .filter(Boolean), " "),
+                arrayJoin(
+                    [
+                        segmentClass,
+                        "marquee-text__segment--clone",
+                        cloneClassName,
+                    ].filter(Boolean),
+                    " "
+                ),
             [cloneClassName, segmentClass]
         );
 
@@ -161,8 +165,10 @@ export const MarqueeText: NamedExoticComponent<MarqueeTextProperties> = memo(
 
         const trackClass = useMemo(
             () =>
-                arrayJoin(["marquee-text__track", trackClassName]
-                    .filter(Boolean), " "),
+                arrayJoin(
+                    ["marquee-text__track", trackClassName].filter(Boolean),
+                    " "
+                ),
             [trackClassName]
         );
 

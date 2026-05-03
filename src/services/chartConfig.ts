@@ -428,7 +428,10 @@ export class ChartConfigService {
                     labels: {
                         color: this.theme.colors.text.primary,
                         font: {
-                            family: arrayJoin(this.theme.typography.fontFamily.sans, ", "),
+                            family: arrayJoin(
+                                this.theme.typography.fontFamily.sans,
+                                ", "
+                            ),
                             size: 12,
                         },
                     },
@@ -460,7 +463,10 @@ export class ChartConfigService {
             ticks: {
                 color: this.theme.colors.text.secondary,
                 font: {
-                    family: arrayJoin(this.theme.typography.fontFamily.sans, ", "),
+                    family: arrayJoin(
+                        this.theme.typography.fontFamily.sans,
+                        ", "
+                    ),
                     size: 11,
                 },
             },

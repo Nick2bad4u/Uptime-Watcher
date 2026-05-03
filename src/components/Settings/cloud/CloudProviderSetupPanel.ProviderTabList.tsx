@@ -203,11 +203,14 @@ export const CloudProviderSetupPanelProviderTabList = ({
                         aria-controls={`cloud-provider-panel-${tab.key}`}
                         aria-disabled={isLocked || !tab.isAvailable}
                         aria-selected={isSelected}
-                        className={arrayJoin([
-                            "themed-button themed-button--size-sm",
-                            variantClass,
-                            stateClass,
-                        ], " ")}
+                        className={arrayJoin(
+                            [
+                                "themed-button themed-button--size-sm",
+                                variantClass,
+                                stateClass,
+                            ],
+                            " "
+                        )}
                         data-provider-key={tab.key}
                         id={`cloud-provider-tab-${tab.key}`}
                         key={tab.key}

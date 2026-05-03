@@ -57,7 +57,7 @@ function getSafeParseError(validation: unknown): unknown {
         return undefined;
     }
 
-    return (safeCastTo<{ readonly error?: unknown }>(validation)).error;
+    return safeCastTo<{ readonly error?: unknown }>(validation).error;
 }
 
 /**

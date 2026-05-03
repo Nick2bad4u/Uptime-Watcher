@@ -56,7 +56,9 @@ describe("urlSchemeValidation", () => {
                 hasNestedHttpSchemeAfterFirstDelimiter("https://http://foo")
             ).toBeTruthy();
             expect(
-                hasNestedHttpSchemeAfterFirstDelimiter("https://https://bar/baz")
+                hasNestedHttpSchemeAfterFirstDelimiter(
+                    "https://https://bar/baz"
+                )
             ).toBeTruthy();
         });
 

@@ -23,9 +23,9 @@ let benchmarkRandomState = 0x6d_2b_79_f5;
  * 1)` for benchmark fixture generation.
  */
 export function secureRandomFloat(): number {
-    benchmarkRandomState = Math.abs(
-        Math.imul(benchmarkRandomState, 1_664_525) + 1_013_904_223
-    ) % 0x1_00_00_00_00;
+    benchmarkRandomState =
+        Math.abs(Math.imul(benchmarkRandomState, 1_664_525) + 1_013_904_223) %
+        0x1_00_00_00_00;
 
     return benchmarkRandomState / 0x1_00_00_00_00;
 }

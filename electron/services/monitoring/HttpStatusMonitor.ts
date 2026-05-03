@@ -69,7 +69,10 @@ const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
         },
     };
 
-type HttpStatusMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
+type HttpStatusMonitorConstructor = Constructor<
+    HttpMonitorServiceInstance,
+    [config?: MonitorServiceConfig]
+>;
 
 const HttpStatusMonitorBase: HttpStatusMonitorConstructor =
     ((): HttpStatusMonitorConstructor => {

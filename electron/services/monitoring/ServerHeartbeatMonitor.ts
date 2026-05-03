@@ -201,7 +201,10 @@ const behavior: RemoteMonitorBehavior<
     type: "server-heartbeat",
 };
 
-type ServerHeartbeatMonitorConstructor = Constructor<IMonitorService, [config?: MonitorServiceConfig]>;
+type ServerHeartbeatMonitorConstructor = Constructor<
+    IMonitorService,
+    [config?: MonitorServiceConfig]
+>;
 
 const ServerHeartbeatMonitorBase: ServerHeartbeatMonitorConstructor =
     ((): ServerHeartbeatMonitorConstructor => {

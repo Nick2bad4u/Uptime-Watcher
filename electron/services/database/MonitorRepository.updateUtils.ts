@@ -10,7 +10,7 @@ import type { Site } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
-import { arrayJoin, objectEntries  } from "ts-extras";
+import { arrayJoin, objectEntries } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";

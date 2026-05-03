@@ -204,7 +204,8 @@ describe("Site Service Performance", () => {
                     (m) => m.siteIdentifier === siteIdentifier
                 );
 
-                const siteLoadTime = secureRandomFloat() * 10 + monitors.length * 0.2;
+                const siteLoadTime =
+                    secureRandomFloat() * 10 + monitors.length * 0.2;
                 totalLoadTime += siteLoadTime;
 
                 if (site) {
@@ -375,7 +376,9 @@ describe("Site Service Performance", () => {
 
                 // Simulate cascade updates if needed
                 const cascadeTime =
-                    urlChanged || intervalChanged ? secureRandomFloat() * 15 : 0;
+                    urlChanged || intervalChanged
+                        ? secureRandomFloat() * 15
+                        : 0;
 
                 const result = {
                     siteIdentifier,
@@ -502,7 +505,8 @@ describe("Site Service Performance", () => {
                 return nameMatch || urlMatch;
             });
 
-            const searchTime = Date.now() - searchStartTime + secureRandomFloat() * 5;
+            const searchTime =
+                Date.now() - searchStartTime + secureRandomFloat() * 5;
 
             const result = {
                 ...searchOperation,
@@ -550,7 +554,8 @@ describe("Site Service Performance", () => {
                 return true;
             });
 
-            const filterTime = Date.now() - filterStartTime + secureRandomFloat() * 3;
+            const filterTime =
+                Date.now() - filterStartTime + secureRandomFloat() * 3;
 
             const result = {
                 ...filterOperation,

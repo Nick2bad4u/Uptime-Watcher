@@ -11,7 +11,7 @@
 
 import type { PartialDeep, SetOptional, UnknownRecord } from "type-fest";
 
-import { objectEntries, safeCastTo  } from "ts-extras";
+import { objectEntries, safeCastTo } from "ts-extras";
 
 import { isObject } from "../utils/typeGuards";
 import { castUnchecked, ensureRecordLike } from "../utils/typeHelpers";
@@ -509,18 +509,20 @@ function deepMergeSection<TTarget>(
     }
 
     const targetRecord = isMergeableObject(target)
-        ? (safeCastTo<UnknownRecord>(target))
-        : (safeCastTo<UnknownRecord>({}));
+        ? safeCastTo<UnknownRecord>(target)
+        : safeCastTo<UnknownRecord>({});
     const result: UnknownRecord = { ...targetRecord };
 
-    for (const [key, sourceValue] of objectEntries(safeCastTo<UnknownRecord>(source))) {
+    for (const [key, sourceValue] of objectEntries(
+        safeCastTo<UnknownRecord>(source)
+    )) {
         if (sourceValue !== undefined) {
             if (isMergeableObject(sourceValue)) {
                 const nextTarget = targetRecord[key];
                 result[key] = deepMergeSection(
                     isMergeableObject(nextTarget)
                         ? nextTarget
-                        : (safeCastTo<UnknownRecord>({})),
+                        : safeCastTo<UnknownRecord>({}),
                     safeCastTo(sourceValue)
                 );
             } else {

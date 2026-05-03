@@ -1175,7 +1175,10 @@ describe("React Virtual DOM Performance", () => {
                 "create",
                 "diff",
                 "reconcile",
-            ][Math.floor(secureRandomFloat() * 3)] as "create" | "diff" | "reconcile";
+            ][Math.floor(secureRandomFloat() * 3)] as
+                | "create"
+                | "diff"
+                | "reconcile";
             const startTime = performance.now();
 
             switch (operationType) {

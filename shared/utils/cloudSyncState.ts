@@ -15,7 +15,7 @@ import type {
 
 import { compareCloudSyncWriteKey } from "@shared/types/cloudSync";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
-import { objectEntries, objectValues  } from "ts-extras";
+import { objectEntries, objectValues } from "ts-extras";
 
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 

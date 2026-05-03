@@ -10,14 +10,14 @@ import type {
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
 } from "@shared/types/ipc";
-import type { Promisable, UnknownArray, UnknownRecord  } from "type-fest";
+import type { Promisable, UnknownArray, UnknownRecord } from "type-fest";
 
 import { IPC_INVOKE_CHANNEL_PARAM_COUNTS } from "@shared/types/ipc";
 import { ensureError } from "@shared/utils/errorHandling";
 import { withLogContext } from "@shared/utils/loggingContext";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
-import { arrayJoin, safeCastTo  } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 
 import type {
     IpcParameterValidator,
@@ -465,7 +465,6 @@ export function registerStandardizedIpcHandler<
     registeredHandlers.add(channelName);
 
     try {
-
         ipcMain.handle(
             channelName,
             async (_event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
@@ -596,20 +595,22 @@ export function registerStandardizedIpcHandler<
 export function createStandardizedIpcRegistrar(
     registeredHandlers: Set<IpcInvokeChannel>
 ): StandardizedIpcRegistrar {
-    return safeCastTo<StandardizedIpcRegistrar>(<TChannel extends IpcInvokeChannel>(
-        channelName: TChannel,
-        handler: StrictIpcInvokeHandler<TChannel>,
-        validateParams?: IpcParameterValidator | null,
-        validateResult?: IpcResultValidator<
-            IpcInvokeChannelResult<TChannel>
-        > | null
-    ) => {
-        registerStandardizedIpcHandler(
-            channelName,
-            handler,
-            validateParams ?? null,
-            registeredHandlers,
-            validateResult ?? null
-        );
-    });
+    return safeCastTo<StandardizedIpcRegistrar>(
+        <TChannel extends IpcInvokeChannel>(
+            channelName: TChannel,
+            handler: StrictIpcInvokeHandler<TChannel>,
+            validateParams?: IpcParameterValidator | null,
+            validateResult?: IpcResultValidator<
+                IpcInvokeChannelResult<TChannel>
+            > | null
+        ) => {
+            registerStandardizedIpcHandler(
+                channelName,
+                handler,
+                validateParams ?? null,
+                registeredHandlers,
+                validateResult ?? null
+            );
+        }
+    );
 }

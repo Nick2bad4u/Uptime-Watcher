@@ -123,10 +123,16 @@ function mergeObjects<
 
     for (const key in obj2) {
         if (Object.hasOwn(obj2, key)) {
-            (result as Record<string, unknown>)[key] = isRecord(result[key as keyof (T & U)]) && isRecord(obj2[key]) ? mergeObjects(
-                    result[key as keyof (T & U)] as Record<string, unknown>,
-                    obj2[key] as Record<string, unknown>
-                ) : obj2[key];
+            (result as Record<string, unknown>)[key] =
+                isRecord(result[key as keyof (T & U)]) && isRecord(obj2[key])
+                    ? mergeObjects(
+                          result[key as keyof (T & U)] as Record<
+                              string,
+                              unknown
+                          >,
+                          obj2[key] as Record<string, unknown>
+                      )
+                    : obj2[key];
         }
     }
 

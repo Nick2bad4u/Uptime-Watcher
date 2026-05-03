@@ -1,8 +1,8 @@
-import type { UnknownArray, UnknownRecord  } from "type-fest";
+import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { isRecord } from "@shared/utils/typeHelpers";
-import { isEmpty, objectEntries, safeCastTo, setHas    } from "ts-extras";
+import { isEmpty, objectEntries, safeCastTo, setHas } from "ts-extras";
 
 /** Supported logging severity levels emitted by the structured logger. */
 export type LogSeverity = "debug" | "error" | "info" | "warn";

@@ -4,7 +4,7 @@
  */
 
 import type { IpcResponse as SharedIpcResponse } from "@shared/types/ipc";
-import type { Promisable, UnknownArray  } from "type-fest";
+import type { Promisable, UnknownArray } from "type-fest";
 
 /**
  * Canonical IPC response shape used by Electron IPC handlers.

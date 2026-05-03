@@ -11,7 +11,12 @@ import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { validateMonitorType } from "@shared/utils/validation";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
-import { isEmpty, objectEntries, objectFromEntries, objectKeys    } from "ts-extras";
+import {
+    isEmpty,
+    objectEntries,
+    objectFromEntries,
+    objectKeys,
+} from "ts-extras";
 
 import { logger } from "../../../utils/logger";
 import {

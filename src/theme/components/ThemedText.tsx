@@ -106,15 +106,17 @@ export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
         weight = "normal",
         ...accessibilityProps
     }: ThemedTextProperties): JSX.Element {
-        const classNames = arrayJoin([
-            "themed-text",
-            `themed-text--${variant}`,
-            `themed-text--size-${size}`,
-            `themed-text--weight-${weight}`,
-            `themed-text--align-${align}`,
-            className,
-        ]
-            .filter(Boolean), " ");
+        const classNames = arrayJoin(
+            [
+                "themed-text",
+                `themed-text--${variant}`,
+                `themed-text--size-${size}`,
+                `themed-text--weight-${weight}`,
+                `themed-text--align-${align}`,
+                className,
+            ].filter(Boolean),
+            " "
+        );
 
         const {
             "aria-describedby": ariaDescribedBy,

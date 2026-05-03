@@ -20,6 +20,6 @@ import { safeCastTo } from "ts-extras";
 export function validateMonitorType(type: unknown): type is MonitorType {
     return (
         typeof type === "string" &&
-        (safeCastTo<readonly string[]>(BASE_MONITOR_TYPES)).includes(type)
+        safeCastTo<readonly string[]>(BASE_MONITOR_TYPES).includes(type)
     );
 }

@@ -19,20 +19,23 @@ export type ElectronResponseHeaders = Record<string, Arrayable<string>>;
  * requires expanding it, do so intentionally and with a targeted allow-list.
  */
 export function getProductionCspHeaderValue(): string {
-    return arrayJoin([
-        "default-src 'self'",
-        "base-uri 'none'",
-        "form-action 'none'",
-        "frame-ancestors 'none'",
-        "object-src 'none'",
-        "script-src 'self'",
-        "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: blob: https://api.microlink.io",
-        "font-src 'self' data:",
-        "connect-src 'self'",
-        "worker-src 'self' blob:",
-        "media-src 'self' blob:",
-    ], "; ");
+    return arrayJoin(
+        [
+            "default-src 'self'",
+            "base-uri 'none'",
+            "form-action 'none'",
+            "frame-ancestors 'none'",
+            "object-src 'none'",
+            "script-src 'self'",
+            "style-src 'self' 'unsafe-inline'",
+            "img-src 'self' data: blob: https://api.microlink.io",
+            "font-src 'self' data:",
+            "connect-src 'self'",
+            "worker-src 'self' blob:",
+            "media-src 'self' blob:",
+        ],
+        "; "
+    );
 }
 
 /**

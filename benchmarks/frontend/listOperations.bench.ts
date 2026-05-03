@@ -1400,7 +1400,9 @@ describe("React List Operations Performance", () => {
             ];
 
             const config =
-                filterConfigs[Math.floor(secureRandomFloat() * filterConfigs.length)];
+                filterConfigs[
+                    Math.floor(secureRandomFloat() * filterConfigs.length)
+                ];
             renderer.renderList(componentId, items, config);
         }
 
@@ -1428,13 +1430,16 @@ describe("React List Operations Performance", () => {
                     id: `item-${index}`,
                     value: {
                         name: `Item ${Math.floor(secureRandomFloat() * 1000)}`,
-                        timestamp: Date.now() - secureRandomFloat() * 86_400_000,
+                        timestamp:
+                            Date.now() - secureRandomFloat() * 86_400_000,
                         score: secureRandomFloat() * 100,
                         category: `Category ${index % 5}`,
                     },
                     metadata: {
-                        created: Date.now() - secureRandomFloat() * 86_400_000 * 30,
-                        modified: Date.now() - secureRandomFloat() * 86_400_000 * 7,
+                        created:
+                            Date.now() - secureRandomFloat() * 86_400_000 * 30,
+                        modified:
+                            Date.now() - secureRandomFloat() * 86_400_000 * 7,
                         tags: [`tag${index % 12}`],
                         category: `Category ${index % 5}`,
                         priority: secureRandomFloat(),
@@ -1477,7 +1482,9 @@ describe("React List Operations Performance", () => {
             ];
 
             const config =
-                sortConfigs[Math.floor(secureRandomFloat() * sortConfigs.length)];
+                sortConfigs[
+                    Math.floor(secureRandomFloat() * sortConfigs.length)
+                ];
             renderer.renderList(componentId, items, config);
         }
 
@@ -1506,7 +1513,9 @@ describe("React List Operations Performance", () => {
                     id: `virtual-item-${index}`,
                     value: {
                         content: `Content for item ${index}`,
-                        data: Array.from({ length: 20 }, () => secureRandomFloat()),
+                        data: Array.from({ length: 20 }, () =>
+                            secureRandomFloat()
+                        ),
                     },
                     metadata: {
                         created: Date.now(),
@@ -1556,7 +1565,9 @@ describe("React List Operations Performance", () => {
 
             const config =
                 virtualizationConfigs[
-                    Math.floor(secureRandomFloat() * virtualizationConfigs.length)
+                    Math.floor(
+                        secureRandomFloat() * virtualizationConfigs.length
+                    )
                 ];
             renderer.renderVirtualizedList(componentId, items, config);
         }
@@ -1594,7 +1605,8 @@ describe("React List Operations Performance", () => {
                         ][index % 3],
                     },
                     metadata: {
-                        created: Date.now() - secureRandomFloat() * 86_400_000 * 30,
+                        created:
+                            Date.now() - secureRandomFloat() * 86_400_000 * 30,
                         modified: Date.now(),
                         tags: [`tag${index % 8}`],
                         category: `Category ${index % 6}`,
@@ -1764,8 +1776,10 @@ describe("React List Operations Performance", () => {
                         featured: secureRandomFloat() > 0.7,
                     },
                     metadata: {
-                        created: Date.now() - secureRandomFloat() * 86_400_000 * 365,
-                        modified: Date.now() - secureRandomFloat() * 86_400_000 * 30,
+                        created:
+                            Date.now() - secureRandomFloat() * 86_400_000 * 365,
+                        modified:
+                            Date.now() - secureRandomFloat() * 86_400_000 * 30,
                         tags: [`tag${index % 20}`, `feature${index % 15}`],
                         category: `Category ${index % 12}`,
                         priority: secureRandomFloat(),
@@ -1858,7 +1872,9 @@ describe("React List Operations Performance", () => {
                     value: {
                         title: `Stress Item ${index}`,
                         content: `Content ${index}`.repeat(10), // Large content
-                        data: Array.from({ length: 50 }, () => secureRandomFloat()), // Large data array
+                        data: Array.from({ length: 50 }, () =>
+                            secureRandomFloat()
+                        ), // Large data array
                         nested: {
                             level1: {
                                 level2: {
@@ -1875,7 +1891,8 @@ describe("React List Operations Performance", () => {
                         },
                     },
                     metadata: {
-                        created: Date.now() - secureRandomFloat() * 86_400_000 * 365,
+                        created:
+                            Date.now() - secureRandomFloat() * 86_400_000 * 365,
                         modified: Date.now(),
                         tags: Array.from(
                             { length: 10 },

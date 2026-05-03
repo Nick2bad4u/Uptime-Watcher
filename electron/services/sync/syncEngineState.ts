@@ -47,7 +47,7 @@ import {
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { ensureError } from "@shared/utils/errorHandling";
-import { objectEntries, objectKeys  } from "ts-extras";
+import { objectEntries, objectKeys } from "ts-extras";
 
 import {
     DEFAULT_CHECK_INTERVAL,

@@ -38,7 +38,9 @@ class MockConnection {
         this.queryCount++;
 
         // Simulate query execution time
-        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 5));
+        await new Promise((resolve) =>
+            setTimeout(resolve, secureRandomFloat() * 5)
+        );
 
         return {
             sql,

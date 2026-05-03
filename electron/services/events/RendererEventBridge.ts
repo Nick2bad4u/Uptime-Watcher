@@ -17,7 +17,7 @@ import {
     isJsonByteBudgetExceeded,
 } from "@shared/utils/jsonByteBudget";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { isDefined, objectEntries  } from "ts-extras";
+import { isDefined, objectEntries } from "ts-extras";
 
 import type { WindowService } from "../window/WindowService";
 

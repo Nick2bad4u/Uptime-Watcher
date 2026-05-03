@@ -247,7 +247,9 @@ describe("Database Data Validation Benchmarks", () => {
                     "error",
                     "warning",
                     "info",
-                ][Math.floor(secureRandomFloat() * 3)] as ValidationRule["severity"],
+                ][
+                    Math.floor(secureRandomFloat() * 3)
+                ] as ValidationRule["severity"],
                 description: `Validates ${ruleType.type} constraints on ${tableName}`,
                 targetTable: tableName,
                 targetColumns: [
@@ -597,7 +599,8 @@ describe("Database Data Validation Benchmarks", () => {
                     const variance = dimension.variance;
 
                     // Add realistic variance to quality scores
-                    const scoreVariation = (secureRandomFloat() - 0.5) * variance;
+                    const scoreVariation =
+                        (secureRandomFloat() - 0.5) * variance;
                     const qualityScore = Math.max(
                         0,
                         Math.min(1, baseScore + scoreVariation)
@@ -712,7 +715,8 @@ describe("Database Data Validation Benchmarks", () => {
                         qualityGrade,
                         issuesIdentified,
                         measurementDate:
-                            Date.now() - secureRandomFloat() * 7 * 24 * 3_600_000, // Within last 7 days
+                            Date.now() -
+                            secureRandomFloat() * 7 * 24 * 3_600_000, // Within last 7 days
                         trendDirection,
                     };
 
@@ -931,7 +935,9 @@ describe("Database Data Validation Benchmarks", () => {
                 ];
                 resolutionAction =
                     resolutionActions[
-                        Math.floor(secureRandomFloat() * resolutionActions.length)
+                        Math.floor(
+                            secureRandomFloat() * resolutionActions.length
+                        )
                     ];
             }
 
@@ -1209,7 +1215,8 @@ describe("Database Data Validation Benchmarks", () => {
             const retryCount = pipelineSuccess
                 ? 0
                 : Math.floor(secureRandomFloat() * 3);
-            const rollbackRequired = !pipelineSuccess && secureRandomFloat() < 0.7; // 70% of failures need rollback
+            const rollbackRequired =
+                !pipelineSuccess && secureRandomFloat() < 0.7; // 70% of failures need rollback
 
             const pipeline: ValidationPipeline = {
                 pipelineId: `pipeline-${i}`,

@@ -68,8 +68,7 @@ vi.stubGlobal("window", {
 vi.mock("../../../services/MonitorTypesService", () => ({
     MonitorTypesService: {
         formatMonitorDetail: mockMonitorTypesApi.formatMonitorDetail,
-        formatMonitorTitleSuffix:
-            mockMonitorTypesApi.formatMonitorTitleSuffix,
+        formatMonitorTitleSuffix: mockMonitorTypesApi.formatMonitorTitleSuffix,
         getMonitorTypes: mockMonitorTypesApi.getMonitorTypes,
         initialize: mockMonitorTypesApi.initialize,
         validateMonitorData: mockMonitorTypesApi.validateMonitorData,

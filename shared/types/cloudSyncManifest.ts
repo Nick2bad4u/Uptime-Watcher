@@ -11,7 +11,7 @@ import {
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isValidPersistedDeviceId } from "@shared/validation/persistedDeviceIdValidation";
-import { objectEntries, objectKeys  } from "ts-extras";
+import { objectEntries, objectKeys } from "ts-extras";
 import * as z from "zod";
 
 export const CLOUD_SYNC_MANIFEST_VERSION = 1 as const;

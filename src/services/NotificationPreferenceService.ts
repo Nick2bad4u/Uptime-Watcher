@@ -68,8 +68,10 @@ export const NotificationPreferenceService: NotificationPreferenceServiceContrac
                     validateNotificationPreferenceUpdate(preferences);
 
                 if (!validation.success) {
-                    const issues = arrayJoin(validation.error.issues
-                        .map(({ message }) => message), ", ");
+                    const issues = arrayJoin(
+                        validation.error.issues.map(({ message }) => message),
+                        ", "
+                    );
                     throw new Error(
                         `Invalid notification preferences: ${issues}`,
                         {

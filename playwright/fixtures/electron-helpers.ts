@@ -12,7 +12,14 @@ import type { ElectronApplication, Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import { createWriteStream, type WriteStream } from "node:fs";
-import { access, copyFile, mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
+import {
+    access,
+    copyFile,
+    mkdir,
+    mkdtemp,
+    readdir,
+    rm,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
 
@@ -26,7 +33,11 @@ import {
 } from "../utils/userDataDirectoryRegistry";
 
 const PLAYWRIGHT_CLOSE_TIMEOUT_MS = 5000;
-const USER_DATA_REMOVAL_RETRY_DELAYS_MS = [250, 500, 1000] as const;
+const USER_DATA_REMOVAL_RETRY_DELAYS_MS = [
+    250,
+    500,
+    1000,
+] as const;
 
 const isBusyFileSystemError = (error: unknown): boolean => {
     const code =
@@ -111,10 +122,18 @@ const forceTerminateChildProcess = (childProcess: ChildProcess): void => {
     }
 
     try {
-        if (process.platform === "win32" && typeof childProcess.pid === "number") {
+        if (
+            process.platform === "win32" &&
+            typeof childProcess.pid === "number"
+        ) {
             execFileSync(
                 "taskkill",
-                ["/F", "/T", "/PID", String(childProcess.pid)],
+                [
+                    "/F",
+                    "/T",
+                    "/PID",
+                    String(childProcess.pid),
+                ],
                 { stdio: "ignore" }
             );
             return;

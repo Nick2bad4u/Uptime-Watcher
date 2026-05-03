@@ -9,7 +9,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { UnknownArray, UnknownRecord  } from "type-fest";
+import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isDefined, objectHasIn } from "ts-extras";

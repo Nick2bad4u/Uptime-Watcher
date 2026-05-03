@@ -228,17 +228,19 @@ const ThemedBoxComponent = ({
     variant = "primary",
     ...restProps
 }: ThemedBoxProperties): ReactElement => {
-    const classNames = arrayJoin([
-        CSS_CLASSES.THEMED_BOX,
-        `themed-box--background-${variant}`,
-        `themed-box--surface-${surface}`,
-        `themed-box--padding-${padding}`,
-        `themed-box--rounded-${rounded}`,
-        shadow && `themed-box--shadow-${shadow}`,
-        border && "themed-box--border",
-        className,
-    ]
-        .filter(Boolean), " ");
+    const classNames = arrayJoin(
+        [
+            CSS_CLASSES.THEMED_BOX,
+            `themed-box--background-${variant}`,
+            `themed-box--surface-${surface}`,
+            `themed-box--padding-${padding}`,
+            `themed-box--rounded-${rounded}`,
+            shadow && `themed-box--shadow-${shadow}`,
+            border && "themed-box--border",
+            className,
+        ].filter(Boolean),
+        " "
+    );
 
     const isInteractive = Boolean(onClick);
 

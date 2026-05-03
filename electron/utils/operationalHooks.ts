@@ -82,7 +82,10 @@ interface OperationalErrorMetadata {
 }
 
 function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
-    const codeCandidate: unknown = Reflect.get(safeCastTo<object>(error), "code");
+    const codeCandidate: unknown = Reflect.get(
+        safeCastTo<object>(error),
+        "code"
+    );
     const errorCode =
         typeof codeCandidate === "string" ? codeCandidate : undefined;
 

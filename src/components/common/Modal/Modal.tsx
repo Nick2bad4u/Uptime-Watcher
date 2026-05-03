@@ -11,7 +11,7 @@ import {
     useRef,
 } from "react";
 import { createPortal } from "react-dom";
-import { arrayAt, arrayFirst, arrayJoin, isEmpty    } from "ts-extras";
+import { arrayAt, arrayFirst, arrayJoin, isEmpty } from "ts-extras";
 
 import { AppIcons } from "../../../utils/icons";
 import {
@@ -527,28 +527,34 @@ export const Modal = ({
         return null;
     }
 
-    const shellClassNames = arrayJoin([
-        "modal-shell",
-        resolveModalShellAccentClass(accent),
-        resolveModalShellSizeClass(size),
-        resolveModalShellVariantClass(variant),
-        shellClassName ?? "",
-    ]
-        .filter(Boolean), " ");
+    const shellClassNames = arrayJoin(
+        [
+            "modal-shell",
+            resolveModalShellAccentClass(accent),
+            resolveModalShellSizeClass(size),
+            resolveModalShellVariantClass(variant),
+            shellClassName ?? "",
+        ].filter(Boolean),
+        " "
+    );
 
-    const overlayClassNames = arrayJoin([
-        "modal-overlay",
-        "modal-overlay--frosted",
-        resolveOverlayVariantClass(overlayVariant),
-        overlayClassName ?? "",
-    ]
-        .filter(Boolean), " ");
+    const overlayClassNames = arrayJoin(
+        [
+            "modal-overlay",
+            "modal-overlay--frosted",
+            resolveOverlayVariantClass(overlayVariant),
+            overlayClassName ?? "",
+        ].filter(Boolean),
+        " "
+    );
 
-    const bodyClassNames = arrayJoin([
-        "modal-shell__body",
-        isBodyScrollable ? "modal-shell__body-scrollable" : "",
-    ]
-        .filter(Boolean), " ");
+    const bodyClassNames = arrayJoin(
+        [
+            "modal-shell__body",
+            isBodyScrollable ? "modal-shell__body-scrollable" : "",
+        ].filter(Boolean),
+        " "
+    );
 
     return createPortal(
         <div className={overlayClassNames} data-testid={overlayTestId}>

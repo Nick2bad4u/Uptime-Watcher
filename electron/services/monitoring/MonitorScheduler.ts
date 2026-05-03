@@ -5,7 +5,7 @@ import { createCombinedAbortSignal } from "@shared/utils/abortUtils";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomInt } from "node:crypto";
-import { isInteger, stringSplit  } from "ts-extras";
+import { isInteger, stringSplit } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";

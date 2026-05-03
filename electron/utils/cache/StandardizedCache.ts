@@ -364,11 +364,12 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * Get cache entries iterator.
      */
     public entries(): IterableIterator<[TKey, TValue]> {
-        const entries = this.cleanupAndExtract(
-            (key, entry): [TKey, TValue] => [key, entry.data]
-        );
+        const entries = this.cleanupAndExtract((key, entry): [TKey, TValue] => [
+            key,
+            entry.data,
+        ]);
 
-        return (function* (): IterableIterator<[TKey, TValue]> {
+        return (function* entriesIterator(): IterableIterator<[TKey, TValue]> {
             for (const entry of entries) {
                 yield entry;
             }

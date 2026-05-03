@@ -59,23 +59,28 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
 
     const triggerClassName = useMemo(
         () =>
-            arrayJoin([
-                "status-subscription-indicator",
-                `status-subscription-indicator--${health.status}`,
-                health.needsAttention
-                    ? "status-subscription-indicator--requires-action"
-                    : undefined,
-            ]
-                .filter(Boolean), " "),
+            arrayJoin(
+                [
+                    "status-subscription-indicator",
+                    `status-subscription-indicator--${health.status}`,
+                    health.needsAttention
+                        ? "status-subscription-indicator--requires-action"
+                        : undefined,
+                ].filter(Boolean),
+                " "
+            ),
         [health.needsAttention, health.status]
     );
 
     const dotClassName = useMemo(
         () =>
-            arrayJoin([
-                "status-subscription-indicator__dot",
-                `status-subscription-indicator__dot--${health.status}`,
-            ], " "),
+            arrayJoin(
+                [
+                    "status-subscription-indicator__dot",
+                    `status-subscription-indicator__dot--${health.status}`,
+                ],
+                " "
+            ),
         [health.status]
     );
 

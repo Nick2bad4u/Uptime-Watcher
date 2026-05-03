@@ -166,6 +166,7 @@ const ThemedInputComponent = ({
     return (
         <input
             aria-describedby={ariaDescribedBy}
+            // eslint-disable-next-line react-hooks/invariant -- ariaLabel is provided by typed props and may intentionally be undefined.
             aria-label={ariaLabel}
             className={`themed-input ${className}`}
             data-testid={id ? `input-${id}` : undefined}

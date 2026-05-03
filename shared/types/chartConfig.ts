@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { Arrayable, UnknownRecord  } from "type-fest";
+import type { Arrayable, UnknownRecord } from "type-fest";
 
 import { safeCastTo } from "ts-extras";
 
@@ -505,8 +505,8 @@ export function hasPlugins(
         typeof config === "object" &&
         config !== null &&
         "plugins" in config &&
-        typeof (safeCastTo<UnknownRecord>(config))["plugins"] === "object" &&
-        (safeCastTo<UnknownRecord>(config))["plugins"] !== null
+        typeof safeCastTo<UnknownRecord>(config)["plugins"] === "object" &&
+        safeCastTo<UnknownRecord>(config)["plugins"] !== null
     );
 }
 
@@ -527,8 +527,8 @@ export function hasScales(
         typeof config === "object" &&
         config !== null &&
         "scales" in config &&
-        typeof (safeCastTo<UnknownRecord>(config))["scales"] === "object" &&
-        (safeCastTo<UnknownRecord>(config))["scales"] !== null
+        typeof safeCastTo<UnknownRecord>(config)["scales"] === "object" &&
+        safeCastTo<UnknownRecord>(config)["scales"] !== null
     );
 }
 

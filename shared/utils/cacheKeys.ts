@@ -73,11 +73,14 @@ function createCacheKey(
     operation?: string
 ): string {
     if (operation) {
-        return arrayJoin([
-            prefix,
-            operation,
-            identifier,
-        ], KEY_SEPARATOR);
+        return arrayJoin(
+            [
+                prefix,
+                operation,
+                identifier,
+            ],
+            KEY_SEPARATOR
+        );
     }
     return arrayJoin([prefix, identifier], KEY_SEPARATOR);
 }

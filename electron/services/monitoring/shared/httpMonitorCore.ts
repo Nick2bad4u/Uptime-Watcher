@@ -11,7 +11,7 @@
 
 import type { Site } from "@shared/types";
 import type { AxiosResponse } from "axios";
-import type { Constructor, Promisable  } from "type-fest";
+import type { Constructor, Promisable } from "type-fest";
 
 import { createAbortError } from "@shared/utils/abortError";
 import {
@@ -21,7 +21,7 @@ import {
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { objectHasOwn, safeCastTo  } from "ts-extras";
+import { objectHasOwn, safeCastTo } from "ts-extras";
 
 import type {
     IMonitorService,

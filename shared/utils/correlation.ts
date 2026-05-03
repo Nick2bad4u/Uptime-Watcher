@@ -1,10 +1,12 @@
 import type { CorrelationId } from "@shared/types/events";
 
 import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
-import { arrayJoin, safeCastTo  } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 
 const resolveWebCrypto = (): Crypto | null => {
-    const candidate = safeCastTo<Crypto | undefined>(Reflect.get(globalThis, "crypto"));
+    const candidate = safeCastTo<Crypto | undefined>(
+        Reflect.get(globalThis, "crypto")
+    );
     if (candidate && typeof candidate.getRandomValues === "function") {
         return candidate;
     }

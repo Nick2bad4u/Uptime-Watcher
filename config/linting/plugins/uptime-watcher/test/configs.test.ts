@@ -10,7 +10,9 @@ interface FlatConfigLike {
     rules?: Record<string, unknown>;
 }
 
-function getPluginConfigs(pluginConfig: unknown): null | Record<string, unknown> {
+function getPluginConfigs(
+    pluginConfig: unknown
+): null | Record<string, unknown> {
     if (!isObject(pluginConfig)) {
         return null;
     }

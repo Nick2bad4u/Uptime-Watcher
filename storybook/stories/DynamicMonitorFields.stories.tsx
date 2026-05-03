@@ -77,7 +77,7 @@ const DynamicMonitorFieldsStory = ({
 
     const handleChangeMap = useMemo<FieldChangeHandlers>(() => {
         if (!fields) {
-            return {} as FieldChangeHandlers;
+            return {};
         }
 
         return buildFieldChangeHandlers(fields, setValues);
@@ -146,6 +146,6 @@ export const DnsWithAnyRecord: Story = {
 
 export const UnknownMonitorType: Story = {
     args: {
-        monitorType: "unregistered" as MonitorType,
+        monitorType: "unregistered",
     },
 };

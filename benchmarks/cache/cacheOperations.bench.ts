@@ -206,7 +206,9 @@ describe("Cache Operations Performance Benchmarks", () => {
                 const key =
                     secureRandomFloat() < 0.8
                         ? mediumKeys[
-                              Math.floor(secureRandomFloat() * mediumKeys.length)
+                              Math.floor(
+                                  secureRandomFloat() * mediumKeys.length
+                              )
                           ]
                         : `miss-key-${i}`;
                 mediumCache.get(key);

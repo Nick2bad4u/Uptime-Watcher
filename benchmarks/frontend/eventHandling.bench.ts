@@ -517,7 +517,9 @@ describe("React Event Handling Performance", () => {
 
         return Array.from({ length: count }, (_, i) => ({
             element: `${elementTypes[Math.floor(secureRandomFloat() * elementTypes.length)]}-${i}`,
-            type: eventTypes[Math.floor(secureRandomFloat() * eventTypes.length)],
+            type: eventTypes[
+                Math.floor(secureRandomFloat() * eventTypes.length)
+            ],
             data: {
                 detail: secureRandomFloat() * 100,
                 clientX: secureRandomFloat() * 1920,
@@ -736,7 +738,8 @@ describe("React Event Handling Performance", () => {
             const listeners = Array.from(
                 { length: 20 },
                 (_, i) => (event: CustomEvent) => {
-                    const processing = secureRandomFloat() * event.detail.complexity;
+                    const processing =
+                        secureRandomFloat() * event.detail.complexity;
                 }
             );
             eventListeners.set(eventType, listeners);

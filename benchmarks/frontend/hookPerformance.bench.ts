@@ -1229,7 +1229,8 @@ describe("React Hook Performance", () => {
             );
 
             const handleCalculation = hookSystem.useCallback(
-                (value: number) => value * config.multiplier * secureRandomFloat(),
+                (value: number) =>
+                    value * config.multiplier * secureRandomFloat(),
                 [config.multiplier]
             );
 
@@ -1309,7 +1310,10 @@ describe("React Hook Performance", () => {
                 try {
                     // Simulate API call
                     const fetchWork = secureRandomFloat() * 10;
-                    const result = { id: secureRandomFloat(), data: "fetched data" };
+                    const result = {
+                        id: secureRandomFloat(),
+                        data: "fetched data",
+                    };
                     setData(result);
                     setError(null);
                 } catch (error_) {
@@ -1428,7 +1432,9 @@ describe("React Hook Performance", () => {
             // Trigger many renders
             for (let render = 0; render < 50; render++) {
                 const componentId =
-                    components[Math.floor(secureRandomFloat() * components.length)];
+                    components[
+                        Math.floor(secureRandomFloat() * components.length)
+                    ];
                 hookSystem.renderComponent(componentId);
             }
 

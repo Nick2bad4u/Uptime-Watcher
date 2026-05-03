@@ -29,7 +29,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { Primitive, Promisable, Simplify  } from "type-fest";
+import type { Primitive, Promisable, Simplify } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import {
@@ -135,8 +135,7 @@ type ArrayPayload = InternalArrayPayload;
 /**
  * Primitive payload supported by the event bus.
  */
-type PrimitivePayload =
-    Primitive;
+type PrimitivePayload = Primitive;
 
 /**
  * Non-array object payload shape used to distinguish plain objects from arrays.

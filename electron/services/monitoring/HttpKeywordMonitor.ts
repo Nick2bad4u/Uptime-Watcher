@@ -47,7 +47,10 @@ const HTTP_KEYWORD_MONITOR_BEHAVIOR: HttpMonitorBehavior<
         }),
 };
 
-type HttpKeywordMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
+type HttpKeywordMonitorConstructor = Constructor<
+    HttpMonitorServiceInstance,
+    [config?: MonitorServiceConfig]
+>;
 
 const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor =
     ((): HttpKeywordMonitorConstructor => {

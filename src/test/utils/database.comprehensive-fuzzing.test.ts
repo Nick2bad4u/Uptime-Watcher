@@ -2497,8 +2497,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Simulate execution
                     for (const [index, op] of ops.entries()) {
-                        const executionTime =
-                            secureRandomFloat() * 1000 + 100; // 100-1100ms
+                        const executionTime = secureRandomFloat() * 1000 + 100; // 100-1100ms
                         const lockRequired = [
                             "CREATE_INDEX",
                             "DROP_INDEX",
@@ -2661,8 +2660,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     );
 
                     // Simulate failure injection
-                    const failureOccurred =
-                        secureRandomBoolean(operation.failureRate);
+                    const failureOccurred = secureRandomBoolean(
+                        operation.failureRate
+                    );
                     const failureBatch = failureOccurred
                         ? secureRandomInt(totalBatches)
                         : -1;
@@ -2706,14 +2706,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                                     operation.batchSize,
                                     operation.totalRecords
                                 );
-                                successfulRecords =
-                                    secureRandomBoolean(0.7)
-                                        ? processedRecords
-                                        : Math.max(
-                                              0,
-                                              processedRecords -
-                                                  effectiveBatchSize
-                                          );
+                                successfulRecords = secureRandomBoolean(0.7)
+                                    ? processedRecords
+                                    : Math.max(
+                                          0,
+                                          processedRecords - effectiveBatchSize
+                                      );
                                 break;
                             }
                         }

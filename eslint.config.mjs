@@ -130,7 +130,7 @@ import pluginPrettier from "eslint-plugin-prettier";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import pluginPromise from "eslint-plugin-promise";
 import * as publint from "eslint-plugin-publint";
-import publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
+import * as publintParser from "eslint-plugin-publint/jsonc-eslint-parser";
 import pluginReactRaw from "eslint-plugin-react";
 // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
 import react19upgrade from "eslint-plugin-react-19-upgrade";
@@ -223,13 +223,9 @@ import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 const enableJsonSchemaValidation =
     process.env["UW_ENABLE_JSON_SCHEMA_VALIDATION"] === "1";
 
-let eslintPluginJsonSchemaValidator = undefined;
-
-if (enableJsonSchemaValidation) {
-    eslintPluginJsonSchemaValidator = (
-        await import("eslint-plugin-json-schema-validator")
-    ).default;
-}
+const eslintPluginJsonSchemaValidator = enableJsonSchemaValidation
+    ? (await import("eslint-plugin-json-schema-validator")).default
+    : undefined;
 
 const jsonSchemaValidatorPlugins = enableJsonSchemaValidation
     ? { "json-schema-validator": eslintPluginJsonSchemaValidator }
@@ -549,6 +545,16 @@ export default defineConfig([
     fileProgressPlugin.configs["recommended-ci"],
     ...copilot.configs["all"],
     ...sdl.configs.required,
+    {
+        name: "CSS runtime compatibility guard",
+        rules: {
+            // Upgraded @eslint/css currently crashes at runtime in this
+            // workspace when resolving css-wide keywords in mixed-language
+            // lint passes (e.g., Storybook TS config files).
+            // Keep disabled until upstream parser/rule compatibility is fixed.
+            "css/font-family-fallbacks": "off",
+        },
+    },
     {
         ...githubActions.configs["all"],
         files: [".github/workflows/*.{yml,yaml}"],
@@ -3181,16 +3187,13 @@ export default defineConfig([
             "react-dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "react-dom/no-void-elements-with-children": "warn",
-            "react-dom/prefer-namespace-import": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
             "react-hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
             "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
             "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
-            "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             "react-hooks/fbt": "warn",
-            "react-hooks/fire": "warn",
             "react-hooks/hooks": "warn",
             "react-hooks/invariant": "warn",
             "react-hooks/memoized-effect-dependencies": "warn",
@@ -3204,7 +3207,6 @@ export default defineConfig([
             "react-naming-convention/ref-name": "warn",
             // This project does not use React Server Components; keep RSC-only rules disabled.
             "react-rsc/function-definition": "off",
-            "react-x/component-hook-factories": "off",
             "react-x/immutability": "warn",
             "react-x/no-class-component": "warn",
             "react-x/no-duplicate-key": "warn",
@@ -3214,16 +3216,12 @@ export default defineConfig([
             "react-x/no-missing-context-display-name": "warn",
             "react-x/no-misused-capture-owner-stack": "warn",
             "react-x/no-nested-component-definitions": "warn",
-            "react-x/no-unnecessary-use-callback": "off",
-            "react-x/no-unnecessary-use-memo": "off",
             "react-x/no-unnecessary-use-prefix": "warn",
             "react-x/no-unstable-context-value": "warn",
             "react-x/no-unstable-default-props": "warn",
             "react-x/no-unused-class-component-members": "warn",
             "react-x/no-unused-props": "warn",
             "react-x/no-unused-state": "warn",
-            "react-x/prefer-destructuring-assignment": "warn",
-            "react-x/prefer-namespace-import": "off",
             "react-x/refs": "warn",
             "react/forbid-component-props": "off",
             // Disable problematic rules for Docusaurus
@@ -4627,7 +4625,6 @@ export default defineConfig([
             "react-dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "react-dom/no-void-elements-with-children": "warn",
-            "react-dom/prefer-namespace-import": "warn",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -4639,12 +4636,10 @@ export default defineConfig([
             "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
             "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
-            "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             // React Hooks
             "react-hooks/exhaustive-deps": "warn",
             "react-hooks/fbt": "warn",
-            "react-hooks/fire": "warn",
             "react-hooks/hooks": "warn",
             "react-hooks/invariant": "warn",
             "react-hooks/memoized-effect-dependencies": "warn",
@@ -4784,7 +4779,6 @@ export default defineConfig([
             // This project does not use React Server Components; keep RSC-only rules disabled.
             "react-rsc/function-definition": "off",
             "react-useeffect/no-non-function-return": "error",
-            "react-x/component-hook-factories": "off",
             "react-x/immutability": "warn",
             "react-x/no-class-component": "warn",
             "react-x/no-duplicate-key": "warn",
@@ -4794,16 +4788,12 @@ export default defineConfig([
             "react-x/no-missing-context-display-name": "warn",
             "react-x/no-misused-capture-owner-stack": "warn",
             "react-x/no-nested-component-definitions": "warn",
-            "react-x/no-unnecessary-use-callback": "off",
-            "react-x/no-unnecessary-use-memo": "off",
             "react-x/no-unnecessary-use-prefix": "warn",
             "react-x/no-unstable-context-value": "warn",
             "react-x/no-unstable-default-props": "warn",
             "react-x/no-unused-class-component-members": "warn",
             "react-x/no-unused-props": "warn",
             "react-x/no-unused-state": "warn",
-            "react-x/prefer-destructuring-assignment": "warn",
-            "react-x/prefer-namespace-import": "off",
             "react-x/refs": "warn",
             // React
             "react/boolean-prop-naming": "warn",
@@ -6315,16 +6305,13 @@ export default defineConfig([
             "react-dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "react-dom/no-void-elements-with-children": "warn",
-            "react-dom/prefer-namespace-import": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
             "react-hooks-extra/ensure-use-callback-has-non-empty-deps": "off",
             "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
             "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
-            "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             "react-hooks/fbt": "warn",
-            "react-hooks/fire": "warn",
             "react-hooks/hooks": "warn",
             "react-hooks/invariant": "warn",
             "react-hooks/memoized-effect-dependencies": "warn",
@@ -6338,7 +6325,6 @@ export default defineConfig([
             "react-naming-convention/ref-name": "warn",
             // This project does not use React Server Components; keep RSC-only rules disabled.
             "react-rsc/function-definition": "off",
-            "react-x/component-hook-factories": "off",
             "react-x/immutability": "warn",
             "react-x/no-class-component": "warn",
             "react-x/no-duplicate-key": "warn",
@@ -6348,16 +6334,12 @@ export default defineConfig([
             "react-x/no-missing-context-display-name": "warn",
             "react-x/no-misused-capture-owner-stack": "warn",
             "react-x/no-nested-component-definitions": "warn",
-            "react-x/no-unnecessary-use-callback": "off",
-            "react-x/no-unnecessary-use-memo": "off",
             "react-x/no-unnecessary-use-prefix": "warn",
             "react-x/no-unstable-context-value": "warn",
             "react-x/no-unstable-default-props": "warn",
             "react-x/no-unused-class-component-members": "warn",
             "react-x/no-unused-props": "warn",
             "react-x/no-unused-state": "warn",
-            "react-x/prefer-destructuring-assignment": "warn",
-            "react-x/prefer-namespace-import": "off",
             "react-x/refs": "warn",
             "react/jsx-boolean-value": ["warn", "never"],
             "react/jsx-fragments": ["warn", "syntax"],
@@ -7744,7 +7726,6 @@ export default defineConfig([
             "react-dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "react-dom/no-void-elements-with-children": "warn",
-            "react-dom/prefer-namespace-import": "warn",
             "react-form-fields/no-mix-controlled-with-uncontrolled": "error",
             "react-form-fields/no-only-value-prop": "error",
             "react-form-fields/styled-no-mix-controlled-with-uncontrolled":
@@ -7756,12 +7737,10 @@ export default defineConfig([
             "react-hooks-extra/ensure-use-memo-has-non-empty-deps": "off",
             /* Hooks extra subplugin */
             "react-hooks-extra/no-direct-set-state-in-use-effect": "warn",
-            "react-hooks/automatic-effect-dependencies": "warn",
             "react-hooks/capitalized-calls": "warn",
             // React Hooks
             "react-hooks/exhaustive-deps": "warn",
             "react-hooks/fbt": "warn",
-            "react-hooks/fire": "warn",
             "react-hooks/hooks": "warn",
             "react-hooks/invariant": "warn",
             "react-hooks/memoized-effect-dependencies": "warn",
@@ -7901,7 +7880,6 @@ export default defineConfig([
             // This project does not use React Server Components; keep RSC-only rules disabled.
             "react-rsc/function-definition": "off",
             "react-useeffect/no-non-function-return": "error",
-            "react-x/component-hook-factories": "off",
             "react-x/immutability": "warn",
             "react-x/no-class-component": "warn",
             "react-x/no-duplicate-key": "warn",
@@ -7911,16 +7889,12 @@ export default defineConfig([
             "react-x/no-missing-context-display-name": "warn",
             "react-x/no-misused-capture-owner-stack": "warn",
             "react-x/no-nested-component-definitions": "warn",
-            "react-x/no-unnecessary-use-callback": "off",
-            "react-x/no-unnecessary-use-memo": "off",
             "react-x/no-unnecessary-use-prefix": "warn",
             "react-x/no-unstable-context-value": "warn",
             "react-x/no-unstable-default-props": "warn",
             "react-x/no-unused-class-component-members": "warn",
             "react-x/no-unused-props": "warn",
             "react-x/no-unused-state": "warn",
-            "react-x/prefer-destructuring-assignment": "warn",
-            "react-x/prefer-namespace-import": "off",
             "react-x/refs": "warn",
             // React
             "react/boolean-prop-naming": "warn",
@@ -10946,7 +10920,6 @@ export default defineConfig([
             "react-perf/jsx-no-new-object-as-prop": "off",
             // Storybook stories are demo code, loosen the grip for now
             "react-x/immutability": "off",
-            "react-x/prefer-destructuring-assignment": "off",
             "react-x/rules-of-hooks": "off",
             "react/jsx-fragments": "off",
             "react/jsx-no-bind": "off",
@@ -11272,6 +11245,22 @@ export default defineConfig([
         name: "Electron: disable unicorn import.meta suggestions",
         rules: {
             "unicorn/prefer-import-meta-properties": "off",
+        },
+    },
+    {
+        files: ["electron/services/ipc/utils.ts"],
+        name: "IPC utility wrapper: sender rule exception",
+        rules: {
+            // This helper centralizes channel registration. Sender/frame trust
+            // validation is handled at preload/window boundary and per-channel
+            // validator guards.
+            "sdl/no-electron-unchecked-ipc-sender": "off",
+        },
+    },
+    {
+        name: "CSS runtime compatibility guard (tail override)",
+        rules: {
+            "css/font-family-fallbacks": "off",
         },
     },
     // #endregion

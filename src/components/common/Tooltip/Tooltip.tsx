@@ -256,13 +256,15 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         const tooltipClasses = useMemo(
             () =>
-                arrayJoin([
-                    "tooltip",
-                    `tooltip--${position}`,
-                    isVisible ? "tooltip--visible" : "",
-                    className,
-                ]
-                    .filter(Boolean), " "),
+                arrayJoin(
+                    [
+                        "tooltip",
+                        `tooltip--${position}`,
+                        isVisible ? "tooltip--visible" : "",
+                        className,
+                    ].filter(Boolean),
+                    " "
+                ),
             [
                 className,
                 isVisible,
@@ -291,14 +293,16 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         const containerClasses = useMemo(
             () =>
-                arrayJoin([
-                    "tooltip-container",
-                    wrapMode === "block"
-                        ? "tooltip-container--block"
-                        : "tooltip-container--inline",
-                    containerClassName,
-                ]
-                    .filter(Boolean), " "),
+                arrayJoin(
+                    [
+                        "tooltip-container",
+                        wrapMode === "block"
+                            ? "tooltip-container--block"
+                            : "tooltip-container--inline",
+                        containerClassName,
+                    ].filter(Boolean),
+                    " "
+                ),
             [containerClassName, wrapMode]
         );
 

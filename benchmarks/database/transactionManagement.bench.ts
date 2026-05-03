@@ -256,23 +256,28 @@ describe("Database Transaction Management Benchmarks", () => {
                 let affectedRows = 0;
                 switch (operation.type) {
                     case "select": {
-                        affectedRows = Math.floor(secureRandomFloat() * 10_000) + 1;
+                        affectedRows =
+                            Math.floor(secureRandomFloat() * 10_000) + 1;
                         break;
                     }
                     case "insert": {
-                        affectedRows = Math.floor(secureRandomFloat() * 100) + 1;
+                        affectedRows =
+                            Math.floor(secureRandomFloat() * 100) + 1;
                         break;
                     }
                     case "update": {
-                        affectedRows = Math.floor(secureRandomFloat() * 1000) + 1;
+                        affectedRows =
+                            Math.floor(secureRandomFloat() * 1000) + 1;
                         break;
                     }
                     case "delete": {
-                        affectedRows = Math.floor(secureRandomFloat() * 500) + 1;
+                        affectedRows =
+                            Math.floor(secureRandomFloat() * 500) + 1;
                         break;
                     }
                     case "mixed": {
-                        affectedRows = Math.floor(secureRandomFloat() * 2000) + 10;
+                        affectedRows =
+                            Math.floor(secureRandomFloat() * 2000) + 10;
                         break;
                     }
                 }
@@ -339,7 +344,9 @@ describe("Database Transaction Management Benchmarks", () => {
 
                     const failure =
                         failureTypes[
-                            Math.floor(secureRandomFloat() * failureTypes.length)
+                            Math.floor(
+                                secureRandomFloat() * failureTypes.length
+                            )
                         ];
                     status = failure.status;
                     error = failure.error;
@@ -525,7 +532,9 @@ describe("Database Transaction Management Benchmarks", () => {
                     const fromIdx = Math.floor(
                         secureRandomFloat() * transactionCount
                     );
-                    const toIdx = Math.floor(secureRandomFloat() * transactionCount);
+                    const toIdx = Math.floor(
+                        secureRandomFloat() * transactionCount
+                    );
 
                     if (fromIdx !== toIdx) {
                         const resource = `resource-${Math.floor(secureRandomFloat() * 5)}`;
@@ -561,7 +570,9 @@ describe("Database Transaction Management Benchmarks", () => {
             ] as const;
             const resolutionMethod =
                 victimSelectionMethods[
-                    Math.floor(secureRandomFloat() * victimSelectionMethods.length)
+                    Math.floor(
+                        secureRandomFloat() * victimSelectionMethods.length
+                    )
                 ];
 
             let victimTransaction: string;
@@ -584,7 +595,8 @@ describe("Database Transaction Management Benchmarks", () => {
                     victimTransaction =
                         involvedTransactions[
                             Math.floor(
-                                secureRandomFloat() * involvedTransactions.length
+                                secureRandomFloat() *
+                                    involvedTransactions.length
                             )
                         ];
                     break;
@@ -737,7 +749,9 @@ describe("Database Transaction Management Benchmarks", () => {
 
         for (let i = 0; i < 500; i++) {
             const resourceType =
-                resourceTypes[Math.floor(secureRandomFloat() * resourceTypes.length)];
+                resourceTypes[
+                    Math.floor(secureRandomFloat() * resourceTypes.length)
+                ];
             const lockMode =
                 lockModes[Math.floor(secureRandomFloat() * lockModes.length)];
 
@@ -1122,7 +1136,8 @@ describe("Database Transaction Management Benchmarks", () => {
                         Math.floor(secureRandomFloat() * 10) + 5; // 5-14
                     throughputTPS = 30 + secureRandomFloat() * 40; // 30-70 TPS
                     averageWaitTime = 50 + secureRandomFloat() * 200; // 50-250ms
-                    blockingChainLength = Math.floor(secureRandomFloat() * 4) + 1; // 1-4
+                    blockingChainLength =
+                        Math.floor(secureRandomFloat() * 4) + 1; // 1-4
                     errorRate = 0.01 + secureRandomFloat() * 0.03; // 1-4%
                     retryCount = Math.floor(secureRandomFloat() * 5) + 1; // 1-5
                     timeoutCount = Math.floor(secureRandomFloat() * 3); // 0-2
@@ -1133,7 +1148,8 @@ describe("Database Transaction Management Benchmarks", () => {
                         Math.floor(secureRandomFloat() * 20) + 10; // 10-29
                     throughputTPS = 50 + secureRandomFloat() * 100; // 50-150 TPS
                     averageWaitTime = 200 + secureRandomFloat() * 500; // 200-700ms
-                    blockingChainLength = Math.floor(secureRandomFloat() * 8) + 2; // 2-9
+                    blockingChainLength =
+                        Math.floor(secureRandomFloat() * 8) + 2; // 2-9
                     errorRate = 0.03 + secureRandomFloat() * 0.07; // 3-10%
                     retryCount = Math.floor(secureRandomFloat() * 10) + 2; // 2-11
                     timeoutCount = Math.floor(secureRandomFloat() * 5) + 1; // 1-5
@@ -1381,7 +1397,8 @@ describe("Database Transaction Management Benchmarks", () => {
                         violationDetails =
                             violationsOfType[
                                 Math.floor(
-                                    secureRandomFloat() * violationsOfType.length
+                                    secureRandomFloat() *
+                                        violationsOfType.length
                                 )
                             ];
                     }

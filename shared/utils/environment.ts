@@ -72,7 +72,8 @@ const getProcessSnapshot = (): ProcessSnapshot | undefined => {
     }
 
     try {
-        const candidate = (safeCastTo<ProcessSnapshotProvider>(globalThis)).process;
+        const candidate =
+            safeCastTo<ProcessSnapshotProvider>(globalThis).process;
         return candidate ?? undefined;
     } catch {
         return undefined;

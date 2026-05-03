@@ -33,7 +33,7 @@
 import type { ValueOf } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { arrayIncludes, objectEntries, objectValues   } from "ts-extras";
+import { arrayIncludes, objectEntries, objectValues } from "ts-extras";
 
 /**
  * Site-related error messages.

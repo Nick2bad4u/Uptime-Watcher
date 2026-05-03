@@ -43,6 +43,7 @@ const ThemedCheckboxComponent = ({
     <input
         type="checkbox"
         {...(checked === undefined ? {} : { checked })}
+        // eslint-disable-next-line react-hooks/invariant -- ariaLabel is provided by typed props and may intentionally be undefined.
         aria-label={ariaLabel}
         className={`themed-checkbox ${className}`}
         disabled={disabled}

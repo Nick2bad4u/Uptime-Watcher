@@ -7,26 +7,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
 import { generateUuid } from "../utils/data/generateUuid";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 const cryptoBaseline = webcrypto;
-
-let uniqueCryptoCounter = 0;
-
-const createUniqueCryptoMock = () => ({
-    randomUUID: vi.fn(() => {
-        uniqueCryptoCounter += 1;
-        return `mock-uuid-${Date.now()}-${uniqueCryptoCounter.toString(36).padStart(8, "0")}`;
-    }),
-    getRandomValues: vi.fn((arr: Uint8Array | Uint32Array) => {
-        for (let i = 0; i < arr.length; i++) {
-            arr[i] = (uniqueCryptoCounter + i) % 256;
-        }
-
-        uniqueCryptoCounter += arr.length;
-        return arr;
-    }),
-});
 
 afterEach(() => {
     vi.stubGlobal("crypto", cryptoBaseline);
@@ -80,7 +62,6 @@ describe("UUID Generation", () => {
             vi.stubGlobal("crypto", undefined);
         });
 
-
         it("should use fallback implementation when crypto is undefined", async ({
             task,
             annotate,
@@ -112,8 +93,8 @@ describe("UUID Generation", () => {
             const timestampMatch = /(?<full>\d+)$/.exec(uuid);
             expect(timestampMatch).toBeTruthy();
 
-            if (timestampMatch && timestampMatch.groups) {
-                const fullDigits = timestampMatch.groups?.["full"];
+            if (timestampMatch?.groups) {
+                const fullDigits = timestampMatch.groups["full"];
                 // Remove the last 3 digits (microseconds) to get the timestamp
                 const timestampStr = fullDigits?.slice(0, -3) ?? "";
                 const timestamp = Number.parseInt(timestampStr, 10);
@@ -152,7 +133,6 @@ describe("UUID Generation", () => {
             });
         });
 
-
         it("should use fallback when randomUUID method is not available", async ({
             task,
             annotate,
@@ -178,7 +158,6 @@ describe("UUID Generation", () => {
                 getRandomValues: vi.fn(),
             });
         });
-
 
         it("should use fallback when randomUUID throws an error", async ({
             task,
@@ -255,7 +234,6 @@ describe("UUID Generation", () => {
             });
         });
 
-
         it("should use fallback when randomUUID is not a function", async ({
             task,
             annotate,
@@ -326,7 +304,6 @@ describe("UUID Generation", () => {
             const randomParts = ids.map((id) => id.split("-")[1]);
             const uniqueRandomParts = new Set(randomParts);
             expect(uniqueRandomParts.size).toBeGreaterThan(1);
-
         });
     });
 
@@ -424,7 +401,6 @@ describe("UUID Generation", () => {
                 expect(typeof uuid).toBe("string");
                 expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
             }
-
         });
 
         it("should generate fallback IDs with correct structure", async ({
@@ -448,7 +424,6 @@ describe("UUID Generation", () => {
             expect(parts[1]?.length).toBe(12); // Two random parts of 6 chars each = 12 characters
             expect(parts[2]).toMatch(/^\d+$/);
             expect(Number.parseInt(parts[2] ?? "0", 10)).toBeGreaterThan(0);
-
         });
     });
 

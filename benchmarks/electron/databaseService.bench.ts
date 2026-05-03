@@ -135,7 +135,9 @@ describe("Database Service Performance", () => {
                 hasGroupBy,
                 executionTime,
                 processingComplexity: hasGroupBy ? "high" : "medium",
-                resultRows: hasGroupBy ? Math.floor(secureRandomFloat() * 50) : 1,
+                resultRows: hasGroupBy
+                    ? Math.floor(secureRandomFloat() * 50)
+                    : 1,
             };
         }
     });
@@ -320,7 +322,9 @@ describe("Database Service Performance", () => {
                 timestamp: Date.now(),
                 sizeKB: backupSize,
                 compressionRatio: 0.6 + secureRandomFloat() * 0.3,
-                method: ["full", "incremental"][Math.floor(secureRandomFloat() * 2)],
+                method: ["full", "incremental"][
+                    Math.floor(secureRandomFloat() * 2)
+                ],
                 executionTime: 0,
                 compressedSizeKB: 0,
                 verificationTime: 0,
@@ -328,7 +332,8 @@ describe("Database Service Performance", () => {
             };
 
             // Simulate backup time based on size
-            backup.executionTime = (backup.sizeKB / 1000) * (1 + secureRandomFloat());
+            backup.executionTime =
+                (backup.sizeKB / 1000) * (1 + secureRandomFloat());
             backup.compressedSizeKB = backup.sizeKB * backup.compressionRatio;
 
             // Simulate verification

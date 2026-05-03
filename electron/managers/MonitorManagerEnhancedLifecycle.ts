@@ -168,7 +168,9 @@ const getMonitorsWithIds = (
 ): ReadonlyArray<Monitor & { id: string }> => {
     const { requireMonitoring = false } = options ?? {};
 
-    const rawMonitors = safeCastTo<Array<Monitor | undefined>>(Array.isArray(site.monitors) ? site.monitors : []);
+    const rawMonitors = safeCastTo<Array<Monitor | undefined>>(
+        Array.isArray(site.monitors) ? site.monitors : []
+    );
 
     return rawMonitors.filter(
         (candidate): candidate is Monitor & { id: string } => {
@@ -229,7 +231,9 @@ export async function startAllMonitoringEnhancedFlow(params: {
     );
 
     await runSequentially(sites, async (site) => {
-        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(Array.isArray(site.monitors) ? site.monitors : []);
+        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(
+            Array.isArray(site.monitors) ? site.monitors : []
+        );
         const siteStarted: { current: boolean } = { current: false };
 
         await runSequentially(monitors, async (candidate) => {
@@ -376,7 +380,9 @@ export async function stopAllMonitoringEnhancedFlow(params: {
     config.logger.info("Stopping all monitoring operations (enhanced system)");
 
     await runSequentially(sites, async (site) => {
-        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(Array.isArray(site.monitors) ? site.monitors : []);
+        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(
+            Array.isArray(site.monitors) ? site.monitors : []
+        );
 
         await runSequentially(monitors, async (candidate) => {
             if (!candidate) {

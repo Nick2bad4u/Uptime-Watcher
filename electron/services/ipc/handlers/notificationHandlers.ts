@@ -58,7 +58,6 @@ export function registerNotificationHandlers({
         ): undefined => {
             const request = parseAppNotificationRequest(payload);
             notificationService.notifyAppEvent(request);
-            
         },
         NotificationHandlerValidators.notifyAppEvent
     );
@@ -72,7 +71,6 @@ export function registerNotificationHandlers({
         ): undefined => {
             const preferences = normalizeNotificationPreferenceUpdate(payload);
             notificationService.updateConfig(preferences);
-            
         },
         NotificationHandlerValidators.updatePreferences
     );

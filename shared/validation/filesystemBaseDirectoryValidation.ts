@@ -137,7 +137,7 @@ export function isFilesystemBaseDirectoryValid(
         readonly maxBytes?: number;
     } = {}
 ): boolean {
-    return (
-        isEmpty(validateFilesystemBaseDirectoryCandidate(candidate, options))
+    return isEmpty(
+        validateFilesystemBaseDirectoryCandidate(candidate, options)
     );
 }

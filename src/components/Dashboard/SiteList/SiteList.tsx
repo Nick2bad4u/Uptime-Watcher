@@ -9,7 +9,7 @@ import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
-import { arrayJoin, isEmpty  } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 import { useShallow } from "zustand/react/shallow";
 
 import type {

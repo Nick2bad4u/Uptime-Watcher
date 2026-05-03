@@ -13,7 +13,7 @@ import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
-import { isInteger, stringSplit  } from "ts-extras";
+import { isInteger, stringSplit } from "ts-extras";
 
 import type { IpcParameterValidator } from "../types";
 import type { ParameterValueValidationResult } from "./utils/parameterValidation";

@@ -316,6 +316,6 @@ export function isUptimeChartData(data: unknown): data is UptimeChartData {
         typeof data === "object" &&
         data !== null &&
         "datasets" in data &&
-        Array.isArray((safeCastTo(data)).datasets)
+        Array.isArray(safeCastTo(data).datasets)
     );
 }

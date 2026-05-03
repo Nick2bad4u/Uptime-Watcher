@@ -1,5 +1,4 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable declaration-no-important, keyframes-name-pattern, plugin/no-low-performance-animation-properties, defensive-css/require-named-grid-lines, scales/font-sizes -- Docusaurus CSS breaks these features */
 
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules

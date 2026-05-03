@@ -19,8 +19,9 @@ const SUPPRESSED_WARNING_SIGNATURES = [
 
 type EmitWarning = typeof process.emitWarning;
 
-const createEmitWarningSuppressor = (original: EmitWarning): EmitWarning =>
-    ((warning: Error | string, type?: unknown, code?: unknown): void => {
+const createEmitWarningSuppressor =
+    (original: EmitWarning): EmitWarning =>
+    (warning: Error | string, type?: unknown, code?: unknown): void => {
         let message = "";
         if (typeof warning === "string") {
             message = warning;
@@ -45,13 +46,13 @@ const createEmitWarningSuppressor = (original: EmitWarning): EmitWarning =>
         }
 
         original(warning);
-    }) as EmitWarning;
+    };
 
-// Storybook tooling can enable Node's experimental web storage flags. When the
-// local storage backing file is not configured, Node emits a warning that is
-// irrelevant to our Storybook story tests. Suppress it to keep output focused.
-// In Vitest browser mode, this file runs inside the browser context and
-// `process` is not defined. In Node contexts, suppress the noisy warning.
+// Storybook tooling can enable Node's experimental web storage flags. When
+// the local storage backing file is not configured, Node emits a warning that
+// is irrelevant to our Storybook story tests. Suppress it to keep output
+// focused. In Vitest browser mode, this file runs inside the browser context
+// and `process` is not defined. In Node contexts, suppress the noisy warning.
 
 if (
     typeof process !== "undefined" &&

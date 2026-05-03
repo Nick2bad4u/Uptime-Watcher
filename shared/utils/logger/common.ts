@@ -74,7 +74,7 @@ function safeSerializeErrorInternal(
         ...("cause" in error
             ? {
                   cause: safeSerializeCause(
-                      (safeCastTo<{ cause?: unknown }>(error)).cause
+                      safeCastTo<{ cause?: unknown }>(error).cause
                   ),
               }
             : {}),

@@ -147,7 +147,9 @@ const createMonitor = (overrides: Partial<Monitor> = {}): Monitor => {
     return {
         checkInterval: overrides.checkInterval ?? 60_000,
         history,
-        id: overrides.id ?? `monitor-${secureRandomFloat().toString(16).slice(2)}`,
+        id:
+            overrides.id ??
+            `monitor-${secureRandomFloat().toString(16).slice(2)}`,
         monitoring: overrides.monitoring ?? true,
         responseTime: overrides.responseTime ?? 120,
         retryAttempts: overrides.retryAttempts ?? 0,

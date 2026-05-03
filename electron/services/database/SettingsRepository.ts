@@ -49,7 +49,7 @@ import type { SettingsRow as DatabaseSettingsRow } from "@shared/types/database"
 import type { Database } from "node-sqlite3-wasm";
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { isEmpty, objectEntries  } from "ts-extras";
+import { isEmpty, objectEntries } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
 

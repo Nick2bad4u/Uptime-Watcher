@@ -2,7 +2,7 @@
  * SyncEngine key parsing helpers.
  */
 
-import { isSafeInteger, stringSplit  } from "ts-extras";
+import { isSafeInteger, stringSplit } from "ts-extras";
 
 import { isAsciiDigits, isValidPersistedDeviceId } from "./syncEngineUtils";
 

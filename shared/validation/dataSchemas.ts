@@ -148,8 +148,10 @@ export const validateSerializedDatabaseRestoreResult = (
 ):
     | { data: SerializedDatabaseRestoreResult; success: true }
     | { error: unknown; success: false } =>
-    safeCastTo<| { data: SerializedDatabaseRestoreResult; success: true }
-        | { error: unknown; success: false }>(serializedDatabaseRestoreResultSchema.safeParse(value));
+    safeCastTo<
+        | { data: SerializedDatabaseRestoreResult; success: true }
+        | { error: unknown; success: false }
+    >(serializedDatabaseRestoreResultSchema.safeParse(value));
 
 export const validateMonitorTypeConfigArray = (
     value: unknown

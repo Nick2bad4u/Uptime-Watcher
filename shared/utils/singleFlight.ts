@@ -1,5 +1,4 @@
-import type { Promisable, UnknownArray  } from "type-fest";
-
+import type { Promisable, UnknownArray } from "type-fest";
 
 /**
  * Single-flight helper for deduplicating concurrent async work.

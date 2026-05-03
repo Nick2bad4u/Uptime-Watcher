@@ -48,7 +48,7 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
-import { objectValues, safeCastTo  } from "ts-extras";
+import { objectValues, safeCastTo } from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {
@@ -72,9 +72,9 @@ export type EventsApi = EventsDomainBridge;
 type EventManager = ReturnType<typeof createEventManager>;
 type EventGuard<TPayload> = (payload: unknown) => payload is TPayload;
 
-const RENDERER_EVENT_CHANNEL_VALUES = safeCastTo<readonly RendererEventChannel[]>(objectValues(
-    RENDERER_EVENT_CHANNELS
-));
+const RENDERER_EVENT_CHANNEL_VALUES = safeCastTo<
+    readonly RendererEventChannel[]
+>(objectValues(RENDERER_EVENT_CHANNELS));
 
 const isRendererEventChannel = createStringUnionGuard(
     RENDERER_EVENT_CHANNEL_VALUES

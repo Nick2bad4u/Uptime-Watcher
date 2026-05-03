@@ -839,8 +839,10 @@ describe("Monitor UI Helpers", () => {
                     // Create a proper partial object that satisfies exactOptionalPropertyTypes
                     const partial: { primary?: string; secondary?: string } =
                         {};
-                    if (secureRandomFloat() > 0.3) partial.primary = full.primary;
-                    if (secureRandomFloat() > 0.3) partial.secondary = full.secondary;
+                    if (secureRandomFloat() > 0.3)
+                        partial.primary = full.primary;
+                    if (secureRandomFloat() > 0.3)
+                        partial.secondary = full.secondary;
                     return partial;
                 }),
         ])(

@@ -1,3 +1,4 @@
+/* eslint-disable react-x/static-components -- This component intentionally uses localized render helpers and icon component mapping for readability in a complex history table. */
 /**
  * History tab component for displaying monitor check history.
  *
@@ -44,7 +45,7 @@ import {
     useRef,
     useState,
 } from "react";
-import { isEmpty, safeCastTo  } from "ts-extras";
+import { isEmpty, safeCastTo } from "ts-extras";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -331,14 +332,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         }
 
         // Ensure we always have at least one valid option, even for small history
-        // counts
-        if (isEmpty(showOptions)) {
-            if (historyLength > 0) {
-                showOptions.push(historyLength);
-            } else {
-                showOptions.push(10);
-            }
-        }
+        // counts.
+        const finalShowOptions = isEmpty(showOptions)
+            ? [historyLength > 0 ? historyLength : 10]
+            : showOptions;
 
         // Compute effective history limit - use user preference or auto-calculated
         // value
@@ -607,7 +604,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                 onChange={handleHistoryLimitChange}
                                 value={safeHistoryLimit}
                             >
-                                {showOptions.map((option) => (
+                                {finalShowOptions.map((option) => (
                                     <option key={option} value={option}>
                                         {option === historyLength
                                             ? `All (${option})`
@@ -618,8 +615,9 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                             <ThemedText size="xs" variant="secondary">
                                 {filteredHistoryRecords.length} of{" "}
                                 {historyLength} records
-                                {historyFilter !== "all" &&
-                                    ` (${historyFilter} filter)`}
+                                {historyFilter === "all"
+                                    ? null
+                                    : ` (${historyFilter} filter)`}
                             </ThemedText>
                         </div>
 
@@ -638,8 +636,9 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 <ThemedCard icon={historyIcon} title="Check History">
                     <div className="history-tab__list">
                         {filteredHistoryRecords.map((record, index) => {
-                            const rawStatus = safeCastTo<| SiteStatus
-                                | undefined>(record.status);
+                            const rawStatus = safeCastTo<
+                                SiteStatus | undefined
+                            >(record.status);
                             const resolvedStatus: SiteStatus =
                                 rawStatus ?? "unknown";
 
@@ -725,7 +724,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                             );
                         })}
 
-                        {Boolean(isEmpty(filteredHistoryRecords)) && (
+                        {isEmpty(filteredHistoryRecords) ? (
                             <div className="flex flex-col items-center justify-center py-12 text-center">
                                 <InboxIcon className="mb-4 text-4xl opacity-50" />
                                 <ThemedText
@@ -741,10 +740,12 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                         : `No "${historyFilter}" records found. Try adjusting your filter.`}
                                 </ThemedText>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </ThemedCard>
             </div>
         );
     }
 );
+
+/* eslint-enable react-x/static-components -- Re-enable static-components checks for other files. */

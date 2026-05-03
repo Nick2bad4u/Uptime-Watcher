@@ -140,7 +140,7 @@ export async function tryOpenExternalValidated(args: {
     } catch (error: unknown) {
         const resolved = ensureError(error);
         const code = tryGetErrorCode(
-            (safeCastTo<{ cause?: unknown }>(resolved)).cause ?? resolved
+            safeCastTo<{ cause?: unknown }>(resolved).cause ?? resolved
         );
 
         return {

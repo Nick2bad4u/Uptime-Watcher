@@ -31,7 +31,7 @@ import {
 import { extractLogContext } from "@shared/utils/loggingContext";
 import { isRecord } from "@shared/utils/typeHelpers";
 import log from "electron-log/renderer";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 
 /**
  * Interface for the logger configuration.

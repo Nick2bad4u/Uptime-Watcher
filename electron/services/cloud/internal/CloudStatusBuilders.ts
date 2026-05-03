@@ -20,11 +20,11 @@ function hasAccountLabel(
         return false;
     }
 
-    const candidate = (
-        safeCastTo<CloudStorageProvider & {
+    const candidate = safeCastTo<
+        CloudStorageProvider & {
             readonly getAccountLabel?: unknown;
-        }>(provider)
-    ).getAccountLabel;
+        }
+    >(provider).getAccountLabel;
 
     return typeof candidate === "function";
 }

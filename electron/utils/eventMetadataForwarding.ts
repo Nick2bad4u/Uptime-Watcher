@@ -4,7 +4,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { UnknownArray  } from "type-fest";
+import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
 
@@ -172,8 +172,10 @@ export function stripForwardedEventMetadata<
 
     // At this point payload is a non-null object. Clone into a plain record to
     // strip well-known metadata keys while preserving the remaining shape.
-
-    const clonedPayload = ({ ...payload}) as UnknownRecord;
+    const typedPayload = castUnchecked<Record<PropertyKey, unknown>>(payload);
+    const clonedPayload = castUnchecked<UnknownRecord>({
+        ...typedPayload,
+    });
 
     if (Reflect.has(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY)) {
         Reflect.deleteProperty(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY);

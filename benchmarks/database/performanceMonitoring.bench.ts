@@ -141,11 +141,14 @@ describe("Database Performance Monitoring", () => {
             id: `metric-${i}`,
             timestamp: Date.now() - i * 1000,
             metricType:
-                metricTypes[Math.floor(secureRandomFloat() * metricTypes.length)],
+                metricTypes[
+                    Math.floor(secureRandomFloat() * metricTypes.length)
+                ],
             value: secureRandomFloat() * 1000,
             source: sources[Math.floor(secureRandomFloat() * sources.length)],
             tags: {
-                environment: secureRandomFloat() > 0.5 ? "production" : "staging",
+                environment:
+                    secureRandomFloat() > 0.5 ? "production" : "staging",
                 region: secureRandomFloat() > 0.5 ? "us-east-1" : "us-west-2",
                 service: `service-${i % 10}`,
             },
@@ -185,10 +188,14 @@ describe("Database Performance Monitoring", () => {
         return Array.from({ length: count }, (_, i) => ({
             id: `threshold-${i}`,
             metricType:
-                metricTypes[Math.floor(secureRandomFloat() * metricTypes.length)],
-            operator: operators[Math.floor(secureRandomFloat() * operators.length)],
+                metricTypes[
+                    Math.floor(secureRandomFloat() * metricTypes.length)
+                ],
+            operator:
+                operators[Math.floor(secureRandomFloat() * operators.length)],
             value: secureRandomFloat() * 1000,
-            severity: severities[Math.floor(secureRandomFloat() * severities.length)],
+            severity:
+                severities[Math.floor(secureRandomFloat() * severities.length)],
             description: `Threshold ${i} for performance monitoring`,
             enabled: secureRandomFloat() > 0.2,
         }));
@@ -237,7 +244,9 @@ describe("Database Performance Monitoring", () => {
                 alerts,
                 summary: {
                     totalMetrics: metrics.length,
-                    alertsTriggered: Math.floor(secureRandomFloat() * alerts.length),
+                    alertsTriggered: Math.floor(
+                        secureRandomFloat() * alerts.length
+                    ),
                     avgResponseTime: secureRandomFloat() * 500,
                     peakMemoryUsage: secureRandomFloat() * 1000,
                     errorRate: secureRandomFloat() * 5,
@@ -451,7 +460,8 @@ describe("Database Performance Monitoring", () => {
                     (_, i) => ({
                         timestamp:
                             timeRange.start +
-                            secureRandomFloat() * (timeRange.end - timeRange.start),
+                            secureRandomFloat() *
+                                (timeRange.end - timeRange.start),
                         type: [
                             "latency_spike",
                             "throughput_drop",
@@ -739,7 +749,9 @@ describe("Database Performance Monitoring", () => {
                 recordsScanned += batchSize;
 
                 // Simulate identifying old records
-                const oldRecords = Math.floor(secureRandomFloat() * batchSize * 0.1);
+                const oldRecords = Math.floor(
+                    secureRandomFloat() * batchSize * 0.1
+                );
                 recordsDeleted += oldRecords;
 
                 // Simulate deletion overhead

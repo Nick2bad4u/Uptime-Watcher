@@ -281,13 +281,7 @@ class MockSettingsRepository {
 
     import(settingsData: any) {
         const settings = Object.entries(settingsData).map(
-            ([
-                key,
-                data,
-            ]: [
-                string,
-                any,
-            ]) => ({
+            ([key, data]: [string, any]) => ({
                 key,
                 value: data.value,
                 type: data.type || "string",

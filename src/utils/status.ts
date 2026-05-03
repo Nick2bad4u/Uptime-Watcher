@@ -16,7 +16,7 @@ import type { CamelCase, Tagged } from "type-fest";
 
 import { isSiteStatus, STATUS_KIND } from "@shared/types";
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { arrayJoin, stringSplit  } from "ts-extras";
+import { arrayJoin } from "ts-extras";
 
 import { AppIcons } from "./icons";
 
@@ -185,11 +185,14 @@ export function createStatusIdentifier<T extends string>(
     statusText: T
 ): StatusIdentifier<T> {
     // Simple camelCase conversion avoiding complex regex patterns
-    const words = stringSplit(statusText.toLowerCase(), /[\s_-]+/u);
-    const camelCased = arrayJoin(words
-        .map((word, index) =>
+    // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
+    const words = statusText.toLowerCase().split(/[\s_-]+/u);
+    const camelCased = arrayJoin(
+        words.map((word, index) =>
             index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
-        ), "");
+        ),
+        ""
+    );
 
     return castUnchecked<StatusIdentifier<T>>(camelCased);
 }

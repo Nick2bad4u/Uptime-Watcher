@@ -171,15 +171,21 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 600; i++) {
             const template =
                 notificationTemplates[
-                    Math.floor(secureRandomFloat() * notificationTemplates.length)
+                    Math.floor(
+                        secureRandomFloat() * notificationTemplates.length
+                    )
                 ];
             const titleTemplate =
                 template.titleTemplates[
-                    Math.floor(secureRandomFloat() * template.titleTemplates.length)
+                    Math.floor(
+                        secureRandomFloat() * template.titleTemplates.length
+                    )
                 ];
             const bodyTemplate =
                 template.bodyTemplates[
-                    Math.floor(secureRandomFloat() * template.bodyTemplates.length)
+                    Math.floor(
+                        secureRandomFloat() * template.bodyTemplates.length
+                    )
                 ];
 
             // Determine urgency based on distribution
@@ -392,10 +398,13 @@ describe("Notification Service Benchmarks", () => {
                 ];
                 userInteraction = {
                     action: interactionTypes[
-                        Math.floor(secureRandomFloat() * interactionTypes.length)
+                        Math.floor(
+                            secureRandomFloat() * interactionTypes.length
+                        )
                     ],
                     timestamp: endTime + secureRandomFloat() * 30_000, // Within 30 seconds
-                    value: secureRandomFloat() > 0.7 ? "user-response" : undefined,
+                    value:
+                        secureRandomFloat() > 0.7 ? "user-response" : undefined,
                 };
             }
 
@@ -500,7 +509,9 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 1000; i++) {
             const category =
                 notificationCategories[
-                    Math.floor(secureRandomFloat() * notificationCategories.length)
+                    Math.floor(
+                        secureRandomFloat() * notificationCategories.length
+                    )
                 ];
             const urgency = [
                 "low",
@@ -671,7 +682,9 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 500; i++) {
             const category =
                 notificationCategories[
-                    Math.floor(secureRandomFloat() * notificationCategories.length)
+                    Math.floor(
+                        secureRandomFloat() * notificationCategories.length
+                    )
                 ];
             const timestamp = Date.now() + i * 1000; // One per second
 
@@ -817,7 +830,9 @@ describe("Notification Service Benchmarks", () => {
         for (let i = 0; i < 200; i++) {
             const strategy =
                 coordinationStrategies[
-                    Math.floor(secureRandomFloat() * coordinationStrategies.length)
+                    Math.floor(
+                        secureRandomFloat() * coordinationStrategies.length
+                    )
                 ];
             const notificationId = `multi-channel-${i}`;
 

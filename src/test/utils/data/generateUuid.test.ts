@@ -163,10 +163,10 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: generateUuid", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            vi.stubGlobal("crypto", {
+                getRandomValues: webcrypto.getRandomValues.bind(webcrypto),
+                randomUUID: "not-a-function",
+            });
 
             const result = generateUuid();
             const parts = result.split("-");

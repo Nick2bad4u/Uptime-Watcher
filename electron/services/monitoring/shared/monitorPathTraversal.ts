@@ -1,4 +1,4 @@
-import { isEmpty, setHas, stringSplit   } from "ts-extras";
+import { isEmpty, setHas, stringSplit } from "ts-extras";
 
 import type { MonitorPathTraversalOptions } from "./monitorPathTraversalOptions";
 
@@ -93,7 +93,9 @@ function normalizePathSegments(
 
     if (
         options.blockPrototypeAccess &&
-        normalizedSegments.some((segment) => setHas(BLOCKED_PATH_SEGMENTS, segment))
+        normalizedSegments.some((segment) =>
+            setHas(BLOCKED_PATH_SEGMENTS, segment)
+        )
     ) {
         return undefined;
     }

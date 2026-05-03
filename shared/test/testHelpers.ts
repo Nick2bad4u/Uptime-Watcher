@@ -15,6 +15,8 @@ import type {
 
 import { webcrypto } from "node:crypto";
 
+import { castUnchecked } from "../utils/typeHelpers";
+
 /**
  * Resolve the Web Crypto API used by shared test helpers.
  *
@@ -26,7 +28,7 @@ const getCryptoForTests = (): Crypto => {
     }
 
     if (typeof webcrypto.getRandomValues === "function") {
-        return webcrypto;
+        return castUnchecked<Crypto>(webcrypto);
     }
 
     throw new TypeError(
@@ -35,8 +37,8 @@ const getCryptoForTests = (): Crypto => {
 };
 
 /**
- * Generate a cryptographically strong floating-point number in the range
- * `[0, 1)`.
+ * Generate a cryptographically strong floating-point number in the range `[0,
+ * 1)`.
  *
  * @returns Secure pseudo-random floating-point number.
  */
@@ -49,8 +51,7 @@ export const secureRandomFloat = (): number => {
 };
 
 /**
- * Generate a cryptographically strong integer in the range
- * `[0, maxExclusive)`.
+ * Generate a cryptographically strong integer in the range `[0, maxExclusive)`.
  *
  * @param maxExclusive - Exclusive upper bound.
  *
@@ -101,9 +102,8 @@ const generateMonitorIdentifier = (): string => {
 
     getCryptoForTests().getRandomValues(values);
 
-    const randomSegment = Array.from(
-        values,
-        (value) => value.toString(36).padStart(2, "0")
+    const randomSegment = Array.from(values, (value) =>
+        value.toString(36).padStart(2, "0")
     )
         .join("")
         .slice(0, 9);

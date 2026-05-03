@@ -153,7 +153,8 @@ describe("Updater Service Benchmarks", () => {
             const checkStartTime = Date.now();
 
             // Simulate network latency
-            const isCacheHit = secureRandomFloat() < selectedScenario.cacheHitRate;
+            const isCacheHit =
+                secureRandomFloat() < selectedScenario.cacheHitRate;
             const networkLatency = isCacheHit
                 ? 10
                 : selectedScenario.networkDelay.min +
@@ -290,12 +291,14 @@ describe("Updater Service Benchmarks", () => {
             // Generate download parameters
             const totalBytes = Math.floor(
                 scenario.size.min +
-                    secureRandomFloat() * (scenario.size.max - scenario.size.min)
+                    secureRandomFloat() *
+                        (scenario.size.max - scenario.size.min)
             );
 
             const baseSpeed = Math.floor(
                 scenario.speed.min +
-                    secureRandomFloat() * (scenario.speed.max - scenario.speed.min)
+                    secureRandomFloat() *
+                        (scenario.speed.max - scenario.speed.min)
             );
 
             const startTime = Date.now();
@@ -340,7 +343,8 @@ describe("Updater Service Benchmarks", () => {
                         : 0;
 
                 // Simulate download failures
-                const shouldFail = secureRandomFloat() > scenario.reliabilityRate;
+                const shouldFail =
+                    secureRandomFloat() > scenario.reliabilityRate;
 
                 const progressSnapshot: DownloadProgress = {
                     downloadId: `download-${i}`,
@@ -446,7 +450,9 @@ describe("Updater Service Benchmarks", () => {
         for (let i = 0; i < 400; i++) {
             const scenario =
                 verificationScenarios[
-                    Math.floor(secureRandomFloat() * verificationScenarios.length)
+                    Math.floor(
+                        secureRandomFloat() * verificationScenarios.length
+                    )
                 ];
 
             const filePath = `./downloads/update-${i}.zip`;
@@ -465,7 +471,8 @@ describe("Updater Service Benchmarks", () => {
             );
 
             // Determine verification results
-            const checksumValid = secureRandomFloat() < scenario.checksumValidRate;
+            const checksumValid =
+                secureRandomFloat() < scenario.checksumValidRate;
             const signatureValid = hasSignature
                 ? secureRandomFloat() < scenario.signatureValidRate
                 : true;
@@ -585,7 +592,9 @@ describe("Updater Service Benchmarks", () => {
         for (let i = 0; i < 200; i++) {
             const scenario =
                 installationScenarios[
-                    Math.floor(secureRandomFloat() * installationScenarios.length)
+                    Math.floor(
+                        secureRandomFloat() * installationScenarios.length
+                    )
                 ];
 
             const installId = `install-${i}`;
@@ -949,7 +958,8 @@ describe("Updater Service Benchmarks", () => {
 
             const plannedTime =
                 windowStart.getTime() +
-                secureRandomFloat() * (windowEnd.getTime() - windowStart.getTime());
+                secureRandomFloat() *
+                    (windowEnd.getTime() - windowStart.getTime());
 
             // Simulate actual execution
             let actualStartTime = plannedTime;
@@ -1013,7 +1023,8 @@ describe("Updater Service Benchmarks", () => {
 
                         switch (phase) {
                             case "check": {
-                                phaseDuration = secureRandomFloat() * 5000 + 1000; // 1-6 seconds
+                                phaseDuration =
+                                    secureRandomFloat() * 5000 + 1000; // 1-6 seconds
                                 phaseSuccessRate = 0.98;
                                 break;
                             }
@@ -1024,12 +1035,14 @@ describe("Updater Service Benchmarks", () => {
                                 break;
                             }
                             case "verify": {
-                                phaseDuration = secureRandomFloat() * 10_000 + 2000; // 2-12 seconds
+                                phaseDuration =
+                                    secureRandomFloat() * 10_000 + 2000; // 2-12 seconds
                                 phaseSuccessRate = 0.99;
                                 break;
                             }
                             case "install": {
-                                phaseDuration = secureRandomFloat() * 60_000 + 20_000; // 20s-1.3min
+                                phaseDuration =
+                                    secureRandomFloat() * 60_000 + 20_000; // 20s-1.3min
                                 phaseSuccessRate = 0.95;
                                 break;
                             }
@@ -1041,7 +1054,8 @@ describe("Updater Service Benchmarks", () => {
 
                         actualEndTime += phaseDuration;
 
-                        const phaseSuccess = secureRandomFloat() < phaseSuccessRate;
+                        const phaseSuccess =
+                            secureRandomFloat() < phaseSuccessRate;
                         if (!phaseSuccess) {
                             currentPhase = phaseIndex; // Resume from this phase on retry
                             break;

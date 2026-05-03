@@ -67,8 +67,10 @@ export const AppNotificationService: AppNotificationServiceContract = {
         async (api, request: AppNotificationRequest) => {
             const validation = validateAppNotificationRequest(request);
             if (!validation.success) {
-                const issues = arrayJoin(validation.error.issues
-                    .map(({ message }) => message), ", ");
+                const issues = arrayJoin(
+                    validation.error.issues.map(({ message }) => message),
+                    ", "
+                );
                 throw new Error(`Invalid app notification request: ${issues}`, {
                     cause: validation.error,
                 });

@@ -125,7 +125,9 @@ describe("Service Container Benchmarks", () => {
             for (let i = 0; i < scenario.count; i++) {
                 const category =
                     serviceCategories[
-                        Math.floor(secureRandomFloat() * serviceCategories.length)
+                        Math.floor(
+                            secureRandomFloat() * serviceCategories.length
+                        )
                     ];
                 const serviceType =
                     serviceTypes[
@@ -136,8 +138,9 @@ describe("Service Container Benchmarks", () => {
                 const dependencies: string[] = [];
                 if (secureRandomFloat() < scenario.dependencyProbability) {
                     const depCount =
-                        Math.floor(secureRandomFloat() * scenario.maxDependencies) +
-                        1;
+                        Math.floor(
+                            secureRandomFloat() * scenario.maxDependencies
+                        ) + 1;
                     const availableServices = serviceDefinitions.slice(
                         -Math.min(10, serviceDefinitions.length)
                     );
@@ -150,7 +153,8 @@ describe("Service Container Benchmarks", () => {
                         const depService =
                             availableServices[
                                 Math.floor(
-                                    secureRandomFloat() * availableServices.length
+                                    secureRandomFloat() *
+                                        availableServices.length
                                 )
                             ];
                         if (!dependencies.includes(depService.id)) {
@@ -504,7 +508,8 @@ describe("Service Container Benchmarks", () => {
                         createdAt: currentTime,
                         lastAccessedAt: currentTime,
                         accessCount: 0,
-                        memoryUsage: Math.floor(secureRandomFloat() * 10_000) + 1000, // 1-11KB
+                        memoryUsage:
+                            Math.floor(secureRandomFloat() * 10_000) + 1000, // 1-11KB
                         state: "initializing",
                         dependencies: [],
                         children: [],
@@ -552,7 +557,9 @@ describe("Service Container Benchmarks", () => {
             ) {
                 const instance =
                     accessibleInstances[
-                        Math.floor(secureRandomFloat() * accessibleInstances.length)
+                        Math.floor(
+                            secureRandomFloat() * accessibleInstances.length
+                        )
                     ];
                 instance.lastAccessedAt = currentTime;
                 instance.accessCount++;
@@ -601,7 +608,10 @@ describe("Service Container Benchmarks", () => {
                 }
 
                 // Singleton services rarely dispose unless explicitly requested
-                if (config.type === "singleton" && secureRandomFloat() < 0.001) {
+                if (
+                    config.type === "singleton" &&
+                    secureRandomFloat() < 0.001
+                ) {
                     return true;
                 }
 
@@ -792,7 +802,8 @@ describe("Service Container Benchmarks", () => {
                         createdAt: currentTime,
                         lastAccessedAt: currentTime,
                         accessCount: 1,
-                        memoryUsage: Math.floor(secureRandomFloat() * 5000) + 1000,
+                        memoryUsage:
+                            Math.floor(secureRandomFloat() * 5000) + 1000,
                         state: "active",
                         dependencies: [],
                         children: [],
@@ -858,7 +869,9 @@ describe("Service Container Benchmarks", () => {
                 if (disposableScopes.length > 0) {
                     targetScope =
                         disposableScopes[
-                            Math.floor(secureRandomFloat() * disposableScopes.length)
+                            Math.floor(
+                                secureRandomFloat() * disposableScopes.length
+                            )
                         ];
 
                     // Dispose all service instances in scope
@@ -1100,7 +1113,9 @@ describe("Service Container Benchmarks", () => {
                 (op) => op.operation === "cache"
             );
             const cacheHitRate =
-                cacheOperations.length > 0 ? secureRandomFloat() * 0.3 + 0.6 : 0.8; // 60-90% hit rate
+                cacheOperations.length > 0
+                    ? secureRandomFloat() * 0.3 + 0.6
+                    : 0.8; // 60-90% hit rate
 
             // Calculate error rate
             const failedOperations = intervalOperations.filter(
@@ -1128,7 +1143,8 @@ describe("Service Container Benchmarks", () => {
             const memoryPressure = currentMemory / (200 * 1024 * 1024); // Pressure at 200MB
             if (memoryPressure > 0.8 && secureRandomFloat() < 0.5) {
                 // Force GC
-                const gcAmount = currentMemory * (0.2 + secureRandomFloat() * 0.3);
+                const gcAmount =
+                    currentMemory * (0.2 + secureRandomFloat() * 0.3);
                 currentMemory = Math.max(
                     currentMemory * 0.3,
                     currentMemory - gcAmount

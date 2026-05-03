@@ -10,15 +10,18 @@ import { arrayJoin } from "ts-extras";
  * runtime properties like status/lastChecked/responseTime.
  */
 export function createMonitorSignature(monitor: Monitor): string {
-    return arrayJoin([
-        `type:${monitor.type}`,
-        `host:${monitor.host ?? ""}`,
-        `port:${monitor.port ?? ""}`,
-        `url:${monitor.url ?? ""}`,
-        `checkInterval:${monitor.checkInterval}`,
-        `timeout:${monitor.timeout}`,
-        `retryAttempts:${monitor.retryAttempts}`,
-    ], "|");
+    return arrayJoin(
+        [
+            `type:${monitor.type}`,
+            `host:${monitor.host ?? ""}`,
+            `port:${monitor.port ?? ""}`,
+            `url:${monitor.url ?? ""}`,
+            `checkInterval:${monitor.checkInterval}`,
+            `timeout:${monitor.timeout}`,
+            `retryAttempts:${monitor.retryAttempts}`,
+        ],
+        "|"
+    );
 }
 
 /**

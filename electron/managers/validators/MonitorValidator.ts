@@ -25,7 +25,7 @@ import type { Except } from "type-fest";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
-import { arrayJoin, isEmpty  } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import type { ValidationResult } from "./interfaces";
 

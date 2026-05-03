@@ -2,7 +2,7 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
-import { arrayAt, arrayJoin, stringSplit   } from "ts-extras";
+import { arrayAt, arrayJoin, stringSplit } from "ts-extras";
 
 import type {
     DiagnosticsPayload,
@@ -145,7 +145,9 @@ export async function copyTextToClipboard(text: string): Promise<void> {
 
 function extractBasenameForDiagnostics(path: string): string {
     const normalized = path.replaceAll("\\", "/");
-    const parts = stringSplit(normalized, "/").filter((part) => part.length > 0);
+    const parts = stringSplit(normalized, "/").filter(
+        (part) => part.length > 0
+    );
     return arrayAt(parts, -1) ?? path;
 }
 

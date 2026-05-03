@@ -16,7 +16,7 @@ import {
 import { readNumberEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isEmpty, isSafeInteger, stringSplit  } from "ts-extras";
+import { arrayJoin, isEmpty, isSafeInteger, stringSplit } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -136,7 +136,10 @@ function decodeUtfEightStrict(buffer: Buffer): string {
 }
 
 function toNdjson(operations: readonly CloudSyncOperation[]): string {
-    return `${arrayJoin(operations.map((op) => JSON.stringify(op)), "\n")}\n`;
+    return `${arrayJoin(
+        operations.map((op) => JSON.stringify(op)),
+        "\n"
+    )}\n`;
 }
 
 function parseNdjsonOperations(args: {
@@ -146,7 +149,8 @@ function parseNdjsonOperations(args: {
     raw: string;
 }): CloudSyncOperation[] {
     const { key, maxLineChars, maxLines, raw } = args;
-    const lines = stringSplit(raw, /\r?\n/u);
+    // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
+    const lines = raw.split(/\r?\n/u);
     const operations: CloudSyncOperation[] = [];
 
     for (const [index, candidate] of lines.entries()) {
@@ -311,10 +315,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         assertValidSyncDeviceId(deviceId);
 
         const createdAtCandidate = createdAtEpochMs ?? Date.now();
-        if (
-            !isSafeInteger(createdAtCandidate) ||
-            createdAtCandidate < 0
-        ) {
+        if (!isSafeInteger(createdAtCandidate) || createdAtCandidate < 0) {
             throw new Error(
                 "createdAtEpochMs must be a non-negative safe integer"
             );

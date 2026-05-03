@@ -22,7 +22,7 @@ import type { Jsonify, UnknownRecord, ValueOf } from "type-fest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
-import { arrayAt, objectHasOwn  } from "ts-extras";
+import { arrayAt, objectHasOwn } from "ts-extras";
 import * as z from "zod";
 
 import {

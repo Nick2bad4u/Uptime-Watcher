@@ -91,85 +91,82 @@ export const RemoteBackupsPanel = ({
         [onDeleteBackupClick]
     );
 
-    const content =
-        isEmpty(backups) ? (
-            <ThemedText size="sm" variant="tertiary">
-                {connected
-                    ? "No remote backups found."
-                    : "Connect a provider to see remote backups."}
-            </ThemedText>
-        ) : (
-            <ul className="space-y-2">
-                {backups.map((backup) => {
-                    const encryptionSuffix = backup.encrypted
-                        ? " · Encrypted"
-                        : "";
-                    const createdAt = new Date(
-                        backup.metadata.createdAt
-                    ).toLocaleString();
+    const content = isEmpty(backups) ? (
+        <ThemedText size="sm" variant="tertiary">
+            {connected
+                ? "No remote backups found."
+                : "Connect a provider to see remote backups."}
+        </ThemedText>
+    ) : (
+        <ul className="space-y-2">
+            {backups.map((backup) => {
+                const encryptionSuffix = backup.encrypted ? " · Encrypted" : "";
+                const createdAt = new Date(
+                    backup.metadata.createdAt
+                ).toLocaleString();
 
-                    return (
-                        <li
-                            className="settings-subcard settings-subcard--compact flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                            key={backup.key}
-                        >
-                            <div className="min-w-0">
-                                <ThemedText
-                                    as="div"
-                                    className="truncate"
-                                    size="sm"
-                                    weight="medium"
-                                >
-                                    {backup.fileName}
-                                </ThemedText>
-                                <ThemedText
-                                    as="div"
-                                    className="mt-0.5"
-                                    size="xs"
-                                    variant="tertiary"
-                                >
-                                    {createdAt} ·{" "}
-                                    {formatByteSize(backup.metadata.sizeBytes)}
-                                    {encryptionSuffix}
-                                </ThemedText>
-                            </div>
+                return (
+                    <li
+                        className="settings-subcard settings-subcard--compact flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                        key={backup.key}
+                    >
+                        <div className="min-w-0">
+                            <ThemedText
+                                as="div"
+                                className="truncate"
+                                size="sm"
+                                weight="medium"
+                            >
+                                {backup.fileName}
+                            </ThemedText>
+                            <ThemedText
+                                as="div"
+                                className="mt-0.5"
+                                size="xs"
+                                variant="tertiary"
+                            >
+                                {createdAt} ·{" "}
+                                {formatByteSize(backup.metadata.sizeBytes)}
+                                {encryptionSuffix}
+                            </ThemedText>
+                        </div>
 
-                            <div className="flex flex-wrap gap-2">
-                                <ThemedButton
-                                    disabled={
-                                        !connected ||
-                                        restoringBackupKey === backup.key
-                                    }
-                                    icon={restoreIcon}
-                                    loading={restoringBackupKey === backup.key}
-                                    onClick={handleRestoreClick}
-                                    size="sm"
-                                    value={backup.key}
-                                    variant="secondary"
-                                >
-                                    Restore
-                                </ThemedButton>
+                        <div className="flex flex-wrap gap-2">
+                            <ThemedButton
+                                disabled={
+                                    !connected ||
+                                    restoringBackupKey === backup.key
+                                }
+                                icon={restoreIcon}
+                                loading={restoringBackupKey === backup.key}
+                                onClick={handleRestoreClick}
+                                size="sm"
+                                value={backup.key}
+                                variant="secondary"
+                            >
+                                Restore
+                            </ThemedButton>
 
-                                <ThemedButton
-                                    disabled={
-                                        !connected ||
-                                        deletingBackupKey === backup.key
-                                    }
-                                    icon={deleteIcon}
-                                    loading={deletingBackupKey === backup.key}
-                                    onClick={handleDeleteClick}
-                                    size="sm"
-                                    value={backup.key}
-                                    variant="error"
-                                >
-                                    Delete
-                                </ThemedButton>
-                            </div>
-                        </li>
-                    );
-                })}
-            </ul>
-        );
+                            <ThemedButton
+                                disabled={
+                                    !connected ||
+                                    deletingBackupKey === backup.key
+                                }
+                                icon={deleteIcon}
+                                loading={deletingBackupKey === backup.key}
+                                onClick={handleDeleteClick}
+                                size="sm"
+                                value={backup.key}
+                                variant="error"
+                            >
+                                Delete
+                            </ThemedButton>
+                        </div>
+                    </li>
+                );
+            })}
+        </ul>
+    );
 
     return (
         <div className="settings-subcard">

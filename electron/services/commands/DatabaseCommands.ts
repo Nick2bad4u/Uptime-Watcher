@@ -22,7 +22,7 @@ import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateImportData } from "@shared/validation/importExportSchemas";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
-import { arrayAt, arrayJoin, isDefined, isEmpty, safeCastTo     } from "ts-extras";
+import { arrayAt, arrayJoin, isDefined, isEmpty, safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
@@ -159,12 +159,15 @@ export abstract class DatabaseCommand<
         error: Error,
         data: Partial<UptimeEvents[K]> = {}
     ): Promise<void> {
-        await this.eventEmitter.emitTyped(eventType, safeCastTo<UptimeEvents[K]>({
-            error: error.message,
-            success: false,
-            timestamp: Date.now(),
-            ...data,
-        }));
+        await this.eventEmitter.emitTyped(
+            eventType,
+            safeCastTo<UptimeEvents[K]>({
+                error: error.message,
+                success: false,
+                timestamp: Date.now(),
+                ...data,
+            })
+        );
     }
 
     /**
@@ -183,11 +186,14 @@ export abstract class DatabaseCommand<
         eventType: K,
         data: Partial<UptimeEvents[K]>
     ): Promise<void> {
-        await this.eventEmitter.emitTyped(eventType, safeCastTo<UptimeEvents[K]>({
-            success: true,
-            timestamp: Date.now(),
-            ...data,
-        }));
+        await this.eventEmitter.emitTyped(
+            eventType,
+            safeCastTo<UptimeEvents[K]>({
+                success: true,
+                timestamp: Date.now(),
+                ...data,
+            })
+        );
     }
 
     public constructor(
@@ -274,7 +280,9 @@ export class DatabaseCommandExecutor {
         // either:
         // - completes successfully, or
         // - is rolled back successfully after a failure.
-        this.executedCommands.push(safeCastTo<IDatabaseCommand<unknown>>(command));
+        this.executedCommands.push(
+            safeCastTo<IDatabaseCommand<unknown>>(command)
+        );
 
         try {
             return await command.execute();
@@ -344,7 +352,10 @@ export class DatabaseCommandExecutor {
         if (errors.length > 0) {
             throw new AggregateError(
                 errors,
-                `Rollback errors: ${arrayJoin(errors.map((e) => e.message), ", ")}`
+                `Rollback errors: ${arrayJoin(
+                    errors.map((e) => e.message),
+                    ", "
+                )}`
             );
         }
     }
@@ -723,11 +734,13 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         });
 
         if (invalidSites.length > 0) {
-            const formattedErrors = arrayJoin(invalidSites
-                .map(
+            const formattedErrors = arrayJoin(
+                invalidSites.map(
                     ({ errors, identifier }) =>
                         `${identifier}: ${arrayJoin(errors, ", ")}`
-                ), "; ");
+                ),
+                "; "
+            );
 
             throw new Error(
                 `Import aborted due to invalid site configuration(s): ${formattedErrors}`

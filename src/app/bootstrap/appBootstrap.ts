@@ -165,12 +165,14 @@ export async function runAppBootstrap(
 
         if (typeof subscribeToStatusUpdates === "function") {
             logger.debug("[App:init] subscribing to status updates");
-            const subscriptionResult = safeCastTo<StatusUpdateSubscriptionSummary | undefined>(await subscribeToStatusUpdates(
-                (update: StatusUpdate) => {
+            const subscriptionResult = safeCastTo<
+                StatusUpdateSubscriptionSummary | undefined
+            >(
+                await subscribeToStatusUpdates((update: StatusUpdate) => {
                     enqueueAlertFromStatusUpdate(update);
                     logStatusUpdateDebugInfo(update);
-                }
-            ));
+                })
+            );
 
             reportSubscriptionDiagnostics(subscriptionResult);
             logger.debug("[App:init] status updates subscription completed");

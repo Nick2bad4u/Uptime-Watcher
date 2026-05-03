@@ -6,7 +6,7 @@
  * including colors, typography, spacing, and visual effects.
  */
 
-import { arrayIncludes, safeCastTo  } from "ts-extras";
+import { arrayIncludes, safeCastTo } from "ts-extras";
 
 import type { SystemThemePreference } from "./components/types";
 

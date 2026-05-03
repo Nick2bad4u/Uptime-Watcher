@@ -75,7 +75,7 @@ const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
     typeof candidate === "object" &&
     candidate !== null &&
     "then" in candidate &&
-    typeof (safeCastTo(candidate)).then === "function";
+    typeof safeCastTo(candidate).then === "function";
 
 /**
  * Normalizes a cleanup candidate into a callable cleanup function.

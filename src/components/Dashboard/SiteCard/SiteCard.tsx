@@ -330,8 +330,10 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         ) : null;
 
         const normalizedStatusLabel = statusLabel.toLowerCase();
-        const metricsSummary = arrayJoin(siteMetrics
-            .map(({ label, value }) => `${label}: ${value}`), " | ");
+        const metricsSummary = arrayJoin(
+            siteMetrics.map(({ label, value }) => `${label}: ${value}`),
+            " | "
+        );
 
         const metricsSection = (
             <div

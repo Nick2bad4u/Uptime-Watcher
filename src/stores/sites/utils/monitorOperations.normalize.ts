@@ -9,7 +9,7 @@
  * @internal
  */
 
-
+import type { UnknownRecord } from "type-fest";
 
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
@@ -28,8 +28,7 @@ import {
     isValidPort,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import { objectEntries, safeCastTo  } from "ts-extras";
-
+import { objectEntries, safeCastTo } from "ts-extras";
 
 /**
  * Baseline defaults applied to every monitor regardless of type.
@@ -280,7 +279,7 @@ function filterMonitorFieldsByType(
 ): Partial<Monitor> {
     const allowedFields = getAllowedFieldsForMonitorType(type);
     const filtered: Partial<Monitor> = {};
-    const filteredRecord = safeCastTo(filtered);
+    const filteredRecord = safeCastTo<UnknownRecord>(filtered);
 
     // Only include fields that are allowed for this monitor type. We keep
     // the external signature strongly typed while using a local record cast
@@ -492,11 +491,9 @@ function applyWebsocketKeepaliveMonitorDefaults(
         WEBSOCKET_KEEPALIVE_DEFAULT_URL
     );
 
-    const maxPongDelayValue = (
-        safeCastTo<{
-            maxPongDelayMs?: unknown;
-        }>(filteredData)
-    ).maxPongDelayMs;
+    const maxPongDelayValue = safeCastTo<{
+        maxPongDelayMs?: unknown;
+    }>(filteredData).maxPongDelayMs;
     let maxPongDelay = WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS;
     if (
         typeof maxPongDelayValue === "number" &&
@@ -534,11 +531,9 @@ function applyServerHeartbeatMonitorDefaults(
         SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS
     );
 
-    const maxDriftValue = (
-        safeCastTo<{
-            heartbeatMaxDriftSeconds?: unknown;
-        }>(filteredData)
-    ).heartbeatMaxDriftSeconds;
+    const maxDriftValue = safeCastTo<{
+        heartbeatMaxDriftSeconds?: unknown;
+    }>(filteredData).heartbeatMaxDriftSeconds;
     let maxDrift = SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS;
     if (typeof maxDriftValue === "number" && Number.isFinite(maxDriftValue)) {
         maxDrift = Math.trunc(maxDriftValue);
@@ -572,11 +567,9 @@ function applyReplicationMonitorDefaults(
         REPLICATION_DEFAULT_TIMESTAMP_FIELD
     );
 
-    const maxLagValue = (
-        safeCastTo<{
-            maxReplicationLagSeconds?: unknown;
-        }>(filteredData)
-    ).maxReplicationLagSeconds;
+    const maxLagValue = safeCastTo<{
+        maxReplicationLagSeconds?: unknown;
+    }>(filteredData).maxReplicationLagSeconds;
     let maxLagSeconds = REPLICATION_DEFAULT_MAX_LAG_SECONDS;
     if (typeof maxLagValue === "number" && Number.isFinite(maxLagValue)) {
         maxLagSeconds = Math.trunc(maxLagValue);

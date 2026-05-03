@@ -18,14 +18,14 @@ import {
     type ZodIssueLike,
     type ZodIssuePathPart,
 } from "@shared/utils/zodIssueFormatting";
-import { arrayJoin, safeCastTo  } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 
 const hasIssueArray = (
     value: unknown
 ): value is { readonly issues: unknown[] } =>
     isObject(value) &&
     "issues" in value &&
-    Array.isArray((safeCastTo(value)).issues);
+    Array.isArray(safeCastTo<{ issues?: unknown }>(value).issues);
 
 const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
     const normalized: ZodIssueLike[] = [];
@@ -37,7 +37,7 @@ const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
             if (typeof rawMessage === "string") {
                 const rawPath = issue["path"];
                 const path = Array.isArray(rawPath)
-                    ? (safeCastTo<readonly ZodIssuePathPart[]>(rawPath))
+                    ? safeCastTo<readonly ZodIssuePathPart[]>(rawPath)
                     : undefined;
 
                 if (path) {
@@ -172,14 +172,19 @@ export function validateServicePayload<T>(
     })();
 
     if (!parsed.success) {
-        const errorForEnsure = (safeCastTo<{ readonly error: unknown }>(parsed)).error;
+        const errorForEnsure = safeCastTo<{ readonly error: unknown }>(
+            parsed
+        ).error;
         const issues = hasIssueArray(errorForEnsure)
             ? normalizeZodIssueLikeArray(errorForEnsure.issues)
             : [];
 
-        const formattedIssues = arrayJoin(formatZodIssues(issues, {
-            includePath: false,
-        }), ", ");
+        const formattedIssues = arrayJoin(
+            formatZodIssues(issues, {
+                includePath: false,
+            }),
+            ", "
+        );
 
         const fallbackReason = describeValidationFailureReason(errorForEnsure);
 

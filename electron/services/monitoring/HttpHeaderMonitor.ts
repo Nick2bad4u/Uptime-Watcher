@@ -110,7 +110,10 @@ const HTTP_HEADER_MONITOR_BEHAVIOR: HttpMonitorBehavior<
     },
 };
 
-type HttpHeaderMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
+type HttpHeaderMonitorConstructor = Constructor<
+    HttpMonitorServiceInstance,
+    [config?: MonitorServiceConfig]
+>;
 
 const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor =
     ((): HttpHeaderMonitorConstructor => {

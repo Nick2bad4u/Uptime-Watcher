@@ -125,7 +125,7 @@ export async function getMonitorTypeConfig(
     type: string
 ): Promise<MonitorTypeConfig | undefined> {
     const configs = await getAvailableMonitorTypes();
-     
+
     return configs.find((config) => config.type === type);
 }
 

@@ -9,7 +9,7 @@
 
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { UnknownArray, UnknownRecord  } from "type-fest";
+import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";

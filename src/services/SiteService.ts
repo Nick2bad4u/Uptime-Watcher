@@ -16,7 +16,7 @@ import {
     validateSiteSnapshot,
     validateSiteSnapshots,
 } from "@shared/validation/guards";
-import { arrayJoin, isEmpty  } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -210,10 +210,9 @@ export const SiteService: SiteServiceContract = {
                 invalidIndices,
                 issues,
             },
-            message:
-                isEmpty(invalidIndices)
-                    ? "[SiteService] getSites returned invalid site snapshot data"
-                    : `[SiteService] getSites returned invalid site snapshot data (indices: ${arrayJoin(invalidIndices, ", ")})`,
+            message: isEmpty(invalidIndices)
+                ? "[SiteService] getSites returned invalid site snapshot data"
+                : `[SiteService] getSites returned invalid site snapshot data (indices: ${arrayJoin(invalidIndices, ", ")})`,
         });
     }),
 

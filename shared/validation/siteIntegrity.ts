@@ -11,7 +11,7 @@
 
 import type { Site } from "@shared/types";
 
-import { arrayJoin, isEmpty  } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 /**
  * Summary of a duplicate site identifier occurrence.
@@ -54,8 +54,12 @@ export class DuplicateSiteIdentifierError extends Error {
         duplicates: readonly DuplicateSiteIdentifier[],
         context?: string
     ) {
-        const formattedDuplicates = arrayJoin(duplicates
-            .map((entry) => `${entry.identifier}x${entry.occurrences}`), ", ");
+        const formattedDuplicates = arrayJoin(
+            duplicates.map(
+                (entry) => `${entry.identifier}x${entry.occurrences}`
+            ),
+            ", "
+        );
         const contextualPrefix = context ? `${context}: ` : "";
         super(
             `${contextualPrefix}Duplicate site identifiers detected: ${formattedDuplicates}`

@@ -33,7 +33,8 @@ class MockQueryExecutor {
             name: `Site ${i + 1}`,
             url: `https://site${i + 1}.com`,
             isActive: secureRandomFloat() > 0.2,
-            createdAt: Date.now() - secureRandomFloat() * 365 * 24 * 60 * 60 * 1000,
+            createdAt:
+                Date.now() - secureRandomFloat() * 365 * 24 * 60 * 60 * 1000,
         }));
         this.data.set("sites", sites);
 
@@ -68,7 +69,8 @@ class MockQueryExecutor {
                 "degraded",
             ][i % 3],
             responseTime: Math.floor(secureRandomFloat() * 2000),
-            timestamp: Date.now() - secureRandomFloat() * 30 * 24 * 60 * 60 * 1000,
+            timestamp:
+                Date.now() - secureRandomFloat() * 30 * 24 * 60 * 60 * 1000,
             eventType: [
                 "status_change",
                 "check_result",

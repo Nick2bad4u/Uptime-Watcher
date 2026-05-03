@@ -14,7 +14,7 @@ import type { BaseMonitorSchemaType } from "@shared/types/schemaTypes";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-import { isEmpty, stringSplit  } from "ts-extras";
+import { isEmpty, stringSplit } from "ts-extras";
 import * as z from "zod";
 
 import { monitorIdSchema } from "./monitorFieldSchemas";
@@ -365,7 +365,9 @@ const edgeLocationListSchema = z
     .trim()
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
-        const entries = stringSplit(value, /[\n\r,]+/u)
+        // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
+        const entries = value
+            .split(/[\n\r,]+/u)
             .map((entry) => entry.trim())
             .filter((entry) => entry.length > 0);
 

@@ -37,8 +37,9 @@ const nextFallbackAlertCounter = (() => {
  * falling back to a deterministic counter otherwise.
  */
 const generateAlertId = (): string => {
-    const cryptoObject = safeCastTo<| (Crypto & { randomUUID?: () => string })
-        | undefined>(globalThis.crypto);
+    const cryptoObject = safeCastTo<
+        (Crypto & { randomUUID?: () => string }) | undefined
+    >(globalThis.crypto);
     if (cryptoObject?.randomUUID) {
         return cryptoObject.randomUUID();
     }

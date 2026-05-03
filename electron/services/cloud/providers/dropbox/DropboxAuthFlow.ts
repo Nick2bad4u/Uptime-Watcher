@@ -168,7 +168,7 @@ export class DropboxAuthFlow {
         );
 
         const parsed = dropboxTokenExchangeResponseSchema.parse(
-            (safeCastTo<{ result?: unknown }>(response)).result
+            safeCastTo<{ result?: unknown }>(response).result
         );
 
         return {

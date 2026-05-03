@@ -101,7 +101,10 @@ const HTTP_JSON_MONITOR_BEHAVIOR: HttpMonitorBehavior<
     },
 };
 
-type HttpJsonMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
+type HttpJsonMonitorConstructor = Constructor<
+    HttpMonitorServiceInstance,
+    [config?: MonitorServiceConfig]
+>;
 
 const HttpJsonMonitorBase: HttpJsonMonitorConstructor =
     ((): HttpJsonMonitorConstructor => {

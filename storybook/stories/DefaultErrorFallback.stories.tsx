@@ -128,7 +128,7 @@ export const WithoutError: Story = {
 
         return (
             <StubReload>
-                <DefaultErrorFallback {...(fallbackArgs as typeof args)} />
+                <DefaultErrorFallback {...fallbackArgs} />
             </StubReload>
         );
     },

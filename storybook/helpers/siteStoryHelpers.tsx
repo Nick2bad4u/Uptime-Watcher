@@ -78,7 +78,7 @@ const captureSitesState = (): ReturnType<typeof useSitesStore.getState> => {
         ...state,
         selectedMonitorIds: { ...state.selectedMonitorIds },
         sites: Array.from(state.sites),
-    } as ReturnType<typeof useSitesStore.getState>;
+    };
 };
 
 const captureUiState = (): ReturnType<typeof useUIStore.getState> => {
@@ -87,7 +87,7 @@ const captureUiState = (): ReturnType<typeof useUIStore.getState> => {
     return {
         ...state,
         siteTableColumnWidths: { ...state.siteTableColumnWidths },
-    } as ReturnType<typeof useUIStore.getState>;
+    };
 };
 
 export const setupSiteStoryEnvironment = (

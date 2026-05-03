@@ -55,18 +55,6 @@
         "write-heading-ids": "docusaurus write-heading-ids",
         "write-translations": "docusaurus write-translations"
     },
-    "browserslist": {
-        "development": [
-            "last 3 chrome version",
-            "last 3 firefox version",
-            "last 5 safari version"
-        ],
-        "production": [
-            ">0.5%",
-            "not dead",
-            "not op_mini all"
-        ]
-    },
     "dependencies": {
         "@docusaurus/core": "^3.9.2",
         "@docusaurus/faster": "^3.9.2",

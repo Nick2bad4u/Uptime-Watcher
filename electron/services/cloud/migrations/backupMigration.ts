@@ -5,7 +5,7 @@ import type {
 import type { AsyncReturnType } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isEmpty  } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
@@ -67,7 +67,9 @@ function buildMigrationResult(args: {
     };
 }
 
-type BackupMigrationEntry = AsyncReturnType<CloudStorageProvider["listBackups"]>[number];
+type BackupMigrationEntry = AsyncReturnType<
+    CloudStorageProvider["listBackups"]
+>[number];
 type CloudBackupMigrationTarget = CloudBackupMigrationRequest["target"];
 
 interface SingleMigrationAttemptResult {

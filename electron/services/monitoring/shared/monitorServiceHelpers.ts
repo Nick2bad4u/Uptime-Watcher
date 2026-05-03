@@ -11,7 +11,6 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
-import { stringSplit } from "ts-extras";
 
 import type { NormalizedMonitorConfig as NormalizedMonitorConfigType } from "../createMonitorConfig";
 import type { MonitorCheckResult } from "../types";
@@ -191,7 +190,9 @@ export function parseMonitorUrlList(value: string): string[] {
         return [];
     }
 
-    return stringSplit(value, URL_LIST_SEPARATOR)
+    // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
+    return value
+        .split(URL_LIST_SEPARATOR)
         .map((entry) => entry.trim())
         .filter((entry) => entry.length > 0);
 }

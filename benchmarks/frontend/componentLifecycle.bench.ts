@@ -496,7 +496,9 @@ class MockComponentLifecycle {
         for (let i = 0; i < hookCount; i++) {
             const hook: HookState = {
                 id: `hook-${component.id}-${i}`,
-                type: hookTypes[Math.floor(secureRandomFloat() * hookTypes.length)],
+                type: hookTypes[
+                    Math.floor(secureRandomFloat() * hookTypes.length)
+                ],
                 value: this.generateHookValue(),
                 dependencies:
                     secureRandomFloat() > 0.5
@@ -560,16 +562,22 @@ class MockComponentLifecycle {
         const valueTypes = [
             () => secureRandomFloat() * 100,
             () => `string-${secureRandomFloat().toString(36).slice(2, 11)}`,
-            () => ({ key: secureRandomFloat(), nested: { value: secureRandomFloat() } }),
+            () => ({
+                key: secureRandomFloat(),
+                nested: { value: secureRandomFloat() },
+            }),
             () =>
-                Array.from({ length: Math.floor(secureRandomFloat() * 10) }, () =>
-                    secureRandomFloat()
+                Array.from(
+                    { length: Math.floor(secureRandomFloat() * 10) },
+                    () => secureRandomFloat()
                 ),
             () => new Date(),
             () => secureRandomFloat() > 0.5,
         ];
 
-        return valueTypes[Math.floor(secureRandomFloat() * valueTypes.length)]();
+        return valueTypes[
+            Math.floor(secureRandomFloat() * valueTypes.length)
+        ]();
     }
 
     private generateDependencies(): any[] {
@@ -935,7 +943,9 @@ describe("React Component Lifecycle Performance", () => {
             const batchSize = Math.floor(secureRandomFloat() * 20) + 5;
             const updates = Array.from({ length: batchSize }, () => {
                 const component =
-                    components[Math.floor(secureRandomFloat() * components.length)];
+                    components[
+                        Math.floor(secureRandomFloat() * components.length)
+                    ];
                 return {
                     component,
                     props: {

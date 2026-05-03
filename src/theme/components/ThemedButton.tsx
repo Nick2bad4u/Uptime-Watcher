@@ -137,15 +137,17 @@ const ThemedButtonComponent = ({
             ? { type: providedType }
             : undefined;
 
-    const classNames = arrayJoin([
-        CSS_CLASSES.THEMED_BUTTON,
-        `themed-button--${variant}`,
-        `themed-button--size-${size}`,
-        fullWidth && "themed-button--full-width",
-        (disabled ? true : loading) && "themed-button--loading",
-        className,
-    ]
-        .filter(Boolean), " ");
+    const classNames = arrayJoin(
+        [
+            CSS_CLASSES.THEMED_BUTTON,
+            `themed-button--${variant}`,
+            `themed-button--size-${size}`,
+            fullWidth && "themed-button--full-width",
+            (disabled ? true : loading) && "themed-button--loading",
+            className,
+        ].filter(Boolean),
+        " "
+    );
 
     // UseCallback handler for jsx-no-bind compliance
     const handleClick = useCallback(

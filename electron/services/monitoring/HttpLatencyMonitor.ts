@@ -75,7 +75,10 @@ const behavior: HttpMonitorBehavior<"http-latency", { threshold: number }> = {
     },
 };
 
-type HttpLatencyMonitorConstructor = Constructor<HttpMonitorServiceInstance, [config?: MonitorServiceConfig]>;
+type HttpLatencyMonitorConstructor = Constructor<
+    HttpMonitorServiceInstance,
+    [config?: MonitorServiceConfig]
+>;
 
 const HttpLatencyMonitorBase: HttpLatencyMonitorConstructor =
     ((): HttpLatencyMonitorConstructor => {

@@ -103,7 +103,9 @@ class MockPingMonitor {
         const startTime = Date.now();
 
         // Simulate ping
-        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 50));
+        await new Promise((resolve) =>
+            setTimeout(resolve, secureRandomFloat() * 50)
+        );
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
@@ -141,7 +143,9 @@ class MockPortMonitor {
         const startTime = Date.now();
 
         // Simulate port check
-        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 30));
+        await new Promise((resolve) =>
+            setTimeout(resolve, secureRandomFloat() * 30)
+        );
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;
@@ -179,7 +183,9 @@ class MockDnsMonitor {
         const startTime = Date.now();
 
         // Simulate DNS lookup
-        await new Promise((resolve) => setTimeout(resolve, secureRandomFloat() * 20));
+        await new Promise((resolve) =>
+            setTimeout(resolve, secureRandomFloat() * 20)
+        );
 
         const endTime = Date.now();
         const responseTime = endTime - startTime;

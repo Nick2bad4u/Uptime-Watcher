@@ -120,10 +120,9 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
 
         const selectValue = hasSelection ? selectedMonitorId : "";
 
-        const placeholderLabel =
-            isEmpty(monitors)
-                ? PLACEHOLDER_LABEL_EMPTY
-                : PLACEHOLDER_LABEL_DEFAULT;
+        const placeholderLabel = isEmpty(monitors)
+            ? PLACEHOLDER_LABEL_EMPTY
+            : PLACEHOLDER_LABEL_DEFAULT;
 
         // Memoize event handlers to prevent recreation on every render
         const handleClick = useCallback((event: MouseEvent) => {
@@ -158,15 +157,19 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                 : monitorTypeLabel;
         }, []);
 
-        const composedClassName = arrayJoin(["monitor-selector", className]
-            .filter(Boolean), " ");
+        const composedClassName = arrayJoin(
+            ["monitor-selector", className].filter(Boolean),
+            " "
+        );
 
-        const wrapperClassName = arrayJoin([
-            "monitor-selector__wrapper",
-            composedClassName,
-            isDisabled ? "monitor-selector__wrapper--disabled" : undefined,
-        ]
-            .filter(Boolean), " ");
+        const wrapperClassName = arrayJoin(
+            [
+                "monitor-selector__wrapper",
+                composedClassName,
+                isDisabled ? "monitor-selector__wrapper--disabled" : undefined,
+            ].filter(Boolean),
+            " "
+        );
 
         const selectedMonitorText = useMemo(() => {
             if (!hasSelection) {

@@ -24,7 +24,13 @@ import {
 import log from "electron-log/main";
 import { mkdirSync } from "node:fs";
 import * as path from "node:path";
-import { arrayIncludes, arrayJoin, isEmpty, safeCastTo, setHas } from "ts-extras";
+import {
+    arrayIncludes,
+    arrayJoin,
+    isEmpty,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
@@ -224,8 +230,12 @@ const configureLogging = (): {
         // Default development behavior
         const isDevMode = !app.isPackaged;
         const configuration = {
-            consoleLevel: safeCastTo<ElectronLogLevel>(isDevMode ? "debug" : "info"),
-            fileLevel: safeCastTo<ElectronLogLevel>(isDevMode ? "info" : "warn"),
+            consoleLevel: safeCastTo<ElectronLogLevel>(
+                isDevMode ? "debug" : "info"
+            ),
+            fileLevel: safeCastTo<ElectronLogLevel>(
+                isDevMode ? "info" : "warn"
+            ),
         };
         logger.debug("[Logging] Using default logging configuration", {
             ...configuration,
@@ -818,7 +828,10 @@ if (process.versions.electron) {
                     }
                 );
                 logger.info(
-                    `[Main] Added Extensions: ${arrayJoin(extensions.map((ext) => ext.name), ", ")}`
+                    `[Main] Added Extensions: ${arrayJoin(
+                        extensions.map((ext) => ext.name),
+                        ", "
+                    )}`
                 );
             } catch (error) {
                 logger.warn(

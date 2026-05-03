@@ -381,7 +381,9 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     objects.push({
                         id: `obj-${i}`,
                         timestamp: Date.now(),
-                        data: Array.from({ length: 100 }).fill(secureRandomFloat()),
+                        data: Array.from({ length: 100 }).fill(
+                            secureRandomFloat()
+                        ),
                         metadata: {
                             created: Date.now(),
                             type: "small-object",
@@ -393,9 +395,12 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 // Access and modify objects
                 for (let i = 0; i < 500; i++) {
                     const obj =
-                        objects[Math.floor(secureRandomFloat() * objects.length)];
-                    obj.data[Math.floor(secureRandomFloat() * obj.data.length)] =
-                        secureRandomFloat();
+                        objects[
+                            Math.floor(secureRandomFloat() * objects.length)
+                        ];
+                    obj.data[
+                        Math.floor(secureRandomFloat() * obj.data.length)
+                    ] = secureRandomFloat();
                     obj.metadata.lastAccessed = Date.now();
                 }
             },
@@ -581,7 +586,9 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                                 timestamp: Date.now(),
                                 value: secureRandomFloat(),
                                 metadata: {
-                                    index: Math.floor(secureRandomFloat() * 1000),
+                                    index: Math.floor(
+                                        secureRandomFloat() * 1000
+                                    ),
                                     category: `category-${Math.floor(secureRandomFloat() * 10)}`,
                                     tags: Array.from({ length: 5 })
                                         .fill(null)
@@ -654,14 +661,18 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     const obj = {
                         id: i,
-                        data: Array.from({ length: 100 }).fill(secureRandomFloat()),
+                        data: Array.from({ length: 100 }).fill(
+                            secureRandomFloat()
+                        ),
                         parent: null as any,
                         children: [] as any[],
                     };
 
                     if (i > 0) {
                         const parent =
-                            objects[Math.floor(secureRandomFloat() * objects.length)];
+                            objects[
+                                Math.floor(secureRandomFloat() * objects.length)
+                            ];
                         obj.parent = parent;
                         parent.children.push(obj);
                     }
@@ -704,7 +715,9 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 // Access patterns
                 for (let i = 0; i < 2000; i++) {
                     const obj =
-                        objects[Math.floor(secureRandomFloat() * objects.length)];
+                        objects[
+                            Math.floor(secureRandomFloat() * objects.length)
+                        ];
                     regularMap.get(obj);
                     weakMap.get(obj);
                 }
@@ -760,7 +773,9 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                 for (let i = 0; i < 1000; i++) {
                     // Allocate temporary objects
                     const temp = {
-                        data: Array.from({ length: 1000 }).fill(secureRandomFloat()),
+                        data: Array.from({ length: 1000 }).fill(
+                            secureRandomFloat()
+                        ),
                         created: Date.now(),
                         id: i,
                     };
@@ -792,7 +807,9 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                         return obj;
                     }
                     return {
-                        data: Array.from({ length: 100 }).fill(secureRandomFloat()),
+                        data: Array.from({ length: 100 }).fill(
+                            secureRandomFloat()
+                        ),
                         used: true,
                         pooled: true,
                     };

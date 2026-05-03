@@ -1061,7 +1061,9 @@ describe("React Context Performance", () => {
                     avatar: `avatar${i}.jpg`,
                     bio: `Bio for user ${i}`,
                     preferences: {
-                        theme: ["light", "dark"][Math.floor(secureRandomFloat() * 2)],
+                        theme: ["light", "dark"][
+                            Math.floor(secureRandomFloat() * 2)
+                        ],
                         notifications: Array.from(
                             { length: 5 },
                             () => secureRandomFloat() > 0.5

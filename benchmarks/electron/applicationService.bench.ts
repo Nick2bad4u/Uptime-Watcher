@@ -256,7 +256,8 @@ describe("Application Service Benchmarks", () => {
 
             // Add some variance to timing
             const duration =
-                baseDuration + (secureRandomFloat() - 0.5) * (baseDuration * 0.3);
+                baseDuration +
+                (secureRandomFloat() - 0.5) * (baseDuration * 0.3);
 
             const lifecyclePhase: LifecyclePhase = {
                 phase,
@@ -381,7 +382,8 @@ describe("Application Service Benchmarks", () => {
                 } // Average events
             }
 
-            const processingTime = baseProcessingTime + secureRandomFloat() * 10;
+            const processingTime =
+                baseProcessingTime + secureRandomFloat() * 10;
             currentTime += processingTime;
 
             // Simulate processing success/failure
@@ -447,7 +449,8 @@ describe("Application Service Benchmarks", () => {
             const templates: MenuTemplate[] = [];
 
             for (let i = 0; i < menuCount; i++) {
-                const hasSubmenu = depth < maxDepth - 1 && secureRandomFloat() > 0.7;
+                const hasSubmenu =
+                    depth < maxDepth - 1 && secureRandomFloat() > 0.7;
 
                 const template: MenuTemplate = {
                     label: `Menu Item ${depth}-${i}`,
@@ -459,7 +462,9 @@ describe("Application Service Benchmarks", () => {
                     enabled: secureRandomFloat() > 0.1,
                     visible: secureRandomFloat() > 0.05,
                     checked:
-                        secureRandomFloat() > 0.8 ? secureRandomFloat() > 0.5 : undefined,
+                        secureRandomFloat() > 0.8
+                            ? secureRandomFloat() > 0.5
+                            : undefined,
                     id: `menu-${depth}-${i}`,
                     submenu: hasSubmenu
                         ? generateMenuTemplate(depth + 1, maxDepth)
@@ -523,7 +528,8 @@ describe("Application Service Benchmarks", () => {
                 case "update": {
                     buildTime = complexity * 0.1 + secureRandomFloat() * 2;
                     renderTime = complexity * 0.2 + secureRandomFloat() * 2;
-                    bindingTime = complexity * 0.1 + Number(secureRandomFloat()) * 1;
+                    bindingTime =
+                        complexity * 0.1 + Number(secureRandomFloat()) * 1;
                     break;
                 }
                 case "rebuild": {
@@ -534,14 +540,16 @@ describe("Application Service Benchmarks", () => {
                 }
                 case "localize": {
                     buildTime = complexity * 0.3 + secureRandomFloat() * 3;
-                    renderTime = complexity * 0.1 + Number(secureRandomFloat()) * 1;
+                    renderTime =
+                        complexity * 0.1 + Number(secureRandomFloat()) * 1;
                     bindingTime = complexity * 0.05 + secureRandomFloat() * 0.5;
                     break;
                 }
                 case "theme-change": {
                     buildTime = complexity * 0.2 + secureRandomFloat() * 2;
                     renderTime = complexity * 0.4 + secureRandomFloat() * 4;
-                    bindingTime = complexity * 0.1 + Number(secureRandomFloat()) * 1;
+                    bindingTime =
+                        complexity * 0.1 + Number(secureRandomFloat()) * 1;
                     break;
                 }
                 default: {
@@ -626,7 +634,9 @@ describe("Application Service Benchmarks", () => {
         for (let i = 0; i < 300; i++) {
             const component =
                 integrationComponents[
-                    Math.floor(secureRandomFloat() * integrationComponents.length)
+                    Math.floor(
+                        secureRandomFloat() * integrationComponents.length
+                    )
                 ];
             const operation =
                 operations[Math.floor(secureRandomFloat() * operations.length)];

@@ -104,6 +104,6 @@ export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
         return false;
     }
 
-    const { then } = safeCastTo(value);
+    const { then } = safeCastTo<{ then?: unknown }>(value);
     return typeof then === "function";
 }

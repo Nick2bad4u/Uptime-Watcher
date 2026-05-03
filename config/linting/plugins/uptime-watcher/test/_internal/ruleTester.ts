@@ -47,9 +47,7 @@ export const getPluginRule = (ruleId: string): PluginRuleModule => {
 
     const dynamicRules = rules as Record<string, unknown>;
     if (!Object.hasOwn(dynamicRules, ruleId)) {
-        throw new TypeError(
-            `Rule '${ruleId}' is not registered in plugin`
-        );
+        throw new TypeError(`Rule '${ruleId}' is not registered in plugin`);
     }
 
     const rule = dynamicRules[ruleId];

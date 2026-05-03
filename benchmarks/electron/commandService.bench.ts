@@ -128,7 +128,9 @@ describe("Command Service Benchmarks", () => {
 
         for (let i = 0; i < 800; i++) {
             const input =
-                commandInputs[Math.floor(secureRandomFloat() * commandInputs.length)];
+                commandInputs[
+                    Math.floor(secureRandomFloat() * commandInputs.length)
+                ];
 
             // Simulate parsing complexity based on input
             const tokens = input.split(/\s+/);
@@ -146,7 +148,10 @@ describe("Command Service Benchmarks", () => {
             if (input.includes("=")) complexity += 1; // Key-value pairs
 
             // Simulate parsing time based on complexity
-            const parseTime = Math.max(1, complexity * 0.5 + secureRandomFloat() * 3);
+            const parseTime = Math.max(
+                1,
+                complexity * 0.5 + secureRandomFloat() * 3
+            );
 
             // Simulate syntax errors (5% error rate)
             const syntaxErrors: string[] = [];
@@ -582,15 +587,18 @@ describe("Command Service Benchmarks", () => {
                     }
                     case "status-check": {
                         result = {
-                            totalSites: Math.floor(secureRandomFloat() * 50) + 10,
-                            activeSites: Math.floor(secureRandomFloat() * 40) + 8,
+                            totalSites:
+                                Math.floor(secureRandomFloat() * 50) + 10,
+                            activeSites:
+                                Math.floor(secureRandomFloat() * 40) + 8,
                             upSites: Math.floor(secureRandomFloat() * 35) + 5,
                         };
                         break;
                     }
                     case "export-data": {
                         result = {
-                            exported: Math.floor(secureRandomFloat() * 1000) + 100,
+                            exported:
+                                Math.floor(secureRandomFloat() * 1000) + 100,
                             fileSize:
                                 Math.floor(secureRandomFloat() * 10_000_000) +
                                 1_000_000,
@@ -614,7 +622,9 @@ describe("Command Service Benchmarks", () => {
                     130,
                 ];
                 exitCode =
-                    errorCodes[Math.floor(secureRandomFloat() * errorCodes.length)];
+                    errorCodes[
+                        Math.floor(secureRandomFloat() * errorCodes.length)
+                    ];
 
                 const errorMessages = [
                     "Operation failed: insufficient permissions",
@@ -828,7 +838,9 @@ describe("Command Service Benchmarks", () => {
                 case "by-command": {
                     const searchCommand =
                         commonCommands[
-                            Math.floor(secureRandomFloat() * commonCommands.length)
+                            Math.floor(
+                                secureRandomFloat() * commonCommands.length
+                            )
                         ];
                     resultsCount = historyEntries.filter((h) =>
                         h.command.includes(searchCommand)

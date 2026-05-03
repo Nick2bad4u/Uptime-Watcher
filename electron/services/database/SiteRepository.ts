@@ -53,7 +53,7 @@ import {
     assertValidSiteIdentifier,
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
-import { isDefined, isEmpty  } from "ts-extras";
+import { isDefined, isEmpty } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
 

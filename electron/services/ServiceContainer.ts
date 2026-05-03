@@ -12,7 +12,7 @@
  */
 import type { UnknownRecord } from "type-fest";
 
-import { isDefined, objectEntries  } from "ts-extras";
+import { isDefined, objectEntries } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 
@@ -578,7 +578,9 @@ export class ServiceContainer {
             UptimeOrchestrator: this.uptimeOrchestrator,
             WindowService: this.windowService,
         };
-        for (const [serviceName, serviceInstance] of objectEntries(serviceMap)) {
+        for (const [serviceName, serviceInstance] of objectEntries(
+            serviceMap
+        )) {
             if (isDefined(serviceInstance)) {
                 services.push({ name: serviceName, service: serviceInstance });
             }

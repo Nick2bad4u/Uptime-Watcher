@@ -122,11 +122,9 @@ export class ServiceContainerEventForwarder {
             }
         } else {
             for (const eventName of eventsToForward) {
-                const rawOn = (
-                    safeCastTo<{
-                        on?: TypedEventBus<UptimeEvents>["on"];
-                    }>(managerEventBus)
-                ).on;
+                const rawOn = safeCastTo<{
+                    on?: TypedEventBus<UptimeEvents>["on"];
+                }>(managerEventBus).on;
 
                 if (typeof rawOn === "function") {
                     rawOn.call(

@@ -265,7 +265,9 @@ describe("Database Connection Pooling Benchmarks", () => {
                 if (activeConnections.length > 0) {
                     const connToRelease =
                         activeConnections[
-                            Math.floor(secureRandomFloat() * activeConnections.length)
+                            Math.floor(
+                                secureRandomFloat() * activeConnections.length
+                            )
                         ];
                     connToRelease.state = "idle";
                     connToRelease.lastUsedAt = currentTime;
@@ -327,7 +329,9 @@ describe("Database Connection Pooling Benchmarks", () => {
                 if (validationTargets.length > 0) {
                     const connToValidate =
                         validationTargets[
-                            Math.floor(secureRandomFloat() * validationTargets.length)
+                            Math.floor(
+                                secureRandomFloat() * validationTargets.length
+                            )
                         ];
                     connToValidate.state = "validating";
 
@@ -519,7 +523,9 @@ describe("Database Connection Pooling Benchmarks", () => {
 
         for (let cycle = 0; cycle < 100; cycle++) {
             const pattern =
-                loadPatterns[Math.floor(secureRandomFloat() * loadPatterns.length)];
+                loadPatterns[
+                    Math.floor(secureRandomFloat() * loadPatterns.length)
+                ];
             const targetUtilization =
                 pattern.utilizationRange[0] +
                 secureRandomFloat() *

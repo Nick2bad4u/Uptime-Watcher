@@ -27,9 +27,7 @@
 import { isInteger } from "ts-extras";
 
 function isValidHttpStatus(httpStatus: number): boolean {
-    return (
-        isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599
-    );
+    return isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599;
 }
 
 /**

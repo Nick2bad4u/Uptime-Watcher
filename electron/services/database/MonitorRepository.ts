@@ -58,7 +58,7 @@ import {
     isValidMonitorId,
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
-import { arrayJoin, isEmpty  } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
 

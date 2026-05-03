@@ -133,7 +133,9 @@ describe("Window Service Benchmarks", () => {
 
         for (let i = 0; i < 200; i++) {
             const windowType =
-                windowTypes[Math.floor(secureRandomFloat() * windowTypes.length)];
+                windowTypes[
+                    Math.floor(secureRandomFloat() * windowTypes.length)
+                ];
 
             // Create window configuration based on type
             const config: WindowConfig = {
@@ -260,7 +262,8 @@ describe("Window Service Benchmarks", () => {
         const transitions: StateTransition[] = [];
 
         for (let i = 0; i < 500; i++) {
-            const window = windows[Math.floor(secureRandomFloat() * windows.length)];
+            const window =
+                windows[Math.floor(secureRandomFloat() * windows.length)];
             const operation =
                 operationTypes[
                     Math.floor(secureRandomFloat() * operationTypes.length)
@@ -369,7 +372,9 @@ describe("Window Service Benchmarks", () => {
                 eventTypes[Math.floor(secureRandomFloat() * eventTypes.length)];
 
             const targetWindow =
-                activeWindows[Math.floor(secureRandomFloat() * activeWindows.length)];
+                activeWindows[
+                    Math.floor(secureRandomFloat() * activeWindows.length)
+                ];
 
             // Simulate focus event processing
             const propagationTime = secureRandomFloat() * 10 + 2; // 2-12ms
@@ -431,7 +436,9 @@ describe("Window Service Benchmarks", () => {
 
         const windowPool = Array.from({ length: 30 }, (_, i) => ({
             id: `coord-window-${i}`,
-            type: windowTypes[Math.floor(secureRandomFloat() * windowTypes.length)],
+            type: windowTypes[
+                Math.floor(secureRandomFloat() * windowTypes.length)
+            ],
             isActive: secureRandomFloat() > 0.2,
             priority: Math.floor(secureRandomFloat() * 5) + 1,
         }));
@@ -783,7 +790,9 @@ describe("Window Service Benchmarks", () => {
                 // Operate on existing window
                 window =
                     lifecycleWindows[
-                        Math.floor(secureRandomFloat() * lifecycleWindows.length)
+                        Math.floor(
+                            secureRandomFloat() * lifecycleWindows.length
+                        )
                     ];
                 windowId = window.id;
 
@@ -793,7 +802,8 @@ describe("Window Service Benchmarks", () => {
                 } else if (window.state === "destroyed") {
                     continue; // Skip destroyed windows
                 } else {
-                    event = events[Math.floor(secureRandomFloat() * events.length)];
+                    event =
+                        events[Math.floor(secureRandomFloat() * events.length)];
                 }
             }
 
@@ -806,7 +816,8 @@ describe("Window Service Benchmarks", () => {
             switch (event) {
                 case "create": {
                     processingTime = secureRandomFloat() * 50 + 20; // 20-70ms
-                    resourcesAllocated = Math.floor(secureRandomFloat() * 100) + 50; // 50-150 units
+                    resourcesAllocated =
+                        Math.floor(secureRandomFloat() * 100) + 50; // 50-150 units
                     memoryUsage += resourcesAllocated;
                     if (window) {
                         window.state = "created";
@@ -816,7 +827,8 @@ describe("Window Service Benchmarks", () => {
                 }
                 case "show": {
                     processingTime = secureRandomFloat() * 30 + 10; // 10-40ms
-                    resourcesAllocated = Math.floor(secureRandomFloat() * 20) + 10; // 10-30 units
+                    resourcesAllocated =
+                        Math.floor(secureRandomFloat() * 20) + 10; // 10-30 units
                     memoryUsage += resourcesAllocated;
                     if (window) {
                         window.state = "visible";

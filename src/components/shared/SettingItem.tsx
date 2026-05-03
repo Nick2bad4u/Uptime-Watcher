@@ -79,7 +79,7 @@ export const SettingItem: FC<SettingItemProperties> = ({
 }) => {
     const resolvedControl =
         typeof control === "function"
-            ? (safeCastTo<() => ReactNode>(control))()
+            ? safeCastTo<() => ReactNode>(control)()
             : control;
 
     const resolvedIconNode = IconComponent ? (

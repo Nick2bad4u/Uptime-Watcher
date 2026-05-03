@@ -8,7 +8,7 @@ import type { Simplify } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 
 import type { Logger } from "../../services/logger";
 import type {

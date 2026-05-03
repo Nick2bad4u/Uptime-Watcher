@@ -143,7 +143,9 @@ describe("Monitoring Service Benchmarks", () => {
                     statusCode: secureRandomFloat() > 0.1 ? 200 : 500, // 90% success rate
                     timestamp: monitorExecution.timestamp,
                     retryCount:
-                        secureRandomFloat() > 0.8 ? Math.floor(secureRandomFloat() * 3) : 0,
+                        secureRandomFloat() > 0.8
+                            ? Math.floor(secureRandomFloat() * 3)
+                            : 0,
                     success: secureRandomFloat() > 0.1,
                 };
             }
@@ -234,9 +236,13 @@ describe("Monitoring Service Benchmarks", () => {
 
             // Generate status change event
             const previousStatus =
-                statusTypes[Math.floor(secureRandomFloat() * statusTypes.length)];
+                statusTypes[
+                    Math.floor(secureRandomFloat() * statusTypes.length)
+                ];
             let currentStatus =
-                statusTypes[Math.floor(secureRandomFloat() * statusTypes.length)];
+                statusTypes[
+                    Math.floor(secureRandomFloat() * statusTypes.length)
+                ];
 
             // Ensure status actually changes 70% of the time
             if (secureRandomFloat() > 0.3 && currentStatus === previousStatus) {
@@ -261,7 +267,8 @@ describe("Monitoring Service Benchmarks", () => {
                 currentStatus,
                 timestamp: Date.now() - secureRandomFloat() * 86_400_000, // Within last 24 hours
                 duration: statusDuration,
-                alertGenerated: isSignificantChange && secureRandomFloat() > 0.2, // 80% alert generation for significant changes
+                alertGenerated:
+                    isSignificantChange && secureRandomFloat() > 0.2, // 80% alert generation for significant changes
             };
 
             statusEvents.push(statusEvent);
@@ -534,7 +541,8 @@ describe("Monitoring Service Benchmarks", () => {
                 switch (coordination.operationType) {
                     case "start_all": {
                         siteTime =
-                            siteOperation.monitors * (secureRandomFloat() * 3 + 2);
+                            siteOperation.monitors *
+                            (secureRandomFloat() * 3 + 2);
                         break;
                     }
                     case "stop_all": {
@@ -545,12 +553,14 @@ describe("Monitoring Service Benchmarks", () => {
                     }
                     case "restart_site": {
                         siteTime =
-                            siteOperation.monitors * (secureRandomFloat() * 4 + 3);
+                            siteOperation.monitors *
+                            (secureRandomFloat() * 4 + 3);
                         break;
                     }
                     case "health_check": {
                         siteTime =
-                            siteOperation.monitors * (secureRandomFloat() * 2 + 1);
+                            siteOperation.monitors *
+                            (secureRandomFloat() * 2 + 1);
                         break;
                     }
                 }
@@ -616,7 +626,9 @@ describe("Monitoring Service Benchmarks", () => {
                         siteIdentifier: `vol-site-${Math.floor((batch * concurrencyLimit + i) / scenario.monitorsPerSite)}`,
                         monitorId: `vol-monitor-${batch * concurrencyLimit + i}`,
                         type: monitorTypes[
-                            Math.floor(secureRandomFloat() * monitorTypes.length)
+                            Math.floor(
+                                secureRandomFloat() * monitorTypes.length
+                            )
                         ],
                         executionTime: secureRandomFloat() * 3000 + 200,
                     };
@@ -629,7 +641,8 @@ describe("Monitoring Service Benchmarks", () => {
                     }
                 }
 
-                const batchTime = Date.now() - batchStart + secureRandomFloat() * 100;
+                const batchTime =
+                    Date.now() - batchStart + secureRandomFloat() * 100;
                 processingTime += batchTime;
             }
 
@@ -756,7 +769,9 @@ describe("Monitoring Service Benchmarks", () => {
                 finalAttempt: retriesUsed + 1,
                 errorType: encountersError
                     ? errorScenarios[
-                          Math.floor(secureRandomFloat() * errorScenarios.length)
+                          Math.floor(
+                              secureRandomFloat() * errorScenarios.length
+                          )
                       ].errorType
                     : null,
             };

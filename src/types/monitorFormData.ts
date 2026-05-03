@@ -22,7 +22,7 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
-import { isInteger, safeCastTo  } from "ts-extras";
+import { isInteger, safeCastTo } from "ts-extras";
 
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
@@ -787,20 +787,16 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
         return false;
     }
 
-    const formData = safeCastTo(data);
+    const formData = safeCastTo<{ type?: unknown }>(data);
 
     if (!validateMonitorType(formData.type)) {
         return false;
     }
 
     const monitorType = formData.type;
-
     const validator = FORM_DATA_VALIDATORS[monitorType];
-    if (!validator) {
-        return false;
-    }
 
-    const typedFormData = safeCastTo(data);
+    const typedFormData = safeCastTo<Partial<MonitorFormData>>(data);
     return validator(typedFormData);
 }
 

@@ -20,7 +20,7 @@ import type {
     VoidIpcInvokeChannel,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
-import type { UnknownArray, UnknownRecord  } from "type-fest";
+import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import {
     MAX_IPC_JSON_IMPORT_BYTES,
@@ -44,7 +44,7 @@ import {
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
-import { isInteger, safeCastTo  } from "ts-extras";
+import { isInteger, safeCastTo } from "ts-extras";
 
 import {
     buildPayloadPreview,
@@ -227,10 +227,7 @@ export function safeParseNonNegativeIntResult(
 
 const DIAGNOSTICS_CHANNEL = DIAGNOSTICS_CHANNELS.verifyIpcHandler;
 
-const globalProcessCandidate: unknown = Reflect.get(
-    globalThis,
-    "process"
-) as unknown;
+const globalProcessCandidate: unknown = Reflect.get(globalThis, "process");
 const globalEnvCandidate: unknown =
     typeof globalProcessCandidate === "object" &&
     globalProcessCandidate !== null

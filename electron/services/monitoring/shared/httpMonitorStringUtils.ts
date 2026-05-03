@@ -1,6 +1,6 @@
 import type { UnknownRecord } from "type-fest";
 
-import { arrayJoin, objectEntries  } from "ts-extras";
+import { arrayJoin, objectEntries } from "ts-extras";
 
 import type { MonitorCheckResult } from "../types";
 

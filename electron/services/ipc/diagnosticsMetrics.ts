@@ -59,10 +59,12 @@ const fallbackDiagnosticsLogger: Logger = {
 };
 
 function resolveDiagnosticsLogger(): Logger {
-    const moduleWithDiagnostics = safeCastTo<Partial<{
-        diagnosticsLogger: Logger;
-        logger: Logger;
-    }>>(loggerModule);
+    const moduleWithDiagnostics = safeCastTo<
+        Partial<{
+            diagnosticsLogger: Logger;
+            logger: Logger;
+        }>
+    >(loggerModule);
 
     if (moduleWithDiagnostics.diagnosticsLogger) {
         return moduleWithDiagnostics.diagnosticsLogger;

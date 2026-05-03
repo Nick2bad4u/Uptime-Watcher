@@ -233,7 +233,9 @@ describe("Site Repository Performance", () => {
                     // 50% updates to existing sites
                     const existingSite =
                         initialSites[
-                            Math.floor(secureRandomFloat() * initialSites.length)
+                            Math.floor(
+                                secureRandomFloat() * initialSites.length
+                            )
                         ];
                     await repository.upsert({
                         identifier: existingSite.identifier,
@@ -411,7 +413,9 @@ describe("Site Repository Performance", () => {
             // Perform rapid lookups
             for (let i = 0; i < 100; i++) {
                 const randomSite =
-                    testSites[Math.floor(secureRandomFloat() * testSites.length)];
+                    testSites[
+                        Math.floor(secureRandomFloat() * testSites.length)
+                    ];
                 await repository.findByIdentifier(randomSite.identifier);
             }
         },

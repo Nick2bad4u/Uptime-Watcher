@@ -643,7 +643,8 @@ class MockSiteChecker {
         const baseDelay = strategy.baseDelay;
         const backoffDelay =
             baseDelay * strategy.backoffMultiplier ** (attempt - 1);
-        const jitter = secureRandomFloat() * strategy.jitterFactor * backoffDelay;
+        const jitter =
+            secureRandomFloat() * strategy.jitterFactor * backoffDelay;
 
         return Math.min(backoffDelay + jitter, strategy.maxDelay);
     }

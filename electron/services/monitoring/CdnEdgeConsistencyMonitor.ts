@@ -15,7 +15,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
-import { arrayJoin, isEmpty  } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -154,8 +154,12 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         );
 
         if (failureResults.length === edgeEndpoints.length) {
-            const failureSummary = arrayJoin(failureResults
-                .map((entry) => `${entry.endpoint}: ${entry.result.error}`), "; ");
+            const failureSummary = arrayJoin(
+                failureResults.map(
+                    (entry) => `${entry.endpoint}: ${entry.result.error}`
+                ),
+                "; "
+            );
             throw new Error(
                 failureSummary.length > 0
                     ? failureSummary
@@ -183,16 +187,22 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         const detailSegments: string[] = [];
 
         if (mismatchResults.length > 0) {
-            const mismatchList = arrayJoin(mismatchResults
-                .map((entry) => entry.endpoint), ", ");
+            const mismatchList = arrayJoin(
+                mismatchResults.map((entry) => entry.endpoint),
+                ", "
+            );
             detailSegments.push(
                 `${mismatchResults.length} edge(s) differ from baseline: ${mismatchList}`
             );
         }
 
         if (failureResults.length > 0) {
-            const failureList = arrayJoin(failureResults
-                .map((entry) => `${entry.endpoint} (${entry.result.error})`), ", ");
+            const failureList = arrayJoin(
+                failureResults.map(
+                    (entry) => `${entry.endpoint} (${entry.result.error})`
+                ),
+                ", "
+            );
             detailSegments.push(
                 `${failureResults.length} edge(s) unavailable: ${failureList}`
             );
@@ -200,10 +210,12 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
 
         const failureSummary =
             failureResults.length > 0
-                ? arrayJoin(failureResults
-                      .map(
+                ? arrayJoin(
+                      failureResults.map(
                           (entry) => `${entry.endpoint}: ${entry.result.error}`
-                      ), "; ")
+                      ),
+                      "; "
+                  )
                 : undefined;
 
         const degradedResult: MonitorCheckResult = {

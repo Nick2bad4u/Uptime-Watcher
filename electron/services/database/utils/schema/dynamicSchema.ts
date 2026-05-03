@@ -642,11 +642,13 @@ export function generateMonitorTableSchema(): string {
         updated_at INTEGER NOT NULL
     `;
 
-    const dynamicFields = arrayJoin(generateDatabaseFieldDefinitions()
-        .map((field) => {
+    const dynamicFields = arrayJoin(
+        generateDatabaseFieldDefinitions().map((field) => {
             const escaped = escapeSqlIdentifier(field.columnName, "schema");
             return `        ${escaped} ${field.sqlType}${field.nullable ? "" : " NOT NULL"}`;
-        }), ",\n");
+        }),
+        ",\n"
+    );
 
     return `CREATE TABLE IF NOT EXISTS monitors (
 ${staticFields}${dynamicFields ? `,\n${dynamicFields}` : ""}
@@ -693,7 +695,10 @@ export function generateSqlParameters(): SqlParameters {
     );
 
     const allColumns = [...staticColumns, ...dynamicColumns];
-    const placeholders = arrayJoin(allColumns.map(() => "?"), ", ");
+    const placeholders = arrayJoin(
+        allColumns.map(() => "?"),
+        ", "
+    );
 
     return { columns: allColumns, placeholders };
 }

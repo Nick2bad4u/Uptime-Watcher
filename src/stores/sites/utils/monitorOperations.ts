@@ -145,7 +145,7 @@ export function updateMonitorInSite(
             try {
                 // Ignore any id field in updates to preserve original monitor identity.
                 const restUpdates = { ...updates };
-                delete (safeCastTo<{ id?: unknown }>(restUpdates)).id;
+                delete safeCastTo<{ id?: unknown }>(restUpdates).id;
 
                 const merged: Partial<Monitor> = {
                     ...baseline,

@@ -13,7 +13,7 @@ import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { hasNestedHttpSchemeAfterFirstDelimiter } from "@shared/utils/urlSchemeValidation";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isValidUrl } from "@shared/validation/validatorUtils";
-import { arrayJoin, isInteger, stringSplit   } from "ts-extras";
+import { arrayJoin, isInteger, stringSplit } from "ts-extras";
 import validator from "validator";
 
 import { validateUrlStringCandidate } from "./urlCandidateValidation";
@@ -96,12 +96,14 @@ export type HttpUrlValidationResult =
     | HttpUrlRejectedResult;
 
 function getRedactedPathname(pathname: string): string {
-    return arrayJoin(stringSplit(pathname, "/")
-        .map((segment) =>
+    return arrayJoin(
+        stringSplit(pathname, "/").map((segment) =>
             segment.length >= SAFE_URL_SUSPECT_SEGMENT_MIN_LENGTH
                 ? "[redacted]"
                 : segment
-        ), "/");
+        ),
+        "/"
+    );
 }
 
 /**
@@ -320,9 +322,14 @@ function normalizeHttpUrlForExternalOpen(args: {
     };
 }
 
-function toIpvOctets(
-    hostname: string
-): [number, number, number, number] | null {
+function toIpvOctets(hostname: string):
+    | [
+          number,
+          number,
+          number,
+          number,
+      ]
+    | null {
     const parts = stringSplit(hostname, ".");
     if (parts.length !== 4) {
         return null;
@@ -335,11 +342,7 @@ function toIpvOctets(
     }
 
     const octets = parts.map(Number);
-    if (
-        octets.some(
-            (value) => !isInteger(value) || value < 0 || value > 255
-        )
-    ) {
+    if (octets.some((value) => !isInteger(value) || value < 0 || value > 255)) {
         return null;
     }
 
@@ -367,7 +370,12 @@ function toIpvOctets(
 }
 
 function isPrivateIpvFourOctets(
-    octets: readonly [number, number, number, number]
+    octets: readonly [
+        number,
+        number,
+        number,
+        number,
+    ]
 ): boolean {
     const [a, b] = octets;
 
@@ -562,9 +570,14 @@ function isPrivateIpv4(hostname: string): boolean {
     return isPrivateIpvFourOctets(octets);
 }
 
-function parseIpvFourFromMappedIpvSix(
-    mappedHostname: string
-): [number, number, number, number] | null {
+function parseIpvFourFromMappedIpvSix(mappedHostname: string):
+    | [
+          number,
+          number,
+          number,
+          number,
+      ]
+    | null {
     if (mappedHostname.includes(".")) {
         return toIpvOctets(mappedHostname);
     }

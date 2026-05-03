@@ -94,7 +94,9 @@ function generateMonitorCheckResults(count: number): MonitorCheckResult[] {
         const success = secureRandomFloat() > 0.05;
         results.push({
             success,
-            responseTime: success ? Math.floor(secureRandomFloat() * 1000) + 50 : 0,
+            responseTime: success
+                ? Math.floor(secureRandomFloat() * 1000) + 50
+                : 0,
             timestamp: now - i * 1000,
             status: success ? "up" : "down",
             error: success ? undefined : `Network error ${i}`,

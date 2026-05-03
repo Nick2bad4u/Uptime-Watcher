@@ -313,7 +313,10 @@ describe("History Repository Performance", () => {
         "find records by monitor",
         () => {
             repository = new MockHistoryRepository();
-            repository.findByMonitor(Math.floor(secureRandomFloat() * 1000) + 1, 100);
+            repository.findByMonitor(
+                Math.floor(secureRandomFloat() * 1000) + 1,
+                100
+            );
         },
         { warmupIterations: 5, iterations: 1000 }
     );
@@ -322,7 +325,10 @@ describe("History Repository Performance", () => {
         "find records by site",
         () => {
             repository = new MockHistoryRepository();
-            repository.findBySite(Math.floor(secureRandomFloat() * 100) + 1, 100);
+            repository.findBySite(
+                Math.floor(secureRandomFloat() * 100) + 1,
+                100
+            );
         },
         { warmupIterations: 5, iterations: 1000 }
     );

@@ -66,6 +66,7 @@ const noUpdate = process.argv.includes("--no-update");
  * Normalizes potentially user-controlled values before writing them to logs.
  *
  * @param {string} value
+ *
  * @returns {string}
  */
 function sanitizeForSingleLineLog(value) {

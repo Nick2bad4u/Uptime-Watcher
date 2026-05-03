@@ -187,7 +187,10 @@ const behavior: RemoteMonitorBehavior<
     type: "replication",
 };
 
-type ReplicationMonitorConstructor = Constructor<IMonitorService, [config?: MonitorServiceConfig]>;
+type ReplicationMonitorConstructor = Constructor<
+    IMonitorService,
+    [config?: MonitorServiceConfig]
+>;
 
 const ReplicationMonitorBase: ReplicationMonitorConstructor =
     ((): ReplicationMonitorConstructor => {

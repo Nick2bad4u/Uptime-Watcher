@@ -153,7 +153,7 @@ export const useSettingsStore: UseBoundStore<
                 const base = safeCastTo(persistedState);
                 const settingsCandidate = persistedState["settings"];
                 const persistedSettings = isRecord(settingsCandidate)
-                    ? (safeCastTo(settingsCandidate))
+                    ? safeCastTo(settingsCandidate)
                     : {};
 
                 return {

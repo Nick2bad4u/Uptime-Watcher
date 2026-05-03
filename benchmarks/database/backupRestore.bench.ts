@@ -98,7 +98,9 @@ describe("Database Backup and Restore Benchmarks", () => {
                 dataSizes[Math.floor(secureRandomFloat() * dataSizes.length)];
             const compressionAlg =
                 compressionAlgorithms[
-                    Math.floor(secureRandomFloat() * compressionAlgorithms.length)
+                    Math.floor(
+                        secureRandomFloat() * compressionAlgorithms.length
+                    )
                 ];
 
             const startTime = Date.now();
@@ -270,7 +272,9 @@ describe("Database Backup and Restore Benchmarks", () => {
                 dataSizes[Math.floor(secureRandomFloat() * dataSizes.length)];
             const compressionAlg =
                 compressionAlgorithms[
-                    Math.floor(secureRandomFloat() * compressionAlgorithms.length)
+                    Math.floor(
+                        secureRandomFloat() * compressionAlgorithms.length
+                    )
                 ];
 
             // Create full backup for this chain
@@ -520,7 +524,9 @@ describe("Database Backup and Restore Benchmarks", () => {
             // Simulate validation errors even on successful recovery
             if (success) {
                 validationErrors =
-                    secureRandomFloat() < 0.1 ? Math.floor(secureRandomFloat() * 5) : 0;
+                    secureRandomFloat() < 0.1
+                        ? Math.floor(secureRandomFloat() * 5)
+                        : 0;
             }
 
             const dataRestored = success
@@ -823,7 +829,9 @@ describe("Database Backup and Restore Benchmarks", () => {
 
         for (let i = 0; i < 100; i++) {
             const disasterType =
-                disasterTypes[Math.floor(secureRandomFloat() * disasterTypes.length)];
+                disasterTypes[
+                    Math.floor(secureRandomFloat() * disasterTypes.length)
+                ];
 
             // Calculate data loss percentage
             const dataLoss =
@@ -843,7 +851,8 @@ describe("Database Backup and Restore Benchmarks", () => {
             const recoveryMethod =
                 disasterType.recoveryMethods[
                     Math.floor(
-                        secureRandomFloat() * disasterType.recoveryMethods.length
+                        secureRandomFloat() *
+                            disasterType.recoveryMethods.length
                     )
                 ];
 

@@ -65,7 +65,7 @@ const captureErrorStoreState = (): ReturnType<
         ...state,
         operationLoading: { ...state.operationLoading },
         storeErrors: { ...state.storeErrors },
-    } as ReturnType<typeof useErrorStore.getState>;
+    };
 };
 
 const withLoadingState: Decorator = (StoryComponent) => {

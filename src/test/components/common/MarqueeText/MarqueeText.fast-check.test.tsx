@@ -74,11 +74,21 @@ describe("MarqueeText fast-check coverage", () => {
     fcTest.prop<
         [
             string,
-            string | undefined,
-            string | undefined,
-            string | undefined,
-            string | undefined,
-            string | undefined,
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
         ]
     >([
         textArbitrary,
@@ -166,11 +176,21 @@ describe("MarqueeText fast-check coverage", () => {
     fcTest.prop<
         [
             string,
-            string | undefined,
-            string | undefined,
-            string | undefined,
-            string | undefined,
-            string | undefined,
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
         ]
     >([
         textArbitrary,
@@ -282,7 +302,18 @@ describe("MarqueeText fast-check coverage", () => {
     );
 
     fcTest.prop<
-        [string, string | undefined, string | undefined, string | undefined]
+        [
+            string,
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+            (
+                string | undefined
+            ),
+        ]
     >([
         colorArbitrary,
         fontWeightArbitrary,

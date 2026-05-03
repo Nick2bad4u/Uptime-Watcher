@@ -1,6 +1,6 @@
 import type { UnknownRecord } from "type-fest";
 
-import { isInteger, objectHasOwn  } from "ts-extras";
+import { isInteger, objectHasOwn } from "ts-extras";
 
 import type { PortNumber } from "../types/units";
 

@@ -1,7 +1,7 @@
 import type { StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, safeCastTo  } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 
@@ -54,15 +54,18 @@ const pruneRecentStatusAlertFingerprints = (now: number): void => {
 };
 
 const createStatusAlertFingerprint = (update: StatusUpdate): string =>
-    arrayJoin([
-        normalizeStatusAlertKeySegment(update.siteIdentifier),
-        normalizeStatusAlertKeySegment(update.monitorId),
-        normalizeStatusAlertKeySegment(update.timestamp),
-        normalizeStatusAlertKeySegment(update.status),
-        normalizeStatusAlertKeySegment(
-            update.previousStatus ?? STATUS_ALERT_UNKNOWN_SEGMENT
-        ),
-    ], "|");
+    arrayJoin(
+        [
+            normalizeStatusAlertKeySegment(update.siteIdentifier),
+            normalizeStatusAlertKeySegment(update.monitorId),
+            normalizeStatusAlertKeySegment(update.timestamp),
+            normalizeStatusAlertKeySegment(update.status),
+            normalizeStatusAlertKeySegment(
+                update.previousStatus ?? STATUS_ALERT_UNKNOWN_SEGMENT
+            ),
+        ],
+        "|"
+    );
 
 const isDuplicateStatusAlertUpdate = (update: StatusUpdate): boolean => {
     const now = Date.now();
