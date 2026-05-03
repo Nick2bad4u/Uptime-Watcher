@@ -1,3 +1,4 @@
+import type { AxiosInstance, AxiosRequestConfig } from "axios";
 /**
  * Axios configuration utilities for HTTP monitoring.
  *
@@ -13,14 +14,13 @@
  * @see {@link MonitorServiceConfig}
  */
 
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
-
 import { readNumberEnv } from "@shared/utils/environment";
 import { ensureRecordLike, isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";
 import * as https from "node:https";
+import { isDefined, isFinite as isFiniteNumber, setHas } from "ts-extras";
 
 import type { MonitorServiceConfig } from "../types";
 
@@ -115,7 +115,7 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
                     ? metadata["startTime"]
                     : undefined;
 
-            if (startTime !== undefined && errorRecord) {
+            if (isDefined(startTime) && errorRecord) {
                 const duration = performance.now() - startTime;
                 Reflect.set(errorRecord, "responseTime", Math.round(duration));
             }
@@ -184,7 +184,7 @@ const DEFAULT_AGENT_KEEP_ALIVE_MSECS = readNumberEnv(
 );
 
 function normalizePositiveInteger(value: number, fallback: number): number {
-    if (!Number.isFinite(value) || value <= 0) {
+    if (!isFiniteNumber(value) || value <= 0) {
         return fallback;
     }
 
@@ -258,8 +258,10 @@ function enforceRedirectSafety(options: unknown): void {
         typeof options["protocol"] === "string" ? options["protocol"] : "";
     const auth = typeof options["auth"] === "string" ? options["auth"] : "";
 
-    if (protocol.length > 0 && !ALLOWED_REDIRECT_PROTOCOLS.has(protocol)) {
-        const error = new Error(`Unsupported redirect protocol: ${protocol}`);
+    if (protocol.length > 0 && !setHas(ALLOWED_REDIRECT_PROTOCOLS, protocol)) {
+        const error = new Error(
+            `Unsupported redirect protocol: ${String(protocol)}`
+        );
         Reflect.set(error, "code", "UW_UNSUPPORTED_REDIRECT_PROTOCOL");
         throw error;
     }
@@ -282,7 +284,7 @@ function enforceRedirectSafety(options: unknown): void {
  */
 export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
     const headers: Record<string, string> = {};
-    if (config.userAgent !== undefined) {
+    if (isDefined(config.userAgent)) {
         headers["User-Agent"] = config.userAgent;
     }
 
@@ -313,7 +315,7 @@ export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
         validateStatus: (): boolean => true,
     };
 
-    if (config.timeout !== undefined) {
+    if (isDefined(config.timeout)) {
         createConfig.timeout = config.timeout;
     }
 

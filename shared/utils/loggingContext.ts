@@ -1,8 +1,8 @@
-import type { UnknownArray, UnknownRecord } from "type-fest";
+import type { UnknownArray, UnknownRecord, Writable } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { isRecord } from "@shared/utils/typeHelpers";
-import { isEmpty, objectEntries, safeCastTo, setHas } from "ts-extras";
+import { isDefined, isEmpty, objectEntries, objectHasIn, safeCastTo, setHas } from "ts-extras";
 
 /** Supported logging severity levels emitted by the structured logger. */
 export type LogSeverity = "debug" | "error" | "info" | "warn";
@@ -37,9 +37,7 @@ export interface SanitizedLogContext {
     readonly userAction?: string;
 }
 
-type Mutable<T> = {
-    -readonly [K in keyof T]: T[K];
-};
+type Mutable<T> = Writable<T>;
 
 export const LOG_CONTEXT_SYMBOL: unique symbol = Symbol(
     "uptime-watcher-log-context"
@@ -303,7 +301,7 @@ function normalizeNonPlainObject(
                 ...(candidate.stack
                     ? { stack: normalizeLogString(candidate.stack) }
                     : {}),
-                ...("cause" in errorWithCause
+                ...(objectHasIn(safeCastTo<UnknownRecord>(errorWithCause), "cause")
                     ? { cause: normalize(errorWithCause.cause) }
                     : {}),
             } satisfies UnknownRecord,
@@ -425,7 +423,7 @@ const collectOptionalFields = (
         optionalFields.userAction = context.userAction;
     }
 
-    if (context.metadata !== undefined) {
+    if (isDefined(context.metadata)) {
         optionalFields.metadata = normalizeLogValue(context.metadata);
     }
 
@@ -442,7 +440,9 @@ export const withLogContext = (
 export const isStructuredLogContext = (
     value: unknown
 ): value is StructuredLogContext =>
-    typeof value === "object" && value !== null && LOG_CONTEXT_SYMBOL in value;
+    typeof value === "object" &&
+    value !== null &&
+    objectHasIn(safeCastTo<UnknownRecord>(value), LOG_CONTEXT_SYMBOL);
 
 export const normalizeLogContext = (
     context: StructuredLogContext | undefined,

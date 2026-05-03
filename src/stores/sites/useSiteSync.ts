@@ -22,6 +22,7 @@ import type {
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
+import { isDefined } from "ts-extras";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -493,8 +494,8 @@ export const createSiteSyncActions = (
             let released = false;
 
             const shouldAttachSubscription =
-                syncEventSubscription.cleanup === undefined &&
-                syncEventSubscription.pending === undefined;
+                !isDefined(syncEventSubscription.cleanup) &&
+                !isDefined(syncEventSubscription.pending);
 
             if (shouldAttachSubscription) {
                 const handleEvent = createStateSyncEventHandler({

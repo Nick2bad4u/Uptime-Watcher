@@ -1,3 +1,4 @@
+import type { Jsonifiable } from "type-fest";
 /**
  * String conversion utilities for safe type conversion across the application.
  *
@@ -10,7 +11,7 @@
  * @see {@link safeStringify}
  */
 
-import type { Jsonifiable } from "type-fest";
+import { isDefined } from "ts-extras";
 
 import { safeJsonStringifyWithFallback } from "./jsonSafety";
 
@@ -69,7 +70,7 @@ const isJsonSerializableObject = (
  */
 export function safeStringify(value: unknown): string {
     // Handle null/undefined early
-    if (value === null || value === undefined) {
+    if (value === null || !isDefined(value)) {
         return "";
     }
 

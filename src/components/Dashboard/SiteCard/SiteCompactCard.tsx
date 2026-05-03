@@ -9,6 +9,7 @@
 import type { MonitorStatus, Site } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { useSite } from "../../../hooks/site/useSite";
 import { StatusIndicator } from "../../../theme/components/StatusIndicator";
@@ -147,11 +148,11 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
         );
 
         const uptimeDisplay =
-            typeof uptime === "number" && Number.isFinite(uptime)
+            typeof uptime === "number" && isFiniteNumber(uptime)
                 ? `${uptime.toFixed(1)}%`
                 : "—";
         const responseDisplay =
-            responseTime === undefined ? "—" : `${responseTime} ms`;
+            isDefined(responseTime) ? `${responseTime} ms` : "—";
         const checksDisplay = checkCount.toLocaleString();
         const runningSummary = useMemo(
             () => `${runningMonitors}/${totalMonitors}`,

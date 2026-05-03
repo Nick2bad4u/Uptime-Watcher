@@ -18,6 +18,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isDefined } from "ts-extras";
 
 /**
  * Options for {@link createRefCountedAsyncSubscription}.
@@ -83,7 +84,7 @@ export function createRefCountedAsyncSubscription(
     let pending: Promise<void> | undefined = undefined;
 
     const safeCleanup = (): void => {
-        if (cleanup === undefined) {
+        if (!isDefined(cleanup)) {
             return;
         }
 
@@ -98,7 +99,7 @@ export function createRefCountedAsyncSubscription(
     };
 
     const ensureStarted = (): void => {
-        if (cleanup !== undefined || pending !== undefined) {
+        if (isDefined(cleanup) || isDefined(pending)) {
             return;
         }
 
@@ -152,7 +153,7 @@ export function createRefCountedAsyncSubscription(
 
             // If setup is still pending, the pending promise will observe
             // refCount===0 and cleanup immediately once ready.
-            if (cleanup !== undefined) {
+            if (isDefined(cleanup)) {
                 safeCleanup();
             }
         };

@@ -19,7 +19,7 @@ import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import axios from "axios";
-import { safeCastTo } from "ts-extras";
+import { safeCastTo, setHas } from "ts-extras";
 
 import type { MonitorCheckResult } from "../types";
 
@@ -129,17 +129,17 @@ export function isCancellationError(
     }
 
     const normalizedCode = normalizeErrorCode(error);
-    if (normalizedCode && CANCELLATION_ERROR_CODES.has(normalizedCode)) {
+    if (normalizedCode && setHas(CANCELLATION_ERROR_CODES, normalizedCode)) {
         return true;
     }
 
-    if (CANCELLATION_ERROR_NAMES.has(error.name)) {
+    if (setHas(CANCELLATION_ERROR_NAMES, error.name)) {
         return true;
     }
 
     if (axios.isAxiosError(error)) {
         const axiosCode = normalizeErrorCode(error);
-        if (axiosCode && CANCELLATION_ERROR_CODES.has(axiosCode)) {
+        if (axiosCode && setHas(CANCELLATION_ERROR_CODES, axiosCode)) {
             return true;
         }
     }

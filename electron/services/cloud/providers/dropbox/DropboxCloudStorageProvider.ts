@@ -8,7 +8,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { Dropbox, DropboxResponseError } from "dropbox";
-import { objectValues } from "ts-extras";
+import { isFinite as isFiniteNumber, objectValues } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -362,7 +362,7 @@ export class DropboxCloudStorageProvider
                 }
 
                 const lastModifiedAt = Date.parse(parsed.serverModified);
-                if (!Number.isFinite(lastModifiedAt)) {
+                if (!isFiniteNumber(lastModifiedAt)) {
                     return { cloudObject: null, isInvalid: true };
                 }
 
@@ -507,7 +507,7 @@ export class DropboxCloudStorageProvider
         }
 
         const lastModifiedAt = Date.parse(uploadData.serverModified);
-        if (!Number.isFinite(lastModifiedAt)) {
+        if (!isFiniteNumber(lastModifiedAt)) {
             throw new CloudProviderOperationError(
                 "Dropbox returned an unexpected server_modified timestamp",
                 {

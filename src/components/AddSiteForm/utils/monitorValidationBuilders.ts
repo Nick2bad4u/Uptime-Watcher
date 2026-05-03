@@ -1,6 +1,8 @@
 import type { MonitorType } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
+import { isDefined } from "ts-extras";
+
 import type { PartialMonitorFormDataByType } from "../../../utils/monitorValidation";
 import type { MonitorValidationFieldValues } from "../../../utils/monitorValidationFields";
 
@@ -39,7 +41,7 @@ const monitorValidationBuilders: MonitorValidationBuilderMap = {
         if (
             trimmedRecordType.length > 0 &&
             trimmedRecordType.toUpperCase() !== "ANY" &&
-            candidate !== undefined
+            isDefined(candidate)
         ) {
             return {
                 ...basePayload,

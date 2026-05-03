@@ -20,7 +20,7 @@
 import type { Site } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { SiteCardPresentation } from "../../../stores/ui/types";
 
@@ -187,11 +187,11 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         const HistoryIcon = AppIcons.ui.history;
 
         const statusLabel = formatStatus(status);
-        const uptimeDisplay = Number.isFinite(uptime)
+        const uptimeDisplay = isFiniteNumber(uptime)
             ? `${uptime.toFixed(1)}%`
             : "—";
         const lastResponseDisplay =
-            responseTime === undefined ? "—" : `${responseTime} ms`;
+            isDefined(responseTime) ? `${responseTime} ms` : "—";
         const avgResponseDisplay =
             checkCount === 0 ? "—" : `${averageResponseTime} ms`;
         const checksDisplay = checkCount.toLocaleString();

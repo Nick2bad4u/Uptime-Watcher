@@ -13,7 +13,7 @@ import type { MonitorType } from "@shared/types";
 import type * as z from "zod";
 
 import { MONITOR_STATUS } from "@shared/types";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, objectHasIn } from "ts-extras";
 
 import type {
     BaseMonitorConfig,
@@ -274,7 +274,7 @@ export function createMonitorWithTypeGuards(
     const validationResult = validateMonitorTypeInternal(type);
     if (!validationResult.success) {
         const errorMessage =
-            "error" in validationResult
+            objectHasIn(validationResult, "error")
                 ? validationResult.error
                 : "Invalid monitor type";
         return {

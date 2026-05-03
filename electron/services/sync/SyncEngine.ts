@@ -21,13 +21,7 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import {
-    isDefined,
-    isSafeInteger,
-    objectEntries,
-    objectKeys,
-    objectValues,
-} from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, isSafeInteger, objectEntries, objectHasIn, objectKeys, objectValues, setHas } from "ts-extras";
 
 import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
@@ -341,10 +335,7 @@ export class SyncEngine {
                 const compactedUpTo =
                     nextManifest.devices[metadata.deviceId]?.compactedUpToOpId;
 
-                if (
-                    compactedUpTo !== undefined &&
-                    metadata.lastOpId <= compactedUpTo
-                ) {
+                if (isDefined(compactedUpTo) && metadata.lastOpId <= compactedUpTo) {
                     keysToDelete.push(entry.key);
                 }
             }
@@ -460,7 +451,7 @@ export class SyncEngine {
         }
 
         for (const existing of currentSites) {
-            if (!desiredSiteIdentifiers.has(existing.identifier)) {
+            if (!setHas(desiredSiteIdentifiers, existing.identifier)) {
                 try {
                     await this.orchestrator.removeSite(existing.identifier);
                 } catch (error) {
@@ -505,7 +496,7 @@ export class SyncEngine {
         }
 
         for (const key of objectKeys(existingFiltered)) {
-            if (!(key in desired)) {
+            if (!objectHasIn(desired, key)) {
                 await this.settings.delete(key);
             }
         }
@@ -572,11 +563,9 @@ export class SyncEngine {
         return deviceId;
     }
 
-    private async getNextOpId(): Promise<number> {
-        const raw = await this.settings.get(SETTINGS_KEY_NEXT_OP_ID);
+    private async getNextOpId(): Promise<number> { const raw = await this.settings.get(SETTINGS_KEY_NEXT_OP_ID);
         const value = raw ? Number(raw) : 0;
-        return Number.isFinite(value) && value >= 0 ? value : 0;
-    }
+        return isFiniteNumber(value) && value >= 0 ? value : 0; }
 
     private async getBaseline(): Promise<CloudSyncBaseline> {
         const raw = await this.settings.get(SETTINGS_KEY_BASELINE);
@@ -691,7 +680,7 @@ export class SyncEngine {
         )) {
             const { siteIdentifier } = monitorConfig;
 
-            if (siteIdentifier in desiredSites) {
+            if (objectHasIn(desiredSites, siteIdentifier)) {
                 const existingMonitors =
                     localMonitorsBySite.get(siteIdentifier) ?? [];
 
@@ -738,7 +727,7 @@ export class SyncEngine {
 
             if (
                 mergedValidMonitorsById.has(monitorId) &&
-                siteIdentifier in desiredSites
+                objectHasIn(desiredSites, siteIdentifier)
             ) {
                 const current = monitorIdsBySite.get(siteIdentifier) ?? [];
                 monitorIdsBySite.set(siteIdentifier, [...current, monitorId]);
@@ -784,14 +773,14 @@ export class SyncEngine {
 
         const nextSite: Record<string, CloudSyncEntityState> = {};
         for (const [siteId, entity] of objectEntries(state.site)) {
-            if (entity.deleted !== undefined || keepSiteIds.has(siteId)) {
+            if (isDefined(entity.deleted) || setHas(keepSiteIds, siteId)) {
                 nextSite[siteId] = entity;
             }
         }
 
         const nextMonitor: Record<string, CloudSyncEntityState> = {};
         for (const [monitorId, entity] of objectEntries(state.monitor)) {
-            if (entity.deleted !== undefined || keepMonitorIds.has(monitorId)) {
+            if (isDefined(entity.deleted) || setHas(keepMonitorIds, monitorId)) {
                 nextMonitor[monitorId] = entity;
             }
         }

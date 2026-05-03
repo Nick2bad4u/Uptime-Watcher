@@ -11,7 +11,7 @@
 
 import type { Site } from "@shared/types";
 
-import { arrayJoin, isEmpty } from "ts-extras";
+import { arrayJoin, isEmpty, setHas } from "ts-extras";
 
 /**
  * Summary of a duplicate site identifier occurrence.
@@ -137,7 +137,7 @@ export function sanitizeSitesByIdentifier(
     const sanitizedSites: Site[] = [];
 
     for (const site of sites) {
-        if (!seen.has(site.identifier)) {
+        if (!setHas(seen, site.identifier)) {
             seen.add(site.identifier);
             sanitizedSites.push(site);
         }

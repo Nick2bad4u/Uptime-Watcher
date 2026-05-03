@@ -8,7 +8,7 @@
  */
 
 import { useCallback } from "react";
-import { objectKeys, safeCastTo, setHas } from "ts-extras";
+import { isDefined, objectHasIn, objectKeys, safeCastTo, setHas } from "ts-extras";
 
 import type { AppSettings } from "../../stores/types";
 
@@ -62,7 +62,7 @@ export function useSettingsChangeHandlers(args: {
             const forceSettingsKeys = new Set<AllowedSettingsKey>(
                 (options?.forceKeys ?? []).filter(
                     (key): key is AllowedSettingsKey =>
-                        ALLOWED_SETTINGS_KEY_STRINGS.has(key)
+                        setHas(ALLOWED_SETTINGS_KEY_STRINGS, key)
                 )
             );
 
@@ -71,13 +71,13 @@ export function useSettingsChangeHandlers(args: {
 
             // Log and apply changes for allowed keys
             for (const allowedKey of ALLOWED_SETTINGS_KEY_LIST) {
-                if (allowedKey in changes) {
+                if (objectHasIn(changes, allowedKey)) {
                     const oldValue = settings[allowedKey];
                     const newValue = changes[allowedKey];
                     const isForced = setHas(forceSettingsKeys, allowedKey);
 
                     if (
-                        newValue !== undefined &&
+                        isDefined(newValue) &&
                         (oldValue !== newValue || isForced)
                     ) {
                         Reflect.set(nextSettings, allowedKey, newValue);
@@ -93,7 +93,7 @@ export function useSettingsChangeHandlers(args: {
 
             // Warn about invalid keys
             for (const rawKey of objectKeys(changes)) {
-                if (!ALLOWED_SETTINGS_KEY_STRINGS.has(rawKey)) {
+                if (!setHas(ALLOWED_SETTINGS_KEY_STRINGS, rawKey)) {
                     logger.warn(
                         "Attempted to update invalid settings key",
                         rawKey

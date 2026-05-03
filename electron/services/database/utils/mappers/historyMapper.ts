@@ -16,6 +16,7 @@ import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { isDefined } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
 
@@ -148,9 +149,9 @@ export function historyEntryToRow(
  */
 export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
     return (
-        row.monitorId !== undefined &&
-        row.status !== undefined &&
-        row.timestamp !== undefined &&
+        isDefined(row.monitorId) &&
+        isDefined(row.status) &&
+        isDefined(row.timestamp) &&
         typeof row.monitorId === "string" &&
         (row.status === "up" ||
             row.status === "degraded" ||
@@ -184,7 +185,7 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
 export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
     try {
         return {
-            ...(row.details !== undefined && {
+            ...(isDefined(row.details) && {
                 details:
                     typeof row.details === "string"
                         ? row.details

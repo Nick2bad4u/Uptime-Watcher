@@ -6,6 +6,8 @@
  * provider coordination and orchestration rather than string-key bookkeeping.
  */
 
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+
 import type { CloudSettingsAdapter } from "../CloudService.types";
 
 /**
@@ -60,10 +62,10 @@ export function parseBooleanSetting(value: string | undefined): boolean {
 
 /** Parse a nullable number stored as a string. */
 export function parseNumberSetting(value: string | undefined): null | number {
-    if (value === undefined) {
+    if (!isDefined(value)) {
         return null;
     }
 
     const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
+    return isFiniteNumber(parsed) ? parsed : null;
 }

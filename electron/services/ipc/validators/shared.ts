@@ -1,3 +1,7 @@
+import {
+    MAX_IPC_JSON_IMPORT_BYTES,
+    MAX_IPC_SQLITE_RESTORE_BYTES,
+} from "@shared/constants/backup";
 /**
  * Parameter validators for specific IPC handler groups.
  *
@@ -11,11 +15,7 @@
  *
  * @see {@link IpcParameterValidator}
  */
-
-import {
-    MAX_IPC_JSON_IMPORT_BYTES,
-    MAX_IPC_SQLITE_RESTORE_BYTES,
-} from "@shared/constants/backup";
+import { isDefined } from "ts-extras";
 
 import type { IpcParameterValidator } from "../types";
 import type { ParameterValueValidationResult } from "./utils/parameterValidation";
@@ -134,7 +134,7 @@ const validateRestorePayload: IpcParameterValidator = createParamValidator(1, [
         );
 
         const fileNameValue = record["fileName"];
-        if (fileNameValue !== undefined) {
+        if (isDefined(fileNameValue)) {
             errors.push(
                 ...validateRestoreFileNameCandidate(fileNameValue, {
                     maxBytes: MAX_RESTORE_FILE_NAME_BYTES,

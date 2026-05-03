@@ -1,6 +1,6 @@
 import { createAbortError } from "@shared/utils/abortError";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
-import { isEmpty } from "ts-extras";
+import { isDefined, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
 import { calculateBackoffDelayMs } from "./backoff";
 
@@ -155,7 +155,7 @@ export function createCombinedAbortSignal(
     };
 
     // Add timeout signal if specified
-    if (timeoutMs !== undefined && timeoutMs > 0) {
+    if (isDefined(timeoutMs) && timeoutMs > 0) {
         signals.push(createTimeoutSignal(timeoutMs, reason));
     }
 
@@ -252,7 +252,7 @@ async function sleepInternal(
         }
 
         // Handle negative or invalid values by resolving immediately.
-        if (!Number.isFinite(ms) || ms <= 0) {
+        if (!isFiniteNumber(ms) || ms <= 0) {
             resolve();
             return;
         }
@@ -262,7 +262,7 @@ async function sleepInternal(
         } = {};
 
         const handleAbort = (): void => {
-            if (state.timeoutId !== undefined) {
+            if (isDefined(state.timeoutId)) {
                 clearTimeout(state.timeoutId);
             }
             signal?.removeEventListener("abort", handleAbort);
@@ -674,7 +674,7 @@ export async function raceWithTimeout<T>(
 ): Promise<T> {
     const { signal, timeoutMessage, timeoutMs, unrefTimer = false } = options;
 
-    if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    if (!isFiniteNumber(timeoutMs) || timeoutMs <= 0) {
         return signal ? raceWithAbort(operation, signal) : operation;
     }
 

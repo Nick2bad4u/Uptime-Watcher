@@ -16,7 +16,7 @@ import {
     validateSiteSnapshot,
     validateSiteSnapshots,
 } from "@shared/validation/guards";
-import { arrayJoin, isEmpty } from "ts-extras";
+import { arrayFirst, arrayJoin, isEmpty } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -176,10 +176,8 @@ export const SiteService: SiteServiceContract = {
         const invalidIndices = Array.from(
             new Set(
                 issues
-                    .map((issue) => issue.path[0])
-                    .filter(
-                        (value): value is number => typeof value === "number"
-                    )
+                    .map((issue) => arrayFirst(issue.path))
+                    .filter((value): value is number => typeof value === "number")
             )
         ).toSorted((a, b) => a - b);
 

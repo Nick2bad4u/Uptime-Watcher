@@ -1,3 +1,4 @@
+import type { Monitor, Site } from "@shared/types";
 /**
  * Shared validation helpers for monitor status changed events.
  *
@@ -7,12 +8,11 @@
  *
  * @packageDocumentation
  */
-
-import type { Monitor, Site } from "@shared/types";
 import type { MonitorStatusChangedEventData } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { objectHasIn } from "ts-extras";
 
 import { validateStatusUpdate } from "./guards";
 
@@ -20,17 +20,17 @@ const isUnknownRecord = (value: unknown): value is UnknownRecord =>
     isRecord(value);
 
 const stripEventMetadata = (value: UnknownRecord): UnknownRecord => {
-    if (!Reflect.has(value, "_meta") && !Reflect.has(value, "_originalMeta")) {
+    if (!objectHasIn(value, "_meta") && !objectHasIn(value, "_originalMeta")) {
         return value;
     }
 
     const sanitizedRecord: UnknownRecord = { ...value };
 
-    if (Reflect.has(sanitizedRecord, "_meta")) {
+    if (objectHasIn(sanitizedRecord, "_meta")) {
         Reflect.deleteProperty(sanitizedRecord, "_meta");
     }
 
-    if (Reflect.has(sanitizedRecord, "_originalMeta")) {
+    if (objectHasIn(sanitizedRecord, "_originalMeta")) {
         Reflect.deleteProperty(sanitizedRecord, "_originalMeta");
     }
 

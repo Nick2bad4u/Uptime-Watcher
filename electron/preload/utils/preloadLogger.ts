@@ -23,7 +23,7 @@ import { isObject } from "@shared/utils/typeGuards";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { ipcRenderer } from "electron";
 import log from "electron-log/renderer";
-import { objectKeys } from "ts-extras";
+import { isDefined, objectKeys } from "ts-extras";
 
 const PRELOAD_PREFIX = "PRELOAD";
 const DIAGNOSTICS_PREFIX = "PRELOAD:DIAGNOSTICS";
@@ -157,10 +157,9 @@ const serializeValue = (value: unknown): unknown => {
     if (value instanceof Error) {
         const { cause: errorCause, message, name, stack } = value;
         return {
-            cause:
-                errorCause === undefined
-                    ? undefined
-                    : serializeValue(errorCause),
+            cause: isDefined(errorCause)
+                ? serializeValue(errorCause)
+                : undefined,
             message,
             name,
             stack,
@@ -236,7 +235,7 @@ export const buildPayloadPreview = (
     payload: unknown,
     limit: number = PAYLOAD_PREVIEW_LIMIT
 ): string | undefined => {
-    if (payload === undefined) {
+    if (!isDefined(payload)) {
         return undefined;
     }
 

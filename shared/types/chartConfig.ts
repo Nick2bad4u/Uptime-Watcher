@@ -11,7 +11,7 @@
 
 import type { Arrayable, UnknownRecord } from "type-fest";
 
-import { safeCastTo } from "ts-extras";
+import { objectHasIn, safeCastTo } from "ts-extras";
 
 /**
  * Chart.js animation easing function values.
@@ -504,9 +504,9 @@ export function hasPlugins(
     return (
         typeof config === "object" &&
         config !== null &&
-        "plugins" in config &&
-        typeof safeCastTo<UnknownRecord>(config)["plugins"] === "object" &&
-        safeCastTo<UnknownRecord>(config)["plugins"] !== null
+        objectHasIn(safeCastTo<UnknownRecord>(config), "plugins") &&
+        typeof safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["plugins"]) === "object" &&
+        safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["plugins"]) !== null
     );
 }
 
@@ -526,9 +526,9 @@ export function hasScales(
     return (
         typeof config === "object" &&
         config !== null &&
-        "scales" in config &&
-        typeof safeCastTo<UnknownRecord>(config)["scales"] === "object" &&
-        safeCastTo<UnknownRecord>(config)["scales"] !== null
+        objectHasIn(safeCastTo<UnknownRecord>(config), "scales") &&
+        typeof safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["scales"]) === "object" &&
+        safeCastTo<UnknownRecord>(safeCastTo<UnknownRecord>(config)["scales"]) !== null
     );
 }
 

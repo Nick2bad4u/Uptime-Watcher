@@ -22,7 +22,15 @@ import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateImportData } from "@shared/validation/importExportSchemas";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
-import { arrayAt, arrayJoin, isDefined, isEmpty, safeCastTo } from "ts-extras";
+import {
+    arrayAt,
+    arrayJoin,
+    isDefined,
+    isEmpty,
+    isFinite as isFiniteNumber,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
@@ -568,7 +576,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 
         const newlyImportedSites: Site[] = [];
         for (const site of reloadedSites) {
-            if (!previousSiteIdentifiers.has(site.identifier)) {
+            if (!setHas(previousSiteIdentifiers, site.identifier)) {
                 newlyImportedSites.push(site);
             }
         }
@@ -635,7 +643,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             (value): value is JsonValue => isDefined(value)
         );
 
-        if (!parseResult.success || parseResult.data === undefined) {
+        if (!parseResult.success || !isDefined(parseResult.data)) {
             errors.push("Import data must be valid JSON");
         } else {
             const validation = validateImportData(parseResult.data);
@@ -664,12 +672,12 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         }
 
         const rawHistoryLimit = settings["historyLimit"];
-        if (rawHistoryLimit === undefined) {
+        if (!isDefined(rawHistoryLimit)) {
             return;
         }
 
         const parsedHistoryLimit = Number(rawHistoryLimit);
-        if (!Number.isFinite(parsedHistoryLimit)) {
+        if (!isFiniteNumber(parsedHistoryLimit)) {
             backendLogger.warn(
                 "[ImportDataCommand] Imported history limit is not a valid number",
                 {

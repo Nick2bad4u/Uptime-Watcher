@@ -1,3 +1,4 @@
+import { hasAsciiControlCharacters as sharedHasAsciiControlCharacters } from "@shared/utils/stringSafety";
 /**
  * Shared SyncEngine utilities.
  *
@@ -5,12 +6,11 @@
  * This module intentionally holds low-level helpers (validation + bounded
  * concurrency) used by {@link electron/services/sync/SyncEngine#SyncEngine}.
  */
-
-import { hasAsciiControlCharacters as sharedHasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import {
     getPersistedDeviceIdValidationError as sharedGetPersistedDeviceIdValidationError,
     isValidPersistedDeviceId as sharedIsValidPersistedDeviceId,
 } from "@shared/validation/persistedDeviceIdValidation";
+import { arrayIncludes, isDefined } from "ts-extras";
 
 /**
  * Returns true when the string contains only ASCII digits.
@@ -27,7 +27,7 @@ export function isAsciiDigits(value: string): boolean {
 
     for (const char of value) {
         const codePoint = char.codePointAt(0);
-        if (codePoint === undefined || codePoint < 48 || codePoint > 57) {
+        if (!isDefined(codePoint) || codePoint < 48 || codePoint > 57) {
             return false;
         }
     }
@@ -87,7 +87,7 @@ function assertNoUndefined<T>(
     values: Array<T | undefined>,
     message: string
 ): asserts values is T[] {
-    if (values.includes(undefined)) {
+    if (arrayIncludes(values)) {
         throw new Error(message);
     }
 }
@@ -115,7 +115,7 @@ export async function mapWithConcurrency<T, R>(args: {
             index += 1;
 
             const item = items[currentIndex];
-            if (item === undefined) {
+            if (!isDefined(item)) {
                 break;
             }
 

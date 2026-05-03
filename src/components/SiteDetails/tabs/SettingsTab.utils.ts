@@ -10,7 +10,7 @@ import type { Monitor, Site } from "@shared/types";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { useEffect, useState } from "react";
-import { arrayFirst } from "ts-extras";
+import { arrayFirst, isFinite as isFiniteNumber } from "ts-extras";
 
 import {
     getMonitorDisplayIdentifier,
@@ -20,13 +20,12 @@ import {
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 
 /** Format a seconds value and include a minutes breakdown for long durations. */
-export function formatSecondsWithMinutes(totalSeconds: number): string {
-    const safeSeconds = Number.isFinite(totalSeconds)
+export function formatSecondsWithMinutes(totalSeconds: number): string { const safeSeconds = isFiniteNumber(totalSeconds)
         ? Math.max(0, Math.round(totalSeconds))
         : 0;
 
     if (safeSeconds < 60) {
-        return `${safeSeconds}s`;
+        return `${safeSeconds }s`;
     }
 
     const minutes = Math.floor(safeSeconds / 60);

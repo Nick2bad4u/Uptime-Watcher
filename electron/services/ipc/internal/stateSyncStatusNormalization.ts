@@ -1,3 +1,4 @@
+import type { EventMetadata } from "@shared/types/events";
 /**
  * Normalizes `sites:state-synchronized` payloads for IPC bookkeeping.
  *
@@ -6,8 +7,6 @@
  * revision) to keep {@link StateSyncStatusSummary} up-to-date. This module
  * avoids heavy validation or cloning of full site payloads.
  */
-
-import type { EventMetadata } from "@shared/types/events";
 import type {
     SiteIdentifierSnapshot,
     StateSyncSource,
@@ -15,6 +14,7 @@ import type {
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Lightweight, normalized view of the `sites:state-synchronized` event used
@@ -90,9 +90,9 @@ export function normalizeStateSyncPayload(
             action !== STATE_SYNC_ACTION.UPDATE) ||
         !isValidStateSyncSource(source) ||
         typeof timestamp !== "number" ||
-        !Number.isFinite(timestamp) ||
+        !isFiniteNumber(timestamp) ||
         typeof revision !== "number" ||
-        !Number.isFinite(revision)
+        !isFiniteNumber(revision)
     ) {
         return null;
     }
@@ -106,7 +106,7 @@ export function normalizeStateSyncPayload(
 
         if (
             typeof siteCountCandidate !== "number" ||
-            !Number.isFinite(siteCountCandidate) ||
+            !isFiniteNumber(siteCountCandidate) ||
             !Array.isArray(sitesCandidate)
         ) {
             return null;

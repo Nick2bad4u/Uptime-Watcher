@@ -17,6 +17,8 @@
  */
 
 /** Supported retry backoff strategies. */
+import { isFinite as isFiniteNumber } from "ts-extras";
+
 export type BackoffStrategy = "exponential" | "linear";
 
 /**
@@ -55,25 +57,23 @@ export interface BackoffDelayOptions {
  *   schedule negative timeouts or throw while handling an already-failing
  *   operation.
  */
-export function calculateBackoffDelayMs(options: BackoffDelayOptions): number {
-    const attemptIndex = Number.isFinite(options.attemptIndex)
+export function calculateBackoffDelayMs(options: BackoffDelayOptions): number { const attemptIndex = isFiniteNumber(options.attemptIndex)
         ? Math.max(0, Math.trunc(options.attemptIndex))
         : 0;
 
-    const initialDelayMs = Number.isFinite(options.initialDelayMs)
+    const initialDelayMs = isFiniteNumber(options.initialDelayMs)
         ? Math.max(0, options.initialDelayMs)
         : 0;
 
     if (initialDelayMs === 0) {
-        return 0;
-    }
+        return 0; }
 
     if (options.strategy === "linear") {
         return initialDelayMs * (attemptIndex + 1);
     }
 
     const rawMultiplier = options.multiplier ?? 2;
-    const multiplier = Number.isFinite(rawMultiplier)
+    const multiplier = isFiniteNumber(rawMultiplier)
         ? Math.max(0, rawMultiplier)
         : 2;
 

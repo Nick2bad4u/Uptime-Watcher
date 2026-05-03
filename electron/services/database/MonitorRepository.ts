@@ -58,7 +58,7 @@ import {
     isValidMonitorId,
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
-import { arrayJoin, isEmpty } from "ts-extras";
+import { arrayJoin, isEmpty, objectHasIn } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
 
@@ -226,9 +226,9 @@ export class MonitorRepository {
                         );
 
                         if (
-                            !("id" in insertResult) ||
-                            typeof insertResult["id"] !== "string" ||
-                            insertResult["id"].length === 0
+                            !objectHasIn(insertResult, "id") ||
+                            typeof insertResult.id !== "string" ||
+                            insertResult.id.length === 0
                         ) {
                             throw new Error(
                                 "Failed to create monitor: invalid or missing ID in database response"
@@ -765,9 +765,9 @@ export class MonitorRepository {
 
         // Validate the returned ID from database
         if (
-            !("id" in insertResult) ||
-            typeof insertResult["id"] !== "string" ||
-            insertResult["id"].length === 0
+            !objectHasIn(insertResult, "id") ||
+            typeof insertResult.id !== "string" ||
+            insertResult.id.length === 0
         ) {
             throw new Error(
                 `Failed to create monitor for site ${siteIdentifier}: invalid or missing ID in database response`
@@ -776,11 +776,11 @@ export class MonitorRepository {
 
         if (isDev()) {
             logger.debug(
-                `[MonitorRepository] Created monitor with id: ${insertResult["id"]} for site: ${siteIdentifier} (internal)`
+                `[MonitorRepository] Created monitor with id: ${insertResult.id} for site: ${siteIdentifier} (internal)`
             );
         }
 
-        return insertResult["id"];
+        return insertResult.id;
     }
 
     /**

@@ -7,7 +7,7 @@
  */
 
 import { sleep, sleepUnref } from "@shared/utils/abortUtils";
-import { arrayAt } from "ts-extras";
+import { arrayAt, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 const RETRY_NON_ERROR_THROWN_MARKER: unique symbol = Symbol(
     "shared.utils.retry.nonErrorThrown"
@@ -119,7 +119,7 @@ function resolveDelayMs(args: {
             ? args.delay({ attempt: args.attempt, error: args.error })
             : args.delay;
 
-    if (!Number.isFinite(value) || value <= 0) {
+    if (!isFiniteNumber(value) || value <= 0) {
         return 0;
     }
 
@@ -224,7 +224,7 @@ export async function withRetry<T>(
 
     // `maxRetries` is the maximum number of attempts (including the first).
     const maxRetries = options.maxRetries ?? 5;
-    if (!Number.isFinite(maxRetries) || maxRetries <= 0) {
+    if (!isFiniteNumber(maxRetries) || maxRetries <= 0) {
         throw new Error(
             `[withRetry] maxRetries must be a positive number (received ${String(maxRetries)})`
         );
@@ -265,7 +265,7 @@ export async function withRetry<T>(
     }
 
     const lastError = arrayAt(errors, -1);
-    if (lastError === undefined) {
+    if (!isDefined(lastError)) {
         throw new Error("[withRetry] Operation failed without an error");
     }
 

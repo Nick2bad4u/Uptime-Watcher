@@ -10,6 +10,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { isDefined, objectHasIn } from "ts-extras";
+
 import { isRecord } from "../utils/typeHelpers";
 
 /**
@@ -186,7 +188,7 @@ export function isValidationResult(
     // Type-safe property access after narrowing
     const obj: UnknownRecord = result;
 
-    if (!("errors" in obj) || !("success" in obj)) {
+    if (!objectHasIn(obj, "errors") || !objectHasIn(obj, "success")) {
         return false;
     }
 
@@ -204,7 +206,7 @@ export function isValidationResult(
     }
 
     if (
-        warnings !== undefined &&
+        isDefined(warnings) &&
         (!Array.isArray(warnings) ||
             warnings.some((value) => typeof value !== "string"))
     ) {
@@ -212,7 +214,7 @@ export function isValidationResult(
     }
 
     if (
-        metadata !== undefined &&
+        isDefined(metadata) &&
         (typeof metadata !== "object" ||
             metadata === null ||
             Array.isArray(metadata))

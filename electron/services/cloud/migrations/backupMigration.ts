@@ -5,7 +5,7 @@ import type {
 import type { AsyncReturnType } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isEmpty } from "ts-extras";
+import { arrayJoin, isDefined, isEmpty, setHas } from "ts-extras";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
@@ -94,7 +94,7 @@ async function migrateSingleEntry(args: {
     });
     const targetKey = toCanonicalBackupObjectKey(targetFileName);
 
-    if (args.existingBackupKeys.has(targetKey)) {
+    if (setHas(args.existingBackupKeys, targetKey)) {
         return {
             failureMessage: `Target backup already exists (${targetKey}); refusing to overwrite`,
             migrated: false,
@@ -223,7 +223,7 @@ export async function migrateProviderBackups(args: {
 
     const needsCryptoKey =
         targetEncrypted || selected.some((entry) => entry.encrypted);
-    if (needsCryptoKey && encryptionKey === undefined) {
+    if (needsCryptoKey && !isDefined(encryptionKey)) {
         throw new Error(ENCRYPTION_KEY_REQUIRED_MESSAGE);
     }
 

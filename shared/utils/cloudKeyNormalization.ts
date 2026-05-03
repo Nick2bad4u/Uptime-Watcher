@@ -1,7 +1,7 @@
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { stringSplit } from "ts-extras";
+import { isFinite as isFiniteNumber, stringSplit } from "ts-extras";
 
 /**
  * Default maximum size budget for provider object keys.
@@ -137,14 +137,12 @@ function assertWithinByteLengthBudget(
 function assertWithinByteLengthBudgetIfValid(
     value: string,
     maxByteLength: number | undefined
-): void {
-    if (
+): void { if (
         typeof maxByteLength !== "number" ||
-        !Number.isFinite(maxByteLength) ||
+            !isFiniteNumber(maxByteLength) ||
         maxByteLength <= 0
     ) {
-        return;
-    }
+        return; }
 
     assertWithinByteLengthBudget(value, maxByteLength);
 }

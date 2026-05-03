@@ -10,6 +10,8 @@
  * @packageDocumentation
  */
 
+import { isFinite as isFiniteNumber, isPresent } from "ts-extras";
+
 import {
     isValidInteger,
     isValidPort as isValidPortValue,
@@ -56,7 +58,7 @@ export function validateRequired(
     value: unknown,
     fieldName = "Field"
 ): { error?: string; isValid: boolean } {
-    if (value === null || value === undefined) {
+    if (!isPresent(value)) {
         return {
             error: `${fieldName} is required`,
             isValid: false,
@@ -144,7 +146,7 @@ export function validatePort(
     }
 
     // Number input path
-    if (!Number.isFinite(port)) {
+    if (!isFiniteNumber(port)) {
         return {
             error: `${fieldName} must be a number`,
             isValid: false,

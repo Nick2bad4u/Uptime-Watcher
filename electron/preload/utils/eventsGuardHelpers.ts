@@ -1,6 +1,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+import { isFinite as isFiniteNumber, setHas } from "ts-extras";
 
 /**
  * Creates a guard that validates a string union using a lookup set.
@@ -10,7 +11,7 @@ export function createStringUnionGuard<T extends string>(
 ): (value: unknown) => value is T {
     const set = new Set<string>(values);
     return (value: unknown): value is T =>
-        typeof value === "string" && set.has(value);
+        typeof value === "string" && setHas(set, value);
 }
 
 /**
@@ -23,4 +24,4 @@ export const isUnknownRecord = (value: unknown): value is UnknownRecord =>
  * Checks that a value is a finite number suitable for timestamps.
  */
 export const hasFiniteTimestamp = (value: unknown): value is number =>
-    typeof value === "number" && Number.isFinite(value);
+    typeof value === "number" && isFiniteNumber(value);

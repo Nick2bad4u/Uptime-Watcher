@@ -34,7 +34,7 @@
 import type { ChartData, ChartOptions } from "chart.js";
 import type { UnknownRecord, ValueOf } from "type-fest";
 
-import { safeCastTo } from "ts-extras";
+import { objectHasIn, safeCastTo } from "ts-extras";
 
 // Import our custom business logic types
 import type {
@@ -298,7 +298,8 @@ export function isUptimeChartOptions(
     return (
         typeof options === "object" &&
         options !== null &&
-        ("scales" in options || "plugins" in options)
+        (objectHasIn(safeCastTo<UnknownRecord>(options), "scales") ||
+            objectHasIn(safeCastTo<UnknownRecord>(options), "plugins"))
     );
 }
 
@@ -315,7 +316,7 @@ export function isUptimeChartData(data: unknown): data is UptimeChartData {
     return (
         typeof data === "object" &&
         data !== null &&
-        "datasets" in data &&
-        Array.isArray(safeCastTo(data).datasets)
+        objectHasIn(safeCastTo<UnknownRecord>(data), "datasets") &&
+        Array.isArray(safeCastTo<UnknownRecord>(data).datasets)
     );
 }

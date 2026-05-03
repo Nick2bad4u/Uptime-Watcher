@@ -48,7 +48,7 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
-import { objectValues, safeCastTo } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, objectValues, safeCastTo } from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {
@@ -133,7 +133,7 @@ const isCacheInvalidatedEventDataPayload = (
 
     const { identifier, reason, timestamp, type } = payload;
 
-    if (identifier !== undefined && typeof identifier !== "string") {
+    if (isDefined(identifier) && typeof identifier !== "string") {
         return false;
     }
 
@@ -166,19 +166,19 @@ const isMonitoringControlEventDataPayload = (
         return false;
     }
 
-    if (activeMonitors !== undefined && typeof activeMonitors !== "number") {
+    if (isDefined(activeMonitors) && typeof activeMonitors !== "number") {
         return false;
     }
 
-    if (monitorCount !== undefined && typeof monitorCount !== "number") {
+    if (isDefined(monitorCount) && typeof monitorCount !== "number") {
         return false;
     }
 
-    if (siteCount !== undefined && typeof siteCount !== "number") {
+    if (isDefined(siteCount) && typeof siteCount !== "number") {
         return false;
     }
 
-    if (reason === undefined) {
+    if (!isDefined(reason)) {
         return true;
     }
 
@@ -258,7 +258,7 @@ const isUpdateStatusEventDataPayload = (
         return false;
     }
 
-    if (error !== undefined && typeof error !== "string") {
+    if (isDefined(error) && typeof error !== "string") {
         return false;
     }
 
@@ -312,7 +312,7 @@ const isHistoryLimitUpdatedEventDataPayload = (
     // History limit semantics:
     // - finite numbers >= 0 are valid
     // - 0 represents "unlimited" retention (see DEFAULT_HISTORY_LIMIT_RULES)
-    if (typeof limit !== "number" || !Number.isFinite(limit) || limit < 0) {
+    if (typeof limit !== "number" || !isFiniteNumber(limit) || limit < 0) {
         return false;
     }
 
@@ -325,9 +325,9 @@ const isHistoryLimitUpdatedEventDataPayload = (
     }
 
     if (
-        previousLimit !== undefined &&
+        isDefined(previousLimit) &&
         (typeof previousLimit !== "number" ||
-            !Number.isFinite(previousLimit) ||
+            !isFiniteNumber(previousLimit) ||
             previousLimit < 0)
     ) {
         return false;
@@ -716,7 +716,7 @@ export function createEventsApi(): EventsApi {
         removeAllListeners: (...args: Readonly<UnknownArray>): void => {
             const [candidate] = args;
 
-            if (candidate === undefined) {
+            if (!isDefined(candidate)) {
                 for (const manager of objectValues(managers)) {
                     manager.removeAll();
                 }

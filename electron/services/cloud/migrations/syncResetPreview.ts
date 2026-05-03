@@ -1,7 +1,7 @@
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
-import { objectKeys, safeCastTo } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, objectKeys, safeCastTo } from "ts-extras";
 
 import type { CloudObjectEntry } from "../providers/CloudStorageProvider.types";
 
@@ -43,14 +43,14 @@ export function buildCloudSyncResetPreview(args: {
         existing.operationObjectCount += 1;
 
         if (
-            existing.oldestCreatedAtEpochMs === undefined ||
+            !isDefined(existing.oldestCreatedAtEpochMs) ||
             createdAtEpochMs < existing.oldestCreatedAtEpochMs
         ) {
             existing.oldestCreatedAtEpochMs = createdAtEpochMs;
         }
 
         if (
-            existing.newestCreatedAtEpochMs === undefined ||
+            !isDefined(existing.newestCreatedAtEpochMs) ||
             createdAtEpochMs > existing.newestCreatedAtEpochMs
         ) {
             existing.newestCreatedAtEpochMs = createdAtEpochMs;
@@ -73,7 +73,7 @@ export function buildCloudSyncResetPreview(args: {
 
             if (deviceId && createdAtString) {
                 const createdAtEpochMs = Number(createdAtString);
-                if (Number.isFinite(createdAtEpochMs)) {
+                if (isFiniteNumber(createdAtEpochMs)) {
                     upsertDeviceOperation(deviceId, createdAtEpochMs);
                 }
             }

@@ -16,10 +16,12 @@ import {
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
 import {
+    isDefined,
     isEmpty,
     objectEntries,
     objectFromEntries,
     safeCastTo,
+    setHas,
 } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
@@ -40,7 +42,7 @@ const lockExpiryTimers = new Map<
 
 const cancelLockExpiryTimer = (key: OptimisticLockKey): void => {
     const timerId = lockExpiryTimers.get(key);
-    if (timerId !== undefined) {
+    if (isDefined(timerId)) {
         globalThis.clearTimeout(timerId);
         lockExpiryTimers.delete(key);
     }
@@ -54,7 +56,7 @@ const collectActiveLockEntries = (
     const entries: OptimisticLockEntry[] = [];
 
     for (const [rawKey, lock] of objectEntries(locks)) {
-        if (isOptimisticLockKey(rawKey) && lock !== undefined) {
+        if (isOptimisticLockKey(rawKey) && isDefined(lock)) {
             entries.push([rawKey, lock]);
         }
     }
@@ -286,7 +288,7 @@ export const createSitesStateActions = (
                         siteIdentifier,
                         monitorId
                     );
-                    if (currentLocks[key] !== undefined) {
+                    if (isDefined(currentLocks[key])) {
                         const removed = Reflect.deleteProperty(
                             currentLocks,
                             key
@@ -517,8 +519,8 @@ export const createSitesStateActions = (
                 );
 
                 const nextSelectedSiteIdentifier =
-                    selectedSiteIdentifier !== undefined &&
-                    validIdentifiers.has(selectedSiteIdentifier)
+                    isDefined(selectedSiteIdentifier) &&
+                    setHas(validIdentifiers, selectedSiteIdentifier)
                         ? selectedSiteIdentifier
                         : undefined;
 
@@ -533,7 +535,7 @@ export const createSitesStateActions = (
                 for (const [siteId, monitorId] of collectSelectedMonitorEntries(
                     selectedMonitorIds
                 )) {
-                    if (validIdentifiers.has(siteId)) {
+                    if (setHas(validIdentifiers, siteId)) {
                         const candidateSite = siteLookup.get(siteId);
                         if (
                             candidateSite?.monitors.some(

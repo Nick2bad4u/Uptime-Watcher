@@ -650,7 +650,7 @@ export const useSettingsController = ({
                         maxBytes: MAX_IPC_SQLITE_RESTORE_BYTES,
                     });
 
-                if ("message" in payloadResult) {
+                if (!payloadResult.ok) {
                     throw new Error(payloadResult.message);
                 }
 

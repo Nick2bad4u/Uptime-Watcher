@@ -2,6 +2,8 @@
  * Shared helpers for history pruning operations.
  */
 
+import { isFinite as isFiniteNumber } from "ts-extras";
+
 /**
  * Normalizes a history prune limit into a positive integer.
  *
@@ -9,7 +11,7 @@
  *   provided limit is invalid / disables pruning.
  */
 export function normalizeHistoryPruneLimit(limit: number): null | number {
-    if (!Number.isFinite(limit)) {
+    if (!isFiniteNumber(limit)) {
         return null;
     }
 

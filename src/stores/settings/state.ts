@@ -1,7 +1,7 @@
 import type { StoreApi } from "zustand";
 
 import { safeNumberConversion } from "@shared/utils/safeConversions";
-import { safeCastTo } from "ts-extras";
+import { isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
 
 /**
  * Basic state slice for the settings store.
@@ -51,15 +51,13 @@ export const defaultSettings: AppSettings = {
 const clampInAppAlertVolume = (
     value: unknown,
     fallback: number = DEFAULT_IN_APP_ALERT_VOLUME
-): number => {
-    const sanitizedFallback = Number.isFinite(fallback)
+): number => { const sanitizedFallback = isFiniteNumber(fallback)
         ? fallback
         : DEFAULT_IN_APP_ALERT_VOLUME;
     const numeric = safeNumberConversion(value, sanitizedFallback);
 
-    if (!Number.isFinite(numeric)) {
-        return sanitizedFallback;
-    }
+    if (!isFiniteNumber(numeric)) {
+        return sanitizedFallback; }
 
     if (numeric <= 0) {
         return 0;

@@ -15,7 +15,12 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Promisable } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import { isEmpty } from "ts-extras";
+import {
+    isDefined,
+    isEmpty,
+    isFinite as isFiniteNumber,
+    setHas,
+} from "ts-extras";
 
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { DatabaseService } from "./DatabaseService";
@@ -539,14 +544,14 @@ export class SiteWriterService {
         );
 
         for (const monitor of updatedMonitors) {
-            if (monitor.id && !originalIds.has(monitor.id)) {
+            if (monitor.id && !setHas(originalIds, monitor.id)) {
                 // Monitor has ID and is not in original set
                 newMonitorIds.push(monitor.id);
             } else if (!monitor.id) {
                 // Monitor without ID - check if it's genuinely new by
                 // comparing signature
                 const monitorSignature = createMonitorSignature(monitor);
-                if (!originalMonitorSignatures.has(monitorSignature)) {
+                if (!setHas(originalMonitorSignatures, monitorSignature)) {
                     // New monitor without ID - use empty string as placeholder
                     newMonitorIds.push("");
                 }
@@ -592,22 +597,22 @@ export class SiteWriterService {
         const defaults: Partial<NormalizedMonitorConfig> = {};
 
         if (
-            existingMonitor?.checkInterval !== undefined &&
-            Number.isFinite(existingMonitor.checkInterval)
+            isDefined(existingMonitor?.checkInterval) &&
+            isFiniteNumber(existingMonitor.checkInterval)
         ) {
             defaults.checkInterval = existingMonitor.checkInterval;
         }
 
         if (
-            existingMonitor?.retryAttempts !== undefined &&
-            Number.isFinite(existingMonitor.retryAttempts)
+            isDefined(existingMonitor?.retryAttempts) &&
+            isFiniteNumber(existingMonitor.retryAttempts)
         ) {
             defaults.retryAttempts = existingMonitor.retryAttempts;
         }
 
         if (
-            existingMonitor?.timeout !== undefined &&
-            Number.isFinite(existingMonitor.timeout)
+            isDefined(existingMonitor?.timeout) &&
+            isFiniteNumber(existingMonitor.timeout)
         ) {
             defaults.timeout = existingMonitor.timeout;
         }
@@ -641,7 +646,7 @@ export class SiteWriterService {
         if (originalInterval !== normalized.checkInterval) {
             if (
                 typeof originalInterval !== "number" ||
-                !Number.isFinite(originalInterval) ||
+                !isFiniteNumber(originalInterval) ||
                 originalInterval <= 0
             ) {
                 this.logger.warn(
@@ -667,7 +672,7 @@ export class SiteWriterService {
         if (
             normalized.retryAttempts !== original.retryAttempts &&
             (typeof original.retryAttempts !== "number" ||
-                !Number.isFinite(original.retryAttempts) ||
+                !isFiniteNumber(original.retryAttempts) ||
                 original.retryAttempts < 0)
         ) {
             this.logger.warn(
@@ -684,7 +689,7 @@ export class SiteWriterService {
         if (
             normalized.timeout !== original.timeout &&
             (typeof original.timeout !== "number" ||
-                !Number.isFinite(original.timeout) ||
+                !isFiniteNumber(original.timeout) ||
                 original.timeout <= 0)
         ) {
             this.logger.warn(
@@ -800,7 +805,12 @@ export class SiteWriterService {
         );
 
         for (const existingMonitor of existingMonitors) {
-            if (!newMonitorIds.has(existingMonitor.id)) {
+            const shouldRemoveMonitor = !setHas(
+                newMonitorIds,
+                existingMonitor.id
+            );
+
+            if (shouldRemoveMonitor) {
                 monitorTx.deleteById(existingMonitor.id);
                 this.logger.debug(
                     `Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`

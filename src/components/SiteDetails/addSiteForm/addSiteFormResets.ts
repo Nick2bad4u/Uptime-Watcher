@@ -1,3 +1,5 @@
+import { setHas } from "ts-extras";
+
 import type { MonitorValidationFieldValues } from "../../../utils/monitorValidationFields";
 
 import { DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES } from "./addSiteFormDefaults";
@@ -213,7 +215,7 @@ export function resetFieldsForMonitorType(args: {
 
     for (const field of fieldResetters) {
         if (
-            !currentFieldNames.has(field.name) &&
+            !setHas(currentFieldNames, field.name) &&
             field.value !== field.defaultValue
         ) {
             field.setter(field.defaultValue);

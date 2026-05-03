@@ -11,6 +11,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { objectHasIn } from "ts-extras";
+
 /**
  * Performs an unchecked cast of an unknown value to type {@link T}.
  *
@@ -148,7 +150,7 @@ export function safePropertyAccess(obj: unknown, key: string): unknown {
     // Intentionally supports inherited properties for record-like objects.
     // This matches the fuzz-suite contract and keeps the helper convenient
     // for Date/Error and other non-plain objects treated as record-like.
-    return key in obj ? obj[key] : undefined;
+    return objectHasIn(obj, key) ? obj[key] : undefined;
 }
 
 /**

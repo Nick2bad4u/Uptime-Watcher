@@ -12,8 +12,11 @@
  *   sequential calls re-validate the bridge.
  */
 
+import type { Except } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
 import log from "electron-log/renderer";
+import { isDefined, objectHasIn } from "ts-extras";
 
 import * as loggerModule from "../logger";
 import {
@@ -60,7 +63,7 @@ const safeGetModuleExport = (
     }
 
     try {
-        if (Reflect.has(module, property)) {
+        if (objectHasIn(module, property)) {
             return Reflect.get(module, property);
         }
     } catch {
@@ -122,7 +125,7 @@ interface CreateIpcServiceHelpersOptions {
     /** Contracts that must be satisfied before the service begins IPC calls. */
     bridgeContracts?: readonly ElectronBridgeContract[];
     /** Overrides for bridge polling parameters (contracts handled separately). */
-    bridgeOptions?: Omit<WaitForElectronBridgeOptions, "contracts">;
+    bridgeOptions?: Except<WaitForElectronBridgeOptions, "contracts">;
     /** Optional logger instance. Defaults to the shared renderer logger. */
     logger?: LoggerLike;
 }
@@ -177,15 +180,15 @@ export function createIpcServiceHelpers(
     let initializationPromise: Promise<void> | undefined = undefined;
 
     const buildBridgeOptions = (): WaitForElectronBridgeOptions => ({
-        ...(options.bridgeContracts === undefined
-            ? {}
-            : { contracts: options.bridgeContracts }),
-        ...(options.bridgeOptions?.baseDelay === undefined
-            ? {}
-            : { baseDelay: options.bridgeOptions.baseDelay }),
-        ...(options.bridgeOptions?.maxAttempts === undefined
-            ? {}
-            : { maxAttempts: options.bridgeOptions.maxAttempts }),
+        ...(isDefined(options.bridgeContracts)
+            ? { contracts: options.bridgeContracts }
+            : {}),
+        ...(isDefined(options.bridgeOptions?.baseDelay)
+            ? { baseDelay: options.bridgeOptions.baseDelay }
+            : {}),
+        ...(isDefined(options.bridgeOptions?.maxAttempts)
+            ? { maxAttempts: options.bridgeOptions.maxAttempts }
+            : {}),
     });
 
     const ensureInitialized = (): Promise<void> => {

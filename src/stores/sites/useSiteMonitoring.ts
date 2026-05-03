@@ -11,6 +11,7 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { isDefined } from "ts-extras";
 
 import type { SiteMonitoringActions } from "./types";
 import type { SitesTelemetryPayload } from "./utils/operationHelpers";
@@ -126,7 +127,7 @@ const buildMonitoringLogPayload = (
     monitorId: string | undefined,
     base: SitesTelemetryPayload
 ): SitesTelemetryPayload => {
-    if (monitorId === undefined) {
+    if (!isDefined(monitorId)) {
         return {
             siteIdentifier,
             ...base,
@@ -177,15 +178,15 @@ export const createSiteMonitoringActions = (
                 siteIdentifier: statusUpdate.siteIdentifier,
                 status: statusUpdate.status,
                 timestamp: statusUpdate.timestamp,
-                ...(statusUpdate.details === undefined
-                    ? {}
-                    : { details: statusUpdate.details }),
-                ...(statusUpdate.previousStatus === undefined
-                    ? {}
-                    : { previousStatus: statusUpdate.previousStatus }),
-                ...(statusUpdate.responseTime === undefined
-                    ? {}
-                    : { responseTime: statusUpdate.responseTime }),
+                ...(isDefined(statusUpdate.details)
+                    ? { details: statusUpdate.details }
+                    : {}),
+                ...(isDefined(statusUpdate.previousStatus)
+                    ? { previousStatus: statusUpdate.previousStatus }
+                    : {}),
+                ...(isDefined(statusUpdate.responseTime)
+                    ? { responseTime: statusUpdate.responseTime }
+                    : {}),
             };
 
             const updatedSites = safeApplyStatusUpdate(
@@ -254,7 +255,7 @@ export const createSiteMonitoringActions = (
 
             for (const monitor of site.monitors) {
                 const shouldUpdate =
-                    monitorId === undefined || monitor.id === monitorId;
+                    !isDefined(monitorId) || monitor.id === monitorId;
 
                 if (!shouldUpdate || monitor.monitoring === monitoring) {
                     updatedMonitors.push(monitor);

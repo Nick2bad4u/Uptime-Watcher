@@ -21,7 +21,7 @@ import {
     isValidIdentifierArray,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import { objectEntries } from "ts-extras";
+import { isDefined, objectEntries, setHas } from "ts-extras";
 
 import type { MonitorRowSource } from "../schema/dynamicSchema";
 
@@ -71,7 +71,7 @@ function copyDynamicFields(
     );
 
     for (const [key, value] of objectEntries(dynamicMonitor)) {
-        if (!excludedFields.has(key)) {
+        if (!setHas(excludedFields, key)) {
             // Dynamic field assignment for monitor type system
             // Key is validated from dynamicMonitor which comes from typed database mapping
             monitorRecord[key] = value;
@@ -141,8 +141,8 @@ function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
         timeout: safeInteger(dynamicMonitor.timeout, 5000, 1000, 300_000),
         type: dynamicMonitor.type,
         // Include optional fields if present
-        ...(bodyKeyword !== undefined && { bodyKeyword }),
-        ...(expectedStatusCode !== undefined && { expectedStatusCode }),
+        ...(isDefined(bodyKeyword) && { bodyKeyword }),
+        ...(isDefined(expectedStatusCode) && { expectedStatusCode }),
         ...(dynamicMonitor.host && { host: dynamicMonitor.host }),
         ...(dynamicMonitor.port && { port: dynamicMonitor.port }),
         ...(dynamicMonitor.url && { url: dynamicMonitor.url }),
@@ -291,9 +291,9 @@ export function buildMonitorParameters(
  */
 export function isValidMonitorRow(row: UnknownRecord): boolean {
     return (
-        row["id"] !== undefined &&
-        row["site_identifier"] !== undefined &&
-        row["type"] !== undefined &&
+        isDefined(row["id"]) &&
+        isDefined(row["site_identifier"]) &&
+        isDefined(row["type"]) &&
         (typeof row["id"] === "string" || typeof row["id"] === "number") &&
         typeof row["site_identifier"] === "string" &&
         typeof row["type"] === "string"

@@ -16,7 +16,7 @@ import type {
     JSX,
     NamedExoticComponent,
 } from "react";
-import type { UnknownArray } from "type-fest";
+import type { Except, UnknownArray } from "type-fest";
 
 import { memo, useMemo } from "react";
 import { arrayJoin, isDefined } from "ts-extras";
@@ -30,7 +30,7 @@ interface MarqueeCustomProperties {
     "--marquee-gap"?: string;
 }
 
-type ThemedTextOptions = Omit<ComponentProps<typeof ThemedText>, "children">;
+type ThemedTextOptions = Except<ComponentProps<typeof ThemedText>, "children">;
 
 const EMPTY_TEXT_PROPS: ThemedTextOptions = {};
 

@@ -1,3 +1,4 @@
+import { isFinite as isFiniteNumber } from "ts-extras";
 /**
  * Shared retry attempt normalization helpers for monitoring.
  *
@@ -19,7 +20,7 @@
  * - Values are truncated and clamped to a minimum of `0`.
  */
 export function normalizeAdditionalRetryAttempts(value: unknown): number {
-    if (typeof value !== "number" || !Number.isFinite(value)) {
+    if (typeof value !== "number" || !isFiniteNumber(value)) {
         return 0;
     }
 

@@ -1,7 +1,7 @@
 import { normalizePathSeparatorsToWindows } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { isEmpty } from "ts-extras";
+import { isDefined, isEmpty } from "ts-extras";
 
 /**
  * Shared filesystem base-directory validation.
@@ -56,13 +56,13 @@ function isAbsoluteFilesystemPath(value: string): boolean {
             secondChar,
             thirdChar,
         ] = value;
-        if (secondChar !== ":" || firstChar === undefined) {
+        if (secondChar !== ":" || !isDefined(firstChar)) {
             return false;
         }
 
         const codePoint = firstChar.codePointAt(0);
         const isAsciiLetter =
-            codePoint !== undefined &&
+            isDefined(codePoint) &&
             ((codePoint >= 65 && codePoint <= 90) ||
                 (codePoint >= 97 && codePoint <= 122));
 

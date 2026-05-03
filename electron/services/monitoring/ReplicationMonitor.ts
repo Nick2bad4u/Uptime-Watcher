@@ -1,13 +1,13 @@
+import type { Monitor } from "@shared/types";
 /**
  * Replication monitor service leveraging the shared remote monitor core for
  * request orchestration and retry handling.
  */
-
-import type { Monitor } from "@shared/types";
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { performance } from "node:perf_hooks";
+import { isDefined } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -56,24 +56,37 @@ function resolveLagThreshold(
     });
 }
 
+type TimestampEvaluation =
+    | {
+          readonly ok: false;
+          readonly result: MonitorCheckResult;
+      }
+    | {
+          readonly ok: true;
+          readonly timestamp: number;
+      };
+
 function evaluateTimestamp(
     payload: RemoteEndpointPayload,
     field: string,
     responseTime: number,
     role: "Primary" | "Replica"
-): MonitorCheckResult | { kind: "ok"; timestamp: number } {
+): TimestampEvaluation {
     const timestamp = normalizeTimestampValue(
         extractNestedFieldValue(payload.data, field)
     );
 
-    if (timestamp === undefined) {
-        return createMonitorErrorResult(
-            `${role} timestamp field '${field}' missing or invalid`,
-            responseTime
-        );
+    if (!isDefined(timestamp)) {
+        return {
+            ok: false,
+            result: createMonitorErrorResult(
+                `${role} timestamp field '${field}' missing or invalid`,
+                responseTime
+            ),
+        };
     }
 
-    return { kind: "ok", timestamp };
+    return { ok: true, timestamp };
 }
 
 const behavior: RemoteMonitorBehavior<
@@ -93,8 +106,8 @@ const behavior: RemoteMonitorBehavior<
             Math.round(performance.now() - started),
             "Primary"
         );
-        if ("status" in primaryEvaluation) {
-            return primaryEvaluation;
+        if (!primaryEvaluation.ok) {
+            return primaryEvaluation.result;
         }
 
         const replicaEvaluation = evaluateTimestamp(
@@ -103,8 +116,8 @@ const behavior: RemoteMonitorBehavior<
             Math.round(performance.now() - started),
             "Replica"
         );
-        if ("status" in replicaEvaluation) {
-            return replicaEvaluation;
+        if (!replicaEvaluation.ok) {
+            return replicaEvaluation.result;
         }
 
         const primaryTimestamp = primaryEvaluation.timestamp;

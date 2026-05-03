@@ -11,7 +11,7 @@
  */
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { arrayFirst, arrayJoin, isEmpty } from "ts-extras";
+import { arrayFirst, arrayJoin, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
 /** Parsed/normalized DNS record data for display and verification. */
 export interface ParsedDnsRecords {
@@ -151,7 +151,7 @@ const parseMxRecords = (result: unknown): ParsedDnsRecords => {
         if (
             typeof exchange === "string" &&
             typeof priority === "number" &&
-            Number.isFinite(priority)
+            isFiniteNumber(priority)
         ) {
             return [{ exchange, priority }];
         }
@@ -225,7 +225,7 @@ const parseSoaRecord = (result: unknown): ParsedDnsRecords => {
         typeof hostmaster !== "string" ||
         typeof nsname !== "string" ||
         typeof serial !== "number" ||
-        !Number.isFinite(serial)
+        !isFiniteNumber(serial)
     ) {
         return {
             actualValues: [],
@@ -259,11 +259,11 @@ const parseSrvRecords = (result: unknown): ParsedDnsRecords => {
         if (
             typeof name === "string" &&
             typeof port === "number" &&
-            Number.isFinite(port) &&
+            isFiniteNumber(port) &&
             typeof priority === "number" &&
-            Number.isFinite(priority) &&
+            isFiniteNumber(priority) &&
             typeof weight === "number" &&
-            Number.isFinite(weight)
+            isFiniteNumber(weight)
         ) {
             return [{ name, port, priority, weight }];
         }

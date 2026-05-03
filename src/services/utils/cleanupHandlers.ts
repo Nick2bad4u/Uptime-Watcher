@@ -20,7 +20,7 @@
  * structure whenever the preload bridge fails to return a callable cleanup
  * function.
  */
-import { safeCastTo } from "ts-extras";
+import { objectHasIn, safeCastTo } from "ts-extras";
 
 export interface CleanupValidationContext {
     /** Type reported by the `typeof` operator for the cleanup candidate. */
@@ -74,7 +74,7 @@ const isCleanupFunction = (candidate: unknown): candidate is () => unknown =>
 const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
     typeof candidate === "object" &&
     candidate !== null &&
-    "then" in candidate &&
+    objectHasIn(candidate, "then") &&
     typeof safeCastTo(candidate).then === "function";
 
 /**

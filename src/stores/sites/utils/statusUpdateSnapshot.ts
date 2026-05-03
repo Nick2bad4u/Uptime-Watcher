@@ -1,6 +1,7 @@
 import type { Monitor, MonitorStatus, Site } from "@shared/types";
 
 import { isDevelopment } from "@shared/utils/environment";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import {
@@ -71,7 +72,7 @@ export const applyStatusUpdateSnapshot = (
     } = statusUpdate;
 
     const parsedTimestamp = Date.parse(String(rawTimestamp));
-    const timestamp = Number.isFinite(parsedTimestamp)
+    const timestamp = isFiniteNumber(parsedTimestamp)
         ? new Date(parsedTimestamp).toISOString()
         : new Date().toISOString();
 
@@ -93,7 +94,7 @@ export const applyStatusUpdateSnapshot = (
     }
 
     const event: MonitorStatusChangedEvent = {
-        ...(details === undefined ? {} : { details }),
+        ...(isDefined(details) ? { details } : {}),
         monitor,
         monitorId,
         previousStatus: resolvedPreviousStatus,

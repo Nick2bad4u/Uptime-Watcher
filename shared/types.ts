@@ -7,7 +7,7 @@ import type { DnsRecordType } from "@shared/types/schemaTypes";
 import type { UnknownRecord, ValueOf } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { arrayIncludes, safeCastTo } from "ts-extras";
+import { arrayIncludes, isDefined, safeCastTo } from "ts-extras";
 
 export const STATUS_KIND = {
     DEGRADED: "degraded",
@@ -587,7 +587,8 @@ export function validateMonitor(monitor: unknown): monitor is Monitor {
     return (
         typeof monitor["id"] === "string" &&
         typeof monitor["type"] === "string" &&
-        safeCastTo<readonly string[]>(BASE_MONITOR_TYPES).includes(
+        arrayIncludes(
+            safeCastTo<readonly string[]>(BASE_MONITOR_TYPES),
             monitor["type"]
         ) &&
         typeof monitor["status"] === "string" &&
@@ -598,7 +599,7 @@ export function validateMonitor(monitor: unknown): monitor is Monitor {
         typeof monitor["timeout"] === "number" &&
         typeof monitor["retryAttempts"] === "number" &&
         Array.isArray(monitor["history"]) &&
-        (monitor["activeOperations"] === undefined ||
+        (!isDefined(monitor["activeOperations"]) ||
             isValidActiveOperations(monitor["activeOperations"]))
     );
 }

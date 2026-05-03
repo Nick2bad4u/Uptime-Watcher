@@ -8,6 +8,8 @@
  * consistent between layers.
  */
 
+import { isFinite as isFiniteNumber } from "ts-extras";
+
 /**
  * Business rules controlling history retention limits.
  *
@@ -88,9 +90,9 @@ export function normalizeHistoryLimit(
         );
     }
 
-    if (!Number.isFinite(candidate)) {
+    if (!isFiniteNumber(candidate)) {
         throw new RangeError(
-            `History limit must be finite, received: ${candidate}`
+            `History limit must be finite, received: ${String(candidate)}`
         );
     }
 

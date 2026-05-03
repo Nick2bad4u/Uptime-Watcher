@@ -9,7 +9,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { stringSplit } from "ts-extras";
+import { isDefined, objectHasIn, stringSplit } from "ts-extras";
 
 /**
  * Base interface for all database row types.
@@ -248,15 +248,15 @@ export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
 
     // Explicit property and type checking
     return (
-        "monitorId" in obj &&
-        "status" in obj &&
-        "timestamp" in obj &&
-        obj["monitorId"] !== undefined &&
-        obj["status"] !== undefined &&
-        obj["timestamp"] !== undefined &&
-        typeof obj["monitorId"] === "string" &&
-        RowValidationUtils.isValidStatus(obj["status"]) &&
-        RowValidationUtils.isValidTimestamp(obj["timestamp"])
+        objectHasIn(obj, "monitorId") &&
+        objectHasIn(obj, "status") &&
+        objectHasIn(obj, "timestamp") &&
+        isDefined(obj.monitorId) &&
+        isDefined(obj.status) &&
+        isDefined(obj.timestamp) &&
+        typeof obj.monitorId === "string" &&
+        RowValidationUtils.isValidStatus(obj.status) &&
+        RowValidationUtils.isValidTimestamp(obj.timestamp)
     );
 }
 
@@ -279,15 +279,15 @@ export function isValidMonitorRow(obj: unknown): obj is MonitorRow {
 
     // Explicit property and type checking
     return (
-        "id" in obj &&
-        "site_identifier" in obj &&
-        "type" in obj &&
-        obj["id"] !== undefined &&
-        obj["site_identifier"] !== undefined &&
-        obj["type"] !== undefined &&
-        (typeof obj["id"] === "string" || typeof obj["id"] === "number") &&
-        typeof obj["site_identifier"] === "string" &&
-        typeof obj["type"] === "string"
+        objectHasIn(obj, "id") &&
+        objectHasIn(obj, "site_identifier") &&
+        objectHasIn(obj, "type") &&
+        isDefined(obj.id) &&
+        isDefined(obj.site_identifier) &&
+        isDefined(obj.type) &&
+        (typeof obj.id === "string" || typeof obj.id === "number") &&
+        typeof obj.site_identifier === "string" &&
+        typeof obj.type === "string"
     );
 }
 
@@ -314,11 +314,11 @@ export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
 
     const row = obj;
     return (
-        "key" in row &&
-        row["key"] !== undefined &&
-        row["key"] !== null &&
-        typeof row["key"] === "string" &&
-        row["key"].length > 0
+        objectHasIn(row, "key") &&
+        isDefined(row.key) &&
+        row.key !== null &&
+        typeof row.key === "string" &&
+        row.key.length > 0
     );
 }
 
@@ -345,11 +345,11 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
 
     const row = obj;
     return (
-        "identifier" in row &&
-        row["identifier"] !== undefined &&
-        row["identifier"] !== null &&
-        typeof row["identifier"] === "string" &&
-        row["identifier"].trim().length > 0
+        objectHasIn(row, "identifier") &&
+        isDefined(row.identifier) &&
+        row.identifier !== null &&
+        typeof row.identifier === "string" &&
+        row.identifier.trim().length > 0
     );
 }
 
@@ -387,7 +387,7 @@ export function safeGetRowProperty<T>(
     }
 
     // First check for exact property name match (including properties with dots)
-    if (property in row && row[property] !== undefined) {
+    if (objectHasIn(row, property) && isDefined(row[property])) {
         return castUnchecked(row[property]);
     }
 
@@ -401,9 +401,9 @@ export function safeGetRowProperty<T>(
             if (
                 current &&
                 typeof current === "object" &&
-                part in current &&
                 RowValidationUtils.isValidObject(current) &&
-                current[part] !== undefined
+                objectHasIn(current, part) &&
+                isDefined(current[part])
             ) {
                 current = current[part];
             } else {

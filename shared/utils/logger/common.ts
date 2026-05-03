@@ -6,9 +6,9 @@
  * log output regardless of execution environment.
  */
 
-import type { UnknownArray } from "type-fest";
+import type { UnknownArray, UnknownRecord } from "type-fest";
 
-import { safeCastTo } from "ts-extras";
+import { isDefined, objectHasIn, safeCastTo } from "ts-extras";
 
 import { normalizeLogValue } from "../loggingContext";
 
@@ -71,7 +71,7 @@ function safeSerializeErrorInternal(
         message: safeNormalizeLogString(error.message),
         name: safeNormalizeLogString(error.name),
         ...(error.stack ? { stack: safeNormalizeLogString(error.stack) } : {}),
-        ...("cause" in error
+        ...(objectHasIn(safeCastTo<UnknownRecord>(error), "cause")
             ? {
                   cause: safeSerializeCause(
                       safeCastTo<{ cause?: unknown }>(error).cause
@@ -146,7 +146,7 @@ export const buildErrorLogArguments = (
     const baseMessage = formatLogMessage(prefix, message);
     const normalizedArgs = args.map((arg) => safeNormalizeLogValue(arg));
 
-    if (error === undefined) {
+    if (!isDefined(error)) {
         return [baseMessage, ...normalizedArgs];
     }
 

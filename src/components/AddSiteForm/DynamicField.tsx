@@ -48,7 +48,7 @@ import type { MonitorFieldDefinition } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
-import { safeCastTo } from "ts-extras";
+import { isDefined, safeCastTo } from "ts-extras";
 
 import { logger } from "../../services/logger";
 import { ThemedText } from "../../theme/components/ThemedText";
@@ -160,8 +160,8 @@ export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
                         {...(field.helpText && { helpText: field.helpText })}
                         id={field.name}
                         label={field.label}
-                        {...(field.max !== undefined && { max: field.max })}
-                        {...(field.min !== undefined && { min: field.min })}
+                        {...(isDefined(field.max) && { max: field.max })}
+                        {...(isDefined(field.min) && { min: field.min })}
                         onChange={handleNumericChange}
                         {...(field.placeholder && {
                             placeholder: field.placeholder,

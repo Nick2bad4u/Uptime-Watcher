@@ -1,5 +1,5 @@
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isDefined } from "ts-extras";
 import * as z from "zod";
 
 /**
@@ -95,8 +95,8 @@ export function parseDropboxFilesDownloadResult(
     }
 
     if (
-        parsed.data.fileBinary === undefined &&
-        parsed.data.fileBlob === undefined
+            !isDefined(parsed.data.fileBinary) &&
+            !isDefined(parsed.data.fileBlob)
     ) {
         throw new TypeError(
             "Dropbox download did not include fileBinary/fileBlob content"

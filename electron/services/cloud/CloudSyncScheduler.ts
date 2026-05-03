@@ -1,5 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomInt } from "node:crypto";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { CloudService } from "./CloudService";
 
@@ -142,7 +143,7 @@ export class CloudSyncScheduler {
     }
 
     private applyJitter(value: number): number {
-        if (!Number.isFinite(value) || value <= 0) {
+        if (!isFiniteNumber(value) || value <= 0) {
             return DEFAULT_SYNC_INTERVAL_MS;
         }
 

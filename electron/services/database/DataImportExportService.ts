@@ -30,6 +30,7 @@ import {
 import {
     arrayJoin,
     isDefined,
+    isFinite as isFiniteNumber,
     objectEntries,
     objectKeys,
     safeCastTo,
@@ -134,7 +135,7 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
         return value.name ? `[Function: ${value.name}]` : "[Function]";
     }
 
-    if (value === undefined) {
+    if (!isDefined(value)) {
         return "undefined";
     }
 
@@ -264,7 +265,7 @@ export class DataImportExportService {
                 acceptAnyJsonValue
             );
 
-            if (!parseResult.success || parseResult.data === undefined) {
+            if (!parseResult.success || !isDefined(parseResult.data)) {
                 throw new Error(
                     `${ERROR_CATALOG.database.IMPORT_DATA_INVALID}: ${parseResult.error ?? "Unknown parsing error"}`
                 );
@@ -558,7 +559,7 @@ export class DataImportExportService {
         const originalInterval = monitor.checkInterval;
         const hasValidInterval =
             typeof originalInterval === "number" &&
-            Number.isFinite(originalInterval) &&
+            isFiniteNumber(originalInterval) &&
             originalInterval > 0;
 
         if (
@@ -574,7 +575,7 @@ export class DataImportExportService {
             );
         } else if (
             typeof originalInterval === "number" &&
-            Number.isFinite(originalInterval) &&
+            isFiniteNumber(originalInterval) &&
             originalInterval > 0 &&
             originalInterval < MIN_MONITOR_CHECK_INTERVAL_MS &&
             originalInterval !== normalizedMonitor.checkInterval

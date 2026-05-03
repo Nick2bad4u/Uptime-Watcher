@@ -5,6 +5,7 @@ import { isRecord } from "@shared/utils/typeHelpers";
 import { randomBytes } from "node:crypto";
 import { once } from "node:events";
 import { createServer } from "node:http";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Default port for all OAuth loopback flows.
@@ -85,7 +86,7 @@ function resolvePortFromServer(server: Server): number {
     }
 
     const portCandidate = address.port;
-    if (typeof portCandidate !== "number" || !Number.isFinite(portCandidate)) {
+    if (typeof portCandidate !== "number" || !isFiniteNumber(portCandidate)) {
         throw new TypeError("OAuth loopback server port unavailable");
     }
 
@@ -214,7 +215,7 @@ export async function startLoopbackOAuthServer(args?: {
     const expectedPath = normalizeRedirectPath(
         redirectPathRaw ?? DEFAULT_OAUTH_LOOPBACK_PATH
     );
-    const omitPath = redirectPathRaw !== undefined && expectedPath === "/";
+    const omitPath = isDefined(redirectPathRaw) && expectedPath === "/";
 
     assertSafeRedirectHost(redirectHost);
 

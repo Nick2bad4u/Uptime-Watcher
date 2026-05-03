@@ -3,7 +3,7 @@ import type { AppNotificationRequest } from "@shared/types/notifications";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { Notification } from "electron";
-import { setHas } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -263,7 +263,7 @@ export class NotificationService {
             typeof request.body === "string" ? request.body : undefined;
 
         const notification = new Notification({
-            ...(body === undefined ? {} : { body }),
+            ...(isDefined(body) ? { body } : {}),
             silent: !this.config.playSound,
             title,
         });
@@ -328,7 +328,7 @@ export class NotificationService {
         if (nextStatus === "down") {
             if (
                 state.lastStatus === "down" &&
-                state.suppressionUntil !== undefined &&
+                isDefined(state.suppressionUntil) &&
                 now < state.suppressionUntil
             ) {
                 const remaining = state.suppressionUntil - now;
@@ -370,11 +370,11 @@ export class NotificationService {
     private normalizeDownAlertCooldownMs(
         candidate: NotificationConfig["downAlertCooldownMs"] | undefined
     ): number {
-        if (candidate === undefined) {
+        if (!isDefined(candidate)) {
             return this.config.downAlertCooldownMs;
         }
 
-        if (!Number.isFinite(candidate) || candidate < 0) {
+        if (!isFiniteNumber(candidate) || candidate < 0) {
             logger.warn(
                 "[NotificationService] Invalid down alert cooldown value; keeping previous value",
                 {
@@ -418,9 +418,9 @@ export class NotificationService {
 
     private composeDownBody(context: NotificationContext): string {
         const metric =
-            context.responseTime === undefined
-                ? "Last response unavailable."
-                : `Last response ${context.responseTime}ms.`;
+            isDefined(context.responseTime)
+                ? `Last response ${context.responseTime}ms.`
+                : "Last response unavailable.";
         const monitorLabel = this.describeMonitor(context.monitor);
         return `${monitorLabel} reported DOWN at ${new Date().toLocaleTimeString()}. ${metric}`;
     }

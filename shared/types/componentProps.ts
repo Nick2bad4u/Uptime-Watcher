@@ -20,7 +20,7 @@ import type {
     ReactNode,
     SyntheticEvent,
 } from "react";
-import type { SetOptional, SetRequired } from "type-fest";
+import type { Merge, SetOptional, SetRequired } from "type-fest";
 
 /**
  * Core set of structural properties shared by many UI components.
@@ -578,7 +578,7 @@ export interface StandardDataDisplayProperties<TItem>
 export type ComponentProperties<
     TBase,
     TOverrides = Record<never, never>,
-> = Omit<TBase, keyof TOverrides> & TOverrides;
+> = Merge<TBase, TOverrides>;
 
 /**
  * Utility type for making certain properties required.

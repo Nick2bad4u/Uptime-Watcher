@@ -1,3 +1,4 @@
+import type { Simplify, TaggedUnion, UnknownRecord, ValueOf } from "type-fest";
 /**
  * Standardized log message templates for consistent logging across the
  * application.
@@ -26,7 +27,7 @@
  * @packageDocumentation
  */
 
-import type { Simplify, TaggedUnion, UnknownRecord, ValueOf } from "type-fest";
+import { isFinite as isFiniteNumber, isPresent } from "ts-extras";
 
 /**
  * Logger interface for type safety with enhanced type utilities.
@@ -495,7 +496,7 @@ export function interpolateLogTemplate(
     variables: TemplateVariables
 ): string {
     const formatValue = (value: ValueOf<TemplateVariables>): string => {
-        if (value === undefined || value === null) {
+        if (!isPresent(value)) {
             return "";
         }
 
@@ -510,7 +511,7 @@ export function interpolateLogTemplate(
                 return "";
             }
             case "number": {
-                return Number.isFinite(value) ? `${value}` : "NaN";
+                return isFiniteNumber(value) ? `${value}` : "NaN";
             }
             case "object": {
                 return "";
@@ -542,9 +543,9 @@ export function interpolateLogTemplate(
             const resolvedKey = groups?.["variableName"] ?? key;
             const value = variables[resolvedKey];
 
-            return value === undefined || value === null
-                ? match
-                : formatValue(value);
+            return isPresent(value)
+                ? formatValue(value)
+                : match;
         }
     );
 }

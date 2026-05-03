@@ -14,7 +14,7 @@ import type { BaseMonitorSchemaType } from "@shared/types/schemaTypes";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-import { isEmpty, stringSplit } from "ts-extras";
+import { arrayIncludes, isDefined, isEmpty, setHas, stringSplit } from "ts-extras";
 import * as z from "zod";
 
 import { monitorIdSchema } from "./monitorFieldSchemas";
@@ -195,7 +195,7 @@ function isUrlWithAllowedProtocols(
     }
 
     const scheme = parsed.protocol.replace(":", "").toLowerCase();
-    if (!protocols.includes(scheme)) {
+    if (!arrayIncludes(protocols, scheme)) {
         return false;
     }
 
@@ -268,7 +268,7 @@ const isValidHeaderName = (value: string): boolean => {
     return Array.from(value).every((char) => {
         const codePoint = char.codePointAt(0);
 
-        if (codePoint === undefined) {
+        if (!isDefined(codePoint)) {
             return false;
         }
 
@@ -280,7 +280,7 @@ const isValidHeaderName = (value: string): boolean => {
             isDigit ||
             isUppercase ||
             isLowercase ||
-            ALLOWED_HEADER_SYMBOLS.has(char)
+            setHas(ALLOWED_HEADER_SYMBOLS, char)
         );
     });
 };

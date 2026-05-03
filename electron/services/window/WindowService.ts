@@ -45,7 +45,7 @@ import * as electron from "electron";
 import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { objectHasOwn, safeCastTo } from "ts-extras";
+import { arrayIncludes, objectHasOwn, safeCastTo, setHas } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -324,8 +324,8 @@ export class WindowService {
         const isHeadless =
             this.getEnvFlag("HEADLESS") ||
             this.getEnvFlag("CI") ||
-            process.argv.includes("--headless") ||
-            process.argv.includes("--test-headless");
+            arrayIncludes(process.argv, "--headless") ||
+            arrayIncludes(process.argv, "--test-headless");
 
         if (isHeadless) {
             logger.info(
@@ -790,7 +790,7 @@ export class WindowService {
                 permission,
                 grantPermission
             ) => {
-                if (!this.loggedDeniedPermissions.has(permission)) {
+                if (!setHas(this.loggedDeniedPermissions, permission)) {
                     this.loggedDeniedPermissions.add(permission);
                     logger.warn("[WindowService] Denied permission request", {
                         permission,

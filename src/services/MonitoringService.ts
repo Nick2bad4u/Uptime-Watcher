@@ -42,6 +42,7 @@ import type * as z from "zod";
 
 import { ApplicationError, ensureError } from "@shared/utils/errorHandling";
 import { validateStatusUpdate } from "@shared/validation/guards";
+import { isDefined } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -239,7 +240,7 @@ export const MonitoringService: MonitoringServiceContract = {
                 monitorId
             );
 
-            if (rawStatusUpdate === undefined) {
+            if (!isDefined(rawStatusUpdate)) {
                 return undefined;
             }
 
@@ -262,15 +263,15 @@ export const MonitoringService: MonitoringServiceContract = {
                 timestamp: data.timestamp,
             };
 
-            if (data.details !== undefined) {
+            if (isDefined(data.details)) {
                 normalizedUpdate.details = data.details;
             }
 
-            if (data.previousStatus !== undefined) {
+            if (isDefined(data.previousStatus)) {
                 normalizedUpdate.previousStatus = data.previousStatus;
             }
 
-            if (data.responseTime !== undefined) {
+            if (isDefined(data.responseTime)) {
                 normalizedUpdate.responseTime = data.responseTime;
             }
 

@@ -7,7 +7,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { objectHasOwn } from "ts-extras";
+import { isDefined, objectHasOwn } from "ts-extras";
 
 import type { Theme } from "../types";
 
@@ -46,7 +46,7 @@ const mergeFontSize = (
     for (const key of fontSizeKeys) {
         const value = overrideFontSize[key];
         // Skip undefined values but allow null and other values
-        if (value !== undefined) {
+        if (isDefined(value)) {
             result[key] = value;
         }
     }

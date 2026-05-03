@@ -1,12 +1,11 @@
-import type { UnknownRecord } from "type-fest";
-
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { ensureError } from "@shared/utils/errorHandling";
+import { isObject } from "@shared/utils/typeGuards";
 import { app } from "electron";
 import sqlite3 from "node-sqlite3-wasm";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
-import { arrayFirst, arrayJoin, safeCastTo } from "ts-extras";
+import { arrayFirst, arrayJoin, objectHasIn } from "ts-extras";
 
 import { BACKUP_DB_FILE_NAME } from "../../../../constants";
 import { logger } from "../../../../utils/logger";
@@ -111,8 +110,12 @@ export function readDatabaseSchemaVersionFromFile(filePath: string): number {
     try {
         const result: unknown = database.prepare("PRAGMA user_version").get();
 
-        if (result && typeof result === "object" && "user_version" in result) {
-            const version = safeCastTo<UnknownRecord>(result)["user_version"];
+        if (isObject(result)) {
+            if (!objectHasIn(result, "user_version")) {
+                return 0;
+            }
+
+            const version: unknown = Reflect.get(result, "user_version");
             if (typeof version === "number") {
                 return version;
             }

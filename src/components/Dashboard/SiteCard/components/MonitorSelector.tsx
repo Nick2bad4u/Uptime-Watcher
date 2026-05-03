@@ -8,7 +8,7 @@ import type { EventHandlers } from "@shared/types/componentProps";
 import type { MouseEvent, NamedExoticComponent } from "react";
 
 import { memo, useCallback, useId, useMemo, useRef } from "react";
-import { arrayJoin, isEmpty } from "ts-extras";
+import { arrayJoin, isEmpty, setHas } from "ts-extras";
 
 import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 import { AppIcons } from "../../../../utils/icons";
@@ -32,17 +32,17 @@ const preferHostPortIdentifier = (
         identifier === monitor.url &&
         typeof monitor.port === "number" &&
         monitor.port > 0 &&
-        !DEFAULT_PORT_VALUES.has(monitor.port) &&
+        !setHas(DEFAULT_PORT_VALUES, monitor.port) &&
         monitor.host
     ) {
         try {
             const parsedUrl = new URL(monitor.url);
 
             if (parsedUrl.hostname === monitor.host && parsedUrl.port === "") {
-                return `${monitor.host}:${monitor.port}`;
+                return `${monitor.host}:${String(monitor.port)}`;
             }
         } catch {
-            return `${monitor.host}:${monitor.port}`;
+            return `${monitor.host}:${String(monitor.port)}`;
         }
     }
 

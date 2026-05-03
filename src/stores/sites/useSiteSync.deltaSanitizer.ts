@@ -9,6 +9,7 @@
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
+import { setHas } from "ts-extras";
 
 const getUniqueStringsPreservingOrder = (
     values: readonly string[]
@@ -17,7 +18,7 @@ const getUniqueStringsPreservingOrder = (
     const result: string[] = [];
 
     for (const value of values) {
-        if (!seen.has(value)) {
+        if (!setHas(seen, value)) {
             seen.add(value);
             result.push(value);
         }
@@ -55,11 +56,11 @@ export const buildSanitizedIncomingSiteSyncDelta = (
     const overlapIdentifiers: string[] = [];
 
     const addedSites = addedSnapshot.sanitizedSites.filter((site) => {
-        if (removedIdentifiers.has(site.identifier)) {
+        if (setHas(removedIdentifiers, site.identifier)) {
             return false;
         }
 
-        if (updatedIdentifiers.has(site.identifier)) {
+        if (setHas(updatedIdentifiers, site.identifier)) {
             overlapIdentifiers.push(site.identifier);
             return false;
         }
@@ -68,7 +69,7 @@ export const buildSanitizedIncomingSiteSyncDelta = (
     });
 
     const updatedSites = updatedSnapshot.sanitizedSites.filter(
-        (site) => !removedIdentifiers.has(site.identifier)
+        (site) => !setHas(removedIdentifiers, site.identifier)
     );
 
     return {

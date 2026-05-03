@@ -25,7 +25,7 @@ import {
     type NamedExoticComponent,
     type ReactElement,
 } from "react";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import type {
     BoxElement,
@@ -262,7 +262,7 @@ const ThemedBoxComponent = ({
         onMouseEnter,
         onMouseLeave,
         style,
-        ...(open !== undefined && { open }),
+        ...(isDefined(open) && { open }),
     };
 
     // Interactive props for clickable elements

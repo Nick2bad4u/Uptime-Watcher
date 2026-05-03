@@ -1,5 +1,8 @@
 import type { Site } from "@shared/types";
 
+import { isObject } from "@shared/utils/typeGuards";
+import { objectHasIn } from "ts-extras";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
@@ -40,12 +43,14 @@ export interface DatabaseCommandContext {
 export function isDatabaseCommandContext(
     value: unknown
 ): value is DatabaseCommandContext {
-    if (value === null || typeof value !== "object") {
+    if (!isObject(value)) {
         return false;
     }
 
     return (
-        "serviceFactory" in value && "eventEmitter" in value && "cache" in value
+        objectHasIn(value, "serviceFactory") &&
+        objectHasIn(value, "eventEmitter") &&
+        objectHasIn(value, "cache")
     );
 }
 

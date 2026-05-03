@@ -10,7 +10,7 @@ import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 import { isObject } from "@shared/utils/typeGuards";
-import { isEmpty, objectHasOwn } from "ts-extras";
+import { isDefined, isEmpty, objectHasOwn } from "ts-extras";
 
 /**
  * Result tuple produced by the safe JSON helpers.
@@ -333,7 +333,7 @@ export function safeJsonParseWithFallback<T extends JsonValue>(
     fallback: T
 ): T {
     const result = safeJsonParse(json, validator);
-    if (result.success && result.data !== undefined) {
+    if (result.success && isDefined(result.data)) {
         return result.data;
     }
     return fallback;
@@ -411,5 +411,5 @@ export function safeJsonStringifyWithFallback(
     }
 
     const result = safeJsonStringify(value, space);
-    return result.success && result.data !== undefined ? result.data : fallback;
+    return result.success && isDefined(result.data) ? result.data : fallback;
 }

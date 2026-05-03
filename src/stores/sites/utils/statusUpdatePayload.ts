@@ -5,6 +5,8 @@
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Site, StatusUpdate } from "@shared/types";
 
+import { isDefined } from "ts-extras";
+
 import type { SitesTelemetryPayload } from "./operationHelpers";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
 
@@ -26,15 +28,15 @@ export function buildStatusUpdatePayload(args: {
         timestamp: new Date(event.timestamp).toISOString(),
     };
 
-    if (event.details !== undefined) {
+    if (isDefined(event.details)) {
         payload.details = event.details;
     }
 
-    if (event.previousStatus !== undefined) {
+    if (isDefined(event.previousStatus)) {
         payload.previousStatus = event.previousStatus;
     }
 
-    if (event.responseTime !== undefined) {
+    if (isDefined(event.responseTime)) {
         payload.responseTime = event.responseTime;
     }
 
@@ -56,22 +58,28 @@ export function buildMonitoringLifecycleTelemetry(args: {
 
     const monitorCountValue = event.monitorCount;
     const siteCountValue = event.siteCount;
-    const timestampValue = event["timestamp"];
+    const timestampValue = event.timestamp;
     const { activeMonitors } = event;
     const { reason } = event;
 
     const monitorCount =
-        typeof monitorCountValue === "number" ? monitorCountValue : undefined;
+        isDefined(monitorCountValue) && typeof monitorCountValue === "number"
+            ? monitorCountValue
+            : undefined;
     const siteCount =
-        typeof siteCountValue === "number" ? siteCountValue : undefined;
+        isDefined(siteCountValue) && typeof siteCountValue === "number"
+            ? siteCountValue
+            : undefined;
     const timestamp =
-        typeof timestampValue === "number" ? timestampValue : undefined;
+        isDefined(timestampValue) && typeof timestampValue === "number"
+            ? timestampValue
+            : undefined;
 
     return {
         phase,
-        ...(timestamp === undefined ? {} : { timestamp }),
-        ...(monitorCount === undefined ? {} : { monitorCount }),
-        ...(siteCount === undefined ? {} : { siteCount }),
+        ...(isDefined(timestamp) ? { timestamp } : {}),
+        ...(isDefined(monitorCount) ? { monitorCount } : {}),
+        ...(isDefined(siteCount) ? { siteCount } : {}),
         ...(typeof activeMonitors === "number" ? { activeMonitors } : {}),
         ...(typeof reason === "string" ? { reason } : {}),
     } satisfies SitesTelemetryPayload;

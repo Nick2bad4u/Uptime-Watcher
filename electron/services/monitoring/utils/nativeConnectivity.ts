@@ -1,3 +1,4 @@
+import { createAbortError, isAbortError } from "@shared/utils/abortError";
 /**
  * Native connectivity checking without external dependencies Replaces the ping
  * package entirely with TCP, DNS, and HTTP checks
@@ -19,14 +20,13 @@
  *
  * @packageDocumentation
  */
-
-import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import * as dns from "node:dns/promises";
 import * as net from "node:net";
 import { performance } from "node:perf_hooks";
 import { setTimeout as delay } from "node:timers/promises";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { MonitorCheckResult } from "../types";
 
@@ -297,7 +297,7 @@ async function checkTcpPorts(
         }
 
         const port = ports[portIndex];
-        if (port === undefined) {
+        if (!isDefined(port)) {
             return null;
         }
         const result = await checkTcpPort(host, port, timeout, signal);
@@ -439,7 +439,7 @@ export async function checkConnectivity(
     // should degrade gracefully and fall back to other methods.
     const timeoutMs =
         typeof opts.timeout === "number" &&
-        Number.isFinite(opts.timeout) &&
+        isFiniteNumber(opts.timeout) &&
         opts.timeout > 0
             ? opts.timeout
             : DEFAULT_OPTIONS.timeout;
@@ -500,9 +500,9 @@ export async function checkConnectivity(
     return {
         details: `Failed to connect to ${String(normalizedHost)}`,
         error:
-            tcpProbeError === undefined
-                ? "Host unreachable - all connectivity checks failed"
-                : getUserFacingErrorDetail(tcpProbeError),
+            isDefined(tcpProbeError)
+                ? getUserFacingErrorDetail(tcpProbeError)
+                : "Host unreachable - all connectivity checks failed",
         responseTime: Math.round(performance.now() - startTime),
         status: "down",
     };

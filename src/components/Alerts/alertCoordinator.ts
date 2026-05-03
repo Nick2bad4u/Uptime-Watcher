@@ -1,7 +1,7 @@
 import type { StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, safeCastTo } from "ts-extras";
+import { arrayJoin, isDefined, isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 
@@ -74,7 +74,7 @@ const isDuplicateStatusAlertUpdate = (update: StatusUpdate): boolean => {
     const fingerprint = createStatusAlertFingerprint(update);
     const seenAt = recentStatusAlertFingerprints.get(fingerprint);
 
-    if (seenAt !== undefined && now - seenAt <= STATUS_ALERT_DEDUP_WINDOW_MS) {
+    if (isDefined(seenAt) && now - seenAt <= STATUS_ALERT_DEDUP_WINDOW_MS) {
         return true;
     }
 
@@ -95,7 +95,7 @@ const resolveAlertVolume = (candidate: unknown): number => {
         return 1;
     }
 
-    if (!Number.isFinite(candidate)) {
+    if (!isFiniteNumber(candidate)) {
         return 1;
     }
 
@@ -290,7 +290,7 @@ export const enqueueAlertFromStatusUpdate = (
     // change (for example, a manual check when the monitor is already UP).
     // Don't create misleading toasts like "is now Up (previously Up)".
     if (
-        update.previousStatus !== undefined &&
+        isDefined(update.previousStatus) &&
         update.previousStatus === update.status
     ) {
         logger.debug(

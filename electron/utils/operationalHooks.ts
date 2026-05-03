@@ -65,7 +65,7 @@ import { sleepUnref } from "@shared/utils/abortUtils";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { ensureError } from "@shared/utils/errorHandling";
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { safeCastTo } from "ts-extras";
+import { isDefined, safeCastTo } from "ts-extras";
 import * as z from "zod";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -345,7 +345,7 @@ function resolveFailureLogLevel<T>(
 ): OperationalLogLevel {
     const { failureLogLevel, operationName } = config;
 
-    if (failureLogLevel === undefined) {
+    if (!isDefined(failureLogLevel)) {
         return "error";
     }
 

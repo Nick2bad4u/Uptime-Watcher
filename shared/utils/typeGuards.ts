@@ -1,6 +1,6 @@
 import type { UnknownRecord } from "type-fest";
 
-import { isInteger, objectHasOwn } from "ts-extras";
+import { isFinite as isFiniteValue, isInteger, objectHasOwn } from "ts-extras";
 
 import type { PortNumber } from "../types/units";
 
@@ -27,7 +27,7 @@ export function isObject(value: unknown): value is UnknownRecord {
  *
  * @remarks
  * This guard considers both positive and negative infinity as numbers. Use
- * {@link isFiniteNumber} when infinities should be rejected.
+ * { @link isFiniteNumber } when infinities should be rejected.
  *
  * @param value - Value to evaluate.
  *
@@ -183,7 +183,7 @@ export function isError(value: unknown): value is Error {
  * @returns `true` when the value is a number and not infinite.
  */
 export function isFiniteNumber(value: unknown): value is number {
-    return isNumber(value) && Number.isFinite(value);
+    return isNumber(value) && isFiniteValue(value);
 }
 
 /**
@@ -237,9 +237,7 @@ export function isNonNullObject(value: unknown): value is UnknownRecord {
  *
  * @returns `true` when the value is greater than zero and finite.
  */
-export function isPositiveNumber(value: unknown): value is number {
-    return isNumber(value) && Number.isFinite(value) && value > 0;
-}
+export function isPositiveNumber(value: unknown): value is number { return isNumber(value) && isFiniteNumber(value) && value > 0; }
 
 /**
  * Checks whether a value is a string.

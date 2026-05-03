@@ -12,6 +12,7 @@ import type { Monitor, StatusHistory } from "@shared/types";
 
 import { typedObjectKeys } from "@shared/utils/objectSafety";
 import { useMemo } from "react";
+import { arrayIncludes, isDefined } from "ts-extras";
 
 import type { Theme } from "../../theme/types";
 
@@ -150,19 +151,16 @@ function calculateDowntimePeriods(
         if (record) {
             // Process only if record is defined
             if (record.status === "down") {
-                if (downtimeEnd === undefined) {
+                if (isDefined(downtimeEnd)) {
+                    // We're extending the downtime period backwards
+                    downtimeStart = record.timestamp;
+                } else {
                     // This is the first "down" we've encountered, so it's the
                     // END of the period
                     downtimeEnd = record.timestamp;
                     downtimeStart = record.timestamp;
-                } else {
-                    // We're extending the downtime period backwards
-                    downtimeStart = record.timestamp;
                 }
-            } else if (
-                downtimeEnd !== undefined &&
-                downtimeStart !== undefined
-            ) {
+            } else if (isDefined(downtimeEnd) && isDefined(downtimeStart)) {
                 // We hit an "up" status, so the downtime period is complete
                 const period: DowntimePeriod = {
                     duration: downtimeEnd - downtimeStart,
@@ -179,7 +177,7 @@ function calculateDowntimePeriods(
     }
 
     // Handle ongoing downtime (reached end of history while in downtime)
-    if (downtimeEnd !== undefined && downtimeStart !== undefined) {
+    if (isDefined(downtimeEnd) && isDefined(downtimeStart)) {
         const period: DowntimePeriod = {
             duration: downtimeEnd - downtimeStart,
             end: downtimeEnd,
@@ -251,7 +249,7 @@ function filterHistoryByTimeRange(
     const now = Date.now();
     // Sanitize timeRange to prevent object injection
     const allowedTimeRanges = typedObjectKeys(TIME_PERIOD_LABELS);
-    const safeTimeRange = allowedTimeRanges.includes(timeRange)
+    const safeTimeRange = arrayIncludes(allowedTimeRanges, timeRange)
         ? timeRange
         : "24h";
 

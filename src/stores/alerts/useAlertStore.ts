@@ -8,6 +8,7 @@
  */
 
 import type { MonitorStatus } from "@shared/types";
+import type { Except } from "type-fest";
 
 import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
@@ -108,7 +109,7 @@ export interface AppToastInput {
 }
 
 /** Input shape for enqueuing alerts. */
-export type StatusAlertInput = Omit<StatusAlert, "id" | "timestamp"> & {
+export type StatusAlertInput = Except<StatusAlert, "id" | "timestamp"> & {
     /**
      * Optional alert identifier. When omitted the store will generate a UUID.
      */

@@ -13,7 +13,7 @@ import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
-import { isInteger, stringSplit } from "ts-extras";
+import { isDefined, isInteger, stringSplit } from "ts-extras";
 
 import type { IpcParameterValidator } from "../types";
 import type { ParameterValueValidationResult } from "./utils/parameterValidation";
@@ -153,7 +153,7 @@ export const validateCloudBackupMigrationRequest: IpcParameterValidator =
                 errors.push("target must be 'plaintext' or 'encrypted'");
             }
 
-            if (limit !== undefined) {
+            if (isDefined(limit)) {
                 const limitError = IpcValidators.requiredNumber(limit, "limit");
                 if (limitError) {
                     errors.push(limitError);

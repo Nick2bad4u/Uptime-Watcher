@@ -44,7 +44,7 @@ import {
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
-import { isInteger, safeCastTo } from "ts-extras";
+import { isFinite as isFiniteNumber, isInteger, safeCastTo, setHas } from "ts-extras";
 
 import {
     buildPayloadPreview,
@@ -190,7 +190,7 @@ export function safeParseStringResult(
 export function safeParseNumberResult(
     candidate: unknown
 ): SafeParseLike<number> {
-    if (typeof candidate === "number" && Number.isFinite(candidate)) {
+    if (typeof candidate === "number" && isFiniteNumber(candidate)) {
         return { data: candidate, success: true };
     }
 
@@ -210,7 +210,7 @@ export function safeParseNonNegativeIntResult(
 ): SafeParseLike<number> {
     if (
         typeof candidate === "number" &&
-        Number.isFinite(candidate) &&
+        isFiniteNumber(candidate) &&
         isInteger(candidate) &&
         candidate >= 0
     ) {
@@ -444,7 +444,7 @@ function assertInvokeArgsWithinBudget(
 }
 
 async function verifyChannelOrThrow(channel: string): Promise<void> {
-    if (verifiedChannels.has(channel) || channel === DIAGNOSTICS_CHANNEL) {
+    if (setHas(verifiedChannels, channel) || channel === DIAGNOSTICS_CHANNEL) {
         return;
     }
 
@@ -461,7 +461,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                 const rawResponse: unknown = await withTimeout({
                     onTimeout: () =>
                         new IpcError(
-                            `Timed out verifying IPC handler for channel '${channel}'`,
+                            `Timed out verifying IPC handler for channel '${String(channel)}'`,
                             channel,
                             undefined,
                             {
@@ -486,7 +486,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
 
                 if (!verificationResult.registered) {
                     preloadDiagnosticsLogger.error(
-                        `[IPC Bridge] No handler registered for channel '${channel}'.`,
+                        `[IPC Bridge] No handler registered for channel '${String(channel)}'.`,
                         undefined,
                         {
                             availableChannels:
@@ -494,7 +494,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                         }
                     );
                     throw new IpcError(
-                        `No handler registered for channel '${channel}'`,
+                        `No handler registered for channel '${String(channel)}'`,
                         channel,
                         undefined,
                         {
@@ -514,7 +514,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
 
                 // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
                 throw new IpcError(
-                    `Failed verifying handler for channel '${channel}': ${getUserFacingErrorDetail(
+                    `Failed verifying handler for channel '${String(channel)}': ${getUserFacingErrorDetail(
                         error
                     )}`,
                     channel,

@@ -10,7 +10,7 @@ import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 
 import { isObject } from "@shared/utils/typeGuards";
 import { validateMonitorType } from "@shared/utils/validation";
-import { isEmpty } from "ts-extras";
+import { isDefined, isEmpty, setHas } from "ts-extras";
 
 /**
  * Shared representation of a monitor type configuration used by frontend and
@@ -168,7 +168,7 @@ const ALLOWED_FIELD_TYPES = new Set<string>(MONITOR_FIELD_TYPE_VALUES);
 const isAllowedFieldType = (
     candidate: unknown
 ): candidate is MonitorFieldDefinition["type"] =>
-    typeof candidate === "string" && ALLOWED_FIELD_TYPES.has(candidate);
+    typeof candidate === "string" && setHas(ALLOWED_FIELD_TYPES, candidate);
 
 /**
  * Checks whether a value is an optional string.
@@ -178,7 +178,7 @@ const isAllowedFieldType = (
  * @returns `true` when the value is either undefined or a string.
  */
 const isOptionalString = (value: unknown): value is string | undefined =>
-    value === undefined || typeof value === "string";
+    !isDefined(value) || typeof value === "string";
 
 /**
  * Checks whether a value is an optional number.
@@ -188,7 +188,7 @@ const isOptionalString = (value: unknown): value is string | undefined =>
  * @returns `true` when the value is either undefined or a number.
  */
 const isOptionalNumber = (value: unknown): value is number | undefined =>
-    value === undefined || typeof value === "number";
+    !isDefined(value) || typeof value === "number";
 
 /**
  * Checks whether a value is an optional boolean.
@@ -198,7 +198,7 @@ const isOptionalNumber = (value: unknown): value is number | undefined =>
  * @returns `true` when the value is either undefined or a boolean.
  */
 const isOptionalBoolean = (value: unknown): value is boolean | undefined =>
-    value === undefined || typeof value === "boolean";
+    !isDefined(value) || typeof value === "boolean";
 
 /**
  * Determines whether a value is a non-empty string.
@@ -239,7 +239,7 @@ const isValidMonitorFieldOption = (
 const hasValidFieldOptions = (
     options: unknown
 ): options is MonitorFieldDefinition["options"] => {
-    if (options === undefined) {
+    if (!isDefined(options)) {
         return true;
     }
 
@@ -260,7 +260,7 @@ const hasValidFieldOptions = (
 const isValidDetailFormats = (
     candidate: unknown
 ): candidate is NonNullable<MonitorTypeConfig["uiConfig"]>["detailFormats"] => {
-    if (candidate === undefined) {
+    if (!isDefined(candidate)) {
         return true;
     }
 
@@ -283,7 +283,7 @@ const isValidDetailFormats = (
 const isValidDisplayConfig = (
     candidate: unknown
 ): candidate is NonNullable<MonitorTypeConfig["uiConfig"]>["display"] => {
-    if (candidate === undefined) {
+    if (!isDefined(candidate)) {
         return true;
     }
 
@@ -306,7 +306,7 @@ const isValidDisplayConfig = (
 const isValidHelpTexts = (
     candidate: unknown
 ): candidate is NonNullable<MonitorTypeConfig["uiConfig"]>["helpTexts"] => {
-    if (candidate === undefined) {
+    if (!isDefined(candidate)) {
         return true;
     }
 
@@ -329,7 +329,7 @@ const isValidHelpTexts = (
 const isValidMonitorTypeUiConfig = (
     candidate: unknown
 ): candidate is NonNullable<MonitorTypeConfig["uiConfig"]> => {
-    if (candidate === undefined) {
+    if (!isDefined(candidate)) {
         return true;
     }
 

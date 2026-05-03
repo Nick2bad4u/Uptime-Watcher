@@ -1,9 +1,8 @@
+import type { Monitor } from "@shared/types";
 /**
  * Shared utilities for monitor services to reduce code duplication Contains
  * common patterns used across PingMonitor, PortMonitor, and HttpMonitor
  */
-
-import type { Monitor } from "@shared/types";
 
 import {
     isValidFQDN,
@@ -11,6 +10,7 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { NormalizedMonitorConfig as NormalizedMonitorConfigType } from "../createMonitorConfig";
 import type { MonitorCheckResult } from "../types";
@@ -231,7 +231,7 @@ export function normalizeTimestampValue(value: unknown): number | undefined {
         return value.getTime();
     }
 
-    if (typeof value === "number" && Number.isFinite(value)) {
+    if (typeof value === "number" && isFiniteNumber(value)) {
         return value > UNIX_SECONDS_THRESHOLD
             ? Math.trunc(value)
             : Math.trunc(value * 1000);
@@ -244,7 +244,7 @@ export function normalizeTimestampValue(value: unknown): number | undefined {
         }
 
         const numeric = Number(trimmed);
-        if (!Number.isNaN(numeric) && Number.isFinite(numeric)) {
+        if (!Number.isNaN(numeric) && isFiniteNumber(numeric)) {
             return numeric > UNIX_SECONDS_THRESHOLD
                 ? Math.trunc(numeric)
                 : Math.trunc(numeric * 1000);

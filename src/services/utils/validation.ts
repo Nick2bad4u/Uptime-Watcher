@@ -18,13 +18,13 @@ import {
     type ZodIssueLike,
     type ZodIssuePathPart,
 } from "@shared/utils/zodIssueFormatting";
-import { arrayJoin, safeCastTo } from "ts-extras";
+import { arrayJoin, objectHasIn, safeCastTo } from "ts-extras";
 
 const hasIssueArray = (
     value: unknown
 ): value is { readonly issues: unknown[] } =>
     isObject(value) &&
-    "issues" in value &&
+    objectHasIn(value, "issues") &&
     Array.isArray(safeCastTo<{ issues?: unknown }>(value).issues);
 
 const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {

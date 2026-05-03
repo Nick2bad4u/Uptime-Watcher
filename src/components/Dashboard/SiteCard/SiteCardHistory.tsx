@@ -6,7 +6,7 @@
 import type { Monitor, StatusHistory } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
-import { arrayFirst } from "ts-extras";
+import { arrayFirst, isDefined } from "ts-extras";
 
 import { useMonitorTypes } from "../../../hooks/useMonitorTypes";
 import { formatTitleSuffix } from "../../../utils/monitorTitleFormatters";
@@ -49,10 +49,10 @@ function areHistoryPropsEqual(
     // Compare monitor objects
     const prevMonitor = previous.monitor;
     const nextMonitor = next.monitor;
-    if (prevMonitor === undefined && nextMonitor === undefined) {
+    if (!isDefined(prevMonitor) && !isDefined(nextMonitor)) {
         return true;
     }
-    if (prevMonitor === undefined || nextMonitor === undefined) {
+    if (!isDefined(prevMonitor) || !isDefined(nextMonitor)) {
         return false;
     }
     if (

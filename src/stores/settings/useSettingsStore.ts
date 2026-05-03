@@ -36,7 +36,7 @@
  * @public
  */
 
-import type { Promisable } from "type-fest";
+import type { Except, Promisable } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { safeCastTo } from "ts-extras";
@@ -70,7 +70,7 @@ const SETTINGS_PERSIST_CONFIG = createPersistConfig<
  * @public
  */
 export const useSettingsStore: UseBoundStore<
-    Omit<StoreApi<SettingsStore>, "persist"> & {
+    Except<StoreApi<SettingsStore>, "persist"> & {
         /**
          * Persistence utilities for settings storage management.
          *

@@ -6,14 +6,16 @@
  * Object.entries operations with proper type checking and validation.
  */
 
-import type { UnknownRecord, ValueOf } from "type-fest";
+import type { Except, UnknownRecord, ValueOf } from "type-fest";
 
 import {
+    isPresent,
     objectEntries,
     objectHasOwn,
     objectKeys,
     objectValues,
     safeCastTo,
+    setHas,
 } from "ts-extras";
 
 import { isObject } from "./typeGuards";
@@ -157,15 +159,15 @@ export interface SafeObjectOmit {
     <T extends object, K extends keyof T>(
         obj: null | T | undefined,
         keys: readonly K[]
-    ): Omit<T, K>;
+    ): Except<T, K>;
 }
 
 function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
     obj: null | T | undefined,
     keys: readonly K[]
-): Omit<T, Extract<K, keyof T>> | Record<string, never> {
+): Except<T, Extract<K, keyof T>> | Record<string, never> {
     // Handle null/undefined inputs by returning empty object
-    if (obj === null || obj === undefined) {
+    if (!isPresent(obj)) {
         return createNullPrototypeObject<Record<string, never>>();
     }
 
@@ -188,12 +190,12 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
     // - `Object.defineProperty` on a null-prototype object always defines an
     //   own property.
     //
-    const result = createNullPrototypeObject<Omit<T, Extract<K, keyof T>>>();
+    const result = createNullPrototypeObject<Except<T, Extract<K, keyof T>>>();
     const record = castUnchecked<UnknownRecord>(obj);
 
     // Copy enumerable string/number properties
     for (const [key, value] of objectEntries(record)) {
-        if (!stringKeysToOmit.has(key)) {
+        if (!setHas(stringKeysToOmit, key)) {
             Object.defineProperty(result, key, {
                 configurable: true,
                 enumerable: true,
@@ -205,7 +207,7 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
 
     // Copy symbol properties
     for (const symbol of Object.getOwnPropertySymbols(obj)) {
-        if (!symbolKeysToOmit.has(symbol)) {
+        if (!setHas(symbolKeysToOmit, symbol)) {
             Object.defineProperty(result, symbol, {
                 configurable: true,
                 enumerable: true,

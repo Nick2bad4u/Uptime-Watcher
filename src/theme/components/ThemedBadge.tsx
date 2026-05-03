@@ -46,7 +46,7 @@ import {
     type ReactNode,
     useMemo,
 } from "react";
-import { arrayJoin, safeCastTo } from "ts-extras";
+import { arrayJoin, objectHasIn, safeCastTo } from "ts-extras";
 
 import type { BadgeSize, BadgeVariant } from "./types";
 
@@ -183,7 +183,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
 
             // Type-safe style lookup with fallbacks for custom values
             const getSizeStyle = (sizeKey: BadgeSize): CSSProperties => {
-                if (sizeKey in sizeStyles) {
+                if (objectHasIn(sizeStyles, sizeKey)) {
                     return sizeStyles[
                         safeCastTo<keyof typeof sizeStyles>(sizeKey)
                     ];
@@ -194,7 +194,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
             const getVariantStyle = (
                 variantKey: BadgeVariant
             ): CSSProperties => {
-                if (variantKey in variantStyles) {
+                if (objectHasIn(variantStyles, variantKey)) {
                     return variantStyles[
                         safeCastTo<keyof typeof variantStyles>(variantKey)
                     ];

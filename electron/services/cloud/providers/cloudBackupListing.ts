@@ -1,7 +1,7 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { isPresent } from "ts-extras";
+import { isPresent, setHas } from "ts-extras";
 
 import type { CloudObjectEntry } from "./CloudStorageProvider.types";
 
@@ -43,7 +43,7 @@ export async function listBackupsFromMetadataObjects(args: {
                     // If the underlying backup blob is missing, the metadata is
                     // effectively orphaned and the backup cannot be restored.
                     // Hide it from the UI to avoid offering broken restore paths.
-                    if (!objectKeys.has(backupKey)) {
+                    if (!setHas(objectKeys, backupKey)) {
                         logger.warn(
                             "[cloudBackupListing] Backup metadata is orphaned; skipping",
                             {

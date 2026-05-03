@@ -2,6 +2,7 @@ import type { PersistOptions } from "zustand/middleware";
 
 import { logger } from "@app/services/logger";
 import { isDevelopment } from "@shared/utils/environment";
+import { isDefined } from "ts-extras";
 
 /**
  * Store utility helpers.
@@ -73,7 +74,7 @@ export const logStoreAction = (
 
     const message = `[${storeName}] ${actionName}`;
 
-    if (details === undefined) {
+    if (!isDefined(details)) {
         logger.info(message);
         return;
     }

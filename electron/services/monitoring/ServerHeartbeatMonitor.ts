@@ -8,7 +8,7 @@ import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { performance } from "node:perf_hooks";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import type { IMonitorService, MonitorServiceConfig } from "./types";
 
@@ -90,7 +90,7 @@ const behavior: RemoteMonitorBehavior<
         const timestampValue = normalizeTimestampValue(
             extractNestedFieldValue(payload.data, context.timestampField)
         );
-        if (timestampValue === undefined) {
+        if (!isDefined(timestampValue)) {
             return createMonitorErrorResult(
                 `Heartbeat timestamp field '${context.timestampField}' missing or invalid`,
                 payload.responseTime

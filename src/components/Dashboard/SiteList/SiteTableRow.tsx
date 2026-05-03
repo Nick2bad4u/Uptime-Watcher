@@ -13,7 +13,7 @@ import {
     useCallback,
     useMemo,
 } from "react";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { useSite } from "../../../hooks/site/useSite";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -164,9 +164,9 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
         );
         const rowStyle = useMemo<SurfaceOrderStyle | undefined>(
             () =>
-                rowOrder === undefined
-                    ? undefined
-                    : { "--surface-order": rowOrder },
+                isDefined(rowOrder)
+                    ? { "--surface-order": rowOrder }
+                    : undefined,
             [rowOrder]
         );
 
@@ -227,10 +227,10 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                 </td>
                 <td className="site-table__cell site-table__cell--response">
                     <ThemedText size="sm">
-                        {typeof responseTime === "number" &&
-                        Number.isFinite(responseTime) &&
+                        { typeof responseTime === "number" &&
+                        isFiniteNumber(responseTime) &&
                         responseTime > 0
-                            ? `${responseTime} ms`
+                            ? `${responseTime } ms`
                             : "—"}
                     </ThemedText>
                 </td>

@@ -1,4 +1,5 @@
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { isDefined } from "ts-extras";
 
 import { requireRecordParamValue } from "./recordValidation";
 import { validateOptionalStringPayload } from "./stringPayloadValidation";
@@ -63,7 +64,7 @@ export function validateDiagnosticsMetadata(
     value: unknown,
     options: DiagnosticsMetadataOptions
 ): string[] {
-    if (value === undefined) {
+    if (!isDefined(value)) {
         return [];
     }
 

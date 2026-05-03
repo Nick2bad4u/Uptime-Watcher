@@ -12,6 +12,7 @@ import {
     type ReactElement,
     useCallback,
 } from "react";
+import { isDefined } from "ts-extras";
 
 import { type AriaProperties, BaseFormField } from "../BaseFormField";
 
@@ -23,8 +24,8 @@ function buildBaseFormFieldProps(args: {
     readonly required: boolean;
 }): FormFieldBaseProperties & { readonly required: boolean } {
     return {
-        ...(args.error !== undefined && { error: args.error }),
-        ...(args.helpText !== undefined && { helpText: args.helpText }),
+        ...(isDefined(args.error) && { error: args.error }),
+        ...(isDefined(args.helpText) && { helpText: args.helpText }),
         id: args.id,
         label: args.label,
         required: args.required,
@@ -39,8 +40,8 @@ function renderBaseFormField(
 
     return (
         <BaseFormField
-            {...(error !== undefined && { error })}
-            {...(helpText !== undefined && { helpText })}
+            {...(isDefined(error) && { error })}
+            {...(isDefined(helpText) && { helpText })}
             id={id}
             label={label}
             required={required}

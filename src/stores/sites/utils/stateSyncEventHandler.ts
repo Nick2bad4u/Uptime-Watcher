@@ -14,6 +14,7 @@ import {
     hasSiteSyncChanges,
     prepareSiteSyncSnapshot,
 } from "@shared/utils/siteSnapshots";
+import { setHas } from "ts-extras";
 
 import { buildSanitizedIncomingSiteSyncDelta } from "../useSiteSync.deltaSanitizer";
 
@@ -59,7 +60,7 @@ const applyDeltaToSites = (
 
     for (const site of currentSites) {
         const { identifier } = site;
-        if (!removedIdentifiers.has(identifier)) {
+        if (!setHas(removedIdentifiers, identifier)) {
             nextSites.push(updatedByIdentifier.get(identifier) ?? site);
             seenIdentifiers.add(identifier);
         }
@@ -68,8 +69,8 @@ const applyDeltaToSites = (
     for (const site of addedSites) {
         const { identifier } = site;
         if (
-            !removedIdentifiers.has(identifier) &&
-            !seenIdentifiers.has(identifier)
+            !setHas(removedIdentifiers, identifier) &&
+            !setHas(seenIdentifiers, identifier)
         ) {
             nextSites.push(site);
             seenIdentifiers.add(identifier);
@@ -80,8 +81,8 @@ const applyDeltaToSites = (
     for (const site of updatedSites) {
         const { identifier } = site;
         if (
-            !removedIdentifiers.has(identifier) &&
-            !seenIdentifiers.has(identifier)
+            !setHas(removedIdentifiers, identifier) &&
+            !setHas(seenIdentifiers, identifier)
         ) {
             nextSites.push(site);
             seenIdentifiers.add(identifier);

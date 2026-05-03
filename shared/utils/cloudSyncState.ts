@@ -12,12 +12,13 @@ import type {
     CloudSyncFieldValue,
     CloudSyncState,
 } from "@shared/types/cloudSyncState";
+import type { Writable } from "type-fest";
 
 import { compareCloudSyncWriteKey } from "@shared/types/cloudSync";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
-import { objectEntries, objectValues } from "ts-extras";
+import { isDefined, objectEntries, objectValues } from "ts-extras";
 
-type Mutable<T> = { -readonly [K in keyof T]: T[K] };
+type Mutable<T> = Writable<T>;
 
 const OPERATION_KIND_RANK: Readonly<
     Record<CloudSyncOperation["kind"], number>
@@ -274,7 +275,7 @@ function applyOperation(
 
     const existingDeletion = entity.deleted;
     const deletionWinsOverWrite =
-        existingDeletion !== undefined &&
+        isDefined(existingDeletion) &&
         compareCloudSyncWriteKey(write, existingDeletion) < 0;
 
     if (deletionWinsOverWrite) {
@@ -295,7 +296,7 @@ function applyOperation(
     };
 
     const shouldResurrect =
-        existingDeletion !== undefined &&
+        isDefined(existingDeletion) &&
         compareCloudSyncWriteKey(existingDeletion, write) < 0;
 
     if (shouldResurrect) {
@@ -308,14 +309,14 @@ function applyOperation(
     }
 
     state[operation.entityType][operation.entityId] =
-        existingDeletion === undefined
+        isDefined(existingDeletion)
             ? {
                   ...entity,
+                  deleted: existingDeletion,
                   fields: nextFields,
               }
             : {
                   ...entity,
-                  deleted: existingDeletion,
                   fields: nextFields,
               };
 }

@@ -17,6 +17,7 @@ import type { RefObject } from "react";
 import type { UnknownArray } from "type-fest";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { isDefined, setHas } from "ts-extras";
 
 /**
  * Listener invoked whenever the associated resize observer detects changes that
@@ -126,7 +127,7 @@ const registerOverflowObserver = (
         cancelRecordCleanup(record);
     }
 
-    const isNewSubscriber = !record.subscribers.has(subscriber);
+    const isNewSubscriber = !setHas(record.subscribers, subscriber);
     if (isNewSubscriber) {
         record.subscribers.add(subscriber);
     }
@@ -279,7 +280,7 @@ export function useOverflowMarquee<
             evaluateOverflow();
 
             const element = containerRef.current;
-            const hasWindow = typeof window !== "undefined";
+            const hasWindow = isDefined(globalThis.window);
             const shouldAttachWindowListener = hasWindow && element !== null;
 
             const handleResize = (): void => {
@@ -287,7 +288,7 @@ export function useOverflowMarquee<
             };
 
             if (shouldAttachWindowListener) {
-                window.addEventListener("resize", handleResize);
+                globalThis.window.addEventListener("resize", handleResize);
             }
 
             const supportsResizeObserver =
@@ -304,7 +305,10 @@ export function useOverflowMarquee<
 
             return function cleanupOverflowObservation(): void {
                 if (shouldAttachWindowListener) {
-                    window.removeEventListener("resize", handleResize);
+                    globalThis.window.removeEventListener(
+                        "resize",
+                        handleResize
+                    );
                 }
 
                 if (!supportsResizeObserver || !element) {

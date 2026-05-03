@@ -1,3 +1,4 @@
+import { isFinite as isFiniteNumber } from "ts-extras";
 /**
  * Shared timeout resolution helpers for monitoring.
  *
@@ -20,7 +21,7 @@ import {
 } from "../constants";
 
 function isValidTimeoutMs(value: unknown): value is number {
-    return typeof value === "number" && Number.isFinite(value) && value > 0;
+    return typeof value === "number" && isFiniteNumber(value) && value > 0;
 }
 
 /**

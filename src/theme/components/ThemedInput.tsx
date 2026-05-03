@@ -61,6 +61,7 @@ import type {
 } from "@shared/types/componentProps";
 
 import { type JSX, memo, type NamedExoticComponent, useMemo } from "react";
+import { isDefined } from "ts-extras";
 
 import { ARIA_LABEL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -180,7 +181,7 @@ const ThemedInputComponent = ({
             step={step}
             style={styles}
             type={type}
-            {...(value === undefined ? {} : { value: inputValue })}
+            {...(isDefined(value) ? { value: inputValue } : {})}
         />
     );
 };

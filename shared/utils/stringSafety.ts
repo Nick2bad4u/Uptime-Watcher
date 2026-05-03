@@ -2,6 +2,8 @@
  * String safety helpers shared across Electron and renderer.
  */
 
+import { isDefined } from "ts-extras";
+
 /**
  * Returns true when the string contains ASCII control characters.
  *
@@ -13,7 +15,7 @@ export function hasAsciiControlCharacters(value: string): boolean {
     for (const char of value) {
         const codePoint = char.codePointAt(0);
         if (
-            codePoint !== undefined &&
+            isDefined(codePoint) &&
             (codePoint < 0x20 || codePoint === 0x7f)
         ) {
             return true;

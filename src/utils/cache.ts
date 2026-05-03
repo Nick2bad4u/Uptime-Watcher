@@ -196,7 +196,7 @@ export class TypedCache<K, V> {
         this.maxSize = options.maxSize ?? 100;
 
         const configuredTtl = options.ttl;
-        if (configuredTtl !== undefined && configuredTtl <= 0) {
+        if (isDefined(configuredTtl) && configuredTtl <= 0) {
             logger.warn("[Cache] Invalid TTL configuration", {
                 configuredTtl,
                 context: "cache:TypedCache",
@@ -204,7 +204,7 @@ export class TypedCache<K, V> {
         }
 
         this.defaultTtl =
-            configuredTtl !== undefined && configuredTtl > 0
+            isDefined(configuredTtl) && configuredTtl > 0
                 ? configuredTtl
                 : undefined;
     }
@@ -352,7 +352,7 @@ export class TypedCache<K, V> {
                 }
             }
 
-            if (lruKey !== undefined) {
+            if (isDefined(lruKey)) {
                 this.cache.delete(lruKey);
             }
         }
@@ -491,7 +491,7 @@ export async function getCachedOrFetch<T extends Exclude<unknown, undefined>>(
 
     // Try to get from cache first
     const cached = cache.get(key);
-    if (cached !== undefined) {
+    if (isDefined(cached)) {
         return cached;
     }
 
@@ -513,7 +513,7 @@ export async function getCachedOrFetch<T extends Exclude<unknown, undefined>>(
         }
 
         // Avoid overwriting newer values set while the fetch was in flight.
-        if (cache.get(key) === undefined) {
+        if (!isDefined(cache.get(key))) {
             cache.set(key, value, ttl);
         }
 

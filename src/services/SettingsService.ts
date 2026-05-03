@@ -16,6 +16,7 @@ import {
     normalizeHistoryLimit,
 } from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
+import { isDefined } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -230,7 +231,7 @@ export const SettingsService: SettingsServiceContract = {
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
 
-                if (sanitizedRequestLimit === undefined) {
+                if (!isDefined(sanitizedRequestLimit)) {
                     logger.warn(
                         "History limit update rejected: requested limit could not be normalised",
                         {

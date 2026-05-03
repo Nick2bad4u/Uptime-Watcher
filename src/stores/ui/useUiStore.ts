@@ -31,11 +31,11 @@
  */
 
 import type { Site } from "@shared/types";
-import type { Promisable } from "type-fest";
+import type { Except, Promisable } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
-import { safeCastTo } from "ts-extras";
+import { isDefined, safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -97,7 +97,7 @@ export const DEFAULT_SITE_TABLE_COLUMN_WIDTHS: Record<
  * Interface for the UI store with persistence capabilities.
  */
 type UIStoreWithPersist = UseBoundStore<
-    Omit<StoreApi<UIStore>, "persist"> & {
+    Except<StoreApi<UIStore>, "persist"> & {
         persist: {
             clearStorage: () => void;
             getOptions: () => Partial<
@@ -324,7 +324,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
 
                     for (const columnKey of SITE_TABLE_COLUMN_KEYS) {
                         const width = widths[columnKey];
-                        if (width !== undefined && !Number.isNaN(width)) {
+                        if (isDefined(width) && !Number.isNaN(width)) {
                             updated[columnKey] = width;
                         }
                     }
@@ -358,7 +358,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     const existingTab =
                         state.siteDetailsTabState[siteIdentifier];
 
-                    if (existingTab === undefined) {
+                    if (!isDefined(existingTab)) {
                         return {
                             activeSiteDetailsTab: "site-overview",
                             siteDetailsTabState: {

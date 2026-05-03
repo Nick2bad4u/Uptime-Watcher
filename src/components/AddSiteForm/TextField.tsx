@@ -56,6 +56,8 @@
 
 import type { NamedExoticComponent } from "react";
 
+import { isDefined } from "ts-extras";
+
 import { ThemedInput } from "../../theme/components/ThemedInput";
 import {
     createStringField,
@@ -126,10 +128,10 @@ const TextFieldBase = createStringField<TextFieldProperties, HTMLInputElement>({
                 {...ariaProps}
                 disabled={disabled}
                 id={id}
-                {...(max !== undefined && { max })}
-                {...(min !== undefined && { min })}
+                {...(isDefined(max) && { max })}
+                {...(isDefined(min) && { min })}
                 onChange={handleChange}
-                {...(placeholder !== undefined && { placeholder })}
+                {...(isDefined(placeholder) && { placeholder })}
                 required={required}
                 type={type}
                 value={value}

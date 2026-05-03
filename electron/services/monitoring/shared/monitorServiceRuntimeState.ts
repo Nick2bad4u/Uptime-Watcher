@@ -1,5 +1,7 @@
 import type { AxiosInstance } from "axios";
 
+import { isDefined } from "ts-extras";
+
 import type { MonitorServiceConfig } from "../types";
 
 import { createHttpClient } from "../utils/httpClient";
@@ -52,10 +54,10 @@ export function updateMonitorServiceRuntimeState(args: {
 }): MonitorServiceRuntimeState {
     // Treat `undefined` as "not provided" (do not overwrite existing config).
     const update: Partial<MonitorServiceConfig> = { ...args.update };
-    if (update.timeout === undefined) {
+    if (!isDefined(update.timeout)) {
         delete update.timeout;
     }
-    if (update.userAgent === undefined) {
+    if (!isDefined(update.userAgent)) {
         delete update.userAgent;
     }
 

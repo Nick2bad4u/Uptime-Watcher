@@ -21,7 +21,7 @@ import {
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { objectHasOwn, safeCastTo } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, objectHasOwn, safeCastTo } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -385,9 +385,9 @@ export function createHttpMonitorService<
             if (objectHasOwn(config, "timeout")) {
                 const { timeout } = config;
                 if (
-                    timeout !== undefined &&
+                    isDefined(timeout) &&
                     (typeof timeout !== "number" ||
-                        !Number.isFinite(timeout) ||
+                        !isFiniteNumber(timeout) ||
                         timeout <= 0)
                 ) {
                     throw new Error(
@@ -395,23 +395,23 @@ export function createHttpMonitorService<
                     );
                 }
 
-                if (timeout === undefined) {
-                    delete nextConfig.timeout;
-                } else {
+                if (isDefined(timeout)) {
                     nextConfig.timeout = timeout;
+                } else {
+                    delete nextConfig.timeout;
                 }
             }
 
             if (objectHasOwn(config, "userAgent")) {
                 const { userAgent } = config;
-                if (userAgent !== undefined && typeof userAgent !== "string") {
+                if (isDefined(userAgent) && typeof userAgent !== "string") {
                     throw new Error("Invalid userAgent: must be a string");
                 }
 
-                if (userAgent === undefined) {
-                    delete nextConfig.userAgent;
-                } else {
+                if (isDefined(userAgent)) {
                     nextConfig.userAgent = userAgent;
+                } else {
+                    delete nextConfig.userAgent;
                 }
             }
 

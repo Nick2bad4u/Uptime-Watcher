@@ -1,5 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { isDefined } from "ts-extras";
 
 import { AppNotificationService } from "../../../services/AppNotificationService";
 import { logger } from "../../../services/logger";
@@ -37,8 +38,8 @@ export function enqueueCloudToast(args: {
 }): string {
     // Store actions are allowed to use Zustand stores directly.
     const toast = useAlertStore.getState().enqueueToast({
-        ...(args.message === undefined ? {} : { message: args.message }),
-        ...(args.ttlMs === undefined ? {} : { ttlMs: args.ttlMs }),
+        ...(isDefined(args.message) ? { message: args.message } : {}),
+        ...(isDefined(args.ttlMs) ? { ttlMs: args.ttlMs } : {}),
         title: args.title,
         variant: args.variant,
     });
@@ -75,7 +76,7 @@ export async function dispatchSystemNotificationIfEnabled(request: {
 
     try {
         await AppNotificationService.notifyAppEvent({
-            ...(request.body === undefined ? {} : { body: request.body }),
+            ...(isDefined(request.body) ? { body: request.body } : {}),
             title: request.title,
         });
     } catch (error: unknown) {

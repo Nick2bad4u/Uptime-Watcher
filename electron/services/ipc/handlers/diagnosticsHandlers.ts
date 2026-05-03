@@ -15,7 +15,7 @@ import {
     withLogContext,
 } from "@shared/utils/loggingContext";
 import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
-import { setHas } from "ts-extras";
+import { isDefined, setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
@@ -208,15 +208,15 @@ export function registerDiagnosticsHandlers({
             const logMetadata: PreloadGuardDiagnosticsLogMetadata = {
                 channel: report.channel,
                 guard: report.guard,
-                ...(report.metadata === undefined
-                    ? {}
-                    : { metadata: report.metadata }),
-                ...(report.payloadPreview === undefined
-                    ? {}
-                    : { payloadPreview: report.payloadPreview }),
-                ...(report.reason === undefined
-                    ? {}
-                    : { reason: report.reason }),
+                ...(isDefined(report.metadata)
+                    ? { metadata: report.metadata }
+                    : {}),
+                ...(isDefined(report.payloadPreview)
+                    ? { payloadPreview: report.payloadPreview }
+                    : {}),
+                ...(isDefined(report.reason)
+                    ? { reason: report.reason }
+                    : {}),
                 timestamp: report.timestamp,
             };
 

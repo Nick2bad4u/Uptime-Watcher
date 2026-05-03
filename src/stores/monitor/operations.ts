@@ -4,6 +4,7 @@ import type { ValidationResult } from "@shared/types/validation";
  * Operational slice containing async monitor type actions.
  */
 import { withErrorHandling } from "@shared/utils/errorHandling";
+import { assertPresent } from "ts-extras";
 
 import type { MonitorTypesStoreGetter, MonitorTypesStoreSetter } from "./state";
 import type { MonitorTypesStore } from "./types";
@@ -38,12 +39,10 @@ export const createMonitorTypesOperationsSlice = (
                     details
                 );
                 const candidate = result as unknown;
-
-                if (candidate === null || candidate === undefined) {
-                    throw new Error(
-                        `formatMonitorDetail returned null for type: ${type}`
-                    );
-                }
+                assertPresent(
+                    candidate,
+                    `formatMonitorDetail returned null for type: ${type}`
+                );
 
                 logStoreAction("MonitorTypesStore", "formatMonitorDetail", {
                     resultLength: result.length,
@@ -75,12 +74,10 @@ export const createMonitorTypesOperationsSlice = (
                         monitor
                     );
                 const candidate = result as unknown;
-
-                if (candidate === null || candidate === undefined) {
-                    throw new Error(
-                        `formatMonitorTitleSuffix returned null for type: ${type}`
-                    );
-                }
+                assertPresent(
+                    candidate,
+                    `formatMonitorTitleSuffix returned null for type: ${type}`
+                );
 
                 logStoreAction(
                     "MonitorTypesStore",

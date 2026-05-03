@@ -1,6 +1,7 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import axios from "axios";
+import { isDefined } from "ts-extras";
 import * as z from "zod";
 
 import type { SecretStore } from "../../secrets/SecretStore";
@@ -168,10 +169,8 @@ export class GoogleDriveTokenManager {
                 accessToken: refreshed.access_token,
                 expiresAt: now + expiresInSeconds * 1000,
                 refreshToken: refreshed.refresh_token ?? tokens.refreshToken,
-                ...(nextScope === undefined ? {} : { scope: nextScope }),
-                ...(nextTokenType === undefined
-                    ? {}
-                    : { tokenType: nextTokenType }),
+                ...(isDefined(nextScope) ? { scope: nextScope } : {}),
+                ...(isDefined(nextTokenType) ? { tokenType: nextTokenType } : {}),
             });
 
             return refreshed.access_token;

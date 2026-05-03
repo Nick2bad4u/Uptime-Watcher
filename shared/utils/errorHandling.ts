@@ -27,6 +27,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { isDefined, objectHasIn, safeCastTo } from "ts-extras";
+
 /**
  * Options for constructing an {@link ApplicationError} instance.
  */
@@ -86,7 +88,7 @@ function normalizeErrorCause(cause: unknown): Error | undefined {
         return cause;
     }
 
-    if (cause === undefined) {
+    if (!isDefined(cause)) {
         return undefined;
     }
 
@@ -412,9 +414,9 @@ function isFrontendStoreContext(
     return (
         typeof candidate === "object" &&
         candidate !== null &&
-        "setError" in candidate &&
-        "clearError" in candidate &&
-        "setLoading" in candidate
+        objectHasIn(safeCastTo<UnknownRecord>(candidate), "setError") &&
+        objectHasIn(safeCastTo<UnknownRecord>(candidate), "clearError") &&
+        objectHasIn(safeCastTo<UnknownRecord>(candidate), "setLoading")
     );
 }
 
@@ -486,10 +488,9 @@ export async function withUtilityErrorHandling<T>(
             throw wrappedError;
         }
 
-        if (fallbackValue === undefined) {
+        if (!isDefined(fallbackValue)) {
             throw new Error(
-                `${operationName} failed and no fallback value provided. ` +
-                    `When shouldThrow is false, you must provide a fallbackValue parameter.`,
+                `${operationName} failed and no fallback value provided. When shouldThrow is false, you must provide a fallbackValue parameter.`,
                 { cause: error }
             );
         }

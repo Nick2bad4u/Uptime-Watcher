@@ -7,6 +7,7 @@ import type {
     SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
+import type { UnknownRecord } from "type-fest";
 
 import {
     formatZodIssues,
@@ -17,7 +18,7 @@ import {
     validateSerializedDatabaseBackupSaveResult,
     validateSerializedDatabaseRestoreResult,
 } from "@shared/validation/dataSchemas";
-import { safeCastTo } from "ts-extras";
+import { objectHasIn, safeCastTo } from "ts-extras";
 
 import type { IpcParameterValidator, IpcResultValidator } from "../types";
 
@@ -36,7 +37,7 @@ function formatSafeParseError(error: unknown): string[] {
         return ["Invalid response"];
     }
 
-    if (!("issues" in error)) {
+    if (!objectHasIn(safeCastTo<UnknownRecord>(error), "issues")) {
         return ["Invalid response"];
     }
 
@@ -53,7 +54,7 @@ function getSafeParseError(validation: unknown): unknown {
         return undefined;
     }
 
-    if (!("error" in validation)) {
+    if (!objectHasIn(safeCastTo<UnknownRecord>(validation), "error")) {
         return undefined;
     }
 

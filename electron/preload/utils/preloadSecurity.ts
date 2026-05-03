@@ -1,4 +1,4 @@
-import { objectKeys } from "ts-extras";
+import { isDefined, objectKeys } from "ts-extras";
 
 interface AutomationProcess {
     readonly env?: Record<string, string | undefined>;
@@ -23,7 +23,7 @@ const toAutomationProcess = (value: unknown): AutomationProcess | undefined => {
         const entry: unknown = Reflect.get(envCandidate, key);
         if (typeof entry === "string") {
             env[key] = entry;
-        } else if (entry === undefined) {
+        } else if (!isDefined(entry)) {
             env[key] = undefined;
         }
     }

@@ -2,7 +2,8 @@ import type { Database } from "node-sqlite3-wasm";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-import { isEmpty } from "ts-extras";
+import { isObject } from "@shared/utils/typeGuards";
+import { isEmpty, objectHasIn, setHas } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
 import { getRegisteredMonitorTypes } from "../../../monitoring/MonitorTypeRegistry";
@@ -135,7 +136,7 @@ function ensureMonitorDynamicColumns(database: Database): void {
 
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const def of fieldDefs) {
-        if (!existingColumns.has(def.columnName)) {
+        if (!setHas(existingColumns, def.columnName)) {
             const column = escapeSqlIdentifier(def.columnName);
             const sqlType = def.sqlType === "INTEGER" ? "INTEGER" : "TEXT";
 
@@ -153,7 +154,7 @@ function ensureMonitorDynamicColumns(database: Database): void {
 const hasUserVersionProperty = (
     value: unknown
 ): value is { user_version?: unknown } =>
-    typeof value === "object" && value !== null && "user_version" in value;
+    isObject(value) && objectHasIn(value, "user_version");
 
 /**
  * Validates a generated SQL schema string before execution.

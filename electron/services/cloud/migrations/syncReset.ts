@@ -1,6 +1,7 @@
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isDefined } from "ts-extras";
 
 import type { CloudSyncEngine } from "../../sync/SyncEngine";
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
@@ -40,7 +41,7 @@ async function deleteObjectsBestEffort(args: {
             const currentIndex = index;
             index += 1;
             const key = keys[currentIndex];
-            if (key === undefined) {
+            if (!isDefined(key)) {
                 break;
             }
 

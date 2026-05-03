@@ -1,6 +1,8 @@
+import type { Except, UnknownRecord } from "type-fest";
+
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { Dropbox, DropboxAuth } from "dropbox";
-import { safeCastTo } from "ts-extras";
+import { isFinite as isFiniteNumber, objectHasIn, safeCastTo } from "ts-extras";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
@@ -19,7 +21,7 @@ function isThenable(value: unknown): value is PromiseLike<unknown> {
     return (
         typeof value === "object" &&
         value !== null &&
-        "then" in value &&
+        objectHasIn(safeCastTo<UnknownRecord>(value), "then") &&
         typeof safeCastTo<{ then?: unknown }>(value).then === "function"
     );
 }
@@ -35,7 +37,7 @@ export class DropboxTokenManager {
     private readonly tokenStorageKey: string;
 
     private readonly authFactory: (tokens: DropboxTokens) => Pick<
-        Omit<DropboxAuth, "refreshAccessToken"> & {
+        Except<DropboxAuth, "refreshAccessToken"> & {
             refreshAccessToken: () => unknown;
         },
         | "getAccessToken"
@@ -120,7 +122,7 @@ export class DropboxTokenManager {
 
         if (
             !(expiresAt instanceof Date) ||
-            !Number.isFinite(expiresAt.getTime())
+            !isFiniteNumber(expiresAt.getTime())
         ) {
             throw new TypeError(
                 "Dropbox refresh did not return a valid access token expiration"

@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import { setHas } from "ts-extras";
 
 const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}._-]/gu;
 
@@ -61,7 +62,7 @@ export function createSanitizedFileName(fileName: string): string {
 
     // Avoid Windows device names (even when running on non-Windows, a backup
     // can later be downloaded/restored on Windows).
-    const safeBaseName = WINDOWS_RESERVED_BASENAMES.has(baseNameLower)
+    const safeBaseName = setHas(WINDOWS_RESERVED_BASENAMES, baseNameLower)
         ? `${baseName}_`
         : baseName;
 

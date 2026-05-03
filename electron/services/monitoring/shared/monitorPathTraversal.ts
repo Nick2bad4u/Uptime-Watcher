@@ -1,4 +1,4 @@
-import { isEmpty, setHas, stringSplit } from "ts-extras";
+import { isDefined, isEmpty, setHas, stringSplit } from "ts-extras";
 
 import type { MonitorPathTraversalOptions } from "./monitorPathTraversalOptions";
 
@@ -83,7 +83,7 @@ function normalizePathSegments(
         decodePathSegment(segment)
     );
 
-    if (decodedSegments.includes(undefined)) {
+    if (!decodedSegments.every(isDefined)) {
         return undefined;
     }
 

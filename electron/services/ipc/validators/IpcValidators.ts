@@ -3,6 +3,7 @@ import {
     validateHttpUrlCandidate,
 } from "@shared/utils/urlSafety";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
+import { isDefined } from "ts-extras";
 
 /**
  * Maximum byte length accepted for URL parameters passed through IPC.
@@ -25,7 +26,7 @@ export const IpcValidators = {
      * Validates an optional string parameter.
      */
     optionalString: (value: unknown, paramName: string): null | string => {
-        if (value !== undefined && !isNonEmptyString(value)) {
+        if (isDefined(value) && !isNonEmptyString(value)) {
             return `${paramName} must be a non-empty string when provided`;
         }
         return null;
@@ -54,7 +55,7 @@ export const IpcValidators = {
         paramName: string
     ): null | string => {
         const validation = validateExternalOpenUrlCandidate(value);
-        if ("reason" in validation) {
+        if (!validation.ok) {
             return `${paramName} ${validation.reason}`;
         }
 

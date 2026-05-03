@@ -33,7 +33,7 @@
  */
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { objectEntries, objectFromEntries } from "ts-extras";
+import { isPresent, objectEntries, objectFromEntries } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
@@ -93,7 +93,7 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                 return raw;
             }
 
-            if (raw !== undefined && raw !== null) {
+            if (isPresent(raw)) {
                 return getUserFacingErrorDetail(raw);
             }
 

@@ -7,6 +7,7 @@ import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 
 import { serializeBackupMetadata } from "@shared/utils/cloudBackupMetadata";
 import { determineBackupMigrationNeedsEncryptionKey } from "@shared/utils/cloudBackupMigration";
+import { isDefined } from "ts-extras";
 
 import type { CloudServiceOperationContext } from "./CloudService.operationContext";
 
@@ -112,7 +113,7 @@ export async function uploadLatestBackup(
         validateDatabaseBackupPayload(backup);
 
         const { encrypted, key } = await ctx.getEncryptionKeyMaybe();
-        const shouldEncrypt = encrypted && key !== undefined;
+        const shouldEncrypt = encrypted && isDefined(key);
         if (encrypted && !key) {
             throw new Error(
                 "Cloud encryption is enabled but locked on this device"

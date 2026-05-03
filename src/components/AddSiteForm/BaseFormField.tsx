@@ -33,6 +33,7 @@ import type { FormFieldBaseProperties } from "@shared/types/componentProps";
 import type { NamedExoticComponent, ReactElement, ReactNode } from "react";
 
 import { memo } from "react";
+import { isDefined } from "ts-extras";
 
 import { createAriaLabel, getAriaDescribedBy } from "./form-utils";
 import { FormField } from "./FormField";
@@ -88,8 +89,8 @@ export const BaseFormField: NamedExoticComponent<BaseFormFieldProperties> =
 
         return (
             <FormField
-                {...(error !== undefined && { error })}
-                {...(helpText !== undefined && { helpText })}
+                {...(isDefined(error) && { error })}
+                {...(isDefined(helpText) && { helpText })}
                 id={id}
                 label={label}
                 required={required}

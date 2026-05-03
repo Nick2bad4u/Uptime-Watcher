@@ -14,7 +14,7 @@ import {
     useMemo,
     useState,
 } from "react";
-import { arrayFirst } from "ts-extras";
+import { arrayFirst, setHas } from "ts-extras";
 
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
@@ -198,7 +198,7 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
 
         const isFaviconVisible =
             typeof faviconUrl === "string" &&
-            !failedFaviconUrls.has(faviconUrl);
+            !setHas(failedFaviconUrls, faviconUrl);
 
         const handleFaviconError = useCallback((): void => {
             if (typeof faviconUrl !== "string") {
@@ -206,7 +206,7 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
             }
 
             setFailedFaviconUrls((previous) => {
-                if (previous.has(faviconUrl)) {
+                if (setHas(previous, faviconUrl)) {
                     return previous;
                 }
 

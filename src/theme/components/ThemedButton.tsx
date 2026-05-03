@@ -66,7 +66,7 @@ import {
     type ReactNode,
     useCallback,
 } from "react";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isPresent } from "ts-extras";
 
 import { renderColoredIcon } from "./iconUtils";
 import { CSS_CLASSES } from "./types";
@@ -193,7 +193,7 @@ const ThemedButtonComponent = ({
             );
         }
 
-        if (children === null || children === undefined || children === false) {
+        if (!isPresent(children) || children === false) {
             return null;
         }
 

@@ -19,6 +19,7 @@
 import type { IpcResponse } from "@shared/types/ipc";
 
 import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
+import { isDefined } from "ts-extras";
 
 /**
  * Runtime type guard for {@link IpcResponse} envelopes.
@@ -102,7 +103,7 @@ export function extractIpcResponseData<T>(
     }
 
     const { requireData = true } = options;
-    if (requireData && response.data === undefined) {
+    if (requireData && !isDefined(response.data)) {
         throw new Error("IPC response missing data field");
     }
 

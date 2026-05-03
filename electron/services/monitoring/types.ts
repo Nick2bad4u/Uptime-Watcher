@@ -42,7 +42,7 @@
  * @see {@link Site} in shared/types for complete interface definition
  */
 import type { Monitor, MonitorType, Site } from "@shared/types";
-import type { Simplify, UnknownRecord } from "type-fest";
+import type { Except, Simplify, UnknownRecord } from "type-fest";
 
 /**
  * Interface for monitor services that perform health checks.
@@ -164,7 +164,7 @@ export interface MonitorCheckResult {
  * renderer forms.
  */
 export type MonitorConfigurationInput = Simplify<
-    Partial<Omit<Monitor, "history" | "type">> &
+    Partial<Except<Monitor, "history" | "type">> &
         UnknownRecord & {
             /** Optional history collection supplied by advanced flows. */
             history?: Monitor["history"];

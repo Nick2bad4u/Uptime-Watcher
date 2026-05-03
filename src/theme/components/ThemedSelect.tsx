@@ -58,6 +58,7 @@ import type {
 } from "react";
 
 import { forwardRef, memo, useMemo } from "react";
+import { isDefined } from "ts-extras";
 
 import { ARIA_LABEL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -174,7 +175,7 @@ const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
                 style={styles}
                 title={title}
                 {...restProps}
-                {...(value === undefined ? {} : { value: selectValue })}
+                {...(isDefined(value) ? { value: selectValue } : {})}
             >
                 {children}
             </select>

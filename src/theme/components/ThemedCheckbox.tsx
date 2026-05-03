@@ -5,6 +5,7 @@ import type {
 } from "@shared/types/componentProps";
 
 import { type JSX, memo, type NamedExoticComponent } from "react";
+import { isDefined } from "ts-extras";
 
 import { ARIA_LABEL } from "../../constants";
 
@@ -42,7 +43,7 @@ const ThemedCheckboxComponent = ({
 }: ThemedCheckboxProperties): JSX.Element => (
     <input
         type="checkbox"
-        {...(checked === undefined ? {} : { checked })}
+        {...(isDefined(checked) ? { checked } : {})}
         // eslint-disable-next-line react-hooks/invariant -- ariaLabel is provided by typed props and may intentionally be undefined.
         aria-label={ariaLabel}
         className={`themed-checkbox ${className}`}

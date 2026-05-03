@@ -22,6 +22,7 @@ import {
     validateMonitoringStartSummary,
     validateMonitoringStopSummary,
 } from "@shared/validation/monitoringSummarySchemas";
+import { isDefined } from "ts-extras";
 
 import {
     createSafeParseAdapter,
@@ -35,13 +36,13 @@ const safeParseStatusUpdate = createSafeParseAdapter(validateStatusUpdate);
 function safeParseOptionalStatusUpdate(
     candidate: unknown
 ): SafeParseLike<StatusUpdate | undefined> {
-    if (candidate === undefined) {
+    if (!isDefined(candidate)) {
         return { data: undefined, success: true };
     }
 
     const parsed = safeParseStatusUpdate(candidate);
 
-    if (!("error" in parsed)) {
+    if (parsed.success) {
         return { data: parsed.data, success: true };
     }
 

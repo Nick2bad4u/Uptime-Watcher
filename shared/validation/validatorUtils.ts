@@ -30,6 +30,9 @@
  * @see {@link https://github.com/validatorjs/validator.js} - Validator.js documentation
  */
 
+import type { Except } from "type-fest";
+
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 import validator from "validator";
 
 import {
@@ -51,7 +54,7 @@ import {
  * enforces camelCase identifiers, so we also accept `disallowAuth` and map it
  * to the underlying validator option.
  */
-export type UrlValidationOptions = Omit<
+export type UrlValidationOptions = Except<
     validator.IsURLOptions,
     "disallow_auth"
 > & {
@@ -258,7 +261,7 @@ export function isValidNumeric(
 
     // Guard against inputs that would parse to Infinity.
     const parsed = Number(value);
-    if (!Number.isFinite(parsed)) {
+    if (!isFiniteNumber(parsed)) {
         return false;
     }
 
@@ -520,7 +523,7 @@ export function safeInteger(
         }
     })();
 
-    if (str === undefined) {
+    if (!isDefined(str)) {
         return defaultValue;
     }
 
@@ -530,11 +533,11 @@ export function safeInteger(
 
     let num = Number.parseInt(str, 10);
 
-    if (min !== undefined && num < min) {
+    if (isDefined(min) && num < min) {
         num = min;
     }
 
-    if (max !== undefined && num > max) {
+    if (isDefined(max) && num > max) {
         num = max;
     }
 

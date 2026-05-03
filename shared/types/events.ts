@@ -17,6 +17,7 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 import type {
+    Except,
     ExclusifyUnion,
     Simplify,
     Tagged,
@@ -781,7 +782,7 @@ export interface MonitoringControlEventData extends BaseEventData {
 /**
  * Canonical payload for monitoring start events emitted to renderer listeners.
  */
-export type MonitoringStartedEventData = Omit<
+export type MonitoringStartedEventData = Except<
     MonitoringControlEventData,
     "monitorCount" | "siteCount" | "summary"
 > & {
@@ -793,7 +794,7 @@ export type MonitoringStartedEventData = Omit<
 /**
  * Canonical payload for monitoring stop events emitted to renderer listeners.
  */
-export type MonitoringStoppedEventData = Omit<
+export type MonitoringStoppedEventData = Except<
     MonitoringControlEventData,
     "activeMonitors" | "reason" | "summary"
 > & {

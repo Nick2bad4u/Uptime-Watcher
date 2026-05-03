@@ -17,7 +17,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { withLogContext } from "@shared/utils/loggingContext";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
-import { arrayJoin, safeCastTo } from "ts-extras";
+import { arrayJoin, isDefined, safeCastTo, setHas } from "ts-extras";
 
 import type {
     IpcParameterValidator,
@@ -91,10 +91,10 @@ export interface WithIpcHandlerOptions<TResult = unknown> {
     validateResult?: IpcResultValidator<TResult> | null;
 }
 
-function assertChannelParams<TChannel extends IpcInvokeChannel>(
-    channelName: TChannel,
+function assertChannelParams(
+    channelName: IpcInvokeChannel,
     params: Readonly<UnknownArray>
-): asserts params is ChannelParams<TChannel> {
+): void {
     if (!Array.isArray(params)) {
         throw new TypeError(
             `[IpcService] Expected parameters array when invoking ${channelName}`
@@ -152,7 +152,7 @@ export function createErrorResponse(
         success: false,
     };
 
-    if (metadata !== undefined) {
+    if (isDefined(metadata)) {
         response.metadata = metadata;
     }
 
@@ -179,15 +179,15 @@ export function createSuccessResponse<T>(
         success: true,
     };
 
-    if (data !== undefined) {
+    if (isDefined(data)) {
         response.data = data;
     }
 
-    if (metadata !== undefined) {
+    if (isDefined(metadata)) {
         response.metadata = metadata;
     }
 
-    if (warnings !== undefined && warnings.length > 0) {
+    if (isDefined(warnings) && warnings.length > 0) {
         response.warnings = warnings;
     }
 
@@ -423,6 +423,7 @@ export function registerStandardizedIpcHandler<
         IpcInvokeChannelResult<TChannel>
     > | null = null
 ): void {
+    const channelLabel = channelName;
     const expectedParamCount = getExpectedParamCount(channelName);
 
     if (validateParams === null && expectedParamCount > 0) {
@@ -443,7 +444,12 @@ export function registerStandardizedIpcHandler<
         throw new Error(errorMessage);
     }
 
-    if (registeredHandlers.has(channelName)) {
+    if (
+        setHas(
+            safeCastTo<ReadonlySet<IpcInvokeChannel>>(registeredHandlers),
+            channelName
+        )
+    ) {
         const errorMessage = `[IpcService] Attempted to register duplicate IPC handler for channel '${channelName}'`;
 
         logger.error(
@@ -470,9 +476,10 @@ export function registerStandardizedIpcHandler<
             async (_event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
                 const { args, correlationId } =
                     extractIpcCorrelationContext(rawArgs);
+                const argCount = args.length;
 
                 const correlationMetadata =
-                    correlationId === undefined ? {} : { correlationId };
+                    isDefined(correlationId) ? { correlationId } : {};
 
                 // Preserve the dedicated error message for "no-param" channels that
                 // do not use validators.
@@ -490,16 +497,16 @@ export function registerStandardizedIpcHandler<
                             severity: "warn",
                         }),
                         {
-                            paramCount: args.length,
+                            paramCount: argCount,
                         }
                     );
 
                     return createErrorResponse(
-                        `Unexpected IPC parameters for ${channelName}. This channel does not accept any parameters.`,
+                        `Unexpected IPC parameters for ${channelLabel}. This channel does not accept any parameters.`,
                         {
                             handler: channelName,
                             ...correlationMetadata,
-                            paramCount: args.length,
+                            paramCount: argCount,
                         }
                     );
                 }
@@ -511,7 +518,7 @@ export function registerStandardizedIpcHandler<
                     const message =
                         safeError.message.length > 0
                             ? safeError.message
-                            : `Invalid IPC parameters for ${channelName}`;
+                            : `Invalid IPC parameters for ${channelLabel}`;
 
                     logger.warn(
                         "[IpcHandler] Rejected IPC invocation due to invalid parameter shape",
@@ -523,27 +530,30 @@ export function registerStandardizedIpcHandler<
                         }),
                         {
                             error: message,
-                            paramCount: args.length,
+                            paramCount: argCount,
                         }
                     );
 
                     return createErrorResponse(message, {
                         handler: channelName,
                         ...correlationMetadata,
-                        paramCount: args.length,
+                        paramCount: argCount,
                     });
                 }
 
-                const baseMetadata = {
-                    paramCount: args.length,
-                } satisfies IpcHandlerMetadata;
                 const handlerOptions: WithIpcHandlerOptions<
                     IpcInvokeChannelResult<TChannel>
                 > = {
-                    ...(correlationId === undefined ? {} : { correlationId }),
-                    metadata: baseMetadata,
-                    ...(validateResult === null ? {} : { validateResult }),
+                    metadata: {
+                        paramCount: argCount,
+                    } satisfies IpcHandlerMetadata,
                 };
+                if (isDefined(correlationId)) {
+                    handlerOptions.correlationId = correlationId;
+                }
+                if (validateResult !== null) {
+                    handlerOptions.validateResult = validateResult;
+                }
 
                 if (validateParams === null) {
                     return withIpcHandler(
@@ -572,7 +582,7 @@ export function registerStandardizedIpcHandler<
                 : new Error(getUserFacingErrorDetail(rawError));
 
         logger.error(
-            `[IpcService] Failed to register IPC handler for channel '${channelName}'`,
+            `[IpcService] Failed to register IPC handler for channel '${channelLabel}'`,
             withLogContext({
                 channel: channelName,
                 event: "ipc:handler:register",

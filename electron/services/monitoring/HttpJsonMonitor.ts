@@ -1,6 +1,7 @@
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isDefined } from "ts-extras";
 
 import type {
     HttpMonitorBehavior,
@@ -46,7 +47,7 @@ const HTTP_JSON_MONITOR_BEHAVIOR: HttpMonitorBehavior<
             context.jsonPath
         );
 
-        if (extracted === undefined) {
+        if (!isDefined(extracted)) {
             return {
                 details: `JSON path '${context.jsonPath}' not found in response`,
                 responseTime,

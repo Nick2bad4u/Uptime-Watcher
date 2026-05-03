@@ -28,7 +28,7 @@ import {
     isValidPort,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import { objectEntries, safeCastTo } from "ts-extras";
+import { arrayFirst, isFinite as isFiniteNumber, objectEntries, safeCastTo, setHas } from "ts-extras";
 
 /**
  * Baseline defaults applied to every monitor regardless of type.
@@ -161,7 +161,7 @@ function resolveMonitorTypeOrDefault(type: unknown): MonitorType {
         return type;
     }
 
-    return BASE_MONITOR_TYPES[0];
+    return arrayFirst(BASE_MONITOR_TYPES);
 }
 
 /**
@@ -285,7 +285,7 @@ function filterMonitorFieldsByType(
     // the external signature strongly typed while using a local record cast
     // to perform dynamic key assignment.
     for (const [key, value] of objectEntries(monitor)) {
-        if (allowedFields.has(key)) {
+        if (setHas(allowedFields, key)) {
             filteredRecord[key] = value;
         }
     }
@@ -329,14 +329,12 @@ function applyHttpKeywordMonitorDefaults(
 function applyHttpStatusMonitorDefaults(
     monitor: Monitor,
     filteredData: Partial<Monitor>
-): void {
-    applyHttpMonitorDefaults(monitor, filteredData);
+): void { applyHttpMonitorDefaults(monitor, filteredData);
 
     const statusValue = filteredData.expectedStatusCode;
-    if (typeof statusValue === "number" && Number.isFinite(statusValue)) {
+    if (typeof statusValue === "number" && isFiniteNumber(statusValue)) {
         const clamped = Math.trunc(statusValue);
-        monitor.expectedStatusCode = Math.min(599, Math.max(100, clamped));
-    } else {
+        monitor.expectedStatusCode = Math.min(599, Math.max(100, clamped)); } else {
         monitor.expectedStatusCode = 200;
     }
 }
@@ -371,7 +369,7 @@ function applySslMonitorDefaults(
     monitor.port = isValidPort(portValue) ? Number(portValue) : 443;
 
     const numericWarning =
-        typeof warningValue === "number" && Number.isFinite(warningValue)
+        typeof warningValue === "number" && isFiniteNumber(warningValue)
             ? Math.trunc(warningValue)
             : DEFAULT_SSL_WARNING_DAYS;
     monitor.certificateWarningDays = Math.min(Math.max(numericWarning, 1), 365);
@@ -469,14 +467,12 @@ function applyHttpLatencyMonitorDefaults(
     let numericLatency = HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS;
     if (
         typeof maxResponseTime === "number" &&
-        Number.isFinite(maxResponseTime)
+        isFiniteNumber(maxResponseTime)
     ) {
         numericLatency = Math.trunc(maxResponseTime);
-    } else if (typeof maxResponseTime === "string") {
-        const parsed = Number.parseFloat(maxResponseTime);
-        if (Number.isFinite(parsed)) {
-            numericLatency = Math.trunc(parsed);
-        }
+    } else if (typeof maxResponseTime === "string") { const parsed = Number.parseFloat(maxResponseTime);
+        if (isFiniteNumber(parsed)) {
+            numericLatency = Math.trunc(parsed); }
     }
 
     monitor.maxResponseTime = Math.max(1, numericLatency);
@@ -497,14 +493,12 @@ function applyWebsocketKeepaliveMonitorDefaults(
     let maxPongDelay = WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS;
     if (
         typeof maxPongDelayValue === "number" &&
-        Number.isFinite(maxPongDelayValue)
+        isFiniteNumber(maxPongDelayValue)
     ) {
         maxPongDelay = Math.trunc(maxPongDelayValue);
-    } else if (typeof maxPongDelayValue === "string") {
-        const parsed = Number.parseInt(maxPongDelayValue, 10);
-        if (Number.isFinite(parsed)) {
-            maxPongDelay = parsed;
-        }
+    } else if (typeof maxPongDelayValue === "string") { const parsed = Number.parseInt(maxPongDelayValue, 10);
+        if (isFiniteNumber(parsed)) {
+            maxPongDelay = parsed; }
     }
 
     monitor.maxPongDelayMs = Math.min(Math.max(maxPongDelay, 10), 60_000);
@@ -535,13 +529,11 @@ function applyServerHeartbeatMonitorDefaults(
         heartbeatMaxDriftSeconds?: unknown;
     }>(filteredData).heartbeatMaxDriftSeconds;
     let maxDrift = SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS;
-    if (typeof maxDriftValue === "number" && Number.isFinite(maxDriftValue)) {
+    if (typeof maxDriftValue === "number" && isFiniteNumber(maxDriftValue)) {
         maxDrift = Math.trunc(maxDriftValue);
-    } else if (typeof maxDriftValue === "string") {
-        const parsed = Number.parseInt(maxDriftValue, 10);
-        if (Number.isFinite(parsed)) {
-            maxDrift = parsed;
-        }
+    } else if (typeof maxDriftValue === "string") { const parsed = Number.parseInt(maxDriftValue, 10);
+        if (isFiniteNumber(parsed)) {
+            maxDrift = parsed; }
     }
 
     monitor.heartbeatMaxDriftSeconds = Math.min(
@@ -571,13 +563,11 @@ function applyReplicationMonitorDefaults(
         maxReplicationLagSeconds?: unknown;
     }>(filteredData).maxReplicationLagSeconds;
     let maxLagSeconds = REPLICATION_DEFAULT_MAX_LAG_SECONDS;
-    if (typeof maxLagValue === "number" && Number.isFinite(maxLagValue)) {
+    if (typeof maxLagValue === "number" && isFiniteNumber(maxLagValue)) {
         maxLagSeconds = Math.trunc(maxLagValue);
-    } else if (typeof maxLagValue === "string") {
-        const parsed = Number.parseInt(maxLagValue, 10);
-        if (Number.isFinite(parsed)) {
-            maxLagSeconds = parsed;
-        }
+    } else if (typeof maxLagValue === "string") { const parsed = Number.parseInt(maxLagValue, 10);
+        if (isFiniteNumber(parsed)) {
+            maxLagSeconds = parsed; }
     }
 
     monitor.maxReplicationLagSeconds = Math.min(

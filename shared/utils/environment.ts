@@ -15,7 +15,7 @@
  * influence architectural behaviour (logging, test modes, user-data routing)
  * rather than attempting to mirror the entire process.env surface.
  */
-import { isDefined, objectEntries, safeCastTo } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, objectEntries, safeCastTo } from "ts-extras";
 
 export interface KnownEnvironmentVariables {
     /** Token used by coverage reporting tooling when present. */
@@ -63,7 +63,7 @@ const processSnapshotState: {
 };
 
 const getProcessSnapshot = (): ProcessSnapshot | undefined => {
-    if (processSnapshotState.override !== undefined) {
+    if (isDefined(processSnapshotState.override)) {
         return processSnapshotState.override ?? undefined;
     }
 
@@ -203,7 +203,7 @@ export function readProcessEnv(key: string): string | undefined {
  */
 export function readBooleanEnv(key: string, defaultValue = false): boolean {
     const value = readProcessEnv(key);
-    if (value === undefined) {
+    if (!isDefined(value)) {
         return defaultValue;
     }
 
@@ -229,12 +229,12 @@ export function readBooleanEnv(key: string, defaultValue = false): boolean {
  */
 export function readNumberEnv(key: string, defaultValue: number): number {
     const value = readProcessEnv(key);
-    if (value === undefined) {
+    if (!isDefined(value)) {
         return defaultValue;
     }
 
     const parsed = Number.parseInt(value, 10);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : defaultValue;
+    return isFiniteNumber(parsed) && parsed > 0 ? parsed : defaultValue;
 }
 
 /**
@@ -248,7 +248,7 @@ export function getNodeEnv(): string {
  * Detects whether browser globals are present.
  */
 export function isBrowserEnvironment(): boolean {
-    return typeof window !== "undefined" && typeof document !== "undefined";
+    return isDefined(globalThis.window) && isDefined(globalThis.document);
 }
 
 /**

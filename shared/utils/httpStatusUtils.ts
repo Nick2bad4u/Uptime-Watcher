@@ -11,6 +11,8 @@
  * @see {@link determineMonitorStatus}
  */
 
+import { arrayIncludes, isInteger } from "ts-extras";
+
 /**
  * Validates that a value is a valid HTTP status code (100–599).
  *
@@ -24,8 +26,6 @@
  *
  * @internal
  */
-import { isInteger } from "ts-extras";
-
 function isValidHttpStatus(httpStatus: number): boolean {
     return isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599;
 }
@@ -91,7 +91,7 @@ export function determineMonitorStatus(
             510,
         ]; // Not Implemented, HTTP Version Not Supported, Not Extended
 
-        if (degradedCodes.includes(httpStatus)) {
+        if (arrayIncludes(degradedCodes, httpStatus)) {
             return "degraded";
         }
 

@@ -12,6 +12,7 @@ import { isValidSiteRow as isValidDatabaseSiteRow } from "@shared/types/database
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { safeStringify } from "@shared/utils/stringConversion";
+import { isDefined } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
 
@@ -77,12 +78,12 @@ export function rowToSite(row: DatabaseSiteRow): SiteRow {
         };
 
         // Handle optional name field
-        if (row.name !== undefined) {
+        if (isDefined(row.name)) {
             site.name = safeStringify(row.name);
         }
 
         // Handle optional monitoring field
-        if (row.monitoring !== undefined) {
+        if (isDefined(row.monitoring)) {
             site.monitoring = Boolean(row.monitoring);
         }
 

@@ -1,3 +1,5 @@
+import { isDefined, isPresent } from "ts-extras";
+
 /**
  * Database value conversion utilities. Provides type-safe conversions between
  * application types and database values.
@@ -69,7 +71,7 @@ export function addBooleanField(
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
-    if (value !== undefined) {
+    if (isDefined(value)) {
         updateFields.push(`${fieldName} = ?`);
         updateValues.push(value ? 1 : 0);
     }
@@ -99,7 +101,7 @@ export function safeNumberConvert(value: unknown): number | undefined {
     if (typeof value === "number") {
         return value;
     }
-    if (value !== null && value !== undefined && value !== "") {
+    if (isPresent(value) && value !== "") {
         const converted = Number(value);
         return Number.isNaN(converted) ? undefined : converted;
     }
@@ -127,7 +129,7 @@ export function addNumberField(
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
-    if (value !== undefined) {
+    if (isDefined(value)) {
         updateFields.push(`${fieldName} = ?`);
         const convertedValue = safeNumberConvert(value);
         updateValues.push(convertedValue ?? value);
@@ -160,7 +162,7 @@ export function addStringField(
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
-    if (value !== undefined) {
+    if (isDefined(value)) {
         updateFields.push(`${fieldName} = ?`);
         // Handle runtime type coercion for tests that pass non-string values
         const stringValue = typeof value === "string" ? value : String(value);

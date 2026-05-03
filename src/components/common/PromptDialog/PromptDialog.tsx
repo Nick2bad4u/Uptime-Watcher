@@ -13,6 +13,7 @@ import {
     useId,
     useMemo,
 } from "react";
+import { isDefined } from "ts-extras";
 
 import { usePromptDialogControls } from "../../../stores/ui/usePromptDialogStore";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
@@ -127,7 +128,7 @@ export const PromptDialog: NamedExoticComponent = memo(
                         onChange={handleChange}
                         type={type}
                         value={value}
-                        {...(placeholder === undefined ? {} : { placeholder })}
+                        {...(isDefined(placeholder) ? { placeholder } : {})}
                     />
                 </form>
             </Modal>

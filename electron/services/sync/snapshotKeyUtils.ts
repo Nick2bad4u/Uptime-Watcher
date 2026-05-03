@@ -13,7 +13,7 @@
  * don't drift across transports/migrations/tests.
  */
 
-import { stringSplit } from "ts-extras";
+import { isDefined, stringSplit } from "ts-extras";
 
 import { isAsciiDigits } from "./syncEngineUtils";
 
@@ -42,7 +42,7 @@ function isValidSnapshotNonceHex(raw: string): boolean {
     // avoidance and should be ASCII hex.
     for (const char of normalized) {
         const codePoint = char.codePointAt(0);
-        if (codePoint === undefined) {
+        if (!isDefined(codePoint)) {
             return false;
         }
 
@@ -79,7 +79,7 @@ export function isValidSnapshotFileName(fileName: string): boolean {
         return false;
     }
 
-    if (nonceRaw !== undefined) {
+    if (isDefined(nonceRaw)) {
         return isValidSnapshotNonceHex(nonceRaw);
     }
 

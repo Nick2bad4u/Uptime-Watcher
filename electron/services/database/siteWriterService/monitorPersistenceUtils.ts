@@ -1,6 +1,6 @@
 import type { Monitor } from "@shared/types";
 
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isDefined } from "ts-extras";
 
 /**
  * Creates a stable signature representing a monitor's configuration.
@@ -45,21 +45,21 @@ export function buildMonitorUpdateData(
     };
 
     // Only update optional fields if they are defined
-    if (newMonitor.host !== undefined) {
+    if (isDefined(newMonitor.host)) {
         updateData.host = newMonitor.host;
     }
-    if (newMonitor.port !== undefined) {
+    if (isDefined(newMonitor.port)) {
         updateData.port = newMonitor.port;
     }
-    if (newMonitor.url !== undefined) {
+    if (isDefined(newMonitor.url)) {
         updateData.url = newMonitor.url;
     }
 
     // DNS-specific fields for DNS monitor support
-    if (newMonitor.recordType !== undefined) {
+    if (isDefined(newMonitor.recordType)) {
         updateData.recordType = newMonitor.recordType;
     }
-    if (newMonitor.expectedValue !== undefined) {
+    if (isDefined(newMonitor.expectedValue)) {
         updateData.expectedValue = newMonitor.expectedValue;
     }
 

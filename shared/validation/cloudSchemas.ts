@@ -9,6 +9,7 @@ import {
     type CloudProviderDetails,
     type CloudStatusSummary,
 } from "@shared/types/cloud";
+import { isDefined } from "ts-extras";
 import * as z from "zod";
 
 const cloudProviderKindSchema = z.enum([
@@ -60,7 +61,7 @@ const cloudStatusSummaryInternalSchema = z
     })
     .strict()
     .superRefine((value, ctx) => {
-        if (value.provider === null && value.providerDetails !== undefined) {
+        if (value.provider === null && isDefined(value.providerDetails)) {
             ctx.addIssue({
                 code: "custom",
                 message:

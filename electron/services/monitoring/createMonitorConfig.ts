@@ -1,6 +1,7 @@
 import type { Monitor } from "@shared/types";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import {
     DEFAULT_CHECK_INTERVAL,
@@ -8,10 +9,8 @@ import {
 } from "../../constants";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 
-function resolveFiniteNumber(source: unknown): number | undefined {
-    if (typeof source === "number") {
-        return Number.isFinite(source) ? source : undefined;
-    }
+function resolveFiniteNumber(source: unknown): number | undefined { if (typeof source === "number") {
+        return isFiniteNumber(source) ? source : undefined; }
 
     if (typeof source === "string") {
         const trimmed = source.trim();
@@ -20,7 +19,7 @@ function resolveFiniteNumber(source: unknown): number | undefined {
         }
 
         const parsed = Number(trimmed);
-        return Number.isFinite(parsed) ? parsed : undefined;
+        return isFiniteNumber(parsed) ? parsed : undefined;
     }
 
     return undefined;
@@ -65,7 +64,7 @@ export function createMonitorConfig(
 
     const timeoutCandidate = resolveFiniteNumber(partial.timeout);
     const timeout =
-        timeoutCandidate !== undefined && timeoutCandidate > 0
+        isDefined(timeoutCandidate) && timeoutCandidate > 0
             ? Math.trunc(timeoutCandidate)
             : fallbackTimeout;
 
@@ -78,7 +77,7 @@ export function createMonitorConfig(
 
     const retryCandidate = resolveFiniteNumber(partial.retryAttempts);
     const retryAttempts =
-        retryCandidate !== undefined && retryCandidate >= 0
+        isDefined(retryCandidate) && retryCandidate >= 0
             ? Math.max(0, Math.trunc(retryCandidate))
             : fallbackRetryAttempts;
 
@@ -91,7 +90,7 @@ export function createMonitorConfig(
 
     const intervalCandidate = resolveFiniteNumber(partial.checkInterval);
     const intervalSource =
-        intervalCandidate !== undefined && intervalCandidate > 0
+        isDefined(intervalCandidate) && intervalCandidate > 0
             ? intervalCandidate
             : normalizedFallbackInterval;
 

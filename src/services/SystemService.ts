@@ -96,7 +96,7 @@ export const SystemService: SystemServiceContract = {
             const validation = validateExternalOpenUrlCandidate(url);
             const urlForMessage = getSafeUrlForLogging(url);
 
-            if ("reason" in validation) {
+            if (!validation.ok) {
                 const error = new TypeError(
                     `Invalid URL provided to SystemService.openExternal: ${validation.safeUrlForLogging}`
                 );

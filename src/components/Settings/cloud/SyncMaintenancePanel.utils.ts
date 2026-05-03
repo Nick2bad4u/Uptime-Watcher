@@ -2,7 +2,7 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
-import { arrayAt, arrayJoin, stringSplit } from "ts-extras";
+import { arrayAt, arrayJoin, isDefined, not, setHas, stringSplit } from "ts-extras";
 
 import type {
     DiagnosticsPayload,
@@ -59,7 +59,7 @@ export function resolveSyncResetSummary(
  * Formats an optional epoch timestamp.
  */
 export function formatOptionalEpochMs(timestamp: number | undefined): string {
-    if (timestamp === undefined) {
+    if (!isDefined(timestamp)) {
         return "—";
     }
 
@@ -90,10 +90,10 @@ export function buildPreviewViewModel(
     const opsSet = new Set(preview.operationDeviceIds);
 
     const devicesOnlyInManifest = preview.deviceIds.filter(
-        (id) => !opsSet.has(id)
+        not((id: string) => setHas(opsSet, id))
     );
     const devicesOnlyInOps = preview.operationDeviceIds.filter(
-        (id) => !manifestSet.has(id)
+        not((id: string) => setHas(manifestSet, id))
     );
 
     let mismatchText: null | string = null;

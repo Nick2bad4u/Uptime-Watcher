@@ -43,6 +43,7 @@ import {
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import { toSerializedError } from "@shared/utils/errorSerialization";
+import { isDefined } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -138,7 +139,7 @@ export class SiteRepositoryService {
         monitoringConfig: MonitoringConfig
     ): Promise<void> {
         const limit = await this.getHistoryLimitSetting();
-        if (limit !== undefined) {
+        if (isDefined(limit)) {
             await monitoringConfig.setHistoryLimit(limit);
             this.logger.info(`History limit applied: ${limit}`);
         }

@@ -3,6 +3,8 @@
  *
  * @internal
  */
+import { isDefined } from "ts-extras";
+
 interface CacheConfigItem {
     /** Enables metrics collection for cache hit/miss tracking. */
     readonly enableStats: boolean;
@@ -169,7 +171,7 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
      * @returns Standardized monitors cache name
      */
     monitors: (suffix?: string): string =>
-        suffix === undefined ? "monitors" : `monitors-${suffix}`,
+        isDefined(suffix) ? `monitors-${suffix}` : "monitors",
 
     /**
      * Generate a settings cache name with optional suffix.
@@ -179,7 +181,7 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
      * @returns Standardized settings cache name
      */
     settings: (suffix?: string): string =>
-        suffix === undefined ? "settings" : `settings-${suffix}`,
+        isDefined(suffix) ? `settings-${suffix}` : "settings",
 
     /**
      * Generate a sites cache name with optional suffix.
@@ -195,7 +197,7 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
      * @returns Standardized sites cache name
      */
     sites: (suffix?: string): string =>
-        suffix === undefined ? "sites" : `sites-${suffix}`,
+        isDefined(suffix) ? `sites-${suffix}` : "sites",
 
     /**
      * Generate a temporary cache name with operation suffix.

@@ -22,7 +22,7 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
-import { isInteger, safeCastTo } from "ts-extras";
+import { isFinite as isFiniteNumber, isInteger, safeCastTo } from "ts-extras";
 
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
@@ -553,7 +553,7 @@ export function isHttpLatencyFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
         typeof data.maxResponseTime === "number" &&
-        Number.isFinite(data.maxResponseTime) &&
+        isFiniteNumber(data.maxResponseTime) &&
         data.maxResponseTime > 0
     );
 }
@@ -697,7 +697,7 @@ export function isReplicationFormData(
         isValidUrl(data.replicaStatusUrl.trim(), URL_VALIDATION_OPTIONS) &&
         isNonEmptyString(data.replicationTimestampField) &&
         typeof data.maxReplicationLagSeconds === "number" &&
-        Number.isFinite(data.maxReplicationLagSeconds)
+        isFiniteNumber(data.maxReplicationLagSeconds)
     );
 }
 
@@ -722,7 +722,7 @@ export function isServerHeartbeatFormData(
         isNonEmptyString(data.heartbeatTimestampField) &&
         isNonEmptyString(data.heartbeatExpectedStatus) &&
         typeof data.heartbeatMaxDriftSeconds === "number" &&
-        Number.isFinite(data.heartbeatMaxDriftSeconds)
+        isFiniteNumber(data.heartbeatMaxDriftSeconds)
     );
 }
 
@@ -744,7 +744,7 @@ export function isWebsocketKeepaliveFormData(
         typeof data.url === "string" &&
         isValidUrl(data.url.trim(), WEBSOCKET_URL_VALIDATION_OPTIONS) &&
         typeof data.maxPongDelayMs === "number" &&
-        Number.isFinite(data.maxPongDelayMs)
+        isFiniteNumber(data.maxPongDelayMs)
     );
 }
 

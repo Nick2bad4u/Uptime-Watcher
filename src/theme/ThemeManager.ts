@@ -14,7 +14,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import deepEqual from "fast-deep-equal";
-import { arrayJoin, objectEntries, objectHasOwn, objectKeys } from "ts-extras";
+import { arrayJoin, objectEntries, objectHasIn, objectHasOwn, objectKeys } from "ts-extras";
 
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
@@ -191,7 +191,7 @@ export class ThemeManager {
         // of returning an incomplete theme. This prevents corrupted
         // configuration from breaking rendering while keeping the set of
         // selectable themes driven by the concrete `themes` registry.
-        if (!(name in themes)) {
+        if (!objectHasIn(themes, name)) {
             const systemPreference = this.getSystemThemePreference();
             return themes[systemPreference];
         }

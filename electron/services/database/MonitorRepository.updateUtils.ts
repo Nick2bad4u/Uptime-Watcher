@@ -10,7 +10,7 @@ import type { Site } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
-import { arrayJoin, objectEntries } from "ts-extras";
+import { arrayJoin, isDefined, objectEntries, objectHasIn } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -32,7 +32,7 @@ function convertValueForDatabase(
     value: unknown
 ): DbValue | undefined {
     const converted = convertToDbValue(value);
-    if (converted !== undefined) {
+    if (isDefined(converted)) {
         return converted;
     }
 
@@ -75,8 +75,8 @@ function shouldSkipMonitoringFields(
 ): boolean {
     if (
         key === "enabled" &&
-        !("monitoring" in monitor) &&
-        !("enabled" in monitor)
+        !objectHasIn(monitor, "monitoring") &&
+        !objectHasIn(monitor, "enabled")
     ) {
         if (isDev()) {
             logger.debug(
@@ -109,12 +109,12 @@ export function buildUpdateFieldsAndValues(args: {
     // Only update fields that are actually provided and are primitive types.
     for (const [key, value] of objectEntries(args.row)) {
         const shouldProcess =
-            value !== undefined &&
+            isDefined(value) &&
             !shouldSkipMonitoringFields(key, args.monitor);
 
         if (shouldProcess) {
             const fieldValue = convertValueForDatabase(key, value);
-            if (fieldValue !== undefined) {
+            if (isDefined(fieldValue)) {
                 updateFields.push(`${escapeSqlIdentifier(key)} = ?`);
                 updateValues.push(fieldValue);
             }

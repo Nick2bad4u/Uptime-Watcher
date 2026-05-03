@@ -1,11 +1,11 @@
+import type { Monitor } from "@shared/types";
 /**
  * HTTP latency monitor service built on the shared HTTP core.
  */
-
-import type { Monitor } from "@shared/types";
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { MonitorServiceConfig } from "./types";
 
@@ -22,7 +22,7 @@ function getThreshold(value: unknown): null | number {
         return null;
     }
 
-    if (!Number.isFinite(value) || value <= 0) {
+    if (!isFiniteNumber(value) || value <= 0) {
         return null;
     }
 

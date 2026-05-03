@@ -1,6 +1,7 @@
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Builds a normalized {@link StateSyncStatusSummary}.
@@ -12,11 +13,11 @@ export function createStateSyncStatusSummary(args: {
     synchronized: boolean;
 }): StateSyncStatusSummary {
     const lastSyncAt =
-        typeof args.lastSyncAt === "number" && Number.isFinite(args.lastSyncAt)
+        typeof args.lastSyncAt === "number" && isFiniteNumber(args.lastSyncAt)
             ? args.lastSyncAt
             : null;
     const siteCount =
-        typeof args.siteCount === "number" && Number.isFinite(args.siteCount)
+        typeof args.siteCount === "number" && isFiniteNumber(args.siteCount)
             ? Math.max(0, Math.trunc(args.siteCount))
             : 0;
 
@@ -43,12 +44,12 @@ export function normalizeStateSyncStatusSummary(args: {
 
     const lastSyncAt = currentStatus.lastSyncAt ?? null;
     const normalizedCachedSiteCount =
-        typeof cachedSiteCount === "number" && Number.isFinite(cachedSiteCount)
+        typeof cachedSiteCount === "number" && isFiniteNumber(cachedSiteCount)
             ? Math.max(0, Math.trunc(cachedSiteCount))
             : 0;
     const normalizedSiteCount =
         typeof currentStatus.siteCount === "number" &&
-        Number.isFinite(currentStatus.siteCount)
+        isFiniteNumber(currentStatus.siteCount)
             ? Math.max(0, Math.trunc(currentStatus.siteCount))
             : normalizedCachedSiteCount;
 

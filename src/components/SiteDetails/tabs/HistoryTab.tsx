@@ -45,7 +45,7 @@ import {
     useRef,
     useState,
 } from "react";
-import { isEmpty, safeCastTo } from "ts-extras";
+import { arrayIncludes, isEmpty, isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -111,12 +111,10 @@ function extractHttpStatusCode(details: string): null | number {
     return raw ? Number(raw) : null;
 }
 
-function getHttpStatusIcon(code: number): IconType | null {
-    if (!Number.isFinite(code)) return null;
+function getHttpStatusIcon(code: number): IconType | null { if (!isFiniteNumber(code)) return null;
 
     if (code >= 200 && code <= 299) {
-        return AppIcons.status.up;
-    }
+        return AppIcons.status.up; }
 
     if (code >= 300 && code <= 399) {
         return AppIcons.actions.refreshAlt;
@@ -326,7 +324,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         if (
             historyLength > 0 &&
             historyLength <= backendLimit &&
-            !showOptions.includes(historyLength)
+            !arrayIncludes(showOptions, historyLength)
         ) {
             showOptions.push(historyLength);
         }
@@ -351,7 +349,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         // Ensure historyLimit is always valid
         const safeHistoryLimit =
-            Number.isFinite(historyLimit) && historyLimit > 0
+            isFiniteNumber(historyLimit) && historyLimit > 0
                 ? historyLimit
                 : Math.min(10, Math.max(1, historyLength));
 

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { useMemo } from "react";
+import { isDefined } from "ts-extras";
 
 import { TRANSITION_ALL } from "../../constants";
 
@@ -55,7 +56,7 @@ export function useThemedControlStyles(args: {
 
     return useMemo((): CSSProperties => {
         let nextCursor: CSSProperties["cursor"] | undefined = undefined;
-        if (cursor !== undefined) {
+        if (isDefined(cursor)) {
             nextCursor = disabled ? "not-allowed" : cursor;
         }
 

@@ -26,6 +26,7 @@ import {
     castUnchecked,
     isRecord as isSharedRecord,
 } from "@shared/utils/typeHelpers";
+import { isDefined, isFinite as isFiniteNumber, isPresent } from "ts-extras";
 
 import type { DbValue } from "../converters/valueConverters";
 
@@ -105,7 +106,7 @@ function ensureValidRows<TRow extends object>(
     options?: RowValidationOptions<TRow>,
     label?: string
 ): TRow[] {
-    if (rows === undefined || rows === null) {
+    if (!isPresent(rows)) {
         return [];
     }
 
@@ -146,7 +147,7 @@ const isValidCountResult = (
     row: UnknownRecord
 ): row is EnforcedRow<CountResult> => {
     const value = row["count"];
-    return typeof value === "number" && Number.isFinite(value);
+    return typeof value === "number" && isFiniteNumber(value);
 };
 
 const COUNT_RESULT_VALIDATION: RowValidationOptions<CountResult> = {
@@ -200,7 +201,7 @@ export function queryForCount(
     params?: DbValue[]
 ): CountResult | undefined {
     const row: unknown = db.get(sql, params);
-    if (row === undefined) {
+    if (!isDefined(row)) {
         return undefined;
     }
 
@@ -244,7 +245,7 @@ export function queryForIds(
         }
 
         const candidateId = row["id"];
-        if (typeof candidateId === "number" && Number.isFinite(candidateId)) {
+        if (typeof candidateId === "number" && isFiniteNumber(candidateId)) {
             validRows.push({ id: candidateId });
             return;
         }
@@ -301,7 +302,7 @@ export function queryForSingleRecord<TRow extends object = UnknownRecord>(
     options?: RowValidationOptions<TRow>
 ): null | TRow | undefined {
     const row: unknown = db.get(sql, params ?? undefined);
-    if (row === undefined) {
+    if (!isDefined(row)) {
         return undefined;
     }
 
@@ -327,7 +328,7 @@ const isValidHistoryEntryRow = (
 
     let hasValidTimestamp = false;
     if (typeof timestamp === "number") {
-        hasValidTimestamp = Number.isFinite(timestamp);
+        hasValidTimestamp = isFiniteNumber(timestamp);
     } else if (typeof timestamp === "string") {
         hasValidTimestamp = !Number.isNaN(Number(timestamp));
     }
@@ -337,7 +338,7 @@ const isValidHistoryEntryRow = (
     }
 
     if (
-        responseTime !== undefined &&
+        isDefined(responseTime) &&
         typeof responseTime !== "number" &&
         typeof responseTime !== "string"
     ) {

@@ -16,7 +16,7 @@ import {
 import { readNumberEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isEmpty, isSafeInteger, stringSplit } from "ts-extras";
+import { arrayJoin, isEmpty, isFinite as isFiniteNumber, isSafeInteger, stringSplit } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -336,7 +336,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             maxOpId = Math.max(maxOpId, op.opId);
         }
 
-        if (!Number.isFinite(minOpId) || !Number.isFinite(maxOpId)) {
+        if (!isFiniteNumber(minOpId) || !isFiniteNumber(maxOpId)) {
             throw new TypeError(
                 "appendOperations internal error (missing op ids)"
             );

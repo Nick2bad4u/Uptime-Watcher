@@ -5,6 +5,7 @@ import { isRecord } from "@shared/utils/typeHelpers";
 import axios from "axios";
 import { DropboxResponseError } from "dropbox";
 import { randomInt } from "node:crypto";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 const DEFAULT_INITIAL_DELAY_MS = 500;
 const DEFAULT_MAX_DELAY_MS = 10_000;
@@ -22,12 +23,12 @@ function parseRetryAfterMs(value: unknown): number | undefined {
 
     // Retry-After can be either seconds or an HTTP date.
     const seconds = Number(trimmed);
-    if (Number.isFinite(seconds) && seconds >= 0) {
+    if (isFiniteNumber(seconds) && seconds >= 0) {
         return Math.round(seconds * 1000);
     }
 
     const dateMs = Date.parse(trimmed);
-    if (Number.isFinite(dateMs)) {
+    if (isFiniteNumber(dateMs)) {
         const delta = dateMs - Date.now();
         return Math.max(delta, 0);
     }
@@ -91,7 +92,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
         if (status === 429) {
             return {
                 status,
-                ...(retryAfterMs === undefined ? {} : { retryAfterMs }),
+                ...(isDefined(retryAfterMs) ? { retryAfterMs } : {}),
             };
         }
 
@@ -103,7 +104,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
         ) {
             return {
                 status,
-                ...(retryAfterMs === undefined ? {} : { retryAfterMs }),
+                ...(isDefined(retryAfterMs) ? { retryAfterMs } : {}),
             };
         }
 
@@ -148,12 +149,12 @@ function extractRetryableHttpFailure(error: unknown): null | {
     ) {
         return {
             status,
-            ...(retryAfterMs === undefined ? {} : { retryAfterMs }),
+            ...(isDefined(retryAfterMs) ? { retryAfterMs } : {}),
         };
     }
 
     // Network / transport errors often have no HTTP status.
-    if (status === undefined) {
+    if (!isDefined(status)) {
         return {};
     }
 

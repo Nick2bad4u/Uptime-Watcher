@@ -10,7 +10,7 @@
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { objectKeys } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, objectHasIn, objectKeys } from "ts-extras";
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
 
@@ -20,9 +20,8 @@ interface LeaveMarker {
 
 function isLeaveMarker(value: unknown): value is LeaveMarker {
     return (
-        typeof value === "object" &&
-        value !== null &&
-        JSON_BYTE_BUDGET_LEAVE in value
+        isRecord(value) &&
+        objectHasIn(value, JSON_BYTE_BUDGET_LEAVE)
     );
 }
 
@@ -121,7 +120,7 @@ function addJsonBytesForObject(
 
     for (let i = keys.length - 1; i >= 0; i--) {
         const key = keys[i];
-        if (key === undefined) {
+        if (!isDefined(key)) {
             addBytes(state, state.maxBytes + 1);
             return;
         }
@@ -160,7 +159,7 @@ function addJsonBytesForValue(
         return;
     }
 
-    if (value === undefined) {
+    if (!isDefined(value)) {
         addBytes(state, getJsonBytesForNull());
         return;
     }
@@ -190,7 +189,7 @@ export function getJsonByteLengthUpTo(
     value: unknown,
     maxBytes: number
 ): number {
-    if (!Number.isFinite(maxBytes) || maxBytes <= 0) {
+    if (!isFiniteNumber(maxBytes) || maxBytes <= 0) {
         return 0;
     }
 

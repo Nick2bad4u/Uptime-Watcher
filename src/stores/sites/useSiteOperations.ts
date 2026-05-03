@@ -19,7 +19,7 @@ import type {
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { safeCastTo } from "ts-extras";
+import { isDefined, safeCastTo } from "ts-extras";
 
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
@@ -65,7 +65,7 @@ const updateMonitorNumericField = async (args: {
         operationName,
         async () => {
             const updates: Partial<Monitor> = {};
-            if (value !== undefined) {
+            if (isDefined(value)) {
                 updates[field] = value;
             }
 
@@ -434,7 +434,7 @@ export const createSiteOperationsActions = (
             telemetry: {
                 monitorId,
                 siteIdentifier,
-                ...(retryAttempts === undefined ? {} : { retryAttempts }),
+                ...(isDefined(retryAttempts) ? { retryAttempts } : {}),
             },
             value: retryAttempts,
         });
@@ -453,7 +453,7 @@ export const createSiteOperationsActions = (
             telemetry: {
                 monitorId,
                 siteIdentifier,
-                ...(timeout === undefined ? {} : { timeout }),
+                ...(isDefined(timeout) ? { timeout } : {}),
             },
             value: timeout,
         });

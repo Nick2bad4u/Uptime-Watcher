@@ -35,7 +35,7 @@ import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, stringSplit } from "ts-extras";
+import { arrayJoin, isDefined, isPresent, setHas, stringSplit } from "ts-extras";
 
 import { logger } from "../services/logger";
 
@@ -52,7 +52,7 @@ import { logger } from "../services/logger";
  * @public
  */
 export function isNullOrUndefined(value: unknown): value is null | undefined {
-    return value === null || value === undefined;
+    return !isPresent(value);
 }
 
 /**
@@ -379,7 +379,7 @@ export function getMonitorDisplayIdentifier(
             const generator = MONITOR_IDENTIFIER_GENERATORS.get(monitor.type);
             if (generator) {
                 const identifier = generator(monitor);
-                if (identifier !== undefined) {
+                if (isDefined(identifier)) {
                     return identifier;
                 }
             }
@@ -472,7 +472,7 @@ function formatMonitorTypeSegment(segment: string): string {
     }
 
     const lower = segment.toLowerCase();
-    if (MONITOR_TYPE_ACRONYMS.has(lower)) {
+    if (setHas(MONITOR_TYPE_ACRONYMS, lower)) {
         return lower.toUpperCase();
     }
 

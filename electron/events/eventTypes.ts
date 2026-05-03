@@ -13,7 +13,7 @@
  * @see {@link UptimeEvents}
  */
 
-import { safeCastTo } from "ts-extras";
+import { arrayIncludes, safeCastTo } from "ts-extras";
 
 import type { EventPayloadValue } from "./TypedEventBus";
 
@@ -485,30 +485,34 @@ export function getEventPriority(
     // Check each priority level using string-based comparison to avoid type
     // assertion issues
     if (
-        safeCastTo<readonly UptimeEventName[]>(
-            EVENT_PRIORITIES.CRITICAL
-        ).includes(eventNameStr)
+        arrayIncludes(
+            safeCastTo<readonly string[]>(EVENT_PRIORITIES.CRITICAL),
+            eventNameStr
+        )
     ) {
         return "CRITICAL";
     }
     if (
-        safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.HIGH).includes(
+        arrayIncludes(
+            safeCastTo<readonly string[]>(EVENT_PRIORITIES.HIGH),
             eventNameStr
         )
     ) {
         return "HIGH";
     }
     if (
-        safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.LOW).includes(
+        arrayIncludes(
+            safeCastTo<readonly string[]>(EVENT_PRIORITIES.LOW),
             eventNameStr
         )
     ) {
         return "LOW";
     }
     if (
-        safeCastTo<readonly UptimeEventName[]>(
-            EVENT_PRIORITIES.MEDIUM
-        ).includes(eventNameStr)
+        arrayIncludes(
+            safeCastTo<readonly string[]>(EVENT_PRIORITIES.MEDIUM),
+            eventNameStr
+        )
     ) {
         return "MEDIUM";
     }
@@ -556,74 +560,108 @@ export function isEventOfCategory(
     // Type-safe category checking using string-based comparison
     switch (category) {
         case "CACHE": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.CACHE
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.CACHE),
+                eventNameStr
+            );
         }
         case "CONFIG": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.CONFIG
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.CONFIG),
+                eventNameStr
+            );
         }
         case "DATABASE": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.DATABASE
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.DATABASE
+                ),
+                eventNameStr
+            );
         }
         case "DIAGNOSTICS": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.DIAGNOSTICS
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.DIAGNOSTICS
+                ),
+                eventNameStr
+            );
         }
         case "INTERNAL_CACHE": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.INTERNAL_CACHE
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.INTERNAL_CACHE
+                ),
+                eventNameStr
+            );
         }
         case "INTERNAL_DATABASE": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.INTERNAL_DATABASE
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.INTERNAL_DATABASE
+                ),
+                eventNameStr
+            );
         }
         case "INTERNAL_MONITOR": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.INTERNAL_MONITOR
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.INTERNAL_MONITOR
+                ),
+                eventNameStr
+            );
         }
         case "INTERNAL_SITE": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.INTERNAL_SITE
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.INTERNAL_SITE
+                ),
+                eventNameStr
+            );
         }
         case "MONITOR": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.MONITOR
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.MONITOR
+                ),
+                eventNameStr
+            );
         }
         case "MONITORING": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.MONITORING
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.MONITORING
+                ),
+                eventNameStr
+            );
         }
         case "PERFORMANCE": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.PERFORMANCE
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.PERFORMANCE
+                ),
+                eventNameStr
+            );
         }
         case "SETTINGS": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.SETTINGS
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(
+                    EVENT_CATEGORIES.SETTINGS
+                ),
+                eventNameStr
+            );
         }
         case "SITE": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.SITE
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.SITE),
+                eventNameStr
+            );
         }
         case "SYSTEM": {
-            return safeCastTo<readonly UptimeEventName[]>(
-                EVENT_CATEGORIES.SYSTEM
-            ).includes(eventNameStr);
+            return arrayIncludes(
+                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.SYSTEM),
+                eventNameStr
+            );
         }
         default: {
             return false;

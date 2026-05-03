@@ -9,6 +9,7 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
+import type { Except } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { safeCastTo } from "ts-extras";
@@ -52,7 +53,7 @@ export function hasInitializeMethod(
  * preserving type safety.
  */
 export type ForwardablePayloadBase<EventName extends EventKey<UptimeEvents>> =
-    Omit<UptimeEvents[EventName], "_meta" | "_originalMeta">;
+    Except<UptimeEvents[EventName], "_meta" | "_originalMeta">;
 
 /**
  * Event payload shape accepted by the event-forwarding layer.

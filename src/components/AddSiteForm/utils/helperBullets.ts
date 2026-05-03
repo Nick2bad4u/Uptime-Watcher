@@ -6,6 +6,8 @@
  * normalization + de-duplication rules.
  */
 
+import { setHas } from "ts-extras";
+
 /**
  * A single helper bullet rendered under the AddSiteForm.
  */
@@ -102,7 +104,7 @@ export function buildAddSiteFormHelperBullets(
 
     const addUniqueBullet = (id: string, text: string): void => {
         const normalized = normalizeText(text);
-        if (normalized.length === 0 || seen.has(normalized)) {
+        if (normalized.length === 0 || setHas(seen, normalized)) {
             return;
         }
 

@@ -3,13 +3,15 @@
  *
  * Use in exhaustive switch default branches to enforce compile-time coverage.
  */
+import { isDefined } from "ts-extras";
+
 function describeValue(v: unknown): string {
     try {
         if (v === null) {
             return "null";
         }
 
-        if (v === undefined) {
+        if (!isDefined(v)) {
             return "undefined";
         }
 

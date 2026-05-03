@@ -13,7 +13,7 @@ import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { hasNestedHttpSchemeAfterFirstDelimiter } from "@shared/utils/urlSchemeValidation";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isValidUrl } from "@shared/validation/validatorUtils";
-import { arrayJoin, isInteger, stringSplit } from "ts-extras";
+import { arrayJoin, isDefined, isInteger, stringSplit } from "ts-extras";
 import validator from "validator";
 
 import { validateUrlStringCandidate } from "./urlCandidateValidation";
@@ -352,12 +352,7 @@ function toIpvOctets(hostname: string):
         c,
         d,
     ] = octets;
-    if (
-        a === undefined ||
-        b === undefined ||
-        c === undefined ||
-        d === undefined
-    ) {
+    if (!isDefined(a) || !isDefined(b) || !isDefined(c) || !isDefined(d)) {
         return null;
     }
 
@@ -588,7 +583,7 @@ function parseIpvFourFromMappedIpvSix(mappedHostname: string):
     }
 
     const [highPart, lowPart] = parts;
-    if (highPart === undefined || lowPart === undefined) {
+    if (!isDefined(highPart) || !isDefined(lowPart)) {
         return null;
     }
 

@@ -18,7 +18,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
-import { arrayJoin } from "ts-extras";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import type { IMonitorService, MonitorServiceConfig } from "./types";
 
@@ -258,7 +258,7 @@ export function getMonitorWithResult(
 
     return {
         configurationApplied,
-        ...(configurationError !== undefined && { configurationError }),
+        ...(isDefined(configurationError) && { configurationError }),
         instance,
     };
 }

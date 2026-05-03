@@ -15,7 +15,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
-import { arrayJoin, isEmpty } from "ts-extras";
+import { arrayJoin, isEmpty, isFinite as isFiniteNumber, objectHasIn, safeCastTo } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -133,7 +133,10 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
 
         if (!baselineResult.success) {
             const baselineError =
-                "error" in baselineResult
+                objectHasIn(
+                    safeCastTo<Record<PropertyKey, unknown>>(baselineResult),
+                    "error"
+                )
                     ? baselineResult.error
                     : "Unknown baseline failure";
             throw new Error(`Baseline request failed: ${baselineError}`);
@@ -267,12 +270,12 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             if (
                 typeof error === "object" &&
                 error !== null &&
-                "responseTime" in error
+                objectHasIn(safeCastTo<Record<PropertyKey, unknown>>(error), "responseTime")
             ) {
                 const candidate = Reflect.get(error, "responseTime");
                 if (
                     typeof candidate === "number" &&
-                    Number.isFinite(candidate)
+                    isFiniteNumber(candidate)
                 ) {
                     responseTime = Math.max(0, Math.round(candidate));
                 }

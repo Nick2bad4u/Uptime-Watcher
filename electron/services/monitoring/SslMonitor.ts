@@ -1,3 +1,4 @@
+import type { MonitorType, Site } from "@shared/types";
 /**
  * TLS/SSL certificate monitoring service for validating certificate health and
  * expiry windows.
@@ -7,14 +8,13 @@
  * monitors as degraded when certificates approach expiry thresholds and down
  * when expired or handshake fails.
  */
-
-import type { MonitorType, Site } from "@shared/types";
 import type { PeerCertificate } from "node:tls";
+import type { Except } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
-import { isEmpty, objectKeys } from "ts-extras";
+import { isDefined, isEmpty, isFinite as isFiniteNumber, objectKeys } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -285,7 +285,7 @@ export class SslMonitor implements IMonitorService {
     private evaluateCertificate(
         certificate: PeerCertificate,
         warningThreshold: number
-    ): Omit<MonitorCheckResult, "responseTime"> {
+    ): Except<MonitorCheckResult, "responseTime"> {
         const validTo = certificate.valid_to;
         if (!validTo) {
             return {
@@ -334,7 +334,7 @@ export class SslMonitor implements IMonitorService {
     }
 
     private getWarningThreshold(value: unknown): number {
-        if (typeof value !== "number" || !Number.isFinite(value)) {
+        if (typeof value !== "number" || !isFiniteNumber(value)) {
             return DEFAULT_WARNING_THRESHOLD_DAYS;
         }
 
@@ -385,7 +385,7 @@ export class SslMonitor implements IMonitorService {
 
     public updateConfig(config: Partial<MonitorServiceConfig>): void {
         if (
-            config.timeout !== undefined &&
+            isDefined(config.timeout) &&
             (typeof config.timeout !== "number" || config.timeout <= 0)
         ) {
             throw new Error("Invalid timeout: must be a positive number");

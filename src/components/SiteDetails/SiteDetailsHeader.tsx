@@ -10,6 +10,7 @@ import type { MouseEvent, NamedExoticComponent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, useCallback, useMemo } from "react";
+import { isDefined } from "ts-extras";
 
 import type { UIStore } from "../../stores/ui/types";
 
@@ -214,17 +215,17 @@ function useSiteDetailsHeaderModel(
 
     const lastCheckRelative = useMemo(
         () =>
-            lastCheckTimestamp === undefined
-                ? undefined
-                : formatRelativeTimestamp(lastCheckTimestamp),
+            isDefined(lastCheckTimestamp)
+                ? formatRelativeTimestamp(lastCheckTimestamp)
+                : undefined,
         [lastCheckTimestamp]
     );
 
     const lastCheckExact = useMemo(
         () =>
-            lastCheckTimestamp === undefined
-                ? undefined
-                : formatFullTimestamp(lastCheckTimestamp),
+            isDefined(lastCheckTimestamp)
+                ? formatFullTimestamp(lastCheckTimestamp)
+                : undefined,
         [lastCheckTimestamp]
     );
 

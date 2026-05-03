@@ -1,5 +1,7 @@
 import type { Monitor } from "@shared/types";
 
+import { isDefined } from "ts-extras";
+
 import type { MonitorUIConfig } from "../monitorUiConfig";
 
 /**
@@ -52,9 +54,9 @@ export function createHttpMonitorUiConfig(
         ...(formatDetail ? { formatDetail } : {}),
         formatTitleSuffix: formatTitleSuffix ?? createUrlSuffixResolver(type),
         ...(helpTexts ? { helpTexts } : {}),
-        ...(supportsAdvancedAnalytics === undefined
-            ? {}
-            : { supportsAdvancedAnalytics }),
-        ...(supportsResponseTime === undefined ? {} : { supportsResponseTime }),
+        ...(isDefined(supportsAdvancedAnalytics)
+            ? { supportsAdvancedAnalytics }
+            : {}),
+        ...(isDefined(supportsResponseTime) ? { supportsResponseTime } : {}),
     };
 }

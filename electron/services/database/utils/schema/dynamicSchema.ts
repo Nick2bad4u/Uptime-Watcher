@@ -15,7 +15,13 @@ import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
-import { arrayJoin, safeCastTo } from "ts-extras";
+import {
+    arrayJoin,
+    isDefined,
+    isPresent,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
@@ -133,7 +139,7 @@ function convertLastCheckedField(lastChecked: unknown): null | number {
         return lastChecked;
     }
     // Log warning when discarding invalid data to help debugging
-    if (lastChecked !== null && lastChecked !== undefined) {
+    if (isPresent(lastChecked)) {
         dbLogger.warn(
             `Invalid lastChecked value discarded: ${safeStringify(lastChecked)} (type: ${typeof lastChecked})`
         );
@@ -289,7 +295,7 @@ export interface DatabaseFieldDefinition {
  * @internal
  */
 function convertMonitoringToDbEnabled(monitor: UnknownRecord): 0 | 1 {
-    return monitor["monitoring"] === true ? 1 : 0;
+    return monitor["monitoring"] ? 1 : 0;
 }
 
 /**
@@ -346,7 +352,7 @@ function processFieldMapping(
 ): FieldMappingResult {
     try {
         const sourceValue = monitor[mapping.sourceField];
-        if (sourceValue === undefined) {
+        if (!isDefined(sourceValue)) {
             return {
                 dbField: mapping.dbField,
                 success: true,
@@ -396,7 +402,7 @@ function processFieldMapping(
  * @internal
  */
 function convertFromDatabase(value: unknown, sqlType: string): unknown {
-    if (value === null || value === undefined) {
+    if (!isPresent(value)) {
         return undefined;
     }
 
@@ -424,7 +430,7 @@ function convertFromDatabase(value: unknown, sqlType: string): unknown {
  * @internal
  */
 function convertToDatabase(value: unknown, sqlType: string): unknown {
-    if (value === undefined || value === null) {
+    if (!isPresent(value)) {
         return null;
     }
 
@@ -527,7 +533,7 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
 
             // Skip if we've already seen this field (avoid duplicates and
             // reserved columns).
-            if (!seenFields.has(columnName)) {
+            if (!setHas(seenFields, columnName)) {
                 seenFields.add(columnName);
 
                 fields.push({
@@ -563,9 +569,10 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
 function mapDynamicFields(monitor: UnknownRecord, row: UnknownRecord): void {
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const fieldDef of fieldDefs) {
-        if (monitor[fieldDef.sourceField] !== undefined) {
+        const value = monitor[fieldDef.sourceField];
+        if (isDefined(value)) {
             row[fieldDef.columnName] = convertToDatabase(
-                monitor[fieldDef.sourceField],
+                value,
                 fieldDef.sqlType
             );
         }
@@ -586,13 +593,15 @@ function mapDynamicFields(monitor: UnknownRecord, row: UnknownRecord): void {
  */
 function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
     // Persist enabled state from the canonical monitor.monitoring boolean.
-    if (monitor["monitoring"] !== undefined) {
+    const monitoringValue = monitor["monitoring"];
+    if (isDefined(monitoringValue)) {
         row["enabled"] = convertMonitoringToDbEnabled(monitor);
     }
 
     // Process all other standard field mappings with enhanced error handling
     for (const mapping of STANDARD_FIELD_MAPPINGS) {
-        if (monitor[mapping.sourceField] !== undefined) {
+        const sourceValue = monitor[mapping.sourceField];
+        if (isDefined(sourceValue)) {
             const result = processFieldMapping(mapping, monitor);
             if (result.success) {
                 row[result.dbField] = result.value;
@@ -803,7 +812,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
             const value = row[safeCastTo<keyof MonitorRow>(columnName)];
 
             // Add field if value exists (dynamic fields from monitor type registry)
-            if (value !== undefined) {
+            if (isDefined(value)) {
                 // Type-safe dynamic field assignment using Record interface
                 // field.name is validated by monitor type configuration
                 mutableMonitor[field.name] = convertFromDatabase(

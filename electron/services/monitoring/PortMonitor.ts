@@ -1,3 +1,4 @@
+import type { MonitorType, Site } from "@shared/types";
 /**
  * TCP port monitoring service for network connectivity health checks.
  *
@@ -30,7 +31,7 @@
  * @see {@link MonitorServiceConfig} for configuration options
  */
 
-import type { MonitorType, Site } from "@shared/types";
+import { isDefined } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -195,7 +196,7 @@ export class PortMonitor implements IMonitorService {
         // Basic validation of config properties - only validate relevant ones
         // for port monitoring
         if (
-            config.timeout !== undefined &&
+            isDefined(config.timeout) &&
             (typeof config.timeout !== "number" || config.timeout <= 0)
         ) {
             throw new Error("Invalid timeout: must be a positive number");

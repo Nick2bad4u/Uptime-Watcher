@@ -14,7 +14,7 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
-import { keyIn, safeCastTo } from "ts-extras";
+import { objectHasIn, safeCastTo } from "ts-extras";
 
 import type { SiteOperationsDependencies } from "../types";
 
@@ -124,7 +124,7 @@ const isTelemetryConfig = (
         return false;
     }
 
-    return TELEMETRY_CONFIG_KEYS.some((key) => keyIn(value, key));
+    return TELEMETRY_CONFIG_KEYS.some((key) => objectHasIn(value, key));
 };
 
 const normalizeTelemetry = (
@@ -184,8 +184,8 @@ const createTelemetryEmitter =
             payload["success"] ??= true;
         } else if (stage === "failure") {
             payload["success"] = false;
-        } else if ("success" in payload) {
-            delete payload["success"];
+        } else if (objectHasIn(payload, "success")) {
+            delete payload.success;
         }
 
         logStoreAction("SitesStore", operationName, payload);

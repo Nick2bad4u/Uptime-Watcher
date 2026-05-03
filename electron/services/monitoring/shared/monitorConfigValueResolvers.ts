@@ -1,5 +1,5 @@
 import { isValidUrl } from "@shared/validation/validatorUtils";
-import { objectHasOwn } from "ts-extras";
+import { isFinite as isFiniteNumber, objectHasOwn } from "ts-extras";
 
 /**
  * Result of resolving a required monitor string field.
@@ -121,7 +121,7 @@ export function resolveMonitorNumericOverride(options: {
     } = options;
 
     const isCandidateAccepted = (candidate: unknown): candidate is number => {
-        if (typeof candidate !== "number" || !Number.isFinite(candidate)) {
+        if (typeof candidate !== "number" || !isFiniteNumber(candidate)) {
             return false;
         }
 

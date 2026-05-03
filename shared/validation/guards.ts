@@ -6,6 +6,7 @@
  * runtime checks remain in sync with the shared type definitions.
  */
 
+import type { Except } from "type-fest";
 import type * as z from "zod";
 
 import type { Site } from "../types";
@@ -20,7 +21,7 @@ import { typedStatusUpdateSchema as statusUpdateSchema } from "./statusUpdateSch
  * Site identifiers are treated as immutable (primary key). Updates may only
  * modify the remaining fields, and unknown keys are rejected.
  */
-type SiteUpdateBase = Omit<Site, "identifier">;
+type SiteUpdateBase = Except<Site, "identifier">;
 
 type SiteUpdate = {
     readonly [Key in keyof SiteUpdateBase]?: SiteUpdateBase[Key] | undefined;

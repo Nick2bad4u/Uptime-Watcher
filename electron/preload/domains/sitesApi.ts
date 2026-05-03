@@ -15,7 +15,7 @@ import {
     validateSiteSnapshot,
     validateSiteSnapshots,
 } from "@shared/validation/guards";
-import { arrayAt } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 
 import {
     createSafeParseAdapter,
@@ -48,8 +48,9 @@ function safeParseSiteArray(
         return { data: parsed.data, success: true };
     }
 
-    const firstIssue = arrayAt(parsed.error.issues, 0);
-    const firstIndex = firstIssue?.path[0];
+    const firstIssue = arrayFirst(parsed.error.issues);
+    const firstPathSegment = firstIssue ? arrayFirst(firstIssue.path) : undefined;
+    const firstIndex = typeof firstPathSegment === "number" ? firstPathSegment : undefined;
     const indexSuffix =
         typeof firstIndex === "number"
             ? ` (first failure at index ${firstIndex})`

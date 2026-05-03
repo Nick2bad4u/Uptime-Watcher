@@ -11,6 +11,7 @@
 import type { Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isDefined } from "ts-extras";
 
 import type { MonitorRepositoryTransactionAdapter } from "./MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "./SiteRepository";
@@ -61,9 +62,9 @@ export class SiteDeletionError extends Error {
         options: { cause?: unknown } = {}
     ) {
         const normalizedCause =
-            options.cause === undefined
-                ? undefined
-                : ensureError(options.cause);
+            isDefined(options.cause)
+                ? ensureError(options.cause)
+                : undefined;
         const causeMessage =
             normalizedCause?.message ?? "Unknown site deletion cause";
         const message =

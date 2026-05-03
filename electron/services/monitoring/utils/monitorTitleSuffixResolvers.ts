@@ -1,5 +1,7 @@
 import type { Monitor } from "@shared/types";
 
+import { isDefined } from "ts-extras";
+
 const wrapSuffix = (value: string): string =>
     value.length > 0 ? ` (${value})` : "";
 
@@ -57,7 +59,7 @@ export function createHostPortTitleSuffixResolver(args: {
             const port =
                 typeof monitor.port === "number" ? monitor.port : undefined;
 
-            if (host.length === 0 || port === undefined) {
+            if (host.length === 0 || !isDefined(port)) {
                 return "";
             }
 

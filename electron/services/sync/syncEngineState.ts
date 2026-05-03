@@ -47,7 +47,7 @@ import {
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { ensureError } from "@shared/utils/errorHandling";
-import { objectEntries, objectKeys } from "ts-extras";
+import { isDefined, isFinite as isFiniteValue, objectEntries, objectHasIn, objectKeys } from "ts-extras";
 
 import {
     DEFAULT_CHECK_INTERVAL,
@@ -66,7 +66,7 @@ const DEFAULT_WRITE_KEY: CloudSyncWriteKey = {
 };
 
 function isFiniteNumber(value: unknown): value is number {
-    return typeof value === "number" && Number.isFinite(value);
+    return typeof value === "number" && isFiniteValue(value);
 }
 
 function isBoolean(value: unknown): value is boolean {
@@ -139,21 +139,9 @@ export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
             defaultValue: true,
             isValid: isBoolean,
         });
-        fields["checkInterval"] = normalizeCloudSyncFieldValue({
-            current: fields["checkInterval"],
-            defaultValue: DEFAULT_CHECK_INTERVAL,
-            isValid: isFiniteNumber,
-        });
-        fields["retryAttempts"] = normalizeCloudSyncFieldValue({
-            current: fields["retryAttempts"],
-            defaultValue: DEFAULT_RETRY_ATTEMPTS,
-            isValid: isFiniteNumber,
-        });
-        fields["timeout"] = normalizeCloudSyncFieldValue({
-            current: fields["timeout"],
-            defaultValue: DEFAULT_REQUEST_TIMEOUT,
-            isValid: isFiniteNumber,
-        });
+        fields["checkInterval"] = normalizeCloudSyncFieldValue({ current: fields["checkInterval"], defaultValue: DEFAULT_CHECK_INTERVAL, isValid: isFiniteNumber,  });
+        fields["retryAttempts"] = normalizeCloudSyncFieldValue({ current: fields["retryAttempts"], defaultValue: DEFAULT_RETRY_ATTEMPTS, isValid: isFiniteNumber,  });
+        fields["timeout"] = normalizeCloudSyncFieldValue({ current: fields["timeout"], defaultValue: DEFAULT_REQUEST_TIMEOUT, isValid: isFiniteNumber,  });
 
         nextMonitor[monitorId] = {
             ...entity,
@@ -190,7 +178,7 @@ export function shouldSyncSettingKey(key: string): boolean {
 function removeUndefinedEntries(value: UnknownRecord): UnknownRecord {
     const result: UnknownRecord = {};
     for (const [key, entryValue] of objectEntries(value)) {
-        if (entryValue !== undefined) {
+        if (isDefined(entryValue)) {
             result[key] = entryValue;
         }
     }
@@ -204,8 +192,8 @@ function toJsonValue(value: unknown): JsonValue {
 
 function areJsonValuesEqual(a: unknown, b: unknown): boolean {
     try {
-        const aJson = a === undefined ? null : toJsonValue(a);
-        const bJson = b === undefined ? null : toJsonValue(b);
+        const aJson = isDefined(a) ? toJsonValue(a) : null;
+        const bJson = isDefined(b) ? toJsonValue(b) : null;
         return (
             stringifyJsonValueStable(aJson) === stringifyJsonValueStable(bJson)
         );
@@ -339,7 +327,7 @@ export function buildDesiredSitesFromSyncState(
     const desiredSites: Record<string, CloudSyncSiteConfig> = {};
 
     for (const [siteId, entity] of objectEntries(siteState)) {
-        if (entity.deleted === undefined) {
+        if (!isDefined(entity.deleted)) {
             const nameValue = entity.fields["name"]?.value;
             const monitoringValue = entity.fields["monitoring"]?.value;
 
@@ -379,7 +367,7 @@ export function buildDesiredMonitorsFromSyncState(
     const desiredMonitors: Record<string, CloudSyncMonitorConfig> = {};
 
     for (const [monitorId, entity] of objectEntries(monitorState)) {
-        if (entity.deleted === undefined) {
+        if (!isDefined(entity.deleted)) {
             const candidate: UnknownRecord = { id: monitorId };
             for (const [field, fieldValue] of objectEntries(entity.fields)) {
                 if (field !== "id" && fieldValue.value !== null) {
@@ -423,7 +411,7 @@ export function buildDesiredSettingsFromSyncState(
     const desiredSettings: CloudSyncSettingsConfig = {};
 
     for (const [key, entity] of objectEntries(settingsState)) {
-        if (shouldSyncSettingKey(key) && entity.deleted === undefined) {
+        if (shouldSyncSettingKey(key) && !isDefined(entity.deleted)) {
             const value = entity.fields["value"]?.value;
             if (typeof value === "string") {
                 desiredSettings[key] = value;
@@ -616,7 +604,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     }
 
     for (const [siteId] of objectEntries(baselineSites)) {
-        if (!(siteId in args.current.sites)) {
+        if (!objectHasIn(args.current.sites, siteId)) {
             emitDelete("site", siteId);
         }
     }
@@ -635,7 +623,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     }
 
     for (const [monitorId] of objectEntries(baselineMonitors)) {
-        if (!(monitorId in args.current.monitors)) {
+        if (!objectHasIn(args.current.monitors, monitorId)) {
             emitDelete("monitor", monitorId);
         }
     }
@@ -649,8 +637,8 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
         const currentValue = args.current.settings[key];
         const baselineValue = baselineSettings[key];
 
-        if (currentValue === undefined) {
-            if (baselineValue !== undefined) {
+        if (!isDefined(currentValue)) {
+            if (isDefined(baselineValue)) {
                 emitDelete("settings", key);
             }
         } else if (!areJsonValuesEqual(baselineValue ?? null, currentValue)) {

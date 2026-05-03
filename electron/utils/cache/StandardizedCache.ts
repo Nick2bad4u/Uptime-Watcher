@@ -10,9 +10,9 @@
  * @packageDocumentation
  */
 
-import type { Promisable } from "type-fest";
+import type { Except, Promisable } from "type-fest";
 
-import { isEmpty } from "ts-extras";
+import { isDefined, isEmpty, objectHasIn } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -21,7 +21,7 @@ import { fireAndForget, fireAndForgetLogged } from "../fireAndForget";
 import { diagnosticsLogger, logger } from "../logger";
 
 const hasThenProperty = (candidate: unknown): candidate is { then: unknown } =>
-    typeof candidate === "object" && candidate !== null && "then" in candidate;
+    typeof candidate === "object" && candidate !== null && objectHasIn(candidate, "then")
 
 const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
     hasThenProperty(candidate) && typeof candidate.then === "function";
@@ -40,12 +40,12 @@ type CacheEventName =
 type ReplaceCacheKey<Payload, TKey extends string> = Payload extends {
     key: string;
 }
-    ? Omit<Payload, "key"> & { key: TKey }
+    ? Except<Payload, "key"> & { key: TKey }
     : Payload;
 
 type CacheEventPayloadMap<TKey extends string> = {
     [Event in CacheEventName]: ReplaceCacheKey<
-        Omit<UptimeEvents[Event], "cacheName" | "timestamp">,
+        Except<UptimeEvents[Event], "cacheName" | "timestamp">,
         TKey
     >;
 };
@@ -85,7 +85,7 @@ const createKeyWithOptionalTtlPayload = <TKey extends string>(
     cacheName: context.cacheName,
     key: data.key,
     timestamp: context.timestamp,
-    ...(data.ttl === undefined ? {} : { ttl: data.ttl }),
+    ...(isDefined(data.ttl) ? { ttl: data.ttl } : {}),
 });
 
 const createKeyWithReasonPayload = <TKey extends string>(

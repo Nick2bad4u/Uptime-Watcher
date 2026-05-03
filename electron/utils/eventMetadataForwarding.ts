@@ -4,9 +4,10 @@
  */
 
 import type { EventMetadata } from "@shared/types/events";
-import type { UnknownArray, UnknownRecord } from "type-fest";
+import type { Except, UnknownArray, UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { objectHasIn } from "ts-extras";
 
 import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
 import { ORIGINAL_METADATA_SYMBOL } from "../events/TypedEventBus";
@@ -32,7 +33,7 @@ type StrippedForwardedEventMetadata<TPayload> =
     TPayload extends Readonly<UnknownArray>
         ? TPayload
         : TPayload extends object
-          ? Omit<TPayload, ForwardedMetadataKey>
+                    ? Except<TPayload, ForwardedMetadataKey>
           : never;
 
 /**
@@ -65,24 +66,24 @@ export function attachForwardedMetadata<TPayload extends object>(
         return payload;
     }
 
-    if (!Reflect.has(source, FORWARDED_METADATA_PROPERTY_KEY)) {
+    if (!objectHasIn(source, FORWARDED_METADATA_PROPERTY_KEY)) {
         return payload;
     }
 
     const metaCandidate = Reflect.get(
         source,
         FORWARDED_METADATA_PROPERTY_KEY
-    ) as unknown;
+    );
 
     if (!isEventMetadataGuard(metaCandidate)) {
         return payload;
     }
 
-    const originalMetaCandidate = Reflect.has(
+    const originalMetaCandidate = objectHasIn(
         source,
         ORIGINAL_METADATA_PROPERTY_KEY
     )
-        ? (Reflect.get(source, ORIGINAL_METADATA_PROPERTY_KEY) as unknown)
+        ? (Reflect.get(source, ORIGINAL_METADATA_PROPERTY_KEY))
         : undefined;
 
     const originalMeta = isEventMetadataGuard(originalMetaCandidate)
@@ -177,15 +178,15 @@ export function stripForwardedEventMetadata<
         ...typedPayload,
     });
 
-    if (Reflect.has(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY)) {
+    if (objectHasIn(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY)) {
         Reflect.deleteProperty(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY);
     }
 
-    if (Reflect.has(clonedPayload, ORIGINAL_METADATA_PROPERTY_KEY)) {
+    if (objectHasIn(clonedPayload, ORIGINAL_METADATA_PROPERTY_KEY)) {
         Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_PROPERTY_KEY);
     }
 
-    if (Reflect.has(clonedPayload, ORIGINAL_METADATA_SYMBOL)) {
+    if (objectHasIn(clonedPayload, ORIGINAL_METADATA_SYMBOL)) {
         Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
     }
 

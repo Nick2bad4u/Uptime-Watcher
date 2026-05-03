@@ -11,12 +11,7 @@ import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { validateMonitorType } from "@shared/utils/validation";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
-import {
-    isEmpty,
-    objectEntries,
-    objectFromEntries,
-    objectKeys,
-} from "ts-extras";
+import { isDefined, isEmpty, objectEntries, objectFromEntries, objectKeys, setHas } from "ts-extras";
 
 import { logger } from "../../../utils/logger";
 import {
@@ -119,7 +114,7 @@ const ConfigPropertyValidator = {
             ...rest
         } = config;
 
-        const knownProperties = new Set([
+        const knownProperties: ReadonlySet<string> = new Set([
             "description",
             "displayName",
             "fields",
@@ -131,7 +126,7 @@ const ConfigPropertyValidator = {
         ]);
 
         const unexpectedProperties = objectFromEntries(
-            objectEntries(rest).filter(([key]) => !knownProperties.has(key))
+            objectEntries(rest).filter(([key]) => !setHas(knownProperties, key))
         );
 
         return {
@@ -160,7 +155,7 @@ const UiConfigSerializer = {
             detailFormats["analyticsLabel"]
         );
 
-        if (analyticsLabel === undefined) {
+        if (!isDefined(analyticsLabel)) {
             return undefined;
         }
 
@@ -195,11 +190,11 @@ const UiConfigSerializer = {
         const primary = pickOptionalString(helpTexts["primary"]);
         const secondary = pickOptionalString(helpTexts["secondary"]);
 
-        if (primary !== undefined) {
+        if (isDefined(primary)) {
             result.primary = primary;
         }
 
-        if (secondary !== undefined) {
+        if (isDefined(secondary)) {
             result.secondary = secondary;
         }
 
