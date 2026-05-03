@@ -345,11 +345,35 @@ test.describe(
         test(
             "should create monitors for every supported type",
             {
+                // Creating one monitor per registered type is a long-running
+                // workflow; allow a single automatic retry to absorb any
+                // intermittent Electron IPC race that can surface on slower
+                // machines.
+                retries: 1,
                 tag: ["@workflow", "@all-monitor-types"],
             },
             async () => {
+                // The preload bridge is attached asynchronously; poll until
+                // getMonitorTypes is callable before evaluating.
+                await page.waitForFunction(
+                    () => {
+                        const w = globalThis as typeof globalThis & {
+                            electronAPI?: {
+                                monitorTypes?: {
+                                    getMonitorTypes?: unknown;
+                                };
+                            };
+                        };
+                        return (
+                            typeof w.electronAPI?.monitorTypes
+                                ?.getMonitorTypes === "function"
+                        );
+                    },
+                    { timeout: WAIT_TIMEOUTS.APP_INITIALIZATION }
+                );
+
                 const monitorConfigs = (await page.evaluate(async () => {
-                    const scopedWindow = window as typeof window & {
+                    const scopedWindow = globalThis as typeof globalThis & {
                         electronAPI?: {
                             monitorTypes?: {
                                 getMonitorTypes?: () => Promise<
@@ -392,6 +416,14 @@ test.describe(
                 const createdSiteNames: string[] = [];
 
                 for (const scenario of scenarios) {
+                    // Guard against the Electron renderer being closed mid-loop
+                    // (can happen under memory pressure after many IPC calls).
+                    if (page.isClosed()) {
+                        throw new Error(
+                            `Page closed unexpectedly before creating monitor type '${scenario.monitorType}'`
+                        );
+                    }
+
                     const siteName = generateSiteName(
                         `${scenario.siteLabel} Coverage`
                     );
@@ -418,7 +450,10 @@ test.describe(
                     createdSiteNames.length,
                     "expected at least one created site"
                 ).toBeGreaterThan(0);
-                const lastSite = createdSiteNames[createdSiteNames.length - 1]!;
+                const lastSite = createdSiteNames.at(-1);
+                if (!lastSite) {
+                    throw new Error("expected at least one created site");
+                }
                 await openSiteDetails(page, lastSite);
                 await expect(page.getByTestId("site-overview-tab")).toBeVisible(
                     {

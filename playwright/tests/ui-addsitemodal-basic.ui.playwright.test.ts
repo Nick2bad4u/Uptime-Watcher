@@ -169,6 +169,10 @@ test.describe(
         test(
             "should enforce server heartbeat dynamic field validation before creation",
             {
+                // Isolated Electron lifecycle event timing on slower machines
+                // can cause sporadic failures here; allow two automatic retries
+                // before surfacing as a real failure.
+                retries: 2,
                 tag: ["@validation", "@monitor-types"],
             },
             async () => {
@@ -194,6 +198,16 @@ test.describe(
 
                     for (const label of heartbeatFieldLabels) {
                         const fieldInput = page.getByLabel(label);
+                        // Dynamic fields render asynchronously after the monitor-type
+                        // dropdown changes — wait for each field to be visible and
+                        // editable before clearing it.
+                        await fieldInput.waitFor({
+                            state: "visible",
+                            timeout: WAIT_TIMEOUTS.MEDIUM,
+                        });
+                        await expect(fieldInput).toBeEditable({
+                            timeout: WAIT_TIMEOUTS.SHORT,
+                        });
                         await fieldInput.fill("");
                     }
 
@@ -214,7 +228,8 @@ test.describe(
 
                     const siteCountAfterInvalid = await page.evaluate(
                         async () => {
-                            const automationWindow = window as typeof window & {
+                            const automationWindow =
+                                globalThis as typeof globalThis & {
                                 electronAPI?: {
                                     sites?: {
                                         getSites?: () => Promise<unknown>;

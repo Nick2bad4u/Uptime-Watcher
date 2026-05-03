@@ -365,7 +365,7 @@ const batchOperationScenarios = fc.record({
     batchSize: fc.integer({ min: 100, max: 50_000 }),
     totalRecords: fc.integer({ min: 1000, max: 1_000_000 }),
     chunkSize: fc.integer({ min: 50, max: 1000 }),
-    failureRate: fc.double({ min: 0, max: 0.1 }), // 0-10% failure rate
+    failureRate: fc.double({ max: 0.1, min: 0, noNaN: true }), // 0-10% failure rate
     failurePoint: fc.oneof(
         fc.constantFrom("START", "MIDDLE", "END", "RANDOM"),
         fc.constant(null)

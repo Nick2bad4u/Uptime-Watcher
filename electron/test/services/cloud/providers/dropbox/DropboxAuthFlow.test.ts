@@ -7,6 +7,7 @@
  */
 
 import * as http from "node:http";
+import * as https from "node:https";
 
 import { describe, expect, it, vi } from "vitest";
 
@@ -25,7 +26,8 @@ import {
 
 function httpGet(url: string): Promise<{ statusCode: number; body: string }> {
     return new Promise((resolve, reject) => {
-        const request = http.get(url, (response) => {
+        const client = new URL(url).protocol === "https:" ? https : http;
+        const request = client.get(url, (response) => {
             const chunks: Buffer[] = [];
             response.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
             response.on("end", () => {
@@ -128,10 +130,11 @@ describe(DropboxAuthFlow, () => {
 
             expect(capturedState).toBeTruthy();
             expect(capturedRedirectUri).toMatch(
-                /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/u
+                /^https:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/u
             );
 
             const callbackUrl = new URL(capturedRedirectUri!);
+            callbackUrl.protocol = "http:";
             callbackUrl.searchParams.set("code", "auth-code");
             callbackUrl.searchParams.set("state", capturedState!);
 
@@ -177,6 +180,7 @@ describe(DropboxAuthFlow, () => {
             const redirectUri = authorizeUrl.searchParams.get("redirect_uri");
 
             const callbackUrl = new URL(redirectUri!);
+            callbackUrl.protocol = "http:";
             callbackUrl.searchParams.set("state", state!);
             callbackUrl.searchParams.set("error_description", "denied");
 
@@ -215,6 +219,7 @@ describe(DropboxAuthFlow, () => {
             const redirectUri = authorizeUrl.searchParams.get("redirect_uri");
 
             const callbackUrl = new URL(redirectUri!);
+            callbackUrl.protocol = "http:";
             callbackUrl.searchParams.set("code", "auth-code");
             callbackUrl.searchParams.set("state", "wrong");
 

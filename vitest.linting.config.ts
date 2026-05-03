@@ -11,12 +11,10 @@
 import * as path from "node:path";
 import pc from "picocolors";
 import { normalizePath, type UserConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import {
     coverageConfigDefaults,
     defaultExclude,
     defineConfig,
-    type ViteUserConfigExport,
 } from "vitest/config";
 
 const dirname = import.meta.dirname;
@@ -33,7 +31,7 @@ const runtimeEnv = globalThis.process.env;
 /**
  * Vitest project configuration for linting/tooling tests.
  */
-const lintingVitestConfig: ViteUserConfigExport = defineConfig({
+const lintingVitestConfig: UserConfig = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-linting",
     json: {
         namedExports: true,
@@ -43,11 +41,6 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
         include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
         target: "esnext",
     },
-    plugins: [
-        tsconfigPaths({
-            projects: ["./tsconfig.json"],
-        }),
-    ],
     resolve: {
         alias: {
             "@app": normalizePath(path.resolve(dirname, "src")),
@@ -55,6 +48,7 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
             "@electron": normalizePath(path.resolve(dirname, "electron")),
             "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
+        tsconfigPaths: true,
     },
     test: {
         attachmentsDir: "./.cache/vitest/.vitest-attachments-linting",
@@ -240,6 +234,6 @@ const lintingVitestConfig: ViteUserConfigExport = defineConfig({
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
     } as any,
-}) satisfies UserConfig as UserConfig;
+}) satisfies UserConfig;
 
-export default lintingVitestConfig as UserConfig;
+export default lintingVitestConfig;

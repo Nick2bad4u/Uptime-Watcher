@@ -21,7 +21,7 @@ describe("validateOAuthAuthorizeUrl()", () => {
         expect(() =>
             validateOAuthAuthorizeUrl({
                 providerName: "Test",
-                url: "https://example.com/oauth?x=1",
+                url: "http://example.com/oauth?x=1",
             })
         ).toThrow(/unexpected.*OAuth URL/iu);
     });

@@ -19,7 +19,6 @@ import devtoolsJson from "vite-plugin-devtools-json";
 import electron from "vite-plugin-electron";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
@@ -296,11 +295,6 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
             target: "esnext", // Updated to match build target for CSS Modules compatibility
         },
         plugins: [
-            tsconfigPaths({
-                // Avoid crawling generated folders like storybook-static/.
-                // Explicitly point to the canonical tsconfig(s).
-                projects: ["./tsconfig.json"],
-            }),
             // CSS Modules patch to fix Vite's CSS Modules handling
             patchCssModules({
                 generateSourceTypes: true, // Generate .d.ts files for TypeScript support
@@ -668,6 +662,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                 ".cts",
                 ".json",
             ],
+            tsconfigPaths: true,
         },
         // Vitest uses Vite under the hood. Our dev-server tuning (warmup,
         // custom watch options, etc.) is valuable during `vite serve` but can

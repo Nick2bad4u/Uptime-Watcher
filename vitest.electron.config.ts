@@ -9,12 +9,10 @@
 import * as path from "node:path";
 import pc from "picocolors";
 import { normalizePath, type UserConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import {
     coverageConfigDefaults,
     defaultExclude,
     defineConfig,
-    type ViteUserConfigExport,
 } from "vitest/config";
 
 const dirname = import.meta.dirname;
@@ -22,7 +20,7 @@ const dirname = import.meta.dirname;
 /**
  * Vitest configuration for Electron backend test suites.
  */
-const vitestElectronConfig: ViteUserConfigExport = defineConfig({
+const vitestElectronConfig: UserConfig = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-backend",
     // Parity: json handling consistent (important if backend loads JSON fixtures)
     json: {
@@ -33,17 +31,13 @@ const vitestElectronConfig: ViteUserConfigExport = defineConfig({
         include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
         target: "esnext",
     },
-    plugins: [
-        tsconfigPaths({
-            projects: ["./tsconfig.json", "./tsconfig.electron.json"],
-        }),
-    ],
     resolve: {
         alias: {
             "@app": normalizePath(path.resolve(dirname, "src")),
             "@electron": normalizePath(path.resolve(dirname, "electron")),
             "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
+        tsconfigPaths: true,
     },
     // Cast: Vitest inline config typing currently lags behind several runtime-supported options.
     test: {
@@ -225,6 +219,6 @@ const vitestElectronConfig: ViteUserConfigExport = defineConfig({
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
     } as any,
-}) satisfies UserConfig as UserConfig;
+}) satisfies UserConfig;
 
-export default vitestElectronConfig as UserConfig;
+export default vitestElectronConfig;

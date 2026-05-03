@@ -10,12 +10,10 @@
 import * as path from "node:path";
 import pc from "picocolors";
 import { normalizePath, type UserConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import {
     coverageConfigDefaults,
     defaultExclude,
     defineConfig,
-    type ViteUserConfigExport,
 } from "vitest/config";
 
 const dirname = import.meta.dirname;
@@ -23,7 +21,7 @@ const dirname = import.meta.dirname;
 /**
  * Vitest configuration for shared utility and cross-process test suites.
  */
-const vitestSharedConfig: ViteUserConfigExport = defineConfig({
+const vitestSharedConfig: UserConfig = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-shared",
     // Parity: json handling
     json: {
@@ -35,17 +33,13 @@ const vitestSharedConfig: ViteUserConfigExport = defineConfig({
         include: ["**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
         target: "esnext",
     },
-    plugins: [
-        tsconfigPaths({
-            projects: ["./tsconfig.json"],
-        }),
-    ],
     resolve: {
         alias: {
             "@app": normalizePath(path.resolve(dirname, "src")),
             "@electron": normalizePath(path.resolve(dirname, "electron")),
             "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
+        tsconfigPaths: true,
     },
     // Cast: Vitest inline config typings currently omit several options we rely on.
     test: {
@@ -242,6 +236,6 @@ const vitestSharedConfig: ViteUserConfigExport = defineConfig({
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing lags behind runtime options we rely on.
     } as any,
-}) satisfies UserConfig as UserConfig;
+}) satisfies UserConfig;
 
-export default vitestSharedConfig as UserConfig;
+export default vitestSharedConfig;

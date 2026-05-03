@@ -17,8 +17,6 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 // eslint-disable-next-line import-x/no-nodejs-modules -- Utility inspection assists with rich error diagnostics during build-time operations.
 import { inspect } from "node:util";
-/* eslint-disable-next-line import-x/no-rename-default -- Shared Storybook helpers rely on root-level vite-tsconfig-paths dependency. */
-import tsconfigPaths from "vite-tsconfig-paths";
 
 /**
  * Narrow type representing the Babel plugin shape expected by the React plugin.
@@ -266,11 +264,7 @@ export const createStorybookPlugins = (
     const reactOptions =
         options?.reactOptions ?? createStorybookReactPluginOptions();
 
-    return [
-        tsconfigPaths(),
-        viteReact(reactOptions),
-        ...additionalPlugins,
-    ];
+    return [viteReact(reactOptions), ...additionalPlugins];
 };
 
 /**
@@ -333,6 +327,7 @@ export const createStorybookBaseViteConfig = (
         resolve: {
             alias,
             extensions: Array.from(extensions),
+            tsconfigPaths: true,
         },
     };
 };
