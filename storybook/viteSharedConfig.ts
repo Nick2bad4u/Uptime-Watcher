@@ -314,15 +314,17 @@ export const createStorybookBaseViteConfig = (
             },
         },
         optimizeDeps: {
-            esbuildOptions: {
-                conditions: [
-                    "module",
-                    "browser",
-                    "node",
-                ],
-            },
             exclude: Array.from(optimizeDepsExclude),
             include: Array.from(optimizeDepsInclude),
+            rolldownOptions: {
+                resolve: {
+                    conditionNames: [
+                        "module",
+                        "browser",
+                        "node",
+                    ],
+                },
+            },
         },
         resolve: {
             alias,

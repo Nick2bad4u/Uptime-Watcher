@@ -130,13 +130,20 @@ describe(DropboxAuthFlow, () => {
 
             expect(capturedState).toBeTruthy();
             expect(capturedRedirectUri).toMatch(
-                /^https:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/u
+                /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/u
             );
 
-            const callbackUrl = new URL(capturedRedirectUri!);
-            callbackUrl.protocol = "http:";
+            if (capturedRedirectUri === undefined) {
+                throw new Error("Expected redirect URI to be captured");
+            }
+
+            if (capturedState === undefined) {
+                throw new Error("Expected OAuth state to be captured");
+            }
+
+            const callbackUrl = new URL(capturedRedirectUri);
             callbackUrl.searchParams.set("code", "auth-code");
-            callbackUrl.searchParams.set("state", capturedState!);
+            callbackUrl.searchParams.set("state", capturedState);
 
             await httpGet(callbackUrl.toString());
 
@@ -179,9 +186,12 @@ describe(DropboxAuthFlow, () => {
             const state = authorizeUrl.searchParams.get("state");
             const redirectUri = authorizeUrl.searchParams.get("redirect_uri");
 
-            const callbackUrl = new URL(redirectUri!);
-            callbackUrl.protocol = "http:";
-            callbackUrl.searchParams.set("state", state!);
+            if (redirectUri === null || state === null) {
+                throw new Error("Expected redirect_uri and state in authorize URL");
+            }
+
+            const callbackUrl = new URL(redirectUri);
+            callbackUrl.searchParams.set("state", state);
             callbackUrl.searchParams.set("error_description", "denied");
 
             await httpGet(callbackUrl.toString());
@@ -218,8 +228,11 @@ describe(DropboxAuthFlow, () => {
             const authorizeUrl = new URL(url);
             const redirectUri = authorizeUrl.searchParams.get("redirect_uri");
 
-            const callbackUrl = new URL(redirectUri!);
-            callbackUrl.protocol = "http:";
+            if (redirectUri === null) {
+                throw new Error("Expected redirect_uri in authorize URL");
+            }
+
+            const callbackUrl = new URL(redirectUri);
             callbackUrl.searchParams.set("code", "auth-code");
             callbackUrl.searchParams.set("state", "wrong");
 

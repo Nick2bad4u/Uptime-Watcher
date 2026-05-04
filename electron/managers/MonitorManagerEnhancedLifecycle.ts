@@ -108,8 +108,12 @@ const toggleSingleMonitorEnhanced = async (args: {
         return false;
     }
 
-    const status =
-        kind === "start" ? MONITOR_STATUS.PENDING : MONITOR_STATUS.PAUSED;
+    const status: MonitorStatus =
+        kind === "start"
+            ? monitor.monitoring
+                ? (monitor.status ?? MONITOR_STATUS.PENDING)
+                : MONITOR_STATUS.PENDING
+            : MONITOR_STATUS.PAUSED;
     await applyMonitorState(
         site,
         monitor,

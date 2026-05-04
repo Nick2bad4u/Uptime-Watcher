@@ -153,6 +153,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
         const iconSize = size === "xs" ? 14 : 16;
         const StopIcon = AppIcons.actions.pauseFilled;
         const StartIcon = AppIcons.actions.playAll;
+        const widthClass = compact ? "" : "min-w-24 justify-center";
 
         // Mirror ActionButtonGroup tooltip behaviour so site-level controls
         // surface a consistent reason when disabled.
@@ -181,7 +182,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
                         <ThemedButton
                             {...triggerProps}
                             aria-label="Stop All Monitoring"
-                            className={`flex items-center gap-1 ${className}`}
+                            className={`flex items-center gap-1 ${widthClass} ${className}`}
                             disabled={isLoading}
                             onClick={handleStopClick}
                             size={size}
@@ -210,7 +211,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
                     <ThemedButton
                         {...triggerProps}
                         aria-label="Start All Monitoring"
-                        className={`flex items-center gap-1 ${className}`}
+                        className={`flex items-center gap-1 ${widthClass} ${className}`}
                         disabled={isLoading}
                         onClick={handleStartClick}
                         size={size}

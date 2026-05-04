@@ -582,7 +582,7 @@ export const SiteOverviewTab = ({
                 <div className="flex flex-wrap items-center gap-4">
                     {allMonitorsRunning ? (
                         <ThemedButton
-                            className="flex items-center gap-1"
+                            className="flex min-w-50 items-center justify-center gap-1"
                             disabled={isLoading}
                             icon={stopSiteMonitoringIcon}
                             onClick={handleStopSiteMonitoringClick}
@@ -593,7 +593,7 @@ export const SiteOverviewTab = ({
                         </ThemedButton>
                     ) : (
                         <ThemedButton
-                            className="flex items-center gap-1"
+                            className="flex min-w-50 items-center justify-center gap-1"
                             disabled={isLoading}
                             icon={startSiteMonitoringIcon}
                             onClick={handleStartSiteMonitoringClick}

@@ -477,7 +477,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                                         <ThemedButton
                                             {...triggerProps}
                                             aria-label="Stop Monitoring"
-                                            className="flex items-center gap-2"
+                                            className="flex min-w-20 items-center justify-center gap-2"
                                             onClick={handleStopMonitoringClick}
                                             size="sm"
                                             variant="warning"
@@ -500,7 +500,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                                         <ThemedButton
                                             {...triggerProps}
                                             aria-label="Start Monitoring"
-                                            className="flex items-center gap-2"
+                                            className="flex min-w-20 items-center justify-center gap-2"
                                             onClick={handleStartMonitoringClick}
                                             size="sm"
                                             variant="success"

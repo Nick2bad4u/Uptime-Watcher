@@ -276,21 +276,10 @@ const updateStateSyncEventDataSchema = baseEventDataSchema
         source: stateSyncSourceSchema,
         truncated: z.literal(false).optional(),
     })
-    .strict()
-    .superRefine((value, ctx) => {
-        const hasAnyChanges =
-            value.delta.addedSites.length > 0 ||
-            value.delta.updatedSites.length > 0 ||
-            value.delta.removedSiteIdentifiers.length > 0;
-
-        if (!hasAnyChanges) {
-            ctx.addIssue({
-                code: "custom",
-                message: "delta must contain at least one change",
-                path: ["delta"],
-            });
-        }
-    });
+    // Update events may legitimately carry an empty delta. The backend emits
+    // no-op updates to preserve a monotonic revision/event stream for
+    // subscribers that reconcile based on revision continuity.
+    .strict();
 
 const deleteStateSyncEventDataSchema = baseEventDataSchema
     .extend({

@@ -398,7 +398,9 @@ export async function startLoopbackOAuthServer(args?: {
     }
 
     const port = resolvePortFromServer(primaryServer.server);
-    const origin = `https://${redirectHost}:${port}`;
+    // Loopback callback listener is an HTTP server (createServer from node:http),
+    // so redirect URIs must use http:// to avoid browser TLS protocol errors.
+    const origin = `http://${redirectHost}:${port}`;
     const redirectUri = omitPath ? origin : `${origin}${expectedPath}`;
 
     return {
