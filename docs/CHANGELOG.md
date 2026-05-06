@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[9ea2112](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9ea2112b5cea87f1163261bb4881577951b49bbe)...
-[f8ecd14](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f8ecd14b5ccfbcc597935ccaf4e9821334245c75)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...f8ecd14b5ccfbcc597935ccaf4e9821334245c75))
+[b27de06](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b27de0655794d9c1b400947eb438f3f7f790045c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9ea2112b5cea87f1163261bb4881577951b49bbe...b27de0655794d9c1b400947eb438f3f7f790045c))
 
 
 ### ✨ Features
@@ -1111,6 +1111,44 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aa7f
 
 ### 🎨 Styling
 
+- 🎨 [style] Refactor code for improved readability and consistency
+ - 🛠️ [fix] Remove unnecessary parentheses in `delete` statements for clarity in `monitorOperations.ts`
+ - 🎨 [style] Align object destructuring and formatting in `useConfirmDialogStore.ts` for better readability
+ - 🎨 [style] Adjust formatting in `useUiStore.ts` to enhance code clarity
+ - 🎨 [style] Improve formatting in `SiteCompactCard.fast-check.test.tsx` for better visual structure
+ - 🎨 [style] Standardize formatting in `MarqueeText.fast-check.test.tsx` for consistency
+ - 🎨 [style] Clean up whitespace and formatting in `generateUuid.test.ts` for better readability
+ - 🎨 [style] Refine mock implementation in `useMonitorTypesStore.simplified100.test.ts` for clarity
+ - 🎨 [style] Enhance clarity in `generateUuid.test.ts` by removing redundant lines
+ - 🎨 [style] Improve formatting in `database.comprehensive-fuzzing.test.ts` for better readability
+ - 🎨 [style] Adjust formatting in `fuzzing-test-suite.runner.test.ts` for consistency
+ - 🎨 [style] Clean up conditional statements in `monitorUiHelpers.test.ts` for better readability
+ - 🎨 [style] Standardize import formatting in `ThemeManager.ts` for consistency
+ - 🎨 [style] Align import statements in `ThemedBadge.tsx` for better organization
+ - 🎨 [style] Improve formatting in `ThemedBox.tsx` for enhanced readability
+ - 🎨 [style] Clean up formatting in `ThemedButton.tsx` for better visual structure
+ - 🎨 [style] Standardize formatting in `ThemedCheckbox.tsx` for consistency
+ - 🎨 [style] Adjust formatting in `ThemedInput.tsx` for improved readability
+ - 🎨 [style] Clean up formatting in `ThemedSlider.tsx` for better organization
+ - 🎨 [style] Improve formatting in `ThemedText.tsx` for enhanced clarity
+ - 🎨 [style] Standardize import statements in `types.ts` for better organization
+ - 🎨 [style] Clean up formatting in `monitorFormData.ts` for improved readability
+ - 🎨 [style] Align import statements in `chartUtils.ts` for consistency
+ - 🎨 [style] Clean up whitespace in `environment.ts` for better organization
+ - 🎨 [style] Improve formatting in `fallbacks.ts` for enhanced readability
+ - 🎨 [style] Clean up whitespace in `monitorTypeHelper.ts` for better organization
+ - 🎨 [style] Adjust formatting in `globalMetrics.ts` for improved clarity
+ - 🎨 [style] Clean up import statements in `status.ts` for better organization
+ - 🎨 [style] Standardize formatting in `siteStoryHelpers.tsx` for consistency
+ - 🎨 [style] Clean up formatting in `DefaultErrorFallback.stories.tsx` for better readability
+ - 🎨 [style] Improve formatting in `DynamicMonitorFields.stories.tsx` for enhanced clarity
+ - 🎨 [style] Clean up formatting in `SiteCompactCard.stories.tsx` for better organization
+ - 🎨 [style] Adjust formatting in `vitest.setup.ts` for improved readability
+ - 🎨 [style] Clean up formatting in `googleDriveHttpClient.test.ts` for better organization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(84eb4e7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/84eb4e7d0569603ed1fedf7e7b882b7f0c3b99bb)
+
+
 - 🎨 [style] Improve code formatting and consistency across multiple files
  - ✨ [feat] Add a new script to synchronize Node version files, ensuring consistency in `.node-version` and `.nvmrc`
  - 🛠️ [fix] Normalize Node.js version strings and validate against package.json engines
@@ -1276,6 +1314,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(da1d
 
 ### 🧹 Chores
 
+- Update changelogs for v23.7.0 [skip ci] [`(a300d8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a300d8afee3a1e5fa8b782a017853b44de97484f)
+
+
 - Update changelogs for v23.6.0 [skip ci] [`(c24e032)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24e03226d70379135f56887c86cc85cdd7df742)
 
 
@@ -1381,7 +1422,115 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dd2e
 
 
 
+### 👷 CI/CD
+
+- 👷 [ci] Remove obsolete GitHub workflows
+ - 🧹 [chore] Deleted `pssecret-scanner.yml` workflow for secret scanning as it is no longer needed.
+ - 🧹 [chore] Removed `repo-stats.yml` workflow for generating repository metrics due to changes in project requirements.
+
+🎨 [style] Clean up CSS styles
+ - 🧹 [chore] Removed unnecessary whitespace in `custom.css` to improve readability.
+
+🚜 [refactor] Improve type safety in event handling
+ - 🛠️ [fix] Updated `eventTypes.ts` to use generic type parameters in `arrayIncludes` for better type inference.
+ - 🛠️ [fix] Enhanced type safety in `ServiceContainer.utils.ts` by refining the `ForwardablePayloadBase` type.
+
+🚜 [refactor] Update type casting in application service
+ - 🛠️ [fix] Replaced `safeCastTo` with `castUnchecked` in `ApplicationService.ts` to ensure type safety during object property checks.
+
+🚜 [refactor] Enhance type checks in cloud services
+ - 🛠️ [fix] Updated `CloudStatusBuilders.ts` to use `castUnchecked` for type assertions, improving type safety.
+
+🚜 [refactor] Refactor Dropbox token manager for type safety
+ - 🛠️ [fix] Changed `safeCastTo` to `castUnchecked` in `DropboxTokenManager.ts` for better type handling.
+
+🚜 [refactor] Improve Google Drive provider type checks
+ - 🛠️ [fix] Updated `GoogleDriveCloudStorageProvider.ts` to use `castUnchecked` for safer type assertions.
+
+🚜 [refactor] Enhance IPC handler type safety
+ - 🛠️ [fix] Replaced `safeCastTo` with `castUnchecked` in various IPC utility files for improved type safety.
+
+🚜 [refactor] Update sync engine utilities for better type handling
+ - 🛠️ [fix] Refactored `syncEngineUtils.ts` to ensure undefined values are handled correctly.
+
+🚜 [refactor] Improve UI store type definitions
+ - 🛠️ [fix] Removed `Except` from `useSettingsStore.ts` to simplify type definitions.
+
+🚜 [refactor] Update site sync delta sanitizer for better type safety
+ - 🛠️ [fix] Changed `setHas` calls to use generic types in `deltaSanitizer.ts` for improved type inference.
+
+🚜 [refactor] Enhance monitor operations normalization
+ - 🛠️ [fix] Updated `monitorOperations.normalize.ts` to use generic types in `setHas` for better type safety.
+
+🚜 [refactor] Improve state sync event handler type checks
+ - 🛠️ [fix] Updated `stateSyncEventHandler.ts` to use `ReadonlySet` for seen identifiers, enhancing type safety.
+
+🚜 [refactor] Clean up settings change handlers
+ - 🛠️ [fix] Refactored `useSettingsChangeHandlers.ts` to improve type safety in settings key checks.
+
+✨ [feat] Add downtime period management functions
+ - 🎨 [style] Introduced `createDowntimePeriod`, `isActiveDowntimeWindow`, and `startOrExtendDowntimeWindow` functions in `useSiteAnalytics.ts` to manage downtime periods effectively.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b27de06)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b27de0655794d9c1b400947eb438f3f7f790045c)
+
+
+
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies and configuration
+
+ - 🔧 Update ts-extras to version 1.0.0 for improved utility functions
+ - 🔧 Upgrade eslint to version 10.3.0 and eslint-plugin-zod to version 3.12.0 for better linting support
+ - 🔧 Update Docusaurus dependencies to version 3.10.1 for enhanced performance and features
+ - 🔧 Modify update-deps script to use npm update --workspaces for better workspace management
+ - 🔧 Remove obsolete ts-extras rules from ESLint configuration to reduce noise and improve clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b0b9d62)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b9d621fed21d300a552a4948571e0877d9be4e)
+
+
+- 🔧 [build] Update validation tests and theme components
+
+ - 🛠️ [fix] Refactor validation tests to use `secureRandomFloat` for randomness instead of `Math.random()`
+ - 📝 [docs] Update URL validation test cases to use HTTPS for consistency
+ - 🎨 [style] Improve readability of theme components by utilizing `arrayJoin` from `ts-extras` for joining class names
+ - 🛠️ [fix] Replace `Object.entries` with `objectEntries` for better type safety in `ThemeManager`
+ - 🛠️ [fix] Use `isEmpty` from `ts-extras` to check for valid children in `ThemeProvider`
+ - 🛠️ [fix] Update `ThemedBadge`, `ThemedBox`, `ThemedButton`, and `ThemedText` components to use `arrayJoin` for class name concatenation
+ - 🛠️ [fix] Enhance monitor form data validation functions to use `safeCastTo` for type safety
+ - 🛠️ [fix] Improve cache utility to use `isDefined` for checking existence of cache keys
+ - 🛠️ [fix] Update status utility to use `stringSplit` for better string manipulation
+ - 🛠️ [fix] Refactor time utility to use `arrayAt` for accessing array elements safely
+ - 🧪 [test] Update tests for `validatedExternalOpen` to ensure HTTPS URLs are validated correctly
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1b286dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1b286dd45e1631d53a25e28f27eab7410e8bf4cc)
+
+
+- 🔧 [build] Update TypeDoc commands and dependencies in package.json
+
+ - 📝 Refactor TypeDoc commands to use a new script for safer execution
+   - Changed `"docs:typedoc"` and `"docs:typedoc:local"` to use `node scripts/run-typedoc-safe.mjs` for improved path handling
+ - 📦 Remove outdated dependency `@microsoft/eslint-plugin-sdl` and add new ESLint plugins
+   - Added `@typpi/eslint-plugin-vite`, `eslint-plugin-copilot`, `eslint-plugin-github-actions-2`, `eslint-plugin-immutable`, `eslint-plugin-sdl-2`, `eslint-plugin-tsdoc-require-2`, and `eslint-plugin-typefest`
+ - 🔄 Update versions of existing dependencies to ensure compatibility and improvements
+
+🛠️ [fix] Introduce run-typedoc-safe.mjs script for TypeDoc execution
+
+ - 🛡️ Implement a new script `run-typedoc-safe.mjs` to handle TypeDoc execution safely
+   - Ensures compatibility with Windows paths by creating a temporary directory and using junctions
+   - Validates the existence of the TypeDoc config file before execution
+   - Captures and handles errors during the TypeDoc execution process
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(13362f3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/13362f3fb7087487dd971edd9eead72247fd0f5b)
+
+
+- 🔧 [build] Update Docusaurus deployment and documentation configuration
+ - 🛠️ Update TypeDoc output directory check in deploy workflow
+ - 📝 Add hierarchy documentation for Uptime Watcher
+ - 🔧 Modify TypeDoc configuration to simplify entry points
+ - 🔧 Adjust local TypeDoc configuration for relative paths
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b48e2cb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b48e2cbfcd42b66be9ce1c9fc3c9f4bca9ef225a)
+
 
 - 🔧 [build] Update dependencies and devDependencies in package.json
  - 📦 Upgrade axios from ^1.13.6 to ^1.14.0

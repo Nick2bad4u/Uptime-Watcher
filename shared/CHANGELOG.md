@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[748d654](https://github.com/Nick2bad4u/Uptime-Watcher/commit/748d65478619de60127944145e33c18d943a3dc8)...
-[f8ecd14](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f8ecd14b5ccfbcc597935ccaf4e9821334245c75)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...f8ecd14b5ccfbcc597935ccaf4e9821334245c75))
+[0a55e85](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0a55e85423d8c04b82c4d17b3d04f3fed6123464)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/748d65478619de60127944145e33c18d943a3dc8...0a55e85423d8c04b82c4d17b3d04f3fed6123464))
 
 
 ### ✨ Features
@@ -693,6 +693,38 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a29e
 
 ### 🚜 Refactor
 
+- 🚜 [refactor] Replace arrayFind with native Array#find for improved readability and performance
+ - 🛠️ [fix] Update CloudProviderSetupPanel.ProviderPanel.tsx to use native find method
+ - 🛠️ [fix] Update CloudProviderSetupPanel.ProviderTabList.tsx to use native find method
+ - 🛠️ [fix] Update CloudProviderSetupPanel.utils.ts to use native find method
+ - 🛠️ [fix] Update SiteDetailsNavigation.tsx to use native find method
+ - 🛠️ [fix] Update HistoryTab.tsx to use native find method
+ - 🛠️ [fix] Update SettingsTab.utils.ts to use native find method
+ - 🛠️ [fix] Update useSiteDetails.handlers.ts to use native find method
+ - 🛠️ [fix] Update useSiteDetails.ts to use native find method
+ - 🛠️ [fix] Update useSiteMonitor.ts to use native find method
+ - 🛠️ [fix] Update useMonitorFields.ts to use native find method
+ - 🛠️ [fix] Update useSelectedSite.ts to use native find method
+ - 🛠️ [fix] Update useCloudStore.ts to use native find method
+ - 🛠️ [fix] Update useSitesState.ts to use native find method
+ - 🛠️ [fix] Update monitorOperations.normalize.ts to use native find method
+ - 🛠️ [fix] Update monitorOperations.ts to use native find method
+ - 🛠️ [fix] Update operationHelpers.ts to use native find method
+ - 🛠️ [fix] Update statusUpdateHandler.ts to use native find method
+ - 📝 [docs] Update generateUuid.test.ts to improve UUID generation tests
+ - 📝 [docs] Update precision-function-coverage.test.ts to improve ID generation tests
+ - 📝 [docs] Update setup.ts to mock crypto API for UUID generation
+ - 📝 [docs] Update useMonitorTypesStore.simplified100.test.ts to improve monitor types store tests
+ - 📝 [docs] Update data/generateUuid.test.ts to improve UUID generation tests
+ - 📝 [docs] Update monitorFormData.ts to improve form data validation
+ - 📝 [docs] Update environment.ts to add PlaywrightAutomationTarget interface
+ - 📝 [docs] Update monitorTypeHelper.ts to improve monitor type configuration retrieval
+ - 📝 [docs] Update monitorHistoryTime.ts to improve latest history timestamp retrieval
+ - 📝 [docs] Update vite.config.ts to improve test configuration
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(38470fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/38470fc5332211be51aa2e8771dd25a4722371b6)
+
+
 - 🚜 [refactor] Streamlines validation and linting
 
 🚜 [refactor] Streamlines monitor form validation by centralizing URL/FQDN options and reusing them across checks, including websocket protocols 🔗
@@ -1261,6 +1293,44 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(588c
 
 ### 🎨 Styling
 
+- 🎨 [style] Refactor code for improved readability and consistency
+ - 🛠️ [fix] Remove unnecessary parentheses in `delete` statements for clarity in `monitorOperations.ts`
+ - 🎨 [style] Align object destructuring and formatting in `useConfirmDialogStore.ts` for better readability
+ - 🎨 [style] Adjust formatting in `useUiStore.ts` to enhance code clarity
+ - 🎨 [style] Improve formatting in `SiteCompactCard.fast-check.test.tsx` for better visual structure
+ - 🎨 [style] Standardize formatting in `MarqueeText.fast-check.test.tsx` for consistency
+ - 🎨 [style] Clean up whitespace and formatting in `generateUuid.test.ts` for better readability
+ - 🎨 [style] Refine mock implementation in `useMonitorTypesStore.simplified100.test.ts` for clarity
+ - 🎨 [style] Enhance clarity in `generateUuid.test.ts` by removing redundant lines
+ - 🎨 [style] Improve formatting in `database.comprehensive-fuzzing.test.ts` for better readability
+ - 🎨 [style] Adjust formatting in `fuzzing-test-suite.runner.test.ts` for consistency
+ - 🎨 [style] Clean up conditional statements in `monitorUiHelpers.test.ts` for better readability
+ - 🎨 [style] Standardize import formatting in `ThemeManager.ts` for consistency
+ - 🎨 [style] Align import statements in `ThemedBadge.tsx` for better organization
+ - 🎨 [style] Improve formatting in `ThemedBox.tsx` for enhanced readability
+ - 🎨 [style] Clean up formatting in `ThemedButton.tsx` for better visual structure
+ - 🎨 [style] Standardize formatting in `ThemedCheckbox.tsx` for consistency
+ - 🎨 [style] Adjust formatting in `ThemedInput.tsx` for improved readability
+ - 🎨 [style] Clean up formatting in `ThemedSlider.tsx` for better organization
+ - 🎨 [style] Improve formatting in `ThemedText.tsx` for enhanced clarity
+ - 🎨 [style] Standardize import statements in `types.ts` for better organization
+ - 🎨 [style] Clean up formatting in `monitorFormData.ts` for improved readability
+ - 🎨 [style] Align import statements in `chartUtils.ts` for consistency
+ - 🎨 [style] Clean up whitespace in `environment.ts` for better organization
+ - 🎨 [style] Improve formatting in `fallbacks.ts` for enhanced readability
+ - 🎨 [style] Clean up whitespace in `monitorTypeHelper.ts` for better organization
+ - 🎨 [style] Adjust formatting in `globalMetrics.ts` for improved clarity
+ - 🎨 [style] Clean up import statements in `status.ts` for better organization
+ - 🎨 [style] Standardize formatting in `siteStoryHelpers.tsx` for consistency
+ - 🎨 [style] Clean up formatting in `DefaultErrorFallback.stories.tsx` for better readability
+ - 🎨 [style] Improve formatting in `DynamicMonitorFields.stories.tsx` for enhanced clarity
+ - 🎨 [style] Clean up formatting in `SiteCompactCard.stories.tsx` for better organization
+ - 🎨 [style] Adjust formatting in `vitest.setup.ts` for improved readability
+ - 🎨 [style] Clean up formatting in `googleDriveHttpClient.test.ts` for better organization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(84eb4e7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/84eb4e7d0569603ed1fedf7e7b882b7f0c3b99bb)
+
+
 - 🎨 [style] Improve code formatting and consistency across multiple files
  - ✨ [feat] Add a new script to synchronize Node version files, ensuring consistency in `.node-version` and `.nvmrc`
  - 🛠️ [fix] Normalize Node.js version strings and validate against package.json engines
@@ -1498,6 +1568,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a197
 
 ### 🧹 Chores
 
+- Update changelogs for v23.7.0 [skip ci] [`(a300d8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a300d8afee3a1e5fa8b782a017853b44de97484f)
+
+
 - Update changelogs for v23.6.0 [skip ci] [`(c24e032)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24e03226d70379135f56887c86cc85cdd7df742)
 
 
@@ -1583,7 +1656,108 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2eed
 
 
 
+### 👷 CI/CD
+
+- 👷 [ci] Remove obsolete GitHub workflows
+ - 🧹 [chore] Deleted `pssecret-scanner.yml` workflow for secret scanning as it is no longer needed.
+ - 🧹 [chore] Removed `repo-stats.yml` workflow for generating repository metrics due to changes in project requirements.
+
+🎨 [style] Clean up CSS styles
+ - 🧹 [chore] Removed unnecessary whitespace in `custom.css` to improve readability.
+
+🚜 [refactor] Improve type safety in event handling
+ - 🛠️ [fix] Updated `eventTypes.ts` to use generic type parameters in `arrayIncludes` for better type inference.
+ - 🛠️ [fix] Enhanced type safety in `ServiceContainer.utils.ts` by refining the `ForwardablePayloadBase` type.
+
+🚜 [refactor] Update type casting in application service
+ - 🛠️ [fix] Replaced `safeCastTo` with `castUnchecked` in `ApplicationService.ts` to ensure type safety during object property checks.
+
+🚜 [refactor] Enhance type checks in cloud services
+ - 🛠️ [fix] Updated `CloudStatusBuilders.ts` to use `castUnchecked` for type assertions, improving type safety.
+
+🚜 [refactor] Refactor Dropbox token manager for type safety
+ - 🛠️ [fix] Changed `safeCastTo` to `castUnchecked` in `DropboxTokenManager.ts` for better type handling.
+
+🚜 [refactor] Improve Google Drive provider type checks
+ - 🛠️ [fix] Updated `GoogleDriveCloudStorageProvider.ts` to use `castUnchecked` for safer type assertions.
+
+🚜 [refactor] Enhance IPC handler type safety
+ - 🛠️ [fix] Replaced `safeCastTo` with `castUnchecked` in various IPC utility files for improved type safety.
+
+🚜 [refactor] Update sync engine utilities for better type handling
+ - 🛠️ [fix] Refactored `syncEngineUtils.ts` to ensure undefined values are handled correctly.
+
+🚜 [refactor] Improve UI store type definitions
+ - 🛠️ [fix] Removed `Except` from `useSettingsStore.ts` to simplify type definitions.
+
+🚜 [refactor] Update site sync delta sanitizer for better type safety
+ - 🛠️ [fix] Changed `setHas` calls to use generic types in `deltaSanitizer.ts` for improved type inference.
+
+🚜 [refactor] Enhance monitor operations normalization
+ - 🛠️ [fix] Updated `monitorOperations.normalize.ts` to use generic types in `setHas` for better type safety.
+
+🚜 [refactor] Improve state sync event handler type checks
+ - 🛠️ [fix] Updated `stateSyncEventHandler.ts` to use `ReadonlySet` for seen identifiers, enhancing type safety.
+
+🚜 [refactor] Clean up settings change handlers
+ - 🛠️ [fix] Refactored `useSettingsChangeHandlers.ts` to improve type safety in settings key checks.
+
+✨ [feat] Add downtime period management functions
+ - 🎨 [style] Introduced `createDowntimePeriod`, `isActiveDowntimeWindow`, and `startOrExtendDowntimeWindow` functions in `useSiteAnalytics.ts` to manage downtime periods effectively.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b27de06)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b27de0655794d9c1b400947eb438f3f7f790045c)
+
+
+
 ### 🔧 Build System
+
+- 🔧 [build] Update monitor status handling and improve OAuth redirect URI
+
+ - 🛠️ [fix] Enhance `toggleSingleMonitorEnhanced` to correctly set monitor status based on current monitoring state.
+ - 🛠️ [fix] Change redirect URI in `startLoopbackOAuthServer` to use HTTP to prevent TLS errors in loopback callback.
+ - 🧪 [test] Update `DropboxAuthFlow` tests to ensure proper handling of redirect URIs and OAuth state.
+ - 🎨 [style] Refactor event data schema to allow empty deltas for no-op updates, preserving event stream continuity.
+ - 🎨 [style] Adjust CSS for sidebar and buttons to improve layout and responsiveness.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0a55e85)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0a55e85423d8c04b82c4d17b3d04f3fed6123464)
+
+
+- 🔧 [build] Update utility functions and improve type safety
+
+ - 🛠️ [fix] Refactor utility function calls to use `isDefined` and `setHas` for better type safety and readability in multiple files.
+   - Updated checks for undefined values to use `isDefined` in `useSiteOperations.ts`, `useSiteSync.ts`, `useSitesState.ts`, and others.
+   - Replaced `has` checks with `setHas` in `useSiteSync.deltaSanitizer.ts`, `useSiteSync.ts`, and `stateSyncEventHandler.ts` for consistency.
+
+ - ⚡ [perf] Optimize performance by using `arrayFirst` in `monitorOperations.normalize.ts` to retrieve the first element of an array instead of directly accessing an index.
+
+ - 🎨 [style] Improve code clarity by using `objectHasIn` instead of direct property checks in `ThemeManager.ts`, `ThemedBadge.tsx`, and other components.
+   - This change enhances the readability and maintainability of the codebase.
+
+ - 🧹 [chore] Clean up imports across various files to ensure only necessary functions from `ts-extras` are imported, reducing bundle size and improving clarity.
+   - Consolidated imports in `useUiStore.ts`, `useUpdatesStore.ts`, and others to include only required utilities.
+
+ - ✨ [feat] Enhance telemetry payload construction in `statusUpdatePayload.ts` by ensuring all optional fields are checked with `isDefined`, improving data integrity.
+   - This change ensures that telemetry data sent is complete and accurate.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cb49c47)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb49c4703b2beac5d274a9e1b952e12b9824854a)
+
+
+- 🔧 [build] Update validation tests and theme components
+
+ - 🛠️ [fix] Refactor validation tests to use `secureRandomFloat` for randomness instead of `Math.random()`
+ - 📝 [docs] Update URL validation test cases to use HTTPS for consistency
+ - 🎨 [style] Improve readability of theme components by utilizing `arrayJoin` from `ts-extras` for joining class names
+ - 🛠️ [fix] Replace `Object.entries` with `objectEntries` for better type safety in `ThemeManager`
+ - 🛠️ [fix] Use `isEmpty` from `ts-extras` to check for valid children in `ThemeProvider`
+ - 🛠️ [fix] Update `ThemedBadge`, `ThemedBox`, `ThemedButton`, and `ThemedText` components to use `arrayJoin` for class name concatenation
+ - 🛠️ [fix] Enhance monitor form data validation functions to use `safeCastTo` for type safety
+ - 🛠️ [fix] Improve cache utility to use `isDefined` for checking existence of cache keys
+ - 🛠️ [fix] Update status utility to use `stringSplit` for better string manipulation
+ - 🛠️ [fix] Refactor time utility to use `arrayAt` for accessing array elements safely
+ - 🧪 [test] Update tests for `validatedExternalOpen` to ensure HTTPS URLs are validated correctly
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1b286dd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1b286dd45e1631d53a25e28f27eab7410e8bf4cc)
+
 
 - 🔧 [build] Update dependencies and devDependencies in package.json
  - 📦 Upgrade axios from ^1.13.6 to ^1.14.0

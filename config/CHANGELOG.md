@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 
 [[6fee1f8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6fee1f850712770d13ed4d8940de7cae221f7036)...
-[f8ecd14](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f8ecd14b5ccfbcc597935ccaf4e9821334245c75)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...f8ecd14b5ccfbcc597935ccaf4e9821334245c75))
+[b0b9d62](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b9d621fed21d300a552a4948571e0877d9be4e)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6fee1f850712770d13ed4d8940de7cae221f7036...b0b9d621fed21d300a552a4948571e0877d9be4e))
 
 
 ### ✨ Features
@@ -360,6 +360,38 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85d4
 
 
 ### 🚜 Refactor
+
+- 🚜 [refactor] Replace arrayFind with native Array#find for improved readability and performance
+ - 🛠️ [fix] Update CloudProviderSetupPanel.ProviderPanel.tsx to use native find method
+ - 🛠️ [fix] Update CloudProviderSetupPanel.ProviderTabList.tsx to use native find method
+ - 🛠️ [fix] Update CloudProviderSetupPanel.utils.ts to use native find method
+ - 🛠️ [fix] Update SiteDetailsNavigation.tsx to use native find method
+ - 🛠️ [fix] Update HistoryTab.tsx to use native find method
+ - 🛠️ [fix] Update SettingsTab.utils.ts to use native find method
+ - 🛠️ [fix] Update useSiteDetails.handlers.ts to use native find method
+ - 🛠️ [fix] Update useSiteDetails.ts to use native find method
+ - 🛠️ [fix] Update useSiteMonitor.ts to use native find method
+ - 🛠️ [fix] Update useMonitorFields.ts to use native find method
+ - 🛠️ [fix] Update useSelectedSite.ts to use native find method
+ - 🛠️ [fix] Update useCloudStore.ts to use native find method
+ - 🛠️ [fix] Update useSitesState.ts to use native find method
+ - 🛠️ [fix] Update monitorOperations.normalize.ts to use native find method
+ - 🛠️ [fix] Update monitorOperations.ts to use native find method
+ - 🛠️ [fix] Update operationHelpers.ts to use native find method
+ - 🛠️ [fix] Update statusUpdateHandler.ts to use native find method
+ - 📝 [docs] Update generateUuid.test.ts to improve UUID generation tests
+ - 📝 [docs] Update precision-function-coverage.test.ts to improve ID generation tests
+ - 📝 [docs] Update setup.ts to mock crypto API for UUID generation
+ - 📝 [docs] Update useMonitorTypesStore.simplified100.test.ts to improve monitor types store tests
+ - 📝 [docs] Update data/generateUuid.test.ts to improve UUID generation tests
+ - 📝 [docs] Update monitorFormData.ts to improve form data validation
+ - 📝 [docs] Update environment.ts to add PlaywrightAutomationTarget interface
+ - 📝 [docs] Update monitorTypeHelper.ts to improve monitor type configuration retrieval
+ - 📝 [docs] Update monitorHistoryTime.ts to improve latest history timestamp retrieval
+ - 📝 [docs] Update vite.config.ts to improve test configuration
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(38470fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/38470fc5332211be51aa2e8771dd25a4722371b6)
+
 
 - 🚜 [refactor] Rename component functions for consistency and clarity
  - 🔧 Refactor `PromptDialog` to `PromptDialogComponent` for better clarity in `src/components/common/PromptDialog/PromptDialog.tsx`
@@ -833,6 +865,44 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(588c
 
 ### 🎨 Styling
 
+- 🎨 [style] Refactor code for improved readability and consistency
+ - 🛠️ [fix] Remove unnecessary parentheses in `delete` statements for clarity in `monitorOperations.ts`
+ - 🎨 [style] Align object destructuring and formatting in `useConfirmDialogStore.ts` for better readability
+ - 🎨 [style] Adjust formatting in `useUiStore.ts` to enhance code clarity
+ - 🎨 [style] Improve formatting in `SiteCompactCard.fast-check.test.tsx` for better visual structure
+ - 🎨 [style] Standardize formatting in `MarqueeText.fast-check.test.tsx` for consistency
+ - 🎨 [style] Clean up whitespace and formatting in `generateUuid.test.ts` for better readability
+ - 🎨 [style] Refine mock implementation in `useMonitorTypesStore.simplified100.test.ts` for clarity
+ - 🎨 [style] Enhance clarity in `generateUuid.test.ts` by removing redundant lines
+ - 🎨 [style] Improve formatting in `database.comprehensive-fuzzing.test.ts` for better readability
+ - 🎨 [style] Adjust formatting in `fuzzing-test-suite.runner.test.ts` for consistency
+ - 🎨 [style] Clean up conditional statements in `monitorUiHelpers.test.ts` for better readability
+ - 🎨 [style] Standardize import formatting in `ThemeManager.ts` for consistency
+ - 🎨 [style] Align import statements in `ThemedBadge.tsx` for better organization
+ - 🎨 [style] Improve formatting in `ThemedBox.tsx` for enhanced readability
+ - 🎨 [style] Clean up formatting in `ThemedButton.tsx` for better visual structure
+ - 🎨 [style] Standardize formatting in `ThemedCheckbox.tsx` for consistency
+ - 🎨 [style] Adjust formatting in `ThemedInput.tsx` for improved readability
+ - 🎨 [style] Clean up formatting in `ThemedSlider.tsx` for better organization
+ - 🎨 [style] Improve formatting in `ThemedText.tsx` for enhanced clarity
+ - 🎨 [style] Standardize import statements in `types.ts` for better organization
+ - 🎨 [style] Clean up formatting in `monitorFormData.ts` for improved readability
+ - 🎨 [style] Align import statements in `chartUtils.ts` for consistency
+ - 🎨 [style] Clean up whitespace in `environment.ts` for better organization
+ - 🎨 [style] Improve formatting in `fallbacks.ts` for enhanced readability
+ - 🎨 [style] Clean up whitespace in `monitorTypeHelper.ts` for better organization
+ - 🎨 [style] Adjust formatting in `globalMetrics.ts` for improved clarity
+ - 🎨 [style] Clean up import statements in `status.ts` for better organization
+ - 🎨 [style] Standardize formatting in `siteStoryHelpers.tsx` for consistency
+ - 🎨 [style] Clean up formatting in `DefaultErrorFallback.stories.tsx` for better readability
+ - 🎨 [style] Improve formatting in `DynamicMonitorFields.stories.tsx` for enhanced clarity
+ - 🎨 [style] Clean up formatting in `SiteCompactCard.stories.tsx` for better organization
+ - 🎨 [style] Adjust formatting in `vitest.setup.ts` for improved readability
+ - 🎨 [style] Clean up formatting in `googleDriveHttpClient.test.ts` for better organization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(84eb4e7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/84eb4e7d0569603ed1fedf7e7b882b7f0c3b99bb)
+
+
 - 🎨 [style] Improve code formatting and consistency across multiple files
  - ✨ [feat] Add a new script to synchronize Node version files, ensuring consistency in `.node-version` and `.nvmrc`
  - 🛠️ [fix] Normalize Node.js version strings and validate against package.json engines
@@ -1002,6 +1072,9 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bb1f
 
 ### 🧹 Chores
 
+- Update changelogs for v23.7.0 [skip ci] [`(a300d8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a300d8afee3a1e5fa8b782a017853b44de97484f)
+
+
 - Update changelogs for v23.6.0 [skip ci] [`(c24e032)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c24e03226d70379135f56887c86cc85cdd7df742)
 
 
@@ -1098,6 +1171,17 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7c8a
 
 
 ### 🔧 Build System
+
+- 🔧 [build] Update dependencies and configuration
+
+ - 🔧 Update ts-extras to version 1.0.0 for improved utility functions
+ - 🔧 Upgrade eslint to version 10.3.0 and eslint-plugin-zod to version 3.12.0 for better linting support
+ - 🔧 Update Docusaurus dependencies to version 3.10.1 for enhanced performance and features
+ - 🔧 Modify update-deps script to use npm update --workspaces for better workspace management
+ - 🔧 Remove obsolete ts-extras rules from ESLint configuration to reduce noise and improve clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b0b9d62)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0b9d621fed21d300a552a4948571e0877d9be4e)
+
 
 - 🔧 [build] Update dependencies and devDependencies in package.json
  - 📦 Upgrade axios from ^1.13.6 to ^1.14.0
