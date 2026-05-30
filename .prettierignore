@@ -18,7 +18,6 @@ docs/TSDoc/
 docs/Guides/
 
 # MD and MDX files since we use Remark Lint and other tools for those
-**/*.mdx
 
 # Ignore Change Logs
 
