@@ -127,7 +127,7 @@ jobs:
             # Upload frontend coverage to Codecov
             - name: Upload frontend coverage to Codecov
               id: upload-frontend-coverage
-              uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -146,7 +146,7 @@ jobs:
             # Upload electron coverage to Codecov
             - name: Upload electron coverage to Codecov
               id: upload-electron-coverage
-              uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
@@ -165,7 +165,7 @@ jobs:
             # Upload shared coverage to Codecov
             - name: Upload shared coverage to Codecov
               id: upload-shared-coverage
-              uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   slug: Nick2bad4u/Uptime-Watcher
