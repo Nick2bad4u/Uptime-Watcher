@@ -24,7 +24,7 @@ jobs:
         timeout-minutes: 20
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@e3f713f2d8f53843e71c69a996d56f51aa9adfb9 # v2.14.1
+              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
               with:
                   egress-policy: audit
 
@@ -39,7 +39,7 @@ jobs:
 
             - name: Download Linux release assets (linux-)
               id: download_linux
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -49,7 +49,7 @@ jobs:
 
             - name: Download Linux release assets (appimage-)
               id: download_appimage
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -59,7 +59,7 @@ jobs:
 
             - name: Download Linux release assets (deb-)
               id: download_deb
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -69,7 +69,7 @@ jobs:
 
             - name: Download Linux release assets (pacman-)
               id: download_pacman
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -79,7 +79,7 @@ jobs:
 
             - name: Download Linux release assets (rpm-)
               id: download_rpm
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -89,7 +89,7 @@ jobs:
 
             - name: Download Linux release assets (snap-)
               id: download_snap
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -99,7 +99,7 @@ jobs:
 
             - name: Download Linux release assets (freebsd-)
               id: download_freebsd
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -109,7 +109,7 @@ jobs:
 
             - name: Download Linux release assets (apk-)
               id: download_apk
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -119,7 +119,7 @@ jobs:
 
             - name: Download Linux release assets (latest-linux.yml)
               id: download_latest
-              uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
               continue-on-error: true
               with:
                   latest: true
@@ -135,7 +135,7 @@ jobs:
                   ls -la release-dist/ || true
 
             - name: Upload Linux distributables to archive.org
-              uses: Nick2bad4u/internet-archive-upload@947bc6bdf79d0bcf816b576082fd7b503d33ddc9 # v1.6
+              uses: Nick2bad4u/internet-archive-upload@369aaddeede5cca7f0be4cb39dcc89e35afbdf48 # v2.0.0
               continue-on-error: true
               with:
                   access-key: "${{ secrets.IA_ACCESS_KEY }}"

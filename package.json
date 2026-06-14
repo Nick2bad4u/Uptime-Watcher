@@ -616,7 +616,8 @@
         "verify:storybook-tsconfig": "node ./scripts/verify-storybook-tsconfig.mjs",
         "webhint": "hint http://localhost:3000 --config .hintrc",
         "webhint:3000": "npm run webhint",
-        "webhint:5173": "hint http://localhost:5173 --config .hintrc"
+        "webhint:5173": "hint http://localhost:5173 --config .hintrc",
+        "update-actions": "npx actions-up --yes --style sha"
     },
     "eslintConfig": {
         "extends": "eslint.config.mjs"
