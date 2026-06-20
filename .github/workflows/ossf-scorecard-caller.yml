@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+# eslint-disable
+
+name: "OpenSSF Scorecard"
+
+run-name: >-
+  ${{
+      github.event_name == 'branch_protection_rule' &&
+      format('OpenSSF Scorecard branch protection {0}', github.event.rule.name || github.run_id) ||
+      github.event_name == 'schedule' &&
+      format('OpenSSF Scorecard scheduled {0}', github.run_id) ||
+      github.event_name == 'workflow_dispatch' &&
+      format('OpenSSF Scorecard manual {0}', github.run_id) ||
+      format('OpenSSF Scorecard {0}', github.ref_name || github.run_id)
+  }}
+
+concurrency:
+  group: >-
+    ossf-scorecard-${{ github.workflow }}-${{
+        github.event.rule.name ||
+        github.sha ||
+        github.ref ||
+        github.run_id
+    }}
+  cancel-in-progress: true
+
+on:
+  branch_protection_rule:
+    types:
+      - "created"
+      - "edited"
+      - "deleted"
+  schedule:
+    - cron: "20 7 * * 2"
+  push:
+    branches:
+      - "main"
+      - "master"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  scorecard:
+    name: "OpenSSF Scorecard"
+    permissions:
+      contents: "read"
+      security-events: "write"
+      id-token: "write"
+      actions: "read"
+      issues: "read"
+      pull-requests: "read"
+      checks: "read"
+    uses: "Nick2bad4u/workflow-templates/.github/workflows/reusable-ossf-scorecard.yml@main"

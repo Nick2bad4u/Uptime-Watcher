@@ -1,0 +1,41 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+
+name: "Label Pull Requests"
+
+run-name: >-
+  ${{
+      github.event_name == 'pull_request_target' &&
+      format('Label Pull Requests #{0}', github.event.pull_request.number) ||
+      format('Label Pull Requests {0}', github.ref_name || github.run_id)
+  }}
+
+concurrency:
+  group: >-
+    labeler-${{ github.workflow }}-${{
+        github.event.pull_request.number ||
+        github.sha ||
+        github.ref ||
+        github.run_id
+    }}
+  cancel-in-progress: true
+
+on:
+  pull_request_target:
+    branches:
+      - "main"
+      - "master"
+    types:
+      - "opened"
+      - "edited"
+      - "reopened"
+      - "synchronize"
+
+permissions: {}
+
+jobs:
+  labeler:
+    name: "Label Pull Requests"
+    permissions:
+      contents: "read"
+      pull-requests: "write"
+    uses: "Nick2bad4u/workflow-templates/.github/workflows/reusable-labeler.yml@main"
