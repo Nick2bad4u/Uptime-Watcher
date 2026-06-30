@@ -10,22 +10,21 @@
  */
 
 import type { UptimeEvents } from "../../events/eventTypes";
-import type { EventKey } from "../../events/TypedEventBus";
+import type {
+    EventKey,
+    EventPayload,
+    TypedEventBus,
+} from "../../events/TypedEventBus";
 
 /**
  * Narrow shape required to emit uptime events.
  */
-export interface UptimeEventEmitter {
-    emitTyped: <TEventName extends EventKey<UptimeEvents>>(
-        eventName: TEventName,
-        payload: UptimeEvents[TEventName]
-    ) => Promise<void>;
-}
+export type UptimeEventEmitter = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
 
 /** Strongly-typed `emitTyped` function signature for uptime events. */
 export type EmitUptimeEvent = <TEventName extends EventKey<UptimeEvents>>(
     eventName: TEventName,
-    payload: UptimeEvents[TEventName]
+    payload: EventPayload<UptimeEvents, TEventName>
 ) => Promise<void>;
 
 /**
@@ -42,7 +41,7 @@ export function createEmitUptimeEvent(
  */
 export function createEmitSystemError(
     bus: UptimeEventEmitter
-): (payload: UptimeEvents["system:error"]) => Promise<void> {
-    return (payload: UptimeEvents["system:error"]) =>
+): (payload: EventPayload<UptimeEvents, "system:error">) => Promise<void> {
+    return (payload: EventPayload<UptimeEvents, "system:error">) =>
         bus.emitTyped("system:error", payload);
 }

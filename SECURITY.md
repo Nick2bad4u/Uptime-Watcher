@@ -32,16 +32,16 @@ sequenceDiagram
 - Always use the latest version of Uptime Watcher.
 - Keep all dependencies up to date. The current major dependencies and their versions are:
 
-| Dependency        | Version  |
-| ----------------- | -------- |
-| electron          | ^39.2.5  |
-| electron-builder  | ^26.0.12 |
-| electron-updater  | ^6.6.2   |
-| node-sqlite3-wasm | ^0.8.52  |
-| react             | ^19.2.1  |
-| typescript        | ^5.9.3   |
-| vite              | ^7.2.6   |
-| tailwindcss       | ^4.1.17  |
+| Dependency        | Version |
+| ----------------- | ------- |
+| electron          | ^41.5.0 |
+| electron-builder  | ^26.8.1 |
+| electron-updater  | ^6.8.3  |
+| node-sqlite3-wasm | ^0.8.56 |
+| react             | ^19.2.5 |
+| typescript        | ^6.0.3  |
+| vite              | ^8.0.16 |
+| tailwindcss       | ^4.2.4  |
 
 - Do not monitor sensitive internal URLs that could expose credentials.
 - Be cautious when sharing monitoring configurations that might contain sensitive information.

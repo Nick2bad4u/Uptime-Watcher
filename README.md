@@ -1,19 +1,19 @@
 # 📊 Uptime Watcher
 
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
-  <img src="https://img.shields.io/badge/version-19.1.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-23.8.0-blue.svg" alt="Version">
 </a>
 <a href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
 </a>
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-v39.2.5-47848F?logo=electron" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-v41.5.0-47848F?logo=electron" alt="Electron">
 </a>
 <a href="https://reactjs.org/">
-  <img src="https://img.shields.io/badge/React-v19.2.1-61DAFB?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/React-v19.2.5-61DAFB?logo=react" alt="React">
 </a>
 <a href="https://www.typescriptlang.org/">
-  <img src="https://img.shields.io/badge/TypeScript-v5.9+-3178C6?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/TypeScript-v6.0.3-3178C6?logo=typescript" alt="TypeScript">
 </a>
 
 <a href="https://github.com/Nick2bad4u/Uptime-Watcher/actions">
@@ -104,25 +104,25 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 ### <strong>Frontend Architecture</strong>
 
 <a href="https://reactjs.org/">
-  <img src="https://img.shields.io/badge/React-19.2.1-61DAFB?logo=react&amp;logoColor=white" alt="React">
+  <img src="https://img.shields.io/badge/React-19.2.5-61DAFB?logo=react&amp;logoColor=white" alt="React">
 </a>
 <a href="https://www.typescriptlang.org/">
-  <img src="https://img.shields.io/badge/TypeScript-5.9+-3178C6?logo=typescript&amp;logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/TypeScript-6.0.3-3178C6?logo=typescript&amp;logoColor=white" alt="TypeScript">
 </a>
 <a href="https://tailwindcss.com/">
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&amp;logoColor=white" alt="Tailwind CSS">
 </a>
 <a href="https://vitejs.dev/">
-  <img src="https://img.shields.io/badge/Vite-7.1+-646CFF?logo=vite&amp;logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Vite-8.0.16-646CFF?logo=vite&amp;logoColor=white" alt="Vite">
 </a>
 
 ### <strong>Desktop Framework</strong>
 
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-39.2.5-47848F?logo=electron&amp;logoColor=white" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-41.5.0-47848F?logo=electron&amp;logoColor=white" alt="Electron">
 </a>
 <a href="https://nodejs.org/">
-  <img src="https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
+  <img src="https://img.shields.io/badge/Node.js-25.8.1-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
 </a>
 
 ### <strong>State & Data Management</strong>
@@ -213,11 +213,11 @@ npm run dist
 
 <div align="center">
 
-| Requirement              | Version                         | Download                                    |
-| ------------------------ | ------------------------------- | ------------------------------------------- |
-| <strong>Node.js</strong> | 24.8+ (required)                | <a href="https://nodejs.org/">Download</a>  |
-| <strong>npm</strong>     | 11.6.4+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
-| <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
+| Requirement              | Version                                 | Download                                    |
+| ------------------------ | --------------------------------------- | ------------------------------------------- |
+| <strong>Node.js</strong> | 25.8.1 (recommended; >=24.8.0 required) | <a href="https://nodejs.org/">Download</a>  |
+| <strong>npm</strong>     | 11.13.0 (from packageManager)           | <a href="https://www.npmjs.com/">Docs</a>   |
+| <strong>Git</strong>     | Latest version                          | <a href="https://git-scm.com/">Download</a> |
 
 > **💡 Tip**: Check out the [Developer Quick Start Guide](./docs/Guides/DEVELOPER_QUICK_START.md) for detailed setup instructions and architecture overview.
 
@@ -245,13 +245,13 @@ For practical guidance on configuring monitors and writing tests, see our compre
 
 For running and tuning our fast-check based fuzzing suites, see:
 
-- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST\_CHECK\_FUZZING\_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
+- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST_CHECK_FUZZING_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
 
 ### End-to-end testing with Playwright
 
 For comprehensive testing with Playwright, including setup, configuration, and troubleshooting common issues:
 
-- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT\_TESTING\_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
+- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
 
 ### IPC automation workflow
 
@@ -391,7 +391,7 @@ We welcome contributions from the community! Here's how you can help:
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-<em>Last updated: December 2025 • Version 19.1.0</em></div>
+<em>Last updated: June 2026 • Version 23.8.0</em></div>
 
 <!-- remark-ignore-start -->
 

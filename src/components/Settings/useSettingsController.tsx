@@ -14,9 +14,7 @@ import type { BackupSummary } from "./sections/BackupSummary";
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { logger } from "../../services/logger";
-import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
-import { ThemedSlider } from "../../theme/components/ThemedSlider";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { isThemeName, type ThemeName } from "../../theme/types";
 import { formatByteSize } from "../../utils/formatting/formatByteSize";
@@ -24,6 +22,7 @@ import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
+import { SettingsAlertVolumeControl } from "./sections/SettingsAlertVolumeControl";
 import { useInAppAlertTonePreview } from "./useInAppAlertTonePreview";
 import { useSettingsChangeHandlers } from "./useSettingsChangeHandlers";
 import { useSettingsModel } from "./useSettingsModel";
@@ -460,45 +459,14 @@ export const useSettingsController = ({
 
     const inAppAlertVolumeControl = useMemo(
         () => (
-            <div className="settings-alert-volume-control">
-                <ThemedSlider
-                    aria-label="In-app alert volume"
-                    aria-valuetext={`${volumePercent}%`}
-                    disabled={sliderDisabled}
-                    max={100}
-                    min={0}
-                    onChange={handleInAppAlertVolumeChange}
-                    step={1}
-                    value={volumePercent}
-                />
-                <div className="settings-alert-volume-control__row">
-                    <ThemedText
-                        className="settings-alert-volume-control__value"
-                        size="sm"
-                        variant="secondary"
-                    >
-                        {volumePercent}%
-                    </ThemedText>
-                    <ThemedButton
-                        disabled={sliderDisabled || isVolumeSilent}
-                        onClick={handleInAppAlertPreviewClick}
-                        size="xs"
-                        variant="secondary"
-                    >
-                        Preview tone
-                    </ThemedButton>
-                </div>
-                {automaticPreviewSuppressed ? (
-                    <ThemedText
-                        className="settings-alert-volume-control__note"
-                        size="xs"
-                        variant="tertiary"
-                    >
-                        Automatic previews are disabled to respect your
-                        reduced-motion preference.
-                    </ThemedText>
-                ) : null}
-            </div>
+            <SettingsAlertVolumeControl
+                automaticPreviewSuppressed={automaticPreviewSuppressed}
+                disabled={sliderDisabled}
+                isVolumeSilent={isVolumeSilent}
+                onPreviewClick={handleInAppAlertPreviewClick}
+                onVolumeChange={handleInAppAlertVolumeChange}
+                volumePercent={volumePercent}
+            />
         ),
         [
             automaticPreviewSuppressed,

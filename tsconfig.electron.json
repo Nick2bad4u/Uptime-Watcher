@@ -10,7 +10,8 @@
             "@electron/*": ["electron/*"],
             "@shared/*": ["shared/*"]
         },
-        "tsBuildInfoFile": "./.cache/tsbuildinfo/tsconfig.electron.tsbuildinfo"
+        "tsBuildInfoFile": "./.cache/tsbuildinfo/tsconfig.electron.tsbuildinfo",
+        "types": ["electron", "node"]
     },
     "exclude": [
         "electron/**/*.spec.ts",

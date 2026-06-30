@@ -2,9 +2,9 @@
 
 <div align="center">
 
-[![Docusaurus badge.](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus\&logoColor=white)](https://docusaurus.io/)
-[![Node.js badge.](https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js\&logoColor=white)](https://nodejs.org/)
-[![Deployment badge.](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github\&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
+[![Docusaurus badge.](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus&logoColor=white)](https://docusaurus.io/)
+[![Node.js badge.](https://img.shields.io/badge/Node.js-25.8.1-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Deployment badge.](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
 
 ## 📖 Official documentation website for Uptime Watcher
 
@@ -31,8 +31,8 @@ This documentation site is part of the main Uptime Watcher project and serves as
 
 ### Prerequisites
 
-- **Node.js**: 24.8+ (required)
-- **npm**: 11.6.4+ (included with Node.js)
+- **Node.js**: 25.8.1 (recommended; >=24.8.0 required)
+- **npm**: 11.13.0 (declared by `packageManager`)
 - **Git**: Latest version
 
 ### Development Setup
@@ -266,7 +266,7 @@ npm run build
 **Local Development Issues**
 
 ```bash
-# Check Node.js version (24.8+ required)
+# Check Node.js version (25.8.1 recommended; >=24.8.0 required)
 node --version
 
 # Reinstall dependencies

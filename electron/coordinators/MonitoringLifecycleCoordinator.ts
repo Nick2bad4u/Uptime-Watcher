@@ -7,7 +7,7 @@ import type {
 import { isEmpty } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
-import type { EventKey } from "../events/TypedEventBus";
+import type { EventKey, EventPayload } from "../events/TypedEventBus";
 import type { MonitorManager } from "../managers/MonitorManager";
 import type { SiteManager } from "../managers/SiteManager";
 import type {
@@ -32,7 +32,7 @@ import {
 
 type EmitTyped = <TEventName extends EventKey<UptimeEvents>>(
     eventName: TEventName,
-    payload: UptimeEvents[TEventName]
+    payload: EventPayload<UptimeEvents, TEventName>
 ) => Promise<void>;
 
 /**

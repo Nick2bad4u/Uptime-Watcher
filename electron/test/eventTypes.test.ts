@@ -16,9 +16,33 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { isEventOfCategory, getEventPriority } from "../events/eventTypes.js";
+import {
+    isEventOfCategory,
+    getEventPriority,
+    type UptimeEventName,
+} from "../events/eventTypes.js";
+
+const uptimeEventNameAllowsAnyString =
+    false satisfies string extends UptimeEventName ? true : false;
 
 describe(isEventOfCategory, () => {
+    it("keeps uptime event names closed at the type level", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(
+            `Testing closed event names for ${task.name}`,
+            "type-safety"
+        );
+        await annotate("Event system component: type contracts", "component");
+        await annotate(
+            "Test case: Verifying arbitrary strings are not UptimeEventName",
+            "compile-time"
+        );
+
+        expect(uptimeEventNameAllowsAnyString).toBeFalsy();
+    });
+
     it("returns true for event in category", async ({ task, annotate }) => {
         await annotate(
             `Testing positive event categorization for ${task.name}`,
@@ -72,6 +96,7 @@ describe(isEventOfCategory, () => {
             "error-handling"
         );
 
+        // @ts-expect-error - intentionally testing unknown event
         expect(isEventOfCategory("not:an:event", "SITE")).toBeFalsy();
         // @ts-expect-error - intentionally testing unknown category
         expect(isEventOfCategory("site:added", "NOT_A_CATEGORY")).toBeFalsy();
@@ -111,6 +136,7 @@ describe(getEventPriority, () => {
             "default-behavior"
         );
 
+        // @ts-expect-error - intentionally testing unknown event
         expect(getEventPriority("not:an:event")).toBe("MEDIUM");
     });
 });

@@ -38,8 +38,8 @@ Uptime Watcher is a sophisticated Electron desktop application for monitoring we
 
 ### Prerequisites
 
-- **Node.js**: 24.8+ (required)
-- **npm**: 11.6.4+ (comes with Node.js)
+- **Node.js**: 25.8.1 (recommended; >=24.8.0 required)
+- **npm**: 11.13.0 (declared by `packageManager`)
 - **Git**: Latest version
 
 ### 1. Clone & Install

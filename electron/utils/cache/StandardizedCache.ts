@@ -15,13 +15,15 @@ import type { Except, Promisable } from "type-fest";
 import { isDefined, isEmpty, objectHasIn } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
-import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { EventPayload, TypedEventBus } from "../../events/TypedEventBus";
 
 import { fireAndForget, fireAndForgetLogged } from "../fireAndForget";
 import { diagnosticsLogger, logger } from "../logger";
 
 const hasThenProperty = (candidate: unknown): candidate is { then: unknown } =>
-    typeof candidate === "object" && candidate !== null && objectHasIn(candidate, "then")
+    typeof candidate === "object" &&
+    candidate !== null &&
+    objectHasIn(candidate, "then");
 
 const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
     hasThenProperty(candidate) && typeof candidate.then === "function";
@@ -107,7 +109,7 @@ const CACHE_EVENT_PAYLOAD_BUILDERS: {
     [Event in CacheEventName]: (
         context: CacheEventContext,
         data: CacheEventPayload<string, Event>
-    ) => UptimeEvents[Event];
+    ) => EventPayload<UptimeEvents, Event>;
 } = {
     "internal:cache:all-invalidated": createItemCountPayload,
     "internal:cache:bulk-updated": createItemCountPayload,
@@ -556,7 +558,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
     private buildCacheEventPayload<EventName extends CacheEventName>(
         eventType: EventName,
         data: CacheEventPayload<TKey, EventName>
-    ): UptimeEvents[EventName] {
+    ): EventPayload<UptimeEvents, EventName> {
         const context: CacheEventContext = {
             cacheName: this.config.name,
             timestamp: Date.now(),

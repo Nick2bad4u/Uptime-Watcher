@@ -15,8 +15,6 @@
 
 import { arrayIncludes, safeCastTo } from "ts-extras";
 
-import type { EventPayloadValue } from "./TypedEventBus";
-
 /**
  * Comprehensive event map for the Uptime Watcher application.
  *
@@ -37,7 +35,7 @@ import type { EventPayloadValue } from "./TypedEventBus";
  * @see {@link EventTriggerType}
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Interface is intentionally augmented in eventTypes.catalogue.*.ts
-export interface UptimeEvents extends Record<string, EventPayloadValue> {}
+export interface UptimeEvents {}
 
 /**
  * String literal union of all registered uptime event names.
@@ -485,32 +483,32 @@ export function getEventPriority(
     // Check each priority level using string-based comparison to avoid type
     // assertion issues
     if (
-        arrayIncludes(
-            safeCastTo<readonly string[]>(EVENT_PRIORITIES.CRITICAL),
+        arrayIncludes<UptimeEventName, UptimeEventName>(
+            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.CRITICAL),
             eventNameStr
         )
     ) {
         return "CRITICAL";
     }
     if (
-        arrayIncludes<string, string>(
-            safeCastTo<readonly string[]>(EVENT_PRIORITIES.HIGH),
+        arrayIncludes<UptimeEventName, UptimeEventName>(
+            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.HIGH),
             eventNameStr
         )
     ) {
         return "HIGH";
     }
     if (
-        arrayIncludes<string, string>(
-            safeCastTo<readonly string[]>(EVENT_PRIORITIES.LOW),
+        arrayIncludes<UptimeEventName, UptimeEventName>(
+            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.LOW),
             eventNameStr
         )
     ) {
         return "LOW";
     }
     if (
-        arrayIncludes<string, string>(
-            safeCastTo<readonly string[]>(EVENT_PRIORITIES.MEDIUM),
+        arrayIncludes<UptimeEventName, UptimeEventName>(
+            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.MEDIUM),
             eventNameStr
         )
     ) {

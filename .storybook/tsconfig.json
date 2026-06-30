@@ -3,7 +3,15 @@
     "compilerOptions": {
         "composite": false,
         "noEmit": true,
-        "tsBuildInfoFile": "../.cache/tsbuildinfo/tsconfig.dotstorybook.tsbuildinfo"
+        "tsBuildInfoFile": "../.cache/tsbuildinfo/tsconfig.dotstorybook.tsbuildinfo",
+        "types": [
+            "node",
+            "vite/client",
+            "@storybook/react-vite",
+            "storybook/actions",
+            "storybook/test",
+            "msw-storybook-addon"
+        ]
     },
     "exclude": [],
     "extends": "../tsconfig.json",

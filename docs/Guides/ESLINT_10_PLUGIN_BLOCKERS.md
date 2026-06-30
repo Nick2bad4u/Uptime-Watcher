@@ -1,3 +1,18 @@
+---
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+doc_title: "ESLint 10 Plugin Blockers"
+summary: "Tracks ESLint plugins and rules that are temporarily wrapped or disabled while the repository migrates to ESLint 10."
+created: "2026-02-17"
+last_reviewed: "2026-02-26"
+doc_category: "guide"
+author: "Nick2bad4u"
+tags:
+ - "eslint"
+ - "tooling"
+ - "compatibility"
+ - "maintenance"
+---
+
 # ESLint 10 Plugin Blockers
 
 This document tracks plugins/rules that are currently incompatible with ESLint 10 in this repository.
@@ -62,6 +77,16 @@ Additional wrapped compatibility candidates:
 | `tailwind/no-unnecessary-arbitrary-value`           | Disabled       | ESLint 10 context API incompatibility surface                                         | Rule forced `off`                                  |
 | `storybook/meta-satisfies-type`                     | Disabled       | `context.getSourceCode is not a function`                                             | Rule forced `off`                                  |
 | `progress/activate`                                 | Disabled       | `context.getFilename is not a function`                                               | Rule forced `off`                                  |
+
+## Install resolver blockers
+
+These packages are either still in use or already removed because their peer
+dependency metadata blocks non-forced installs with ESLint 10:
+
+| Package                                   | Current status | ESLint peer range | Resolution status                                                      |
+| ----------------------------------------- | -------------- | ----------------- | ---------------------------------------------------------------------- |
+| `@rushstack/eslint-plugin-security`        | Enabled        | 6 through 9       | Kept for `@rushstack/security/no-unsafe-regexp`; no newer npm release. |
+| `@arthurgeron/eslint-plugin-react-usememo` | Removed        | 9 only            | Removed because all configured rules were already `off`.               |
 
 ## Completed migrations
 

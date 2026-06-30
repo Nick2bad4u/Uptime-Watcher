@@ -81,7 +81,7 @@
         "check:electron:test": "tsc --build config/testing/tsconfig.electron.test.json",
         "check:frontend": "tsc --build tsconfig.json",
         "check:frontend:test": "tsc --build config/testing/tsconfig.test.json",
-        "check:ipc": "tsx scripts/generate-ipc-artifacts.mts --check",
+        "check:ipc": "node --experimental-strip-types scripts/generate-ipc-artifacts.mts --check",
         "check:js": "tsc --build config/testing/tsconfig.js.json",
         "check:js:test": "npm run check:js",
         "check:other:all": "tsc --build config/testing/tsconfig.AllOtherRoot.json",
@@ -128,6 +128,7 @@
         "debug:vite": "vite --debug",
         "dep:check": "npm-check",
         "dep:update": "npm-check-updates -u && npm install",
+        "deps:check:no-force": "npm install --force=false --dry-run --no-audit --no-fund",
         "detect-secrets": "detect-secrets scan",
         "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 vite",
         "dev:profile": "npm run profile",
@@ -140,7 +141,7 @@
         "docs:backup:force": "git push origin-docs `git subtree split --prefix=docs/docusaurus`:main --force",
         "docs:build": "npm run docs:typedoc && npm run build:eslint-inspector && npm run build:docs-storybook && cd docs/docusaurus && yarn build",
         "docs:build:local": "npm run docs:build",
-        "docs:check": "npm run docs:lint && node scripts/validate-doc-frontmatter.mjs",
+        "docs:check": "npm run docs:lint && node scripts/validate-doc-frontmatter.mjs && npm run release:check && npm run lint:custom-rules:docs",
         "docs:check-links": "node scripts/check-doc-links.mjs",
         "docs:deploy": "npm run docs:typedoc && npm run build:eslint-inspector && npm run build:docs-storybook && cd docs/docusaurus && yarn deploy",
         "docs:deploy:local": "npm run docs:deploy",
@@ -217,7 +218,7 @@
         "fuzz:runs": "tsx scripts/run-fast-check-fuzzing.ts",
         "fuzz:shared": "vitest run --config vitest.shared.config.ts --reporter=default -t \"fuzz|fuzzing\"",
         "fuzz:verbose": "vitest run --reporter=verbose -t \"fuzz|fuzzing\"",
-        "generate:ipc": "tsx scripts/generate-ipc-artifacts.mts",
+        "generate:ipc": "node --experimental-strip-types scripts/generate-ipc-artifacts.mts",
         "generate:toc": "npm run docs:maintain",
         "git:branch-cleanup": "git branch --merged | grep -v \"\\*\\|main\\|master\\|develop\" | xargs -n 1 git branch -d",
         "git:log": "git log --oneline -10",
@@ -262,6 +263,7 @@
         "lint:complexity": "npm run lint:cognitive-complexity",
         "lint:config:build": "npm run build:eslint-inspector",
         "lint:config:inspect": "npx eslint --inspect-config",
+        "lint:custom-rules:docs": "node scripts/check-custom-eslint-rule-docs.mjs",
         "lint:css": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .cache/stylelintcache src/ electron/ shared/ docs/ --custom-formatter stylelint-formatter-pretty && echo \"Stylelint done!\"",
         "lint:css:docs": "stylelint --cache --config ./stylelint.config.mjs --ignore-path ./docs/docusaurus/.stylelintignore --cache-strategy content --cache-location docs/docusaurus/stylelintcache docs/docusaurus --custom-formatter stylelint-formatter-pretty && echo \"Stylelint done!\"",
         "lint:css:docs:fix": "stylelint --cache --config ./stylelint.config.mjs --ignore-path ./docs/docusaurus/.stylelintignore --cache-strategy content --cache-location docs/docusaurus/stylelintcache docs/docusaurus --custom-formatter stylelint-formatter-pretty --fix && echo \"Stylelint done!\"",
@@ -383,7 +385,7 @@
         "lint-pretty": "npm run lint && npm run lint:prettier",
         "lint-pretty:fix": "npm run lint:fix && npm run lint:prettynow",
         "lpf": "npm run lint:fix && npm run lint:prettynow",
-        "madge:circular": "madge --circular --no-spinner --ts-config tsconfig.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts src/ electron/ shared/ --exclude \"(^|[\\/])(test|dist|node_modules)($|[\\/])|\\.css$\"",
+        "madge:circular": "node scripts/check-circular-dependencies.mjs",
         "madge:leaves": "madge --leaves --no-spinner --ts-config tsconfig.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts src/ electron/ shared/ --exclude \"(^|[\\/])(test|dist|node_modules)($|[\\/])|\\.css$\"",
         "madge:orphans": "madge --orphans --no-spinner --ts-config tsconfig.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts src/ electron/ shared/ --exclude \"(^|[\\/])(test|dist|node_modules)($|[\\/])|\\.css$\"",
         "mutation": "stryker run",
@@ -423,6 +425,7 @@
         "quality": "npm run lint:all && npm run test:all:coverage",
         "quality:check": "npm run lint:ci && npm run test:all:coverage",
         "rebuild": "npm run clean && npm install && npm run build",
+        "release:check": "node scripts/check-release-metadata.mjs",
         "remark": "remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail",
         "remark:check": "remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail \"*.{md,mdx}\" \"docs/**/*.{md,mdx}\" \"src/**/*.{md,mdx}\" \"electron/**/*.{md,mdx}\" \"shared/**/*.{md,mdx}\"  --quiet",
         "remark:check-docs": "remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail \"docs/**/*.{md,mdx}\"",
@@ -741,7 +744,6 @@
     },
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.18.2",
-        "@arthurgeron/eslint-plugin-react-usememo": "^3.0.0",
         "@biomejs/biome": "^2.4.14",
         "@codecov/vite-plugin": "^2.0.1",
         "@commitlint/cli": "^20.5.3",
@@ -1288,133 +1290,6 @@
     },
     "icon": "src/components/icons/icon.ico",
     "appid": "io.github.uptime-watcher",
-    "build": {
-        "icon": "src/components/icons/icon.ico",
-        "appId": "io.github.uptime-watcher",
-        "artifactName": "Uptime-Watcher-${platform}-${arch}-${version}.${ext}",
-        "asar": true,
-        "publish": [
-            {
-                "provider": "github",
-                "owner": "Nick2bad4u",
-                "repo": "Uptime-Watcher"
-            }
-        ],
-        "productName": "Uptime-Watcher",
-        "directories": {
-            "output": "dist"
-        },
-        "files": [
-            "dist/**/*",
-            "node_modules/**/*",
-            "!node_modules/@tailwindcss/oxide-*",
-            "!node_modules/@tailwindcss/oxide-*/**",
-            "!dist/mac-universal-*",
-            "!dist/*.app",
-            "!dist/*.dmg",
-            "!dist/*.zip"
-        ],
-        "win": {
-            "icon": "src/components/icons/icon.ico",
-            "target": [
-                "nsis",
-                "nsis-web",
-                "portable",
-                "squirrel",
-                "msi"
-            ],
-            "legalTrademarks": "Uptime Watcher",
-            "requestedExecutionLevel": "asInvoker"
-        },
-        "nsis": {
-            "oneClick": false,
-            "allowElevation": true,
-            "allowToChangeInstallationDirectory": true,
-            "createDesktopShortcut": true,
-            "createStartMenuShortcut": true,
-            "runAfterFinish": true,
-            "artifactName": "Uptime-Watcher-nsis-${arch}-${version}.${ext}"
-        },
-        "nsisWeb": {
-            "artifactName": "Uptime-Watcher-nsis-web-${arch}-${version}.${ext}"
-        },
-        "portable": {
-            "artifactName": "Uptime-Watcher-portable-${arch}-${version}.${ext}"
-        },
-        "squirrelWindows": {
-            "artifactName": "Uptime-Watcher-squirrel-${arch}-${version}.${ext}"
-        },
-        "msi": {
-            "artifactName": "Uptime-Watcher-msi-${arch}-${version}.${ext}"
-        },
-        "appImage": {
-            "artifactName": "Uptime-Watcher-appimage-${arch}-${version}.${ext}"
-        },
-        "deb": {
-            "artifactName": "Uptime-Watcher-deb-${arch}-${version}.${ext}"
-        },
-        "rpm": {
-            "artifactName": "Uptime-Watcher-rpm-${arch}-${version}.${ext}"
-        },
-        "snap": {
-            "artifactName": "Uptime-Watcher-snap-${arch}-${version}.${ext}"
-        },
-        "freebsd": {
-            "artifactName": "Uptime-Watcher-freebsd-${arch}-${version}.${ext}"
-        },
-        "pacman": {
-            "artifactName": "Uptime-Watcher-pacman-${arch}-${version}.${ext}"
-        },
-        "p5p": {
-            "artifactName": "Uptime-Watcher-p5p-${arch}-${version}.${ext}"
-        },
-        "apk": {
-            "artifactName": "Uptime-Watcher-apk-${arch}-${version}.${ext}"
-        },
-        "dmg": {
-            "artifactName": "Uptime-Watcher-dmg-${arch}-${version}.${ext}"
-        },
-        "pkg": {
-            "artifactName": "Uptime-Watcher-pkg-${arch}-${version}.${ext}"
-        },
-        "flatpak": {
-            "artifactName": "Uptime-Watcher-flatpak-${arch}-${version}.${ext}"
-        },
-        "mac": {
-            "icon": "src/components/icons/favicon-512x512.icns",
-            "target": [
-                "dmg",
-                "zip",
-                "pkg"
-            ],
-            "category": "public.app-category.productivity",
-            "hardenedRuntime": true,
-            "gatekeeperAssess": true,
-            "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**"
-        },
-        "linux": {
-            "icon": "src/components/icons/icon-256.png",
-            "target": [
-                "AppImage",
-                "deb",
-                "rpm",
-                "snap",
-                "freebsd",
-                "pacman",
-                "apk"
-            ],
-            "category": "Utility",
-            "synopsis": "A cross-platform Electron app to monitor website uptime status",
-            "maintainer": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com>",
-            "desktop": {
-                "entry": {
-                    "Name": "Uptime Watcher",
-                    "Comment": "View and analyze Website Uptime",
-                    "Categories": "Utility;"
-                }
-            }
-        }
-    },
     "msw": {
         "workerDirectory": [
             "public"

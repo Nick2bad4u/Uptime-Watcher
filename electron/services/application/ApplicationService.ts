@@ -67,6 +67,7 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type {
     EnhancedEventPayload,
     EventKey,
+    EventPayload,
 } from "../../events/TypedEventBus";
 import type { RendererEventBridge } from "../events/RendererEventBridge";
 
@@ -212,7 +213,10 @@ export class ApplicationService {
             // future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
             if (
-                objectHasIn(castUnchecked<UnknownRecord>(ipcService), "cleanup") &&
+                objectHasIn(
+                    castUnchecked<UnknownRecord>(ipcService),
+                    "cleanup"
+                ) &&
                 typeof ipcService.cleanup === "function"
             ) {
                 ipcService.cleanup();
@@ -838,17 +842,21 @@ export class ApplicationService {
         EventName extends EventKey<UptimeEvents>,
     >(
         eventName: EventName,
-        payload: EnhancedEventPayload<UptimeEvents[EventName]>
-    ): UptimeEvents[EventName] {
+        payload: EnhancedEventPayload<EventPayload<UptimeEvents, EventName>>
+    ): EventPayload<UptimeEvents, EventName> {
         const isArrayPayload = Array.isArray(payload);
 
         if (isArrayPayload) {
             this.logMetadataRemoval(eventName, true);
-            return stripForwardedEventMetadata(payload);
+            return castUnchecked<EventPayload<UptimeEvents, EventName>>(
+                stripForwardedEventMetadata(payload)
+            );
         }
 
         this.logMetadataRemoval(eventName, false);
-        return stripForwardedEventMetadata(payload);
+        return castUnchecked<EventPayload<UptimeEvents, EventName>>(
+            stripForwardedEventMetadata(payload)
+        );
     }
 
     private logMetadataRemoval(

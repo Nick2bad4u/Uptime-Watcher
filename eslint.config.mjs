@@ -15,8 +15,6 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
 /* eslint-disable import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
 
-// @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
-import { flatConfig } from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
 import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import { fixupPluginRules } from "@eslint/compat";
@@ -3564,7 +3562,6 @@ export default defineConfig([
         },
         name: "TypeScript Frontend - src/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            "@arthurgeron/react-usememo": flatConfig,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             ...rushStackSecurityPlugin,
@@ -3724,9 +3721,6 @@ export default defineConfig([
             //   the need for manual useMemo/React.memo.
             // - Blanket enforcement tends to create noisy diffs and can even hurt
             //   performance or correctness if it drives unsafe refactors.
-            "@arthurgeron/react-usememo/require-memo": "off",
-            "@arthurgeron/react-usememo/require-usememo": "off",
-            "@arthurgeron/react-usememo/require-usememo-children": "off",
             // Sonar quality helpers
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
@@ -6650,7 +6644,6 @@ export default defineConfig([
         },
         name: "TypeScript Shared - shared/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            "@arthurgeron/react-usememo": flatConfig,
             "@jcoreio/implicit-dependencies": implicitDependencies,
             "@metamask/design-tokens": pluginDesignTokens,
             ...rushStackSecurityPlugin,
@@ -6800,10 +6793,7 @@ export default defineConfig([
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
             ...zod.configs.recommended.rules,
-            // React performance linting: keep these off (see note above).
-            "@arthurgeron/react-usememo/require-memo": "off",
-            "@arthurgeron/react-usememo/require-usememo": "off",
-            "@arthurgeron/react-usememo/require-usememo-children": "off",
+            // React performance linting: keep blanket memoization disabled.
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
@@ -10854,7 +10844,6 @@ export default defineConfig([
         files: ["storybook/**/*.stories.tsx"],
         name: "Storybook Stories - storybook/**/*.stories.tsx",
         rules: {
-            "@arthurgeron/react-usememo/require-usememo": "off",
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@metamask/design-tokens/color-no-hex": "off",
             "@typescript-eslint/array-type": "off",

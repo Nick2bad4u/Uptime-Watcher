@@ -77,7 +77,7 @@ export const ORIGINAL_METADATA_SYMBOL: unique symbol = Symbol(
  * @public
  */
 export interface EventBusDiagnostics<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 > {
     /** Unique identifier for this event bus instance. */
     busId: string;
@@ -161,12 +161,28 @@ type PrimitiveEventPayload<Value extends PrimitivePayload> = Readonly<{
 /**
  * Mapping between event keys and their typed payload values.
  */
-export type TypedEventMap = Record<string, EventPayloadValue>;
+export type TypedEventMap = object;
 
 /**
- * Extracts the string key union from a typed event map.
+ * Extracts the string key union from a typed event map, excluding keys whose
+ * values are not valid event payloads.
  */
-export type EventKey<EventMap> = Extract<keyof EventMap, string>;
+export type EventKey<EventMap extends TypedEventMap> = Extract<
+    {
+        [K in keyof EventMap]: EventMap[K] extends EventPayloadValue
+            ? K
+            : never;
+    }[keyof EventMap],
+    string
+>;
+
+/**
+ * Extracts a payload for a known event key.
+ */
+export type EventPayload<
+    EventMap extends TypedEventMap,
+    K extends EventKey<EventMap>,
+> = [EventMap[K]] extends [EventPayloadValue] ? EventMap[K] : never;
 
 /**
  * Payload enriched with metadata for downstream listeners.
@@ -198,23 +214,25 @@ export type EnhancedEventPayload<Payload extends EventPayloadValue> =
 export type TypedEventListener<
     EventMap extends TypedEventMap,
     K extends EventKey<EventMap>,
-> = (payload: EnhancedEventPayload<EventMap[K]>) => void;
+> = (payload: EnhancedEventPayload<EventPayload<EventMap, K>>) => void;
 
 /**
  * Middleware function signature used by {@link TypedEventBus} to process events
  * before they are emitted to listeners.
  */
-export type EventMiddleware<EventMap extends TypedEventMap = TypedEventMap> = <
-    K extends EventKey<EventMap>,
->(
+export type EventMiddleware<
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
+> = <K extends EventKey<EventMap>>(
     event: K,
-    data: EventMap[K],
+    data: EventPayload<EventMap, K>,
     next: () => Promisable<void>
 ) => Promisable<void>;
 
-type MiddlewareExecutor<EventMap extends TypedEventMap> = (
-    event: EventKey<EventMap>,
-    data: EventMap[EventKey<EventMap>],
+type MiddlewareExecutor<EventMap extends TypedEventMap> = <
+    K extends EventKey<EventMap>,
+>(
+    event: K,
+    data: EventPayload<EventMap, K>,
     next: () => Promisable<void>
 ) => Promisable<void>;
 
@@ -326,7 +344,7 @@ export class TypedEventBus<
      */
     public async emitTyped<K extends EventKey<EventMap>>(
         event: K,
-        data: EventMap[K]
+        data: EventPayload<EventMap, K>
     ): Promise<void> {
         const correlationId = generateCorrelationId();
         const eventName = event;
@@ -351,7 +369,10 @@ export class TypedEventBus<
 
             // Use EventEmitter's emit to respect once() semantics and internal bookkeeping
             try {
-                this.emit(eventName, castUnchecked<EventMap[K]>(enhancedData));
+                this.emit(
+                    eventName,
+                    castUnchecked<EventPayload<EventMap, K>>(enhancedData)
+                );
             } catch (listenerError) {
                 // Log listener errors but don't let them fail the emission
                 // Use base logger directly for error objects since
@@ -394,7 +415,7 @@ export class TypedEventBus<
      */
     private async processMiddleware<K extends EventKey<EventMap>>(
         event: K,
-        data: EventMap[K],
+        data: EventPayload<EventMap, K>,
         correlationId: string
     ): Promise<void> {
         if (isEmpty(this.middlewares)) {
@@ -406,7 +427,7 @@ export class TypedEventBus<
         const processNext = async (
             index: number,
             currentEvent: K,
-            currentData: EventMap[K]
+            currentData: EventPayload<EventMap, K>
         ): Promise<void> => {
             if (index >= this.middlewares.length) {
                 return;

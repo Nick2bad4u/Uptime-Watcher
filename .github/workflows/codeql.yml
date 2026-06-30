@@ -15,9 +15,9 @@
 #   - Harden runner (security best practice).
 #   - Checkout repo (full history, no credential persistence).
 #   - Initialize CodeQL for matrix languages.
-#   - Setup Node.js v24 (current LTS).
+#   - Setup Node.js from .node-version.
 #   - Cache node_modules for faster builds.
-#   - Install dependencies with npm install --force --no-audit --no-fund --force (robust for CI).
+#   - Install dependencies with npm install --force --no-audit --no-fund.
 #   - Build Electron Vite project (matches architecture).
 #   - Package/upload CodeQL DBs for debugging (optional, non-fatal).
 #   - Perform CodeQL analysis.
@@ -39,7 +39,8 @@
 # - Notifications:
 #   - No notification step for failures (Slack/email). Add if needed.
 # - Dependency Installation:
-#   - continue-on-error: true for npm install --force --no-audit --no-fund/build means analysis runs even if install/build fails (may be incomplete).
+#   - Install/build failures stop analysis so CodeQL does not report an
+#     incomplete scan as a successful security signal.
 # -----------------------------------------------
 
 # For most projects, this workflow file will not need changing; you simply need
@@ -159,17 +160,15 @@ jobs:
                   key: ${{ runner.os }}-.-node-modules-${{ hashFiles('./package-lock.json') }}
                   restore-keys: |
                       ${{ runner.os }}-.-node-modules-
-              continue-on-error: true # If this fails, the analysis will still run, but it may not be complete.
+              continue-on-error: true # Cache misses or cache service failures should not block analysis.
 
             - name: Install dependencies
-              run: npm install --force --no-audit --no-fund --force
-              continue-on-error: true # If this fails, the analysis will still run, but it may not be complete.
+              run: npm install --force --no-audit --no-fund
 
             # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
             # If this step fails, then you should remove it and run the build manually (see below)
             - name: Build Electron Vite Project
               run: npm run build:electron-vite
-              continue-on-error: true
 
             # Optional: package any generated CodeQL DBs for debugging (non-fatal)
             - name: Package CodeQL DBs (debug)

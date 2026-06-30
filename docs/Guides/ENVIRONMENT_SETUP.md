@@ -34,8 +34,8 @@ tags:
 
 ### Required Software
 
-- **Node.js**: 24.8+ (required)
-- **npm**: 11.6.4+ (comes with Node.js)
+- **Node.js**: 25.8.1 (recommended; >=24.8.0 required)
+- **npm**: 11.13.0 (declared by `packageManager`)
 - **Git**: Latest version
 - **VS Code**: Recommended IDE (with extensions)
 
@@ -55,11 +55,11 @@ tags:
 # Using Node Version Manager (recommended)
 # macOS/Linux
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 24.8.0
-nvm use 24.8.0
+nvm install 25.8.1
+nvm use 25.8.1
 
 # Windows (using Chocolatey)
-choco install nodejs --version=24.8.0
+choco install nodejs --version=25.8.1
 
 # Or download directly from nodejs.org
 ```
@@ -67,8 +67,8 @@ choco install nodejs --version=24.8.0
 #### Verification
 
 ```bash
-node --version  # Should be 24.8+
-npm --version   # Should be 11.6.4+
+node --version  # Should be 25.8.1 recommended; >=24.8.0 required
+npm --version   # Should be 11.13.0
 ```
 
 ### 2. VS Code Configuration
@@ -540,8 +540,8 @@ sudo apt-get install -y nodejs
 
 ### Environment Verification
 
-- \[ ] Node.js 24.8+ installed and active
-- \[ ] npm 11.6.4+ available
+- \[ ] Node.js 25.8.1 installed and active (>=24.8.0 required)
+- \[ ] npm 11.13.0 available
 - \[ ] Git configured with user details
 - \[ ] VS Code with recommended extensions
 - \[ ] Project cloned and dependencies installed

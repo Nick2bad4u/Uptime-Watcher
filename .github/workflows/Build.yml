@@ -10,12 +10,17 @@ concurrency:
 
 on:
     workflow_dispatch:
+        inputs:
+            release_version:
+                description: Exact SemVer already present in package.json, README, SECURITY, and CHANGELOG.md
+                required: true
+                type: string
 
 permissions:
     contents: read
 jobs:
     bump-version:
-        name: Bump version and create tag
+        name: Validate release version and create tag
         runs-on: ubuntu-latest
         timeout-minutes: 15
         permissions:
@@ -25,8 +30,8 @@ jobs:
                 shell: bash
                 working-directory: .
         outputs:
-            new_version: ${{ steps.bump.outputs.new_version }}
-            bump_sha: ${{ steps.commit_version.outputs.bump_sha }}
+            new_version: ${{ steps.validate_release.outputs.new_version }}
+            bump_sha: ${{ steps.validate_release.outputs.bump_sha }}
         steps:
             - name: Harden the runner (Audit all outbound calls)
               id: harden_runner
@@ -59,9 +64,14 @@ jobs:
                   echo "--- END GIT DIFF OUTPUT ---"
               continue-on-error: true
 
-            - name: Bump package.json version number
-              id: bump
+            - name: Check release metadata
+              run: npm run release:check
+
+            - name: Validate requested release version
+              id: validate_release
               run: |
+                  set -euo pipefail
+
                   if [ ! -f package.json ]; then
                     echo "Error: package.json not found" >&2
                     exit 1
@@ -70,50 +80,38 @@ jobs:
                     echo "Error: package.json is not valid JSON" >&2
                     exit 1
                   fi
-                  VERSION=$(jq -r .version package.json)
-                  MAJOR=$(echo "$VERSION" | cut -d. -f1)
-                  MINOR=$(echo "$VERSION" | cut -d. -f2)
-                  PATCH=$(echo "$VERSION" | cut -d. -f3)
-                  # PATCH appears unused, so remove or export if needed
-                  # export PATCH
-                  if [ "$MINOR" -lt 9 ]; then
-                    NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
-                  else
-                    NEW_VERSION="$((MAJOR + 1)).0.0"
+
+                  requested_version="${{ inputs.release_version }}"
+                  package_version=$(jq -r .version package.json)
+
+                  if [[ ! "$requested_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+                    echo "Error: release_version must be a SemVer value, received '$requested_version'" >&2
+                    exit 1
                   fi
-                  # Update both package.json and package-lock.json without running lifecycle scripts.
-                  npm version --no-git-tag-version --ignore-scripts "$NEW_VERSION"
+
+                  if [ "$requested_version" != "$package_version" ]; then
+                    echo "Error: release_version ($requested_version) must match package.json version ($package_version)." >&2
+                    echo "Update package metadata in a reviewed commit before dispatching this workflow." >&2
+                    exit 1
+                  fi
+
+                  if git rev-parse "v$requested_version" >/dev/null 2>&1; then
+                    echo "Error: tag v$requested_version already exists." >&2
+                    exit 1
+                  fi
+
                   {
-                    echo "new_version=$NEW_VERSION"
-                    echo "patch=$PATCH"
+                    echo "new_version=$requested_version"
+                    echo "bump_sha=$(git rev-parse HEAD)"
                   } >> "$GITHUB_OUTPUT"
-
-            - name: Commit and push version bump to repo
-              id: commit_version
-              if: steps.bump.outputs.new_version != ''
-              shell: bash
-              run: |
-                  set -euo pipefail
-
-                  target_branch="${{ github.ref_name }}"
-
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-                  git add package.json package-lock.json
-                  git commit -m "chore(release): v${{ steps.bump.outputs.new_version }} [skip ci]"
-                  git push origin "HEAD:${target_branch}"
-
-                  echo "bump_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
             - name: Create and push tag for new version
               id: tag_version
-              if: steps.bump.outputs.new_version != ''
               shell: bash
               run: |
                   set -euo pipefail
-                  git tag -a "v${{ steps.bump.outputs.new_version }}" -m "Release v${{ steps.bump.outputs.new_version }}"
-                  git push origin "v${{ steps.bump.outputs.new_version }}"
+                  git tag -a "v${{ steps.validate_release.outputs.new_version }}" -m "Release v${{ steps.validate_release.outputs.new_version }}"
+                  git push origin "v${{ steps.validate_release.outputs.new_version }}"
 
     build:
         name: Build release artifacts
@@ -1150,7 +1148,7 @@ jobs:
                     echo ""
                     echo "See above for the full build matrix results."
                     echo "---"
-                    echo "- **Version bump and tagging** completed for v${{ needs.bump-version.outputs.new_version }}."
+                    echo "- **Validated version and tag** completed for v${{ needs.bump-version.outputs.new_version }}."
                     echo "- **Builds executed** for multiple OS and architectures."
                     echo "- **Build artifacts uploaded** for each platform."
                     echo "- **Release creation/update** was attempted after artifact verification."

@@ -11,11 +11,15 @@
 import type { EventMetadata } from "@shared/types/events";
 import type { Except } from "type-fest";
 
-import { isRecord } from "@shared/utils/typeHelpers";
+import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
-import type { EnhancedEventPayload, EventKey } from "../events/TypedEventBus";
+import type {
+    EnhancedEventPayload,
+    EventKey,
+    EventPayload,
+} from "../events/TypedEventBus";
 
 /**
  * Represents a service that optionally exposes an
@@ -53,12 +57,15 @@ export function hasInitializeMethod(
  * preserving type safety.
  */
 export type ForwardablePayloadBase<EventName extends EventKey<UptimeEvents>> =
-    UptimeEvents[EventName] extends object
+    EventPayload<UptimeEvents, EventName> extends object
         ? Except<
-              UptimeEvents[EventName],
-              Extract<"_meta" | "_originalMeta", keyof UptimeEvents[EventName]>
+              EventPayload<UptimeEvents, EventName>,
+              Extract<
+                  "_meta" | "_originalMeta",
+                  keyof EventPayload<UptimeEvents, EventName>
+              >
           >
-        : UptimeEvents[EventName];
+        : EventPayload<UptimeEvents, EventName>;
 
 /**
  * Event payload shape accepted by the event-forwarding layer.
@@ -92,8 +99,9 @@ export type ForwardablePayloadWithMeta<
  * bridging manager event buses into the orchestrator bus.
  */
 export const toForwardablePayload = <EventName extends EventKey<UptimeEvents>>(
-    payload: EnhancedEventPayload<UptimeEvents[EventName]>
-): ForwardableEventPayload<EventName> => payload;
+    payload: EnhancedEventPayload<EventPayload<UptimeEvents, EventName>>
+): ForwardableEventPayload<EventName> =>
+    castUnchecked<ForwardableEventPayload<EventName>>(payload);
 
 /**
  * Determines whether a value is promise-like.

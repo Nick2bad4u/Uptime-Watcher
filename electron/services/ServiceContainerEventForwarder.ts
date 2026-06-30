@@ -13,13 +13,14 @@ import type { EventMetadata } from "@shared/types/events";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
-import { objectHasIn,  safeCastTo } from "ts-extras";
+import { objectHasIn, safeCastTo } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
 
 import {
     type EnhancedEventPayload,
     type EventKey,
+    type EventPayload,
     ORIGINAL_METADATA_SYMBOL,
     type TypedEventBus,
 } from "../events/TypedEventBus";
@@ -39,12 +40,10 @@ import {
 /**
  * The subset of orchestrator functionality required for event forwarding.
  */
-export interface ServiceContainerOrchestratorEmitter {
-    emitTyped: <EventName extends EventKey<UptimeEvents>>(
-        eventName: EventName,
-        payload: UptimeEvents[EventName]
-    ) => Promise<void>;
-}
+export type ServiceContainerOrchestratorEmitter = Pick<
+    TypedEventBus<UptimeEvents>,
+    "emitTyped"
+>;
 
 /** Construction options for {@link ServiceContainerEventForwarder}. */
 export interface ServiceContainerEventForwarderOptions {
@@ -107,7 +106,7 @@ export class ServiceContainerEventForwarder {
                     eventName,
                     (
                         payloadWithMeta: EnhancedEventPayload<
-                            UptimeEvents[typeof eventName]
+                            EventPayload<UptimeEvents, typeof eventName>
                         >
                     ): void => {
                         const forwardablePayload =
@@ -169,7 +168,7 @@ export class ServiceContainerEventForwarder {
     >(
         eventName: EventName,
         payload: ForwardableEventPayload<EventName>
-    ): UptimeEvents[EventName] {
+    ): EventPayload<UptimeEvents, EventName> {
         return this.stripEventMetadata(eventName, payload);
     }
 
@@ -215,9 +214,11 @@ export class ServiceContainerEventForwarder {
     private stripEventMetadata<EventName extends EventKey<UptimeEvents>>(
         eventName: EventName,
         payload: ForwardableEventPayload<EventName>
-    ): UptimeEvents[EventName] {
+    ): EventPayload<UptimeEvents, EventName> {
         if (!this.isPayloadWithMetadata(payload)) {
-            return stripForwardedEventMetadata(payload);
+            return castUnchecked<EventPayload<UptimeEvents, EventName>>(
+                stripForwardedEventMetadata(payload)
+            );
         }
 
         const payloadWithMeta: ForwardablePayloadWithMeta<EventName> = payload;
@@ -253,7 +254,7 @@ export class ServiceContainerEventForwarder {
             this.applyForwardingMetadata(stripped, forwarded, original);
         }
 
-        return stripped;
+        return castUnchecked<EventPayload<UptimeEvents, EventName>>(stripped);
     }
 
     private isPayloadWithMetadata<EventName extends EventKey<UptimeEvents>>(

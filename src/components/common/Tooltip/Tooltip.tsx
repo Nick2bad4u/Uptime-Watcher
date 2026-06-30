@@ -129,8 +129,8 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
     }: TooltipProperties) {
         const [isVisible, setIsVisible] = useState(false);
         const [shouldRender, setShouldRender] = useState(false);
-        const showTimerRef = useRef<NodeJS.Timeout | null>(null);
-        const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+        const showTimerRef = useRef<null | ReturnType<typeof setTimeout>>(null);
+        const hideTimerRef = useRef<null | ReturnType<typeof setTimeout>>(null);
         const tooltipId = useId();
         const containerRef = useRef<HTMLDivElement | null>(null);
         const tooltipRef = useRef<HTMLDivElement | null>(null);

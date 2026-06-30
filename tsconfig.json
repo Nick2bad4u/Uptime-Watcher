@@ -112,13 +112,9 @@
         "traceResolution": false,
         "tsBuildInfoFile": "./.cache/tsbuildinfo/tsconfig.app.tsbuildinfo",
         "types": [
-            "@testing-library/jest-dom",
-            "electron",
-            "node",
             "react-dom",
             "react",
-            "vite/client",
-            "vitest/globals"
+            "vite/client"
         ],
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true,

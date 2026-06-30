@@ -58,6 +58,13 @@ import { SITES_CHANNELS } from "@shared/types/preload";
 - Plugin implementation: `config/linting/plugins/uptime-watcher.mjs`
 - Shared contract interface guard: `uptime-watcher/no-redeclare-shared-contract-interfaces` (implemented in the plugin)
 - Configuration: `eslint.config.mjs`
+- Rule docs: `config/linting/plugins/uptime-watcher/docs/rules/*.md`
+- Rule tests: `config/linting/plugins/uptime-watcher/test/*.test.ts`
+- Drift check: `npm run lint:custom-rules:docs`
+
+The drift check verifies that every `uptime-watcher/*` rule has both a rule
+document and a fixture-backed test file. `configs.test.ts` and
+`docs-integrity.test.ts` are allowed harness tests, not individual rule tests.
 
 ## Current custom rule inventory (enforced)
 

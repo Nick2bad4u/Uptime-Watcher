@@ -57,7 +57,9 @@ export const ScreenshotThumbnail = ({
         null
     );
     const linkRef = useRef<HTMLAnchorElement>(null);
-    const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+        undefined
+    );
     const { themeName } = useTheme();
     const openExternal = useUIStore(selectOpenExternal);
 

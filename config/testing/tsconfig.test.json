@@ -20,7 +20,16 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.test.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.test.tsbuildinfo",
+        "types": [
+            "@testing-library/jest-dom",
+            "electron",
+            "node",
+            "react-dom",
+            "react",
+            "vite/client",
+            "vitest/globals"
+        ]
     },
     "exclude": [
         "../../electron/**/*.test.ts",

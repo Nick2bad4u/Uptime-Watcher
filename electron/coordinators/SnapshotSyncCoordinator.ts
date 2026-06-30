@@ -15,7 +15,7 @@ import { isObject } from "@shared/utils/typeGuards";
 import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
-import type { EventKey } from "../events/TypedEventBus";
+import type { EventKey, EventPayload } from "../events/TypedEventBus";
 import type { MonitorManager } from "../managers/MonitorManager";
 import type { SiteManager } from "../managers/SiteManager";
 import type { UpdateSitesCacheRequestData } from "../UptimeOrchestrator.types";
@@ -28,7 +28,7 @@ type ManualCheckCompletedPayload = UptimeEvents["monitor:check-completed"];
 
 type EmitTyped = <TEventName extends EventKey<UptimeEvents>>(
     eventName: TEventName,
-    payload: UptimeEvents[TEventName]
+    payload: EventPayload<UptimeEvents, TEventName>
 ) => Promise<void>;
 
 /**

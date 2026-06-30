@@ -30,7 +30,9 @@ docs/Guides/
 ├── DEVELOPER_QUICK_START.md               # Fast developer setup guide
 ├── DOCUMENTATION_INDEX.md                 # Complete documentation navigation hub
 ├── DOCUSAURUS_SETUP_GUIDE.md              # Documentation site setup
+├── DEPENDENCY_INSTALL_DEBT.md              # Forced npm install blockers and exit criteria
 ├── ENVIRONMENT_SETUP.md                   # Complete environment configuration
+├── TEST_SUITE_MAINTENANCE.md              # Test naming, overlap inventory, and cleanup guidance
 ├── TESTING.md                             # Testing setup and practices
 ├── TROUBLESHOOTING.md                     # Common issues and solutions
 ├── TECHNOLOGY_EVOLUTION.md                # Migration history and rationale
@@ -61,6 +63,7 @@ For new developers, start with these essential guides:
 | [UI feature development](./UI_FEATURE_DEVELOPMENT_GUIDE.md)      | Frontend development patterns and practices | Frontend developers         |
 | [Zustand store patterns](./ZUSTAND_STORE_PATTERN_GUIDE.md)       | State management implementation guide       | Frontend developers         |
 | [Testing methodology](./TESTING_METHODOLOGY_REACT_COMPONENTS.md) | React component testing strategies          | All developers              |
+| [Test suite maintenance](./TEST_SUITE_MAINTENANCE.md)            | Test naming and overlap cleanup guidance    | Maintainers                 |
 | [Type-fest patterns](./TYPE_FEST_PATTERNS.md)                    | TypeScript utility type usage               | All developers              |
 
 ### Setup and configuration
@@ -68,6 +71,8 @@ For new developers, start with these essential guides:
 | Guide                                           | Description                                    | Audience         |
 | ----------------------------------------------- | ---------------------------------------------- | ---------------- |
 | [Environment setup](./ENVIRONMENT_SETUP.md)     | Complete development environment configuration | New contributors |
+| [Dependency install debt](./DEPENDENCY_INSTALL_DEBT.md) | Forced npm install blockers and exit criteria | Maintainers      |
+| [Lint guardrails](./LINT_GUARDRAILS_AND_CUSTOM_RULES.md) | Custom ESLint rules and docs/test checks | Maintainers      |
 | [Docusaurus setup](./DOCUSAURUS_SETUP_GUIDE.md) | Documentation site configuration               | Maintainers      |
 | [Vite performance](./VITE_PERFORMANCE.md)       | Build optimization and performance tuning      | Build engineers  |
 

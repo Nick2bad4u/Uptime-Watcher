@@ -4,30 +4,20 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import { createCombinedAbortSignal } from "@shared/utils/abortUtils";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
-import { randomInt } from "node:crypto";
 import { isInteger, stringSplit } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../../events/eventTypes";
-import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { EventPayload, TypedEventBus } from "../../events/TypedEventBus";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { logger as backendLogger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "./constants";
+import { computeMonitorSchedulerDelay } from "./MonitorSchedulerPolicy";
 import {
     resolveMonitorBaseTimeoutMs,
     resolveMonitorOperationTimeoutMs,
 } from "./shared/timeoutUtils";
-
-const JITTER_PERCENTAGE = 0.1;
-
-// Backoff must be able to exceed typical monitoring intervals; otherwise
-// repeated failures won't slow down and can amplify provider throttling or
-// local resource contention.
-//
-// NOTE: This is a global cap. The effective cap is `max(baseIntervalMs, cap)`
-// so user-configured intervals are never reduced by the backoff logic.
-const MAX_BACKOFF_DELAY_MS = 60 * 60_000; // 60 minutes
 
 type MonitorSchedulerEventBus = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
 
@@ -359,7 +349,7 @@ export class MonitorScheduler {
 
     private async emitEvent<K extends UptimeEventName>(
         eventName: K,
-        payload: UptimeEvents[K]
+        payload: EventPayload<UptimeEvents, K>
     ): Promise<void> {
         try {
             await this.eventEmitter.emitTyped(eventName, payload);
@@ -921,27 +911,10 @@ export class MonitorScheduler {
     }
 
     private computeNextDelay(job: MonitorJob): number {
-        const backoffMultiplier = 2 ** job.backoffAttempt;
-
-        // Never reduce the user-configured base interval by applying a global
-        // cap that is smaller than it.
-        const maxDelayMs = Math.max(job.baseIntervalMs, MAX_BACKOFF_DELAY_MS);
-        const targetInterval = Math.min(
-            job.baseIntervalMs * backoffMultiplier,
-            maxDelayMs
-        );
-        const jitteredInterval = this.applyJitter(targetInterval);
-        return Math.max(MIN_CHECK_INTERVAL, jitteredInterval);
-    }
-
-    private applyJitter(value: number): number {
-        if (value <= 0) {
-            return MIN_CHECK_INTERVAL;
-        }
-
-        const jitterRange = Math.max(1, Math.round(value * JITTER_PERCENTAGE));
-        const jitterOffset = randomInt(0, jitterRange * 2 + 1) - jitterRange;
-        return Math.max(MIN_CHECK_INTERVAL, value + jitterOffset);
+        return computeMonitorSchedulerDelay({
+            backoffAttempt: job.backoffAttempt,
+            baseIntervalMs: job.baseIntervalMs,
+        });
     }
 
     /** Emits a schedule updated event with correlation metadata. */

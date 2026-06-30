@@ -19,6 +19,7 @@ import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeJsonParse } from "@shared/utils/jsonSafety";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateImportData } from "@shared/validation/importExportSchemas";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
@@ -33,7 +34,11 @@ import {
 } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
-import type { EventKey, TypedEventBus } from "../../events/TypedEventBus";
+import type {
+    EventKey,
+    EventPayload,
+    TypedEventBus,
+} from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type {
@@ -165,11 +170,11 @@ export abstract class DatabaseCommand<
     protected async emitFailureEvent<K extends EventKey<UptimeEvents>>(
         eventType: K,
         error: Error,
-        data: Partial<UptimeEvents[K]> = {}
+        data: Partial<EventPayload<UptimeEvents, K>> = {}
     ): Promise<void> {
         await this.eventEmitter.emitTyped(
             eventType,
-            safeCastTo<UptimeEvents[K]>({
+            castUnchecked<EventPayload<UptimeEvents, K>>({
                 error: error.message,
                 success: false,
                 timestamp: Date.now(),
@@ -192,11 +197,11 @@ export abstract class DatabaseCommand<
      */
     protected async emitSuccessEvent<K extends EventKey<UptimeEvents>>(
         eventType: K,
-        data: Partial<UptimeEvents[K]>
+        data: Partial<EventPayload<UptimeEvents, K>>
     ): Promise<void> {
         await this.eventEmitter.emitTyped(
             eventType,
-            safeCastTo<UptimeEvents[K]>({
+            castUnchecked<EventPayload<UptimeEvents, K>>({
                 success: true,
                 timestamp: Date.now(),
                 ...data,

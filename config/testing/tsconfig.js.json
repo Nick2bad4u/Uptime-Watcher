@@ -35,7 +35,8 @@
             ]
         },
         "rootDir": "../..",
-        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.js.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.js.tsbuildinfo",
+        "types": ["node"]
     },
     "exclude": [
         "../../electron/**/*.test.ts",
