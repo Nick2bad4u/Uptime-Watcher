@@ -277,18 +277,7 @@
     z-index: 1;
     display: block;
     color: color-mix(in srgb, var(--color-text-primary) 96%, transparent);
-    font-family:
-        "var(
-        --font-family-mono,
-        " "JetBrains Mono" ",
-        "
-            SFMono-Regular
-            ",
-        Menlo,
-        Consolas,
-        monospace
-    )",
-        system-ui;
+    font-family: var(--font-mono), system-ui;
     font-size: clamp(0.875rem, 0.875rem + 0.2vi, 1rem);
     font-weight: var(--font-weight-semibold);
     letter-spacing: 0.015em;
