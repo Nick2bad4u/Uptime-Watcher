@@ -61,7 +61,7 @@ export async function selectMonitorType(
     window: Page,
     monitorType: MonitorType
 ): Promise<void> {
-    const monitorTypeSelect = window.getByLabel(/monitor type/iv);
+    const monitorTypeSelect = window.getByLabel(/monitor type/i);
     await expect.soft(monitorTypeSelect).toBeEnabled();
     await monitorTypeSelect.selectOption(monitorType);
     await expect.soft(monitorTypeSelect).toHaveValue(monitorType);

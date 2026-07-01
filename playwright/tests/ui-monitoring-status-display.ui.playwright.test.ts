@@ -97,10 +97,10 @@ test.describe(
                 await expect.soft(statusDisplay).toContainText(/website url/i);
                 await expect.soft(statusDisplay).toContainText("example.com");
 
-                const monitorEntries = page.getByTestId(/monitor-status-/v);
+                const monitorEntries = page.getByTestId(/monitor-status-/);
                 await expect.soft(monitorEntries).toHaveCount(1);
                 const monitorEntry = monitorEntries.first();
-                await expect.soft(monitorEntry).toContainText(/http/iv);
+                await expect.soft(monitorEntry).toContainText(/http/i);
 
                 const connectionSnippet = await monitorEntry.textContent();
                 expect.soft(connectionSnippet ?? "").toContain("example.com");

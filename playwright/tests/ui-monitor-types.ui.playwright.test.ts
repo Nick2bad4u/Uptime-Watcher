@@ -575,7 +575,7 @@ test.describe(
                 await openAddSiteModal(page);
                 const formElements = await getAddSiteFormElements(page);
 
-                const urlField = page.getByLabel(/url/iv).first();
+                const urlField = page.getByLabel(/url/i).first();
                 await expect.soft(urlField).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
@@ -584,7 +584,7 @@ test.describe(
                 await expect.soft(page.getByLabel(/host/i)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(page.getByLabel(/port/iv)).toBeVisible({
+                await expect.soft(page.getByLabel(/port/i)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await expect.soft(urlField).toBeHidden({
@@ -595,7 +595,7 @@ test.describe(
                 await expect.soft(page.getByLabel(/host/i)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(page.getByLabel(/port/iv)).toBeHidden({
+                await expect.soft(page.getByLabel(/port/i)).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 

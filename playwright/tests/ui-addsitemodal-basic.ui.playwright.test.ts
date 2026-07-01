@@ -141,7 +141,7 @@ test.describe(
             async () => {
                 await openAddSiteModal(page);
 
-                const monitorTypeSelect = page.getByLabel(/monitor type/iv);
+                const monitorTypeSelect = page.getByLabel(/monitor type/i);
                 await expect.soft(monitorTypeSelect).toBeVisible();
 
                 const monitorTypeValues = await monitorTypeSelect.evaluate(
@@ -198,7 +198,7 @@ test.describe(
                         });
 
                         const heartbeatFieldLabels = [
-                            /heartbeat url/iv,
+                            /heartbeat url/i,
                             /status field/i,
                             /expected status/i,
                             /timestamp field/i,

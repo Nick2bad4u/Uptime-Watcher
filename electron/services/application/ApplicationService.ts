@@ -339,7 +339,12 @@ export class ApplicationService {
      * @internal
      */
     private setupApplication(): void {
-        app.on("ready", this.handleAppReady);
+        if (app.isReady()) {
+            this.handleAppReady();
+        } else {
+            app.on("ready", this.handleAppReady);
+        }
+
         app.on("window-all-closed", this.handleWindowAllClosed);
         app.on("activate", this.handleActivate);
     }

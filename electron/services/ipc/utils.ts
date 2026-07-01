@@ -50,7 +50,16 @@ type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
 ) => Promisable<IpcInvokeChannelResult<TChannel>>;
 
 const VITE_DEV_ORIGIN = "http://localhost:5173";
-const CURRENT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
+const resolveCurrentDirectory = (): string => {
+    const moduleUrl = import.meta.url;
+    if (typeof moduleUrl === "string" && moduleUrl.length > 0) {
+        return path.dirname(fileURLToPath(moduleUrl));
+    }
+
+    return path.resolve(process.cwd(), "dist");
+};
+
+const CURRENT_DIRECTORY = resolveCurrentDirectory();
 const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(CURRENT_DIRECTORY);
 
 /**

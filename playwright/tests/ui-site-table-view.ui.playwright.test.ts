@@ -135,7 +135,7 @@ test.describe(
                     .soft(
                         table
                             .getByRole("button", {
-                                name: /All Monitoring$/v,
+                                name: /All Monitoring$/,
                             })
                             .first()
                     )

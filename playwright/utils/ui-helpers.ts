@@ -393,7 +393,7 @@ export async function waitForDashboard(
     timeout: number = WAIT_TIMEOUTS.LONG
 ): Promise<void> {
     await expect
-        .soft(page.getByRole("region", { name: /monitoring overview/iv }))
+        .soft(page.getByRole("region", { name: /monitoring overview/i }))
         .toBeVisible({ timeout });
 }
 
@@ -655,10 +655,10 @@ export async function getAddSiteFormElements(page: Page): Promise<{
     // sides match, Playwright can act on the wrong element depending on DOM
     // order.
     const siteNameInput = dialog.getByLabel(/site name/i);
-    const siteUrlInput = dialog
-        .getByLabel(/url/iv)
-        .or(dialog.getByRole("textbox", { name: /url/iv }));
-    const monitorTypeSelect = dialog.getByLabel(/monitor type/iv);
+    const siteUrlInput = dialog.getByRole("textbox", {
+        name: /url.*required/i,
+    });
+    const monitorTypeSelect = dialog.getByLabel(/monitor type/i);
     const submitButton = dialog
         .getByTestId("add-site-submit")
         .or(dialog.getByRole("button", { name: /add site|create|submit/i }));
@@ -713,11 +713,16 @@ export async function fillAddSiteForm(
     }
 
     if (siteData.url) {
-        const isUrlInputVisible = await formElements.siteUrlInput
-            .isVisible()
+        const visibleUrlInput = formElements.siteUrlInput.first();
+        const isUrlInputVisible = await visibleUrlInput
+            .waitFor({
+                state: "visible",
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+            })
+            .then(() => true)
             .catch(() => false);
         if (isUrlInputVisible) {
-            await formElements.siteUrlInput.fill(siteData.url);
+            await visibleUrlInput.fill(siteData.url);
         }
     }
 

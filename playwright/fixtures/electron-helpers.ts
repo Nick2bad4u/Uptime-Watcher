@@ -273,10 +273,14 @@ export async function launchElectronApp(
             return "";
         }
 
+        // Normalize with a leading space so the patterns also match flags at
+        // the beginning of NODE_OPTIONS.
+        const padded = ` ${trimmed}`;
+
         // Remove common inspector flags.
         // Note: we intentionally keep unrelated flags such as
         // `--max_old_space_size`.
-        const withoutInspector = trimmed
+        const withoutInspector = padded
             .replaceAll(/\s--inspect-brk(=\S+)?/gv, "")
             .replaceAll(/\s--inspect(=\S+)?/gv, "")
             .replaceAll(/\s--inspect-publish-uid=\S+/gv, "");

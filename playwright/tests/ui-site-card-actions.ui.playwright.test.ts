@@ -26,7 +26,7 @@ import {
 function resolveMetricsSummaryLocator(page: Page, site: CreatedSiteResult) {
     return site.identifier
         ? page.getByTestId(`site-card-metrics-summary-${site.identifier}`)
-        : page.getByText(/^Status:/v).first();
+        : page.getByText(/^Status:/).first();
 }
 
 test.describe(
@@ -200,13 +200,13 @@ test.describe(
                 // status-alert toasts, then verify its live-region semantics.
                 const toaster = page
                     .getByRole("complementary")
-                    .filter({ has: page.getByTestId(/status-alert-/v) });
+                    .filter({ has: page.getByTestId(/status-alert-/) });
 
                 await expect
                     .soft(toaster)
                     .toHaveAttribute("aria-live", "polite");
 
-                const alertEntries = page.getByTestId(/status-alert-/v);
+                const alertEntries = page.getByTestId(/status-alert-/);
                 const pausedToastEntry = alertEntries.filter({
                     hasText: /monitoring paused/i,
                 });
