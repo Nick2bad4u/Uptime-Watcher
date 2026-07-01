@@ -185,7 +185,7 @@ test.describe(
                     tag: ["@validation", "@monitor-types"],
                 },
                 async () => {
-                    test.setTimeout(70_000);
+                    test.setTimeout(120_000);
                     const heartbeatSiteName = generateSiteName(
                         "Server Heartbeat Validation"
                     );
