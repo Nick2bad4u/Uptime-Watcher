@@ -22,9 +22,18 @@ concurrency:
 
 jobs:
     test:
-        name: "Playwright E2E Tests (Windows)"
+        name: "Playwright E2E Tests (Windows, ${{ matrix.project }})"
         runs-on: "windows-latest"
-        timeout-minutes: 60
+        timeout-minutes: 35
+        strategy:
+            fail-fast: false
+            matrix:
+                project:
+                    - "electron-main"
+                    - "electron-renderer"
+                    - "electron-e2e"
+                    - "ui-smoke"
+                    - "ui-regression"
 
         steps:
             # Harden the runner (audit all outbound calls)
@@ -85,7 +94,7 @@ jobs:
 
             # Run Playwright tests (Windows, Electron sandbox fix)
             - name: "Run Playwright tests"
-              run: "npx playwright test"
+              run: "npx playwright test --project '${{ matrix.project }}'"
               shell: "pwsh"
               # Electron sandbox must be disabled for Playwright tests on Windows due to Electron's sandboxing incompatibility with Windows runners.
               # PLAYWRIGHT_CHROMIUM_ARGS disables Chromium sandboxing for compatibility with Windows runners and Electron.
@@ -110,6 +119,6 @@ jobs:
               if: "${{ !cancelled() }}"
               uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
               with:
-                  name: "playwright-report"
+                  name: "playwright-report-${{ matrix.project }}"
                   path: "playwright-report/"
                   retention-days: 7 # Reduced retention to minimize storage costs; see CI/CD guidelines for org policy
