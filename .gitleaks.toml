@@ -11,6 +11,7 @@ title = "Nick2bad4u shared Gitleaks configuration"
         '''^coverage/''',
         '''^dist/''',
         '''^docs/docusaurus/\.docusaurus/''',
+        '''^docs/docusaurus/build/''',
         '''^docs/docusaurus/docs/_media/''',
     ]
 
