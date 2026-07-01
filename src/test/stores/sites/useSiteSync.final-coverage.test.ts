@@ -194,7 +194,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             const result = await syncActions.getSyncStatus();
 
-            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalledWith();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
             expect(logStoreAction).toHaveBeenCalledWith(
                 "SitesStore",
                 "getSyncStatus",

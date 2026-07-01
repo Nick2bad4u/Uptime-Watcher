@@ -43,13 +43,13 @@ describe("environment comprehensive fuzzing tests", () => {
     // (env, version, versions, etc.), not the full EventEmitter interface.
     let originalProcess: any = process;
     let originalWindow: typeof globalThis.window = globalThis.window;
-    let originalDocument: typeof globalThis.document = document;
+    let originalDocument: typeof globalThis.document = globalThis.document;
 
     beforeEach(() => {
         // Store original globals
         originalProcess = process;
         originalWindow = globalThis.window;
-        originalDocument = document;
+        originalDocument = globalThis.document;
     });
 
     afterEach(() => {

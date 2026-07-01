@@ -290,7 +290,7 @@ const setOnCacheInvalidatedHandler = (
             )
     );
 
-    const electronWindow = globalThis as typeof globalThis.window & {
+    const electronWindow = globalThis.window as typeof globalThis.window & {
         electronAPI: MockElectronAPI;
     };
 
@@ -460,7 +460,7 @@ describe("cacheSync", () => {
                 expect(typeof cleanup).toBe("function");
 
                 cleanup();
-                expect(mockCleanup).toHaveBeenCalledWith();
+                expect(mockCleanup).toHaveBeenCalled();
             });
 
             it("should handle 'all' cache invalidation type", async ({
@@ -489,7 +489,7 @@ describe("cacheSync", () => {
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing all frontend caches"
                 );
-                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Cleared monitorType cache"
                 );
@@ -529,7 +529,7 @@ describe("cacheSync", () => {
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing all frontend caches"
                 );
-                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
                 expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
             });
@@ -564,7 +564,7 @@ describe("cacheSync", () => {
                         identifier: "monitor-123",
                     }
                 );
-                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
                 expect(sitesResyncSpy).not.toHaveBeenCalled();
             });
@@ -598,7 +598,7 @@ describe("cacheSync", () => {
                         identifier: undefined,
                     }
                 );
-                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
                 expect(sitesResyncSpy).not.toHaveBeenCalled();
             });
@@ -840,7 +840,7 @@ describe("cacheSync", () => {
                         identifier: "test-monitor-789",
                     }
                 );
-                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
                 expect(sitesResyncSpy).not.toHaveBeenCalled();
             });
@@ -1075,7 +1075,7 @@ describe("cacheSync", () => {
                     "Received cache invalidation event",
                     invalidationData
                 );
-                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalled();
             });
 
             it("should handle empty identifier string", async ({
@@ -1118,7 +1118,7 @@ describe("cacheSync", () => {
                         identifier: "",
                     }
                 );
-                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalled();
             });
         });
     });
@@ -1181,7 +1181,7 @@ describe("cacheSync", () => {
                     dispatchedEvent.type === CACHE_INVALIDATION_TYPE.ALL ||
                     dispatchedEvent.type === CACHE_INVALIDATION_TYPE.MONITOR
                 ) {
-                    expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                    expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 }
             }
         );
@@ -1216,7 +1216,7 @@ describe("cacheSync", () => {
                         "[CacheSync] Clearing monitor-related caches",
                         { identifier: dispatchedEvent.identifier }
                     );
-                    expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                    expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 } else if (
                     dispatchedEvent.type === CACHE_INVALIDATION_TYPE.SITE
                 ) {

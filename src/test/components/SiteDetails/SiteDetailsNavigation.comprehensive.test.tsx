@@ -385,7 +385,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             const selector = screen.getByTestId("monitor-selector");
             fireEvent.change(selector, { target: { value: portMonitorId } });
 
-            expect(handleMonitorIdChange).toHaveBeenCalledWith();
+            expect(handleMonitorIdChange).toHaveBeenCalled();
         });
     });
 
@@ -693,7 +693,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             fireEvent.click(screen.getByLabelText(/Start Monitoring/v));
 
-            expect(handleStartMonitoring).toHaveBeenCalledWith();
+            expect(handleStartMonitoring).toHaveBeenCalled();
         });
 
         it("should handle stop monitoring click", ({ task, annotate }) => {
@@ -715,7 +715,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             fireEvent.click(screen.getByLabelText(/Stop Monitoring/v));
 
-            expect(handleStopMonitoring).toHaveBeenCalledWith();
+            expect(handleStopMonitoring).toHaveBeenCalled();
         });
     });
 
@@ -883,7 +883,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             fireEvent.click(screen.getByTestId("start-site-monitoring"));
 
-            expect(handleStartSiteMonitoring).toHaveBeenCalledWith();
+            expect(handleStartSiteMonitoring).toHaveBeenCalled();
         });
 
         it("should handle site monitoring stop", ({ task, annotate }) => {
@@ -906,7 +906,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             fireEvent.click(screen.getByTestId("stop-site-monitoring"));
 
-            expect(handleStopSiteMonitoring).toHaveBeenCalledWith();
+            expect(handleStopSiteMonitoring).toHaveBeenCalled();
         });
     });
 });

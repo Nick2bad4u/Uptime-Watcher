@@ -27,11 +27,12 @@ export function isObject(value: unknown): value is UnknownRecord {
  *
  * @remarks
  * This guard considers both positive and negative infinity as numbers. Use {
- * @link isFiniteNumber } when infinities should be rejected.
  *
  * @param value - Value to evaluate.
  *
  * @returns `true` when the value is a number and not `NaN`.
+ *
+ * @link isFiniteNumber } when infinities should be rejected.
  */
 export function isNumber(value: unknown): value is number {
     return typeof value === "number" && !Number.isNaN(value);

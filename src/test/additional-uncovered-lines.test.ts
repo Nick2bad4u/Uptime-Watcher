@@ -47,6 +47,18 @@ describe("Additional Uncovered Lines Tests", () => {
         document.body.replaceChildren();
 
         // Mock global URL methods
+        if (!URL.createObjectURL) {
+            Object.defineProperty(URL, "createObjectURL", {
+                configurable: true,
+                value: vi.fn(),
+            });
+        }
+        if (!URL.revokeObjectURL) {
+            Object.defineProperty(URL, "revokeObjectURL", {
+                configurable: true,
+                value: vi.fn(),
+            });
+        }
         vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:test");
         vi.spyOn(URL, "revokeObjectURL").mockReturnValue(undefined);
     });
@@ -155,7 +167,7 @@ describe("Additional Uncovered Lines Tests", () => {
                 await import("../stores/sites/utils/fileDownload");
             downloadFile({ buffer, fileName });
 
-            expect(mockClick).toHaveBeenCalledWith();
+            expect(mockClick).toHaveBeenCalled();
         });
 
         it("should handle non-DOM related errors", async ({

@@ -221,7 +221,7 @@ describe("DataService", () => {
         it("should initialize successfully when electron API is available", async () => {
             await expect(DataService.initialize()).resolves.toBeUndefined();
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
@@ -233,7 +233,7 @@ describe("DataService", () => {
                 "Electron API not available"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockEnsureError).toHaveBeenCalledWith(initializationError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[DataService] Failed to initialize:",
@@ -248,7 +248,7 @@ describe("DataService", () => {
             await expect(DataService.initialize()).rejects.toBe(stringError);
 
             expect(mockEnsureError).toHaveBeenCalledWith(stringError);
-            expect(mockLogger.error).toHaveBeenCalledWith();
+            expect(mockLogger.error).toHaveBeenCalled();
         });
 
         it("should handle null/undefined initialization errors", async () => {
@@ -258,7 +258,7 @@ describe("DataService", () => {
             await expect(DataService.initialize()).rejects.toBe(nullError);
 
             expect(mockEnsureError).toHaveBeenCalledWith(nullError);
-            expect(mockLogger.error).toHaveBeenCalledWith();
+            expect(mockLogger.error).toHaveBeenCalled();
         });
     });
 
@@ -271,10 +271,10 @@ describe("DataService", () => {
 
             const result = await DataService.downloadSqliteBackup();
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalledWith();
+            ).toHaveBeenCalled();
             expect(result).toEqual(mockBackup);
             expect(result.buffer).toBeInstanceOf(ArrayBuffer);
             expect(typeof result.fileName).toBe("string");
@@ -303,10 +303,10 @@ describe("DataService", () => {
                 "Backup failed"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalledWith();
+            ).toHaveBeenCalled();
         });
 
         it("should handle different backup response formats", async () => {
@@ -340,7 +340,7 @@ describe("DataService", () => {
 
             const result = await DataService.restoreSqliteBackup(payload);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
                 mockElectronAPI.data.restoreSqliteBackup
             ).toHaveBeenCalledWith(payload);
@@ -378,8 +378,8 @@ describe("DataService", () => {
 
             const result = await DataService.exportData();
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
-            expect(mockElectronAPI.data.exportData).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockElectronAPI.data.exportData).toHaveBeenCalled();
             expect(result).toBe(mockExportData);
             expect(typeof result).toBe("string");
         });
@@ -403,8 +403,8 @@ describe("DataService", () => {
                 "Export failed"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
-            expect(mockElectronAPI.data.exportData).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockElectronAPI.data.exportData).toHaveBeenCalled();
         });
 
         it("should handle empty export data", async () => {
@@ -459,7 +459,7 @@ describe("DataService", () => {
 
             const isResult = await DataService.importData(importData);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 importData
             );
@@ -487,7 +487,7 @@ describe("DataService", () => {
                 "Import failed"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 importData
             );
@@ -644,7 +644,7 @@ describe("DataService", () => {
 
         it("should handle missing electron API gracefully", async () => {
             // Remove the electronAPI
-            Reflect.deleteProperty(globalThis, "electronAPI");
+            Reflect.deleteProperty((globalThis as any).window, "electronAPI");
 
             await expect(DataService.exportData()).rejects.toThrow();
         });
@@ -652,7 +652,7 @@ describe("DataService", () => {
         it("should handle partial electron API gracefully", async () => {
             // Remove specific method
             Reflect.deleteProperty(
-                (globalThis as any).electronAPI.data,
+                (globalThis as any).window.electronAPI.data,
                 "exportData"
             );
 

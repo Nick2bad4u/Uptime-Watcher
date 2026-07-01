@@ -293,9 +293,9 @@ describe(SiteDetails, () => {
         const user = userEvent.setup();
         await user.click(overlay);
 
-        expect(waitForAnimationMock).toHaveBeenCalledWith();
+        expect(waitForAnimationMock).toHaveBeenCalled();
         await waitFor(() => {
-            expect(onClose).toHaveBeenCalledWith();
+            expect(onClose).toHaveBeenCalled();
         });
     });
 
@@ -310,9 +310,9 @@ describe(SiteDetails, () => {
         });
         fireEvent.keyDown(overlay, { key: "Escape" });
 
-        expect(waitForAnimationMock).toHaveBeenCalledWith();
+        expect(waitForAnimationMock).toHaveBeenCalled();
         await waitFor(() => {
-            expect(onClose).toHaveBeenCalledWith();
+            expect(onClose).toHaveBeenCalled();
         });
     });
 

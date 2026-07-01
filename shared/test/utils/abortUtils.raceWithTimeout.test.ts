@@ -59,18 +59,15 @@ describe("shared/utils/abortUtils - raceWithTimeout", () => {
             unrefTimer: true,
         });
 
-        const rejectionExpectation = promise
-            .catch((error: unknown) => {
-                expect(error).toBeInstanceOf(Error);
-                expect((error as Error).message).toMatch(/timed out/iv);
-            })
-            .then(() => {
-                throw new Error(
-                    "Expected raceWithTimeout to reject on timeout"
-                );
-            });
+        let didReject = false;
+        const rejectionExpectation = promise.catch((error: unknown) => {
+            didReject = true;
+            expect(error).toBeInstanceOf(Error);
+            expect((error as Error).message).toMatch(/timed out/iv);
+        });
         await vi.advanceTimersByTimeAsync(25);
         await rejectionExpectation;
+        expect(didReject).toBeTruthy();
     });
 
     it("rejects with an abort error when the abort signal fires first", async ({
@@ -94,16 +91,15 @@ describe("shared/utils/abortUtils - raceWithTimeout", () => {
             signal: controller.signal,
         });
 
-        const rejectionExpectation = promise
-            .catch((error: unknown) => {
-                expect(isAbortError(error)).toBeTruthy();
-            })
-            .then(() => {
-                throw new Error("Expected raceWithTimeout to reject on abort");
-            });
+        let didReject = false;
+        const rejectionExpectation = promise.catch((error: unknown) => {
+            didReject = true;
+            expect(isAbortError(error)).toBeTruthy();
+        });
 
         controller.abort(new Error("stop"));
 
         await rejectionExpectation;
+        expect(didReject).toBeTruthy();
     });
 });

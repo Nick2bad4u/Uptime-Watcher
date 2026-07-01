@@ -380,9 +380,9 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             }
 
             // Verify that theme classes are being properly added
-            expect(mockAdd).toHaveBeenCalledWith();
+            expect(mockAdd).toHaveBeenCalled();
             // Verify that old theme classes are being removed when switching themes
-            expect(mockRemove).toHaveBeenCalledWith();
+            expect(mockRemove).toHaveBeenCalled();
         });
 
         it("should test cleanup function returned by onSystemThemeChange", async ({
@@ -424,7 +424,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
 
             // Test that cleanup function actually calls removeEventListener
             cleanup();
-            expect(mockRemoveEventListener).toHaveBeenCalledWith();
+            expect(mockRemoveEventListener).toHaveBeenCalled();
 
             Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,

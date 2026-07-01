@@ -114,7 +114,7 @@ describe("useSite Hook - Coverage Tests", () => {
                 type: "http",
                 monitoring: true,
             });
-            expect(useErrorStore).toHaveBeenCalledWith();
+            expect(useErrorStore).toHaveBeenCalled();
         });
 
         it("should pass filteredHistory from monitor to stats", async ({

@@ -261,7 +261,7 @@ describe(ThemeManager, () => {
             themeManager.applyTheme(lightTheme);
 
             const documentElement = document.documentElement as any;
-            expect(documentElement.style.setProperty).toHaveBeenCalledWith();
+            expect(documentElement.style.setProperty).toHaveBeenCalled();
         });
 
         it("should handle missing document gracefully", async ({

@@ -331,7 +331,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
 
             // Test other callbacks
             fireEvent.click(screen.getByTestId("history-button"));
-            expect(handleHistoryLimitChange).toHaveBeenCalledWith();
+            expect(handleHistoryLimitChange).toHaveBeenCalled();
 
             fireEvent.click(screen.getByTestId("setting1-button"));
             expect(handleSettingChange).toHaveBeenCalledWith("setting1");

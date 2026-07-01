@@ -8,7 +8,6 @@
  */
 
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { safeCastTo } from "ts-extras";
 import "@testing-library/jest-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -27,7 +26,7 @@ const promptControls = vi.hoisted(() => ({
     cancel: vi.fn(),
     confirm: vi.fn(),
     setValue: vi.fn(),
-    request: safeCastTo<null | PromptRequest>(null),
+    request: null as null | PromptRequest,
     value: "",
 }));
 

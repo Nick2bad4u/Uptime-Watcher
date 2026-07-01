@@ -36,10 +36,13 @@ export function createSelectorHookMock<State extends object>(
         ) => (typeof selector === "function" ? selector(state) : state)
     ) as unknown as SelectorHookMock<State>;
 
-    vi.spyOn(mock, "getState").mockReturnValue(state);
-    vi.spyOn(mock, "setState").mockImplementation((partial) => {
-        const next = typeof partial === "function" ? partial(state) : partial;
-        Object.assign(state, next);
+    Object.assign(mock, {
+        getState: vi.fn(() => state),
+        setState: vi.fn((partial) => {
+            const next =
+                typeof partial === "function" ? partial(state) : partial;
+            Object.assign(state, next);
+        }),
     });
 
     return mock;

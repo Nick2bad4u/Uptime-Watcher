@@ -759,14 +759,14 @@ describe("Component Coverage Boost", () => {
             }) as React.MouseEvent;
 
             actionButtonLogic.handleCheckNowClick(baseProps, mockEvent);
-            expect(mockEvent.stopPropagation).toHaveBeenCalledWith();
-            expect(baseProps.onCheckNow).toHaveBeenCalledWith();
+            expect(mockEvent.stopPropagation).toHaveBeenCalled();
+            expect(baseProps.onCheckNow).toHaveBeenCalled();
 
             actionButtonLogic.handleStartMonitoringClick(baseProps, mockEvent);
-            expect(baseProps.onStartMonitoring).toHaveBeenCalledWith();
+            expect(baseProps.onStartMonitoring).toHaveBeenCalled();
 
             actionButtonLogic.handleStopMonitoringClick(baseProps, mockEvent);
-            expect(baseProps.onStopMonitoring).toHaveBeenCalledWith();
+            expect(baseProps.onStopMonitoring).toHaveBeenCalled();
         });
 
         it("should handle all monitors running scenarios", ({

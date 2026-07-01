@@ -59,20 +59,29 @@ jobs:
               run: "npm run build"
 
             - name: "Run tests with coverage"
-              run: "npm run test:all:coverage || true"
+              run: "npm run test:sonar:coverage"
 
             - name: "Verify coverage files exist"
               run: |
                   echo "Checking for LCOV coverage files..."
-                  if [ -f "coverage/lcov.info" ]; then
-                    echo "✓ Main coverage file found: coverage/lcov.info"
-                    ls -la coverage/lcov.info
-                  else
-                    echo "✗ Main coverage file missing: coverage/lcov.info"
-                  fi
+                  required_files=(
+                    "coverage/lcov.info"
+                    "coverage/electron/lcov.info"
+                    "coverage/shared/lcov.info"
+                  )
+
+                  for coverage_file in "${required_files[@]}"; do
+                    if [ -s "${coverage_file}" ]; then
+                      echo "LCOV coverage file found: ${coverage_file}"
+                      ls -la "${coverage_file}"
+                    else
+                      echo "::error::LCOV coverage file missing or empty: ${coverage_file}"
+                      exit 1
+                    fi
+                  done
 
                   echo "Coverage directory contents:"
-                  ls -la coverage/ || echo "Coverage directory not found"
+                  ls -la coverage/
 
             - name: "Skip SonarCloud scan without token"
               if: "${{ env.SONAR_TOKEN == '' }}"

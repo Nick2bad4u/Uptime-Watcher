@@ -8,7 +8,7 @@ import type * as React from "react";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { act, renderHook } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SelectorHookMock } from "../../utils/createSelectorHookMock";
@@ -77,7 +77,7 @@ const mockUpdateMonitorTimeout = vi.fn();
 const mockUpdateSiteCheckInterval = vi.fn();
 
 const useSitesStoreMockRef = vi.hoisted(() => ({
-    current: safeCastTo<SelectorHookMock<any> | undefined>(undefined),
+    current: undefined as SelectorHookMock<any> | undefined,
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", async () => {
@@ -369,7 +369,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             );
 
             expect(result.current.analytics).toBeDefined();
-            expect(useSiteAnalytics).toHaveBeenCalledWith();
+            expect(useSiteAnalytics).toHaveBeenCalled();
         });
     });
 

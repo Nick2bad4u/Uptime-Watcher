@@ -118,7 +118,7 @@ describe("SystemService", () => {
             await expect(SystemService.initialize()).rejects.toThrow(
                 "String error"
             );
-            expect(mockLogger.error).toHaveBeenCalledWith();
+            expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(error);
         });
 
@@ -126,7 +126,7 @@ describe("SystemService", () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
             await expect(SystemService.initialize()).rejects.toThrow("null");
-            expect(mockLogger.error).toHaveBeenCalledWith();
+            expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(null);
         });
     });

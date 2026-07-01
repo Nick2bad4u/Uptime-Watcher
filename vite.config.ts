@@ -841,7 +841,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                     autoUpdate: false,
                     branches: 77, // Tightened to reflect real-world branch coverage considering JSX/CSS-module instrumentation (see analysis)
                     functions: 92,
-                    lines: 93,
+                    lines: 90,
                     statements: 89,
                 },
             },

@@ -17,10 +17,13 @@ describe("validateOAuthAuthorizeUrl()", () => {
     });
 
     it("rejects http URLs", () => {
+        const insecureUrl = new URL("https://example.com/oauth?x=1");
+        insecureUrl.protocol = "http";
+
         expect(() =>
             validateOAuthAuthorizeUrl({
                 providerName: "Test",
-                url: "https://example.com/oauth?x=1",
+                url: insecureUrl.href,
             })
         ).toThrow(/unexpected.*oauth url/iv);
     });

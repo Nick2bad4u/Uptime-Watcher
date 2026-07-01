@@ -818,7 +818,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             const nameInput = screen.getByLabelText(/site name/i);
             await user.type(nameInput, "New Site");
 
-            expect(setName).toHaveBeenCalledWith();
+            expect(setName).toHaveBeenCalled();
         });
 
         it("should handle site URL input changes", async ({
@@ -848,7 +848,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 name: /url.*required/iv,
             });
             await user.type(urlInput, "https://example.com");
-            expect(setUrl).toHaveBeenCalledWith();
+            expect(setUrl).toHaveBeenCalled();
         });
 
         it("should handle monitor type selection changes", async ({
@@ -950,7 +950,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
                 name: /check interval/i,
             });
             await user.selectOptions(intervalInput, "300000"); // Milliseconds
-            expect(setCheckIntervalMs).toHaveBeenCalledWith();
+            expect(setCheckIntervalMs).toHaveBeenCalled();
         });
 
         it("should handle timeout value changes", async ({
@@ -1886,7 +1886,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             await user.click(urlInput);
 
             // Verify dynamic help text interaction
-            expect(mockDynamicHelp).toHaveBeenCalledWith();
+            expect(mockDynamicHelp).toHaveBeenCalled();
         });
     });
 

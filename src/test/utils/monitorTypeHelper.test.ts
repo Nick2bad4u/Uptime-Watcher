@@ -846,7 +846,7 @@ describe("monitorTypeHelper", () => {
                     clearMonitorTypeCache();
 
                     // Verify clear was called
-                    expect(AppCaches.monitorTypes.clear).toHaveBeenCalledWith();
+                    expect(AppCaches.monitorTypes.clear).toHaveBeenCalled();
                 }
             );
         });
@@ -874,7 +874,7 @@ describe("monitorTypeHelper", () => {
                     const result = await getAvailableMonitorTypes();
 
                     expect(result).toEqual(mockTypes);
-                    expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith();
+                    expect(AppCaches.monitorTypes.set).toHaveBeenCalled();
                 }
             );
 

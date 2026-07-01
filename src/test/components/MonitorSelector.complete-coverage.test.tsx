@@ -278,7 +278,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             await user.click(select);
             select.focus();
 
-            expect(focusSpy).toHaveBeenCalledWith();
+            expect(focusSpy).toHaveBeenCalled();
             expect(defaultProps.onChange).not.toHaveBeenCalled();
             expect(wrapper).not.toHaveAttribute("aria-expanded");
 
@@ -488,7 +488,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             const select = screen.getByTestId("themed-select");
             await user.selectOptions(select, "monitor-2");
 
-            expect(onChange).toHaveBeenCalledWith();
+            expect(onChange).toHaveBeenCalled();
         });
 
         it("should stop propagation on click events", ({ task, annotate }) => {
@@ -518,7 +518,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             fireEvent(select, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalledWith();
+            expect(stopPropagation).toHaveBeenCalled();
         });
 
         it("should stop propagation on mouseDown events", ({
@@ -551,7 +551,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             fireEvent(select, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalledWith();
+            expect(stopPropagation).toHaveBeenCalled();
         });
 
         it("should handle click without event object", ({ task, annotate }) => {

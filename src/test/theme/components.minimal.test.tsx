@@ -72,7 +72,7 @@ describe("Theme Components - Basic Functionality", () => {
 
             render(<ThemedBox onClick={mockOnClick}>Clickable</ThemedBox>);
             fireEvent.click(screen.getByRole("button"));
-            expect(mockOnClick).toHaveBeenCalledWith();
+            expect(mockOnClick).toHaveBeenCalled();
         });
     });
 
@@ -107,7 +107,7 @@ describe("Theme Components - Basic Functionality", () => {
 
             render(<ThemedButton onClick={mockOnClick}>Click Me</ThemedButton>);
             fireEvent.click(screen.getByRole("button"));
-            expect(mockOnClick).toHaveBeenCalledWith();
+            expect(mockOnClick).toHaveBeenCalled();
         });
     });
 
@@ -142,7 +142,7 @@ describe("Theme Components - Basic Functionality", () => {
             fireEvent.change(screen.getByRole("textbox"), {
                 target: { value: "test" },
             });
-            expect(mockOnChange).toHaveBeenCalledWith();
+            expect(mockOnChange).toHaveBeenCalled();
         });
     });
 
@@ -192,7 +192,7 @@ describe("Theme Components - Basic Functionality", () => {
 
             render(<ThemedCheckbox onChange={mockOnChange} />);
             fireEvent.click(screen.getByRole("checkbox"));
-            expect(mockOnChange).toHaveBeenCalledWith();
+            expect(mockOnChange).toHaveBeenCalled();
         });
     });
 
@@ -251,7 +251,7 @@ describe("Theme Components - Basic Functionality", () => {
                 </ThemedCard>
             );
             fireEvent.click(screen.getByRole("button"));
-            expect(mockOnClick).toHaveBeenCalledWith();
+            expect(mockOnClick).toHaveBeenCalled();
         });
     });
 

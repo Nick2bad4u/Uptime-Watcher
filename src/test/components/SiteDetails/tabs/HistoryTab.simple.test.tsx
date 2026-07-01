@@ -218,8 +218,8 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
-            expect(mockFormatFullTimestamp).toHaveBeenCalledWith();
-            expect(mockFormatResponseTime).toHaveBeenCalledWith();
+            expect(mockFormatFullTimestamp).toHaveBeenCalled();
+            expect(mockFormatResponseTime).toHaveBeenCalled();
             const upLabels = screen.getAllByText("Up");
             expect(upLabels.length).toBeGreaterThan(0);
             for (const label of upLabels) {

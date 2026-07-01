@@ -432,8 +432,8 @@ describe("OperationHelpers", () => {
             ).rejects.toThrow("API Error");
 
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
-            expect(mockUpdateMonitorInSite).toHaveBeenCalledWith();
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith();
+            expect(mockUpdateMonitorInSite).toHaveBeenCalled();
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
             expect(setSitesSpy).not.toHaveBeenCalled();
         });
     });

@@ -111,8 +111,8 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         expect(mockDocument.body.append).toHaveBeenCalledWith(
                             mockAnchor
                         );
-                        expect(mockAnchor.click).toHaveBeenCalledWith();
-                        expect(mockAnchor.remove).toHaveBeenCalledWith();
+                        expect(mockAnchor.click).toHaveBeenCalled();
+                        expect(mockAnchor.remove).toHaveBeenCalled();
 
                         // Verify cleanup
                         expect(mockURL.revokeObjectURL).toHaveBeenCalledWith(
@@ -210,7 +210,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         }).not.toThrow();
 
                         // Should still try to click even with DOM error
-                        expect(mockAnchor.click).toHaveBeenCalledWith();
+                        expect(mockAnchor.click).toHaveBeenCalled();
                     }
                 )
             );
@@ -283,7 +283,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         expect(() => {
                             downloadFile(options);
                         }).not.toThrow();
-                        expect(mockAnchor.click).toHaveBeenCalledWith();
+                        expect(mockAnchor.click).toHaveBeenCalled();
                     }
                 )
             );
@@ -421,11 +421,11 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).resolves.not.toThrow();
 
-                        expect(downloadFunction).toHaveBeenCalledWith();
+                        expect(downloadFunction).toHaveBeenCalled();
                         expectBlobCalledWithLength(backupData.length);
-                        expect(mockURL.createObjectURL).toHaveBeenCalledWith();
-                        expect(mockAnchor.click).toHaveBeenCalledWith();
-                        expect(mockURL.revokeObjectURL).toHaveBeenCalledWith();
+                        expect(mockURL.createObjectURL).toHaveBeenCalled();
+                        expect(mockAnchor.click).toHaveBeenCalled();
+                        expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
                 )
             );
@@ -474,7 +474,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow("Download trigger failed");
 
-                        expect(mockURL.revokeObjectURL).toHaveBeenCalledWith();
+                        expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
                 )
             );
@@ -497,7 +497,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow("Download trigger failed");
 
-                        expect(mockURL.revokeObjectURL).toHaveBeenCalledWith();
+                        expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
                 )
             );
@@ -532,9 +532,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                                 // Expected for error scenarios
                             }
 
-                            expect(
-                                mockURL.revokeObjectURL
-                            ).toHaveBeenCalledWith();
+                            expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                         }
                     }
                 )
@@ -554,7 +552,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow(errorMessage);
 
-                        expect(downloadFunction).toHaveBeenCalledWith();
+                        expect(downloadFunction).toHaveBeenCalled();
                         expect(mockBlob).not.toHaveBeenCalled();
                         expect(mockURL.createObjectURL).not.toHaveBeenCalled();
                     }

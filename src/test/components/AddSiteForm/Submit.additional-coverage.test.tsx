@@ -265,7 +265,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.createSite).toHaveBeenCalledWith();
+            expect(properties.createSite).toHaveBeenCalled();
         });
 
         it("should handle port monitor type submission (lines 115-120)", async ({
@@ -294,7 +294,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.createSite).toHaveBeenCalledWith();
+            expect(properties.createSite).toHaveBeenCalled();
         });
 
         it("should handle unknown monitor type with default case (lines 121-122)", async ({
@@ -352,7 +352,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             await handleSubmit(mockEvent, properties);
 
             // Should set form error for missing existing site selection
-            expect(properties.setFormError).toHaveBeenCalledWith();
+            expect(properties.setFormError).toHaveBeenCalled();
         });
     });
 
@@ -384,7 +384,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.addMonitorToSite).toHaveBeenCalledWith();
+            expect(properties.addMonitorToSite).toHaveBeenCalled();
         });
 
         it("should handle port monitor in existing mode field assignment (lines 302-306)", async ({
@@ -415,7 +415,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.addMonitorToSite).toHaveBeenCalledWith();
+            expect(properties.addMonitorToSite).toHaveBeenCalled();
         });
 
         it("should handle unsupported monitor type with error (line 307)", async ({
@@ -473,7 +473,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             await handleSubmit(mockEvent, properties);
 
             // The createSite method should have been called
-            expect(properties.createSite).toHaveBeenCalledWith();
+            expect(properties.createSite).toHaveBeenCalled();
         });
     });
 });

@@ -196,7 +196,7 @@ describe("useSiteSync", () => {
 
             await syncActions.fullResyncSites();
 
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
             expect(mockDeps.setSites).toHaveBeenCalledWith(
                 fullSyncResult.sites
             );
@@ -273,7 +273,7 @@ describe("useSiteSync", () => {
             const result = await syncActions.getSyncStatus();
 
             expect(result).toEqual(mockStatus);
-            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalledWith();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
         });
 
         it("should handle getSyncStatus errors with fallback", async ({
@@ -930,7 +930,7 @@ describe("useSiteSync", () => {
             await syncActions.syncSites();
 
             // Verify sync was called and completed
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
             expect(mockDeps.setSites).toHaveBeenCalledWith(
                 fullSyncResult.sites
             );

@@ -142,6 +142,14 @@ const {
         mockValidateMonitorData,
     };
 });
+
+const createTrustedIpcEvent = () => ({
+    senderFrame: {
+        isDestroyed: () => false,
+        url: "http://localhost:5173/index.html",
+    },
+});
+
 // Set up mocks
 vi.mock("electron", () => ({
     ipcMain: mockIpcMain,
@@ -258,7 +266,7 @@ describe(IpcService, () => {
             expect(typeof diagnosticsHandler).toBe("function");
 
             const successResponse = await diagnosticsHandler(
-                undefined,
+                createTrustedIpcEvent(),
                 "get-history-limit"
             );
             expect(successResponse.success).toBeTruthy();
@@ -269,7 +277,7 @@ describe(IpcService, () => {
             expect(metrics.missingHandlerChecks).toBe(0);
 
             const failureResponse = await diagnosticsHandler(
-                undefined,
+                createTrustedIpcEvent(),
                 "missing-channel"
             );
             expect(failureResponse.success).toBeTruthy();
@@ -295,7 +303,7 @@ describe(IpcService, () => {
             expect(typeof diagnosticsHandler).toBe("function");
 
             const timestamp = Date.now();
-            await diagnosticsHandler(undefined, {
+            await diagnosticsHandler(createTrustedIpcEvent(), {
                 channel: "monitor:status-changed",
                 guard: "isMonitorStatusChangedEventData",
                 metadata: { source: "eventsApi" },
@@ -367,7 +375,7 @@ describe(IpcService, () => {
             const handler = notificationHandlerEntry?.[1];
             expect(typeof handler).toBe("function");
 
-            await handler(undefined, {
+            await handler(createTrustedIpcEvent(), {
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: true,
             });
@@ -387,7 +395,7 @@ describe(IpcService, () => {
             const appNotifyHandler = appNotifyHandlerEntry?.[1];
             expect(typeof appNotifyHandler).toBe("function");
 
-            await appNotifyHandler(undefined, {
+            await appNotifyHandler(createTrustedIpcEvent(), {
                 title: "Backup uploaded",
                 body: "backup.sqlite",
             });
@@ -483,7 +491,7 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getAllHandler) {
-                const result = await getAllHandler();
+                const result = await getAllHandler(createTrustedIpcEvent());
 
                 expect(result).toEqual({
                     success: true,
@@ -520,7 +528,7 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getAllHandler) {
-                const result = await getAllHandler();
+                const result = await getAllHandler(createTrustedIpcEvent());
                 expect(result.success).toBeFalsy();
                 expect(result.error).toContain("unexpected properties");
             } else {
@@ -563,7 +571,7 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getHandler) {
-                const result = await getHandler();
+                const result = await getHandler(createTrustedIpcEvent());
                 expect(result).toEqual({
                     success: true,
                     data: [primarySite, secondarySite],
@@ -582,7 +590,7 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getHandler) {
-                const result = await getHandler();
+                const result = await getHandler(createTrustedIpcEvent());
 
                 expect(result).toEqual({
                     success: true,
@@ -628,7 +636,7 @@ describe(IpcService, () => {
                 };
 
                 const result = await validateHandler(
-                    {},
+                    createTrustedIpcEvent(),
                     "http",
                     validMonitorData
                 );
@@ -662,7 +670,9 @@ describe(IpcService, () => {
             expect(quitAndInstallHandler).toBeDefined();
 
             if (quitAndInstallHandler) {
-                const result = await quitAndInstallHandler();
+                const result = await quitAndInstallHandler(
+                    createTrustedIpcEvent()
+                );
                 expect(
                     mockAutoUpdaterService.quitAndInstall
                 ).toHaveBeenCalled();
@@ -686,7 +696,9 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getHistoryLimitHandler) {
-                const result = await getHistoryLimitHandler();
+                const result = await getHistoryLimitHandler(
+                    createTrustedIpcEvent()
+                );
                 expect(result).toEqual({
                     success: true,
                     data: 500,
@@ -711,7 +723,7 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getHandler) {
-                const result = await getHandler();
+                const result = await getHandler(createTrustedIpcEvent());
                 expect(result).toEqual({
                     success: false,
                     error: "Database error",
@@ -736,7 +748,7 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getHandler) {
-                const result = await getHandler();
+                const result = await getHandler(createTrustedIpcEvent());
 
                 expect(result).toEqual({
                     success: true,
@@ -757,7 +769,7 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getAllHandler) {
-                const result = await getAllHandler();
+                const result = await getAllHandler(createTrustedIpcEvent());
 
                 expect(result).toEqual({
                     success: true,

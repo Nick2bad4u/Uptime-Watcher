@@ -311,8 +311,8 @@ describe("Environment Detection Utilities", () => {
         let originalDocument: any;
 
         beforeEach(() => {
-            originalWindow = globalThis;
-            originalDocument = document;
+            originalWindow = globalThis.window;
+            originalDocument = globalThis.document;
         });
 
         afterEach(() => {

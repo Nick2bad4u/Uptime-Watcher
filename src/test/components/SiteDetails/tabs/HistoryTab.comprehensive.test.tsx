@@ -464,8 +464,8 @@ describe(HistoryTab, () => {
             const monitor = createMockMonitor(2);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            expect(mockFormatFullTimestamp).toHaveBeenCalledWith();
-            expect(mockFormatResponseTime).toHaveBeenCalledWith();
+            expect(mockFormatFullTimestamp).toHaveBeenCalled();
+            expect(mockFormatResponseTime).toHaveBeenCalled();
         });
 
         it("should display formatted timestamps", ({ task, annotate }) => {
@@ -562,7 +562,7 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
-            expect(vi.mocked(useTheme)).toHaveBeenCalledWith();
+            expect(vi.mocked(useTheme)).toHaveBeenCalled();
             // Theme colors should be applied to filter and history icons
         });
 
@@ -597,7 +597,7 @@ describe(HistoryTab, () => {
             rerender(<HistoryTab {...defaultProps} />);
 
             // Component should re-render with new theme
-            expect(vi.mocked(useTheme)).toHaveBeenCalledWith();
+            expect(vi.mocked(useTheme)).toHaveBeenCalled();
         });
     });
 

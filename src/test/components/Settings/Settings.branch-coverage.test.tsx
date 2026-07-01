@@ -389,7 +389,7 @@ describe("Settings - Branch Coverage Tests", () => {
             fireEvent.click(soundAlertsCheckbox);
 
             // Should still call updateSettings for valid keys
-            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith();
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalled();
         });
     });
 
@@ -591,10 +591,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
 
             await waitFor(() => {
-                expect(mockSettingsStore.resetSettings).toHaveBeenCalledWith();
+                expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
             });
 
-            expect(mockErrorStore.clearError).toHaveBeenCalledWith();
+            expect(mockErrorStore.clearError).toHaveBeenCalled();
         });
 
         it("should not reset settings when user cancels", ({
@@ -879,7 +879,7 @@ describe("Settings - Branch Coverage Tests", () => {
             });
             await user.click(closeButton);
             await waitFor(() => {
-                expect(mockOnClose).toHaveBeenCalledWith();
+                expect(mockOnClose).toHaveBeenCalled();
             });
         });
     });
@@ -914,7 +914,7 @@ describe("Settings - Branch Coverage Tests", () => {
             await user.click(syncButton);
 
             await waitFor(() => {
-                expect(mockFullSync).toHaveBeenCalledWith();
+                expect(mockFullSync).toHaveBeenCalled();
             });
         });
 
@@ -949,7 +949,7 @@ describe("Settings - Branch Coverage Tests", () => {
             await user.click(backupButton);
 
             await waitFor(() => {
-                expect(mockSaveBackup).toHaveBeenCalledWith();
+                expect(mockSaveBackup).toHaveBeenCalled();
             });
         });
     });

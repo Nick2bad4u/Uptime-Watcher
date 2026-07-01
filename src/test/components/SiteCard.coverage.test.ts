@@ -107,18 +107,14 @@ describe("SiteCard Component Coverage Tests", () => {
             interactionProps.onStopMonitoring();
             interactionProps.onStopSiteMonitoring();
 
-            expect(interactionProps.onCheckNow).toHaveBeenCalledWith();
+            expect(interactionProps.onCheckNow).toHaveBeenCalled();
             expect(interactionProps.onMonitorIdChange).toHaveBeenCalledWith(
                 "monitor-1"
             );
-            expect(interactionProps.onStartMonitoring).toHaveBeenCalledWith();
-            expect(
-                interactionProps.onStartSiteMonitoring
-            ).toHaveBeenCalledWith();
-            expect(interactionProps.onStopMonitoring).toHaveBeenCalledWith();
-            expect(
-                interactionProps.onStopSiteMonitoring
-            ).toHaveBeenCalledWith();
+            expect(interactionProps.onStartMonitoring).toHaveBeenCalled();
+            expect(interactionProps.onStartSiteMonitoring).toHaveBeenCalled();
+            expect(interactionProps.onStopMonitoring).toHaveBeenCalled();
+            expect(interactionProps.onStopSiteMonitoring).toHaveBeenCalled();
         });
 
         describe("SiteCard Hook Integration", () => {
@@ -551,8 +547,8 @@ describe("SiteCard Component Coverage Tests", () => {
                 clickHandlers.handleCheckNow();
                 clickHandlers.handleMonitorIdChange("new-monitor");
 
-                expect(clickHandlers.handleCardClick).toHaveBeenCalledWith();
-                expect(clickHandlers.handleCheckNow).toHaveBeenCalledWith();
+                expect(clickHandlers.handleCardClick).toHaveBeenCalled();
+                expect(clickHandlers.handleCheckNow).toHaveBeenCalled();
                 expect(
                     clickHandlers.handleMonitorIdChange
                 ).toHaveBeenCalledWith("new-monitor");

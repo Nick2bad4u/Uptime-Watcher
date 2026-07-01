@@ -552,7 +552,7 @@ describe("AddSiteForm behavioral coverage", () => {
         // pipeline executed; the underlying form reset behavior is covered by
         // dedicated store tests.
         await waitFor(() => {
-            expect(onSuccess).toHaveBeenCalledWith();
+            expect(onSuccess).toHaveBeenCalled();
         });
         expect(useDelayedButtonLoadingMock).toHaveBeenCalledWith(false);
         expect(themedButtonProps?.loading).toBeFalsy();
@@ -566,7 +566,7 @@ describe("AddSiteForm behavioral coverage", () => {
         const form = screen.getByTestId("add-site-form");
         fireEvent.submit(form);
         await waitFor(() => {
-            expect(handleSubmitMock).toHaveBeenCalledWith();
+            expect(handleSubmitMock).toHaveBeenCalled();
         });
         await waitFor(() => {
             expect(loggerErrorMock).toHaveBeenCalledWith(
@@ -595,7 +595,7 @@ describe("AddSiteForm behavioral coverage", () => {
         expect(errorAlertProps).toBeDefined();
         expect(screen.getByText(/validation failed/iv)).toBeInTheDocument();
         errorAlertProps?.onDismiss();
-        expect(clearErrorSpy).toHaveBeenCalledWith();
+        expect(clearErrorSpy).toHaveBeenCalled();
         expect(setFormErrorSpy).toHaveBeenCalledWith(undefined);
     });
 

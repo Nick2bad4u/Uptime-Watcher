@@ -93,8 +93,8 @@ describe("Final 90% Function Coverage Push", () => {
             mockEvent.preventDefault();
             mockEvent.stopPropagation();
 
-            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-            expect(mockEvent.stopPropagation).toHaveBeenCalledWith();
+            expect(mockEvent.preventDefault).toHaveBeenCalled();
+            expect(mockEvent.stopPropagation).toHaveBeenCalled();
         });
 
         it("should test form validation helpers", async ({

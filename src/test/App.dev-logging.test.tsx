@@ -249,7 +249,7 @@ describe("App Development Logging Coverage", () => {
         // Wait for initialization to complete
         await waitFor(
             () => {
-                expect(subscribeToStatusUpdatesMock).toHaveBeenCalledWith();
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
             },
             { timeout: 1000 }
         );
@@ -307,7 +307,7 @@ describe("App Development Logging Coverage", () => {
         // Wait for initialization to complete
         await waitFor(
             () => {
-                expect(subscribeToStatusUpdatesMock).toHaveBeenCalledWith();
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
             },
             { timeout: 1000 }
         );

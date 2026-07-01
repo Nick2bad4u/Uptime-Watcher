@@ -143,10 +143,12 @@ vi.mock("../../../services/chartConfig", () => {
     const ChartConfigServiceMock = vi.fn(function ChartConfigServiceMock(
         this: any
     ) {
-        vi.spyOn(this, "getLineChartConfig").mockReturnValue({});
-        vi.spyOn(this, "getBarChartConfig").mockReturnValue({});
-        vi.spyOn(this, "getDoughnutChartConfig").mockReturnValue({});
-        vi.spyOn(this, "getBaseConfig").mockReturnValue({});
+        Object.assign(this, {
+            getBarChartConfig: vi.fn(() => ({})),
+            getBaseConfig: vi.fn(() => ({})),
+            getDoughnutChartConfig: vi.fn(() => ({})),
+            getLineChartConfig: vi.fn(() => ({})),
+        });
     });
 
     return {
@@ -396,7 +398,9 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(customSite);
 
-            expect(useSiteDetails).toHaveBeenCalledWith();
+            expect(useSiteDetails).toHaveBeenCalledWith({
+                site: customSite,
+            });
         });
 
         it("should render default overview tab content", ({
@@ -806,7 +810,9 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(differentSite);
 
-            expect(useSiteDetails).toHaveBeenCalledWith();
+            expect(useSiteDetails).toHaveBeenCalledWith({
+                site: differentSite,
+            });
         });
 
         it("should handle minimal site data", ({ task, annotate }) => {
@@ -828,7 +834,9 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(minimalSite);
 
-            expect(useSiteDetails).toHaveBeenCalledWith();
+            expect(useSiteDetails).toHaveBeenCalledWith({
+                site: minimalSite,
+            });
         });
 
         it("should handle special characters in site data", ({
@@ -853,7 +861,9 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(specialSite);
 
-            expect(useSiteDetails).toHaveBeenCalledWith();
+            expect(useSiteDetails).toHaveBeenCalledWith({
+                site: specialSite,
+            });
         });
     });
 
@@ -875,7 +885,9 @@ describe(SiteDetails, () => {
             renderSiteDetails();
 
             // The hook should be called indicating component mounted
-            expect(useSiteDetails).toHaveBeenCalledWith();
+            expect(useSiteDetails).toHaveBeenCalledWith({
+                site: mockSite,
+            });
         });
 
         it("should handle component updates correctly", async ({
@@ -928,7 +940,9 @@ describe(SiteDetails, () => {
             );
 
             await waitFor(() => {
-                expect(useSiteDetails).toHaveBeenCalledWith();
+                expect(useSiteDetails).toHaveBeenCalledWith({
+                    site: updatedSite,
+                });
             });
         });
     });

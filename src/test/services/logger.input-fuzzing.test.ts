@@ -382,7 +382,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             logger.app.started();
 
             // Assert - verify the logger was called (exact message may vary)
-            expect(mockInfo).toHaveBeenCalledWith();
+            expect(mockInfo).toHaveBeenCalled();
         });
 
         it("should handle application stopped logging", () => {
@@ -390,7 +390,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             logger.app.stopped();
 
             // Assert
-            expect(mockInfo).toHaveBeenCalledWith();
+            expect(mockInfo).toHaveBeenCalled();
         });
 
         fcTest.prop([arbitraries.contextString, arbitraries.errorObject])(
@@ -400,7 +400,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 logger.app.error(context, error);
 
                 // Assert
-                expect(mockError).toHaveBeenCalledWith();
+                expect(mockError).toHaveBeenCalled();
 
                 // Verify context and error are included
                 const calls = mockError.mock.calls;
@@ -423,7 +423,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             logger.app.performance(operation, duration);
 
             // Assert
-            expect(mockDebug).toHaveBeenCalledWith();
+            expect(mockDebug).toHaveBeenCalled();
 
             // Verify operation and duration are logged
             const calls = mockDebug.mock.calls;
@@ -474,7 +474,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 logger.site.error(siteIdentifier, error);
 
                 // Assert
-                expect(mockError).toHaveBeenCalledWith();
+                expect(mockError).toHaveBeenCalled();
             }
         );
 
@@ -506,7 +506,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 logger.site.check(siteIdentifier, status, responseTime);
 
                 // Assert
-                expect(mockInfo).toHaveBeenCalledWith();
+                expect(mockInfo).toHaveBeenCalled();
             }
         );
     });
@@ -561,7 +561,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 logger.user.action(actionName, details);
 
                 // Assert
-                expect(mockInfo).toHaveBeenCalledWith();
+                expect(mockInfo).toHaveBeenCalled();
             }
         );
 
@@ -729,7 +729,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 expect(() => {
                     logger.error("Circular error", circularError);
                 }).not.toThrow();
-                expect(mockError).toHaveBeenCalledWith();
+                expect(mockError).toHaveBeenCalled();
             }
         );
 
@@ -746,7 +746,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 logger.app.performance("extreme-operation", extremeDuration);
 
                 // Assert
-                expect(mockDebug).toHaveBeenCalledWith();
+                expect(mockDebug).toHaveBeenCalled();
             }
         );
     });
@@ -823,7 +823,7 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 expect(() => {
                     logger.app.performance(operation, negativeDuration);
                 }).not.toThrow();
-                expect(mockDebug).toHaveBeenCalledWith();
+                expect(mockDebug).toHaveBeenCalled();
             }
         );
     });

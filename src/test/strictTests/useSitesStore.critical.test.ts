@@ -278,7 +278,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             });
 
             // Verify SiteService was called instead of electronAPI directly
-            expect(SiteService.addSite).toHaveBeenCalledWith();
+            expect(SiteService.addSite).toHaveBeenCalled();
         });
 
         it("should exercise sync status functions", async () => {
@@ -304,7 +304,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                     typeof syncStatus.lastSyncAt === "number"
             ).toBeTruthy();
             expect(typeof syncStatus.source).toBe("string");
-            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalledWith();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
         });
 
         it("should exercise initialization functions", async () => {
@@ -317,7 +317,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof result.success).toBe("boolean");
             expect(typeof result.sitesLoaded).toBe("number");
             expect(typeof result.message).toBe("string");
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
             expect(SiteService.getSites).not.toHaveBeenCalled();
         });
 
@@ -406,7 +406,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Test syncSites
             await store.syncSites();
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
 
             // Test fullResyncSites
             await store.fullResyncSites();

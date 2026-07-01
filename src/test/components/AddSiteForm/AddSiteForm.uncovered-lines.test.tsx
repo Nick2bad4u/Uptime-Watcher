@@ -486,9 +486,9 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(mockResetForm).toHaveBeenCalledWith();
+            expect(mockResetForm).toHaveBeenCalled();
         });
-        expect(mockOnSuccess).toHaveBeenCalledWith();
+        expect(mockOnSuccess).toHaveBeenCalled();
     });
 
     it("should cover dynamic field change handlers", async ({
@@ -600,7 +600,7 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         fireEvent.click(clearButton);
 
         await waitFor(() => {
-            expect(mockClearError).toHaveBeenCalledWith();
+            expect(mockClearError).toHaveBeenCalled();
         });
         expect(mockSetFormError).toHaveBeenCalledWith(undefined);
     });

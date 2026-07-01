@@ -382,7 +382,7 @@ describe("100% Coverage Edge Cases", () => {
                 false
             );
             expect(result).toBe("success");
-            expect(operation).toHaveBeenCalledWith();
+            expect(operation).toHaveBeenCalled();
         });
 
         it("should handle async operation failure with fallback", async () => {
@@ -451,7 +451,7 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(typeof wrapper).toBe("function");
             wrapper();
-            expect(asyncOp).toHaveBeenCalledWith();
+            expect(asyncOp).toHaveBeenCalled();
         });
     });
 
@@ -562,7 +562,7 @@ describe("100% Coverage Edge Cases", () => {
                 name: /dismiss error/i,
             });
             fireEvent.click(dismissButton);
-            expect(clearError).toHaveBeenCalledWith();
+            expect(clearError).toHaveBeenCalled();
         });
     });
 

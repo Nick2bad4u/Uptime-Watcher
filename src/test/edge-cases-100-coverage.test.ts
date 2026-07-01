@@ -86,7 +86,7 @@ describe("100% Coverage Edge Cases", () => {
 
             const uuid = generateUuid();
             expect(uuid).toBe(mockUuid);
-            expect(crypto.randomUUID).toHaveBeenCalledWith();
+            expect(crypto.randomUUID).toHaveBeenCalled();
         });
 
         it("should generate consistent fallback format", () => {
@@ -183,7 +183,7 @@ describe("100% Coverage Edge Cases", () => {
                 false
             );
             expect(result).toBe("success");
-            expect(operation).toHaveBeenCalledWith();
+            expect(operation).toHaveBeenCalled();
         });
 
         it("should handle async operation failure with fallback", async () => {
@@ -307,7 +307,7 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(typeof wrapper).toBe("function");
             await wrapper();
-            expect(asyncOp).toHaveBeenCalledWith();
+            expect(asyncOp).toHaveBeenCalled();
         });
 
         it("should handle async error wrapper with success case", async () => {
@@ -321,7 +321,7 @@ describe("100% Coverage Edge Cases", () => {
 
             // Wait for async operation to complete
             await new Promise((resolve) => setTimeout(resolve, 10));
-            expect(asyncOp).toHaveBeenCalledWith();
+            expect(asyncOp).toHaveBeenCalled();
         });
 
         it("should handle multiple async wrapper calls", async () => {

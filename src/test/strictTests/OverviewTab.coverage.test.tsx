@@ -7,7 +7,7 @@ import type { ChangeEventHandler, ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OverviewTab } from "../../components/SiteDetails/tabs/OverviewTab";
@@ -18,9 +18,8 @@ const availabilityMock = vi.hoisted(() => ({
 }));
 
 vi.mock("../../theme/useTheme", async (importOriginal) => {
-    const actual = safeCastTo<typeof import("../../theme/useTheme")>(
-        await importOriginal()
-    );
+    const actual =
+        await importOriginal<typeof import("../../theme/useTheme")>();
     return {
         ...actual,
         useAvailabilityColors: () => availabilityMock,
@@ -37,7 +36,7 @@ vi.mock("../../theme/useTheme", async (importOriginal) => {
     };
 });
 
-const statusIndicatorProps = vi.hoisted(() => safeCastTo<UnknownRecord[]>([]));
+const statusIndicatorProps = vi.hoisted(() => [] as UnknownRecord[]);
 
 vi.mock("../../theme/components/StatusIndicator", () => ({
     StatusIndicator: (props: UnknownRecord) => {
@@ -235,7 +234,7 @@ describe("OverviewTab coverage", () => {
             })
         );
 
-        expect(availabilityMock.getAvailabilityColor).toHaveBeenCalledWith();
-        expect(availabilityMock.getAvailabilityVariant).toHaveBeenCalledWith();
+        expect(availabilityMock.getAvailabilityColor).toHaveBeenCalled();
+        expect(availabilityMock.getAvailabilityVariant).toHaveBeenCalled();
     });
 });

@@ -512,11 +512,10 @@ function Get-EnhancedFileAnalysis {
                         "{0:N2} MB" -f ($file.Length / 1MB)
                     } elseif ($file.Length -ge 1KB) {
                         "{0:N2} KB" -f ($file.Length / 1KB)
-                    }
-                    else {
+                    } else {
                         "$($file.Length) B"
-                    } Lines =
-                        $lineCount
+                    }
+                    Lines = $lineCount
                     Directory = $file.Directory.Name
                     LastModified = $file.LastWriteTime
                     ComplexityScore =

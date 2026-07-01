@@ -1261,7 +1261,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe("Network timeout");
+            ).toBe("Error: Error: Network timeout");
 
             // Test permission errors
             await act(async () => {
@@ -1279,7 +1279,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe("Permission denied");
+            ).toBe("Error: Error: Permission denied");
 
             // Test service unavailable errors
             mockElectronAPI.monitorTypes.formatMonitorDetail.mockImplementation(
@@ -1298,7 +1298,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe("Service unavailable");
+            ).toBe("Error: Service unavailable");
 
             // Test corrupted response errors
             mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockImplementation(
@@ -1319,7 +1319,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe("Corrupted response");
+            ).toBe("Error: Corrupted response");
         });
     });
 

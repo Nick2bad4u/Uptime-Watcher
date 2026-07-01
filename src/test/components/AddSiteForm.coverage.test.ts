@@ -118,7 +118,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 10_000
             );
             expect(mockHandlers.setMonitorType).toHaveBeenCalledWith("port");
-            expect(mockHandlers.resetForm).toHaveBeenCalledWith();
+            expect(mockHandlers.resetForm).toHaveBeenCalled();
         });
     });
 
@@ -346,7 +346,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             mockEvent.preventDefault();
-            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+            expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(mockEvent.target.value).toBe("test-value");
         });
     });
@@ -407,7 +407,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
             // Test calling the callback
             props.onSuccess();
-            expect(props.onSuccess).toHaveBeenCalledWith();
+            expect(props.onSuccess).toHaveBeenCalled();
         });
     });
 
@@ -428,8 +428,8 @@ describe("AddSiteForm Component Coverage Tests", () => {
             resetForm();
             onSuccess();
 
-            expect(resetForm).toHaveBeenCalledWith();
-            expect(onSuccess).toHaveBeenCalledWith();
+            expect(resetForm).toHaveBeenCalled();
+            expect(onSuccess).toHaveBeenCalled();
         });
     });
 
@@ -462,7 +462,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             cleanup();
-            expect(mockClearTimeout).toHaveBeenCalledWith();
+            expect(mockClearTimeout).toHaveBeenCalled();
         });
     });
 

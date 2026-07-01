@@ -219,7 +219,7 @@ describe(createSiteOperationsActions, () => {
                 mockElectronAPI.sites.updateSite.mock.calls.at(-1);
             const updatedMonitors = updateCall?.[1]?.monitors ?? [];
             expect(updatedMonitors).toHaveLength(2);
-            expect(mockDeps.setSites).toHaveBeenCalledWith();
+            expect(mockDeps.setSites).toHaveBeenCalled();
             const reconciledSites =
                 vi.mocked(mockDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
             const reconciledSite = reconciledSites.find(
@@ -647,7 +647,7 @@ describe(createSiteOperationsActions, () => {
                 "monitor-1"
             );
             expect(mockElectronAPI.sites.updateSite).not.toHaveBeenCalled();
-            expect(mockDeps.setSites).toHaveBeenCalledWith();
+            expect(mockDeps.setSites).toHaveBeenCalled();
             const reconciledSites =
                 vi.mocked(mockDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
             const reconciledSite = reconciledSites.find(
@@ -790,7 +790,7 @@ describe(createSiteOperationsActions, () => {
 
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalledWith();
+            ).toHaveBeenCalled();
             expect(mockDeps.setLastBackupMetadata).toHaveBeenCalledWith(
                 result.metadata
             );
@@ -826,7 +826,7 @@ describe(createSiteOperationsActions, () => {
             expect(mockDeps.setLastBackupMetadata).toHaveBeenCalledWith(
                 summary.metadata
             );
-            expect(mockDeps.syncSites).toHaveBeenCalledWith();
+            expect(mockDeps.syncSites).toHaveBeenCalled();
             expect(result).toEqual(summary);
         });
 

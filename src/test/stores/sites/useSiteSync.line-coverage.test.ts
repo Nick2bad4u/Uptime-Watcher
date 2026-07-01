@@ -444,7 +444,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             eventHandler(deleteEvent);
 
-            expect(logger.error).toHaveBeenCalledWith();
+            expect(logger.error).toHaveBeenCalled();
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
     });

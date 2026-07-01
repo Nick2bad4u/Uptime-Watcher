@@ -285,7 +285,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 site.identifier,
                 new Error("Attempted to start monitoring without valid monitor")
             );
-            expect(mockLogger.site.error).toHaveBeenCalledWith();
+            expect(mockLogger.site.error).toHaveBeenCalled();
         });
 
         it("should handle stop monitoring action", () => {
@@ -337,7 +337,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 site.identifier,
                 new Error("Attempted to stop monitoring without valid monitor")
             );
-            expect(mockLogger.site.error).toHaveBeenCalledWith();
+            expect(mockLogger.site.error).toHaveBeenCalled();
         });
 
         it("should handle start site monitoring action", () => {

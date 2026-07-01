@@ -6,7 +6,7 @@ import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
 } from "@shared/validation/monitorSchemas";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
@@ -20,21 +20,21 @@ import {
     validateMonitorFieldEnhanced,
 } from "../../utils/monitorValidation";
 
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => {
-    const getState = vi.fn();
-    return {
-        useMonitorTypesStore: {
-            getState,
-        },
-    };
-});
+const monitorTypesStoreGetStateMock = vi.hoisted(() => vi.fn());
+
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+    useMonitorTypesStore: {
+        getState: monitorTypesStoreGetStateMock,
+    },
+}));
 
 vi.mock(
     "@shared/validation/monitorSchemas",
     async (importOriginal): Promise<unknown> => {
-        const actual = safeCastTo<
-            typeof import("@shared/validation/monitorSchemas")
-        >(await importOriginal());
+        const actual =
+            await importOriginal<
+                typeof import("@shared/validation/monitorSchemas")
+            >();
 
         return {
             ...actual,
@@ -46,7 +46,7 @@ vi.mock(
 
 type MonitorTypesStoreState = ReturnType<typeof useMonitorTypesStore.getState>;
 
-const mockedMonitorTypesStore = vi.mocked(useMonitorTypesStore.getState);
+const mockedMonitorTypesStore = vi.mocked(monitorTypesStoreGetStateMock);
 const mockedSharedSchemas = {
     validateMonitorData: vi.mocked(sharedValidateMonitorData),
     validateMonitorField: vi.mocked(sharedValidateMonitorField),

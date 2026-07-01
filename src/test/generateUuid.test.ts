@@ -40,7 +40,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(crypto.randomUUID).toHaveBeenCalledWith();
+            expect(crypto.randomUUID).toHaveBeenCalled();
             expect(uuid).toBe("123e4567-e89b-12d3-a456-426614174000");
         });
 
@@ -173,7 +173,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(crypto.randomUUID).toHaveBeenCalledWith();
+            expect(crypto.randomUUID).toHaveBeenCalled();
             expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
         });
 

@@ -318,9 +318,7 @@ describe(useSettingsStore, () => {
                 await result.current.initializeSettings();
             });
 
-            expect(
-                mockElectronAPI.settings.getHistoryLimit
-            ).toHaveBeenCalledWith();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(500);
         });
 

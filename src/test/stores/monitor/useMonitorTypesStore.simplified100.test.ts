@@ -550,7 +550,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             // RefreshMonitorTypes should force a reload
             expect(
                 mockElectronAPI.monitorTypes.getMonitorTypes
-            ).toHaveBeenCalledWith();
+            ).toHaveBeenCalled();
         });
     });
 

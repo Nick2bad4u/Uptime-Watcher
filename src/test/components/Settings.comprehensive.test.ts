@@ -22,7 +22,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(typeof props.onClose).toBe("function");
 
             props.onClose();
-            expect(props.onClose).toHaveBeenCalledWith();
+            expect(props.onClose).toHaveBeenCalled();
         });
     });
 
@@ -99,7 +99,7 @@ describe("Settings Component Coverage Tests", () => {
             errorStore.clearError();
             errorStore.setError(new Error("Test error"));
 
-            expect(errorStore.clearError).toHaveBeenCalledWith();
+            expect(errorStore.clearError).toHaveBeenCalled();
             expect(errorStore.setError).toHaveBeenCalledWith(expect.any(Error));
         });
 
@@ -160,8 +160,8 @@ describe("Settings Component Coverage Tests", () => {
             sitesStore.saveSqliteBackup();
             sitesStore.fullResyncSites();
 
-            expect(sitesStore.saveSqliteBackup).toHaveBeenCalledWith();
-            expect(sitesStore.fullResyncSites).toHaveBeenCalledWith();
+            expect(sitesStore.saveSqliteBackup).toHaveBeenCalled();
+            expect(sitesStore.fullResyncSites).toHaveBeenCalled();
         });
 
         it("should integrate with useTheme", async ({ task, annotate }) => {
@@ -501,7 +501,7 @@ describe("Settings Component Coverage Tests", () => {
             clearError();
             setError(new Error("Test error"));
 
-            expect(clearError).toHaveBeenCalledWith();
+            expect(clearError).toHaveBeenCalled();
             expect(setError).toHaveBeenCalledWith(expect.any(Error));
         });
     });
@@ -563,7 +563,7 @@ describe("Settings Component Coverage Tests", () => {
             const resetSettings = vi.fn();
 
             resetSettings();
-            expect(resetSettings).toHaveBeenCalledWith();
+            expect(resetSettings).toHaveBeenCalled();
         });
     });
 
@@ -756,7 +756,7 @@ describe("Settings Component Coverage Tests", () => {
             // Simulate close button click
             onClose();
 
-            expect(onClose).toHaveBeenCalledWith();
+            expect(onClose).toHaveBeenCalled();
         });
 
         it("should handle setting changes", async ({ task, annotate }) => {

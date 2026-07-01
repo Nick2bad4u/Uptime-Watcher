@@ -9,7 +9,7 @@ import {
     MONITOR_TYPES_CHANNELS,
     MONITORING_CHANNELS,
 } from "@shared/types/preload";
-import { ipcMain } from "electron";
+import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -88,6 +88,14 @@ const CHANNELS_FOR_TESTS = {
 } as const;
 
 type TestChannel = (typeof CHANNELS_FOR_TESTS)[keyof typeof CHANNELS_FOR_TESTS];
+
+const createTrustedIpcEvent = (): IpcMainInvokeEvent =>
+    ({
+        senderFrame: {
+            isDestroyed: () => false,
+            url: "http://localhost:5173/index.html",
+        },
+    }) as IpcMainInvokeEvent;
 
 describe("IPC Utils - Comprehensive Coverage", () => {
     beforeEach(() => {
@@ -1570,7 +1578,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const registeredFunction = handleCall![1];
 
                 // ValidateParams === null means: no-arg channel only.
-                const result = await registeredFunction({} as any);
+                const result = await registeredFunction(
+                    createTrustedIpcEvent()
+                );
 
                 expect(mockHandler).toHaveBeenCalledWith();
                 expect(result.success).toBeTruthy();
@@ -1606,7 +1616,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(handleCall).toBeDefined();
 
                 const registeredFunction = handleCall![1];
-                const result = await registeredFunction({} as any);
+                const result = await registeredFunction(
+                    createTrustedIpcEvent()
+                );
 
                 expect(result.success).toBeFalsy();
                 expect(result.metadata).toMatchObject({
@@ -1645,7 +1657,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(handleCall).toBeDefined();
 
                 const registeredFunction = handleCall![1];
-                const result = await registeredFunction({} as any);
+                const result = await registeredFunction(
+                    createTrustedIpcEvent()
+                );
 
                 expect(result.success).toBeFalsy();
             });
@@ -1678,7 +1692,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const registeredFunction = handleCall![1];
                 const result = await registeredFunction(
-                    {} as any,
+                    createTrustedIpcEvent(),
                     "arg1",
                     "arg2"
                 );
@@ -1745,7 +1759,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const registeredFunction = handleCall![1];
                 const result = await registeredFunction(
-                    {} as any,
+                    createTrustedIpcEvent(),
                     "site-identifier",
                     "monitor-id"
                 );
@@ -1796,7 +1810,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const registeredFunction = handleCall![1];
                 const result = await registeredFunction(
-                    {} as any,
+                    createTrustedIpcEvent(),
                     "site-identifier",
                     "monitor-id",
                     "unexpected"
@@ -1841,7 +1855,9 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(handleCall).toBeDefined();
 
                 const registeredFunction = handleCall![1];
-                const result = await registeredFunction({} as any);
+                const result = await registeredFunction(
+                    createTrustedIpcEvent()
+                );
 
                 expect(mockValidator).not.toHaveBeenCalled();
                 expect(handlerCallCount).toBe(0);

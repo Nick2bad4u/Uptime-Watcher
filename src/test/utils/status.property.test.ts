@@ -202,7 +202,7 @@ describe("status Utils Property-Based Tests", () => {
                 // Remaining parts should form the capitalized text
                 const textPart = arrayJoin(parts.slice(1), " ");
 
-                expect(textPart).toBe(true);
+                expect(textPart).not.toBe("");
                 expect(textPart.charAt(0)).toBe(
                     textPart.charAt(0).toUpperCase()
                 );

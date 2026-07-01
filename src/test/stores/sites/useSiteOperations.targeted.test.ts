@@ -305,7 +305,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalledWith();
+            ).toHaveBeenCalled();
         });
     });
 
@@ -360,7 +360,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
 
-            expect(mockSiteDeps.setSites).toHaveBeenCalledWith();
+            expect(mockSiteDeps.setSites).toHaveBeenCalled();
             const updatedSites =
                 arrayAt(vi.mocked(mockSiteDeps.setSites).mock.calls, -1)?.[0] ??
                 [];
@@ -499,7 +499,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(mockSiteDeps.setSites).toHaveBeenCalledWith();
+            expect(mockSiteDeps.setSites).toHaveBeenCalled();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
 
@@ -525,7 +525,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(mockSiteDeps.setSites).toHaveBeenCalledWith();
+            expect(mockSiteDeps.setSites).toHaveBeenCalled();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
     });

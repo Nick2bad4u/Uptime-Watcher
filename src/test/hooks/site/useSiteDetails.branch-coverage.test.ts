@@ -175,7 +175,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 })
             ).rejects.toThrow();
 
-            expect(mockLogger.site.error).toHaveBeenCalledWith();
+            expect(mockLogger.site.error).toHaveBeenCalled();
         });
 
         it("should handle validation failure for timeout", async ({
@@ -216,7 +216,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 })
             ).rejects.toThrow();
 
-            expect(mockLogger.site.error).toHaveBeenCalledWith();
+            expect(mockLogger.site.error).toHaveBeenCalled();
         });
 
         it("should handle validation failure for retry attempts", async ({
@@ -257,7 +257,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 })
             ).rejects.toThrow();
 
-            expect(mockLogger.site.error).toHaveBeenCalledWith();
+            expect(mockLogger.site.error).toHaveBeenCalled();
         });
     });
 

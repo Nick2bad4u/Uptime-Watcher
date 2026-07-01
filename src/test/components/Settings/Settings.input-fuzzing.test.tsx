@@ -9,7 +9,7 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayAt, safeCastTo } from "ts-extras";
+import { arrayAt } from "ts-extras";
 import "@testing-library/jest-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -50,9 +50,9 @@ const {
     const state = {
         settings: { ...baseSettings },
         error: {
-            error: safeCastTo<ErrorStoreSnapshot["error"]>(null),
+            error: null as ErrorStoreSnapshot["error"],
             isLoading: false,
-            lastError: safeCastTo<ErrorStoreSnapshot["lastError"]>(undefined),
+            lastError: undefined as ErrorStoreSnapshot["lastError"],
         },
     } satisfies {
         error: ErrorStoreSnapshot;

@@ -432,7 +432,7 @@ describe(ScreenshotThumbnail, () => {
             link.dispatchEvent(clickEvent);
 
             // Verify preventDefault was called
-            expect(preventDefaultSpy).toHaveBeenCalledWith();
+            expect(preventDefaultSpy).toHaveBeenCalled();
         });
 
         it("should not fall back to window.open when SystemService rejects", async ({
@@ -1285,7 +1285,7 @@ describe(ScreenshotThumbnail, () => {
 
             fireEvent.mouseEnter(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
         });
@@ -1325,7 +1325,7 @@ describe(ScreenshotThumbnail, () => {
             // Focus to trigger timeout clearing
             fireEvent.focus(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
         });
@@ -1365,7 +1365,7 @@ describe(ScreenshotThumbnail, () => {
             // Blur to trigger timeout clearing
             fireEvent.blur(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
         });
@@ -1407,7 +1407,7 @@ describe(ScreenshotThumbnail, () => {
             fireEvent.mouseLeave(image);
 
             // This should have called clearTimeout for the existing timeout before setting new one
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1491,7 +1491,7 @@ describe(ScreenshotThumbnail, () => {
 
             fireEvent.mouseEnter(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1530,7 +1530,7 @@ describe(ScreenshotThumbnail, () => {
             // Focus should clear existing timeout
             fireEvent.focus(link);
 
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1569,7 +1569,7 @@ describe(ScreenshotThumbnail, () => {
             // Blur should clear existing timeout
             fireEvent.blur(link);
 
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1751,7 +1751,7 @@ describe(ScreenshotThumbnail, () => {
             expect(vi.getTimerCount()).toBeGreaterThan(0);
 
             fireEvent.mouseEnter(link); // Should clear timeout
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockClear();
 
@@ -1760,7 +1760,7 @@ describe(ScreenshotThumbnail, () => {
             fireEvent.mouseLeave(link);
             expect(vi.getTimerCount()).toBeGreaterThan(0);
             fireEvent.focus(link); // Should clear timeout
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockClear();
 
@@ -1769,7 +1769,7 @@ describe(ScreenshotThumbnail, () => {
             fireEvent.mouseLeave(link);
             expect(vi.getTimerCount()).toBeGreaterThan(0);
             fireEvent.blur(link); // Should clear timeout
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();

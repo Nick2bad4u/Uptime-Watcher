@@ -104,7 +104,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 name: /try again/iv,
             });
             fireEvent.click(retryButton);
-            expect(onRetry).toHaveBeenCalledWith();
+            expect(onRetry).toHaveBeenCalled();
         });
 
         it("should exercise withErrorBoundary HOC functions", ({
@@ -289,10 +289,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 />
             );
 
-            expect(mountEffect).toHaveBeenCalledWith();
+            expect(mountEffect).toHaveBeenCalled();
 
             unmount();
-            expect(unmountEffect).toHaveBeenCalledWith();
+            expect(unmountEffect).toHaveBeenCalled();
         });
 
         it("should exercise useState functions", ({ task, annotate }) => {
@@ -391,19 +391,19 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const input = screen.getByRole("textbox");
 
             fireEvent.click(button);
-            expect(clickHandler).toHaveBeenCalledWith();
+            expect(clickHandler).toHaveBeenCalled();
 
             fireEvent.change(input, { target: { value: "test" } });
-            expect(changeHandler).toHaveBeenCalledWith();
+            expect(changeHandler).toHaveBeenCalled();
 
             fireEvent.focus(input);
-            expect(focusHandler).toHaveBeenCalledWith();
+            expect(focusHandler).toHaveBeenCalled();
 
             fireEvent.blur(input);
-            expect(blurHandler).toHaveBeenCalledWith();
+            expect(blurHandler).toHaveBeenCalled();
 
             fireEvent.keyDown(input, { key: "Enter" });
-            expect(keyHandler).toHaveBeenCalledWith();
+            expect(keyHandler).toHaveBeenCalled();
         });
     });
 
@@ -457,7 +457,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 expect(screen.getByText("success")).toBeInTheDocument();
             });
 
-            expect(asyncEffect).toHaveBeenCalledWith();
+            expect(asyncEffect).toHaveBeenCalled();
         });
 
         it("should exercise error handling in async functions", async ({
@@ -512,7 +512,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 expect(screen.getByText("Async error")).toBeInTheDocument();
             });
 
-            expect(failingAsyncEffect).toHaveBeenCalledWith();
+            expect(failingAsyncEffect).toHaveBeenCalled();
         });
     });
 
@@ -699,14 +699,14 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
 
             const { unmount } = render(<TestClassComponent />);
 
-            expect(componentDidMount).toHaveBeenCalledWith();
+            expect(componentDidMount).toHaveBeenCalled();
 
             const button = screen.getByRole("button");
             fireEvent.click(button);
             expect(screen.getByText("Value: 1")).toBeInTheDocument();
 
             unmount();
-            expect(componentWillUnmount).toHaveBeenCalledWith();
+            expect(componentWillUnmount).toHaveBeenCalled();
         });
     });
 

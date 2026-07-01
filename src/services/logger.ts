@@ -174,7 +174,11 @@ const buildFinalArgs = (
     context: unknown
 ): Readonly<UnknownArray> =>
     context
-        ? [arrayFirst(logArgs), context, ...logArgs.slice(1)]
+        ? [
+              arrayFirst(logArgs),
+              context,
+              ...logArgs.slice(1),
+          ]
         : [...logArgs];
 
 type LogMethodName = "debug" | "error" | "info" | "silly" | "verbose" | "warn";

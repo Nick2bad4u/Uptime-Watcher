@@ -565,6 +565,7 @@
         "test:shared:quiet": "vitest run --config vitest.shared.config.ts --reporter=default --silent",
         "test:shared:ui": "vitest --config vitest.shared.config.ts --ui",
         "test:shared:verbose": "vitest run --config vitest.shared.config.ts --reporter=verbose",
+        "test:sonar:coverage": "npm run test:coverage && npm run test:electron:coverage && npm run test:shared:coverage",
         "test:storybook": "cross-env VITEST=true NODE_ENV=test node --max-old-space-size=16384 ./node_modules/vitest/vitest.mjs run --config vitest.storybook.config.ts --silent",
         "test:storybook:coverage": "cross-env VITEST=true NODE_ENV=test node --max-old-space-size=16384 ./node_modules/vitest/vitest.mjs run --config vitest.storybook.config.ts --coverage",
         "test:storybook:detailed": "cross-env VITEST=true NODE_ENV=test node --max-old-space-size=16384 ./node_modules/vitest/vitest.mjs run --config vitest.storybook.config.ts --reporter=verbose",

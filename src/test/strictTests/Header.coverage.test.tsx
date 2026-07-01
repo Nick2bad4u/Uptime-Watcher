@@ -5,7 +5,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Header } from "../../components/Header/Header";
@@ -99,7 +99,7 @@ vi.mock("../../components/Header/StatusSubscriptionIndicator", () => ({
 }));
 
 const uiStoreState = vi.hoisted(() => ({
-    layout: safeCastTo<"card-large" | "table">("table"),
+    layout: "table" as "card-large" | "table",
     setShowAddSiteModal: vi.fn(),
     setShowSettings: vi.fn(),
 }));
@@ -341,7 +341,7 @@ describe("Header component", () => {
 
         expect(uiStoreState.setShowAddSiteModal).toHaveBeenCalledWith(true);
         expect(uiStoreState.setShowSettings).toHaveBeenCalledWith(true);
-        expect(statusSubscriptionIndicatorSpy.component).toHaveBeenCalledWith();
+        expect(statusSubscriptionIndicatorSpy.component).toHaveBeenCalled();
     });
 
     it("suppresses summary when layout is card-large", () => {

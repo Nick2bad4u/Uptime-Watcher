@@ -1882,9 +1882,7 @@ describe("monitor Validation Utilities", () => {
                     );
 
                     // Verify the function was called (don't check exact parameters due to complexity)
-                    expect(
-                        mockStore.validateMonitorData
-                    ).toHaveBeenCalledWith();
+                    expect(mockStore.validateMonitorData).toHaveBeenCalled();
                 }
             );
         });

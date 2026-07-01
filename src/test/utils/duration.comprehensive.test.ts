@@ -236,7 +236,6 @@ describe(calculateMaxDuration, () => {
             const result = calculateMaxDuration(timeout, retryAttempts);
 
             // Assert
-            expect(result).toBe(true);
             expect(result).toMatch(/^\d+[hms]$/v); // Should be valid format
         });
 

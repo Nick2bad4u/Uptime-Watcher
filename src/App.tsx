@@ -422,7 +422,11 @@ export const App: NamedExoticComponent = memo(
 
             const isNext = !isSidebarOpen;
             persistSidebarPreference(isNext);
-        }, [isCompactViewport, isSidebarOpen, persistSidebarPreference]);
+        }, [
+            isCompactViewport,
+            isSidebarOpen,
+            persistSidebarPreference,
+        ]);
 
         const globalMetrics = useGlobalMonitoringMetrics();
 
@@ -447,7 +451,12 @@ export const App: NamedExoticComponent = memo(
 
             applyUpdateStatus("idle");
             setUpdateError(undefined);
-        }, [applyUpdate, applyUpdateStatus, setUpdateError, updateStatus]);
+        }, [
+            applyUpdate,
+            applyUpdateStatus,
+            setUpdateError,
+            updateStatus,
+        ]);
 
         /**
          * Handles closing the settings modal.

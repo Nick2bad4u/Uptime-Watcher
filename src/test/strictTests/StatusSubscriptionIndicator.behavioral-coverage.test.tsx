@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
@@ -50,9 +50,7 @@ interface ThemedButtonMockProps {
     variant?: string;
 }
 
-const themedButtonInvocations = vi.hoisted(() =>
-    safeCastTo<ThemedButtonMockProps[]>([])
-);
+const themedButtonInvocations = vi.hoisted(() => [] as ThemedButtonMockProps[]);
 
 vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: (props: ThemedButtonMockProps) => {
@@ -98,7 +96,7 @@ vi.mock("../../utils/icons", () => ({
 const healthState = vi.hoisted(() => ({
     value: {
         description: "All systems operational",
-        errors: safeCastTo<string[]>([]),
+        errors: [] as string[],
         label: "Healthy",
         needsAttention: false,
         status: "healthy",
@@ -136,7 +134,7 @@ const siteStoreState = vi.hoisted(() => ({
     retryStatusSubscription: vi.fn(async () =>
         createSummary({ expectedListeners: 3, listenersAttached: 2 })
     ),
-    summary: safeCastTo<StatusUpdateSubscriptionSummary | undefined>(undefined),
+    summary: undefined as StatusUpdateSubscriptionSummary | undefined,
 }));
 
 const createSiteStoreSnapshot = vi.hoisted(() => () => ({
@@ -283,9 +281,7 @@ describe("StatusSubscriptionIndicator coverage", () => {
         fireEvent.click(arrayFirst(retryButtonsCollection)!);
 
         await waitFor(() => {
-            expect(
-                siteStoreState.retryStatusSubscription
-            ).toHaveBeenCalledWith();
+            expect(siteStoreState.retryStatusSubscription).toHaveBeenCalled();
         });
 
         expect(

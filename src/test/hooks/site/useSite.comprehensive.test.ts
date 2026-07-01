@@ -137,7 +137,7 @@ describe("useSite Hook", () => {
                 mockSite,
                 undefined
             );
-            expect(mockUseErrorStore).toHaveBeenCalledWith();
+            expect(mockUseErrorStore).toHaveBeenCalled();
         });
 
         it("should pass filteredHistory from monitor to stats", async ({

@@ -571,20 +571,20 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
     describe("Constants and exports validation", () => {
         it("should export BASE_MONITOR_TYPES correctly", () => {
             expect(BASE_MONITOR_TYPES).toEqual([
+                "cdn-edge-consistency",
+                "dns",
                 "http",
-                "http-keyword",
-                "http-status",
                 "http-header",
                 "http-json",
+                "http-keyword",
                 "http-latency",
-                "port",
+                "http-status",
                 "ping",
-                "dns",
+                "port",
+                "replication",
+                "server-heartbeat",
                 "ssl",
                 "websocket-keepalive",
-                "server-heartbeat",
-                "replication",
-                "cdn-edge-consistency",
             ]);
             expect(Array.isArray(BASE_MONITOR_TYPES)).toBeTruthy();
             expect(BASE_MONITOR_TYPES).toHaveLength(14);

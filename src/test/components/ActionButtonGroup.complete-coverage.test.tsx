@@ -229,8 +229,8 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
             fireEvent(checkButton, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalledWith();
-            expect(onCheckNow).toHaveBeenCalledWith();
+            expect(stopPropagation).toHaveBeenCalled();
+            expect(onCheckNow).toHaveBeenCalled();
         });
 
         it("should be disabled when isLoading is true", ({
@@ -488,8 +488,8 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
             fireEvent(startButton, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalledWith();
-            expect(onStartMonitoring).toHaveBeenCalledWith();
+            expect(stopPropagation).toHaveBeenCalled();
+            expect(onStartMonitoring).toHaveBeenCalled();
         });
 
         it("should stop event propagation on stop monitoring click", ({
@@ -527,8 +527,8 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
             fireEvent(stopButton, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalledWith();
-            expect(onStopMonitoring).toHaveBeenCalledWith();
+            expect(stopPropagation).toHaveBeenCalled();
+            expect(onStopMonitoring).toHaveBeenCalled();
         });
 
         it("should disable start button when loading", ({ task, annotate }) => {
@@ -830,7 +830,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             // Simulate a click that might not have an event object
             fireEvent.click(checkButton);
 
-            expect(onCheckNow).toHaveBeenCalledWith();
+            expect(onCheckNow).toHaveBeenCalled();
             // Should not throw error when event is undefined
         });
 
@@ -862,7 +862,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             });
             fireEvent.click(startButton);
 
-            expect(onStartMonitoring).toHaveBeenCalledWith();
+            expect(onStartMonitoring).toHaveBeenCalled();
         });
 
         it("should handle stop monitoring click without event object", ({
@@ -893,7 +893,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             });
             fireEvent.click(stopButton);
 
-            expect(onStopMonitoring).toHaveBeenCalledWith();
+            expect(onStopMonitoring).toHaveBeenCalled();
         });
     });
 

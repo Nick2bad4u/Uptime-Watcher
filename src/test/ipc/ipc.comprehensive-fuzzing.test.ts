@@ -132,6 +132,13 @@ const TEST_CORRELATION_ENVELOPE = createIpcCorrelationEnvelope(
     generateCorrelationId()
 );
 
+const createTrustedIpcEvent = () => ({
+    senderFrame: {
+        isDestroyed: () => false,
+        url: "http://localhost:5173/index.html",
+    },
+});
+
 type IpcValidatorParam = Parameters<typeof registerStandardizedIpcHandler>[2];
 type NonNullIpcValidator = Exclude<IpcValidatorParam, null>;
 
@@ -356,7 +363,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                     try {
                         // Simulate IPC call
                         const result = await registeredHandler(
-                            {},
+                            createTrustedIpcEvent(),
                             input,
                             TEST_CORRELATION_ENVELOPE
                         );
@@ -425,12 +432,14 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({});
+                    const result = await registeredHandler(
+                        createTrustedIpcEvent()
+                    );
 
                     // Result should be wrapped in IPC response format
                     expect(result).toHaveProperty("success", true);
                     expect(result).toHaveProperty("data");
-                    expect(handler).toHaveBeenCalledWith();
+                    expect(handler).toHaveBeenCalled();
                 }
             }
         );
@@ -555,7 +564,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 if (registeredHandler) {
                     try {
                         const result = await registeredHandler(
-                            {},
+                            createTrustedIpcEvent(),
                             input,
                             TEST_CORRELATION_ENVELOPE
                         );
@@ -599,7 +608,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     try {
-                        const result = await registeredHandler({});
+                        const result = await registeredHandler(
+                            createTrustedIpcEvent()
+                        );
                         // Should return error object, not throw
                         expect(result).toHaveProperty("error");
                     } catch (error) {
@@ -674,7 +685,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 if (registeredHandler) {
                     // Simulate multiple simultaneous calls
                     const promises = Array.from({ length: callCount }, () =>
-                        registeredHandler({})
+                        registeredHandler(createTrustedIpcEvent())
                     );
 
                     const results = await Promise.allSettled(promises);
@@ -742,7 +753,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 )?.[1];
 
                 if (registeredHandler) {
-                    const result = await registeredHandler({});
+                    const result = await registeredHandler(
+                        createTrustedIpcEvent()
+                    );
 
                     // Should return error object, not throw
                     expect(result).toHaveProperty("error");
@@ -770,7 +783,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
             if (registeredHandler) {
                 // Should handle circular references by catching the error
-                const result = await registeredHandler({});
+                const result = await registeredHandler(createTrustedIpcEvent());
 
                 // Since circular references cause JSON serialization errors,
                 // the system should either handle it gracefully or return an error response
@@ -826,7 +839,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     const result = await registeredHandler(
-                        {},
+                        createTrustedIpcEvent(),
                         siteData,
                         TEST_CORRELATION_ENVELOPE
                     );
@@ -883,7 +896,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     const result = await registeredHandler(
-                        {},
+                        createTrustedIpcEvent(),
                         monitoringData,
                         TEST_CORRELATION_ENVELOPE
                     );
@@ -929,7 +942,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     const result = await registeredHandler(
-                        {},
+                        createTrustedIpcEvent(),
                         settingsData,
                         TEST_CORRELATION_ENVELOPE
                     );
@@ -966,14 +979,14 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
 
                 if (registeredHandler) {
                     const result = await registeredHandler(
-                        {},
+                        createTrustedIpcEvent(),
                         input,
                         TEST_CORRELATION_ENVELOPE
                     );
 
                     // Since validation is permissive, all handlers should be
                     // called and return success.
-                    expect(handler).toHaveBeenCalledWith();
+                    expect(handler).toHaveBeenCalled();
                     expect(result).toHaveProperty("success", true);
                     expect(result).toHaveProperty("data");
                 }

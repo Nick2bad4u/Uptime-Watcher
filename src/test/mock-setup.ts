@@ -766,9 +766,15 @@ Object.defineProperties(globalThis, {
 });
 
 // Mock notifications
-const MockNotification = vi.fn() as any;
-MockNotification.permission = "granted";
-vi.spyOn(MockNotification, "requestPermission").mockResolvedValue("granted");
+const MockNotification = vi.fn() as unknown as typeof Notification;
+Object.defineProperties(MockNotification, {
+    permission: {
+        value: "granted",
+    },
+    requestPermission: {
+        value: vi.fn().mockResolvedValue("granted"),
+    },
+});
 
 Object.defineProperty(globalThis, "Notification", {
     value: MockNotification,

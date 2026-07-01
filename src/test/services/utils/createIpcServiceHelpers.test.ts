@@ -210,7 +210,7 @@ describe("createIpcServiceHelpers", () => {
 
         expect(waitForElectronBridge).toHaveBeenCalledTimes(1);
         expect(handler).toHaveBeenCalledWith(
-            (globalThis as any).electronAPI,
+            (globalThis as any).window.electronAPI,
             "site-123"
         );
         expect(ensureError).toHaveBeenCalledWith(handlerError);

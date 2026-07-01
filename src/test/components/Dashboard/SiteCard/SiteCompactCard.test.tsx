@@ -142,7 +142,7 @@ describe(SiteCompactCard, () => {
         expect(screen.getByText("42")).toBeInTheDocument();
 
         await user.click(screen.getByTestId("themed-box"));
-        expect(siteState.handleCardClick).toHaveBeenCalledWith();
+        expect(siteState.handleCardClick).toHaveBeenCalled();
         expect(arrayAt(monitorSelectorCalls, -1)).toEqual({
             selectedMonitorId: "monitor-1",
         });
@@ -157,7 +157,7 @@ describe(SiteCompactCard, () => {
         });
 
         await user.click(screen.getByTestId("action-group"));
-        expect(siteState.handleCheckNow).toHaveBeenCalledWith();
+        expect(siteState.handleCheckNow).toHaveBeenCalled();
     });
 
     it("shows fallback monitor summary when no monitor is selected", () => {

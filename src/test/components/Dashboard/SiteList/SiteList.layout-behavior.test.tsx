@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type {
@@ -46,38 +46,32 @@ const {
     iconInvocations,
 } = vi.hoisted(() => ({
     themeState: { isDark: false },
-    uiStoreState: safeCastTo<UiStoreState>({
+    uiStoreState: {
         siteListLayout: "card-large",
         setSiteListLayout: vi.fn(),
         siteCardPresentation: "grid",
         setSiteCardPresentation: vi.fn(),
         surfaceDensity: "comfortable",
         setSurfaceDensity: vi.fn(),
-    }),
-    tableViewInvocations: safeCastTo<
-        Invocation<{
-            density: InterfaceDensity;
-            sites: Site[];
-        }>[]
-    >([]),
-    compactCardInvocations: safeCastTo<Invocation<{ site: Site }>[]>([]),
-    cardInvocations: safeCastTo<
-        Invocation<{
-            presentation: SiteCardPresentation;
-            site: Site;
-        }>[]
-    >([]),
-    selectorInvocations: safeCastTo<
-        Invocation<{
-            cardPresentation: SiteCardPresentation;
-            layout: SiteListLayoutMode;
-            listDensity: InterfaceDensity;
-            onLayoutChange: (mode: SiteListLayoutMode) => void;
-            onListDensityChange: (density: InterfaceDensity) => void;
-            onPresentationChange: (presentation: SiteCardPresentation) => void;
-        }>[]
-    >([]),
-    iconInvocations: safeCastTo<Invocation<UnknownRecord>[]>([]),
+    } as UiStoreState,
+    tableViewInvocations: [] as Invocation<{
+        density: InterfaceDensity;
+        sites: Site[];
+    }>[],
+    compactCardInvocations: [] as Invocation<{ site: Site }>[],
+    cardInvocations: [] as Invocation<{
+        presentation: SiteCardPresentation;
+        site: Site;
+    }>[],
+    selectorInvocations: [] as Invocation<{
+        cardPresentation: SiteCardPresentation;
+        layout: SiteListLayoutMode;
+        listDensity: InterfaceDensity;
+        onLayoutChange: (mode: SiteListLayoutMode) => void;
+        onListDensityChange: (density: InterfaceDensity) => void;
+        onPresentationChange: (presentation: SiteCardPresentation) => void;
+    }>[],
+    iconInvocations: [] as Invocation<UnknownRecord>[],
 }));
 
 // Create sites store state outside hoisted block to avoid import timing issues

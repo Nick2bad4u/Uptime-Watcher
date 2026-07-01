@@ -135,7 +135,7 @@ describe("SettingsService", () => {
             await expect(SettingsService.initialize()).rejects.toThrow(
                 "String error"
             );
-            expect(mockLogger.error).toHaveBeenCalledWith();
+            expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(error);
         });
 
@@ -143,7 +143,7 @@ describe("SettingsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
             await expect(SettingsService.initialize()).rejects.toThrow("null");
-            expect(mockLogger.error).toHaveBeenCalledWith();
+            expect(mockLogger.error).toHaveBeenCalled();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(null);
         });
     });

@@ -259,18 +259,21 @@ const validThemeNameArbitrary: fc.Arbitrary<ThemeName> = fc.constantFrom(
 describe("themeManager Property-Based Tests", () => {
     let themeManager: ThemeManager;
     let originalDocument: typeof document;
+    let originalMatchMedia: typeof globalThis.matchMedia;
     let originalWindow: typeof window;
 
     beforeEach(() => {
-        // Reset singleton instance
-        (ThemeManager as any).instance = undefined;
-        themeManager = ThemeManager.getInstance();
-
         // Mock DOM environment
         originalDocument = document;
+        originalMatchMedia = globalThis.matchMedia;
         originalWindow = globalThis.window;
         globalThis.document = mockDocument as any;
         globalThis.window = mockWindow as any;
+        globalThis.matchMedia = mockWindow.matchMedia as any;
+
+        // Reset singleton instance after the mocked browser APIs are installed.
+        (ThemeManager as any).instance = undefined;
+        themeManager = ThemeManager.getInstance();
 
         // Clear all mocks
         vi.clearAllMocks();
@@ -279,6 +282,7 @@ describe("themeManager Property-Based Tests", () => {
     afterEach(() => {
         // Restore original environment
         globalThis.document = originalDocument;
+        globalThis.matchMedia = originalMatchMedia;
         globalThis.window = originalWindow;
         vi.clearAllMocks();
     });
@@ -294,7 +298,7 @@ describe("themeManager Property-Based Tests", () => {
             // Verify CSS properties were set
             expect(
                 mockDocument.documentElement.style.setProperty
-            ).toHaveBeenCalledWith();
+            ).toHaveBeenCalled();
 
             // Verify color properties were applied
             const setPropertyCalls = (
@@ -490,7 +494,7 @@ describe("themeManager Property-Based Tests", () => {
             // Should have called setProperty for each unique theme
             expect(
                 mockDocument.documentElement.style.setProperty
-            ).toHaveBeenCalledWith();
+            ).toHaveBeenCalled();
         }
     );
 

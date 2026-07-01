@@ -1156,7 +1156,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             // Wait for initialization to complete
             await waitFor(() => {
-                expect(mockCacheSync.setupCacheSync).toHaveBeenCalledWith();
+                expect(mockCacheSync.setupCacheSync).toHaveBeenCalled();
             });
 
             unmountApp(utils);
@@ -1202,7 +1202,7 @@ describe("App Component - Comprehensive Coverage", () => {
             await renderApp();
 
             await waitFor(() => {
-                expect(subscribeToStatusUpdates).toHaveBeenCalledWith();
+                expect(subscribeToStatusUpdates).toHaveBeenCalled();
             });
 
             // Simulate a status update

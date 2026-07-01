@@ -6,7 +6,6 @@ import type { ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { render, screen } from "@testing-library/react";
-import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { StatusSummary } from "../../components/Header/StatusSummary";
@@ -43,8 +42,8 @@ vi.mock("../../theme/components/ThemedBox", () => ({
     ThemedBox: themedBoxMock.render,
 }));
 
-const themedTextCalls = vi.hoisted(() =>
-    safeCastTo<(UnknownRecord & { children?: ReactNode })[]>([])
+const themedTextCalls = vi.hoisted(
+    () => [] as (UnknownRecord & { children?: ReactNode })[]
 );
 
 vi.mock("../../theme/components/ThemedText", () => ({
@@ -54,7 +53,7 @@ vi.mock("../../theme/components/ThemedText", () => ({
     },
 }));
 
-const statusIndicatorCalls = vi.hoisted(() => safeCastTo<UnknownRecord[]>([]));
+const statusIndicatorCalls = vi.hoisted(() => [] as UnknownRecord[]);
 
 vi.mock("../../theme/components/StatusIndicator", () => ({
     StatusIndicator: (props: UnknownRecord) => {
@@ -63,7 +62,7 @@ vi.mock("../../theme/components/StatusIndicator", () => ({
     },
 }));
 
-const healthIndicatorCalls = vi.hoisted(() => safeCastTo<UnknownRecord[]>([]));
+const healthIndicatorCalls = vi.hoisted(() => [] as UnknownRecord[]);
 
 vi.mock("../../components/Header/HealthIndicator", () => ({
     HealthIndicator: (props: UnknownRecord) => {

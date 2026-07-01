@@ -86,9 +86,7 @@ describe(ThemeManager, () => {
 
             themeManager.applyTheme(lightTheme);
 
-            expect(
-                mockDocumentElement.style.setProperty
-            ).toHaveBeenCalledWith();
+            expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
             expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
                 "theme-light"
             );
@@ -102,9 +100,7 @@ describe(ThemeManager, () => {
 
             themeManager.applyTheme(darkTheme);
 
-            expect(
-                mockDocumentElement.style.setProperty
-            ).toHaveBeenCalledWith();
+            expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
             expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
                 "theme-dark"
             );

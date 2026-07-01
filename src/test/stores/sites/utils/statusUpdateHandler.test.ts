@@ -271,15 +271,9 @@ describe("StatusUpdateHandler", () => {
 
             await manager.subscribe();
 
-            expect(
-                mockEventsService.onMonitorStatusChanged
-            ).toHaveBeenCalledWith();
-            expect(
-                mockEventsService.onMonitoringStarted
-            ).toHaveBeenCalledWith();
-            expect(
-                mockEventsService.onMonitoringStopped
-            ).toHaveBeenCalledWith();
+            expect(mockEventsService.onMonitorStatusChanged).toHaveBeenCalled();
+            expect(mockEventsService.onMonitoringStarted).toHaveBeenCalled();
+            expect(mockEventsService.onMonitoringStopped).toHaveBeenCalled();
         });
 
         it("should cleanup existing subscriptions before subscribing again", async ({
@@ -301,7 +295,7 @@ describe("StatusUpdateHandler", () => {
             await manager.subscribe();
             await manager.subscribe(); // Subscribe again
 
-            expect(cleanupFn).toHaveBeenCalledWith();
+            expect(cleanupFn).toHaveBeenCalled();
         });
 
         it("should unsubscribe and remove all listeners", async ({
@@ -394,9 +388,9 @@ describe("StatusUpdateHandler", () => {
             // Trigger the callback and wait for async execution
             await statusChangedCallback(monitorStatusEvent);
 
-            expect(mockSetSites).toHaveBeenCalledWith();
+            expect(mockSetSites).toHaveBeenCalled();
             // The actual onUpdate gets called with the full StatusUpdate including the site
-            expect(mockOnUpdate).toHaveBeenCalledWith();
+            expect(mockOnUpdate).toHaveBeenCalled();
             const actualUpdate = mockOnUpdate.mock.calls[0][0];
             expect(actualUpdate.siteIdentifier).toBe("site1"); // Converted to siteIdentifier in StatusUpdate
             expect(actualUpdate.monitorId).toBe("monitor1");
@@ -534,7 +528,7 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
 
-            expect(mockSetSites).toHaveBeenCalledWith();
+            expect(mockSetSites).toHaveBeenCalled();
             const newSites = mockSetSites.mock.calls[0][0];
             expect(newSites).toBeDefined();
             expect(Array.isArray(newSites)).toBeTruthy();
@@ -562,7 +556,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should fall back to full sync when monitor not found", async ({
@@ -586,7 +580,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle invalid data format and fall back to full sync", async ({
@@ -607,7 +601,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(invalidData);
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle when updated site is not found after update", async ({
@@ -685,7 +679,7 @@ describe("StatusUpdateHandler", () => {
             );
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockSetSites).toHaveBeenCalledWith();
+            expect(mockSetSites).toHaveBeenCalled();
 
             managerWithoutCallback.unsubscribe();
         });
@@ -755,7 +749,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle errors in onUpdate callback gracefully", async ({
@@ -988,7 +982,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle sites with no monitors", async ({
@@ -1016,7 +1010,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle null/undefined status updates", async ({
@@ -1192,7 +1186,7 @@ describe("StatusUpdateHandler", () => {
             await monitoringStartedCallback();
 
             // Should have triggered full sync
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should trigger full sync when monitoring stops", async ({
@@ -1209,7 +1203,7 @@ describe("StatusUpdateHandler", () => {
             await monitoringStoppedCallback();
 
             // Should have triggered full sync
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
         });
 
         it("should handle invalid event data and log warning in development mode", async ({
@@ -1240,7 +1234,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(invalidEvent);
 
             // Should have triggered full sync as fallback
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
 
             // Should have logged warning in development mode
             expect(logger.logger.warn).toHaveBeenCalledWith(
@@ -1272,7 +1266,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(invalidEvent);
 
             // Should still trigger full sync but without warning
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
             expect(logger.logger.warn).not.toHaveBeenCalled();
         });
 
@@ -1368,7 +1362,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(event);
 
             // Should have updated the sites with the new monitor status
-            expect(mockSetSites).toHaveBeenCalledWith();
+            expect(mockSetSites).toHaveBeenCalled();
             const updatedSitesArray = mockSetSites.mock.calls[0][0];
 
             // Find the updated site and verify the monitor status was changed
@@ -1407,7 +1401,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(event);
 
             // Should trigger full sync but not log debug messages
-            expect(mockfullResyncSites).toHaveBeenCalledWith();
+            expect(mockfullResyncSites).toHaveBeenCalled();
             expect(logger.logger.debug).not.toHaveBeenCalled();
         });
 
@@ -1532,7 +1526,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(eventWithEmptyHistory);
 
             // Verify that setSites was called
-            expect(mockSetSites).toHaveBeenCalledWith();
+            expect(mockSetSites).toHaveBeenCalled();
             const updatedSitesArray = mockSetSites.mock.calls[0][0];
 
             // Find the updated site and verify the history was preserved

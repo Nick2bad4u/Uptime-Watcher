@@ -281,7 +281,7 @@ describe("CloudService", () => {
         expect(mockElectronAPI.cloud.restoreBackup).toHaveBeenCalledWith(
             "backups/1.sqlite"
         );
-        expect(mockLogger.info).toHaveBeenCalledWith();
+        expect(mockLogger.info).toHaveBeenCalled();
     });
 
     it("rejects empty restore key", async () => {
@@ -308,7 +308,7 @@ describe("CloudService", () => {
         expect(
             mockElectronAPI.cloud.setEncryptionPassphrase
         ).toHaveBeenCalledWith("pass");
-        expect(mockLogger.info).toHaveBeenCalledWith();
+        expect(mockLogger.info).toHaveBeenCalled();
     });
 
     it("rejects empty encryption passphrase", async () => {

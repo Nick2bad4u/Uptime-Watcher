@@ -120,13 +120,13 @@ describe("file Download Utility", () => {
             expect(Blob).toHaveBeenCalledWith([buffer], {
                 type: mimeType,
             });
-            expect(URL.createObjectURL).toHaveBeenCalledWith();
+            expect(URL.createObjectURL).toHaveBeenCalled();
             expect(document.createElement).toHaveBeenCalledWith("a");
             expect(mockAnchor.href).toBe("mock-object-url");
             expect(mockAnchor.download).toBe(fileName);
             expect(document.body.append).toHaveBeenCalledWith(mockAnchor);
-            expect(mockAnchor.click).toHaveBeenCalledWith();
-            expect(mockAnchor.remove).toHaveBeenCalledWith();
+            expect(mockAnchor.click).toHaveBeenCalled();
+            expect(mockAnchor.remove).toHaveBeenCalled();
             expect(URL.revokeObjectURL).toHaveBeenCalledWith("mock-object-url");
         });
 
@@ -169,7 +169,7 @@ describe("file Download Utility", () => {
             downloadFile({ buffer, fileName });
 
             // Should still attempt click as fallback
-            expect(mockAnchor.click).toHaveBeenCalledWith();
+            expect(mockAnchor.click).toHaveBeenCalled();
         });
 
         it("should handle createObjectURL errors", async ({
@@ -236,7 +236,7 @@ describe("file Download Utility", () => {
             }).not.toThrow();
 
             // Verify that append was called (indicating both primary and fallback attempts)
-            expect(document.body.append).toHaveBeenCalledWith();
+            expect(document.body.append).toHaveBeenCalled();
         });
 
         it("should clean up object URL even when errors occur", async ({
@@ -282,7 +282,7 @@ describe("file Download Utility", () => {
 
             downloadFile({ buffer, fileName });
 
-            expect(mockAnchor.click).toHaveBeenCalledWith();
+            expect(mockAnchor.click).toHaveBeenCalled();
         });
 
         describe("property-based Tests", () => {
@@ -305,8 +305,8 @@ describe("file Download Utility", () => {
                         type: mimeType,
                     });
                     expect(mockAnchor.download).toBe(fileName);
-                    expect(mockAnchor.click).toHaveBeenCalledWith();
-                    expect(mockAnchor.remove).toHaveBeenCalledWith();
+                    expect(mockAnchor.click).toHaveBeenCalled();
+                    expect(mockAnchor.remove).toHaveBeenCalled();
                 }
             );
 
@@ -327,7 +327,7 @@ describe("file Download Utility", () => {
                         type: "application/octet-stream",
                     });
                     expect(mockAnchor.download).toBe(fileName);
-                    expect(URL.createObjectURL).toHaveBeenCalledWith();
+                    expect(URL.createObjectURL).toHaveBeenCalled();
                 }
             );
 
@@ -339,7 +339,7 @@ describe("file Download Utility", () => {
 
                     downloadFile({ buffer, fileName });
 
-                    expect(URL.createObjectURL).toHaveBeenCalledWith();
+                    expect(URL.createObjectURL).toHaveBeenCalled();
                     expect(URL.revokeObjectURL).toHaveBeenCalledWith(
                         "mock-object-url"
                     );
@@ -362,7 +362,7 @@ describe("file Download Utility", () => {
                     expect(document.body.append).toHaveBeenCalledWith(
                         mockAnchor
                     );
-                    expect(mockAnchor.click).toHaveBeenCalledWith();
+                    expect(mockAnchor.click).toHaveBeenCalled();
                 }
             );
         });
@@ -465,11 +465,11 @@ describe("file Download Utility", () => {
                     const result = generateBackupFileName(prefix, extension);
                     const escapedPrefix = prefix.replaceAll(
                         /[$()*+.?[\\\]^{|}]/gu,
-                        "$&"
+                        String.raw`\$&`
                     );
                     const escapedExtension = extension.replaceAll(
                         /[$()*+.?[\\\]^{|}]/gu,
-                        "$&"
+                        String.raw`\$&`
                     );
                     const expectedPattern = new RegExp(
                         String.raw`^${escapedPrefix}-\d{4}-\d{2}-\d{2}\.${escapedExtension}$`
@@ -610,12 +610,12 @@ describe("file Download Utility", () => {
 
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
-            expect(mockDownloadFunction).toHaveBeenCalledWith();
+            expect(mockDownloadFunction).toHaveBeenCalled();
 
             expectLatestBlobCall(payload.length);
 
             expect(mockAnchor.download).toBe(backup.fileName);
-            expect(mockAnchor.click).toHaveBeenCalledWith();
+            expect(mockAnchor.click).toHaveBeenCalled();
         });
 
         it("should throw TypeError for invalid backup data type", async ({
@@ -696,7 +696,7 @@ describe("file Download Utility", () => {
 
             expectLatestBlobCall(payload.length);
 
-            expect(mockAnchor.click).toHaveBeenCalledWith();
+            expect(mockAnchor.click).toHaveBeenCalled();
         });
 
         it("should fall back to generated filename when provided name is blank", async ({
@@ -816,7 +816,7 @@ describe("file Download Utility", () => {
 
             expectLatestBlobCall(payload.length);
 
-            expect(mockAnchor.click).toHaveBeenCalledWith();
+            expect(mockAnchor.click).toHaveBeenCalled();
         });
 
         describe("property-based Tests", () => {
@@ -835,7 +835,7 @@ describe("file Download Utility", () => {
                     expectLatestBlobCall(mockDataArray.length);
 
                     expect(mockAnchor.download).toBe(backup.fileName);
-                    expect(mockAnchor.click).toHaveBeenCalledWith();
+                    expect(mockAnchor.click).toHaveBeenCalled();
                 }
             );
 

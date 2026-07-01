@@ -8,7 +8,7 @@ import type { Site } from "@shared/types";
 import type * as React from "react";
 
 import { act, renderHook } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SelectorHookMock } from "../../utils/createSelectorHookMock";
@@ -18,7 +18,7 @@ import { createSitesStoreMock } from "../../utils/createSitesStoreMock";
 import { createMockMonitor, createMockSite } from "../../utils/mockFactories";
 
 const useSitesStoreMockRef = vi.hoisted(() => ({
-    current: safeCastTo<SelectorHookMock<any> | undefined>(undefined),
+    current: undefined as SelectorHookMock<any> | undefined,
 }));
 
 // Mock the dependencies

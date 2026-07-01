@@ -346,7 +346,9 @@ describe("playInAppAlertTone", () => {
         createOscillatorSpy = vi.fn(() => new MockOscillator());
         createGainSpy = vi.fn(() => new MockGain());
 
-        originalAudioContext = AudioContext;
+        originalAudioContext = (
+            globalThis as unknown as { AudioContext?: typeof AudioContext }
+        ).AudioContext;
         (
             globalThis as unknown as { AudioContext: typeof AudioContext }
         ).AudioContext = TestAudioContext as unknown as typeof AudioContext;

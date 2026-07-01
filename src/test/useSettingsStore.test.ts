@@ -211,9 +211,7 @@ describe(useSettingsStore, () => {
 
             await useSettingsStore.getState().initializeSettings();
 
-            expect(
-                mockElectronAPI.settings.getHistoryLimit
-            ).toHaveBeenCalledWith();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(250);

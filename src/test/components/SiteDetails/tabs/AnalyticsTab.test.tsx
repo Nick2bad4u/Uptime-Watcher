@@ -57,19 +57,17 @@ const {
     errorLogs,
 } = vi.hoisted(() => ({
     availabilityState: { variant: "success" },
-    badgeInvocations: safeCastTo<BadgeInvocation[]>([]),
-    buttonInvocations: safeCastTo<ButtonInvocation[]>([]),
-    progressInvocations: safeCastTo<ProgressInvocation[]>([]),
-    responseTimeChartInvocations: safeCastTo<ChartInvocation[]>([]),
-    statusChartInvocations: safeCastTo<ChartInvocation[]>([]),
-    uptimeChartInvocations: safeCastTo<ChartInvocation[]>([]),
-    userActionLogs: safeCastTo<
-        {
-            readonly event: string;
-            readonly payload: unknown;
-        }[]
-    >([]),
-    errorLogs: safeCastTo<(readonly [string, Error])[]>([]),
+    badgeInvocations: [] as BadgeInvocation[],
+    buttonInvocations: [] as ButtonInvocation[],
+    progressInvocations: [] as ProgressInvocation[],
+    responseTimeChartInvocations: [] as ChartInvocation[],
+    statusChartInvocations: [] as ChartInvocation[],
+    uptimeChartInvocations: [] as ChartInvocation[],
+    userActionLogs: [] as {
+        readonly event: string;
+        readonly payload: unknown;
+    }[],
+    errorLogs: [] as (readonly [string, Error])[],
 }));
 
 const themeStub = vi.hoisted(() => ({

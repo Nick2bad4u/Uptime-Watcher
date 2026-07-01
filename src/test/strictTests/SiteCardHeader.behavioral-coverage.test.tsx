@@ -6,7 +6,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { ChangeEvent, ReactNode } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteCardHeader } from "../../components/Dashboard/SiteCard/SiteCardHeader";
@@ -30,11 +30,11 @@ interface ActionButtonGroupMockProperties {
     onStopSiteMonitoring: () => void;
 }
 
-const monitorSelectorProps = vi.hoisted(() =>
-    safeCastTo<MonitorSelectorMockProperties[]>([])
+const monitorSelectorProps = vi.hoisted(
+    () => [] as MonitorSelectorMockProperties[]
 );
-const actionButtonGroupProps = vi.hoisted(() =>
-    safeCastTo<ActionButtonGroupMockProperties[]>([])
+const actionButtonGroupProps = vi.hoisted(
+    () => [] as ActionButtonGroupMockProperties[]
 );
 
 vi.mock(
@@ -145,10 +145,10 @@ describe("SiteCardHeader coverage", () => {
         );
 
         fireEvent.click(screen.getByTestId("mock-monitor-selector"));
-        expect(interactions.onMonitorIdChange).toHaveBeenCalledWith();
+        expect(interactions.onMonitorIdChange).toHaveBeenCalled();
 
         fireEvent.click(screen.getByTestId("mock-check-now"));
-        expect(interactions.onCheckNow).toHaveBeenCalledWith();
+        expect(interactions.onCheckNow).toHaveBeenCalled();
 
         expect(arrayFirst(monitorSelectorProps)).toMatchObject({
             monitors: baseSite.monitors,

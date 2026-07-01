@@ -551,9 +551,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             const syncStatus = await store.getSyncStatus();
             expect(syncStatus).toEqual(mockSyncStatus);
-            expect(
-                mockElectronAPI.stateSync.getSyncStatus
-            ).toHaveBeenCalledWith();
+            expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
 
             await store.syncSites();
             await store.fullResyncSites();

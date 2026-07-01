@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteTableRow } from "../../components/Dashboard/SiteList/SiteTableRow";
@@ -41,7 +41,7 @@ vi.mock("../../theme/components/ThemedText", () => ({
 }));
 
 const statusBadgeMock = vi.hoisted(() => ({
-    props: safeCastTo<UnknownRecord[]>([]),
+    props: [] as UnknownRecord[],
     component: (props: UnknownRecord) => {
         statusBadgeMock.props.push(props);
         return <div data-testid="status-badge" />;
@@ -53,7 +53,7 @@ vi.mock("../../components/common/StatusBadge", () => ({
 }));
 
 const monitorSelectorMock = vi.hoisted(() => ({
-    props: safeCastTo<UnknownRecord[]>([]),
+    props: [] as UnknownRecord[],
     component: (props: {
         monitors: unknown;
         onChange: (event: { target: { value: string } }) => void;
@@ -82,7 +82,7 @@ vi.mock(
 );
 
 const actionButtonGroupMock = vi.hoisted(() => ({
-    props: safeCastTo<UnknownRecord[]>([]),
+    props: [] as UnknownRecord[],
     component: (props: {
         isLoading: boolean;
         onCheckNow: () => void;

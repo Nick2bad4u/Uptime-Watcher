@@ -444,7 +444,7 @@ describe(useCloudStore, () => {
         expect(
             cloudServiceMock.CloudService.restoreBackup
         ).toHaveBeenCalledWith("backups/1.sqlite");
-        expect(cloudServiceMock.CloudService.getStatus).toHaveBeenCalledWith();
+        expect(cloudServiceMock.CloudService.getStatus).toHaveBeenCalled();
 
         const [toast] = useAlertStore.getState().toasts;
         expect(toast?.variant).toBe("success");

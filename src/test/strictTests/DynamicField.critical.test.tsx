@@ -705,7 +705,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
             await user.type(input, "test");
 
             // Should call onChange for each character - verify multiple calls were made
-            expect(mockOnChange).toHaveBeenCalledWith();
+            expect(mockOnChange).toHaveBeenCalled();
             expect(mockOnChange.mock.calls.length).toBeGreaterThan(0);
 
             // Check that calls contain individual characters as expected from userEvent.type()
@@ -787,7 +787,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
             await user.type(input, "8080");
 
             // Should call onChange - verify it was called and with numeric values
-            expect(mockOnChange).toHaveBeenCalledWith();
+            expect(mockOnChange).toHaveBeenCalled();
             expect(mockOnChange.mock.calls.length).toBeGreaterThan(0);
 
             // Verify that calls contain numeric values and eventually the complete number

@@ -5,7 +5,7 @@
 import type { ReactNode } from "react";
 
 import { render, screen } from "@testing-library/react";
-import { arrayAt, arrayFirst, safeCastTo } from "ts-extras";
+import { arrayAt, arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DynamicField } from "../../components/AddSiteForm/DynamicField";
@@ -45,10 +45,8 @@ interface SelectFieldMockProps {
     value: string;
 }
 
-const textFieldProps = vi.hoisted(() => safeCastTo<TextFieldMockProps[]>([]));
-const selectFieldProps = vi.hoisted(() =>
-    safeCastTo<SelectFieldMockProps[]>([])
-);
+const textFieldProps = vi.hoisted(() => [] as TextFieldMockProps[]);
+const selectFieldProps = vi.hoisted(() => [] as SelectFieldMockProps[]);
 
 vi.mock("../../components/AddSiteForm/TextField", () => ({
     TextField: (props: TextFieldMockProps) => {

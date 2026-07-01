@@ -412,7 +412,7 @@ describe("Settings Component", () => {
         fireEvent.click(closeButton);
 
         await waitFor(() => {
-            expect(mockOnClose).toHaveBeenCalledWith();
+            expect(mockOnClose).toHaveBeenCalled();
         });
     });
 
@@ -493,7 +493,7 @@ describe("Settings Component", () => {
         fireEvent.click(resetButton);
 
         await waitFor(() => {
-            expect(mockSettingsStore.resetSettings).toHaveBeenCalledWith();
+            expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
         });
         expect(confirmMock).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -550,7 +550,7 @@ describe("Settings Component", () => {
         });
         fireEvent.click(syncButton);
 
-        expect(mockSitesStore.fullResyncSites).toHaveBeenCalledWith();
+        expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
     });
 
     it("should handle SQLite backup save", ({ task, annotate }) => {
@@ -571,7 +571,7 @@ describe("Settings Component", () => {
         });
         fireEvent.click(downloadButton);
 
-        expect(mockSitesStore.saveSqliteBackup).toHaveBeenCalledWith();
+        expect(mockSitesStore.saveSqliteBackup).toHaveBeenCalled();
     });
 
     it("should handle theme changes", ({ task, annotate }) => {
@@ -722,7 +722,7 @@ describe("Settings Component", () => {
                 await vi.advanceTimersByTimeAsync(200);
             });
 
-            expect(mockPlayInAppAlertTone).toHaveBeenCalledWith();
+            expect(mockPlayInAppAlertTone).toHaveBeenCalled();
         } finally {
             vi.useRealTimers();
         }

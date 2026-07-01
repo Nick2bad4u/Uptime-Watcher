@@ -110,7 +110,7 @@ type BridgeRoot = typeof window extends { electronAPI: infer T } ? T : unknown;
 
 const getGlobalWindow = (): unknown => {
     if (typeof window !== "undefined") {
-        return globalThis;
+        return window;
     }
 
     const globalObject = safeCastTo<{ window?: unknown }>(globalThis);

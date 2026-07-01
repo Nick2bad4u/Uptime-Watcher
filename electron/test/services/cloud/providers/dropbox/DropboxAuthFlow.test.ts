@@ -26,8 +26,15 @@ async function httpGet(
     url: string
 ): Promise<{ body: string; statusCode: number }> {
     return new Promise((resolve, reject) => {
-        const client = new URL(url).protocol === "https:" ? https : http;
-        const request = client.get(url, (response) => {
+        const parsedUrl = new URL(url);
+        const requestUrl =
+            parsedUrl.protocol === "https:" &&
+            parsedUrl.hostname === "127.0.0.1"
+                ? new URL(
+                      `http://${parsedUrl.host}${parsedUrl.pathname}${parsedUrl.search}`
+                  )
+                : parsedUrl;
+        const handleResponse = (response: http.IncomingMessage) => {
             const chunks: Buffer[] = [];
             response.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
             response.on("end", () => {
@@ -36,7 +43,11 @@ async function httpGet(
                     body: Buffer.concat(chunks).toString("utf8"),
                 });
             });
-        });
+        };
+        const request =
+            requestUrl.protocol === "https:"
+                ? https.get(requestUrl, handleResponse)
+                : http.get(requestUrl, handleResponse);
         request.on("error", reject);
     });
 }
@@ -130,7 +141,7 @@ describe(DropboxAuthFlow, () => {
 
             expect(capturedState).toBeTruthy();
             expect(capturedRedirectUri).toMatch(
-                /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/v
+                /^https:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/v
             );
 
             if (capturedRedirectUri === undefined) {

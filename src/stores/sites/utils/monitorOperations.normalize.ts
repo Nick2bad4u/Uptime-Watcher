@@ -16,7 +16,6 @@ import {
     MIN_MONITOR_CHECK_INTERVAL_MS,
 } from "@shared/constants/monitoring";
 import {
-    BASE_MONITOR_TYPES,
     DEFAULT_MONITOR_STATUS,
     isMonitorStatus,
     type Monitor,
@@ -29,7 +28,6 @@ import {
     safeInteger,
 } from "@shared/validation/validatorUtils";
 import {
-    arrayFirst,
     isFinite as isFiniteNumber,
     objectEntries,
     safeCastTo,
@@ -72,6 +70,7 @@ const DEFAULT_MONITOR_TIMEOUT_MS = 30_000;
 const DEFAULT_MONITOR_RETRY_ATTEMPTS = 3;
 const IS_DEFAULT_MONITOR_MONITORING = true;
 const DEFAULT_SSL_WARNING_DAYS = 30;
+const DEFAULT_MONITOR_TYPE: MonitorType = "http";
 
 const HTTP_DEFAULT_URL = "https://example.com";
 
@@ -167,7 +166,7 @@ function resolveMonitorTypeOrDefault(type: unknown): MonitorType {
         return type;
     }
 
-    return arrayFirst(BASE_MONITOR_TYPES);
+    return DEFAULT_MONITOR_TYPE;
 }
 
 /**

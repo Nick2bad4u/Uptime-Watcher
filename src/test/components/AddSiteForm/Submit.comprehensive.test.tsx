@@ -262,9 +262,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             // Call with correct signature (event, properties)
             await handleSubmit(mockEvent, properties);
 
-            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-            expect(properties.createSite).toHaveBeenCalledWith();
-            expect(properties.onSuccess).toHaveBeenCalledWith();
+            expect(mockEvent.preventDefault).toHaveBeenCalled();
+            expect(properties.createSite).toHaveBeenCalled();
+            expect(properties.onSuccess).toHaveBeenCalled();
             expect(validationModule.createMonitorObject).toHaveBeenCalledWith(
                 properties.monitorType,
                 expect.objectContaining({ url: properties.url })
@@ -294,7 +294,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+            expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(properties.setFormError).toHaveBeenCalledWith(
                 "Invalid URL format"
             );
@@ -331,9 +331,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-            expect(properties.addMonitorToSite).toHaveBeenCalledWith();
-            expect(properties.onSuccess).toHaveBeenCalledWith();
+            expect(mockEvent.preventDefault).toHaveBeenCalled();
+            expect(properties.addMonitorToSite).toHaveBeenCalled();
+            expect(properties.onSuccess).toHaveBeenCalled();
             expect(validationModule.createMonitorObject).toHaveBeenCalledWith(
                 properties.monitorType,
                 expect.objectContaining({ url: properties.url })
@@ -481,9 +481,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-                expect(properties.createSite).toHaveBeenCalledWith();
-                expect(properties.onSuccess).toHaveBeenCalledWith();
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.createSite).toHaveBeenCalled();
+                expect(properties.onSuccess).toHaveBeenCalled();
                 expect(
                     validationModule.createMonitorObject
                 ).toHaveBeenCalledWith(
@@ -534,8 +534,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-                expect(properties.setFormError).toHaveBeenCalledWith();
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.setFormError).toHaveBeenCalled();
                 expect(properties.createSite).not.toHaveBeenCalled();
                 expect(
                     validationModule.createMonitorObject
@@ -579,8 +579,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-                expect(properties.createSite).toHaveBeenCalledWith();
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.createSite).toHaveBeenCalled();
 
                 // Verify Port config characteristics
                 expect(portConfig.port).toBeGreaterThanOrEqual(1);
@@ -620,8 +620,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-                expect(properties.setFormError).toHaveBeenCalledWith();
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.setFormError).toHaveBeenCalled();
                 expect(properties.createSite).not.toHaveBeenCalled();
 
                 // Form should handle invalid input without crashing
@@ -674,11 +674,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, propertiesWithReject);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-                expect(propertiesWithReject.createSite).toHaveBeenCalledWith();
-                expect(
-                    propertiesWithReject.setFormError
-                ).toHaveBeenCalledWith();
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(propertiesWithReject.createSite).toHaveBeenCalled();
+                expect(propertiesWithReject.setFormError).toHaveBeenCalled();
 
                 // Verify error characteristics
                 expect([
@@ -714,14 +712,14 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
-                expect(properties.onSuccess).toHaveBeenCalledWith();
+                expect(mockEvent.preventDefault).toHaveBeenCalled();
+                expect(properties.onSuccess).toHaveBeenCalled();
 
                 // Verify mode-specific behavior
                 if (addMode === "new") {
-                    expect(properties.createSite).toHaveBeenCalledWith();
+                    expect(properties.createSite).toHaveBeenCalled();
                 } else {
-                    expect(properties.addMonitorToSite).toHaveBeenCalledWith();
+                    expect(properties.addMonitorToSite).toHaveBeenCalled();
                 }
 
                 expect(["new", "existing"]).toContain(addMode);
@@ -757,7 +755,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 // Process all submissions
                 for (const { mockEvent, properties } of submissions) {
                     await handleSubmit(mockEvent, properties);
-                    expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+                    expect(mockEvent.preventDefault).toHaveBeenCalled();
                 }
 
                 // Verify submission characteristics
@@ -956,7 +954,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 expect(
                     validationModule.validateMonitorFormData
-                ).toHaveBeenCalledWith();
+                ).toHaveBeenCalled();
                 const calls =
                     validationModule.validateMonitorFormData.mock.calls;
                 const lastCall = arrayAt(calls, -1);

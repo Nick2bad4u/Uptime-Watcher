@@ -832,7 +832,7 @@ describe("time Utilities", () => {
                     // Property: Minutes should be between 1-59
                     const minutesMatch = /^(?<minutes>\d+)m/v.exec(result);
 
-                    expect(minutesMatch).toBe(true);
+                    expect(minutesMatch).not.toBeNull();
 
                     const minutesCapture = minutesMatch![1];
                     if (!minutesCapture) {
@@ -848,7 +848,7 @@ describe("time Utilities", () => {
                     // Property: Seconds should be between 0-59
                     const secondsMatch = /(?<seconds>\d+)s$/v.exec(result);
 
-                    expect(secondsMatch).toBe(true);
+                    expect(secondsMatch).not.toBeNull();
 
                     const secondsCapture = secondsMatch![1];
                     if (!secondsCapture) {
@@ -873,7 +873,7 @@ describe("time Utilities", () => {
                     // Property: Hours should be at least 1
                     const hoursMatch = /^(?<hours>\d+)h/v.exec(result);
 
-                    expect(hoursMatch).toBe(true);
+                    expect(hoursMatch).not.toBeNull();
 
                     const hoursCapture = hoursMatch![1];
                     if (!hoursCapture) {
@@ -888,7 +888,7 @@ describe("time Utilities", () => {
                     // Property: Minutes should be between 0-59
                     const minutesMatch = /(?<minutes>\d+)m$/v.exec(result);
 
-                    expect(minutesMatch).toBe(true);
+                    expect(minutesMatch).not.toBeNull();
 
                     const minutesCapture = minutesMatch![1];
                     if (!minutesCapture) {

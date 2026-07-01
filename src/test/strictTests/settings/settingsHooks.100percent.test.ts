@@ -250,7 +250,7 @@ describe(useSettingsChangeHandlers, () => {
             expect.objectContaining({ historyLimit: 2500, theme: "light" })
         );
         expect(mockedLogger.warn).toHaveBeenCalledTimes(1);
-        expect(mockedLogger.user.settingsChange).toHaveBeenCalledWith();
+        expect(mockedLogger.user.settingsChange).toHaveBeenCalled();
     });
 
     it("does not call updateSettings when there are no effective changes", async () => {

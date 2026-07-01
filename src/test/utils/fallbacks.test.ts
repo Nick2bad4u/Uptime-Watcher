@@ -500,7 +500,7 @@ describe("fallback Utilities", () => {
 
                 expect(result).toBe(fallback);
                 expect(operation).toHaveBeenCalledTimes(1);
-                expect(logger.logger.error).toHaveBeenCalledWith();
+                expect(logger.logger.error).toHaveBeenCalled();
             });
 
             it("should handle different error types", async ({
@@ -525,7 +525,7 @@ describe("fallback Utilities", () => {
                 );
 
                 expect(result).toBe(fallback);
-                expect(logger.logger.error).toHaveBeenCalledWith();
+                expect(logger.logger.error).toHaveBeenCalled();
             });
 
             it("should log the error with operation name", async ({
@@ -592,7 +592,7 @@ describe("fallback Utilities", () => {
 
                     expect(result).toBe(fallbackValue);
                     expect(operation).toHaveBeenCalledTimes(1);
-                    expect(logger.logger.error).toHaveBeenCalledWith();
+                    expect(logger.logger.error).toHaveBeenCalled();
                 }
             );
 
@@ -619,7 +619,7 @@ describe("fallback Utilities", () => {
                     );
 
                     expect(result).toBe(fallbackValue);
-                    expect(logger.logger.error).toHaveBeenCalledWith();
+                    expect(logger.logger.error).toHaveBeenCalled();
                 }
             );
         });

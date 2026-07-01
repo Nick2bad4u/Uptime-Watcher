@@ -337,7 +337,7 @@ describe("Header Assignment Operator Mutations", () => {
         expect(container).toBeInTheDocument();
 
         // We can test the aggregate function directly by checking the store calls
-        expect(mockUseSitesStore).toHaveBeenCalledWith();
+        expect(mockUseSitesStore).toHaveBeenCalled();
     });
 
     /**
@@ -444,7 +444,7 @@ describe("Header Assignment Operator Mutations", () => {
         // With mutation: site1 has 3 pending - site2 has 1 pending = 2 total pending (wrong)
 
         expect(container).toBeInTheDocument();
-        expect(mockUseSitesStore).toHaveBeenCalledWith();
+        expect(mockUseSitesStore).toHaveBeenCalled();
     });
 
     /**
@@ -561,6 +561,6 @@ describe("Header Assignment Operator Mutations", () => {
         // If paused mutation: site1(1) - site2(1) - site3(0) = 0 (wrong)
         // If pending mutation: site1(1) - site2(1) - site3(0) = 0 (wrong)
 
-        expect(mockUseSitesStore).toHaveBeenCalledWith();
+        expect(mockUseSitesStore).toHaveBeenCalled();
     });
 });

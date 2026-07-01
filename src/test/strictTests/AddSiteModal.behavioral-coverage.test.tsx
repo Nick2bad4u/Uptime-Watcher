@@ -11,7 +11,6 @@ import {
     waitFor,
     within,
 } from "@testing-library/react";
-import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
@@ -21,9 +20,8 @@ const themeState = vi.hoisted(() => ({
 }));
 
 vi.mock("../../theme/useTheme", async (importOriginal) => {
-    const actual = safeCastTo<typeof import("../../theme/useTheme")>(
-        await importOriginal()
-    );
+    const actual =
+        await importOriginal<typeof import("../../theme/useTheme")>();
     return {
         ...actual,
         useTheme: () => ({
@@ -33,7 +31,7 @@ vi.mock("../../theme/useTheme", async (importOriginal) => {
 });
 
 const addSiteFormMock = vi.hoisted(() => ({
-    lastOnSuccess: safeCastTo<(() => void) | undefined>(undefined),
+    lastOnSuccess: undefined as (() => void) | undefined,
     component: ({ onSuccess }: { onSuccess: () => void }) => {
         addSiteFormMock.lastOnSuccess = onSuccess;
         return <div data-testid="add-site-form-mock" />;

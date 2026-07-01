@@ -189,9 +189,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(
-                mockElectronAPI.settings.getHistoryLimit
-            ).toHaveBeenCalledWith();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
             expect(result.current.settings.historyLimit).toBe(2000);
         });
 
@@ -223,9 +221,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(
-                mockElectronAPI.settings.getHistoryLimit
-            ).toHaveBeenCalledWith();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
             expect(logger.warn).toHaveBeenCalledWith(
                 "Failed to sync settings after rehydration:",
                 expect.any(Error)

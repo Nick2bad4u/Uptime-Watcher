@@ -178,9 +178,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             expect(state.settings.historyLimit).toBe(250);
 
             // Verify API calls
-            expect(
-                mockElectronAPI.settings.getHistoryLimit
-            ).toHaveBeenCalledWith();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
         });
 
         it("should handle backend errors in syncFromBackend", async ({

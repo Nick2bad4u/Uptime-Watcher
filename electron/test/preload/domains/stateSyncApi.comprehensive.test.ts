@@ -288,9 +288,9 @@ describe("State Sync Domain API", () => {
         // Must match the shared Zod schemas:
         // - identifier: /^[\dA-Z:_-]+$/i
         // - name: /^[\dA-Z .:_-]+$/i
-        const siteIdentifierArb = fc.stringMatching(/^[\w\-:]{1,50}$/v);
+        const siteIdentifierArb = fc.stringMatching(/^[\w\-:]{1,50}$/u);
         const siteNameArb = fc
-            .stringMatching(/^[\w \-.:]{1,120}$/v)
+            .stringMatching(/^[\w \-.:]{1,120}$/u)
             .filter((name) => name.trim().length > 0);
 
         it("should handle various full sync scenarios", async () => {

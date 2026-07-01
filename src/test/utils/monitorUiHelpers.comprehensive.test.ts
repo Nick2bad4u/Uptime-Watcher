@@ -3,7 +3,6 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
 import { CacheKeys } from "@shared/utils/cacheKeys";
-import { safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MonitorTypesService } from "../../services/MonitorTypesService";
@@ -51,7 +50,7 @@ const monitorTypesStoreState = vi.hoisted(() => ({
     isLoading: false,
     lastError: undefined,
     loadMonitorTypes: vi.fn(),
-    monitorTypes: safeCastTo<MonitorTypeConfig[]>([]),
+    monitorTypes: [] as MonitorTypeConfig[],
     refreshMonitorTypes: vi.fn(),
     setError: vi.fn(),
     setLoading: vi.fn(),

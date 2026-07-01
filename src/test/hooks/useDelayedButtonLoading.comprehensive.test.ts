@@ -185,7 +185,7 @@ describe(useDelayedButtonLoading, () => {
             unmount();
 
             // Assert
-            expect(clearTimeoutSpy).toHaveBeenCalledWith();
+            expect(clearTimeoutSpy).toHaveBeenCalled();
         });
 
         it("should clear previous timeout when isLoading changes rapidly", async ({

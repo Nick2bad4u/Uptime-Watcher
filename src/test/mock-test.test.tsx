@@ -17,6 +17,6 @@ function TestComponent() {
 describe("Mock Test", () => {
     it("should use mocked version", () => {
         render(<TestComponent />);
-        expect(mockHook).toHaveBeenCalledWith();
+        expect(mockHook).toHaveBeenCalled();
     });
 });

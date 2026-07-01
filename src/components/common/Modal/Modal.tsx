@@ -359,7 +359,11 @@ export const Modal = ({
                 priority: escapePriority,
             },
         ],
-        [escapePriority, handleCloseTopMost, isOpen]
+        [
+            escapePriority,
+            handleCloseTopMost,
+            isOpen,
+        ]
     );
 
     useEscapeKeyModalHandler(escapeConfigs);
@@ -396,7 +400,11 @@ export const Modal = ({
                 }
             };
         },
-        [isBlocking, isOpen, modalId]
+        [
+            isBlocking,
+            isOpen,
+            modalId,
+        ]
     );
 
     useEffect(
@@ -507,7 +515,11 @@ export const Modal = ({
         }
 
         onRequestClose();
-    }, [closeOnOverlayClick, modalId, onRequestClose]);
+    }, [
+        closeOnOverlayClick,
+        modalId,
+        onRequestClose,
+    ]);
 
     const handleCloseButtonClick = useCallback((): void => {
         handleCloseTopMost();

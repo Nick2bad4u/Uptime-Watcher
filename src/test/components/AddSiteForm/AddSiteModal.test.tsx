@@ -13,7 +13,7 @@ import {
     within,
 } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
-import { arrayFirst, safeCastTo } from "ts-extras";
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteModal } from "../../../components/AddSiteForm/AddSiteModal";
@@ -30,8 +30,8 @@ interface FormInvocation {
 const { themeState, boxInvocations, formInvocations, closeIconSpy } =
     vi.hoisted(() => ({
         themeState: { isDark: false },
-        boxInvocations: safeCastTo<BoxInvocation[]>([]),
-        formInvocations: safeCastTo<FormInvocation[]>([]),
+        boxInvocations: [] as BoxInvocation[],
+        formInvocations: [] as FormInvocation[],
         closeIconSpy: vi.fn(({ size }: { readonly size?: number }) => (
             <svg data-size={size} data-testid="add-site-modal-close-icon" />
         )),
@@ -161,7 +161,7 @@ describe(AddSiteModal, () => {
         await waitFor(() => {
             expect(handleClose).toHaveBeenCalledTimes(1);
         });
-        expect(closeIconSpy).toHaveBeenCalledWith();
+        expect(closeIconSpy).toHaveBeenCalled();
         expect(arrayFirst(closeIconSpy.mock.calls)?.[0]).toEqual({ size: 18 });
     });
 });
