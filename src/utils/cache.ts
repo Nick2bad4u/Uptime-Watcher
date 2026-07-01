@@ -346,7 +346,7 @@ export class TypedCache<K, V> {
 
             // Find the least recently used entry (O(n) operation)
             for (const [entryKey, entry] of this.cache) {
-                if (!(entry.lastAccessed < oldestAccessTime)) {
+                if (entry.lastAccessed >= oldestAccessTime) {
                     continue;
                 }
 

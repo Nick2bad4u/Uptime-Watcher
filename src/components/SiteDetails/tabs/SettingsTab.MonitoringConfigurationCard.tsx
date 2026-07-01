@@ -343,13 +343,13 @@ export const SettingsTabMonitoringConfigurationCard = ({
                                         {formatSecondsWithMinutes(
                                             localTimeoutSeconds
                                         )}
-                                    </span>
-                                    <span> per attempt</span>
+                                    </span>{" "}
+                                    <span>per attempt</span>
                                     <span className="mx-1">×</span>
                                     <span className="inline-flex items-center gap-1">
                                         <RetryIcon aria-hidden size={14} />
-                                        {maxCheckDuration.totalAttempts}{" "}
-                                        attempts
+                                        {maxCheckDuration.totalAttempts}
+                                        {" attempts"}
                                     </span>
                                     <span className="mx-1">+</span>
                                     <span className="inline-flex items-center gap-1">
@@ -359,8 +359,8 @@ export const SettingsTabMonitoringConfigurationCard = ({
                                         />
                                         {formatSecondsWithMinutes(
                                             maxCheckDuration.backoffSeconds
-                                        )}{" "}
-                                        backoff
+                                        )}
+                                        {" backoff"}
                                     </span>
                                 </ThemedText>
                                 <div className="mt-2">

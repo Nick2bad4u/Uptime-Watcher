@@ -613,7 +613,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         let oldestTime = Infinity;
 
         for (const [key, entry] of this.cache) {
-            if (!(entry.timestamp < oldestTime)) {
+            if (entry.timestamp >= oldestTime) {
                 continue;
             }
 

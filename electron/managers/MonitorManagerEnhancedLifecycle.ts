@@ -78,6 +78,17 @@ export type MonitorActionDelegate = (
 
 type MonitorToggleKind = "start" | "stop";
 
+const getNextToggleStatus = (
+    kind: MonitorToggleKind,
+    monitor: Monitor
+): MonitorStatus => {
+    if (kind === "stop") {
+        return MONITOR_STATUS.PAUSED;
+    }
+
+    return monitor.monitoring ? monitor.status : MONITOR_STATUS.PENDING;
+};
+
 const toggleSingleMonitorEnhanced = async (args: {
     readonly applyMonitorState: EnhancedLifecycleHost["applyMonitorState"];
     readonly config: EnhancedLifecycleConfig;
@@ -108,12 +119,7 @@ const toggleSingleMonitorEnhanced = async (args: {
         return false;
     }
 
-    const status: MonitorStatus =
-        kind === "start"
-            ? monitor.monitoring
-                ? monitor.status
-                : MONITOR_STATUS.PENDING
-            : MONITOR_STATUS.PAUSED;
+    const status = getNextToggleStatus(kind, monitor);
     await applyMonitorState(
         site,
         monitor,
