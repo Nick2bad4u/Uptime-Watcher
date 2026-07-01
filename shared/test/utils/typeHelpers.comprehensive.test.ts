@@ -210,6 +210,8 @@ describe("Shared Type Helpers", () => {
             expect(safePropertyAccess(null, "any")).toBeUndefined();
             expect(safePropertyAccess(undefined, "any")).toBeUndefined();
             expect(safePropertyAccess("string", "any")).toBeUndefined();
+            expect(safePropertyAccess(["a", "b"], "length")).toBe(2);
+            expect(safePropertyAccess(["a", "b"], "0")).toBeUndefined();
         });
     });
 

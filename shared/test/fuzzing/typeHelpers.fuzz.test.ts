@@ -188,7 +188,13 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.string(), fc.anything()])(
             "should return property value when it exists",
             (key, value) => {
-                const obj = { [key]: value };
+                const obj: Record<string, unknown> = Object.create(null);
+                Object.defineProperty(obj, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value,
+                    writable: true,
+                });
 
                 const result = safePropertyAccess(obj, key);
                 expect(result).toBe(value);

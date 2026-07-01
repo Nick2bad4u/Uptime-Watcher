@@ -203,8 +203,16 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
         test.prop([fc.object(), fc.string()])(
             "should return property value when property exists",
             (obj, key) => {
-                // Add the key to guarantee it exists
-                const testObj = { ...obj, [key]: "test-value" };
+                // Add the key as an own data property. Object spread cannot
+                // represent "__proto__" this way because object literals treat
+                // it as prototype syntax.
+                const testObj: Record<string, unknown> = { ...obj };
+                Object.defineProperty(testObj, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: "test-value",
+                    writable: true,
+                });
                 const result = safePropertyAccess(testObj, key);
                 expect(result).toBe("test-value");
             }
