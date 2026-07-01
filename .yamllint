@@ -1,0 +1,1 @@
+extends: node_modules/yamllint-config-nick2bad4u/.yamllint

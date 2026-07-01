@@ -26,6 +26,9 @@
             ]
         },
         "rootDir": "../../../..",
+        "types": [
+            "node"
+        ],
         "tsBuildInfoFile": "../../../../.cache/tsbuildinfo/tsconfig.uptime-watcher-eslint.tsbuildinfo"
     },
     "exclude": [

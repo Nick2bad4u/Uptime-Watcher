@@ -25,7 +25,7 @@ tsconfig*.json @Nick2bad4u
 
 # Linting and code quality
 eslint.config.mjs @Nick2bad4u
-.prettierrc @Nick2bad4u
+prettier.config.mjs @Nick2bad4u
 stylelint.config.mjs @Nick2bad4u
 .cspell.json @Nick2bad4u
 

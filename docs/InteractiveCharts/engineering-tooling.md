@@ -66,7 +66,7 @@ graph TD
 
     subgraph Prettier["Prettier formatting"]
         PrettierRunner["prettier . --cache --cache-location .cache/.prettier-cache"]
-        PrettierConfig[".prettierrc + plugins"]
+        PrettierConfig["prettier.config.mjs + shared config"]
         PrettierCache[".cache/.prettier-cache"]
     end
 
@@ -82,7 +82,7 @@ graph TD
         Complexity["eslint complexity override\n + cognitive-complexity-ts"]
         Knip["knip -- include unused exports"]
         Depcheck["depcheck --ignores @types/*"]
-        Yamllint["yamllint -c config/linting/.yamllint"]
+        Yamllint["yamllint -c .yamllint"]
         Grype["grype . -c config/linting/.grype.yaml"]
     end
 

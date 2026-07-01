@@ -372,7 +372,7 @@ const config: Config = {
                         memo: true, // Wrap component with React.memo
                         native: false, // Produce web React components (not React Native)
                         prettier: true, // Run Prettier on output
-                        prettierConfig: "../../.prettierrc",
+                        prettierConfig: "../../prettier.config.mjs",
                         replaceAttrValues: {
                             "#000": "currentColor",
                             "#000000": "currentColor",

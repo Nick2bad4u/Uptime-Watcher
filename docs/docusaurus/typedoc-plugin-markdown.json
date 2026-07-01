@@ -102,7 +102,7 @@
     "interfacePropertiesFormat": "list",
     "json": "docs/typedoc.json",
     "mergeReadme": true,
-    "prettierConfigFile": "../../.prettierrc",
+    "prettierConfigFile": "../../prettier.config.mjs",
     "sanitizeComments": false,
     "tableColumnSettings": {
         "hideDefaults": false,

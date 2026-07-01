@@ -1,0 +1,174 @@
+## Executive Summary
+
+- The repo has a strong baseline: strict TypeScript settings, a clear `src` / `electron` / `shared` split, generated IPC artifacts, custom architecture guards, pinned GitHub Actions, and broad test coverage.
+- Focused architecture checks passed: `npm run check:ipc`, `npm run lint:architecture`, `npm run lint:circular`, and `npm run sync:node-version-files:check`. `check:ipc` printed a Node `DEP0205` warning, and `lint:circular` reported 2 Madge warnings despite exiting zero.
+- The main long-term risk is not missing tooling; it is too much custom tooling and surface area: `package.json` is ~90 KB, `eslint.config.mjs` is ~560 KB, the local ESLint plugin has 63 rules, and several core files are 800–1,100+ lines.
+- Architecture boundaries are mostly enforced, but event typing is not fully closed at the type level: `UptimeEvents` extends `Record<string, EventPayloadValue>`, so string event names rely heavily on static guard scripts.
+- Renderer isolation is good in source practice, but `tsconfig.json` still gives renderer code ambient `node`, `electron`, and `vitest/globals` types, which weakens compile-time boundary enforcement.
+- Release/versioning is the clearest “must fix soon” area: `.github/workflows/Build.yml` auto-bumps versions from workflow logic, while `README` and security docs are stale versus `package.json`.
+- The test suite is extensive, but the amount of “comprehensive”, “coverage”, “final”, “debug”, and similarly named tests suggests coverage-maintenance debt rather than purely behavior-focused confidence.
+- I did not run full `lint:all`, `type-check:all`, `test:all`, or `build`; this review is based on static inspection plus targeted architecture checks.
+
+## Prioritized Long-Term Goals
+
+### 1. Make Release and Versioning Fail-Safe
+
+**Why it matters:** Release automation can publish the wrong version or stale metadata if versioning is inferred from workflow state instead of release intent.
+
+**Current evidence:**
+- `package.json` is `23.8.0`
+- `README.md` still advertises `19.1.0`
+- `SECURITY.md` lists stale dependency versions
+- `.github/workflows/Build.yml` computes version bumps internally and commits/tags from the workflow
+
+**Recommended direction:** Require explicit release intent, validate docs/package metadata before tagging, and keep `electron-builder.config.ts` as the single packaging source if the `package.json#build` block is not intentionally needed.
+
+**Suggested first steps:** Add a release dry-run check that validates package version, README badges, SECURITY dependency table, changelog state, and Electron builder config source-of-truth before any tag is created.
+
+- **Risk/complexity:** Medium
+- **Priority:** P0
+
+### 2. Close IPC and Event Contracts at the Type Level
+
+**Why it matters:** Event names and payloads are architecture-critical; guard scripts help, but TypeScript should reject invalid event names before custom checks run.
+
+**Current evidence:**
+- `electron/events/eventTypes.ts` defines `UptimeEvents extends Record<string, EventPayloadValue>`
+- `TypedEventBus` uses `Record<string, EventPayloadValue>`
+- `npm run check:ipc` found 14 renderer event channels and 50 invoke channels, so this surface is large enough to justify stricter contracts
+
+**Recommended direction:** Generate or define a closed `UptimeEventName` / event map union from the catalogue files, then keep `scripts/architecture-static-guards.mjs` as a drift detector rather than the primary safety net.
+
+**Suggested first steps:** Prototype one closed event map, add type-level tests for invalid event names and payloads, then migrate emit/listen helpers away from broad casts.
+
+- **Risk/complexity:** Medium
+- **Priority:** P0
+
+### 3. Split Large Orchestration Files Incrementally
+
+**Why it matters:** Files near 1,000 lines make change review, testing, and ownership harder, especially in Electron services where lifecycle, I/O, and security concerns meet.
+
+**Current evidence:**
+- `electron/services/window/WindowService.ts` — 1,176 lines
+- `electron/services/commands/DatabaseCommands.ts` — 1,008 lines
+- `electron/UptimeOrchestrator.ts` — 993 lines
+- `electron/services/monitoring/MonitorScheduler.ts` — 992 lines
+- `electron/services/ServiceContainer.ts` — 906 lines
+
+**Recommended direction:** Avoid rewrites. Extract pure policy and factory code while preserving existing public service APIs.
+
+**Suggested first steps:** Start with `MonitorScheduler` or `DatabaseCommands`: extract timeout/backoff/rollback/event-emission policy into small tested modules, then leave orchestration methods as thin coordinators.
+
+- **Risk/complexity:** Medium
+- **Priority:** P1
+
+### 4. Reduce Renderer Controller and Form Complexity
+
+**Why it matters:** Large React controllers that build JSX, manage effects, and perform service I/O become brittle and hard to test.
+
+**Current evidence:**
+- `src/components/Settings/useSettingsController.tsx` — 875 lines and returns many `ReactNode` controls
+- `src/components/AddSiteForm/AddSiteForm.tsx` — 765 lines and combines store selection, monitor type loading, validation state, handlers, and layout
+
+**Recommended direction:** Keep the existing Zustand/domain pattern, but split presentational sections from controller hooks. Hooks should primarily return data, state, and callbacks; components should own JSX.
+
+**Suggested first steps:** Extract Settings backup/restore and notification controls into focused components/hooks, then split Add Site form sections by target input, monitor fields, validation summary, and submit controls.
+
+- **Risk/complexity:** Medium
+- **Priority:** P1
+
+### 5. Strengthen TypeScript Environment Boundaries
+
+**Why it matters:** Renderer isolation should be enforced by TypeScript as well as ESLint and architecture scripts.
+
+**Current evidence:**
+- Root `tsconfig.json` includes `src/**/*`
+- It also exposes ambient `node`, `electron`, and `vitest/globals` types
+- Source inspection shows renderer code mostly follows the intended service/preload boundary, so the type config is looser than the architecture
+
+**Recommended direction:** Separate app, Electron, preload, and test ambient types. Keep Node/Electron globals out of renderer app typechecking.
+
+**Suggested first steps:** Introduce or tighten a renderer app `tsconfig`, move test globals to test-specific configs, run `npm run type-check:src`, and fix any hidden ambient-type dependencies.
+
+- **Risk/complexity:** Low to Medium
+- **Priority:** P1
+
+### 6. Tame Custom Tooling and Config Sprawl
+
+**Why it matters:** The repo already has strong automation; the risk is maintainability of the automation itself.
+
+**Current evidence:**
+- Root `package.json` has hundreds of scripts
+- `eslint.config.mjs` is very large
+- `vite.config.ts` mixes renderer build, Electron build, SQLite WASM handling, dev/test watcher behavior, bundle analysis, and Codecov upload logic
+- The custom ESLint plugin has 63 rules
+
+**Recommended direction:** Modularize by concern and document ownership. Do not remove useful guards blindly.
+
+**Suggested first steps:** Extract Vite config sections into small config helpers, add an index documenting each custom ESLint rule’s purpose and fixture coverage, and consolidate duplicate package-script aliases around a smaller set of canonical commands.
+
+- **Risk/complexity:** Medium
+- **Priority:** P1
+
+### 7. Reduce Test Suite Maintenance Debt
+
+**Why it matters:** High coverage is useful only if tests describe stable behavior. Coverage-chasing tests increase maintenance cost and hide the signal from important failures.
+
+**Current evidence:** The amount of “comprehensive”, “coverage”, “final”, “debug”, and similarly named tests suggests parts of the suite may be optimized more for coverage shape than for durable behavior guarantees.
+
+**Recommended direction:** Consolidate redundant tests, prefer behavior-oriented naming, and reserve broad matrix/coverage-heavy suites for areas where the maintenance cost and evidence remain acceptable.
+
+**Suggested first steps:** Inventory overlapping test files by feature, mark redundant suites, and define naming guidance that distinguishes regression, behavior, integration, and exhaustive coverage tests.
+
+- **Risk/complexity:** Medium
+- **Priority:** P1
+
+### 8. Turn Forced Installs into Tracked Dependency Debt
+
+**Why it matters:** `npm --force` can hide peer dependency conflicts and reduce CI reproducibility.
+
+**Current evidence:**
+- `.npmrc` sets `force=true`
+- Workflows use forced installs
+- Root `package.json` has 531 dev dependencies
+- The lockfile contains 6,645 package entries
+- `.github/workflows/AGENTS.md` says forced installs are currently required
+
+**Recommended direction:** Keep forced installs until the blockers are understood, but document the exact dependency conflicts and remove `force` where possible over time.
+
+**Suggested first steps:** Run an install without force in a scratch branch or disposable worktree, capture peer conflicts with `npm explain`, and create a dependency-debt checklist grouped by blocker.
+
+- **Risk/complexity:** Medium
+- **Priority:** P2
+
+### 9. Fix Contributor Documentation Drift
+
+**Why it matters:** Stale setup and version docs waste contributor time and reduce trust in otherwise strong architecture documentation.
+
+**Current evidence:**
+- `README.md` shows version `19.1.0` while `package.json` is `23.8.0`
+- `README` and `SECURITY` list older Electron, React, TypeScript, Vite, Node, and npm versions
+- `.node-version` / `.nvmrc` are `25.8.1`, while some docs still mention Node `24.8+` or workspace-specific lower engine floors
+
+**Recommended direction:** Generate or check repeated version facts instead of hand-maintaining them in several docs.
+
+**Suggested first steps:** Add a docs freshness check for package version, Node/npm versions, and major dependency versions; update `README`, `CONTRIBUTING`, `SECURITY`, and docs workspace engine notes.
+
+- **Risk/complexity:** Low
+- **Priority:** P2
+
+### 10. Improve CI Security Signal Quality
+
+**Why it matters:** Security workflows are present, but incomplete analysis can create false confidence.
+
+**Current evidence:**
+- The repo has CodeQL, dependency review, Scorecard, Gitleaks, TruffleHog, SonarCloud, MegaLinter, and pinned workflow actions
+- `.github/workflows/codeql.yml` allows dependency install and build steps to continue on error
+- Targeted checks surfaced unresolved warnings from Node loader usage and Madge
+
+**Recommended direction:** Make security scans either fail on incomplete setup or explicitly choose a documented no-build mode.
+
+**Suggested first steps:** Remove or narrow `continue-on-error` in CodeQL install/build steps, trace the `DEP0205` warning from `check:ipc`, and capture the Madge warnings from `lint:circular` as actionable maintenance issues.
+
+- **Risk/complexity:** Low to Medium
+- **Priority:** P2

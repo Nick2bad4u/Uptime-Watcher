@@ -73,7 +73,6 @@ const knipConfig: KnipConfig = {
         ".*prettier.*",
         "@commitlint.*",
         "@cspell.*",
-        "@csstools/stylelint-formatter-github",
         "@dword-design/eslint-plugin-import-alias",
         "@electron/notarize",
         "@eslint.*",
