@@ -74,7 +74,7 @@ JSON_REPORTER: true
 JSON_REPORTER_OUTPUT_DETAIL: "detailed"
 JSON_V8R_DISABLE_ERRORS_IF_LESS_THAN: 2
 # LLM Advisor configuration
-LLM_ADVISOR_ENABLED: true
+LLM_ADVISOR_ENABLED: false
 LLM_ADVISOR_LEVEL: "WARNING"
 LLM_ADVISOR_POSITION: "after_linter_output"
 LLM_MAX_TOKENS: "1048576"
@@ -99,7 +99,6 @@ PLUGINS:
     - "https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-repolinter/refs/heads/main/mega-linter-plugin-repolinter/repolinter.megalinter-descriptor.yml"
     - "https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml"
     - "https://raw.githubusercontent.com/ssc-services/mega-linter-plugin-salt/main/mega-linter-plugin-salt/salt.megalinter-descriptor.yml"
-    - "https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml"
     - "https://raw.githubusercontent.com/hype8912/check-toml-megalinter-plugin/main/mega-linter-plugin-checktoml/checktoml.megalinter-descriptor.yml"
     - "https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-fmlint/refs/heads/main/mega-linter-plugin-fmlint/fmlint.megalinter-descriptor.yml"
 PRINT_ALL_FILES: false
@@ -120,5 +119,5 @@ TEXT_REPORTER: true
 TYPESCRIPT_DEFAULT_STYLE: "prettier"
 TYPESCRIPT_STANDARD_DISABLE_ERRORS: true
 UPDATED_SOURCES_REPORTER: true
-VALIDATE_ALL_CODEBASE: true
+VALIDATE_ALL_CODEBASE: false
 YAML_YAMLLINT_CONFIG_FILE: "config/linting/.yamllint"

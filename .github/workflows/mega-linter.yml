@@ -5,19 +5,15 @@ run-name: "Mega Linter"
 
 on:
     push:
-        paths-ignore:
-            - "*"
-            - "*/**"
-            - "!src/**"
-            - "**/CHANGELOG.md"
-            - "CHANGELOG.md"
+        paths:
+            - ".github/workflows/mega-linter.yml"
+            - ".mega-linter.yml"
+            - "src/**"
     pull_request:
-        paths-ignore:
-            - "*"
-            - "*/**"
-            - "!src/**"
-            - "**/CHANGELOG.md"
-            - "CHANGELOG.md"
+        paths:
+            - ".github/workflows/mega-linter.yml"
+            - ".mega-linter.yml"
+            - "src/**"
     merge_group:
         types:
             - "checks_requested"
