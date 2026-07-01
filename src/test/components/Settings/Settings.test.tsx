@@ -14,7 +14,7 @@ import {
     waitFor,
     within,
 } from "@testing-library/react";
-import { arrayJoin, safeCastTo  } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ThemeName } from "../../../theme/types";
@@ -77,7 +77,7 @@ globalWithSettingsMocks.__useSettingsStoreMock_settings__ =
     useSettingsStoreMock;
 
 // Mock all dependencies
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: <Result = typeof errorStoreState,>(
         selector?: (state: typeof errorStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -91,7 +91,7 @@ vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../stores/settings/useSettingsStore'), () => ({
+vi.mock("../../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: <Result = typeof settingsStoreState,>(
         selector?: (state: typeof settingsStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -108,7 +108,7 @@ vi.mock(import('../../../stores/settings/useSettingsStore'), () => ({
 // Cloud settings integration triggers side-effectful store operations and IPC
 // calls. This suite focuses on the baseline Settings UI; CloudSettingsSection
 // has its own dedicated tests.
-vi.mock(import('../../../components/Settings/CloudSettingsSection'), () => ({
+vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
     CloudSettingsSection: (): null => null,
 }));
 
@@ -138,7 +138,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 globalWithSettingsMocks.__useSitesStoreMock_settings__ = useSitesStoreMock;
 
-vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -179,7 +179,7 @@ const themeState: { current: UnknownRecord } = {
     current: defaultThemeForSelectors,
 };
 
-vi.mock(import('../../../theme/useTheme'), () => {
+vi.mock("../../../theme/useTheme", () => {
     const useThemeMock = vi.fn(() => themeState.current);
     const useThemeClassesMock = vi.fn(() => ({
         join: vi.fn((...classes: readonly string[]) =>
@@ -203,7 +203,7 @@ vi.mock(import('../../../theme/useTheme'), () => {
     };
 });
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         warn: vi.fn(),
         error: vi.fn(),
@@ -214,20 +214,20 @@ vi.mock(import('../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../utils/errorHandling'), () => ({
+vi.mock("../../../utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         Error.isError(error) ? error : new Error(String(error))
     ),
 }));
 
-vi.mock(import('../../../hooks/usePrefersReducedMotion'), () => ({
+vi.mock("../../../hooks/usePrefersReducedMotion", () => ({
     usePrefersReducedMotion: () => false,
 }));
-vi.mock(import('../../../components/Alerts/alertCoordinator'), () => ({
+vi.mock("../../../components/Alerts/alertCoordinator", () => ({
     playInAppAlertTone: vi.fn().mockResolvedValue(undefined),
 }));
 const confirmMock = vi.fn();
-vi.mock(import('../../../hooks/ui/useConfirmDialog'), () => ({
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => confirmMock,
 }));
 
@@ -492,9 +492,9 @@ describe("Settings Component", () => {
         });
         fireEvent.click(resetButton);
 
-        await waitFor(() =>
-            { expect(mockSettingsStore.resetSettings).toHaveBeenCalledWith(); }
-        );
+        await waitFor(() => {
+            expect(mockSettingsStore.resetSettings).toHaveBeenCalledWith();
+        });
         expect(confirmMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 message:
@@ -527,9 +527,9 @@ describe("Settings Component", () => {
         });
         fireEvent.click(resetButton);
 
-        await waitFor(() =>
-            { expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled(); }
-        );
+        await waitFor(() => {
+            expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled();
+        });
     });
 
     it("should handle sync settings", async ({ task, annotate }) => {

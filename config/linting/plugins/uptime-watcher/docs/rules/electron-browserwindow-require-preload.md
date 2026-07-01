@@ -17,12 +17,12 @@ No options.
 
 ```ts
 new BrowserWindow({
-  webPreferences: {
-    contextIsolation: true,
-    sandbox: true,
-    nodeIntegration: false,
-    webviewTag: false,
-  },
+ webPreferences: {
+  contextIsolation: true,
+  sandbox: true,
+  nodeIntegration: false,
+  webviewTag: false,
+ },
 });
 ```
 
@@ -30,12 +30,12 @@ new BrowserWindow({
 
 ```ts
 new BrowserWindow({
-  webPreferences: {
-    contextIsolation: true,
-    sandbox: true,
-    nodeIntegration: false,
-    webviewTag: false,
-    preload: getPreloadPath(),
-  },
+ webPreferences: {
+  contextIsolation: true,
+  sandbox: true,
+  nodeIntegration: false,
+  webviewTag: false,
+  preload: getPreloadPath(),
+ },
 });
 ```

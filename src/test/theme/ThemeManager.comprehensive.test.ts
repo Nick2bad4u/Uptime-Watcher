@@ -10,17 +10,14 @@ import { ThemeManager } from "../../theme/ThemeManager";
 // Mock window.matchMedia
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation(
-        (query) =>
-            ({
-                addEventListener: vi.fn(),
-                dispatchEvent: vi.fn(),
-                matches: false,
-                media: query,
-                onchange: null,
-                removeEventListener: vi.fn(),
-            })
-    ),
+    value: vi.fn().mockImplementation((query) => ({
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        matches: false,
+        media: query,
+        onchange: null,
+        removeEventListener: vi.fn(),
+    })),
 });
 
 // Mock document with body
@@ -280,7 +277,9 @@ describe(ThemeManager, () => {
             delete (globalThis as any).document;
 
             const lightTheme = themeManager.getTheme("light");
-            expect(() => { themeManager.applyTheme(lightTheme); }).not.toThrow();
+            expect(() => {
+                themeManager.applyTheme(lightTheme);
+            }).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;
@@ -300,7 +299,9 @@ describe(ThemeManager, () => {
             const lightTheme = themeManager.getTheme("light");
 
             // Apply theme and verify it doesn't throw
-            expect(() => { themeManager.applyTheme(lightTheme); }).not.toThrow();
+            expect(() => {
+                themeManager.applyTheme(lightTheme);
+            }).not.toThrow();
 
             // Verify basic functionality (the actual calls may vary based on internal implementation)
             // We just verify that the applyTheme method executes without errors
@@ -319,7 +320,9 @@ describe(ThemeManager, () => {
 
             for (const themeName of availableThemes) {
                 const theme = themeManager.getTheme(themeName);
-                expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
+                expect(() => {
+                    themeManager.applyTheme(theme);
+                }).not.toThrow();
             }
         });
     });
@@ -479,9 +482,9 @@ describe(ThemeManager, () => {
                 borderRadius: {},
             } as any;
 
-            expect(() =>
-                { themeManager.applyTheme(incompleteTheme); }
-            ).not.toThrow();
+            expect(() => {
+                themeManager.applyTheme(incompleteTheme);
+            }).not.toThrow();
             expect(() =>
                 themeManager.generateCSSVariables(incompleteTheme)
             ).not.toThrow();
@@ -505,7 +508,9 @@ describe(ThemeManager, () => {
                 borderRadius: {},
             } as any;
 
-            expect(() => { themeManager.applyTheme(themeWithNulls); }).not.toThrow();
+            expect(() => {
+                themeManager.applyTheme(themeWithNulls);
+            }).not.toThrow();
         });
 
         it("should work without DOM environment", async ({
@@ -521,7 +526,9 @@ describe(ThemeManager, () => {
             delete (globalThis as any).document;
 
             const theme = themeManager.getTheme("light");
-            expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
+            expect(() => {
+                themeManager.applyTheme(theme);
+            }).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;

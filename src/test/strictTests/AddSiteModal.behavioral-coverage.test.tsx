@@ -20,9 +20,10 @@ const themeState = vi.hoisted(() => ({
     isDark: false,
 }));
 
-vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
-    const actual =
-        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual = safeCastTo<typeof import("../../theme/useTheme")>(
+        await importOriginal()
+    );
     return {
         ...actual,
         useTheme: () => ({
@@ -39,7 +40,7 @@ const addSiteFormMock = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../components/AddSiteForm/AddSiteForm'), () => ({
+vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
     AddSiteForm: addSiteFormMock.component,
 }));
 
@@ -49,7 +50,7 @@ const themedBoxMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedBox'), () => ({
+vi.mock("../../theme/components/ThemedBox", () => ({
     ThemedBox: themedBoxMock.component,
 }));
 
@@ -59,7 +60,7 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: themedTextMock.component,
 }));
 

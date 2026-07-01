@@ -10,7 +10,7 @@ const mockWaitForElectronBridge = vi.hoisted(() =>
     vi.fn(async () => undefined)
 );
 
-vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: class ElectronBridgeNotReadyError extends Error {
         public readonly diagnostics: unknown;
 
@@ -22,7 +22,7 @@ vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -31,7 +31,7 @@ vi.mock(import('../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('electron-log/renderer'), () => ({
+vi.mock("electron-log/renderer", () => ({
     default: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -41,7 +41,7 @@ vi.mock(import('electron-log/renderer'), () => ({
 }));
 
 // Override budgets so we can test without allocating huge buffers/strings.
-vi.mock(import('@shared/constants/backup'), async () => {
+vi.mock("@shared/constants/backup", async () => {
     const actual = await vi.importActual<
         typeof import("@shared/constants/backup")
     >("@shared/constants/backup");

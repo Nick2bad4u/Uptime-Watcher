@@ -2,7 +2,7 @@
  * Tests for AddSiteForm component focusing on achieving high coverage
  */
 
-import { objectEntries, objectValues, setHas   } from "ts-extras";
+import { objectEntries, objectValues, setHas } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 describe("AddSiteForm Component Coverage Tests", () => {

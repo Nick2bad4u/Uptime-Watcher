@@ -67,7 +67,9 @@ describe("databaseSchema upgrades (node-sqlite3-wasm)", () => {
                     .user_version
             ).toBe(1);
 
-            expect(() => { synchronizeDatabaseSchemaVersion(db); }).not.toThrow();
+            expect(() => {
+                synchronizeDatabaseSchemaVersion(db);
+            }).not.toThrow();
 
             const pragmaAfter = db.get("PRAGMA user_version") as {
                 user_version?: unknown;
@@ -139,7 +141,9 @@ describe("databaseSchema upgrades (node-sqlite3-wasm)", () => {
                 )`
             );
 
-            expect(() => { synchronizeDatabaseSchemaVersion(db); }).not.toThrow();
+            expect(() => {
+                synchronizeDatabaseSchemaVersion(db);
+            }).not.toThrow();
 
             const pragmaAfter = db.get("PRAGMA user_version") as {
                 user_version?: unknown;

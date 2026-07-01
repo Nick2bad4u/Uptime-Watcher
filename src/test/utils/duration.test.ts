@@ -612,11 +612,14 @@ describe("duration Utilities", () => {
                         const timeoutTime = timeout * totalAttempts;
                         const backoffTime =
                             retryAttempts > 0
-                                ? Math.sumPrecise(Array.from(
+                                ? Array.from(
                                       { length: retryAttempts },
                                       (_, index) =>
                                           Math.min(0.5 * 2 ** index, 5)
-                                  ))
+                                  ).reduce(
+                                      (total, backoff) => total + backoff,
+                                      0
+                                  )
                                 : 0;
 
                         const totalTime = Math.ceil(timeoutTime + backoffTime);
@@ -699,11 +702,14 @@ describe("duration Utilities", () => {
                         const timeoutTime = timeout * totalAttempts;
                         const backoffTime =
                             retryAttempts > 0
-                                ? Math.sumPrecise(Array.from(
+                                ? Array.from(
                                       { length: retryAttempts },
                                       (_, index) =>
                                           Math.min(0.5 * 2 ** index, 5)
-                                  ))
+                                  ).reduce(
+                                      (total, backoff) => total + backoff,
+                                      0
+                                  )
                                 : 0;
 
                         const totalTime = Math.ceil(timeoutTime + backoffTime);

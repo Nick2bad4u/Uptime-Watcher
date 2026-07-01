@@ -20,7 +20,9 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
         // Mock AbortSignal.timeout for fake timers compatibility
         vi.spyOn(AbortSignal, "timeout").mockImplementation((delay: number) => {
             const controller = new AbortController();
-            setTimeout(() => { controller.abort(); }, delay);
+            setTimeout(() => {
+                controller.abort();
+            }, delay);
             return controller.signal;
         });
 
@@ -32,9 +34,15 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                         controller.abort();
                         break;
                     }
-                    signal.addEventListener("abort", () => { controller.abort(); }, {
-                        once: true,
-                    });
+                    signal.addEventListener(
+                        "abort",
+                        () => {
+                            controller.abort();
+                        },
+                        {
+                            once: true,
+                        }
+                    );
                 }
                 return controller.signal;
             }
@@ -79,7 +87,7 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
             [
                 fc.constantFrom(
                     "",
-                    ' '.repeat(3), // Whitespace only
+                    " ".repeat(3), // Whitespace only
                     "This is a normal error",
                     "HTTP 404 Not Found",
                     "Network error",
@@ -176,7 +184,9 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
 
                 // Create a longer-running operation
                 const operation = new Promise<string>((resolve) => {
-                    setTimeout(() => { resolve(result); }, delayMs * 2);
+                    setTimeout(() => {
+                        resolve(result);
+                    }, delayMs * 2);
                 });
 
                 // Start the race
@@ -317,7 +327,9 @@ describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
                 const operations = delays.map(
                     (delay) =>
                         new Promise<number>((resolve) => {
-                            setTimeout(() => { resolve(delay); }, delay);
+                            setTimeout(() => {
+                                resolve(delay);
+                            }, delay);
                         })
                 );
 

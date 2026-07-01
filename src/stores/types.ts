@@ -114,8 +114,8 @@ export type StoreState<T> = {
  * Application update status enumeration.
  *
  * @remarks
- * Represents the various states of the app update process, from initial
- * idle state through checking, downloading, and completion. Used by the updates
+ * Represents the various states of the app update process, from initial idle
+ * state through checking, downloading, and completion. Used by the updates
  * store to track update progress and display appropriate UI states to the
  * user.
  */
@@ -126,10 +126,9 @@ export type UpdateStatus = SharedUpdateStatus;
  *
  * @remarks
  * These types are re-exported from the shared/types module to provide a single
- * import location for commonly used domain types across the frontend
- * app. This improves developer experience by reducing the need for
- * multiple import statements and provides consistency in type usage across
- * components.
+ * import location for commonly used domain types across the frontend app. This
+ * improves developer experience by reducing the need for multiple import
+ * statements and provides consistency in type usage across components.
  *
  * The re-exported types include:
  *

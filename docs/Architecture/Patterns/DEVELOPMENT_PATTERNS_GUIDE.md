@@ -96,20 +96,20 @@ graph TB
 
 ## Table of Contents
 
-1. [Repository Pattern](#repository-pattern)
-2. [Event-Driven Communication](#event-driven-communication)
-3. [Shared Utility Imports](#shared-utility-imports)
-4. [Logging Format & Prefix Standards](#logging-format--prefix-standards)
-5. [Error Handling Patterns](#error-handling-patterns)
-6. [Frontend State Management](#frontend-state-management)
-7. [IPC Communication](#ipc-communication)
-8. [Testing Patterns](#testing-patterns)
-9. [Standardized Cache Configuration](#standardized-cache-configuration)
-10. [Memory Management](#memory-management)
-11. [Race Condition Prevention](#race-condition-prevention)
-12. [Site Mutation Pipeline](#site-mutation-pipeline)
-13. [Best Practices Summary](#best-practices-summary)
-14. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
+- [Repository Pattern](#repository-pattern)
+- [Event-Driven Communication](#event-driven-communication)
+- [Shared Utility Imports](#shared-utility-imports)
+- [Logging Format & Prefix Standards](#logging-format--prefix-standards)
+- [Error Handling Patterns](#error-handling-patterns)
+- [Frontend State Management](#frontend-state-management)
+- [IPC Communication](#ipc-communication)
+- [Testing Patterns](#testing-patterns)
+- [Standardized Cache Configuration](#standardized-cache-configuration)
+- [Memory Management](#memory-management)
+- [Race Condition Prevention](#race-condition-prevention)
+- [Site Mutation Pipeline](#site-mutation-pipeline)
+- [Best Practices Summary](#best-practices-summary)
+- [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
 
 ## Repository Pattern
 
@@ -485,7 +485,8 @@ patterns are used when wiring store actions to `withErrorHandling()`:
     async () => {
      const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
      getState().updateSettings({ historyLimit: sanitizedLimit });
-     const backendLimit = await SettingsService.updateHistoryLimit(sanitizedLimit);
+     const backendLimit =
+      await SettingsService.updateHistoryLimit(sanitizedLimit);
      // ...apply normalized backendLimit...
     },
     {
@@ -499,7 +500,9 @@ patterns are used when wiring store actions to `withErrorHandling()`:
       });
      },
      setLoading: (loading) =>
-      useErrorStore.getState().setOperationLoading("updateHistoryLimit", loading),
+      useErrorStore
+       .getState()
+       .setOperationLoading("updateHistoryLimit", loading),
     }
    );
    ```

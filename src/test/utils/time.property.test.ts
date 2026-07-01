@@ -20,7 +20,7 @@
  */
 
 import { fc, test as fcTest } from "@fast-check/vitest";
-import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     formatDuration,
@@ -36,7 +36,7 @@ import {
 } from "../../utils/time";
 
 // Mock UiDefaults for consistent testing
-vi.mock(import('../fallbacks'), () => ({
+vi.mock("../fallbacks", () => ({
     UiDefaults: {
         notAvailableLabel: "N/A",
     },
@@ -49,7 +49,7 @@ describe("time Utils Property-Based Tests", () => {
     beforeEach(() => {
         originalDateNow = Date.now;
         mockTime = 1_640_995_200_000; // Fixed timestamp: 2021-12-31 16:00:00 UTC
-        vi.spyOn(Date, 'now').mockImplementation(() => mockTime);
+        vi.spyOn(Date, "now").mockImplementation(() => mockTime);
     });
 
     afterEach(() => {

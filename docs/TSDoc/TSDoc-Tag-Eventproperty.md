@@ -1,10 +1,12 @@
 # @eventProperty
 
 <!-- prettier-ignore-start -->
-|    |    |
-| -- | -- |
+
+|                  |                                                                  |
+| ---------------- | ---------------------------------------------------------------- |
 | Standardization: | [Extended](https://tsdoc.org/pages/spec/standardization_groups/) |
-| Syntax kind: | [Modifier](https://tsdoc.org/pages/spec/tag_kinds/) |
+| Syntax kind:     | [Modifier](https://tsdoc.org/pages/spec/tag_kinds/)              |
+
 <!-- prettier-ignore-end -->
 
 ## Usage

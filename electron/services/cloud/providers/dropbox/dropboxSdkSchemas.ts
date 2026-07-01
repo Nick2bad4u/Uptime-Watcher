@@ -95,8 +95,8 @@ export function parseDropboxFilesDownloadResult(
     }
 
     if (
-            !isDefined(parsed.data.fileBinary) &&
-            !isDefined(parsed.data.fileBlob)
+        !isDefined(parsed.data.fileBinary) &&
+        !isDefined(parsed.data.fileBlob)
     ) {
         throw new TypeError(
             "Dropbox download did not include fileBinary/fileBlob content"

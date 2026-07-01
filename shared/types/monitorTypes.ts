@@ -155,13 +155,12 @@ export interface MonitorTypeUICommons {
     supportsResponseTime?: boolean;
 }
 
-const MONITOR_FIELD_TYPE_VALUES: readonly MonitorFieldDefinition["type"][] =
-    [
-        "number",
-        "select",
-        "text",
-        "url",
-    ];
+const MONITOR_FIELD_TYPE_VALUES: readonly MonitorFieldDefinition["type"][] = [
+    "number",
+    "select",
+    "text",
+    "url",
+];
 
 const ALLOWED_FIELD_TYPES = new Set<string>(MONITOR_FIELD_TYPE_VALUES);
 
@@ -417,9 +416,9 @@ export function isMonitorFieldDefinition(
  *
  * @remarks
  * Used when accepting IPC payloads or cache entries to ensure they match the
- * canonical {@link MonitorTypeConfig} contract before mutating app
- * state. The guard intentionally checks only JSON-serializable properties to
- * mirror what crosses the process boundary.
+ * canonical {@link MonitorTypeConfig} contract before mutating app state. The
+ * guard intentionally checks only JSON-serializable properties to mirror what
+ * crosses the process boundary.
  *
  * @param candidate - Value to validate.
  *

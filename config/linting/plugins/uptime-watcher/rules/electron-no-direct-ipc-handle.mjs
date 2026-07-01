@@ -26,7 +26,11 @@ export const electronNoDirectIpcHandleRule = {
     /**
      * @param {{
      *     getFilename: () => any;
-     *     report: (arg0: { data: { method: any }; messageId: string; node: any }) => void;
+     *     report: (arg0: {
+     *         data: { method: any };
+     *         messageId: string;
+     *         node: any;
+     *     }) => void;
      * }} context
      */
     create(context) {

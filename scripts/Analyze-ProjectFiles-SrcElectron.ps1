@@ -67,52 +67,41 @@
 param(
     [Parameter(Position = 0)]
     [ValidateScript({Test-Path $_ -PathType Container})]
-    [string]$ProjectPath = ".",
-
-    [switch]$ShowDetails,
-
-    [switch]$IncludeTests,
-
+    [string] $ProjectPath = ".",
+    [switch] $ShowDetails,
+    [switch] $IncludeTests,
     [ValidateSet('Table', 'Json', 'Csv', 'Html')]
-    [string]$OutputFormat = 'Table',
-
-    [switch]$CacheResults,
-
+    [string] $OutputFormat = 'Table',
+    [switch] $CacheResults,
     [ValidateRange(1, 50)]
-    [int]$MaxDepth = [int]::MaxValue,
-
+    [int] $MaxDepth = [int]::MaxValue,
     [ValidateRange(0, [long]::MaxValue)]
-    [long]$MinFileSize = 0,
-
+    [long] $MinFileSize = 0,
     [ValidateSet('Size', 'Lines', 'Name', 'Extension', 'Date')]
-    [string]$SortBy = 'Size',
-
+    [string] $SortBy = 'Size',
     [ValidateRange(1, 1000)]
-    [int]$TopCount = 20,
-
-    [string]$ExportPath,
-
-    [switch]$Parallel,
-
-    [switch]$ShowProgress
+    [int] $TopCount = 20,
+    [string] $ExportPath,
+    [switch] $Parallel,
+    [switch] $ShowProgress
 )
 
 # Enhanced color scheme with more visual elements
 $Colors = @{
-    Header       = "Cyan"
-    FolderName   = "Yellow"
-    TableHeader  = "Green"
-    FileType     = "Magenta"
-    Size         = "Blue"
-    Lines        = "Red"
-    Border       = "DarkGray"
-    Summary      = "White"
-    Success      = "Green"
-    Warning      = "Yellow"
-    Error        = "Red"
-    Info         = "Cyan"
-    Progress     = "DarkCyan"
-    Performance  = "DarkGreen"
+    Header = "Cyan"
+    FolderName = "Yellow"
+    TableHeader = "Green"
+    FileType = "Magenta"
+    Size = "Blue"
+    Lines = "Red"
+    Border = "DarkGray"
+    Summary = "White"
+    Success = "Green"
+    Warning = "Yellow"
+    Error = "Red"
+    Info = "Cyan"
+    Progress = "DarkCyan"
+    Performance = "DarkGreen"
 }
 
 # Performance monitoring
@@ -133,16 +122,36 @@ $script:CacheConfig = @{
 
 # File extensions to analyze
 $script:ValidExtensions = @(
-    '.ts', '.tsx', '.js', '.jsx', '.json', '.md',
-    '.css', '.scss', '.sass', '.less', '.html',
-    '.yml', '.yaml', '.toml', '.xml', '.vue',
-    '.svelte', '.mjs', '.cjs'
+    '.ts',
+    '.tsx',
+    '.js',
+    '.jsx',
+    '.json',
+    '.md',
+    '.css',
+    '.scss',
+    '.sass',
+    '.less',
+    '.html',
+    '.yml',
+    '.yaml',
+    '.toml',
+    '.xml',
+    '.vue',
+    '.svelte',
+    '.mjs',
+    '.cjs'
 )
 
 # Test patterns for filtering
 $script:TestPatterns = @(
-    '*test*', '*spec*', '*mock*', '*fixture*',
-    '*__tests__*', '*__mocks__*', '*__fixtures__*'
+    '*test*',
+    '*spec*',
+    '*mock*',
+    '*fixture*',
+    '*__tests__*',
+    '*__mocks__*',
+    '*__fixtures__*'
 )
 
 #region Utility Functions
@@ -150,9 +159,9 @@ $script:TestPatterns = @(
 function Write-ColorOutput {
     [CmdletBinding()]
     param(
-        [string]$Message,
-        [string]$Color = "White",
-        [switch]$NoNewline
+        [string] $Message,
+        [string] $Color = "White",
+        [switch] $NoNewline
     )
 
     if ($NoNewline) {
@@ -165,10 +174,10 @@ function Write-ColorOutput {
 function Write-ProgressInfo {
     [CmdletBinding()]
     param(
-        [string]$Activity,
-        [string]$Status,
-        [int]$PercentComplete = -1,
-        [int]$Id = 1
+        [string] $Activity,
+        [string] $Status,
+        [int] $PercentComplete = - 1,
+        [int] $Id = 1
     )
 
     if ($ShowProgress) {
@@ -183,8 +192,8 @@ function Write-ProgressInfo {
 function Get-CacheKey {
     [CmdletBinding()]
     param(
-        [string]$Path,
-        [hashtable]$Parameters
+        [string] $Path,
+        [hashtable] $Parameters
     )
 
     $keyData = @{
@@ -192,18 +201,21 @@ function Get-CacheKey {
         IncludeTests = $Parameters.IncludeTests
         MaxDepth = $Parameters.MaxDepth
         MinFileSize = $Parameters.MinFileSize
-        LastModified = (Get-Item $Path -ErrorAction SilentlyContinue)?.LastWriteTime
+        LastModified =
+            (Get-Item $Path -ErrorAction SilentlyContinue) ?.LastWriteTime
     }
 
     $keyString = ($keyData | ConvertTo-Json -Compress)
-    $hash = [System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($keyString))
+    $hash = [System.Security.Cryptography.SHA256]::Create().ComputeHash(
+        [System.Text.Encoding]::UTF8.GetBytes($keyString)
+    )
     return [System.BitConverter]::ToString($hash) -replace '-', ''
 }
 
 function Get-FromCache {
     [CmdletBinding()]
     param(
-        [string]$CacheKey
+        [string] $CacheKey
     )
 
     if (-not $script:CacheConfig.Enabled) {
@@ -215,7 +227,7 @@ function Get-FromCache {
     if (Test-Path $cachePath) {
         try {
             $cacheItem = Get-Content $cachePath -Raw | ConvertFrom-Json
-            $cacheAge = (Get-Date) - [DateTime]$cacheItem.Timestamp
+            $cacheAge = (Get-Date) - [DateTime] $cacheItem.Timestamp
 
             if ($cacheAge -le $script:CacheConfig.MaxAge) {
                 $script:PerformanceCounters.CacheHits++
@@ -234,8 +246,8 @@ function Get-FromCache {
 function Set-ToCache {
     [CmdletBinding()]
     param(
-        [string]$CacheKey,
-        [object]$Data
+        [string] $CacheKey,
+        [object] $Data
     )
 
     if (-not $script:CacheConfig.Enabled) {
@@ -244,16 +256,16 @@ function Set-ToCache {
 
     try {
         if (-not (Test-Path $script:CacheConfig.Path)) {
-            New-Item -ItemType Directory -Path $script:CacheConfig.Path -Force | Out-Null
+            New-Item -ItemType Directory -Path $script:CacheConfig.Path -Force
+                | Out-Null
         }
 
-        $cacheItem = @{
-            Timestamp = Get-Date
-            Data = $Data
-        }
+        $cacheItem = @{ Timestamp = Get-Date; data = $Data }
 
         $cachePath = Join-Path $script:CacheConfig.Path "$CacheKey.json"
-        $cacheItem | ConvertTo-Json -Depth 10 | Set-Content $cachePath -Encoding UTF8
+        $cacheItem
+            | ConvertTo-Json -Depth 10
+            | Set-Content $cachePath -Encoding UTF8
 
         Write-ColorOutput "💾 Results cached for future runs" $Colors.Performance
     } catch {
@@ -267,7 +279,7 @@ function Get-EnhancedLineCount {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [string]$FilePath
+        [string] $FilePath
     )
 
     try {
@@ -285,7 +297,11 @@ function Get-EnhancedLineCount {
 
         # Read content efficiently
         $content = Get-Content $FilePath -ErrorAction Stop
-        return if ($content) { $content.Count } else { 0 }
+        return if ($content) {
+            $content.Count
+        } else {
+            0
+        }
     }
     catch {
         Write-Verbose "Failed to read file $FilePath : $($_.Exception.Message)"
@@ -297,7 +313,7 @@ function Format-FileSize {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [long]$Bytes
+        [long] $Bytes
     )
 
     $sizes = @(
@@ -305,7 +321,7 @@ function Format-FileSize {
         @{ Unit = "GB"; Value = 1GB },
         @{ Unit = "MB"; Value = 1MB },
         @{ Unit = "KB"; Value = 1KB },
-        @{ Unit = "B";  Value = 1 }
+        @{ Unit = "B"; Value = 1 }
     )
 
     foreach ($size in $sizes) {
@@ -322,8 +338,8 @@ function Get-FileComplexityScore {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [System.IO.FileInfo]$File,
-        [int]$LineCount
+        [System.IO.FileInfo] $File,
+        [int] $LineCount
     )
 
     $score = 0
@@ -334,28 +350,46 @@ function Get-FileComplexityScore {
 
     # Extension-based complexity
     switch ($File.Extension.ToLower()) {
-        '.ts'    { $score += 20 }  # TypeScript is complex
-        '.tsx'   { $score += 25 }  # TSX even more so
-        '.js'    { $score += 15 }  # JavaScript
-        '.jsx'   { $score += 18 }  # JSX
-        '.css'   { $score += 10 }  # CSS
-        '.scss'  { $score += 12 }  # SCSS
-        '.json'  { $score += 5 }   # JSON is simple
-        '.md'    { $score += 8 }   # Markdown
-        default  { $score += 7 }
+        '.ts' {
+            $score += 20
+        } # TypeScript is complex
+        '.tsx' {
+            $score += 25
+        } # TSX even more so
+        '.js' {
+            $score += 15
+        } # JavaScript
+        '.jsx' {
+            $score += 18
+        } # JSX
+        '.css' {
+            $score += 10
+        } # CSS
+        '.scss' {
+            $score += 12
+        } # SCSS
+        '.json' {
+            $score += 5
+        } # JSON is simple
+        '.md' {
+            $score += 8
+        } # Markdown
+        default {
+            $score += 7
+        }
     }
 
-    return [math]::Round($score, 1)
+    return [math]::Round( $score, 1 )
 }
 
 function Get-FilteredFiles {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [string]$FolderPath,
-        [bool]$IncludeTests,
-        [int]$MaxDepth = [int]::MaxValue,
-        [long]$MinFileSize = 0
+        [string] $FolderPath,
+        [bool] $IncludeTests,
+        [int] $MaxDepth = [int]::MaxValue,
+        [long] $MinFileSize = 0
     )
 
     if (-not (Test-Path $FolderPath)) {
@@ -367,7 +401,12 @@ function Get-FilteredFiles {
     try {
         # Get all files with depth limiting
         $getAllFilesScript = {
-            param($Path, $Extensions, $MaxDepth, $CurrentDepth = 0)
+            param(
+                $Path,
+                $Extensions,
+                $MaxDepth,
+                $CurrentDepth = 0
+            )
 
             if ($CurrentDepth -ge $MaxDepth) {
                 return @()
@@ -378,8 +417,12 @@ function Get-FilteredFiles {
 
             foreach ($item in $items) {
                 if ($item.PSIsContainer) {
-                    $files += & $getAllFilesScript $item.FullName $Extensions $MaxDepth ($CurrentDepth + 1)
-                } elseif ($item.Extension -in $Extensions -and $item.Length -ge $MinFileSize) {
+                    $files += & $getAllFilesScript $item.FullName $Extensions $MaxDepth(
+                        $CurrentDepth + 1
+                    )
+                } elseif (
+                    $item.Extension -in $Extensions -and $item.Length -ge $MinFileSize
+                ) {
                     $files += $item
                 }
             }
@@ -391,24 +434,29 @@ function Get-FilteredFiles {
 
         # Filter out test files unless -IncludeTests is specified
         if (-not $IncludeTests) {
-            $allFiles = $allFiles | Where-Object {
-                $isTestFile = $false
+            $allFiles = $allFiles
+                | Where-Object {
+                    $isTestFile = $false
 
-                foreach ($pattern in $script:TestPatterns) {
-                    if ($_.Name -like $pattern -or
-                        $_.DirectoryName -like "*$($pattern.Trim('*'))*" -or
-                        $_.FullName -like "*$($pattern.Trim('*'))*") {
-                        $isTestFile = $true
-                        break
+                    foreach ($pattern in $script:TestPatterns) {
+                        if (
+                            $_.Name -like $pattern -or
+                            $_.DirectoryName -like "*$($pattern.Trim('*'))*" -or
+                            $_.FullName -like "*$($pattern.Trim('*'))*"
+                        ) {
+                            $isTestFile = $true
+                            break
+                        }
                     }
-                }
 
-                -not $isTestFile
-            }
+                    -not $isTestFile
+                }
         }
 
         $script:PerformanceCounters.FilesProcessed += $allFiles.Count
-        $script:PerformanceCounters.BytesProcessed += ($allFiles | Measure-Object Length -Sum).Sum
+        $script:PerformanceCounters.BytesProcessed += (
+            $allFiles | Measure-Object Length -Sum
+        ).Sum
 
         return $allFiles
     }
@@ -422,9 +470,9 @@ function Get-EnhancedFileAnalysis {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [System.IO.FileInfo[]]$Files,
-        [string]$FolderPath,
-        [switch]$UseParallel
+        [System.IO.FileInfo[]] $Files,
+        [string] $FolderPath,
+        [switch] $UseParallel
     )
 
     Write-ProgressInfo -Activity "Analyzing Files" -Status "Processing file statistics..."
@@ -433,34 +481,50 @@ function Get-EnhancedFileAnalysis {
         Write-ColorOutput "🔄 Using parallel processing for $($Files.Count) files..." $Colors.Performance
 
         # Parallel processing for large file sets
-        $fileStats = $Files | ForEach-Object -Parallel {
-            $file = $_
-            $relativePath = $file.FullName.Replace($using:FolderPath, "").TrimStart('\', '/')
-            $lineCount = 0
-
-            try {
-                if ($file.Length -gt 0 -and $file.Length -lt 50MB) {
-                    $content = Get-Content $file.FullName -ErrorAction Stop
-                    $lineCount = if ($content) { $content.Count } else { 0 }
-                }
-            } catch {
+        $fileStats = $Files
+            | ForEach-Object -Parallel {
+                $file = $_
+                $relativePath = $file.FullName.Replace(
+                    $using:FolderPath,
+                    ""
+                ).TrimStart( '\', '/' )
                 $lineCount = 0
-            }
 
-            [PSCustomObject]@{
-                Name = $file.Name
-                RelativePath = $relativePath
-                Extension = $file.Extension
-                SizeBytes = $file.Length
-                SizeFormatted = if ($file.Length -ge 1MB) { "{0:N2} MB" -f ($file.Length / 1MB) }
-                               elseif ($file.Length -ge 1KB) { "{0:N2} KB" -f ($file.Length / 1KB) }
-                               else { "$($file.Length) B" }
-                Lines = $lineCount
-                Directory = $file.Directory.Name
-                LastModified = $file.LastWriteTime
-                ComplexityScore = [math]::Log10($file.Length + 1) * 10 + [math]::Log10($lineCount + 1) * 15
-            }
-        } -ThrottleLimit 8
+                try {
+                    if ($file.Length -gt 0 -and $file.Length -lt 50MB) {
+                        $content = Get-Content $file.FullName -ErrorAction Stop
+                        $lineCount = if ($content) {
+                            $content.Count
+                        } else {
+                            0
+                        }
+                    }
+                } catch {
+                    $lineCount = 0
+                }
+
+                [PSCustomObject] @{
+                    Name = $file.Name
+                    RelativePath = $relativePath
+                    Extension = $file.Extension
+                    SizeBytes = $file.Length
+                    SizeFormatted = if ($file.Length -ge 1MB) {
+                        "{0:N2} MB" -f ($file.Length / 1MB)
+                    } elseif ($file.Length -ge 1KB) {
+                        "{0:N2} KB" -f ($file.Length / 1KB)
+                    }
+                    else {
+                        "$($file.Length) B"
+                    } Lines =
+                        $lineCount
+                    Directory = $file.Directory.Name
+                    LastModified = $file.LastWriteTime
+                    ComplexityScore =
+                        [math]::Log10($file.Length + 1) * 10 + [math]::Log10(
+                            $lineCount + 1
+                        ) * 15
+                }
+            } -ThrottleLimit 8
     } else {
         # Sequential processing
         $fileStats = @()
@@ -474,11 +538,14 @@ function Get-EnhancedFileAnalysis {
                 Write-ProgressInfo -Activity "Analyzing Files" -Status "Processing file $current of $totalFiles" -PercentComplete $percent
             }
 
-            $relativePath = $file.FullName.Replace($FolderPath, "").TrimStart('\', '/')
+            $relativePath = $file.FullName.Replace( $FolderPath, "" ).TrimStart(
+                '\',
+                '/'
+            )
             $lineCount = Get-EnhancedLineCount -FilePath $file.FullName
             $complexityScore = Get-FileComplexityScore -File $file -LineCount $lineCount
 
-            $fileStats += [PSCustomObject]@{
+            $fileStats += [PSCustomObject] @{
                 Name = $file.Name
                 RelativePath = $relativePath
                 Extension = $file.Extension
@@ -499,10 +566,10 @@ function Export-AnalysisResults {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [object[]]$Results,
+        [object[]] $Results,
         [Parameter(Mandatory)]
-        [string]$Format,
-        [string]$Path
+        [string] $Format,
+        [string] $Path
     )
 
     switch ($Format.ToLower()) {
@@ -518,7 +585,8 @@ function Export-AnalysisResults {
 
         'csv' {
             if ($Path) {
-                $Results | Export-Csv -Path $Path -NoTypeInformation -Encoding UTF8
+                $Results
+                    | Export-Csv -Path $Path -NoTypeInformation -Encoding UTF8
                 Write-ColorOutput "📁 Results exported to: $Path" $Colors.Success
             } else {
                 return ($Results | ConvertTo-Csv -NoTypeInformation)
@@ -600,30 +668,33 @@ function Export-AnalysisResults {
         }
     }
 }
-    param(
-        [string]$FolderPath,
-        [string]$FolderName
-    )
 
-    if (-not (Test-Path $FolderPath)) {
-        Write-Output "⚠️  Folder '$FolderName' not found at: $FolderPath" -ForegroundColor Yellow
-        return
-    }
+param(
+    [string] $FolderPath,
+    [string] $FolderName
+)
 
-    # Get filtered files
-    $files = Get-FilteredFile -FolderPath $FolderPath -IncludeTests $IncludeTests
+if (-not (Test-Path $FolderPath)) {
+    Write-Output "⚠️  Folder '$FolderName' not found at: $FolderPath" -ForegroundColor Yellow
+    return
+}
 
-    if ($files.Count -eq 0) {
-        Write-Output "📁 No relevant files found in $FolderName" -ForegroundColor Yellow
-        return
-    }
+# Get filtered files
+$files = Get-FilteredFile -FolderPath $FolderPath -IncludeTests $IncludeTests
 
-    # Calculate file statistics
-    $fileStats = $files | ForEach-Object {
+if ($files.Count -eq 0) {
+    Write-Output "📁 No relevant files found in $FolderName" -ForegroundColor Yellow
+    return
+}
+
+# Calculate file statistics
+$fileStats = $files
+    | ForEach-Object {
         $lineCount = Get-LineCount $_.FullName
-        [PSCustomObject]@{
+        [PSCustomObject] @{
             Name = $_.Name
-            RelativePath = $_.FullName.Replace($FolderPath, "").TrimStart('\', '/')
+            RelativePath =
+                $_.FullName.Replace( $FolderPath, "" ).TrimStart( '\', '/' )
             Extension = $_.Extension
             SizeBytes = $_.Length
             SizeFormatted = Format-FileSize $_.Length
@@ -632,87 +703,124 @@ function Export-AnalysisResults {
         }
     }
 
-    # Sort by size (descending)
-    $sortedFiles = $fileStats | Sort-Object SizeBytes -Descending
+# Sort by size (descending)
+$sortedFiles = $fileStats | Sort-Object SizeBytes -Descending
 
-    # Display header
-    Write-Output ""
-    Write-Output "═══════════════════════════════════════════════════════════════════" -ForegroundColor $Colors.Border
-    $testStatus = if ($IncludeTests) { "🧪 Including test files" } else { "🚫 Excluding test files" }
-    Write-Output "📂 $FolderName Directory Analysis ($testStatus)" -ForegroundColor $Colors.FolderName
-    Write-Output "═══════════════════════════════════════════════════════════════════" -ForegroundColor $Colors.Border
-
-    # Summary statistics
-    $totalFiles = $files.Count
-    $totalSize = ($fileStats | Measure-Object SizeBytes -Sum).Sum
-    $totalLines = ($fileStats | Measure-Object Lines -Sum).Sum
-    $avgSize = if ($totalFiles -gt 0) { $totalSize / $totalFiles } else { 0 }
-    $avgLines = if ($totalFiles -gt 0) { $totalLines / $totalFiles } else { 0 }
-
-    Write-Output "📊 Summary: " -ForegroundColor $Colors.Summary -NoNewline
-    Write-Output "$totalFiles files" -ForegroundColor $Colors.FileType -NoNewline
-    Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
-    Write-Output "$(Format-FileSize $totalSize)" -ForegroundColor $Colors.Size -NoNewline
-    Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
-    Write-Output "$totalLines lines" -ForegroundColor $Colors.Lines
-    Write-Output "📈 Averages: " -ForegroundColor $Colors.Summary -NoNewline
-    Write-Output "$(Format-FileSize $avgSize) per file" -ForegroundColor $Colors.Size -NoNewline
-    Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
-    Write-Output "$([math]::Round($avgLines)) lines per file" -ForegroundColor $Colors.Lines
-    Write-Output ""
-
-    # Table header
-    $headerFormat = "{0,-30} {1,-8} {2,10} {3,8} {4,-15}"
-    Write-Output ($headerFormat -f "File Name", "Type", "Size", "Lines", "Directory") -ForegroundColor $Colors.TableHeader
-    Write-Output ("-" * 80) -ForegroundColor $Colors.Border
-
-    # Display top files
-    $topFiles = $sortedFiles | Select-Object -First 20
-    foreach ($file in $topFiles) {
-        $nameColor = switch ($file.Extension) {
-            { $_ -in '.ts', '.tsx' } { "Blue" }
-            { $_ -in '.js', '.jsx' } { "Yellow" }
-            '.json' { "Green" }
-            '.md' { "Cyan" }
-            { $_ -in '.css', '.scss' } { "Magenta" }
-            default { "White" }
-        }
-
-        $truncatedName = if ($file.Name.Length -gt 28) {
-            $file.Name.Substring(0, 25) + "..."
-        } else {
-            $file.Name
-        }
-
-        Write-Output ($headerFormat -f
-            $truncatedName,
-            $file.Extension,
-            $file.SizeFormatted,
-            $file.Lines,
-            $file.Directory
-        ) -ForegroundColor $nameColor
-    }
-
-    if ($sortedFiles.Count -gt 20) {
-        Write-Output ""
-        Write-Output "... and $($sortedFiles.Count - 20) more files" -ForegroundColor $Colors.Border
-    }
-
-    # File type breakdown
-    Write-Output ""
-    Write-Output "📋 File Type Breakdown:" -ForegroundColor $Colors.Summary
-    $typeStats = $fileStats | Group-Object Extension | Sort-Object Count -Descending
-    foreach ($type in $typeStats) {
-        $typeSize = ($type.Group | Measure-Object SizeBytes -Sum).Sum
-        $typeLines = ($type.Group | Measure-Object Lines -Sum).Sum
-        Write-Output "   $($type.Name): " -ForegroundColor $Colors.FileType -NoNewline
-        Write-Output "$($type.Count) files" -ForegroundColor White -NoNewline
-        Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
-        Write-Output "$(Format-FileSize $typeSize)" -ForegroundColor $Colors.Size -NoNewline
-        Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
-        Write-Output "$typeLines lines" -ForegroundColor $Colors.Lines
-    }
+# Display header
+Write-Output ""
+Write-Output "═══════════════════════════════════════════════════════════════════" -ForegroundColor $Colors.Border
+$testStatus = if ($IncludeTests) {
+    "🧪 Including test files"
+} else {
+    "🚫 Excluding test files"
 }
+Write-Output "📂 $FolderName Directory Analysis ($testStatus)" -ForegroundColor $Colors.FolderName
+Write-Output "═══════════════════════════════════════════════════════════════════" -ForegroundColor $Colors.Border
+
+# Summary statistics
+$totalFiles = $files.Count
+$totalSize = ($fileStats | Measure-Object SizeBytes -Sum).Sum
+$totalLines = ($fileStats | Measure-Object Lines -Sum).Sum
+$avgSize = if ($totalFiles -gt 0) {
+    $totalSize / $totalFiles
+} else {
+    0
+}
+$avgLines = if ($totalFiles -gt 0) {
+    $totalLines / $totalFiles
+} else {
+    0
+}
+
+Write-Output "📊 Summary: " -ForegroundColor $Colors.Summary -NoNewline
+Write-Output "$totalFiles files" -ForegroundColor $Colors.FileType -NoNewline
+Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
+Write-Output "$(Format-FileSize $totalSize)" -ForegroundColor $Colors.Size -NoNewline
+Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
+Write-Output "$totalLines lines" -ForegroundColor $Colors.Lines
+Write-Output "📈 Averages: " -ForegroundColor $Colors.Summary -NoNewline
+Write-Output "$(Format-FileSize $avgSize) per file" -ForegroundColor $Colors.Size -NoNewline
+Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
+Write-Output "$([math]::Round($avgLines)) lines per file" -ForegroundColor $Colors.Lines
+Write-Output ""
+
+# Table header
+$headerFormat = "{0,-30} {1,-8} {2,10} {3,8} {4,-15}"
+Write-Output (
+    $headerFormat -f "File Name",
+    "Type",
+    "Size",
+    "Lines",
+    "Directory"
+) -ForegroundColor $Colors.TableHeader
+Write-Output ("-" * 80) -ForegroundColor $Colors.Border
+
+# Display top files
+$topFiles = $sortedFiles | Select-Object -First 20
+foreach ($file in $topFiles) {
+    $nameColor = switch ($file.Extension) {
+        {
+            $_ -in '.ts', '.tsx'
+        } {
+            "Blue"
+        }
+        {
+            $_ -in '.js', '.jsx'
+        } {
+            "Yellow"
+        }
+        '.json' {
+            "Green"
+        }
+        '.md' {
+            "Cyan"
+        }
+        {
+            $_ -in '.css', '.scss'
+        } {
+            "Magenta"
+        }
+        default {
+            "White"
+        }
+    }
+
+    $truncatedName = if ($file.Name.Length -gt 28) {
+        $file.Name.Substring( 0, 25 ) + "..."
+    } else {
+        $file.Name
+    }
+
+    Write-Output (
+        $headerFormat -f,
+        $truncatedName,
+        $file.Extension,
+        $file.SizeFormatted,
+        $file.Lines,
+        $file.Directory
+    ) -ForegroundColor $nameColor
+}
+
+if ($sortedFiles.Count -gt 20) {
+    Write-Output ""
+    Write-Output "... and $($sortedFiles.Count - 20) more files" -ForegroundColor $Colors.Border
+}
+
+# File type breakdown
+Write-Output ""
+Write-Output "📋 File Type Breakdown:" -ForegroundColor $Colors.Summary
+$typeStats = $fileStats | Group-Object Extension | Sort-Object Count -Descending
+foreach ($type in $typeStats) {
+    $typeSize = ($type.Group | Measure-Object SizeBytes -Sum).Sum
+    $typeLines = ($type.Group | Measure-Object Lines -Sum).Sum
+    Write-Output "   $($type.Name): " -ForegroundColor $Colors.FileType -NoNewline
+    Write-Output "$($type.Count) files" -ForegroundColor White -NoNewline
+    Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
+    Write-Output "$(Format-FileSize $typeSize)" -ForegroundColor $Colors.Size -NoNewline
+    Write-Output " | " -ForegroundColor $Colors.Border -NoNewline
+    Write-Output "$typeLines lines" -ForegroundColor $Colors.Lines
+}
+
 
 # Main script execution
 Clear-Host
@@ -765,7 +873,12 @@ $allFiles = $allSrcFiles + $allElectronFiles
 
 if ($allFiles.Count -gt 0) {
     $projectTotalSize = ($allFiles | Measure-Object Length -Sum).Sum
-    $projectTotalLines = $allFiles | ForEach-Object { Get-LineCount $_.FullName } | Measure-Object -Sum | Select-Object -ExpandProperty Sum
+    $projectTotalLines = $allFiles
+        | ForEach-Object {
+            Get-LineCount $_.FullName
+        }
+        | Measure-Object -Sum
+        | Select-Object -ExpandProperty Sum
 
     Write-Output "📦 Total Files: " -ForegroundColor $Colors.Summary -NoNewline
     Write-Output "$($allFiles.Count)" -ForegroundColor White

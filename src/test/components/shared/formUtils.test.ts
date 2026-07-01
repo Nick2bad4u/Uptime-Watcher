@@ -8,7 +8,7 @@
 import type * as React from "react";
 
 import { fc, test } from "@fast-check/vitest";
-import { arrayFirst, arrayIncludes  } from "ts-extras";
+import { arrayFirst, arrayIncludes } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -159,11 +159,14 @@ describe("Form Utilities", () => {
 
                     handler(mockEvent);
 
-                    const isExpectedBoolean = arrayIncludes([
-                        "true",
-                        "1",
-                        "yes",
-                    ], booleanLikeValue);
+                    const isExpectedBoolean = arrayIncludes(
+                        [
+                            "true",
+                            "1",
+                            "yes",
+                        ],
+                        booleanLikeValue
+                    );
                     expect(setValue).toHaveBeenCalledWith(isExpectedBoolean);
                 }
             );
@@ -849,7 +852,9 @@ describe("Form Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(validationPatterns.nonEmptyString("")).toBeFalsy();
-                expect(validationPatterns.nonEmptyString(' '.repeat(3))).toBeFalsy();
+                expect(
+                    validationPatterns.nonEmptyString(" ".repeat(3))
+                ).toBeFalsy();
                 expect(validationPatterns.nonEmptyString("\t\n")).toBeFalsy();
             });
 
@@ -1312,21 +1317,20 @@ describe("Form Utilities", () => {
             }
         );
 
-        test.prop([fc.constantFrom("", ' '.repeat(3), "\t", "\n", "  \t  \n  ")])(
-            "should reject invalid inputs with validation",
-            (emptyInput) => {
-                const setValue = vi.fn();
-                const validator = (value: string) => value.trim().length > 0;
-                const handler = createStringInputHandler(setValue, validator);
+        test.prop([
+            fc.constantFrom("", " ".repeat(3), "\t", "\n", "  \t  \n  "),
+        ])("should reject invalid inputs with validation", (emptyInput) => {
+            const setValue = vi.fn();
+            const validator = (value: string) => value.trim().length > 0;
+            const handler = createStringInputHandler(setValue, validator);
 
-                const mockEvent = {
-                    target: { value: emptyInput },
-                } as React.ChangeEvent<HTMLInputElement>;
+            const mockEvent = {
+                target: { value: emptyInput },
+            } as React.ChangeEvent<HTMLInputElement>;
 
-                handler(mockEvent);
-                expect(setValue).not.toHaveBeenCalled();
-            }
-        );
+            handler(mockEvent);
+            expect(setValue).not.toHaveBeenCalled();
+        });
 
         it("should handle validation function that throws", () => {
             const setValue = vi.fn();
@@ -1339,7 +1343,9 @@ describe("Form Utilities", () => {
                 target: { value: "test" },
             } as React.ChangeEvent<HTMLInputElement>;
 
-            expect(() => { handler(mockEvent); }).toThrow("Validation error");
+            expect(() => {
+                handler(mockEvent);
+            }).toThrow("Validation error");
             expect(setValue).not.toHaveBeenCalled();
         });
     });
@@ -1434,7 +1440,9 @@ describe("Form Utilities", () => {
                 target: { value: "test" },
             } as React.ChangeEvent<HTMLInputElement>;
 
-            expect(() => { handler(mockEvent); }).toThrow("Conversion error");
+            expect(() => {
+                handler(mockEvent);
+            }).toThrow("Conversion error");
             expect(setValue).not.toHaveBeenCalled();
         });
 
@@ -1454,7 +1462,9 @@ describe("Form Utilities", () => {
                 target: { value: "123" },
             } as React.ChangeEvent<HTMLInputElement>;
 
-            expect(() => { handler(mockEvent); }).toThrow("Validation error");
+            expect(() => {
+                handler(mockEvent);
+            }).toThrow("Validation error");
             expect(setValue).not.toHaveBeenCalled();
         });
 

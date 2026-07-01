@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteTableRow } from "../../components/Dashboard/SiteList/SiteTableRow";
@@ -16,7 +16,7 @@ const useSiteState = vi.hoisted(() => ({
     factory: vi.fn(),
 }));
 
-vi.mock(import('../../hooks/site/useSite'), () => ({
+vi.mock("../../hooks/site/useSite", () => ({
     useSite: (site: Site) => useSiteState.factory(site),
 }));
 
@@ -26,7 +26,7 @@ const marqueeTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../components/common/MarqueeText/MarqueeText'), () => ({
+vi.mock("../../components/common/MarqueeText/MarqueeText", () => ({
     MarqueeText: marqueeTextMock.component,
 }));
 
@@ -36,7 +36,7 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: themedTextMock.component,
 }));
 
@@ -48,7 +48,7 @@ const statusBadgeMock = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../components/common/StatusBadge'), () => ({
+vi.mock("../../components/common/StatusBadge", () => ({
     StatusBadge: statusBadgeMock.component,
 }));
 
@@ -63,9 +63,9 @@ const monitorSelectorMock = vi.hoisted(() => ({
         return (
             <button
                 data-testid="monitor-selector"
-                onClick={() =>
-                    { props.onChange({ target: { value: "monitor-2" } }); }
-                }
+                onClick={() => {
+                    props.onChange({ target: { value: "monitor-2" } });
+                }}
                 type="button"
             >
                 selector
@@ -75,7 +75,7 @@ const monitorSelectorMock = vi.hoisted(() => ({
 }));
 
 vi.mock(
-    import('../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
         MonitorSelector: monitorSelectorMock.component,
     })
@@ -107,7 +107,7 @@ const actionButtonGroupMock = vi.hoisted(() => ({
 }));
 
 vi.mock(
-    import('../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
         ActionButtonGroup: actionButtonGroupMock.component,
     })

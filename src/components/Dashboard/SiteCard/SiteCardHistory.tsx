@@ -61,11 +61,13 @@ function areHistoryPropsEqual(
     ) {
         return false;
     }
-    return prevMonitor.url === nextMonitor.url &&
+    return (
+        prevMonitor.url === nextMonitor.url &&
         prevMonitor.port === nextMonitor.port &&
         prevMonitor.host === nextMonitor.host &&
         prevMonitor.recordType === nextMonitor.recordType &&
-        prevMonitor.expectedValue === nextMonitor.expectedValue;
+        prevMonitor.expectedValue === nextMonitor.expectedValue
+    );
 }
 
 /**

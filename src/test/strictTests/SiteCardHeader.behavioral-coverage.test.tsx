@@ -6,7 +6,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { ChangeEvent, ReactNode } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteCardHeader } from "../../components/Dashboard/SiteCard/SiteCardHeader";
@@ -30,26 +30,26 @@ interface ActionButtonGroupMockProperties {
     onStopSiteMonitoring: () => void;
 }
 
-const monitorSelectorProps = vi.hoisted(
-    () => safeCastTo<MonitorSelectorMockProperties[]>([])
+const monitorSelectorProps = vi.hoisted(() =>
+    safeCastTo<MonitorSelectorMockProperties[]>([])
 );
-const actionButtonGroupProps = vi.hoisted(
-    () => safeCastTo<ActionButtonGroupMockProperties[]>([])
+const actionButtonGroupProps = vi.hoisted(() =>
+    safeCastTo<ActionButtonGroupMockProperties[]>([])
 );
 
 vi.mock(
-    import('../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
         MonitorSelector: (props: MonitorSelectorMockProperties) => {
             monitorSelectorProps.push(props);
             return (
                 <button
                     data-testid="mock-monitor-selector"
-                    onClick={() =>
-                        { props.onChange({
+                    onClick={() => {
+                        props.onChange({
                             target: { value: "monitor-2" },
-                        } as ChangeEvent<HTMLSelectElement>); }
-                    }
+                        } as ChangeEvent<HTMLSelectElement>);
+                    }}
                     type="button"
                 >
                     monitor-selector
@@ -60,14 +60,16 @@ vi.mock(
 );
 
 vi.mock(
-    import('../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
         ActionButtonGroup: (props: ActionButtonGroupMockProperties) => {
             actionButtonGroupProps.push(props);
             return (
                 <button
                     data-testid="mock-check-now"
-                    onClick={() => { props.onCheckNow(); }}
+                    onClick={() => {
+                        props.onCheckNow();
+                    }}
                     type="button"
                 >
                     check-now
@@ -77,11 +79,11 @@ vi.mock(
     })
 );
 
-vi.mock(import('../../components/Dashboard/SiteCard/SiteCardFooter'), () => ({
+vi.mock("../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
     SiteCardFooter: () => <div data-testid="mock-site-card-footer" />,
 }));
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: ({ children }: { children?: ReactNode }) => (
         <span data-testid="mock-themed-text">{children}</span>
     ),

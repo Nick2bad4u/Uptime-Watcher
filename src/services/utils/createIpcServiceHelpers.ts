@@ -180,9 +180,15 @@ export function createIpcServiceHelpers(
     let initializationPromise: Promise<void> | undefined;
 
     const buildBridgeOptions = (): WaitForElectronBridgeOptions => ({
-        ...(isDefined(options.bridgeContracts) && { contracts: options.bridgeContracts }),
-        ...(isDefined(options.bridgeOptions?.baseDelay) && { baseDelay: options.bridgeOptions.baseDelay }),
-        ...(isDefined(options.bridgeOptions?.maxAttempts) && { maxAttempts: options.bridgeOptions.maxAttempts }),
+        ...(isDefined(options.bridgeContracts) && {
+            contracts: options.bridgeContracts,
+        }),
+        ...(isDefined(options.bridgeOptions?.baseDelay) && {
+            baseDelay: options.bridgeOptions.baseDelay,
+        }),
+        ...(isDefined(options.bridgeOptions?.maxAttempts) && {
+            maxAttempts: options.bridgeOptions.maxAttempts,
+        }),
     });
 
     const ensureInitialized = (): Promise<void> => {
@@ -236,7 +242,7 @@ export function createIpcServiceHelpers(
             await ensureInitialized();
 
             try {
-                return await handler(globalThis.electronAPI, ...args);
+                return await handler(window.electronAPI, ...args);
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
                 logger.error(

@@ -24,7 +24,11 @@ export const electronNoRendererImportRule = {
     /**
      * @param {{
      *     getFilename: () => any;
-     *     report: (arg0: { data: { module: any }; messageId: string; node: any }) => void;
+     *     report: (arg0: {
+     *         data: { module: any };
+     *         messageId: string;
+     *         node: any;
+     *     }) => void;
      * }} context
      */
     create(context) {
@@ -90,9 +94,11 @@ export const electronNoRendererImportRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                if (node.callee.type !== "Identifier" ||
+                if (
+                    node.callee.type !== "Identifier" ||
                     node.callee.name !== "require" ||
-                    node.arguments.length === 0) {
+                    node.arguments.length === 0
+                ) {
                     return;
                 }
 
@@ -101,12 +107,8 @@ export const electronNoRendererImportRule = {
                     firstArgument?.type === "Literal" &&
                     typeof firstArgument.value === "string"
                 ) {
-                    handleModuleSpecifier(
-                        firstArgument,
-                        firstArgument.value
-                    );
+                    handleModuleSpecifier(firstArgument, firstArgument.value);
                 }
-
             },
 
             /**

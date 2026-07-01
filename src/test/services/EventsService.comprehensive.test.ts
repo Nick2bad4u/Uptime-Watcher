@@ -21,7 +21,7 @@ import {
     type TestEventData,
     type UpdateStatusEventData,
 } from "@shared/types/events";
-import { arrayAt, safeCastTo  } from "ts-extras";
+import { arrayAt, safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EventsService } from "../../services/EventsService";
@@ -74,7 +74,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -86,13 +86,13 @@ const mockLogger = vi.hoisted(() => ({
     warn: vi.fn(),
     debug: vi.fn(),
 }));
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
 
 // Mock ensureError from shared utils
 const mockEnsureError = vi.hoisted(() => vi.fn((error) => error));
-vi.mock(import('../../../shared/utils/errorHandling'), () => ({
+vi.mock("../../../shared/utils/errorHandling", () => ({
     ensureError: mockEnsureError,
 }));
 
@@ -426,9 +426,14 @@ describe("EventsService", () => {
                 mockElectronAPI.events.onMonitoringStarted
             ).toHaveBeenCalledTimes(1);
 
-            const call =
-                safeCastTo<| [MonitoringStartedEventHandler]
-                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStarted.mock.calls, 0));
+            const call = safeCastTo<
+                [MonitoringStartedEventHandler] | undefined
+            >(
+                arrayAt(
+                    mockElectronAPI.events.onMonitoringStarted.mock.calls,
+                    0
+                )
+            );
             expect(call).toBeDefined();
             if (!call) {
                 throw new Error(
@@ -463,8 +468,10 @@ describe("EventsService", () => {
             const callback = vi.fn();
             await EventsService.onMonitoringStarted(callback);
 
-            const call =
-                arrayAt(mockElectronAPI.events.onMonitoringStarted.mock.calls, 0);
+            const call = arrayAt(
+                mockElectronAPI.events.onMonitoringStarted.mock.calls,
+                0
+            );
             expect(call).toBeDefined();
             const [registeredHandler] = call as [MonitoringStartedEventHandler];
 
@@ -493,9 +500,14 @@ describe("EventsService", () => {
                 mockElectronAPI.events.onMonitoringStopped
             ).toHaveBeenCalledTimes(1);
 
-            const call =
-                safeCastTo<| [MonitoringStoppedEventHandler]
-                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStopped.mock.calls, 0));
+            const call = safeCastTo<
+                [MonitoringStoppedEventHandler] | undefined
+            >(
+                arrayAt(
+                    mockElectronAPI.events.onMonitoringStopped.mock.calls,
+                    0
+                )
+            );
             expect(call).toBeDefined();
             if (!call) {
                 throw new Error(
@@ -530,8 +542,10 @@ describe("EventsService", () => {
             const callback = vi.fn();
             await EventsService.onMonitoringStopped(callback);
 
-            const call =
-                arrayAt(mockElectronAPI.events.onMonitoringStopped.mock.calls, 0);
+            const call = arrayAt(
+                mockElectronAPI.events.onMonitoringStopped.mock.calls,
+                0
+            );
             expect(call).toBeDefined();
             const [registeredHandler] = call as [MonitoringStoppedEventHandler];
 
@@ -810,10 +824,14 @@ describe("EventsService", () => {
                     callbacks.monitorCheckCompleted
                 ),
                 EventsService.onMonitoringStarted(
-                    safeCastTo<MonitoringStartedEventHandler>(callbacks.monitoringStarted)
+                    safeCastTo<MonitoringStartedEventHandler>(
+                        callbacks.monitoringStarted
+                    )
                 ),
                 EventsService.onMonitoringStopped(
-                    safeCastTo<MonitoringStoppedEventHandler>(callbacks.monitoringStopped)
+                    safeCastTo<MonitoringStoppedEventHandler>(
+                        callbacks.monitoringStopped
+                    )
                 ),
                 EventsService.onMonitorStatusChanged(
                     callbacks.monitorStatusChanged
@@ -858,12 +876,22 @@ describe("EventsService", () => {
                 callbacks.updateStatus
             );
 
-            const startedCall =
-                safeCastTo<| [MonitoringStartedEventHandler]
-                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStarted.mock.calls, 0));
-            const stoppedCall =
-                safeCastTo<| [MonitoringStoppedEventHandler]
-                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStopped.mock.calls, 0));
+            const startedCall = safeCastTo<
+                [MonitoringStartedEventHandler] | undefined
+            >(
+                arrayAt(
+                    mockElectronAPI.events.onMonitoringStarted.mock.calls,
+                    0
+                )
+            );
+            const stoppedCall = safeCastTo<
+                [MonitoringStoppedEventHandler] | undefined
+            >(
+                arrayAt(
+                    mockElectronAPI.events.onMonitoringStopped.mock.calls,
+                    0
+                )
+            );
 
             expect(startedCall).toBeDefined();
             expect(stoppedCall).toBeDefined();
@@ -920,7 +948,7 @@ describe("EventsService", () => {
 
         it("should handle missing electron API gracefully", async () => {
             // Remove the electronAPI
-            delete globalThis.electronAPI;
+            Reflect.deleteProperty(globalThis, "electronAPI");
 
             const callback = vi.fn();
 

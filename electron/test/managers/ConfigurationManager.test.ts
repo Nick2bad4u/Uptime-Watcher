@@ -132,7 +132,9 @@ describe(ConfigurationManager, () => {
             await annotate("Type: Validation", "type");
 
             // The cache is private, so we just test that the method executes without error
-            expect(() => { configManager.clearValidationCache(); }).not.toThrow();
+            expect(() => {
+                configManager.clearValidationCache();
+            }).not.toThrow();
         });
     });
 

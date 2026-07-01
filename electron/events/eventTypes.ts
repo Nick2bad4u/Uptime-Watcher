@@ -4,9 +4,9 @@
  *
  * @remarks
  * Provides compile-time type safety for event data and event names across the
- * app. Events are organized by domain (site, monitor, database, system,
- * etc.) and include comprehensive metadata for debugging, auditing, and
- * middleware processing.
+ * app. Events are organized by domain (site, monitor, database, system, etc.)
+ * and include comprehensive metadata for debugging, auditing, and middleware
+ * processing.
  *
  * @public
  *
@@ -193,8 +193,8 @@ export const EVENT_CATEGORIES = {
      * Configuration change events.
      *
      * @remarks
-     * Events emitted when app configuration settings are modified,
-     * including user preferences and system settings.
+     * Events emitted when app configuration settings are modified, including
+     * user preferences and system settings.
      */
     CONFIG: ["config:changed"] as const,
 
@@ -357,11 +357,7 @@ export const EVENT_CATEGORIES = {
      * Events related to system operations including startup, shutdown, and
      * system-level errors that affect the entire app.
      */
-    SYSTEM: [
-        "system:error",
-        "system:shutdown",
-        "system:startup",
-    ] as const,
+    SYSTEM: ["system:error", "system:shutdown", "system:startup"] as const,
 } as const;
 
 /**
@@ -385,8 +381,8 @@ export const EVENT_PRIORITIES = {
      * Critical priority events that require immediate attention.
      *
      * @remarks
-     * Events that indicate system-level issues, performance problems, or
-     * app shutdown scenarios that need immediate processing.
+     * Events that indicate system-level issues, performance problems, or app
+     * shutdown scenarios that need immediate processing.
      */
     CRITICAL: [
         "performance:warning",

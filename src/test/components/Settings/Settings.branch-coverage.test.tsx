@@ -18,7 +18,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { objectAssign, safeCastTo  } from "ts-extras";
+import { objectAssign, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Settings } from "../../../components/Settings/Settings";
@@ -37,11 +37,9 @@ import {
     updateSitesStoreMock,
 } from "../../utils/createSitesStoreMock";
 
-type MutableSitesStore = ReturnType<typeof createSitesStoreMock>;
-
 // Mock all dependencies
-vi.mock(import('../../../stores/error/useErrorStore'));
-vi.mock(import('../../../stores/settings/useSettingsStore'));
+vi.mock("../../../stores/error/useErrorStore");
+vi.mock("../../../stores/settings/useSettingsStore");
 
 const createDefaultSaveBackup = () =>
     vi.fn(async () => ({
@@ -82,7 +80,7 @@ const resetSitesStoreState = (): void => {
     });
 };
 
-vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -97,13 +95,13 @@ vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../theme/useTheme'));
+vi.mock("../../../theme/useTheme");
 const confirmMock = vi.fn();
-vi.mock(import('../../../hooks/ui/useConfirmDialog'), () => ({
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => confirmMock,
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         warn: vi.fn(),
         error: vi.fn(),
@@ -114,7 +112,7 @@ vi.mock(import('../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
@@ -176,17 +174,22 @@ describe("Settings - Branch Coverage Tests", () => {
         resetSitesStoreState();
         useSitesStoreMock.mockClear();
 
-        vi.spyOn(mockErrorStore, 'clearError').mockImplementation();
-        vi.spyOn(mockErrorStore, 'setError').mockImplementation();
-        vi.spyOn(mockErrorStore, 'setLoading').mockImplementation();
+        vi.spyOn(mockErrorStore, "clearError").mockReturnValue(undefined);
+        vi.spyOn(mockErrorStore, "setError").mockReturnValue(undefined);
+        vi.spyOn(mockErrorStore, "setLoading").mockReturnValue(undefined);
         mockErrorStore.isLoading = false;
         mockErrorStore.lastError = null;
 
-        vi.spyOn(mockSettingsStore, 'updateSettings').mockImplementation();
-        vi.spyOn(mockSettingsStore, 'persistHistoryLimit').mockImplementation()
-            .mockResolvedValue(undefined);
-        vi.spyOn(mockSettingsStore, 'resetSettings').mockImplementation().mockResolvedValue(undefined);
-        vi.spyOn(mockSettingsStore, 'syncSettings').mockImplementation();
+        vi.spyOn(mockSettingsStore, "updateSettings").mockReturnValue(
+            undefined
+        );
+        vi.spyOn(mockSettingsStore, "persistHistoryLimit").mockResolvedValue(
+            undefined
+        );
+        vi.spyOn(mockSettingsStore, "resetSettings").mockResolvedValue(
+            undefined
+        );
+        vi.spyOn(mockSettingsStore, "syncSettings").mockReturnValue(undefined);
         mockSettingsStore.settings = {
             autoStart: false,
             historyLimit: 1000,

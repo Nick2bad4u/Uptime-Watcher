@@ -20,10 +20,10 @@ tags:
 
 ## Table of Contents
 
-1. [Purpose](#purpose)
-2. [Implementation Steps](#implementation-steps)
-3. [Example Skeleton](#example-skeleton)
-4. [Checklist](#checklist)
+- [Purpose](#purpose)
+- [Implementation Steps](#implementation-steps)
+- [Example Skeleton](#example-skeleton)
+- [Checklist](#checklist)
 
 ## Purpose
 

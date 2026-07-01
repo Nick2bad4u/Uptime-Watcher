@@ -89,9 +89,11 @@ test.describe(
                 const listButton = layoutToggleGroup.getByRole("button", {
                     name: "List",
                 });
-                await expect.soft(page.getByText(/tracking 2 sites/i)).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect
+                    .soft(page.getByText(/tracking 2 sites/i))
+                    .toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
                 await listButton.click();
 
                 const table = page.getByRole("table");
@@ -103,12 +105,14 @@ test.describe(
                 expect.soft(headers.length).toBeGreaterThanOrEqual(6);
 
                 for (const siteName of createdSites) {
-                    await expect.soft(
-                        table
-                            .getByRole("row")
-                            .filter({ hasText: siteName })
-                            .first()
-                    ).toBeVisible({ timeout: WAIT_TIMEOUTS.LONG });
+                    await expect
+                        .soft(
+                            table
+                                .getByRole("row")
+                                .filter({ hasText: siteName })
+                                .first()
+                        )
+                        .toBeVisible({ timeout: WAIT_TIMEOUTS.LONG });
                 }
 
                 const monitorSelects = table.getByRole("combobox", {
@@ -117,19 +121,25 @@ test.describe(
                 await expect.soft(monitorSelects.first()).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(monitorSelects).toHaveCount(createdSites.length);
+                await expect
+                    .soft(monitorSelects)
+                    .toHaveCount(createdSites.length);
 
-                await expect.soft(
-                    table.getByRole("button", { name: "Check Now" }).first()
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(
+                        table.getByRole("button", { name: "Check Now" }).first()
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await expect.soft(
-                    table
-                        .getByRole("button", {
-                            name: /All Monitoring$/v,
-                        })
-                        .first()
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(
+                        table
+                            .getByRole("button", {
+                                name: /All Monitoring$/v,
+                            })
+                            .first()
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
             }
         );
 
@@ -173,11 +183,13 @@ test.describe(
                 await expect.soft(siteDetailsModal).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
-                await expect.soft(
-                    siteDetailsModal
-                        .getByText(firstSiteName, { exact: true })
-                        .first()
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(
+                        siteDetailsModal
+                            .getByText(firstSiteName, { exact: true })
+                            .first()
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await closeSiteDetails(page);
             }

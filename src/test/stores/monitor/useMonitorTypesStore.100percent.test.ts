@@ -24,7 +24,7 @@ import type { UnknownArray } from "type-fest";
 
 import { BASE_MONITOR_TYPES, type Monitor } from "@shared/types";
 import { act, renderHook } from "@testing-library/react";
-import { isDefined, objectKeys  } from "ts-extras";
+import { isDefined, objectKeys } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useErrorStore } from "../../../stores/error/useErrorStore";
@@ -37,7 +37,7 @@ const originalLogStoreAction = vi.hoisted(() => vi.fn());
 const originalSafeExtractIpcData = vi.hoisted(() => vi.fn());
 
 // Mock dependencies with full control over their behavior (partial mock to retain exports).
-vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
@@ -61,7 +61,7 @@ vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     };
 });
 
-vi.mock(import('../../../stores/utils'), async (importOriginal) => {
+vi.mock("../../../stores/utils", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -136,8 +136,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     store.setLoading(true);
                     return await operation();
                 } catch (error: unknown) {
-                    const errorMessage =
-                        Error.isError(error) ? error.message : String(error);
+                    const errorMessage = Error.isError(error)
+                        ? error.message
+                        : String(error);
                     store.setError(errorMessage);
                     throw error;
                 } finally {
@@ -311,7 +312,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 { type: undefined },
                 { type: 42 },
                 { type: "" }, // Empty string
-                { type: ' '.repeat(3) }, // Whitespace only
+                { type: " ".repeat(3) }, // Whitespace only
                 { type: "valid", extraField: "ignored" }, // Extra fields should be allowed
                 { notType: "invalid" },
                 {
@@ -478,10 +479,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                             store.setLoading(true);
                             throw errorType;
                         } catch (error: unknown) {
-                            const errorMessage =
-                                Error.isError(error)
-                                    ? error.message
-                                    : String(error);
+                            const errorMessage = Error.isError(error)
+                                ? error.message
+                                : String(error);
                             store.setError(errorMessage);
                             throw error;
                         } finally {
@@ -1010,7 +1010,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             const edgeCasePayloads: Readonly<UnknownArray> = [
                 {},
                 { text: "" },
-                { whitespace: ' '.repeat(3) },
+                { whitespace: " ".repeat(3) },
                 { special: "special-chars-!@#$%^&*()" },
                 { unicode: "unicode-测试" },
                 {
@@ -1222,10 +1222,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                         store.setLoading(true);
                         return await operation();
                     } catch (error: unknown) {
-                        const errorMessage =
-                            Error.isError(error)
-                                ? error.message
-                                : String(error);
+                        const errorMessage = Error.isError(error)
+                            ? error.message
+                            : String(error);
                         store.setError(errorMessage);
                         throw error;
                     } finally {
@@ -1370,8 +1369,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             ).toBeTruthy();
             expect(
                 stateChanges.some(
-                    (change) =>
-                        !isDefined(change.storeErrors["monitor-types"])
+                    (change) => !isDefined(change.storeErrors["monitor-types"])
                 )
             ).toBeTruthy();
 

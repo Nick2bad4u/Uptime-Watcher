@@ -17,21 +17,21 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 // import type { ChangeEvent } from "react";
 
 // Mock modules
-vi.mock(import('../../stores/sites/useSitesStore'));
-vi.mock(import('../../services/logger'));
-vi.mock(import('../../stores/error/useErrorStore'), () => ({
+vi.mock("../../stores/sites/useSitesStore");
+vi.mock("../../services/logger");
+vi.mock("../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(() => ({
         clearError: vi.fn(),
         isLoading: false,
         error: null,
     })),
 }));
-vi.mock(import('../../stores/ui/useUiStore'));
+vi.mock("../../stores/ui/useUiStore");
 const confirmMock = vi.fn();
-vi.mock(import('../../hooks/ui/useConfirmDialog'), () => ({
+vi.mock("../../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => confirmMock,
 }));
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
         async (fn, _context, _defaultValue, _throwOnError) => await fn()
     ),

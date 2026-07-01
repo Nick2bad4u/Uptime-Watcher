@@ -44,8 +44,7 @@ describe("String Conversion - Final Final Coverage", () => {
                 configurable: true,
             });
 
-            // Try to manipulate the object to hit the default case This is a bit tricky since typeof only returns
-            // specific strings But we'll try various approaches
+            // Try to manipulate the object to hit the default case This is a bit tricky since typeof only returns specific strings But we'll try various approaches
 
             const result = safeStringify(weirdObject);
             // Should still return object type, but this exercises the code path
@@ -86,9 +85,7 @@ describe("String Conversion - Final Final Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
-            // The default case is very hard to hit because typeof only returns: "string", "number", "bigint",
-            // "boolean", "symbol", "undefined", "object", "function" Let's make sure we're covering the undefined case
-            // thoroughly
+            // The default case is very hard to hit because typeof only returns: "string", "number", "bigint", "boolean", "symbol", "undefined", "object", "function" Let's make sure we're covering the undefined case thoroughly
 
             const undefinedVar = undefined;
             const result = safeStringify(undefinedVar);

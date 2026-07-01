@@ -3,12 +3,12 @@
  */
 
 import { renderHook, waitFor } from "@testing-library/react";
-import { describe, expect, it, test, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { useMount } from "../../hooks/useMount";
 import { logger } from "../../services/logger";
 
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -32,9 +32,9 @@ describe("useMount - 100% Coverage Tests", () => {
         const mountCallback = vi.fn();
         const unmountCallback = vi.fn();
 
-        const { rerender, unmount } = renderHook(() =>
-            { useMount(mountCallback, unmountCallback); }
-        );
+        const { rerender, unmount } = renderHook(() => {
+            useMount(mountCallback, unmountCallback);
+        });
 
         expect(mountCallback).toHaveBeenCalledTimes(1);
 
@@ -62,9 +62,9 @@ describe("useMount - 100% Coverage Tests", () => {
             .mockRejectedValue(new Error(errorMessage));
         const unmountCallback = vi.fn();
 
-        const { unmount } = renderHook(() =>
-            { useMount(asyncMountCallback, unmountCallback); }
-        );
+        const { unmount } = renderHook(() => {
+            useMount(asyncMountCallback, unmountCallback);
+        });
 
         // Wait for async error handling without introducing fixed delays.
         await waitFor(() => {

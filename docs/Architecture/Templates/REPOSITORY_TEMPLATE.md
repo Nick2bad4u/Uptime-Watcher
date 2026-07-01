@@ -18,11 +18,11 @@ tags:
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
-3. [Template Structure](#template-structure)
-4. [Customization Checklist](#customization-checklist)
-5. [Testing Template](#testing-template)
+- [Overview](#overview)
+- [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
+- [Template Structure](#template-structure)
+- [Customization Checklist](#customization-checklist)
+- [Testing Template](#testing-template)
 
 ## Overview
 
@@ -41,7 +41,6 @@ Repository classes manage data persistence using the dual-method pattern:
 ## Template Structure
 
 ````typescript
-
 import { Database } from "node-sqlite3-wasm";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";
@@ -150,11 +149,7 @@ export class ExampleRepository {
   * @param data - The entity data to create.
   */
  public createInternal(db: Database, data: ExampleRow): void {
-  db.run(EXAMPLE_QUERIES.INSERT, [
-   data.id,
-   data.name,
-   data.createdAt,
-  ]);
+  db.run(EXAMPLE_QUERIES.INSERT, [data.id, data.name, data.createdAt]);
   logger.debug(`[ExampleRepository] Created entity: ${data.id}`);
  }
 
@@ -202,8 +197,7 @@ export class ExampleRepository {
   return withDatabaseOperation(() => {
    const db = this.getDb();
    const result = db.get(EXAMPLE_QUERIES.SELECT_BY_ID, [id]) as
-    | ExampleRow
-    | undefined;
+    ExampleRow | undefined;
    return Promise.resolve(result);
   }, "ExampleRepository.findById");
  }
@@ -398,11 +392,7 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([
-     record.id,
-     record.name,
-     record.createdAt,
-    ]);
+    stmt.run([record.id, record.name, record.createdAt]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} entity records (internal)`
@@ -483,11 +473,7 @@ describe("ExampleRepository", () => {
    expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
    expect(mockDatabase.run).toHaveBeenCalledWith(
     expect.stringContaining("INSERT"),
-    [
-     data.id,
-     data.name,
-     data.createdAt,
-    ]
+    [data.id, data.name, data.createdAt]
    );
   });
  });

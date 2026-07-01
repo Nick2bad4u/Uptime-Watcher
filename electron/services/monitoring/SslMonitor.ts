@@ -14,7 +14,12 @@ import type { Except } from "type-fest";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
-import { isDefined, isEmpty, isFinite as isFiniteNumber, objectKeys } from "ts-extras";
+import {
+    isDefined,
+    isEmpty,
+    isFinite as isFiniteNumber,
+    objectKeys,
+} from "ts-extras";
 
 import type {
     IMonitorService,
@@ -228,12 +233,11 @@ export class SslMonitor implements IMonitorService {
                         ? `TLS authorization failed: ${details}`
                         : "TLS authorization failed";
 
-                    const error =
-                        Error.isError(authorizationError)
-                            ? new Error(errorMessage, {
-                                  cause: authorizationError,
-                              })
-                            : new Error(errorMessage);
+                    const error = Error.isError(authorizationError)
+                        ? new Error(errorMessage, {
+                              cause: authorizationError,
+                          })
+                        : new Error(errorMessage);
 
                     handleFailure(error, abortListener);
                     return;

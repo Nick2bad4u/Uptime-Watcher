@@ -7,7 +7,7 @@ import "@testing-library/jest-dom";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import fc from "fast-check";
 import { EventEmitter } from "node:events";
-import { objectAssign, safeCastTo  } from "ts-extras";
+import { objectAssign, safeCastTo } from "ts-extras";
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
 
 // Set max listeners to prevent memory leak warnings in tests
@@ -28,7 +28,7 @@ process.setMaxListeners(MAX_LISTENERS);
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
+const baseNumRuns = safeCastTo<{ numRuns?: number }>(current).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
@@ -87,103 +87,101 @@ beforeAll(() => {
     });
 
     // Mock IntersectionObserver for component visibility testing
-    globalThis.IntersectionObserver =
-        class MockIntersectionObserver implements IntersectionObserver {
-            private readonly callback: IntersectionObserverCallback;
+    globalThis.IntersectionObserver = class MockIntersectionObserver implements IntersectionObserver {
+        private readonly callback: IntersectionObserverCallback;
 
-            public readonly root: Document | Element | null;
+        public readonly root: Document | Element | null;
 
-            public readonly rootMargin: string;
+        public readonly rootMargin: string;
 
-            public readonly scrollMargin: string;
+        public readonly scrollMargin: string;
 
-            public readonly thresholds: readonly number[];
+        public readonly thresholds: readonly number[];
 
-            public constructor(
-                callback: IntersectionObserverCallback = NOOP_INTERSECTION_OBSERVER_CALLBACK,
-                options: IntersectionObserverInit = {}
-            ) {
-                this.callback = callback;
-                this.root = options.root ?? null;
-                this.rootMargin = options.rootMargin ?? "";
-                this.scrollMargin = "";
-                const threshold = options.threshold;
-                if (Array.isArray(threshold)) {
-                    this.thresholds = Object.freeze([...threshold]);
-                } else if (typeof threshold === "number") {
-                    this.thresholds = Object.freeze([threshold]);
-                } else {
-                    this.thresholds = Object.freeze([]);
-                }
+        public constructor(
+            callback: IntersectionObserverCallback = NOOP_INTERSECTION_OBSERVER_CALLBACK,
+            options: IntersectionObserverInit = {}
+        ) {
+            this.callback = callback;
+            this.root = options.root ?? null;
+            this.rootMargin = options.rootMargin ?? "";
+            this.scrollMargin = "";
+            const threshold = options.threshold;
+            if (Array.isArray(threshold)) {
+                this.thresholds = Object.freeze([...threshold]);
+            } else if (typeof threshold === "number") {
+                this.thresholds = Object.freeze([threshold]);
+            } else {
+                this.thresholds = Object.freeze([]);
             }
+        }
 
-            public disconnect(): void {
-                // no-op
-            }
+        public disconnect(): void {
+            // no-op
+        }
 
-            public observe(target: Element): void {
-                this.callback(
-                    [
-                        {
-                            boundingClientRect: target.getBoundingClientRect(),
-                            intersectionRatio: 0,
-                            intersectionRect: target.getBoundingClientRect(),
-                            isIntersecting: false,
-                            rootBounds: null,
-                            target,
-                            time: performance.now(),
-                        },
-                    ],
-                    this
-                );
-            }
+        public observe(target: Element): void {
+            this.callback(
+                [
+                    {
+                        boundingClientRect: target.getBoundingClientRect(),
+                        intersectionRatio: 0,
+                        intersectionRect: target.getBoundingClientRect(),
+                        isIntersecting: false,
+                        rootBounds: null,
+                        target,
+                        time: performance.now(),
+                    },
+                ],
+                this
+            );
+        }
 
-            public takeRecords(): IntersectionObserverEntry[] {
-                return [];
-            }
+        public takeRecords(): IntersectionObserverEntry[] {
+            return [];
+        }
 
-            public unobserve(_target: Element): void {
-                // no-op
-            }
-        };
+        public unobserve(_target: Element): void {
+            // no-op
+        }
+    };
 
     // Mock ResizeObserver for responsive component testing
-    globalThis.ResizeObserver =
-        class MockResizeObserver implements ResizeObserver {
-            private readonly callback: ResizeObserverCallback;
+    globalThis.ResizeObserver = class MockResizeObserver implements ResizeObserver {
+        private readonly callback: ResizeObserverCallback;
 
-            public constructor(
-                callback: ResizeObserverCallback = NOOP_RESIZE_OBSERVER_CALLBACK
-            ) {
-                this.callback = callback;
-            }
+        public constructor(
+            callback: ResizeObserverCallback = NOOP_RESIZE_OBSERVER_CALLBACK
+        ) {
+            this.callback = callback;
+        }
 
-            public disconnect(): void {
-                // no-op
-            }
+        public disconnect(): void {
+            // no-op
+        }
 
-            public observe(
-                target: Element,
-                _options?: ResizeObserverOptions
-            ): void {
-                this.callback(
-                    [
-                        {
-                            borderBoxSize: [],
-                            contentBoxSize: [],
-                            contentRect: target.getBoundingClientRect(),
-                            devicePixelContentBoxSize: [],
-                            target,
-                        },
-                    ],
-                    this
-                );
-            }
+        public observe(
+            target: Element,
+            _options?: ResizeObserverOptions
+        ): void {
+            this.callback(
+                [
+                    {
+                        borderBoxSize: [],
+                        contentBoxSize: [],
+                        contentRect: target.getBoundingClientRect(),
+                        devicePixelContentBoxSize: [],
+                        target,
+                    },
+                ],
+                this
+            );
+        }
 
-            public unobserve(_target: Element): void {
-                // no-op
-            }
-        };
+        public unobserve(_target: Element): void {
+            // no-op
+        }
+    };
 
     // Mock requestIdleCallback for performance testing
     globalThis.requestIdleCallback = (
@@ -211,15 +209,15 @@ beforeAll(() => {
     };
 
     // Mock getComputedStyle for CSS-dependent tests
-    vi.spyOn(globalThis, 'getComputedStyle').mockImplementation().mockReturnValue({
+    vi.spyOn(globalThis, "getComputedStyle").mockReturnValue({
         getPropertyValue: vi.fn().mockReturnValue(""),
-    });
+    } as unknown as CSSStyleDeclaration);
 
     // Mock Element.prototype.scrollIntoView
-    vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation();
+    vi.spyOn(Element.prototype, "scrollIntoView").mockReturnValue(undefined);
 
     // Mock Element.prototype.getBoundingClientRect
-    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation().mockReturnValue({
+    vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue({
         width: 0,
         height: 0,
         top: 0,
@@ -241,8 +239,8 @@ beforeAll(() => {
     });
 
     // Mock URL.createObjectURL
-    vi.spyOn(URL, 'createObjectURL').mockImplementation().mockReturnValue("blob:mock-url");
-    vi.spyOn(URL, 'revokeObjectURL').mockImplementation();
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:mock-url");
+    vi.spyOn(URL, "revokeObjectURL").mockReturnValue(undefined);
 
     // Mock File and FileReader for file upload testing
     globalThis.File = class MockFile extends Blob implements File {
@@ -391,7 +389,7 @@ beforeAll(() => {
     };
 
     // Mock performance.now for timing tests
-    vi.spyOn(performance, 'now').mockReturnValue(Date.now());
+    vi.spyOn(performance, "now").mockReturnValue(Date.now());
 
     // Mock console methods to reduce test noise (optional)
     const originalConsole = { ...console };

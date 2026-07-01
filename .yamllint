@@ -1,1 +1,7 @@
-extends: node_modules/yamllint-config-nick2bad4u/.yamllint
+extends: "node_modules/yamllint-config-nick2bad4u/.yamllint"
+
+rules:
+    empty-values:
+        forbid-in-block-mappings: false
+        forbid-in-block-sequences: true
+        forbid-in-flow-mappings: false

@@ -1,8 +1,9 @@
+# yamllint disable rule:indentation
 matrix:
     - aspell:
-          default_encoding: utf-8
+          default_encoding: "utf-8"
           dictionary:
-          encoding: utf-8
+          encoding: "utf-8"
           exclude:
               - "libs/**"
               - "node_modules/**"
@@ -11,18 +12,18 @@ matrix:
               - "**/changelog.md"
               - "**/CHANGELOG.md"
               - "**/copilot-instructions.md"
-          lang: en
+          lang: "en"
           pipeline:
               - markdown_extensions:
-                    - pymdownx.superfences
+                    - "pymdownx.superfences"
                 pyspelling.filters.markdown:
               - comments: false
                 ignores:
-                    - code
-                    - pre
+                    - "code"
+                    - "pre"
                 pyspelling.filters.html:
           sources:
               - "**/*.md"
           wordlists:
-              - .wordlist.txt
-      name: Markdown
+              - ".wordlist.txt"
+      name: "Markdown"

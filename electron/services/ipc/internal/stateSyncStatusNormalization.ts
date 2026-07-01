@@ -34,8 +34,7 @@ export type NormalizedStateSyncStatusEvent =
     | {
           readonly _meta?: EventMetadata | undefined;
           readonly action:
-              | typeof STATE_SYNC_ACTION.DELETE
-              | typeof STATE_SYNC_ACTION.UPDATE;
+              typeof STATE_SYNC_ACTION.DELETE | typeof STATE_SYNC_ACTION.UPDATE;
           readonly delta: {
               readonly addedSites: readonly SiteIdentifierSnapshot[];
               readonly removedSiteIdentifiers: readonly string[];

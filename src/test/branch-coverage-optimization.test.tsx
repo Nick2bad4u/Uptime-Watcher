@@ -17,7 +17,7 @@ import { SiteCardHistory } from "../components/Dashboard/SiteCard/SiteCardHistor
 import { ThemeProvider } from "../theme/components/ThemeProvider";
 
 // Mock dependencies
-vi.mock(import('../hooks/useMonitorTypes'), () => ({
+vi.mock("../hooks/useMonitorTypes", () => ({
     useMonitorTypes: () => ({
         options: [
             { value: "http", label: "HTTP" },
@@ -26,7 +26,7 @@ vi.mock(import('../hooks/useMonitorTypes'), () => ({
     }),
 }));
 
-vi.mock(import('../utils/monitorTitleFormatters'), () => ({
+vi.mock("../utils/monitorTitleFormatters", () => ({
     formatTitleSuffix: (monitor: any) => {
         if (monitor.type === "http" && monitor.url) {
             return ` - ${monitor.url}`;
@@ -38,7 +38,7 @@ vi.mock(import('../utils/monitorTitleFormatters'), () => ({
     },
 }));
 
-vi.mock(import('../components/common/HistoryChart'), () => ({
+vi.mock("../components/common/HistoryChart", () => ({
     HistoryChart: ({ title, history, maxItems }: any) => (
         <div data-testid="history-chart">
             <div data-testid="chart-title">{title}</div>
@@ -419,8 +419,12 @@ describe("Branch Coverage Optimization Tests", () => {
                 }
 
                 // Compare first history item timestamp
-                const prevTimestamp = arrayFirst(prev.filteredHistory)?.timestamp;
-                const nextTimestamp = arrayFirst(next.filteredHistory)?.timestamp;
+                const prevTimestamp = arrayFirst(
+                    prev.filteredHistory
+                )?.timestamp;
+                const nextTimestamp = arrayFirst(
+                    next.filteredHistory
+                )?.timestamp;
                 if (prevTimestamp !== nextTimestamp) {
                     return false;
                 }
@@ -448,9 +452,11 @@ describe("Branch Coverage Optimization Tests", () => {
                 }
 
                 // Compare optional properties
-                return prevMonitor.url === nextMonitor.url &&
+                return (
+                    prevMonitor.url === nextMonitor.url &&
                     prevMonitor.port === nextMonitor.port &&
-                    prevMonitor.host === nextMonitor.host;
+                    prevMonitor.host === nextMonitor.host
+                );
             }
         );
 

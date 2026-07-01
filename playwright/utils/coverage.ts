@@ -22,8 +22,7 @@ const coverageLabels = new WeakMap<ElectronApplication, string>();
 export const isCoverageEnabled = Boolean(process.env[COVERAGE_ENV]);
 
 /**
- * Associates a descriptive label with an Electron app for coverage
- * output.
+ * Associates a descriptive label with an Electron app for coverage output.
  *
  * @param electronApp - The Electron app instance spawned by Playwright.
  * @param label - Human-readable identifier to embed in the coverage artifact

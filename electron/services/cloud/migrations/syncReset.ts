@@ -107,7 +107,9 @@ export async function resetProviderCloudSyncState(args: {
 
     const nextManifest = {
         ...ProviderCloudSyncTransport.createEmptyManifest(),
-        ...(remoteManifest.encryption && { encryption: remoteManifest.encryption }),
+        ...(remoteManifest.encryption && {
+            encryption: remoteManifest.encryption,
+        }),
         resetAt,
     };
 

@@ -18,11 +18,13 @@ interface ProcessStub {
     env?: Record<string, string | undefined>;
 }
 
-const globalTarget = safeCastTo<UnknownRecord & {
-    navigator?: Navigator;
-    playwrightAutomation?: boolean;
-    process?: ProcessStub | undefined;
-}>(globalThis);
+const globalTarget = safeCastTo<
+    UnknownRecord & {
+        navigator?: Navigator;
+        playwrightAutomation?: boolean;
+        process?: ProcessStub | undefined;
+    }
+>(globalThis);
 
 const markerSentinel = Symbol("playwright-marker-sentinel");
 

@@ -20,7 +20,7 @@ import {
 
 describe("shared/utils/environment.ts - Complete Function Coverage", () => {
     const originalProcess = process;
-    const originalWindow = globalThis;
+    const originalWindow = globalThis.window;
 
     beforeEach(() => {
         // Reset global state before each test

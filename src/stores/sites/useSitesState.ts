@@ -231,7 +231,9 @@ export const createSitesStateActions = (
                     ...state.optimisticMonitoringLocks,
                 };
                 const isRemoved = Reflect.deleteProperty(nextLocks, key);
-                return isRemoved ? { optimisticMonitoringLocks: nextLocks } : {};
+                return isRemoved
+                    ? { optimisticMonitoringLocks: nextLocks }
+                    : {};
             });
         }, durationMs + 25);
 
@@ -526,7 +528,7 @@ export const createSitesStateActions = (
 
                 const siteLookup = new Map<Site["identifier"], Site>(
                     sitesForState.map(
-                        (site) => [site, site.identifier] as const
+                        (site) => [site.identifier, site] as const
                     )
                 );
 

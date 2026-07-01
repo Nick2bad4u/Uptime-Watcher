@@ -274,11 +274,13 @@ describe("useThemeStyles Hook", () => {
                 "matches",
                 true
             );
-            const listener = arrayFirst((
-                mockMediaQuery.addEventListener as unknown as ReturnType<
-                    typeof vi.fn
-                >
-            ).mock.calls)?.[1];
+            const listener = arrayFirst(
+                (
+                    mockMediaQuery.addEventListener as unknown as ReturnType<
+                        typeof vi.fn
+                    >
+                ).mock.calls
+            )?.[1];
 
             act(() => {
                 if (listener) {
@@ -314,11 +316,13 @@ describe("useThemeStyles Hook", () => {
                 "matches",
                 false
             );
-            const listener = arrayFirst((
-                mockMediaQuery.addEventListener as unknown as ReturnType<
-                    typeof vi.fn
-                >
-            ).mock.calls)?.[1];
+            const listener = arrayFirst(
+                (
+                    mockMediaQuery.addEventListener as unknown as ReturnType<
+                        typeof vi.fn
+                    >
+                ).mock.calls
+            )?.[1];
 
             act(() => {
                 if (listener) {

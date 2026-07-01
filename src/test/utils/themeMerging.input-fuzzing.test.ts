@@ -20,7 +20,7 @@
 
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
-import { arrayFirst, objectKeys, objectValues, safeCastTo    } from "ts-extras";
+import { arrayFirst, objectKeys, objectValues, safeCastTo } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 import type { Theme } from "../../theme/types";

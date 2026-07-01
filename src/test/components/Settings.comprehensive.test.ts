@@ -2,7 +2,7 @@
  * Tests for Settings component to improve coverage
  */
 
-import { objectValues, setHas  } from "ts-extras";
+import { objectValues, setHas } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 describe("Settings Component Coverage Tests", () => {

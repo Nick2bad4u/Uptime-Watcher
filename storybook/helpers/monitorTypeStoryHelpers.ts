@@ -30,9 +30,9 @@ const createFieldConfigMap = (
 export const prepareMonitorTypesStore = (
     configs: readonly MonitorTypeConfig[] = SAMPLE_MONITOR_TYPES
 ): void => {
-    const monitorTypes = configs.map(
-        (config): MonitorTypeConfig => ({ ...config })
-    );
+    const monitorTypes = configs.map((config): MonitorTypeConfig => ({
+        ...config,
+    }));
     setMockMonitorTypes(monitorTypes);
 
     useMonitorTypesStore.setState({

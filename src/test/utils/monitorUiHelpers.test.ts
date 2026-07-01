@@ -7,7 +7,7 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { fc, test } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
-import { arrayFirst, isEmpty  } from "ts-extras";
+import { arrayFirst, isEmpty } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppCaches } from "../../utils/cache";
@@ -22,7 +22,7 @@ const MONITOR_TYPES_UNDER_TEST = [
     "ping",
 ] as const satisfies readonly MonitorType[];
 
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(async (fn, _description, fallback) => {
         try {
             return await fn();
@@ -32,7 +32,7 @@ vi.mock(import('@shared/utils/errorHandling'), () => ({
     }),
 }));
 
-vi.mock(import('../../utils/monitorTypeHelper'), () => ({
+vi.mock("../../utils/monitorTypeHelper", () => ({
     getAvailableMonitorTypes: vi.fn(),
     getMonitorTypeConfig: vi.fn(),
 }));
@@ -149,10 +149,11 @@ describe("monitor UI Helpers", () => {
                 return undefined;
             });
 
-            const isResult = await monitorUiHelpers.allSupportsAdvancedAnalytics([
-                "http",
-                "port",
-            ]);
+            const isResult =
+                await monitorUiHelpers.allSupportsAdvancedAnalytics([
+                    "http",
+                    "port",
+                ]);
 
             expect(isResult).toBe(true);
         });
@@ -182,10 +183,11 @@ describe("monitor UI Helpers", () => {
                 return undefined;
             });
 
-            const isResult = await monitorUiHelpers.allSupportsAdvancedAnalytics([
-                "http",
-                "port",
-            ]);
+            const isResult =
+                await monitorUiHelpers.allSupportsAdvancedAnalytics([
+                    "http",
+                    "port",
+                ]);
 
             expect(isResult).toBe(false);
         });
@@ -196,9 +198,8 @@ describe("monitor UI Helpers", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const isResult = await monitorUiHelpers.allSupportsAdvancedAnalytics(
-                []
-            );
+            const isResult =
+                await monitorUiHelpers.allSupportsAdvancedAnalytics([]);
 
             expect(isResult).toBe(true);
         });
@@ -357,7 +358,8 @@ describe("monitor UI Helpers", () => {
                 })
             );
 
-            const isResult = await monitorUiHelpers.supportsResponseTime("http");
+            const isResult =
+                await monitorUiHelpers.supportsResponseTime("http");
 
             expect(isResult).toBe(true);
         });
@@ -378,7 +380,8 @@ describe("monitor UI Helpers", () => {
                 })
             );
 
-            const isResult = await monitorUiHelpers.supportsResponseTime("http");
+            const isResult =
+                await monitorUiHelpers.supportsResponseTime("http");
 
             expect(isResult).toBe(false);
         });
@@ -394,7 +397,8 @@ describe("monitor UI Helpers", () => {
 
             vi.mocked(getMonitorTypeConfig).mockResolvedValue(undefined);
 
-            const isResult = await monitorUiHelpers.supportsResponseTime("http");
+            const isResult =
+                await monitorUiHelpers.supportsResponseTime("http");
 
             expect(isResult).toBe(false);
         });
@@ -551,9 +555,9 @@ describe("monitor UI Helpers", () => {
             await expect(
                 monitorUiHelpers.supportsResponseTime("http")
             ).resolves.toBe(false);
-            await expect(
-                monitorUiHelpers.shouldShowUrl("http")
-            ).resolves.toBe(false);
+            await expect(monitorUiHelpers.shouldShowUrl("http")).resolves.toBe(
+                false
+            );
             await expect(
                 monitorUiHelpers.getAnalyticsLabel("http")
             ).resolves.toBe("HTTP Response Time");
@@ -718,7 +722,9 @@ describe("monitor UI Helpers", () => {
                 const isResponseTimeResult =
                     await monitorUiHelpers.supportsResponseTime("http");
 
-                expect(isResponseTimeResult).toBe(features.supportsResponseTime);
+                expect(isResponseTimeResult).toBe(
+                    features.supportsResponseTime
+                );
 
                 const showUrlResult =
                     await monitorUiHelpers.shouldShowUrl("http");

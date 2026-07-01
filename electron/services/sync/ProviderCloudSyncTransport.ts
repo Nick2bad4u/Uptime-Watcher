@@ -16,7 +16,13 @@ import {
 import { readNumberEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isEmpty, isFinite as isFiniteNumber, isSafeInteger, stringSplit } from "ts-extras";
+import {
+    arrayJoin,
+    isEmpty,
+    isFinite as isFiniteNumber,
+    isSafeInteger,
+    stringSplit,
+} from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -99,13 +105,17 @@ class CloudSyncSizeLimitError extends Error {
 
     public readonly objectKind: "manifest" | "snapshot";
 
-    public constructor(args: {
-        actualBytes: number;
-        maxBytes: number;
-        objectKind: "manifest" | "snapshot";
-    }, options: ErrorOptions) {
+    public constructor(
+        args: {
+            actualBytes: number;
+            maxBytes: number;
+            objectKind: "manifest" | "snapshot";
+        },
+        options?: ErrorOptions
+    ) {
         super(
-            `Cloud sync ${args.objectKind} exceeds size limit of ${args.maxBytes} bytes. Actual: ${args.actualBytes} bytes.`, options
+            `Cloud sync ${args.objectKind} exceeds size limit of ${args.maxBytes} bytes. Actual: ${args.actualBytes} bytes.`,
+            options
         );
         this.name = "CloudSyncSizeLimitError";
         this.actualBytes = args.actualBytes;
@@ -149,7 +159,6 @@ function parseNdjsonOperations(args: {
     raw: string;
 }): CloudSyncOperation[] {
     const { key, maxLineChars, maxLines, raw } = args;
-    // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
     const lines = raw.split(/\r?\n/u);
     const operations: CloudSyncOperation[] = [];
 

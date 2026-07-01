@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { logger } from "../services/logger";
 
 // Mock the logger
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock(import('../services/logger'), () => {
 
 // Mock the settings store
 const mockUpdateSettings = vi.fn();
-vi.mock(import('../stores/settings/useSettingsStore'), () => ({
+vi.mock("../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(() => ({
         settings: {
             autoStart: true,
@@ -54,12 +54,12 @@ const selectorAwareUseSitesStore = vi.fn(
         selector?: (state: typeof mockSitesStore) => unknown,
         _equalityFn?: (a: unknown, b: unknown) => boolean
     ) =>
-        (typeof selector === "function"
+        typeof selector === "function"
             ? selector(mockSitesStore)
-            : mockSitesStore)
+            : mockSitesStore
 );
 
-vi.mock(import('../stores/sites/useSitesStore'), () => ({
+vi.mock("../stores/sites/useSitesStore", () => ({
     useSitesStore: selectorAwareUseSitesStore,
 }));
 

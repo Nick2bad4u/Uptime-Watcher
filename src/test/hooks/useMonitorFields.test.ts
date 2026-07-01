@@ -7,11 +7,11 @@ import { useMonitorFields } from "../../hooks/useMonitorFields";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 
-vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: vi.fn(),
 }));
 
-vi.mock(import('../../stores/error/useErrorStore'), () => ({
+vi.mock("../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(),
 }));
 

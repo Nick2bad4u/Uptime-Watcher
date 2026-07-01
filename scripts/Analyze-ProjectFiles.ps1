@@ -8,9 +8,9 @@
 # Date: $(Get-Date -Format "yyyy-MM-dd")
 
 param(
-    [string]$ProjectPath = ".",
-    [switch]$ShowDetails = $false,
-    [switch]$IncludeTests = $false
+    [string] $ProjectPath = ".",
+    [switch] $ShowDetails = $false,
+    [switch] $IncludeTests = $false
 )
 
 # Color scheme
@@ -26,7 +26,7 @@ $Colors = @{
 }
 
 function Get-LineCount {
-    param([string]$FilePath)
+    param([string] $FilePath)
 
     try {
         $content = Get-Content $FilePath -ErrorAction SilentlyContinue
@@ -41,7 +41,7 @@ function Get-LineCount {
 }
 
 function Format-FileSize {
-    param([long]$Bytes)
+    param([long] $Bytes)
 
     if ($Bytes -ge 1MB) {
         return "{0:N2} MB" -f ($Bytes / 1MB)
@@ -56,8 +56,8 @@ function Format-FileSize {
 
 function Show-FolderAnalysis {
     param(
-        [string]$FolderPath,
-        [string]$FolderName
+        [string] $FolderPath,
+        [string] $FolderName
     )
 
     if (-not (Test-Path $FolderPath)) {
@@ -66,19 +66,21 @@ function Show-FolderAnalysis {
     }
 
     # Get all files recursively
-    $files = Get-ChildItem -Path $FolderPath -File -Recurse | Where-Object {
-        $_.Extension -match '\.(ts|tsx|js|jsx|json|md|css|scss|html|yml|yaml|toml)$'
-    }
+    $files = Get-ChildItem -Path $FolderPath -File -Recurse
+        | Where-Object {
+            $_.Extension -match '\.(ts|tsx|js|jsx|json|md|css|scss|html|yml|yaml|toml)$'
+        }
 
     # Filter out test files unless -IncludeTests is specified
     if (-not $IncludeTests) {
-        $files = $files | Where-Object {
-            $_.Name -notmatch '\.(test|spec)\.' -and
-            $_.Directory.Name -notmatch '^(test|tests|__tests__|spec|specs)$' -and
-            $_.FullName -notmatch '[\\/](test|tests|__tests__|spec|specs)[\\/]' -and
-            $_.Name -notmatch '^(test|spec)\.' -and
-            $_.Name -notmatch '\.(test|spec)$'
-        }
+        $files = $files
+            | Where-Object {
+                $_.Name -notmatch '\.(test|spec)\.' -and
+                $_.Directory.Name -notmatch '^(test|tests|__tests__|spec|specs)$' -and
+                $_.FullName -notmatch '[\\/](test|tests|__tests__|spec|specs)[\\/]' -and
+                $_.Name -notmatch '^(test|spec)\.' -and
+                $_.Name -notmatch '\.(test|spec)$'
+            }
     }
 
     if ($files.Count -eq 0) {
@@ -87,18 +89,20 @@ function Show-FolderAnalysis {
     }
 
     # Calculate file statistics
-    $fileStats = $files | ForEach-Object {
-        $lineCount = Get-LineCount $_.FullName
-        [PSCustomObject]@{
-            Name = $_.Name
-            RelativePath = $_.FullName.Replace($FolderPath, "").TrimStart('\', '/')
-            Extension = $_.Extension
-            SizeBytes = $_.Length
-            SizeFormatted = Format-FileSize $_.Length
-            Lines = $lineCount
-            Directory = $_.Directory.Name
+    $fileStats = $files
+        | ForEach-Object {
+            $lineCount = Get-LineCount $_.FullName
+            [PSCustomObject] @{
+                Name = $_.Name
+                RelativePath =
+                    $_.FullName.Replace( $FolderPath, "" ).TrimStart( '\', '/' )
+                Extension = $_.Extension
+                SizeBytes = $_.Length
+                SizeFormatted = Format-FileSize $_.Length
+                Lines = $lineCount
+                Directory = $_.Directory.Name
+            }
         }
-    }
 
     # Sort by size (descending)
     $sortedFiles = $fileStats | Sort-Object SizeBytes -Descending
@@ -106,7 +110,11 @@ function Show-FolderAnalysis {
     # Display header
     Write-Output ""
     Write-Output "═══════════════════════════════════════════════════════════════════" -ForegroundColor $Colors.Border
-    $testStatus = if ($IncludeTests) { "🧪 Including test files" } else { "🚫 Excluding test files" }
+    $testStatus = if ($IncludeTests) {
+        "🧪 Including test files"
+    } else {
+        "🚫 Excluding test files"
+    }
     Write-Output "📂 $FolderName Directory Analysis ($testStatus)" -ForegroundColor $Colors.FolderName
     Write-Output "═══════════════════════════════════════════════════════════════════" -ForegroundColor $Colors.Border
 
@@ -114,8 +122,16 @@ function Show-FolderAnalysis {
     $totalFiles = $files.Count
     $totalSize = ($fileStats | Measure-Object SizeBytes -Sum).Sum
     $totalLines = ($fileStats | Measure-Object Lines -Sum).Sum
-    $avgSize = if ($totalFiles -gt 0) { $totalSize / $totalFiles } else { 0 }
-    $avgLines = if ($totalFiles -gt 0) { $totalLines / $totalFiles } else { 0 }
+    $avgSize = if ($totalFiles -gt 0) {
+        $totalSize / $totalFiles
+    } else {
+        0
+    }
+    $avgLines = if ($totalFiles -gt 0) {
+        $totalLines / $totalFiles
+    } else {
+        0
+    }
 
     Write-Output "📊 Summary: " -ForegroundColor $Colors.Summary -NoNewline
     Write-Output "$totalFiles files" -ForegroundColor $Colors.FileType -NoNewline
@@ -131,28 +147,53 @@ function Show-FolderAnalysis {
 
     # Table header
     $headerFormat = "{0,-30} {1,-8} {2,10} {3,8} {4,-15}"
-    Write-Output ($headerFormat -f "File Name", "Type", "Size", "Lines", "Directory") -ForegroundColor $Colors.TableHeader
+    Write-Output (
+        $headerFormat -f "File Name",
+        "Type",
+        "Size",
+        "Lines",
+        "Directory"
+    ) -ForegroundColor $Colors.TableHeader
     Write-Output ("-" * 80) -ForegroundColor $Colors.Border
 
     # Display top files
     $topFiles = $sortedFiles | Select-Object -First 20
     foreach ($file in $topFiles) {
         $nameColor = switch ($file.Extension) {
-            { $_ -in '.ts', '.tsx' } { "Blue" }
-            { $_ -in '.js', '.jsx' } { "Yellow" }
-            '.json' { "Green" }
-            '.md' { "Cyan" }
-            { $_ -in '.css', '.scss' } { "Magenta" }
-            default { "White" }
+            {
+                $_ -in '.ts', '.tsx'
+            } {
+                "Blue"
+            }
+            {
+                $_ -in '.js', '.jsx'
+            } {
+                "Yellow"
+            }
+            '.json' {
+                "Green"
+            }
+            '.md' {
+                "Cyan"
+            }
+            {
+                $_ -in '.css', '.scss'
+            } {
+                "Magenta"
+            }
+            default {
+                "White"
+            }
         }
 
         $truncatedName = if ($file.Name.Length -gt 28) {
-            $file.Name.Substring(0, 25) + "..."
+            $file.Name.Substring( 0, 25 ) + "..."
         } else {
             $file.Name
         }
 
-        Write-Output ($headerFormat -f
+        Write-Output (
+            $headerFormat -f,
             $truncatedName,
             $file.Extension,
             $file.SizeFormatted,
@@ -169,7 +210,9 @@ function Show-FolderAnalysis {
     # File type breakdown
     Write-Output ""
     Write-Output "📋 File Type Breakdown:" -ForegroundColor $Colors.Summary
-    $typeStats = $fileStats | Group-Object Extension | Sort-Object Count -Descending
+    $typeStats = $fileStats
+        | Group-Object Extension
+        | Sort-Object Count -Descending
     foreach ($type in $typeStats) {
         $typeSize = ($type.Group | Measure-Object SizeBytes -Sum).Sum
         $typeLines = ($type.Group | Measure-Object Lines -Sum).Sum
@@ -206,42 +249,55 @@ Write-Output "══════════════════════
 
 # Get all files with proper filtering
 $allSrcFiles = if (Test-Path $srcPath) {
-    $srcFiles = Get-ChildItem -Path $srcPath -File -Recurse | Where-Object {
-        $_.Extension -match '\.(ts|tsx|js|jsx|json|md|css|scss|html|yml|yaml|toml)$'
-    }
-    if (-not $IncludeTests) {
-        $srcFiles = $srcFiles | Where-Object {
-            $_.Name -notmatch '\.(test|spec)\.' -and
-            $_.Directory.Name -notmatch '^(test|tests|__tests__|spec|specs)$' -and
-            $_.FullName -notmatch '[\\/](test|tests|__tests__|spec|specs)[\\/]' -and
-            $_.Name -notmatch '^(test|spec)\.' -and
-            $_.Name -notmatch '\.(test|spec)$'
+    $srcFiles = Get-ChildItem -Path $srcPath -File -Recurse
+        | Where-Object {
+            $_.Extension -match '\.(ts|tsx|js|jsx|json|md|css|scss|html|yml|yaml|toml)$'
         }
+    if (-not $IncludeTests) {
+        $srcFiles = $srcFiles
+            | Where-Object {
+                $_.Name -notmatch '\.(test|spec)\.' -and
+                $_.Directory.Name -notmatch '^(test|tests|__tests__|spec|specs)$' -and
+                $_.FullName -notmatch '[\\/](test|tests|__tests__|spec|specs)[\\/]' -and
+                $_.Name -notmatch '^(test|spec)\.' -and
+                $_.Name -notmatch '\.(test|spec)$'
+            }
     }
     $srcFiles
-} else { @() }
+} else {
+    @()
+}
 
 $allElectronFiles = if (Test-Path $electronPath) {
-    $electronFiles = Get-ChildItem -Path $electronPath -File -Recurse | Where-Object {
-        $_.Extension -match '\.(ts|tsx|js|jsx|json|md|css|scss|html|yml|yaml|toml)$'
-    }
-    if (-not $IncludeTests) {
-        $electronFiles = $electronFiles | Where-Object {
-            $_.Name -notmatch '\.(test|spec)\.' -and
-            $_.Directory.Name -notmatch '^(test|tests|__tests__|spec|specs)$' -and
-            $_.FullName -notmatch '[\\/](test|tests|__tests__|spec|specs)[\\/]' -and
-            $_.Name -notmatch '^(test|spec)\.' -and
-            $_.Name -notmatch '\.(test|spec)$'
+    $electronFiles = Get-ChildItem -Path $electronPath -File -Recurse
+        | Where-Object {
+            $_.Extension -match '\.(ts|tsx|js|jsx|json|md|css|scss|html|yml|yaml|toml)$'
         }
+    if (-not $IncludeTests) {
+        $electronFiles = $electronFiles
+            | Where-Object {
+                $_.Name -notmatch '\.(test|spec)\.' -and
+                $_.Directory.Name -notmatch '^(test|tests|__tests__|spec|specs)$' -and
+                $_.FullName -notmatch '[\\/](test|tests|__tests__|spec|specs)[\\/]' -and
+                $_.Name -notmatch '^(test|spec)\.' -and
+                $_.Name -notmatch '\.(test|spec)$'
+            }
     }
     $electronFiles
-} else { @() }
+} else {
+    @()
+}
 
 $allFiles = $allSrcFiles + $allElectronFiles
 
 if ($allFiles.Count -gt 0) {
     $projectTotalSize = ($allFiles | Measure-Object Length -Sum).Sum
-    $projectTotalLines = $allFiles | ForEach-Object { Get-LineCount $_.FullName } | Measure-Object -Sum | Select-Object -ExpandProperty Sum
+    $projectTotalLines = $allFiles
+        | ForEach-Object {
+            Get-LineCount $_.FullName
+        }
+        | Measure-Object -Sum
+        | Select-Object -ExpandProperty Sum
 
     Write-Output "📦 Total Files: " -ForegroundColor $Colors.Summary -NoNewline
     Write-Output "$($allFiles.Count)" -ForegroundColor White

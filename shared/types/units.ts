@@ -49,8 +49,10 @@ function assertValidPortNumber(value: number): asserts value is PortNumber {
 
 function assertValidTimeout(
     value: number
-): asserts value is TimeoutMilliseconds { if (!isFiniteNumber(value)) {
-        throw new RangeError("Timeout must be a finite number"); }
+): asserts value is TimeoutMilliseconds {
+    if (!isFiniteNumber(value)) {
+        throw new RangeError("Timeout must be a finite number");
+    }
 
     if (value < MIN_TIMEOUT_MILLISECONDS || value > MAX_TIMEOUT_MILLISECONDS) {
         throw new RangeError(

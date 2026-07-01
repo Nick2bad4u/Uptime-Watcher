@@ -28,7 +28,7 @@ export interface SafeJsonResult<T> {
 }
 
 class JsonValidationError extends TypeError {
-    public constructor(message: string, options: ErrorOptions) {
+    public constructor(message: string, options?: ErrorOptions) {
         super(message, options);
         this.name = "JsonValidationError";
     }

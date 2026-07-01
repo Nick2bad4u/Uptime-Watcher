@@ -7,15 +7,16 @@
  * considerations.
  */
 
-import { createValidMonitor,
+import {
+    createValidMonitor,
     createValidMonitors,
     createValidStatusHistory,
-    secureRandomFloat } from "@shared/test/testHelpers";
+    secureRandomFloat,
+} from "@shared/test/testHelpers";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import type { MonitorStatus, MonitorType } from "../types";
-
 
 describe("testHelpers", () => {
     describe(createValidMonitor, () => {

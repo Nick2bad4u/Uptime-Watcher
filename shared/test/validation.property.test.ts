@@ -32,7 +32,7 @@ describe("Validation Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.constantFrom("", ' '.repeat(3), "\t", "\n", "\r\n")])(
+        test.prop([fc.constantFrom("", " ".repeat(3), "\t", "\n", "\r\n")])(
             "should reject empty or whitespace-only strings",
             (emptyStr) => {
                 expect(isNonEmptyString(emptyStr)).toBeFalsy();

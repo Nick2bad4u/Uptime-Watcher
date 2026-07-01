@@ -45,8 +45,8 @@ const setupModule = async (overrides: SetupOverrides = {}) => {
         }
     }
 
-    vi.doMock(import('@shared/utils/errorHandling'), () => ({ ensureError }));
-    vi.doMock(import('electron-log/renderer'), () => ({ default: electronLog }));
+    vi.doMock("@shared/utils/errorHandling", () => ({ ensureError }));
+    vi.doMock("electron-log/renderer", () => ({ default: electronLog }));
 
     const loggerModule =
         overrides.loggerModule ??
@@ -54,9 +54,9 @@ const setupModule = async (overrides: SetupOverrides = {}) => {
             Logger: { error: loggerError, debug: loggerDebug },
             logger: { error: loggerError, debug: loggerDebug },
         } satisfies UnknownRecord);
-    vi.doMock(import('../../../services/logger'), () => loggerModule);
+    vi.doMock("../../../services/logger", () => loggerModule);
 
-    vi.doMock(import('../../../services/utils/electronBridgeReadiness'), () => ({
+    vi.doMock("../../../services/utils/electronBridgeReadiness", () => ({
         ElectronBridgeNotReadyError: TestElectronBridgeNotReadyError,
         waitForElectronBridge,
     }));
@@ -209,7 +209,10 @@ describe("createIpcServiceHelpers", () => {
         await expect(wrapped("site-123")).rejects.toBe(handlerError);
 
         expect(waitForElectronBridge).toHaveBeenCalledTimes(1);
-        expect(handler).toHaveBeenCalledWith(globalThis.electronAPI, "site-123");
+        expect(handler).toHaveBeenCalledWith(
+            (globalThis as any).electronAPI,
+            "site-123"
+        );
         expect(ensureError).toHaveBeenCalledWith(handlerError);
         expect(loggerError).toHaveBeenCalledWith(
             "[HistoryService] fetchHistory failed:",

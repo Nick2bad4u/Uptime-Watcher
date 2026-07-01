@@ -41,10 +41,7 @@ interface ValidationExecution {
     violationsFound: number;
     validationMethod: "real-time" | "batch" | "scheduled" | "trigger-based";
     validationScope:
-        | "single-record"
-        | "table-level"
-        | "cross-table"
-        | "database-wide";
+        "single-record" | "table-level" | "cross-table" | "database-wide";
     resourceUsage: {
         cpuTime: number;
         memoryMB: number;
@@ -117,10 +114,7 @@ interface ValidationStage {
     stageId: string;
     stageName: string;
     stageType:
-        | "pre-validation"
-        | "core-validation"
-        | "post-validation"
-        | "cleanup";
+        "pre-validation" | "core-validation" | "post-validation" | "cleanup";
     executionOrder: number;
     executionTime: number;
     recordsProcessed: number;

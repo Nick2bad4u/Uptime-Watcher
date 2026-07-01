@@ -173,11 +173,15 @@ export const SiteService: SiteServiceContract = {
         }
 
         const { issues } = validationResult.error;
-        const invalidIndices = [...new Set(
+        const invalidIndices = [
+            ...new Set(
                 issues
                     .map((issue) => arrayFirst(issue.path))
-                    .filter((value): value is number => typeof value === "number")
-            )].toSorted((a, b) => a - b);
+                    .filter(
+                        (value): value is number => typeof value === "number"
+                    )
+            ),
+        ].toSorted((a, b) => a - b);
 
         if (isEmpty(issues)) {
             throw new ApplicationError({

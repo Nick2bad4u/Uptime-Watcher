@@ -32,9 +32,10 @@ const themeMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
-    const actual =
-        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual = safeCastTo<typeof import("../../theme/useTheme")>(
+        await importOriginal()
+    );
     return {
         ...actual,
         useTheme: () => themeMock,
@@ -54,7 +55,7 @@ const statusUtilsMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../utils/status'), () => statusUtilsMock);
+vi.mock("../../utils/status", () => statusUtilsMock);
 
 describe("StatusIndicator coverage", () => {
     beforeEach(() => {
@@ -69,7 +70,7 @@ describe("StatusIndicator coverage", () => {
         );
 
         // eslint-disable-next-line testing-library/no-container -- Component does not expose semantic roles for the indicator dot
-        const dot = container.querySelector(
+        const dot = container.querySelector<HTMLElement>(
             ".themed-status-indicator__dot"
         );
         expect(dot).not.toBeNull();
@@ -97,7 +98,7 @@ describe("StatusIndicator coverage", () => {
         const { container } = render(<StatusIndicator status="up" />);
 
         // eslint-disable-next-line testing-library/no-container -- Component does not render semantic roles for sizing assertions
-        const dot = container.querySelector(
+        const dot = container.querySelector<HTMLElement>(
             ".themed-status-indicator__dot"
         );
         expect(dot).not.toBeNull();

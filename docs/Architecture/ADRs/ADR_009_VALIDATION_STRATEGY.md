@@ -19,18 +19,18 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Validation Layers](#validation-layers)
-5. [Zod Schema Architecture](#zod-schema-architecture)
-6. [IPC Validation](#ipc-validation)
-7. [Manager Validation](#manager-validation)
-8. [Repository Validation](#repository-validation)
-9. [Consequences](#consequences)
-10. [Implementation Guidelines](#implementation-guidelines)
-11. [Compliance](#compliance)
-12. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Validation Layers](#validation-layers)
+- [Zod Schema Architecture](#zod-schema-architecture)
+- [IPC Validation](#ipc-validation)
+- [Manager Validation](#manager-validation)
+- [Repository Validation](#repository-validation)
+- [Consequences](#consequences)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 

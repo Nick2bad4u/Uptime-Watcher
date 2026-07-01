@@ -4,7 +4,7 @@
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { act, renderHook } from "@testing-library/react";
-import { arrayAt, safeCastTo  } from "ts-extras";
+import { arrayAt, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -204,8 +204,12 @@ describe(useConfirmDialogStore, () => {
     ): ConfirmDialogOptions => ({
         message: options.message,
         title: options.title,
-        ...(options.cancelLabel !== undefined && { cancelLabel: options.cancelLabel }),
-        ...(options.confirmLabel !== undefined && { confirmLabel: options.confirmLabel }),
+        ...(options.cancelLabel !== undefined && {
+            cancelLabel: options.cancelLabel,
+        }),
+        ...(options.confirmLabel !== undefined && {
+            confirmLabel: options.confirmLabel,
+        }),
         ...(options.details !== undefined && { details: options.details }),
         ...(options.tone !== undefined && { tone: options.tone }),
     });
@@ -265,16 +269,18 @@ describe(useConfirmDialogStore, () => {
     );
 
     it("exposes Playwright automation helpers on the global scope", async () => {
-        const automationTarget = safeCastTo<typeof globalThis & {
-            playwrightConfirmDialog?: {
-                cancel: () => void;
-                confirm: () => void;
-                getState: () => ConfirmDialogStoreState;
-                subscribe: (
-                    listener: (state: ConfirmDialogStoreState) => void
-                ) => () => void;
-            };
-        }>(globalThis);
+        const automationTarget = safeCastTo<
+            typeof globalThis & {
+                playwrightConfirmDialog?: {
+                    cancel: () => void;
+                    confirm: () => void;
+                    getState: () => ConfirmDialogStoreState;
+                    subscribe: (
+                        listener: (state: ConfirmDialogStoreState) => void
+                    ) => () => void;
+                };
+            }
+        >(globalThis);
 
         const bridge = automationTarget.playwrightConfirmDialog;
         expect(bridge).toBeDefined();

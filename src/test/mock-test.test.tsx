@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 // Test mock
 const mockHook = vi.fn(() => ({ value: "mocked" }));
 
-vi.mock(import('../components/SiteDetails/useAddSiteForm'), () => ({
+vi.mock("../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: mockHook,
 }));
 

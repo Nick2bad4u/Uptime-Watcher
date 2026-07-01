@@ -20,22 +20,22 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Testing Pyramid and Responsibilities](#testing-pyramid-and-responsibilities)
-5. [Test Configuration Architecture](#test-configuration-architecture)
-6. [Coverage Strategy](#coverage-strategy)
-7. [Mocking Strategy](#mocking-strategy)
-8. [Property-Based Testing](#property-based-testing)
-9. [Component Testing (Storybook)](#component-testing-storybook)
-10. [E2E Testing](#e2e-testing)
-11. [Flake Management](#flake-management)
-12. [CI Gating](#ci-gating)
-13. [Consequences](#consequences)
-14. [Implementation Guidelines](#implementation-guidelines)
-15. [Compliance](#compliance)
-16. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Testing Pyramid and Responsibilities](#testing-pyramid-and-responsibilities)
+- [Test Configuration Architecture](#test-configuration-architecture)
+- [Coverage Strategy](#coverage-strategy)
+- [Mocking Strategy](#mocking-strategy)
+- [Property-Based Testing](#property-based-testing)
+- [Component Testing (Storybook)](#component-testing-storybook)
+- [E2E Testing](#e2e-testing)
+- [Flake Management](#flake-management)
+- [CI Gating](#ci-gating)
+- [Consequences](#consequences)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 

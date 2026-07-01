@@ -276,7 +276,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
         fcTest.prop([
             fc.oneof(
                 fc.string({ minLength: 0, maxLength: 0 }), // Empty string
-                fc.constant(' '.repeat(3)), // Whitespace
+                fc.constant(" ".repeat(3)), // Whitespace
                 fc.constant("\n\t\r"), // Newlines and tabs
                 fc.string({ minLength: 1000, maxLength: 2000 }), // Very long string
                 fc.string()

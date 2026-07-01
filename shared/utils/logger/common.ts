@@ -73,10 +73,10 @@ function safeSerializeErrorInternal(
         name: safeNormalizeLogString(error.name),
         ...(error.stack && { stack: safeNormalizeLogString(error.stack) }),
         ...(objectHasIn(castUnchecked<UnknownRecord>(error), "cause") && {
-                  cause: safeSerializeCause(
-                      safeCastTo<{ cause?: unknown }>(error).cause
-                  ),
-              }),
+            cause: safeSerializeCause(
+                safeCastTo<{ cause?: unknown }>(error).cause
+            ),
+        }),
     } satisfies SerializedError;
 }
 

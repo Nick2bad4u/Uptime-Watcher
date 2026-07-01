@@ -78,7 +78,7 @@ describe("urlSafety", () => {
 
         it("treats empty/whitespace as private", () => {
             expect(isPrivateNetworkHostname("")).toBeTruthy();
-            expect(isPrivateNetworkHostname(' '.repeat(3))).toBeTruthy();
+            expect(isPrivateNetworkHostname(" ".repeat(3))).toBeTruthy();
         });
     });
 

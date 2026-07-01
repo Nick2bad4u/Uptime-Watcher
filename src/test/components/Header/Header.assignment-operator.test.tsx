@@ -33,8 +33,8 @@ import {
 } from "../../utils/createSerializedBackupResult";
 
 // Mock all store hooks
-vi.mock(import('../../../stores/sites/useSitesStore'));
-vi.mock(import('../../../stores/ui/useUiStore'), async () => {
+vi.mock("../../../stores/sites/useSitesStore");
+vi.mock("../../../stores/ui/useUiStore", async () => {
     const actual = await vi.importActual<
         typeof import("../../../stores/ui/useUiStore")
     >("../../../stores/ui/useUiStore");
@@ -43,7 +43,7 @@ vi.mock(import('../../../stores/ui/useUiStore'), async () => {
         useUIStore: vi.fn(),
     };
 });
-vi.mock(import('../../../theme/useTheme'));
+vi.mock("../../../theme/useTheme");
 
 const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseUIStore = vi.mocked(useUIStore);

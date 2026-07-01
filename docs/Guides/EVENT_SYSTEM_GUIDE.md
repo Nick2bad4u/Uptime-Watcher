@@ -20,17 +20,17 @@ This guide provides comprehensive documentation for the TypedEventBus-based even
 
 ## Table of Contents
 
-1. [Architecture Overview](#architecture-overview)
-2. [TypedEventBus Implementation](#typedeventbus-implementation)
-3. [Event Types and Contracts](#event-types-and-contracts)
-4. [EventsService Integration](#eventsservice-integration)
-5. [Frontend Event Handling](#frontend-event-handling)
-6. [Middleware System](#middleware-system)
-7. [Event Metadata](#event-metadata)
-8. [Best Practices](#best-practices)
-9. [Testing Events](#testing-events)
-10. [Debugging and Diagnostics](#debugging-and-diagnostics)
-11. [Related Documentation](#related-documentation)
+- [Architecture Overview](#architecture-overview)
+- [TypedEventBus Implementation](#typedeventbus-implementation)
+- [Event Types and Contracts](#event-types-and-contracts)
+- [EventsService Integration](#eventsservice-integration)
+- [Frontend Event Handling](#frontend-event-handling)
+- [Middleware System](#middleware-system)
+- [Event Metadata](#event-metadata)
+- [Best Practices](#best-practices)
+- [Testing Events](#testing-events)
+- [Debugging and Diagnostics](#debugging-and-diagnostics)
+- [Related Documentation](#related-documentation)
 
 ## Architecture Overview
 

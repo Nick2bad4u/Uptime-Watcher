@@ -6,7 +6,7 @@ import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
 } from "@shared/validation/monitorSchemas";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
@@ -20,7 +20,7 @@ import {
     validateMonitorFieldEnhanced,
 } from "../../utils/monitorValidation";
 
-vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => {
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => {
     const getState = vi.fn();
     return {
         useMonitorTypesStore: {
@@ -30,10 +30,11 @@ vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => {
 });
 
 vi.mock(
-    import('@shared/validation/monitorSchemas'),
+    "@shared/validation/monitorSchemas",
     async (importOriginal): Promise<unknown> => {
-        const actual =
-            safeCastTo<typeof import("@shared/validation/monitorSchemas")>(await importOriginal());
+        const actual = safeCastTo<
+            typeof import("@shared/validation/monitorSchemas")
+        >(await importOriginal());
 
         return {
             ...actual,
@@ -165,7 +166,9 @@ describe("monitorValidation error handling", () => {
         const result = await validateMonitorDataClientSide("http", {});
 
         expect(result.success).toBe(false);
-        expect(arrayFirst(result.errors)).toContain("Client-side validation failed");
+        expect(arrayFirst(result.errors)).toContain(
+            "Client-side validation failed"
+        );
     });
 
     it("filters errors per field when enhancing validation", async () => {

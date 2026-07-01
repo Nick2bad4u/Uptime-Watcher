@@ -252,17 +252,11 @@ const configureLogging = (): {
 log.initialize({ preload: true });
 
 type ElectronLogLevel =
-    | "debug"
-    | "error"
-    | "info"
-    | "silly"
-    | "verbose"
-    | "warn";
+    "debug" | "error" | "info" | "silly" | "verbose" | "warn";
 
 const ELECTRON_LOG_FILE = "uptime-watcher-main.log" as const;
 const LOG_FILE_MAX_SIZE = 1024 ** 2 * 5; // 5MB max file size
-const LOG_FILE_FORMAT =
-    "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+const LOG_FILE_FORMAT = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
 const LOG_CONSOLE_FORMAT = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 const { consoleLevel, fileLevel } = configureLogging();
@@ -770,9 +764,9 @@ class Main {
      * Removes event listeners to prevent memory leaks.
      *
      * @remarks
-     * Called during app shutdown to clean up event listeners and
-     * prevent memory leaks. Removes both Node.js process and Electron app event
-     * listeners that were set up in the constructor.
+     * Called during app shutdown to clean up event listeners and prevent memory
+     * leaks. Removes both Node.js process and Electron app event listeners that
+     * were set up in the constructor.
      */
     public removeEventListeners(): void {
         process.off("beforeExit", this.handleProcessExit);
@@ -789,8 +783,8 @@ class Main {
 /**
  * @remarks
  * Intentionally not assigning the Main instance to a variable. This ensures the
- * instance persists for the app's lifetime, preventing premature
- * garbage collection and maintaining lifecycle handlers.
+ * instance persists for the app's lifetime, preventing premature garbage
+ * collection and maintaining lifecycle handlers.
  */
 if (process.versions.electron) {
     Main.start();

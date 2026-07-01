@@ -19,7 +19,12 @@
  * @file Advanced fuzzing tests for JSON safety utilities
  */
 
-import type { Jsonifiable, JsonObject, JsonValue, UnknownRecord  } from "type-fest";
+import type {
+    Jsonifiable,
+    JsonObject,
+    JsonValue,
+    UnknownRecord,
+} from "type-fest";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import {
@@ -29,7 +34,13 @@ import {
     safeJsonStringify,
     safeJsonStringifyWithFallback,
 } from "@shared/utils/jsonSafety";
-import { objectEntries, objectFromEntries, objectKeys, objectValues, safeCastTo     } from "ts-extras";
+import {
+    objectFromEntries,
+    objectKeys,
+    objectValues,
+    safeCastTo,
+    objectEntries,
+} from "ts-extras";
 import { describe, expect } from "vitest";
 
 /**
@@ -66,7 +77,7 @@ function normalizeForJsonComparison(value: any): any {
     // For objects, remove undefined properties and handle special values
     // Create a normal object to mimic JSON.parse behavior (which creates objects with Object.prototype)
     const normalized: any = {};
-    for (const [key, val] of objectEntries(value)) {
+    for (const [key, val] of objectEntries(value as Record<string, unknown>)) {
         if (val === undefined) {
             continue;
         }

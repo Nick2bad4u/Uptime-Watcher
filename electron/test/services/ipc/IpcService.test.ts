@@ -257,7 +257,7 @@ describe(IpcService, () => {
             const diagnosticsHandler = diagnosticsEntry?.[1];
             expect(typeof diagnosticsHandler).toBe("function");
 
-            const successResponse = await (diagnosticsHandler)(
+            const successResponse = await diagnosticsHandler(
                 undefined,
                 "get-history-limit"
             );
@@ -268,7 +268,7 @@ describe(IpcService, () => {
             expect(metrics.successfulHandlerChecks).toBe(1);
             expect(metrics.missingHandlerChecks).toBe(0);
 
-            const failureResponse = await (diagnosticsHandler)(
+            const failureResponse = await diagnosticsHandler(
                 undefined,
                 "missing-channel"
             );
@@ -295,7 +295,7 @@ describe(IpcService, () => {
             expect(typeof diagnosticsHandler).toBe("function");
 
             const timestamp = Date.now();
-            await (diagnosticsHandler)(undefined, {
+            await diagnosticsHandler(undefined, {
                 channel: "monitor:status-changed",
                 guard: "isMonitorStatusChangedEventData",
                 metadata: { source: "eventsApi" },
@@ -367,7 +367,7 @@ describe(IpcService, () => {
             const handler = notificationHandlerEntry?.[1];
             expect(typeof handler).toBe("function");
 
-            await (handler)(undefined, {
+            await handler(undefined, {
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: true,
             });
@@ -387,7 +387,7 @@ describe(IpcService, () => {
             const appNotifyHandler = appNotifyHandlerEntry?.[1];
             expect(typeof appNotifyHandler).toBe("function");
 
-            await (appNotifyHandler)(undefined, {
+            await appNotifyHandler(undefined, {
                 title: "Backup uploaded",
                 body: "backup.sqlite",
             });

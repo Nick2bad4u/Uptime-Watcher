@@ -18,22 +18,20 @@ interface CapturedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const buttonProps: CapturedButtonProps[] = [];
 
-vi.mock(import('../../../../stores/ui/useConfirmDialogStore'), () => ({
+vi.mock("../../../../stores/ui/useConfirmDialogStore", () => ({
     useConfirmDialogControls: vi.fn(),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../../theme/components/ThemedBox", () => ({
     ThemedBox: ({
         children,
         ...props
     }: HTMLAttributes<HTMLElement> & {
         readonly children?: ReactNode;
-    }) => (
-        <section {...props}>{children}</section>
-    ),
+    }) => <section {...props}>{children}</section>,
 }));
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({
         children,
         ...props
@@ -42,7 +40,7 @@ vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     }) => <span {...props}>{children}</span>,
 }));
 
-vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         icon,

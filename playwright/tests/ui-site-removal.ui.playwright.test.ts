@@ -90,7 +90,9 @@ test.describe(
                                     return "missing-modal";
                                 }
 
-                                const buttons = [...modal.querySelectorAll("button")] as HTMLButtonElement[];
+                                const buttons = [
+                                    ...modal.querySelectorAll("button"),
+                                ] as HTMLButtonElement[];
                                 const target = buttons.find((button) =>
                                     button.textContent
                                         ?.trim()
@@ -124,11 +126,13 @@ test.describe(
                 await expect.soft(confirmationDialog).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    confirmationDialog.getByText(siteName, {
-                        exact: false,
-                    })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(
+                        confirmationDialog.getByText(siteName, {
+                            exact: false,
+                        })
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await resolveConfirmDialog(page, "cancel");
 
@@ -136,15 +140,21 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await expect.soft(
-                    page
-                        .getByRole("navigation", { name: "Monitored sites" })
-                        .getByRole("button", { name: new RegExp(siteName) })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(
+                        page
+                            .getByRole("navigation", {
+                                name: "Monitored sites",
+                            })
+                            .getByRole("button", { name: new RegExp(siteName) })
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await expect.soft(getSiteCardLocator(page, siteName)).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.LONG,
-                });
+                await expect
+                    .soft(getSiteCardLocator(page, siteName))
+                    .toBeVisible({
+                        timeout: WAIT_TIMEOUTS.LONG,
+                    });
             }
         );
 
@@ -178,7 +188,9 @@ test.describe(
                                     return "missing-modal";
                                 }
 
-                                const buttons = [...modal.querySelectorAll("button")] as HTMLButtonElement[];
+                                const buttons = [
+                                    ...modal.querySelectorAll("button"),
+                                ] as HTMLButtonElement[];
                                 const target = buttons.find((button) =>
                                     button.textContent
                                         ?.trim()
@@ -228,19 +240,21 @@ test.describe(
                 const navigation = page.getByRole("navigation", {
                     name: "Monitored sites",
                 });
-                await expect.soft(navigation.getByRole("button")).toHaveCount(0, {
-                    timeout: WAIT_TIMEOUTS.LONG,
-                });
-                await expect.soft(
-                    navigation.getByText("No sites match your search.")
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(navigation.getByRole("button"))
+                    .toHaveCount(0, {
+                        timeout: WAIT_TIMEOUTS.LONG,
+                    });
+                await expect
+                    .soft(navigation.getByText("No sites match your search."))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await expect.soft(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    page.getByText("No sites are being monitored")
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(page.getByText("No sites are being monitored"))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
             }
         );
     }

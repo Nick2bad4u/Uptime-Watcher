@@ -41,10 +41,9 @@ const sampleSites = [
 
 const withSidebarLayout: Decorator = (StoryComponent) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const toggleSidebar = useCallback(
-        () => { setIsSidebarOpen((previous) => !previous); },
-        []
-    );
+    const toggleSidebar = useCallback(() => {
+        setIsSidebarOpen((previous) => !previous);
+    }, []);
     const providerValue = useMemo(
         () => ({
             isSidebarOpen,

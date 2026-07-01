@@ -2,10 +2,10 @@
  * Context utilities for coordinating sidebar layout state across the renderer.
  *
  * @remarks
- * The app shell exposes a collapsible sidebar on compact viewports.
- * Components such as {@link Header} and {@link AppSidebar} need to toggle or
- * observe that state without prop drilling, therefore we use a lightweight
- * React context with a resilient fallback for tests.
+ * The app shell exposes a collapsible sidebar on compact viewports. Components
+ * such as {@link Header} and {@link AppSidebar} need to toggle or observe that
+ * state without prop drilling, therefore we use a lightweight React context
+ * with a resilient fallback for tests.
  */
 
 import { type Context, createContext, use } from "react";

@@ -7,5 +7,4 @@
  * rules.
  */
 export type RequireAllOrNoneFields<T extends object> =
-    | { [K in keyof T]-?: NonNullable<T[K]> }
-    | { [K in keyof T]?: undefined };
+    { [K in keyof T]-?: NonNullable<T[K]> } | { [K in keyof T]?: undefined };

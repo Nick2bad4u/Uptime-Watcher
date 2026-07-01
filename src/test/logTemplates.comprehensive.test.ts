@@ -619,10 +619,7 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
     });
 
     describe(createTemplateLogger, () => {
-        type LoggerMethod = (
-            message: string,
-            context?: UnknownRecord
-        ) => void;
+        type LoggerMethod = (message: string, context?: UnknownRecord) => void;
 
         let mockLogger: {
             debug: Mock<LoggerMethod>;

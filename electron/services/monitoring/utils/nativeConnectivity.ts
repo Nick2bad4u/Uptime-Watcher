@@ -236,7 +236,9 @@ async function checkDnsResolution(
         : undefined;
 
     try {
-        const raceCandidates: Promise<string[] | typeof ABORTED | typeof TIMEOUT>[] = [dns.resolve4(host), timeoutPromise];
+        const raceCandidates: Promise<
+            string[] | typeof ABORTED | typeof TIMEOUT
+        >[] = [dns.resolve4(host), timeoutPromise];
 
         if (abortPromise) {
             raceCandidates.push(abortPromise);
@@ -500,10 +502,9 @@ export async function checkConnectivity(
 
     return {
         details: `Failed to connect to ${normalizedHost}`,
-        error:
-            isDefined(tcpProbeError)
-                ? getUserFacingErrorDetail(tcpProbeError)
-                : "Host unreachable - all connectivity checks failed",
+        error: isDefined(tcpProbeError)
+            ? getUserFacingErrorDetail(tcpProbeError)
+            : "Host unreachable - all connectivity checks failed",
         responseTime: Math.round(performance.now() - startTime),
         status: "down",
     };

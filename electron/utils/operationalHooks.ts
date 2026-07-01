@@ -98,9 +98,9 @@ function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
         errorName,
         ...(errorCode && { errorCode }),
         ...(causeError && {
-                  errorCauseMessage: causeError.message,
-                  errorCauseName: causeError.name,
-              }),
+            errorCauseMessage: causeError.message,
+            errorCauseName: causeError.name,
+        }),
     };
 }
 
@@ -135,8 +135,7 @@ const operationIdSchema = z.custom<OperationId>(
  * Author-supplied context accepted by operational hooks before normalization.
  */
 export type OperationalHookContextInput =
-    | OperationalHookContext
-    | Readonly<UnknownRecord>;
+    OperationalHookContext | Readonly<UnknownRecord>;
 
 const isOperationalHookContext = (
     candidate: unknown
@@ -294,9 +293,7 @@ function generateOperationId(): OperationId {
         );
     }
 
-    const candidate = `op_${Date.now()}_${crypto
-        .randomUUID()
-        .slice(0, 8)}`;
+    const candidate = `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
     return operationIdSchema.parse(candidate);
 }
 

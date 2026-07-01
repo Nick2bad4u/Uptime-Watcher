@@ -55,7 +55,7 @@ export function castIpcResponse<T>(
  * - Returning the raw runtime value (including `null`) is required for backwards
  *   compatibility.
  */
-// eslint-disable-next-line etc/no-misused-generics, @typescript-eslint/no-unnecessary-type-parameters -- Generic is intentionally supplied by callers at dynamic boundaries.
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Generic is intentionally supplied by callers at dynamic boundaries.
 export function castUnchecked<T>(value: unknown): T {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Centralized unchecked cast for validated/dynamic boundaries.
     return value as T;

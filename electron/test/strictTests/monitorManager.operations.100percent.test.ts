@@ -1,5 +1,5 @@
 import type { Monitor, Site } from "@shared/types";
-import type { BaseLogger, Logger } from "@shared/utils/logger/interfaces";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { describe, expect, it, vi } from "vitest";
 

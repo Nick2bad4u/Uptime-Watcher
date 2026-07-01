@@ -47,7 +47,13 @@ import {
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { ensureError } from "@shared/utils/errorHandling";
-import { isDefined, isFinite as isFiniteValue, objectEntries, objectHasIn, objectKeys } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteValue,
+    objectEntries,
+    objectHasIn,
+    objectKeys,
+} from "ts-extras";
 
 import {
     DEFAULT_CHECK_INTERVAL,
@@ -139,9 +145,21 @@ export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
             defaultValue: true,
             isValid: isBoolean,
         });
-        fields["checkInterval"] = normalizeCloudSyncFieldValue({ current: fields["checkInterval"], defaultValue: DEFAULT_CHECK_INTERVAL, isValid: isFiniteNumber,  });
-        fields["retryAttempts"] = normalizeCloudSyncFieldValue({ current: fields["retryAttempts"], defaultValue: DEFAULT_RETRY_ATTEMPTS, isValid: isFiniteNumber,  });
-        fields["timeout"] = normalizeCloudSyncFieldValue({ current: fields["timeout"], defaultValue: DEFAULT_REQUEST_TIMEOUT, isValid: isFiniteNumber,  });
+        fields["checkInterval"] = normalizeCloudSyncFieldValue({
+            current: fields["checkInterval"],
+            defaultValue: DEFAULT_CHECK_INTERVAL,
+            isValid: isFiniteNumber,
+        });
+        fields["retryAttempts"] = normalizeCloudSyncFieldValue({
+            current: fields["retryAttempts"],
+            defaultValue: DEFAULT_RETRY_ATTEMPTS,
+            isValid: isFiniteNumber,
+        });
+        fields["timeout"] = normalizeCloudSyncFieldValue({
+            current: fields["timeout"],
+            defaultValue: DEFAULT_REQUEST_TIMEOUT,
+            isValid: isFiniteNumber,
+        });
 
         nextMonitor[monitorId] = {
             ...entity,
@@ -337,9 +355,7 @@ export function buildDesiredSitesFromSyncState(
         const parsed = cloudSyncSiteConfigSchema.safeParse({
             identifier: siteId,
             monitoring:
-                typeof monitoringValue === "boolean"
-                    ? monitoringValue
-                    : true,
+                typeof monitoringValue === "boolean" ? monitoringValue : true,
             name:
                 typeof nameValue === "string" && nameValue.trim().length > 0
                     ? nameValue
@@ -515,7 +531,10 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     const operations: CloudSyncOperation[] = [];
     let opId = args.nextOpId;
 
-    const monitorFields: readonly Exclude<keyof CloudSyncMonitorConfig, "id">[] = [
+    const monitorFields: readonly Exclude<
+        keyof CloudSyncMonitorConfig,
+        "id"
+    >[] = [
         "baselineUrl",
         "bodyKeyword",
         "certificateWarningDays",
@@ -632,7 +651,10 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
         }
     }
 
-    const settingsKeys = new Set<string>(Iterator.concat(objectKeys(args.current.settings), objectKeys(baselineSettings)));
+    const settingsKeys = new Set<string>([
+        ...objectKeys(args.current.settings),
+        ...objectKeys(baselineSettings),
+    ]);
 
     for (const key of settingsKeys) {
         const currentValue = args.current.settings[key];

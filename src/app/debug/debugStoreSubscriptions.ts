@@ -184,7 +184,10 @@ export function subscribeToDebugStores(args: {
 export function cleanupDebugStoreSubscriptions(args: {
     refs: DebugStoreSubscriptionRefs;
 }): void {
-    for (const [index, unsubscribe] of args.refs.subscriptionsRef.current.entries()) {
+    for (const [
+        index,
+        unsubscribe,
+    ] of args.refs.subscriptionsRef.current.entries()) {
         if (typeof unsubscribe !== "function") {
             logger.warn(
                 "[App:debug] encountered a non-function during debug subscription cleanup",

@@ -65,6 +65,7 @@ extensions. This can lead to frustrating incompatibilities.
 Consider a hypothetical input:
 
 <!-- prettier-ignore -->
+
 ````typescript
 
 /**

@@ -24,7 +24,7 @@ No options.
 
 ```ts
 if (process.env.NODE_ENV === "production") {
-  // ...
+ // ...
 }
 ```
 
@@ -32,6 +32,6 @@ if (process.env.NODE_ENV === "production") {
 
 ```ts
 if (import.meta.env.MODE === "production") {
-  // ...
+ // ...
 }
 ```

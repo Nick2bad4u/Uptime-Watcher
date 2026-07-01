@@ -1,61 +1,61 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 # yamllint disable rule:line-length
-name: Build and Release Electron App
+name: "Build and Release Electron App"
 
-run-name: Build and Release Electron App
+run-name: "Build and Release Electron App"
 
 concurrency:
-    group: build-${{ github.ref }}
+    group: "build-${{ github.ref }}"
     cancel-in-progress: true
 
 on:
     workflow_dispatch:
         inputs:
             release_version:
-                description: Exact SemVer already present in package.json, README, SECURITY, and CHANGELOG.md
+                description: "Exact SemVer already present in package.json, README, SECURITY, and CHANGELOG.md"
                 required: true
-                type: string
+                type: "string"
 
 permissions:
-    contents: read
+    contents: "read"
 jobs:
     bump-version:
-        name: Validate release version and create tag
-        runs-on: ubuntu-latest
+        name: "Validate release version and create tag"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 15
         permissions:
-            contents: write
+            contents: "write"
         defaults:
             run:
-                shell: bash
-                working-directory: .
+                shell: "bash"
+                working-directory: "."
         outputs:
-            new_version: ${{ steps.validate_release.outputs.new_version }}
-            bump_sha: ${{ steps.validate_release.outputs.bump_sha }}
+            new_version: "${{ steps.validate_release.outputs.new_version }}"
+            bump_sha: "${{ steps.validate_release.outputs.bump_sha }}"
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              id: harden_runner
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              id: "harden_runner"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout Repo code
-              id: checkout_code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout Repo code"
+              id: "checkout_code"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
-                  ref: ${{ github.ref }}
+                  ref: "${{ github.ref }}"
                   fetch-depth: 0
                   fetch-tags: true
 
-            - name: Setup Node.js environment (v25)
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Setup Node.js environment (v25)"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Show git diff for Uptime-Watcher (debug)
-              id: git_diff
+            - name: "Show git diff for Uptime-Watcher (debug)"
+              id: "git_diff"
               run: |
                   echo "--- GIT DIFF OUTPUT (since last tag) ---"
                   git fetch --tags --force
@@ -64,11 +64,11 @@ jobs:
                   echo "--- END GIT DIFF OUTPUT ---"
               continue-on-error: true
 
-            - name: Check release metadata
-              run: npm run release:check
+            - name: "Check release metadata"
+              run: "npm run release:check"
 
-            - name: Validate requested release version
-              id: validate_release
+            - name: "Validate requested release version"
+              id: "validate_release"
               run: |
                   set -euo pipefail
 
@@ -105,87 +105,87 @@ jobs:
                     echo "bump_sha=$(git rev-parse HEAD)"
                   } >> "$GITHUB_OUTPUT"
 
-            - name: Create and push tag for new version
-              id: tag_version
-              shell: bash
+            - name: "Create and push tag for new version"
+              id: "tag_version"
+              shell: "bash"
               run: |
                   set -euo pipefail
                   git tag -a "v${{ steps.validate_release.outputs.new_version }}" -m "Release v${{ steps.validate_release.outputs.new_version }}"
                   git push origin "v${{ steps.validate_release.outputs.new_version }}"
 
     build:
-        name: Build release artifacts
-        needs: bump-version
-        runs-on: ${{ matrix.os }}
+        name: "Build release artifacts"
+        needs: "bump-version"
+        runs-on: "${{ matrix.os }}"
         timeout-minutes: 60
         env:
             # Vite (and vite-plugin-electron) can run multiple builds in the same
             # Node process (renderer + main + preload). With sourcemaps and build
             # plugins, the default ~2GB heap on GitHub runners (notably macOS
             # arm64) is easy to exceed.
-            NODE_OPTIONS: --max_old_space_size=8192
+            NODE_OPTIONS: "--max_old_space_size=8192"
         strategy:
             matrix:
                 os:
-                    - ubuntu-latest
-                    - ubuntu-24.04-arm
-                    - windows-latest
-                    - macos-15
-                    - macos-latest
+                    - "ubuntu-latest"
+                    - "ubuntu-24.04-arm"
+                    - "windows-latest"
+                    - "macos-15"
+                    - "macos-latest"
 
-                arch: [x64, ia32, arm64]
+                arch: ["x64", "ia32", "arm64"]
                 exclude:
                     # Exclude macOS with ia32 architecture as it is not supported by Electron
-                    - os: macos-latest
-                      arch: ia32
-                    - os: macos-latest
-                      arch: arm64
-                    - os: macos-15
-                      arch: ia32
-                    - os: macos-15
-                      arch: x64
+                    - os: "macos-latest"
+                      arch: "ia32"
+                    - os: "macos-latest"
+                      arch: "arm64"
+                    - os: "macos-15"
+                      arch: "ia32"
+                    - os: "macos-15"
+                      arch: "x64"
                     # Exclude Ubuntu with ia32 and arm64 architectures as they are not commonly used and not officially supported except for ubuntu-24.04-arm/arm64
-                    - os: ubuntu-latest
-                      arch: ia32
-                    - os: ubuntu-latest
-                      arch: arm64
+                    - os: "ubuntu-latest"
+                      arch: "ia32"
+                    - os: "ubuntu-latest"
+                      arch: "arm64"
                     # Exclude ubuntu-24.04-arm with x64 and ia32
-                    - os: ubuntu-24.04-arm
-                      arch: x64
-                    - os: ubuntu-24.04-arm
-                      arch: ia32
-                    - os: ubuntu-24.04-arm
-                      arch: arm64
+                    - os: "ubuntu-24.04-arm"
+                      arch: "x64"
+                    - os: "ubuntu-24.04-arm"
+                      arch: "ia32"
+                    - os: "ubuntu-24.04-arm"
+                      arch: "arm64"
                     # Exclude Windows with arm64 (not supported)
-                    - os: windows-latest
-                      arch: arm64
+                    - os: "windows-latest"
+                      arch: "arm64"
                     # Exclude Windows with ia32 (if not supported, uncomment)
                     # - os: windows-latest
                     #   arch: ia32
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout Repo code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout Repo code"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
-                  ref: ${{ needs.bump-version.outputs.bump_sha }}
+                  ref: "${{ needs.bump-version.outputs.bump_sha }}"
                   fetch-depth: 0
                   fetch-tags: true
 
-            - name: Setup Node.js environment (v25)
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Setup Node.js environment (v25)"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Install Linux build dependencies
-              id: install_linux_deps
-              if: runner.os == 'Linux'
-              shell: bash
+            - name: "Install Linux build dependencies"
+              id: "install_linux_deps"
+              if: "runner.os == 'Linux'"
+              shell: "bash"
               run: |
                   sudo apt-get update
                   sudo apt-get install -y rpm dpkg fakeroot xz-utils flatpak flatpak-builder ruby ruby-dev build-essential zlib1g-dev
@@ -195,31 +195,31 @@ jobs:
                   which bsdtar
                   sudo apt-get install -y pacman
 
-            - name: Install macOS build dependencies
-              id: install_macos_deps
-              if: runner.os == 'macOS'
-              shell: bash
+            - name: "Install macOS build dependencies"
+              id: "install_macos_deps"
+              if: "runner.os == 'macOS'"
+              shell: "bash"
               run: |
                   brew install rpm dpkg xz gnu-tar
 
-            - name: Install dmg-license workaround for Mac Builder
-              id: install_dmg_license
-              if: runner.os == 'macOS'
-              shell: bash
-              run: npm install --force --no-save --no-audit --no-fund dmg-license
-              working-directory: .
+            - name: "Install dmg-license workaround for Mac Builder"
+              id: "install_dmg_license"
+              if: "runner.os == 'macOS'"
+              shell: "bash"
+              run: "npm install --force --no-save --no-audit --no-fund dmg-license"
+              working-directory: "."
 
-            - name: Install Windows build dependencies (Chocolatey)
-              id: install_windows_deps
-              if: runner.os == 'Windows'
-              shell: pwsh
+            - name: "Install Windows build dependencies (Chocolatey)"
+              id: "install_windows_deps"
+              if: "runner.os == 'Windows'"
+              shell: "pwsh"
               run: |
                   choco install -y 7zip.install
 
-            - name: Cache node modules (Windows)
-              id: cache_node_modules_windows
-              if: runner.os == 'Windows'
-              uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+            - name: "Cache node modules (Windows)"
+              id: "cache_node_modules_windows"
+              if: "runner.os == 'Windows'"
+              uses: "actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae" # v5.0.5
               with:
                   path: |
                       ~\.npm
@@ -228,41 +228,41 @@ jobs:
                       ~\.cache
                       ~\icons
                       ~\libs
-                  key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+                  key: "${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}"
                   restore-keys: |
                       ${{ runner.os }}-node-
                   enableCrossOsArchive: true
               continue-on-error: true
 
-            - name: Cache node modules (non-Windows)
-              id: cache_node_modules_non_windows
-              if: runner.os != 'Windows'
-              uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+            - name: "Cache node modules (non-Windows)"
+              id: "cache_node_modules_non_windows"
+              if: "runner.os != 'Windows'"
+              uses: "actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae" # v5.0.5
               with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  path: "~/.npm"
+                  key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
                   restore-keys: |
                       ${{ runner.os }}-node-
                   enableCrossOsArchive: true
               continue-on-error: true
 
-            - name: Install NPM dependencies (.package.json)
-              id: install_dependencies
-              shell: bash
+            - name: "Install NPM dependencies (.package.json)"
+              id: "install_dependencies"
+              shell: "bash"
               run: |
                   # NOTE: This repo requires --force due to known peer-dependency conflicts.
                   # Do NOT use --omit=optional: Rollup/Vite depends on optional native packages
                   # (e.g. @rollup/rollup-darwin-*) on macOS.
                   npm install --force --no-audit --no-fund
 
-            - name: Build Vite Frontend and Electron Backend
-              id: build_vite_electron
-              shell: bash
-              run: npm run build
+            - name: "Build Vite Frontend and Electron Backend"
+              id: "build_vite_electron"
+              shell: "bash"
+              run: "npm run build"
 
-            - name: Build Electron app (debug)
-              id: build_app
-              shell: bash
+            - name: "Build Electron app (debug)"
+              id: "build_app"
+              shell: "bash"
               run: |
                   # For macOS universal builds, remove optional native ws accelerators
                   # (bufferutil, utf-8-validate) so @electron/universal does not attempt
@@ -298,15 +298,15 @@ jobs:
                     npx electron-builder --config electron-builder.config.ts --publish never --${{ matrix.arch }}
                   fi
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
                   DEBUG_DEMB: true
                   CI: true
                   DEBUG: "@malept/flatpak-bundler"
 
-            - name: Print Windows distributable hash (debug, Windows)
-              id: print_hash_windows
-              if: runner.os == 'Windows'
-              shell: pwsh
+            - name: "Print Windows distributable hash (debug, Windows)"
+              id: "print_hash_windows"
+              if: "runner.os == 'Windows'"
+              shell: "pwsh"
               run: |
                   $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak')
                   $files = @()
@@ -320,10 +320,10 @@ jobs:
                     Write-Host "$($file.FullName): $b64"
                   }
               continue-on-error: true
-            - name: Print Linux distributable hash (debug, Linux)
-              id: print_hash_linux
-              if: runner.os == 'Linux'
-              shell: bash
+            - name: "Print Linux distributable hash (debug, Linux)"
+              id: "print_hash_linux"
+              if: "runner.os == 'Linux'"
+              shell: "bash"
               run: |
                   find release -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(sha512sum "$file" | awk '{print $1}')
@@ -331,10 +331,10 @@ jobs:
                     echo "$file: $b64"
                   done
               continue-on-error: true
-            - name: Print Mac distributable hash (debug, macOS)
-              id: print_hash_macos
-              if: runner.os == 'macOS'
-              shell: bash
+            - name: "Print Mac distributable hash (debug, macOS)"
+              id: "print_hash_macos"
+              if: "runner.os == 'macOS'"
+              shell: "bash"
               run: |
                   find release -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(shasum -a 512 "$file" | awk '{print $1}')
@@ -343,11 +343,11 @@ jobs:
                   done
               continue-on-error: true
 
-            - name: Upload packaged distributables as artifact
-              id: upload_artifact
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+            - name: "Upload packaged distributables as artifact"
+              id: "upload_artifact"
+              uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
               with:
-                  name: dist-${{ matrix.os }}-${{ matrix.arch }}
+                  name: "dist-${{ matrix.os }}-${{ matrix.arch }}"
                   path: |
                       release/Uptime-Watcher-*
                       release/*.yml
@@ -355,11 +355,11 @@ jobs:
                       release/squirrel*/**/*
                       release/nsis-web/**/*
                   include-hidden-files: true
-                  if-no-files-found: error
+                  if-no-files-found: "error"
 
-            - name: Update Build Matrix Summary (per platform/arch)
-              if: always()
-              shell: bash
+            - name: "Update Build Matrix Summary (per platform/arch)"
+              if: "always()"
+              shell: "bash"
               run: |
                   STATUS="${{ job.status }}"
                   # If build_app step failed, mark as failure
@@ -371,39 +371,39 @@ jobs:
                   echo "| ${{ needs.bump-version.outputs.new_version }} | ${{ matrix.os }} | ${{ matrix.arch }} | Build Status: $STATUS |" >> "$GITHUB_STEP_SUMMARY"
 
     release:
-        name: Publish release and update changelogs
-        needs: [build, bump-version]
-        if: ${{ needs.build.result == 'success' && needs.bump-version.result == 'success' }}
-        runs-on: ubuntu-latest
+        name: "Publish release and update changelogs"
+        needs: ["build", "bump-version"]
+        if: "${{ needs.build.result == 'success' && needs.bump-version.result == 'success' }}"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 45
         permissions:
-            checks: write
-            contents: write
+            checks: "write"
+            contents: "write"
         defaults:
             run:
-                shell: bash
-                working-directory: .
+                shell: "bash"
+                working-directory: "."
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout Repo code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout Repo code"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
-                  ref: ${{ needs.bump-version.outputs.bump_sha }}
+                  ref: "${{ needs.bump-version.outputs.bump_sha }}"
                   fetch-depth: 0
                   fetch-tags: true
 
-            - name: Download all build artifacts from build job
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+            - name: "Download all build artifacts from build job"
+              uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8.0.1
               with:
-                  path: ./artifacts
+                  path: "./artifacts"
 
-            - name: Verify build artifacts were downloaded
-              id: verify_artifacts
-              shell: bash
+            - name: "Verify build artifacts were downloaded"
+              id: "verify_artifacts"
+              shell: "bash"
               run: |
                   set -euo pipefail
 
@@ -423,18 +423,18 @@ jobs:
                     exit 1
                   fi
 
-            - name: Determine previous release tag
-              id: previous_tag
-              shell: bash
+            - name: "Determine previous release tag"
+              id: "previous_tag"
+              shell: "bash"
               run: |
                   git fetch --tags --force
                   current_tag="v${{ needs.bump-version.outputs.new_version }}"
                   prev_tag=$(git describe --tags --match "v*" --abbrev=0 "${current_tag}^" 2>/dev/null || true)
                   echo "previous_tag=${prev_tag}" >> "$GITHUB_OUTPUT"
 
-            - name: Generate release notes since previous tag
-              id: release_notes_full
-              shell: bash
+            - name: "Generate release notes since previous tag"
+              id: "release_notes_full"
+              shell: "bash"
               run: |
                   git fetch --tags --force
                   current_tag="v${{ needs.bump-version.outputs.new_version }}"
@@ -457,10 +457,10 @@ jobs:
                     echo "EOF"
                   } >> "$GITHUB_OUTPUT"
 
-            - name: Print Windows artifact hash (debug, Windows)
-              id: print_artifact_hash_windows
-              if: runner.os == 'Windows'
-              shell: pwsh
+            - name: "Print Windows artifact hash (debug, Windows)"
+              id: "print_artifact_hash_windows"
+              if: "runner.os == 'Windows'"
+              shell: "pwsh"
               run: |
                   $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak')
                   $files = @()
@@ -473,10 +473,10 @@ jobs:
                     $b64 = [Convert]::ToBase64String($bytes)
                     Write-Host "$($file.FullName): $b64"
                   }
-            - name: Print Linux artifact hash (debug, Linux)
-              id: print_artifact_hash_linux
-              if: runner.os == 'Linux'
-              shell: bash
+            - name: "Print Linux artifact hash (debug, Linux)"
+              id: "print_artifact_hash_linux"
+              if: "runner.os == 'Linux'"
+              shell: "bash"
               run: |
                   if [ ! -d "./artifacts" ]; then
                     echo "ERROR: ./artifacts directory does not exist."
@@ -487,10 +487,10 @@ jobs:
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
                   done
-            - name: Print MacOS artifact hash (debug, macOS)
-              id: print_artifact_hash_macos
-              if: runner.os == 'macOS'
-              shell: bash
+            - name: "Print MacOS artifact hash (debug, macOS)"
+              id: "print_artifact_hash_macos"
+              if: "runner.os == 'macOS'"
+              shell: "bash"
               run: |
                   find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(shasum -a 512 "$file" | awk '{print $1}')
@@ -498,13 +498,13 @@ jobs:
                     echo "$file: $b64"
                   done
 
-            - name: List artifacts (debug)
-              id: list_artifacts
-              run: ls -R ./artifacts
+            - name: "List artifacts (debug)"
+              id: "list_artifacts"
+              run: "ls -R ./artifacts"
 
-            - name: Rename Windows latest.yml files for unique arch/platform
-              id: rename_windows_latest_yml
-              shell: bash
+            - name: "Rename Windows latest.yml files for unique arch/platform"
+              id: "rename_windows_latest_yml"
+              shell: "bash"
               run: |
                   echo "Renaming nsis-web and root latest.yml files for Windows builds in ./artifacts..."
                   # 32-bit (ia32)
@@ -541,9 +541,9 @@ jobs:
                     fi
                   done
 
-            - name: Organize distributables by platform and arch
-              id: organize_distributables
-              shell: bash
+            - name: "Organize distributables by platform and arch"
+              id: "organize_distributables"
+              shell: "bash"
               run: |
                   set -uo pipefail
                   # NOTE: not using `set -e` so we can log and continue on some failures
@@ -708,9 +708,9 @@ jobs:
 
                   echo "=== Organize step complete ==="
 
-            - name: Fix all sha512 in latest*.yml files
-              id: fix_sha512
-              shell: bash
+            - name: "Fix all sha512 in latest*.yml files"
+              id: "fix_sha512"
+              shell: "bash"
               run: |
                   set -e
                   find release-dist -type f -name 'latest*.yml' | while IFS= read -r yml; do
@@ -783,10 +783,10 @@ jobs:
                     echo "Updated $yml"
                   done
 
-            - name: Print artifact hash (debug, Windows)
-              id: print_artifact_hash_debug_windows
-              if: runner.os == 'Windows'
-              shell: pwsh
+            - name: "Print artifact hash (debug, Windows)"
+              id: "print_artifact_hash_debug_windows"
+              if: "runner.os == 'Windows'"
+              shell: "pwsh"
               run: |
                   $patterns = @('*.exe','*.nupkg','*.dmg','*.AppImage','*.snap','*.zip','*.yml','*.blockmap','*.msi','*.deb','*.rpm','*.pkg','*.mas','*.apk','*.p5p','*.pacman','*.freebsd','*.flatpak')
                   $files = @()
@@ -799,28 +799,28 @@ jobs:
                     $b64 = [Convert]::ToBase64String($bytes)
                     Write-Host "$($file.FullName): $b64"
                   }
-            - name: Print artifact hash (debug, Linux)
-              id: print_artifact_hash_debug_linux
-              if: runner.os == 'Linux'
-              shell: bash
+            - name: "Print artifact hash (debug, Linux)"
+              id: "print_artifact_hash_debug_linux"
+              if: "runner.os == 'Linux'"
+              shell: "bash"
               run: |
                   find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(sha512sum "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
                   done
-            - name: Print artifact hash (debug, macOS)
-              id: print_artifact_hash_debug_macos
-              if: runner.os == 'macOS'
-              shell: bash
+            - name: "Print artifact hash (debug, macOS)"
+              id: "print_artifact_hash_debug_macos"
+              if: "runner.os == 'macOS'"
+              shell: "bash"
               run: |
                   find artifacts -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.snap' -o -name '*.zip' -o -name '*.yml' -o -name '*.blockmap' -o -name '*.msi' -o -name '*.deb' -o -name '*.rpm' -o -name '*.pkg' -o -name '*.mas' -o -name '*.apk' -o -name '*.p5p' -o -name '*.pacman' -o -name '*.freebsd' -o -name '*.flatpak' \) | sort | while read -r file; do
                     hash=$(shasum -a 512 "$file" | awk '{print $1}')
                     b64=$(echo "$hash" | xxd -r -p | base64)
                     echo "$file: $b64"
                   done
-            - name: Rename Squirrel win32 nupkg and RELEASES for release
-              shell: bash
+            - name: "Rename Squirrel win32 nupkg and RELEASES for release"
+              shell: "bash"
               run: |
                   set -euo pipefail
 
@@ -877,9 +877,9 @@ jobs:
                     done
                   fi
 
-            - name: Check duplicate release asset names (debug)
-              id: check_release_asset_name_duplicates
-              shell: bash
+            - name: "Check duplicate release asset names (debug)"
+              id: "check_release_asset_name_duplicates"
+              shell: "bash"
               run: |
                   set -euo pipefail
 
@@ -911,13 +911,13 @@ jobs:
 
                   exit 1
 
-            - name: Create or update release with distributable builds
+            - name: "Create or update release with distributable builds"
               continue-on-error: true
-              id: release
-              uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+              id: "release"
+              uses: "softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda" # v3.0.0
               with:
-                  tag_name: v${{ needs.bump-version.outputs.new_version }}
-                  name: Uptime-Watcher v${{ needs.bump-version.outputs.new_version }}
+                  tag_name: "v${{ needs.bump-version.outputs.new_version }}"
+                  name: "Uptime-Watcher v${{ needs.bump-version.outputs.new_version }}"
                   body: |
                       ## 🚀 Release Notes
                       ${{ steps.release_notes_full.outputs.notes }}
@@ -992,25 +992,25 @@ jobs:
 
                       _Thank you for using **Uptime-Watcher**!_
 
-                  files: release-dist/**/*
+                  files: "release-dist/**/*"
                   draft: false
                   prerelease: false
                   make_latest: true
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: Checkout repository branch for changelog updates
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout repository branch for changelog updates"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
-                  ref: ${{ github.ref_name }}
+                  ref: "${{ github.ref_name }}"
                   fetch-depth: 0
                   fetch-tags: true
 
-            - name: Create Check Run
+            - name: "Create Check Run"
               continue-on-error: true
-              id: create_check
+              id: "create_check"
               env:
-                  GH_TOKEN: ${{ github.token }}
+                  GH_TOKEN: "${{ github.token }}"
               run: |
                   CHECKID=$(gh api -X POST -H "Accept: application/vnd.github+json" \
                     -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -1023,17 +1023,17 @@ jobs:
                     /repos/${{ github.repository }}/check-runs)
                   echo "CHECKID=$CHECKID" >> "$GITHUB_ENV"
 
-            - name: Set up Node.js
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Set up Node.js"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Install git-cliff
-              run: npm install -g git-cliff --force
+            - name: "Install git-cliff"
+              run: "npm install -g git-cliff --force"
 
-            - name: Generate CHANGELOG.md files
+            - name: "Generate CHANGELOG.md files"
               run: |
                   echo "Starting changelog generation with git-cliff..."
                   echo "Current directory: $(pwd)"
@@ -1067,7 +1067,7 @@ jobs:
                   echo "Final directory listing:"
                   find . -name "CHANGELOG.md" -exec echo "Found: {}" \; -exec wc -l {} \;
 
-            - name: Commit and push changelog updates
+            - name: "Commit and push changelog updates"
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -1084,11 +1084,11 @@ jobs:
                   fi
               continue-on-error: true
 
-            - name: Update Check Run - Changelogs Generated
+            - name: "Update Check Run - Changelogs Generated"
               continue-on-error: true
-              if: success()
+              if: "success()"
               env:
-                  GH_TOKEN: ${{ github.token }}
+                  GH_TOKEN: "${{ github.token }}"
               run: |
                   echo '{
                     "status": "in_progress",
@@ -1100,11 +1100,11 @@ jobs:
                     -H "X-GitHub-Api-Version: 2022-11-28" \
                     /repos/${{ github.repository }}/check-runs/"$CHECKID" --input -
 
-            - name: Complete Check Run
+            - name: "Complete Check Run"
               continue-on-error: true
-              if: always()
+              if: "always()"
               env:
-                  GH_TOKEN: ${{ github.token }}
+                  GH_TOKEN: "${{ github.token }}"
               run: |
                   CONCLUSION="success"
                   if [ "${{ job.status }}" != "success" ]; then
@@ -1120,8 +1120,8 @@ jobs:
                     -H "X-GitHub-Api-Version: 2022-11-28" \
                     /repos/${{ github.repository }}/check-runs/"$CHECKID" --input -
 
-            - name: Add Changelog Job Summary
-              if: always()
+            - name: "Add Changelog Job Summary"
+              if: "always()"
               run: |
                   {
                     echo "## 📝 Changelog Update Summary"
@@ -1140,8 +1140,8 @@ jobs:
                     echo "- \`/electron/CHANGELOG.md\`"
                   } >> "$GITHUB_STEP_SUMMARY"
 
-            - name: Add release job summary
-              if: always()
+            - name: "Add release job summary"
+              if: "always()"
               run: |
                   {
                     echo "## 🏗️ Build and Release Electron App Workflow Summary"

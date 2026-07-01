@@ -88,23 +88,23 @@ test.describe(
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
 
-                await expect.soft(
-                    siteDetailsModal.getByTestId("site-overview-tab")
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(siteDetailsModal.getByTestId("site-overview-tab"))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
                     .getByRole("tab", { name: "Monitor Overview" })
                     .click();
-                await expect.soft(
-                    siteDetailsModal.getByTestId("overview-tab")
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(siteDetailsModal.getByTestId("overview-tab"))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
                     .getByRole("tab", { name: ANALYTICS_BUTTON_REGEX })
                     .click();
-                await expect.soft(
-                    siteDetailsModal.getByTestId("analytics-tab")
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(siteDetailsModal.getByTestId("analytics-tab"))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 const historyButton = siteDetailsModal
                     .getByRole("tab", {
@@ -115,12 +115,14 @@ test.describe(
                     state: "visible",
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(async () => {
-                    await historyButton.click({
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
-                        trial: true,
-                    });
-                }).toPass({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(async () => {
+                        await historyButton.click({
+                            timeout: WAIT_TIMEOUTS.MEDIUM,
+                            trial: true,
+                        });
+                    })
+                    .toPass({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await historyButton.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 const historyTab = siteDetailsModal.getByTestId("history-tab");
@@ -347,19 +349,22 @@ test.describe(
 
                 await ensureSiteDetailsHeaderCollapsed(siteDetailsModal);
 
-                await expect.soft(header).toHaveAttribute("data-collapsed", "true");
-                await expect.soft(
-                    siteDetailsModal.getByTestId(
-                        "site-details-header-thumbnail"
+                await expect
+                    .soft(header)
+                    .toHaveAttribute("data-collapsed", "true");
+                await expect
+                    .soft(
+                        siteDetailsModal.getByTestId(
+                            "site-details-header-thumbnail"
+                        )
                     )
-                ).toHaveCount(0);
+                    .toHaveCount(0);
 
                 await closeSiteDetails(page);
 
                 const persistedState = await page.evaluate(() => {
                     try {
-                        const raw =
-                            localStorage.getItem("uptime-watcher-ui");
+                        const raw = localStorage.getItem("uptime-watcher-ui");
                         return raw ? JSON.parse(raw) : null;
                     } catch {
                         return null;
@@ -378,8 +383,7 @@ test.describe(
 
                 const persistedAfterReload = await page.evaluate(() => {
                     try {
-                        const raw =
-                            localStorage.getItem("uptime-watcher-ui");
+                        const raw = localStorage.getItem("uptime-watcher-ui");
                         return raw ? JSON.parse(raw) : null;
                     } catch {
                         return null;

@@ -24,13 +24,13 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock(import('../../stores/error/useErrorStore'), () => ({
+vi.mock("../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
-vi.mock(import('../../stores/utils'), async (importOriginal) => {
+vi.mock("../../stores/utils", async (importOriginal) => {
     const actual = await importOriginal<typeof import("../../stores/utils")>();
 
     return {
@@ -44,7 +44,7 @@ vi.mock(import('../../stores/utils'), async (importOriginal) => {
     };
 });
 
-vi.mock(import('../../../shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("../../../shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../shared/utils/errorHandling")
@@ -72,7 +72,7 @@ const mockStateSyncService = {
     }),
 };
 
-vi.mock(import('../../services/StateSyncService'), () => ({
+vi.mock("../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 

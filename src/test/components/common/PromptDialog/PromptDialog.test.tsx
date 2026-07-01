@@ -31,7 +31,7 @@ const promptControls = vi.hoisted(() => ({
     value: "",
 }));
 
-vi.mock(import('../../../../stores/ui/usePromptDialogStore'), () => ({
+vi.mock("../../../../stores/ui/usePromptDialogStore", () => ({
     usePromptDialogControls: () => promptControls,
 }));
 
@@ -56,7 +56,7 @@ describe(PromptDialog, () => {
             title: "Prompt title",
             type: "text",
         };
-        promptControls.value = ' '.repeat(3);
+        promptControls.value = " ".repeat(3);
 
         render(<PromptDialog />);
 

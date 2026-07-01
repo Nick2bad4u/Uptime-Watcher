@@ -27,13 +27,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock logger
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -49,14 +49,14 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
 // Mock store utils (partial) so createPersistConfig remains available.
-vi.mock(import('../../../stores/utils'), async (importOriginal) => {
+vi.mock("../../../stores/utils", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -66,7 +66,7 @@ vi.mock(import('../../../stores/utils'), async (importOriginal) => {
 });
 
 // Mock withErrorHandling from shared utils (partial) to preserve ApplicationError, etc.
-vi.mock(import('../../../../shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../../shared/utils/errorHandling")
@@ -143,8 +143,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            // This is testing the syncSettingsAfterRehydration function that is called during persist rehydration We
-            // need to test it via the rehydration mechanism since it's not a public method
+            // This is testing the syncSettingsAfterRehydration function that is called during persist rehydration We need to test it via the rehydration mechanism since it's not a public method
 
             // Clear any persisted state first
             useSettingsStore.persist.clearStorage();
@@ -190,7 +189,9 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledWith();
             expect(result.current.settings.historyLimit).toBe(2000);
         });
 
@@ -222,7 +223,9 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledWith();
             expect(logger.warn).toHaveBeenCalledWith(
                 "Failed to sync settings after rehydration:",
                 expect.any(Error)

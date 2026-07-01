@@ -20,9 +20,9 @@ tags:
 
 ## Table of Contents
 
-1. [Purpose](#purpose)
-2. [Checklist](#checklist)
-3. [Minimal Skeleton](#minimal-skeleton)
+- [Purpose](#purpose)
+- [Checklist](#checklist)
+- [Minimal Skeleton](#minimal-skeleton)
 
 ## Purpose
 

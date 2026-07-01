@@ -41,6 +41,7 @@ vi.mock("../../../shared/utils/environment", () => ({
 
 const asEventPayload = (value: unknown): EventPayloadValue =>
     value as EventPayloadValue;
+type TestEventMap = Record<string, EventPayloadValue>;
 
 describe("middleware.ts - Additional Coverage", () => {
     beforeEach(() => {
@@ -389,7 +390,9 @@ describe("middleware.ts - Additional Coverage", () => {
 
             // Should still log completion with timing
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                expect.stringMatching(/Completed event 'simple:event' in \d+ms/v)
+                expect.stringMatching(
+                    /Completed event 'simple:event' in \d+ms/v
+                )
             );
 
             expect(next).toHaveBeenCalled();
@@ -720,7 +723,7 @@ describe("middleware.ts - Additional Coverage", () => {
                 await next();
             };
 
-            const stack = MIDDLEWARE_STACKS.custom([mw1, mw2]);
+            const stack = MIDDLEWARE_STACKS.custom<TestEventMap>([mw1, mw2]);
             await stack("test:event", {}, next);
 
             expect(executionOrder).toEqual(["mw1", "mw2"]);
@@ -733,7 +736,7 @@ describe("middleware.ts - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const next = vi.fn();
-            const stack = MIDDLEWARE_STACKS.custom([]);
+            const stack = MIDDLEWARE_STACKS.custom<TestEventMap>([]);
 
             await stack("test:event", {}, next);
 

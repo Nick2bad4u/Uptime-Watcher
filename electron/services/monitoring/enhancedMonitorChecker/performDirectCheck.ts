@@ -110,7 +110,9 @@ export async function performDirectCheck(args: {
                     ? { status: finalStatus }
                     : {
                           status: finalStatus,
-                          ...((typeof serviceResult.details === "string") && { serviceDetails: serviceResult.details }),
+                          ...(typeof serviceResult.details === "string" && {
+                              serviceDetails: serviceResult.details,
+                          }),
                       }
             ),
             monitor: fallbackMonitor,

@@ -1,67 +1,67 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Sonar Cloud Analysis
-run-name: SonarCloud analysis (${{ github.event_name }})
+name: "Sonar Cloud Analysis"
+run-name: "SonarCloud analysis (${{ github.event_name }})"
 
 concurrency:
-    group: sonarcloud-${{ github.ref }}
+    group: "sonarcloud-${{ github.ref }}"
     cancel-in-progress: true
 
-"on":
+on:
     push:
         branches:
-            - main
-            - master
+            - "main"
+            - "master"
     pull_request:
-        types: [opened, synchronize, reopened]
+        types: ["opened", "synchronize", "reopened"]
     merge_group:
         branches:
-            - main
+            - "main"
         types:
-            - checks_requested
+            - "checks_requested"
 
 permissions:
-    contents: read
+    contents: "read"
 
 jobs:
     sonarcloud:
-        name: SonarCloud Code Quality Analysis
-        runs-on: ubuntu-latest
+        name: "SonarCloud Code Quality Analysis"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 30
-        if: ${{ github.repository == 'Nick2bad4u/Uptime-Watcher' }}
+        if: "${{ github.repository == 'Nick2bad4u/Uptime-Watcher' }}"
         defaults:
             run:
-                shell: bash
+                shell: "bash"
         env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
 
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout repository"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
                   fetch-depth: 0
 
-            - name: Setup Node.js
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Setup Node.js"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Install dependencies
-              run: npm install --force
+            - name: "Install dependencies"
+              run: "npm install --force"
 
-            - name: Build project
-              run: npm run build
+            - name: "Build project"
+              run: "npm run build"
 
-            - name: Run tests with coverage
-              run: npm run test:all:coverage || true
+            - name: "Run tests with coverage"
+              run: "npm run test:all:coverage || true"
 
-            - name: Verify coverage files exist
+            - name: "Verify coverage files exist"
               run: |
                   echo "Checking for LCOV coverage files..."
                   if [ -f "coverage/lcov.info" ]; then
@@ -74,13 +74,14 @@ jobs:
                   echo "Coverage directory contents:"
                   ls -la coverage/ || echo "Coverage directory not found"
 
-            - name: Skip SonarCloud scan without token
-              if: ${{ env.SONAR_TOKEN == '' }}
-              run: echo "::warning::SONAR_TOKEN is not available. Skipping SonarCloud scan."
+            - name: "Skip SonarCloud scan without token"
+              if: "${{ env.SONAR_TOKEN == '' }}"
+              run: >-
+                  echo "::warning::SONAR_TOKEN is not available. Skipping SonarCloud scan."
 
-            - name: SonarCloud Scan
-              if: ${{ env.SONAR_TOKEN != '' }}
-              uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e # v8.2.0
+            - name: "SonarCloud Scan"
+              if: "${{ env.SONAR_TOKEN != '' }}"
+              uses: "SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e" # v8.2.0
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                  SONAR_TOKEN: "${{ env.SONAR_TOKEN }}"

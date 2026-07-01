@@ -8,7 +8,7 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { fc, test } from "@fast-check/vitest";
 import { mockConstructableReturnValueOnce } from "@shared/test/helpers/vitestConstructors";
-import { arrayAt, arrayFirst, objectAssign   } from "ts-extras";
+import { arrayAt, arrayFirst, objectAssign } from "ts-extras";
 import {
     afterAll,
     afterEach,
@@ -20,14 +20,11 @@ import {
     vi,
 } from "vitest";
 
-import type {
-    initialSitesState} from "../../../stores/sites/useSitesState";
+import type { initialSitesState } from "../../../stores/sites/useSitesState";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 
 import { logger } from "../../../services/logger";
-import {
-    createSitesStateActions
-} from "../../../stores/sites/useSitesState";
+import { createSitesStateActions } from "../../../stores/sites/useSitesState";
 // Import the modules after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { logStoreAction } from "../../../stores/utils";
@@ -67,7 +64,7 @@ const buildSite = (identifier: string): Site => ({
 });
 
 // Mock all the dependencies
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -77,11 +74,11 @@ vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -90,7 +87,7 @@ vi.mock(import('../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error: unknown): Error => {
         if (Error.isError(error)) return error;
         return new Error(String(error));
@@ -105,7 +102,7 @@ vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
     }),
 }));
 
-vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
+vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
         return {
             getExpectedListenerCount: vi.fn(() => 4),
@@ -128,7 +125,7 @@ const mockStateSyncService = vi.hoisted(() => ({
     requestFullSync: vi.fn(),
 }));
 
-vi.mock(import('../../../services/StateSyncService'), () => ({
+vi.mock("../../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 
@@ -226,7 +223,9 @@ describe("useSiteSync", () => {
             let resolveSync: (() => void) | undefined;
             mockStateSyncService.requestFullSync.mockReturnValue(
                 new Promise((resolve) => {
-                    resolveSync = () => { resolve(fullSyncResult); };
+                    resolveSync = () => {
+                        resolve(fullSyncResult);
+                    };
                 })
             );
 
@@ -735,7 +734,7 @@ describe("useSiteSync", () => {
 
             mockDeps.getSites = () => state.sites;
             mockDeps.setSites = stateActions.setSites;
-            vi.spyOn(mockDeps, 'onSiteDelta').mockImplementation();
+            vi.spyOn(mockDeps, "onSiteDelta").mockReturnValue(undefined);
 
             syncActions = createSiteSyncActions(mockDeps);
 
@@ -902,7 +901,7 @@ describe("useSiteSync", () => {
         beforeEach(() => {
             // Reset mocks specifically for this describe block
             vi.clearAllMocks();
-            vi.spyOn(mockDeps, 'setSites').mockImplementation();
+            vi.spyOn(mockDeps, "setSites").mockReturnValue(undefined);
             syncActions = createSiteSyncActions(mockDeps);
         });
 

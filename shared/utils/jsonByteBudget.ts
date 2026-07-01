@@ -10,7 +10,12 @@
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { isDefined, isFinite as isFiniteNumber, objectHasIn, objectKeys } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteNumber,
+    objectHasIn,
+    objectKeys,
+} from "ts-extras";
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
 
@@ -210,8 +215,5 @@ function isBudgetExceeded(state: JsonByteBudgetState): boolean {
 }
 
 function isLeaveMarker(value: unknown): value is LeaveMarker {
-    return (
-        isRecord(value) &&
-        objectHasIn(value, JSON_BYTE_BUDGET_LEAVE)
-    );
+    return isRecord(value) && objectHasIn(value, JSON_BYTE_BUDGET_LEAVE);
 }

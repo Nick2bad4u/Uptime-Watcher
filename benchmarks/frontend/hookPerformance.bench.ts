@@ -103,12 +103,7 @@ type EffectCleanup = ReturnType<EffectCallback>;
  * Enumerates supported hook types tracked by the benchmark.
  */
 type HookType =
-    | "useState"
-    | "useEffect"
-    | "useMemo"
-    | "useCallback"
-    | "useRef"
-    | "custom";
+    "useState" | "useEffect" | "useMemo" | "useCallback" | "useRef" | "custom";
 
 /**
  * Tracks hook execution context for a single synthetic component.

@@ -3,11 +3,11 @@
  * validation features.
  *
  * @remarks
- * This component provides a styled input field that integrates with the
- * app's theme system. It supports various input types (text, email,
- * number, password, URL), accessibility attributes, and validation constraints.
- * The input automatically applies appropriate colors, focus states, and
- * disabled states based on the current theme.
+ * This component provides a styled input field that integrates with the app's
+ * theme system. It supports various input types (text, email, number, password,
+ * URL), accessibility attributes, and validation constraints. The input
+ * automatically applies appropriate colors, focus states, and disabled states
+ * based on the current theme.
  *
  * @example Basic text input:
  *
@@ -167,7 +167,6 @@ const ThemedInputComponent = ({
     return (
         <input
             aria-describedby={ariaDescribedBy}
-            // eslint-disable-next-line react-hooks/invariant -- ariaLabel is provided by typed props and may intentionally be undefined.
             aria-label={ariaLabel}
             className={`themed-input ${className}`}
             data-testid={id ? `input-${id}` : undefined}

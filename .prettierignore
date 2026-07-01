@@ -13,6 +13,7 @@ dist/
 docs/docusaurus/docs/
 docs/docusaurus/build/
 docs/docusaurus/.docusaurus/
+docs/docusaurus/src/**/*.module.css.d.ts
 docs/packages/
 docs/TSDoc/
 docs/Guides/

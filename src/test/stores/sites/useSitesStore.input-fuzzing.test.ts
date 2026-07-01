@@ -12,7 +12,7 @@ import type { Monitor, MonitorStatus, Site } from "@shared/types";
 
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
-import { arrayFirst, isEmpty, safeCastTo   } from "ts-extras";
+import { arrayFirst, isEmpty, safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
@@ -68,62 +68,68 @@ const createTestSitesStore = () => {
 
 // Property-based test arbitraries for sites store
 const arbitraries = {
-    monitorStatus: safeCastTo<fc.Arbitrary<MonitorStatus>>(fc.constantFrom(
-        "up" as const,
-        "down" as const,
-        "pending" as const,
-        "paused" as const
-    )),
-
-    monitor: safeCastTo<fc.Arbitrary<Monitor>>(fc.record({
-        id: fc.string({ minLength: 1, maxLength: 50 }),
-        type: fc.constantFrom(
-            "http" as const,
-            "ping" as const,
-            "port" as const,
-            "dns" as const
-        ),
-        checkInterval: fc.integer({ min: 1000, max: 300_000 }), // 1 second to 5 minutes
-        history: fc.array(
-            fc.record({
-                status: fc.constantFrom("up" as const, "down" as const),
-                responseTime: fc.integer({ min: 0, max: 5000 }),
-                timestamp: fc.integer({ min: 0, max: Date.now() }),
-                details: fc.option(fc.string()),
-            }),
-            { maxLength: 100 }
-        ),
-        monitoring: fc.boolean(),
-        responseTime: fc.integer({ min: 0, max: 10_000 }),
-        retryAttempts: fc.integer({ min: 0, max: 10 }),
-        status: fc.constantFrom(
+    monitorStatus: safeCastTo<fc.Arbitrary<MonitorStatus>>(
+        fc.constantFrom(
             "up" as const,
             "down" as const,
             "pending" as const,
             "paused" as const
-        ),
-        timeout: fc.integer({ min: 1000, max: 30_000 }), // 1-30 seconds
-        // Optional fields
-        activeOperations: fc.option(fc.array(fc.string())),
-        expectedValue: fc.option(fc.string()),
-        host: fc.option(fc.string()),
-        lastChecked: fc.option(fc.date()),
-        port: fc.option(fc.integer({ min: 1, max: 65_535 })),
-        recordType: fc.option(fc.string()),
-        url: fc.option(fc.webUrl()),
-    })),
+        )
+    ),
+
+    monitor: safeCastTo<fc.Arbitrary<Monitor>>(
+        fc.record({
+            id: fc.string({ minLength: 1, maxLength: 50 }),
+            type: fc.constantFrom(
+                "http" as const,
+                "ping" as const,
+                "port" as const,
+                "dns" as const
+            ),
+            checkInterval: fc.integer({ min: 1000, max: 300_000 }), // 1 second to 5 minutes
+            history: fc.array(
+                fc.record({
+                    status: fc.constantFrom("up" as const, "down" as const),
+                    responseTime: fc.integer({ min: 0, max: 5000 }),
+                    timestamp: fc.integer({ min: 0, max: Date.now() }),
+                    details: fc.option(fc.string()),
+                }),
+                { maxLength: 100 }
+            ),
+            monitoring: fc.boolean(),
+            responseTime: fc.integer({ min: 0, max: 10_000 }),
+            retryAttempts: fc.integer({ min: 0, max: 10 }),
+            status: fc.constantFrom(
+                "up" as const,
+                "down" as const,
+                "pending" as const,
+                "paused" as const
+            ),
+            timeout: fc.integer({ min: 1000, max: 30_000 }), // 1-30 seconds
+            // Optional fields
+            activeOperations: fc.option(fc.array(fc.string())),
+            expectedValue: fc.option(fc.string()),
+            host: fc.option(fc.string()),
+            lastChecked: fc.option(fc.date()),
+            port: fc.option(fc.integer({ min: 1, max: 65_535 })),
+            recordType: fc.option(fc.string()),
+            url: fc.option(fc.webUrl()),
+        })
+    ),
 
     get site() {
-        return safeCastTo<fc.Arbitrary<Site>>(fc.record({
-            identifier: fc.string({ minLength: 1, maxLength: 50 }),
-            name: fc.string({ minLength: 1, maxLength: 100 }),
-            monitoring: fc.boolean(),
-            monitors: fc.uniqueArray(arbitraries.monitor, {
-                selector: (monitor) => monitor.id,
-                minLength: 0,
-                maxLength: 5,
-            }),
-        }));
+        return safeCastTo<fc.Arbitrary<Site>>(
+            fc.record({
+                identifier: fc.string({ minLength: 1, maxLength: 50 }),
+                name: fc.string({ minLength: 1, maxLength: 100 }),
+                monitoring: fc.boolean(),
+                monitors: fc.uniqueArray(arbitraries.monitor, {
+                    selector: (monitor) => monitor.id,
+                    minLength: 0,
+                    maxLength: 5,
+                }),
+            })
+        );
     },
 
     get multipleSites() {
@@ -361,14 +367,14 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 createTestSitesStore();
 
                 // Act & Assert - operations on non-existent sites should not crash
-                expect(() =>
-                    { useSitesStore
+                expect(() => {
+                    useSitesStore
                         .getState()
-                        .removeSite("non-existent-identifier"); }
-                ).not.toThrow();
-                expect(() =>
-                    { useSitesStore.getState().selectSite(site); }
-                ).not.toThrow();
+                        .removeSite("non-existent-identifier");
+                }).not.toThrow();
+                expect(() => {
+                    useSitesStore.getState().selectSite(site);
+                }).not.toThrow();
 
                 const state = useSitesStore.getState();
                 expect(state.sites).toHaveLength(0);
@@ -382,9 +388,9 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 createTestSitesStore();
 
                 // Act & Assert - malformed operations should not crash
-                expect(() =>
-                    { useSitesStore.getState().removeSite(malformedId); }
-                ).not.toThrow();
+                expect(() => {
+                    useSitesStore.getState().removeSite(malformedId);
+                }).not.toThrow();
 
                 const state = useSitesStore.getState();
                 expect(state.sites).toHaveLength(0);

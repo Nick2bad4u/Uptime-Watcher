@@ -9,11 +9,14 @@ import type { Site } from "@shared/types";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
-import type { EventKey, TypedEventBus } from "../../../events/TypedEventBus";
+import type {
+    EventKey,
+    EventPayload,
+    TypedEventBus,
+} from "../../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
 import type { DatabaseCommandContext } from "../../../services/commands/databaseCommandContext";
 import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
-import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
 import {
@@ -43,7 +46,9 @@ const createMockCache = () => {
     const mockCache: Partial<StandardizedCache<Site>> & {
         replaceAll: ReturnType<typeof vi.fn>;
     } = {
-        clear: vi.fn(() => { cache.clear(); }),
+        clear: vi.fn(() => {
+            cache.clear();
+        }),
         delete: vi.fn((key: string) => cache.delete(key)),
         entries: vi.fn(() => cache.entries()),
         get: vi.fn((key: string) => cache.get(key)),
@@ -112,7 +117,7 @@ class TestDatabaseCommand extends DatabaseCommand<string> {
     // Expose protected methods for testing
     public async testEmitSuccessEvent<TEvent extends EventKey<UptimeEvents>>(
         eventType: TEvent,
-        data: Partial<UptimeEvents[TEvent]>
+        data: Partial<EventPayload<UptimeEvents, TEvent>>
     ): Promise<void> {
         await this.emitSuccessEvent(eventType, data);
     }
@@ -120,7 +125,7 @@ class TestDatabaseCommand extends DatabaseCommand<string> {
     public async testEmitFailureEvent<TEvent extends EventKey<UptimeEvents>>(
         eventType: TEvent,
         error: Error,
-        data: Partial<UptimeEvents[TEvent]> = {}
+        data: Partial<EventPayload<UptimeEvents, TEvent>> = {}
     ): Promise<void> {
         await this.emitFailureEvent(eventType, error, data);
     }
@@ -788,8 +793,7 @@ describe("DatabaseCommands", () => {
                 data: '{"sites": [{"identifier": "test1"}], "settings": {}}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                serviceFactory:
-                    mockServiceFactory,
+                serviceFactory: mockServiceFactory,
                 updateHistoryLimit: mockUpdateHistoryLimit as unknown as (
                     limit: number
                 ) => Promise<void>,
@@ -1009,8 +1013,7 @@ describe("DatabaseCommands", () => {
                 data: "",
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                serviceFactory:
-                    mockServiceFactory,
+                serviceFactory: mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1040,8 +1043,7 @@ describe("DatabaseCommands", () => {
                 data: "   \n\t   ",
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                serviceFactory:
-                    mockServiceFactory,
+                serviceFactory: mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1071,8 +1073,7 @@ describe("DatabaseCommands", () => {
                 data: '{"invalid": json}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                serviceFactory:
-                    mockServiceFactory,
+                serviceFactory: mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1096,8 +1097,7 @@ describe("DatabaseCommands", () => {
                 data: "",
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                serviceFactory:
-                    mockServiceFactory,
+                serviceFactory: mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1133,8 +1133,7 @@ describe("DatabaseCommands", () => {
                 data: '{"sites": [], "settings": {}}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                serviceFactory:
-                    mockServiceFactory,
+                serviceFactory: mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1164,10 +1163,10 @@ describe("DatabaseCommands", () => {
         let command: RestoreBackupCommand;
         let payload: { buffer: Buffer; fileName: string };
         let restoreResult: {
-            metadata: Record<
-                string,
-                unknown
-            > & { checksum: string; schemaVersion: number };
+            metadata: Record<string, unknown> & {
+                checksum: string;
+                schemaVersion: number;
+            };
             preRestoreBackup: {
                 buffer: Buffer;
                 fileName: string;
@@ -1485,8 +1484,7 @@ describe("DatabaseCommands", () => {
                     data: '{"sites": [], "settings": {}}',
                     eventEmitter:
                         mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                    serviceFactory:
-                        mockServiceFactory,
+                    serviceFactory: mockServiceFactory,
                 }),
                 new LoadSitesCommand(
                     mockServiceFactory,

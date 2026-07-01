@@ -229,9 +229,9 @@ describe("Backend Arrow Function Mutation Tests", () => {
             // Mutated callback: () => undefined
             const filterCallbackMutated = (): undefined => undefined;
 
-            const filteredOperations = operations.filter(() =>
-                { filterCallbackMutated(); }
-            );
+            const filteredOperations = operations.filter(() => {
+                filterCallbackMutated();
+            });
 
             // Undefined is falsy, so all items are filtered out
             expect(filteredOperations).toEqual([]);

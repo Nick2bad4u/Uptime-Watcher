@@ -32,7 +32,9 @@ const createAlert = (overrides: Partial<StatusAlert> = {}): StatusAlert => ({
     siteName: overrides.siteName ?? sampleOne(siteNameArbitrary),
     status: overrides.status ?? "down",
     timestamp: overrides.timestamp ?? Date.now(),
-    ...(overrides.previousStatus !== undefined && { previousStatus: overrides.previousStatus }),
+    ...(overrides.previousStatus !== undefined && {
+        previousStatus: overrides.previousStatus,
+    }),
 });
 
 const createStatusUpdate = (

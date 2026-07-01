@@ -21,7 +21,11 @@ export const preferSharedAliasRule = {
     /**
      * @param {{
      *     getFilename: () => any;
-     *     report: (arg0: { fix: (fixer: any) => any; messageId: string; node: any }) => void;
+     *     report: (arg0: {
+     *         fix: (fixer: any) => any;
+     *         messageId: string;
+     *         node: any;
+     *     }) => void;
      * }} context
      */
     create(context) {
@@ -98,7 +102,8 @@ export const preferSharedAliasRule = {
                      *     replaceText: (arg0: any, arg1: string) => any;
                      * }} fixer
                      */
-                    fix: (fixer) => fixer.replaceText(
+                    fix: (fixer) =>
+                        fixer.replaceText(
                             node.source,
                             `${quote}${aliasPath}${quote}`
                         ),

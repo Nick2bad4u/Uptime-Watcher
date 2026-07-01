@@ -34,9 +34,6 @@
         }
     ],
     "type": "module",
-    "main": "./plugin.cjs",
-    "module": "./plugin.mjs",
-    "types": "./plugin.d.cts",
     "exports": {
         ".": {
             "import": {
@@ -50,6 +47,9 @@
             "default": "./plugin.mjs"
         }
     },
+    "main": "./plugin.cjs",
+    "module": "./plugin.mjs",
+    "types": "./plugin.d.cts",
     "scripts": {
         "lint": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx",
         "lint:fix": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx --fix",

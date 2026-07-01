@@ -1,109 +1,109 @@
 # Flatpak Application Manifest for Uptime Watcher
 # Modern configuration with enhanced security, sandboxing, and 2025 best practices
 # yaml-language-server: $schema=https://raw.githubusercontent.com/flatpak/flatpak-builder/refs/heads/main/data/flatpak-manifest.schema.json
-$schema: https://raw.githubusercontent.com/flatpak/flatpak-builder/refs/heads/main/data/flatpak-manifest.schema.json
+$schema: "https://raw.githubusercontent.com/flatpak/flatpak-builder/refs/heads/main/data/flatpak-manifest.schema.json"
 # Extension points for additional functionality
 add-extensions:
     # Optional: Custom themes extension point
     io.github.uptimewatcher.Theme:
-        directory: share/themes
+        directory: "share/themes"
         no-autodownload: true
 
         subdirectories: true
 # Application metadata
-app-id: io.github.uptimewatcher
+app-id: "io.github.uptimewatcher"
 # Electron BaseApp for optimized Electron applications
-base: org.electronjs.Electron2.BaseApp
+base: "org.electronjs.Electron2.BaseApp"
 base-version: "24.08"
 
 # Build configuration
 build-options:
     # Node.js build environment
-    append-path: /usr/lib/sdk/node24/bin
+    append-path: "/usr/lib/sdk/node24/bin"
 
     # Optimization flags
-    cflags: -O2 -g -fPIC
-    cxxflags: -O2 -g -fPIC
+    cflags: "-O2 -g -fPIC"
+    cxxflags: "-O2 -g -fPIC"
 
     # Environment variables for build
     env:
         # Electron configuration
-        ELECTRON_CACHE: /run/build/uptime-watcher/electron-cache
+        ELECTRON_CACHE: "/run/build/uptime-watcher/electron-cache"
         ELECTRON_SKIP_BINARY_DOWNLOAD: "true"
-        NODE_ENV: production
+        NODE_ENV: "production"
         NPM_CONFIG_AUDIT: "false"
         NPM_CONFIG_FUND: "false"
         # Node.js configuration
-        NPM_CONFIG_LOGLEVEL: info
+        NPM_CONFIG_LOGLEVEL: "info"
         NPM_CONFIG_PROGRESS: "false"
         # Cache directories
-        XDG_CACHE_HOME: /run/build/uptime-watcher/flatpak-node/cache
-        npm_config_cache: /run/build/uptime-watcher/flatpak-node/npm-cache
-        npm_config_nodedir: /usr/lib/sdk/node24
+        XDG_CACHE_HOME: "/run/build/uptime-watcher/flatpak-node/cache"
+        npm_config_cache: "/run/build/uptime-watcher/flatpak-node/npm-cache"
+        npm_config_nodedir: "/usr/lib/sdk/node24"
         npm_config_offline: "true"
 
 # Cleanup patterns for optimized package size
 cleanup:
-    - /include
-    - /lib/pkgconfig
-    - /man
-    - /share/doc
-    - /share/gtk-doc
-    - /share/man
-    - /share/pkgconfig
+    - "/include"
+    - "/lib/pkgconfig"
+    - "/man"
+    - "/share/doc"
+    - "/share/gtk-doc"
+    - "/share/man"
+    - "/share/pkgconfig"
     - "*.la"
     - "*.a"
 # Cleanup commands to optimize final package size
 cleanup-commands:
-    - mkdir -p ${FLATPAK_DEST}/lib/electron-cache
-    - mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/{16x16,24x24,64x64,128x128,256x256,512x512}/apps
+    - "mkdir -p ${FLATPAK_DEST}/lib/electron-cache"
+    - "mkdir -p ${FLATPAK_DEST}/share/icons/hicolor/{16x16,24x24,64x64,128x128,256x256,512x512}/apps"
 
 # Application entry point
-command: run-electron.sh
+command: "run-electron.sh"
 
 # Sandbox permissions with security-first approach
 finish-args:
     # Core IPC and display
-    - --share=ipc
-    - --device=dri
-    - --socket=x11 # Primary display protocol
-    - --socket=fallback-x11 # Fallback for Wayland
-    - --socket=wayland # Native Wayland support
+    - "--share=ipc"
+    - "--device=dri"
+    - "--socket=x11" # Primary display protocol
+    - "--socket=fallback-x11" # Fallback for Wayland
+    - "--socket=wayland" # Native Wayland support
 
     # Audio support
-    - --socket=pulseaudio
+    - "--socket=pulseaudio"
 
     # Network access (required for uptime monitoring)
-    - --share=network
+    - "--share=network"
 
     # File system access (minimal and secure)
-    - --filesystem=xdg-download:rw # Downloads folder access
-    - --filesystem=xdg-documents:ro # Read-only documents access
-    - --filesystem=xdg-config/uptime-watcher:create # App-specific config
+    - "--filesystem=xdg-download:rw" # Downloads folder access
+    - "--filesystem=xdg-documents:ro" # Read-only documents access
+    - "--filesystem=xdg-config/uptime-watcher:create" # App-specific config
 
     # Notifications
-    - --talk-name=org.freedesktop.Notifications
-    - --talk-name=org.kde.StatusNotifierWatcher
+    - "--talk-name=org.freedesktop.Notifications"
+    - "--talk-name=org.kde.StatusNotifierWatcher"
 
     # Desktop integration
-    - --talk-name=org.freedesktop.FileManager1 # File manager integration
-    - --talk-name=org.freedesktop.portal.Desktop # Desktop portal access
-    - --talk-name=org.freedesktop.portal.Request # Request portal
+    - "--talk-name=org.freedesktop.FileManager1" # File manager integration
+    - "--talk-name=org.freedesktop.portal.Desktop" # Desktop portal access
+    - "--talk-name=org.freedesktop.portal.Request" # Request portal
 
     # Environment variables
-    - --env=ELECTRON_IS_DEV=0
-    - --env=ELECTRON_FORCE_IS_PACKAGED=true
-    - --env=NODE_ENV=production
-    - --env=ELECTRON_TRASH=gio # Trash integration
-    - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons # HiDPI cursor support
+    - "--env=ELECTRON_IS_DEV=0"
+    - "--env=ELECTRON_FORCE_IS_PACKAGED=true"
+    - "--env=NODE_ENV=production"
+    - "--env=ELECTRON_TRASH=gio" # Trash integration
+    - "--env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons" # HiDPI cursor support
 
     # Security hardening
-    - --env=ELECTRON_DISABLE_SECURITY_WARNINGS=true
-    - --env=TMPDIR=/tmp # Secure temp directory
+    - "--env=ELECTRON_DISABLE_SECURITY_WARNINGS=true"
+    - "--env=TMPDIR=/tmp" # Secure temp directory
 
     # Performance optimizations
-    - --env=ELECTRON_NO_ASAR=false # Enable ASAR for performance
-    - --env=ELECTRON_USE_SYSTEM_ICONS=true # Use system icons
+    - "--env=ELECTRON_NO_ASAR=false" # Enable ASAR for performance
+    - "--env=ELECTRON_USE_SYSTEM_ICONS=true" # Use system icons
 
 # Application modules
 modules:
@@ -116,8 +116,8 @@ modules:
               # guarantees presence. This keeps local ad-hoc builds more forgiving.
               echo "(info) Node.js from extension version: $(node --version 2>/dev/null || echo 'unavailable')"
               echo "(info) npm version: $(npm --version 2>/dev/null || echo 'unavailable')"
-      buildsystem: simple
-      name: nodejs
+      buildsystem: "simple"
+      name: "nodejs"
       sources: []
 
     # Main application module
@@ -219,22 +219,22 @@ modules:
       build-options:
           env:
               # Additional build-time environment
-              ELECTRON_BUILDER_CACHE: /run/build/uptime-watcher/electron-builder-cache
+              ELECTRON_BUILDER_CACHE: "/run/build/uptime-watcher/electron-builder-cache"
 
-      buildsystem: simple
-      name: uptime-watcher
+      buildsystem: "simple"
+      name: "uptime-watcher"
       sources:
-          - path: .
+          - path: "."
 
-            type: dir
-runtime: org.freedesktop.Platform
+            type: "dir"
+runtime: "org.freedesktop.Platform"
 runtime-version: "24.08"
 # Pin SDK to matching version
-sdk: org.freedesktop.Sdk//24.08
+sdk: "org.freedesktop.Sdk//24.08"
 
 # Node.js SDK extension for build-time dependencies
 sdk-extensions:
-    - org.freedesktop.Sdk.Extension.node24
+    - "org.freedesktop.Sdk.Extension.node24"
 
 # Locale handling
 separate-locales: false

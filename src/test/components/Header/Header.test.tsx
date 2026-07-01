@@ -12,7 +12,7 @@ import {
 } from "../../../stores/ui/useUiStore";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 
-vi.mock(import('../../../stores/ui/useUiStore'), async () => {
+vi.mock("../../../stores/ui/useUiStore", async () => {
     const actual = await vi.importActual<
         typeof import("../../../stores/ui/useUiStore")
     >("../../../stores/ui/useUiStore");
@@ -21,11 +21,11 @@ vi.mock(import('../../../stores/ui/useUiStore'), async () => {
         useUIStore: vi.fn(),
     };
 });
-vi.mock(import('../../../theme/useTheme'), () => ({
+vi.mock("../../../theme/useTheme", () => ({
     useAvailabilityColors: vi.fn(),
     useTheme: vi.fn(),
 }));
-vi.mock(import('../../../hooks/useGlobalMonitoringMetrics'), () => ({
+vi.mock("../../../hooks/useGlobalMonitoringMetrics", () => ({
     useGlobalMonitoringMetrics: vi.fn(),
 }));
 

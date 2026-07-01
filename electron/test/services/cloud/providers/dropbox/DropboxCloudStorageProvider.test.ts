@@ -29,16 +29,15 @@ describe(DropboxCloudStorageProvider, () => {
         });
 
         const provider = new DropboxCloudStorageProvider({
-            clientFactory: () =>
-                ({
-                    filesListFolder,
-                    filesListFolderContinue: vi.fn(),
-                    filesUpload: vi.fn(),
-                    filesDownload: vi.fn(),
-                    filesDeleteV2: vi.fn(),
-                    usersGetCurrentAccount: vi.fn(),
-                    authTokenRevoke: vi.fn(),
-                }),
+            clientFactory: () => ({
+                filesListFolder,
+                filesListFolderContinue: vi.fn(),
+                filesUpload: vi.fn(),
+                filesDownload: vi.fn(),
+                filesDeleteV2: vi.fn(),
+                usersGetCurrentAccount: vi.fn(),
+                authTokenRevoke: vi.fn(),
+            }),
             tokenManager: tokenManager as never,
         });
 
@@ -94,16 +93,15 @@ describe(DropboxCloudStorageProvider, () => {
         });
 
         const provider = new DropboxCloudStorageProvider({
-            clientFactory: () =>
-                ({
-                    filesListFolder,
-                    filesListFolderContinue: vi.fn(),
-                    filesUpload: vi.fn(),
-                    filesDownload: vi.fn(),
-                    filesDeleteV2: vi.fn(),
-                    usersGetCurrentAccount: vi.fn(),
-                    authTokenRevoke: vi.fn(),
-                }),
+            clientFactory: () => ({
+                filesListFolder,
+                filesListFolderContinue: vi.fn(),
+                filesUpload: vi.fn(),
+                filesDownload: vi.fn(),
+                filesDeleteV2: vi.fn(),
+                usersGetCurrentAccount: vi.fn(),
+                authTokenRevoke: vi.fn(),
+            }),
             tokenManager: tokenManager as never,
         });
 
@@ -128,16 +126,15 @@ describe(DropboxCloudStorageProvider, () => {
         });
 
         const provider = new DropboxCloudStorageProvider({
-            clientFactory: () =>
-                ({
-                    filesListFolder: vi.fn(),
-                    filesListFolderContinue: vi.fn(),
-                    filesUpload,
-                    filesDownload: vi.fn(),
-                    filesDeleteV2: vi.fn(),
-                    usersGetCurrentAccount: vi.fn(),
-                    authTokenRevoke: vi.fn(),
-                }),
+            clientFactory: () => ({
+                filesListFolder: vi.fn(),
+                filesListFolderContinue: vi.fn(),
+                filesUpload,
+                filesDownload: vi.fn(),
+                filesDeleteV2: vi.fn(),
+                usersGetCurrentAccount: vi.fn(),
+                authTokenRevoke: vi.fn(),
+            }),
             tokenManager: tokenManager as never,
         });
 
@@ -178,16 +175,15 @@ describe(DropboxCloudStorageProvider, () => {
         const filesUpload = vi.fn().mockRejectedValue(conflict);
 
         const provider = new DropboxCloudStorageProvider({
-            clientFactory: () =>
-                ({
-                    filesListFolder: vi.fn(),
-                    filesListFolderContinue: vi.fn(),
-                    filesUpload,
-                    filesDownload: vi.fn(),
-                    filesDeleteV2: vi.fn(),
-                    usersGetCurrentAccount: vi.fn(),
-                    authTokenRevoke: vi.fn(),
-                }),
+            clientFactory: () => ({
+                filesListFolder: vi.fn(),
+                filesListFolderContinue: vi.fn(),
+                filesUpload,
+                filesDownload: vi.fn(),
+                filesDeleteV2: vi.fn(),
+                usersGetCurrentAccount: vi.fn(),
+                authTokenRevoke: vi.fn(),
+            }),
             tokenManager: tokenManager as never,
         });
 

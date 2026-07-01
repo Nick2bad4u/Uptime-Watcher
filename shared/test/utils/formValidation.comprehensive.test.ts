@@ -87,7 +87,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result = validateRequiredString(' '.repeat(3));
+            const result = validateRequiredString(" ".repeat(3));
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("Field is required");
@@ -243,7 +243,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result = validateUrl(' '.repeat(3));
+            const result = validateUrl(" ".repeat(3));
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("URL is required");
@@ -381,7 +381,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result = validatePort(' '.repeat(3));
+            const result = validatePort(" ".repeat(3));
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("Port is required");
@@ -776,7 +776,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isEmptyString(' '.repeat(3))).toBeTruthy();
+            expect(isEmptyString(" ".repeat(3))).toBeTruthy();
         });
 
         it("should return false for non-empty string", async ({
@@ -863,7 +863,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const pattern = /\d+/v;
-            const result = validatePattern(' '.repeat(3), pattern);
+            const result = validatePattern(" ".repeat(3), pattern);
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("Field is required");

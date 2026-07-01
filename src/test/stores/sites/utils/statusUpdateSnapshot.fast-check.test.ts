@@ -33,7 +33,7 @@ import {
     type StatusUpdateSnapshotPayload,
 } from "../../../../stores/sites/utils/statusUpdateSnapshot";
 
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -53,34 +53,31 @@ const createHistoryEntry = (
     timestamp: Date.UTC(2024, 0, seed + 1),
 });
 
-const createMonitor = (overrides: Partial<Monitor> = {}): Monitor =>
-    ({
-        checkInterval: overrides.checkInterval ?? 60_000,
-        history: overrides.history ?? [],
-        id: overrides.id ?? "monitor-default",
-        monitoring: overrides.monitoring ?? true,
-        responseTime: overrides.responseTime ?? 150,
-        retryAttempts: overrides.retryAttempts ?? 3,
-        status: overrides.status ?? "up",
-        timeout: overrides.timeout ?? 30_000,
-        type: overrides.type ?? "http",
-        url: overrides.url ?? "https://status.example.com/health",
-        lastChecked:
-            overrides.lastChecked ?? new Date("2024-01-01T00:00:00.000Z"),
-        ...overrides,
-    });
+const createMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
+    checkInterval: overrides.checkInterval ?? 60_000,
+    history: overrides.history ?? [],
+    id: overrides.id ?? "monitor-default",
+    monitoring: overrides.monitoring ?? true,
+    responseTime: overrides.responseTime ?? 150,
+    retryAttempts: overrides.retryAttempts ?? 3,
+    status: overrides.status ?? "up",
+    timeout: overrides.timeout ?? 30_000,
+    type: overrides.type ?? "http",
+    url: overrides.url ?? "https://status.example.com/health",
+    lastChecked: overrides.lastChecked ?? new Date("2024-01-01T00:00:00.000Z"),
+    ...overrides,
+});
 
 const createSite = (
     identifier: string,
     monitors: readonly Monitor[],
     overrides: Partial<Site> = {}
-): Site =>
-    ({
-        identifier,
-        monitoring: overrides.monitoring ?? true,
-        monitors: overrides.monitors ?? [...monitors],
-        name: overrides.name ?? `Site ${identifier}`,
-    });
+): Site => ({
+    identifier,
+    monitoring: overrides.monitoring ?? true,
+    monitors: overrides.monitors ?? [...monitors],
+    name: overrides.name ?? `Site ${identifier}`,
+});
 
 const ensureSite = (site: Site | undefined): Site => {
     expect(site).toBeDefined();

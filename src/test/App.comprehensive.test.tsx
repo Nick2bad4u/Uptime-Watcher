@@ -14,6 +14,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
+import { objectAssign } from "ts-extras";
 
 import type { Theme } from "../theme/types";
 
@@ -29,15 +30,15 @@ import { darkTheme, lightTheme } from "../theme/themes";
 import { useTheme } from "../theme/useTheme";
 
 // Mock all required modules
-vi.mock(import('../hooks/useBackendFocusSync'), () => ({
+vi.mock("../hooks/useBackendFocusSync", () => ({
     useBackendFocusSync: vi.fn(),
 }));
 
-vi.mock(import('../hooks/useSelectedSite'), () => ({
+vi.mock("../hooks/useSelectedSite", () => ({
     useSelectedSite: vi.fn().mockReturnValue(null),
 }));
 
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         app: {
             started: vi.fn(),
@@ -54,23 +55,23 @@ vi.mock(import('../services/logger'), () => {
     };
 });
 
-vi.mock(import('../utils/cacheSync'), () => ({
+vi.mock("../utils/cacheSync", () => ({
     setupCacheSync: vi.fn(() => vi.fn()),
 }));
 
-vi.mock(import('../components/Header/Header'), () => ({
+vi.mock("../components/Header/Header", () => ({
     Header: () => <header data-testid="header">Header</header>,
 }));
 
-vi.mock(import('../components/Dashboard/SiteList/SiteList'), () => ({
+vi.mock("../components/Dashboard/SiteList/SiteList", () => ({
     SiteList: () => <div data-testid="site-list">Site List</div>,
 }));
 
-vi.mock(import('../components/AddSiteForm/AddSiteForm'), () => ({
+vi.mock("../components/AddSiteForm/AddSiteForm", () => ({
     AddSiteForm: () => <div data-testid="add-site-form">Add Site Form</div>,
 }));
 
-vi.mock(import('../components/Settings/Settings'), () => ({
+vi.mock("../components/Settings/Settings", () => ({
     Settings: ({ onClose }: { onClose: () => void }) => (
         <div data-testid="settings-modal">
             <button data-testid="close-settings" onClick={onClose}>
@@ -80,7 +81,7 @@ vi.mock(import('../components/Settings/Settings'), () => ({
     ),
 }));
 
-vi.mock(import('../components/SiteDetails/SiteDetails'), () => ({
+vi.mock("../components/SiteDetails/SiteDetails", () => ({
     SiteDetails: ({ onClose, site }: { onClose: () => void; site: any }) => (
         <div data-testid="site-details-modal">
             <span data-testid="site-details-identifier">{site.identifier}</span>
@@ -91,13 +92,13 @@ vi.mock(import('../components/SiteDetails/SiteDetails'), () => ({
     ),
 }));
 
-vi.mock(import('../stores/error/useErrorStore'));
-vi.mock(import('../stores/settings/useSettingsStore'));
-vi.mock(import('../stores/sites/useSitesStore'));
-vi.mock(import('../stores/ui/useUiStore'));
-vi.mock(import('../stores/updates/useUpdatesStore'));
-vi.mock(import('../theme/useTheme'));
-vi.mock(import('../services/NotificationPreferenceService'), () => ({
+vi.mock("../stores/error/useErrorStore");
+vi.mock("../stores/settings/useSettingsStore");
+vi.mock("../stores/sites/useSitesStore");
+vi.mock("../stores/ui/useUiStore");
+vi.mock("../stores/updates/useUpdatesStore");
+vi.mock("../theme/useTheme");
+vi.mock("../services/NotificationPreferenceService", () => ({
     NotificationPreferenceService: {
         initialize: vi.fn().mockResolvedValue(undefined),
         updatePreferences: vi.fn().mockResolvedValue(undefined),
@@ -112,7 +113,7 @@ const mockUseUpdatesStore = vi.mocked(useUpdatesStore);
 const mockUseTheme = vi.mocked(useTheme);
 
 // Mock environment functions
-vi.mock(import('../../shared/utils/environment'), () => ({
+vi.mock("../../shared/utils/environment", () => ({
     isDevelopment: vi.fn(() => false),
     isProduction: vi.fn(() => true),
 }));
@@ -329,7 +330,7 @@ describe("App Component - Comprehensive Coverage", () => {
         // Reset mutable store state between tests
         defaultSitesStore.sites = [];
         defaultSettingsStore.settings = { ...defaultSettings };
-        Object.assign(defaultUIStore, {
+        objectAssign(defaultUIStore, {
             setShowAddSiteModal: vi.fn(),
             setShowSettings: vi.fn(),
             setShowSiteDetails: vi.fn(),

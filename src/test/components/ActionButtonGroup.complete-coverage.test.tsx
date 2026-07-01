@@ -24,7 +24,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../theme/components/ThemedButton'), () => ({
+vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         onClick,
@@ -46,7 +46,7 @@ vi.mock(import('../../theme/components/ThemedButton'), () => ({
 
 // Mock SiteMonitoringButton
 vi.mock(
-    import('../../components/common/SiteMonitoringButton/SiteMonitoringButton'),
+    "../../components/common/SiteMonitoringButton/SiteMonitoringButton",
     () => ({
         SiteMonitoringButton: ({
             onStartSiteMonitoring,

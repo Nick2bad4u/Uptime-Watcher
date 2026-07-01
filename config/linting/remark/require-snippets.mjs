@@ -15,7 +15,7 @@ import * as path from "node:path";
  *
  * @returns {string} Normalized POSIX-style path.
  */
-const normalizePath = (filePath) => filePath.replaceAll('\\', "/");
+const normalizePath = (filePath) => filePath.replaceAll("\\", "/");
 
 /**
  * @typedef {object} RequiredSnippetEntry
@@ -40,8 +40,7 @@ const remarkRequireSnippets = (options = {}) => {
         }
 
         const originalPath =
-            (Array.isArray(file.history) &&
-                file.history.at(-1)) ||
+            (Array.isArray(file.history) && file.history.at(-1)) ||
             file.path ||
             "";
         const normalized = normalizePath(

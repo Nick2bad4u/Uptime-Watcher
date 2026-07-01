@@ -22,11 +22,11 @@ import { DEFAULT_SITE_TABLE_COLUMN_WIDTHS } from "../../stores/ui/useUiStore";
 let useSelectedSite: typeof import("../../hooks/useSelectedSite").useSelectedSite;
 let renderHook: typeof import("@testing-library/react").renderHook;
 
-vi.mock(import('../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(),
 }));
 
-vi.mock(import('../../stores/ui/useUiStore'), async () => {
+vi.mock("../../stores/ui/useUiStore", async () => {
     const actual = await vi.importActual<
         typeof import("../../stores/ui/useUiStore")
     >("../../stores/ui/useUiStore");

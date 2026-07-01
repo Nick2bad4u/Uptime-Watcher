@@ -106,8 +106,7 @@ describe("useUpdatesStore (strict coverage)", () => {
 
     it("subscribes to update status events and updates state", async () => {
         let capturedListener:
-            | ((status: UpdateStatusEventData) => void)
-            | undefined;
+            ((status: UpdateStatusEventData) => void) | undefined;
 
         const cleanupSpy = vi.fn();
         onUpdateStatusMock.mockImplementationOnce(async (listener) => {

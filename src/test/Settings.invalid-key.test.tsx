@@ -11,7 +11,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { act, render, screen, within } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
-import { objectKeys, safeCastTo  } from "ts-extras";
+import { objectKeys, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ThemeName } from "../theme/types";
@@ -20,7 +20,7 @@ import { Settings } from "../components/Settings/Settings";
 import { logger } from "../services/logger";
 
 // Mock constants
-vi.mock(import('../constants'), () => ({
+vi.mock("../constants", () => ({
     ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 100,
     HISTORY_LIMIT_OPTIONS: [
@@ -39,7 +39,7 @@ vi.mock(import('../constants'), () => ({
 }));
 
 // Mock logger
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -87,9 +87,9 @@ const selectorAwareUseSitesStore = vi.fn(
         selector?: (state: UnknownRecord) => unknown,
         _equalityFn?: (a: unknown, b: unknown) => boolean
     ) =>
-        (typeof selector === "function"
+        typeof selector === "function"
             ? selector(safeCastTo<UnknownRecord>(mockUseStore))
-            : mockUseStore)
+            : mockUseStore
 );
 
 // Mock the theme hook
@@ -212,7 +212,7 @@ const mockUseTheme = {
 };
 
 // Mock themed components
-vi.mock(import('../theme/components'), () => ({
+vi.mock("../theme/components", () => ({
     StatusIndicator: ({
         children,
         ...props
@@ -276,14 +276,14 @@ vi.mock(import('../theme/components'), () => ({
 }));
 
 // Mock the stores
-vi.mock(import('../stores'), () => ({
+vi.mock("../stores", () => ({
     useErrorStore: () => mockUseStore,
     useSettingsStore: () => mockUseStore,
     useSitesStore: selectorAwareUseSitesStore,
 }));
 
 // Mock the theme hook
-vi.mock(import('../theme/useTheme'), () => ({
+vi.mock("../theme/useTheme", () => ({
     useTheme: () => mockUseTheme,
     useThemeClasses: () => ({
         getBackgroundClass: vi.fn(),
@@ -307,7 +307,7 @@ vi.mock(import('../theme/useTheme'), () => ({
 }));
 
 const confirmMock = vi.fn();
-vi.mock(import('../hooks/ui/useConfirmDialog'), () => ({
+vi.mock("../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => confirmMock,
 }));
 
@@ -337,9 +337,9 @@ const getSettingsModal = (): HTMLElement => {
 const createAllowedSettingsKeySet = (): ReadonlySet<
     keyof typeof mockUseStore.settings
 > => {
-    const keys = safeCastTo<(keyof typeof mockUseStore.settings)[]>(objectKeys(
-        mockUseStore.settings
-    ));
+    const keys = safeCastTo<(keyof typeof mockUseStore.settings)[]>(
+        objectKeys(mockUseStore.settings)
+    );
 
     return new Set<keyof typeof mockUseStore.settings>(keys);
 };
@@ -366,8 +366,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
         // Ensure the modal structure matches expectations after recent UI updates
         getSettingsModal();
 
-        // We need to simulate the internal handleSettingChange call Since we can't directly access the method,
-        // we'll test it by creating a scenario where the method would be called with an invalid key
+        // We need to simulate the internal handleSettingChange call Since we can't directly access the method, we'll test it by creating a scenario where the method would be called with an invalid key
 
         // The key insight is that the component's handleSettingChange method is called from the onChange handlers.
         // We need to modify the component to allow testing of invalid keys, or use a different approach.
@@ -425,9 +424,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
             const validKey = "systemNotificationsEnabled";
 
             // Simulate the logic from handleSettingChange with valid key
-            if (
-                !allowedKeys.has(validKey)
-            ) {
+            if (!allowedKeys.has(validKey)) {
                 logger.warn(
                     "Attempted to update invalid settings key",
                     validKey

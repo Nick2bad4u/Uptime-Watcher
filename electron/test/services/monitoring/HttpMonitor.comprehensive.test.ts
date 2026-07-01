@@ -288,17 +288,17 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() => { httpMonitor.updateConfig({ timeout: -1000 }); }).toThrow(
-                "Invalid timeout: must be a positive number"
-            );
-            expect(() => { httpMonitor.updateConfig({ timeout: 0 }); }).toThrow(
-                "Invalid timeout: must be a positive number"
-            );
-            expect(() =>
-                { httpMonitor.updateConfig({
+            expect(() => {
+                httpMonitor.updateConfig({ timeout: -1000 });
+            }).toThrow("Invalid timeout: must be a positive number");
+            expect(() => {
+                httpMonitor.updateConfig({ timeout: 0 });
+            }).toThrow("Invalid timeout: must be a positive number");
+            expect(() => {
+                httpMonitor.updateConfig({
                     timeout: "invalid" as any,
-                }); }
-            ).toThrow("Invalid timeout: must be a positive number");
+                });
+            }).toThrow("Invalid timeout: must be a positive number");
         });
 
         it("should throw error for invalid userAgent", async ({
@@ -310,11 +310,11 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() =>
-                { httpMonitor.updateConfig({
+            expect(() => {
+                httpMonitor.updateConfig({
                     userAgent: 123 as any,
-                }); }
-            ).toThrow("Invalid userAgent: must be a string");
+                });
+            }).toThrow("Invalid userAgent: must be a string");
         });
     });
 

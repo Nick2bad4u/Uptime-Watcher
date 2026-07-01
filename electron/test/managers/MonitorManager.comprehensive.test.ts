@@ -954,11 +954,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             };
 
             const transactionError = new Error("transaction failed");
-            mockDependencies.databaseService.executeTransaction.mockImplementationOnce(
-                async () => {
-                    throw transactionError;
-                }
-            );
+            mockDependencies[
+                "databaseService"
+            ].executeTransaction.mockImplementationOnce(async () => {
+                throw transactionError;
+            });
 
             await expect(
                 manager.setupSiteForMonitoring(siteRequiringRemediation)

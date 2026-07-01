@@ -4,8 +4,8 @@
  * @remarks
  * This module provides utilities specifically designed to handle the complex
  * modal workflows and state management patterns used in the Uptime Watcher
- * Electron app. These utilities ensure reliable test execution by
- * providing proper wait strategies, element selection, and error handling.
+ * Electron app. These utilities ensure reliable test execution by providing
+ * proper wait strategies, element selection, and error handling.
  */
 
 import type { Locator, Page } from "@playwright/test";
@@ -143,8 +143,7 @@ export interface CreateSiteOptions {
     /** Optional collection of monitor-specific dynamic fields to populate. */
     readonly dynamicFields?: readonly DynamicFieldInput[];
     /**
-     * Optional monitor type identifier supported by the app (defaults
-     * to HTTP).
+     * Optional monitor type identifier supported by the app (defaults to HTTP).
      */
     readonly monitorType?: string;
     /** Optional site name; a unique name is generated when omitted. */
@@ -267,16 +266,17 @@ export async function waitForAppInitialization(
         timeout: WAIT_TIMEOUTS.SHORT,
     });
 
-    await expect.soft(
-        page
-            .getByRole("banner")
-            .getByRole("button", { name: /add (new )?site/i })
-    ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    await expect
+        .soft(
+            page
+                .getByRole("banner")
+                .getByRole("button", { name: /add (new )?site/i })
+        )
+        .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 }
 
 /**
- * Removes every persisted site in the app by calling the electron
- * bridge.
+ * Removes every persisted site in the app by calling the electron bridge.
  *
  * @remarks
  * When the tests are running against one-off, isolated userData directories,
@@ -392,9 +392,9 @@ export async function waitForDashboard(
     page: Page,
     timeout: number = WAIT_TIMEOUTS.LONG
 ): Promise<void> {
-    await expect.soft(
-        page.getByRole("region", { name: /monitoring overview/iv })
-    ).toBeVisible({ timeout });
+    await expect
+        .soft(page.getByRole("region", { name: /monitoring overview/iv }))
+        .toBeVisible({ timeout });
 }
 
 /**
@@ -412,7 +412,9 @@ export async function openAddSiteModal(page: Page): Promise<void> {
     const addSiteButton = page
         .getByRole("banner")
         .getByRole("button", { name: /add (new )?site/i });
-    await expect.soft(addSiteButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    await expect
+        .soft(addSiteButton)
+        .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
     // Short debounce to allow the animated header control to settle before
     // interaction. Using a targeted timeout here has proven more robust than
     // repeated trial clicks for this specific control.
@@ -566,7 +568,10 @@ async function waitForMonitorCountSoft(
         const electronCount = await getElectronSiteCount(page).catch(
             () => null
         );
-        lastCount = typeof electronCount === "number" ? electronCount : (await getMonitorCountFromDom(page).catch(() => null));
+        lastCount =
+            typeof electronCount === "number"
+                ? electronCount
+                : await getMonitorCountFromDom(page).catch(() => null);
 
         if (lastCount === expectedCount) {
             return true;
@@ -843,8 +848,9 @@ export async function waitForSiteMonitoringHydration(
                 statusDisplay.querySelectorAll(
                     '[data-testid^="monitor-status-"]'
                 ).length > 0;
-            const activeMatch =
-                /(\d+)\/1 active/v.exec(statusDisplay.textContent);
+            const activeMatch = /(\d+)\/1 active/v.exec(
+                statusDisplay.textContent
+            );
 
             return Boolean(activeMatch) && hasMonitorEntries;
         },
@@ -888,9 +894,11 @@ export async function openSiteDetailsSettingsTab(
 
     await settingsButton.click({ timeout: WAIT_TIMEOUTS.LONG });
 
-    await expect.soft(siteDetailsModal.getByTestId("settings-tab")).toBeVisible({
-        timeout: WAIT_TIMEOUTS.MEDIUM,
-    });
+    await expect
+        .soft(siteDetailsModal.getByTestId("settings-tab"))
+        .toBeVisible({
+            timeout: WAIT_TIMEOUTS.MEDIUM,
+        });
 }
 
 /**
@@ -967,26 +975,28 @@ export async function ensureSiteDetailsHeaderState(
         return;
     }
 
-    await expect.soft(async () => {
-        const toggleButton = siteDetailsModal
-            .getByRole("button", { name: toggleButtonName })
-            .first();
-        await toggleButton.waitFor({
-            state: "attached",
-            timeout: WAIT_TIMEOUTS.MEDIUM,
-        });
-        const didClick = await toggleButton
-            .evaluate((node) => {
-                (node as HTMLButtonElement).click();
-                return true as const;
-            })
-            .catch(() => false);
-        if (!didClick) {
-            throw new Error(
-                `Site details header toggle '${toggleButtonName}' could not be activated via DOM click.`
-            );
-        }
-    }).toPass({ timeout: WAIT_TIMEOUTS.LONG });
+    await expect
+        .soft(async () => {
+            const toggleButton = siteDetailsModal
+                .getByRole("button", { name: toggleButtonName })
+                .first();
+            await toggleButton.waitFor({
+                state: "attached",
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+            });
+            const didClick = await toggleButton
+                .evaluate((node) => {
+                    (node as HTMLButtonElement).click();
+                    return true as const;
+                })
+                .catch(() => false);
+            if (!didClick) {
+                throw new Error(
+                    `Site details header toggle '${toggleButtonName}' could not be activated via DOM click.`
+                );
+            }
+        })
+        .toPass({ timeout: WAIT_TIMEOUTS.LONG });
 
     await expect
         .poll(
@@ -1035,8 +1045,12 @@ export async function openSettingsModal(page: Page): Promise<void> {
         .first();
 
     await settingsButton.scrollIntoViewIfNeeded().catch(() => undefined);
-    await page.evaluate(() => { window.scrollTo({ left: 0, top: 0 }); });
-    await expect.soft(settingsButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    await page.evaluate(() => {
+        window.scrollTo({ left: 0, top: 0 });
+    });
+    await expect
+        .soft(settingsButton)
+        .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
     try {
         await settingsButton.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
@@ -1189,7 +1203,9 @@ export async function waitForConfirmDialogRequest(
         );
         const confirmLabel = confirmElement?.textContent?.trim() ?? "Confirm";
         const confirmClassName = confirmElement?.className ?? "";
-        const tone: "danger" | "default" = confirmClassName.includes('themed-button--error')
+        const tone: "danger" | "default" = confirmClassName.includes(
+            "themed-button--error"
+        )
             ? "danger"
             : "default";
 
@@ -1218,7 +1234,8 @@ export async function waitForConfirmDialogRequest(
             message,
             title,
             tone,
-            ...(typeof details === "string" && details.length > 0 && { details }),
+            ...(typeof details === "string" &&
+                details.length > 0 && { details }),
         };
     });
 }

@@ -282,8 +282,8 @@ export const MonitoringService: MonitoringServiceContract = {
      * Ensures the preload bridge is ready before invoking monitoring APIs.
      *
      * @remarks
-     * Call this during app startup to avoid paying the bridge
-     * initialization cost on the first monitoring operation.
+     * Call this during app startup to avoid paying the bridge initialization
+     * cost on the first monitoring operation.
      *
      * @returns A promise that resolves when the `monitoring` bridge is ready
      *   for use.

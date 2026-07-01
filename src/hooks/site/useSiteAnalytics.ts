@@ -181,11 +181,13 @@ function calculateDowntimePeriods(
         const record = filteredHistory[i];
         if (record) {
             if (record.status === "down") {
-                const { downtimeEnd: nextDowntimeEnd, downtimeStart: nextDowntimeStart } =
-                    startOrExtendDowntimeWindow({
-                        downtimeEnd,
-                        record,
-                    });
+                const {
+                    downtimeEnd: nextDowntimeEnd,
+                    downtimeStart: nextDowntimeStart,
+                } = startOrExtendDowntimeWindow({
+                    downtimeEnd,
+                    record,
+                });
                 downtimeEnd = nextDowntimeEnd;
                 downtimeStart = nextDowntimeStart;
             } else {
@@ -240,9 +242,7 @@ function calculateResponseMetrics(filteredHistory: readonly StatusHistory[]): {
         responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
 
     // Calculate percentiles
-    const sortedResponseTimes = [...responseTimes].toSorted(
-        (a, b) => a - b
-    );
+    const sortedResponseTimes = [...responseTimes].toSorted((a, b) => a - b);
     const getPercentile = (p: number): number => {
         // Ensure p is between 0 and 1
         const safeP = Math.max(0, Math.min(1, p));

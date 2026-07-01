@@ -14,10 +14,7 @@ import { isDefined } from "ts-extras";
 export function hasAsciiControlCharacters(value: string): boolean {
     for (const char of value) {
         const codePoint = char.codePointAt(0);
-        if (
-            isDefined(codePoint) &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
+        if (isDefined(codePoint) && (codePoint < 0x20 || codePoint === 0x7f)) {
             return true;
         }
     }

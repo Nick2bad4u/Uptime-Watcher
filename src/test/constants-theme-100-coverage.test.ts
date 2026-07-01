@@ -7,7 +7,7 @@
  */
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
-import { arrayFirst, arrayJoin, objectHasOwn, objectValues    } from "ts-extras";
+import { arrayFirst, arrayJoin, objectHasOwn, objectValues } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import constants and utility functions
@@ -22,7 +22,7 @@ import {
 } from "../constants";
 
 // Mock any external dependencies
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),

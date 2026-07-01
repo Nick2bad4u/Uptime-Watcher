@@ -6,7 +6,7 @@
 import type { Monitor, StatusHistory } from "@shared/types";
 
 import { renderHook } from "@testing-library/react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Theme } from "../theme/types";
@@ -19,7 +19,7 @@ import {
 } from "../hooks/site/useSiteAnalytics";
 
 // Mock constants to avoid dependency issues
-vi.mock(import('../constants'), () => ({
+vi.mock("../constants", () => ({
     CHART_TIME_PERIODS: {
         "1h": 60 ** 2 * 1000,
         "7d": 7 * 24 * 60 * 60 * 1000,
@@ -29,7 +29,7 @@ vi.mock(import('../constants'), () => ({
     },
 }));
 
-vi.mock(import('../utils/time'), () => ({
+vi.mock("../utils/time", () => ({
     TIME_PERIOD_LABELS: {
         "1h": "Last Hour",
         "7d": "Last 7 Days",
@@ -399,11 +399,13 @@ describe(useSiteAnalytics, () => {
             );
             // Duration should be t1 - t0 (1000ms)
             expect(result.current.downtimePeriods).toHaveLength(1);
-            expect(arrayFirst(result.current.downtimePeriods)?.duration).toBe(1000);
-            // Mutated (end + start) would yield ~ t1 + t0 (a huge number, certainly > now)
-            expect(arrayFirst(result.current.downtimePeriods)?.duration).toBeLessThan(
-                10_000
+            expect(arrayFirst(result.current.downtimePeriods)?.duration).toBe(
+                1000
             );
+            // Mutated (end + start) would yield ~ t1 + t0 (a huge number, certainly > now)
+            expect(
+                arrayFirst(result.current.downtimePeriods)?.duration
+            ).toBeLessThan(10_000);
         });
 
         it("should compute MTTR as totalDowntime / count (kills multiplication mutation)", async ({
@@ -748,7 +750,10 @@ describe(useSiteAnalytics, () => {
                 ],
             };
 
-            rerender({ monitor: newMonitor, timeRange: safeCastTo<TimePeriod>("24h") });
+            rerender({
+                monitor: newMonitor,
+                timeRange: safeCastTo<TimePeriod>("24h"),
+            });
 
             expect(result.current).not.toBe(firstResult);
             expect(result.current.totalChecks).toBe(
@@ -1086,7 +1091,9 @@ describe(useChartData, () => {
         rerender({ monitor: newMonitor, theme: mockTheme });
 
         expect(result.current).not.toBe(firstResult);
-        expect(arrayFirst(result.current.lineChartData.datasets)?.data).toHaveLength(4);
+        expect(
+            arrayFirst(result.current.lineChartData.datasets)?.data
+        ).toHaveLength(4);
     });
 });
 

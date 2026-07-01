@@ -26,9 +26,9 @@ import { themes } from "../../../../theme/themes";
 import { useTheme } from "../../../../theme/useTheme";
 
 // Mock dependencies
-vi.mock(import('../../../../stores/settings/useSettingsStore'));
-vi.mock(import('../../../../services/logger'));
-vi.mock(import('../../../../theme/useTheme'), () => ({
+vi.mock("../../../../stores/settings/useSettingsStore");
+vi.mock("../../../../services/logger");
+vi.mock("../../../../theme/useTheme", () => ({
     useTheme: vi.fn(),
     useThemeClasses: vi.fn(() => ({
         getBackgroundClass: vi.fn((variant: string) => ({
@@ -64,7 +64,7 @@ type ThemedTextMockProperties = PropsWithChildren<
     HTMLAttributes<HTMLSpanElement>
 >;
 
-vi.mock(import('../../../../theme/components'), () => ({
+vi.mock("../../../../theme/components", () => ({
     StatusIndicator: ({
         children,
         ...props
@@ -100,7 +100,7 @@ type DetailLabelMockProperties = PropsWithChildren<
     HTMLAttributes<HTMLDivElement>
 >;
 
-vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
+vi.mock("../../../../components/common/MonitorUiComponents", () => ({
     DetailLabel: ({ children, ...props }: DetailLabelMockProperties) => (
         <div data-testid="detail-label" {...props}>
             {children}
@@ -481,8 +481,9 @@ describe(HistoryTab, () => {
 
             const monitor = createMockMonitor(1);
             const timestamp = Date.now();
-            if (arrayFirst(monitor.history)) {
-                arrayFirst(monitor.history).timestamp = timestamp;
+            const historyEntry = arrayFirst(monitor.history);
+            if (historyEntry) {
+                historyEntry.timestamp = timestamp;
             }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -502,8 +503,9 @@ describe(HistoryTab, () => {
             annotate("Type: Business Logic", "type");
 
             const monitor = createMockMonitor(1);
-            if (arrayFirst(monitor.history)) {
-                arrayFirst(monitor.history).responseTime = 250;
+            const historyEntry = arrayFirst(monitor.history);
+            if (historyEntry) {
+                historyEntry.responseTime = 250;
             }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -526,8 +528,9 @@ describe(HistoryTab, () => {
             annotate("Type: Business Logic", "type");
 
             const monitor = createMockMonitor(1);
-            if (arrayFirst(monitor.history)) {
-                arrayFirst(monitor.history).status = "up";
+            const historyEntry = arrayFirst(monitor.history);
+            if (historyEntry) {
+                historyEntry.status = "up";
             }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);

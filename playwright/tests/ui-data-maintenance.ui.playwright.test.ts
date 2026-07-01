@@ -75,20 +75,23 @@ test.describe(
 
                 await exportButton.click();
 
-                await expect.soft(exportButton).not.toHaveClass(
-                    /themed-button--loading/v,
-                    { timeout: WAIT_TIMEOUTS.LONG }
-                );
+                await expect
+                    .soft(exportButton)
+                    .not.toHaveClass(/themed-button--loading/v, {
+                        timeout: WAIT_TIMEOUTS.LONG,
+                    });
 
-                await expect.soft(
-                    page.getByText("Failed to download SQLite backup")
-                ).toHaveCount(0);
+                await expect
+                    .soft(page.getByText("Failed to download SQLite backup"))
+                    .toHaveCount(0);
 
-                await expect.soft(
-                    page.getByText(
-                        "Manage data exports and advanced utilities."
+                await expect
+                    .soft(
+                        page.getByText(
+                            "Manage data exports and advanced utilities."
+                        )
                     )
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
             }
         );
 
@@ -125,9 +128,9 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await expect.soft(
-                    page.getByText("Failed to download SQLite backup")
-                ).toHaveCount(0);
+                await expect
+                    .soft(page.getByText("Failed to download SQLite backup"))
+                    .toHaveCount(0);
             }
         );
 
@@ -143,10 +146,11 @@ test.describe(
 
                 await refreshButton.click();
 
-                await expect.soft(refreshButton).not.toHaveClass(
-                    /themed-button--loading/v,
-                    { timeout: WAIT_TIMEOUTS.LONG }
-                );
+                await expect
+                    .soft(refreshButton)
+                    .not.toHaveClass(/themed-button--loading/v, {
+                        timeout: WAIT_TIMEOUTS.LONG,
+                    });
 
                 await expect.soft(page.getByText("Sync complete")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,

@@ -51,7 +51,7 @@ describe("httpMonitorStringUtils", () => {
 
         it("returns null for non-string or blank values", () => {
             expect(getTrimmedNonEmptyString(123)).toBeNull();
-            expect(getTrimmedNonEmptyString(' '.repeat(3))).toBeNull();
+            expect(getTrimmedNonEmptyString(" ".repeat(3))).toBeNull();
         });
     });
 
@@ -73,7 +73,7 @@ describe("httpMonitorStringUtils", () => {
             const result = resolveRequiredMonitorStringContext({
                 errorMessage: "missing",
                 onValue: (value) => ({ keyword: value }),
-                value: ' '.repeat(3),
+                value: " ".repeat(3),
             });
 
             expect(result.kind).toBe("error");

@@ -17,9 +17,9 @@ No options.
 
 ```ts
 class WindowService {
-  createMainWindow() {
-    this.mainWindow.webContents.openDevTools();
-  }
+ createMainWindow() {
+  this.mainWindow.webContents.openDevTools();
+ }
 }
 ```
 
@@ -27,8 +27,8 @@ class WindowService {
 
 ```ts
 class WindowService {
-  loadDevelopmentContent() {
-    this.mainWindow.webContents.openDevTools();
-  }
+ loadDevelopmentContent() {
+  this.mainWindow.webContents.openDevTools();
+ }
 }
 ```

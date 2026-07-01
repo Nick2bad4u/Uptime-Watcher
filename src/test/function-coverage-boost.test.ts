@@ -504,7 +504,7 @@ describe("Function Coverage Boost Tests", () => {
 
             vi.resetModules();
 
-            vi.doMock(import('../utils/cache'), () => ({
+            vi.doMock("../utils/cache", () => ({
                 AppCaches: {
                     general: createCache(),
                     monitorTypes: createCache(),
@@ -512,7 +512,7 @@ describe("Function Coverage Boost Tests", () => {
                 },
             }));
 
-            vi.doMock(import('@shared/utils/errorHandling'), () => ({
+            vi.doMock("@shared/utils/errorHandling", () => ({
                 withUtilityErrorHandling: vi.fn(
                     async <T>(
                         operation: () => Promise<T>,
@@ -528,7 +528,7 @@ describe("Function Coverage Boost Tests", () => {
                 ),
             }));
 
-            vi.doMock(import('../stores/monitor/useMonitorTypesStore'), () => {
+            vi.doMock("../stores/monitor/useMonitorTypesStore", () => {
                 const loadMonitorTypes = vi.fn().mockResolvedValue(undefined);
                 const state = {
                     clearError: vi.fn(),
@@ -554,7 +554,7 @@ describe("Function Coverage Boost Tests", () => {
                 };
             });
 
-            vi.doMock(import('../services/MonitorTypesService'), () => ({
+            vi.doMock("../services/MonitorTypesService", () => ({
                 MonitorTypesService: {
                     formatMonitorDetail: vi.fn().mockResolvedValue("detail"),
                     formatMonitorTitleSuffix: vi

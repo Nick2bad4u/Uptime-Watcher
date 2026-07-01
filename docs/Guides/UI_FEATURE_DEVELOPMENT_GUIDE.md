@@ -20,20 +20,20 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 ## Table of Contents
 
-1. [Architecture Overview](#architecture-overview)
-2. [Validation Best Practices](#validation-best-practices)
-3. [Development Process](#development-process)
-4. [Component Creation Guidelines](#component-creation-guidelines)
-5. [Component Props Standards](#component-props-standards)
-6. [State Management](#state-management)
-7. [Event Handling](#event-handling)
-8. [Modal Development](#modal-development)
-9. [Reusable Components](#reusable-components)
-10. [Testing Strategy](#testing-strategy)
-11. [Documentation Requirements](#documentation-requirements)
-12. [Common Pitfalls](#common-pitfalls)
-13. [Real-Time Updates & Event Integration](#real-time-updates--event-integration)
-14. [Summary](#summary)
+- [Architecture Overview](#architecture-overview)
+- [Validation Best Practices](#validation-best-practices)
+- [Development Process](#development-process)
+- [Component Creation Guidelines](#component-creation-guidelines)
+- [Component Props Standards](#component-props-standards)
+- [State Management](#state-management)
+- [Event Handling](#event-handling)
+- [Modal Development](#modal-development)
+- [Reusable Components](#reusable-components)
+- [Testing Strategy](#testing-strategy)
+- [Documentation Requirements](#documentation-requirements)
+- [Common Pitfalls](#common-pitfalls)
+- [Real-Time Updates & Event Integration](#real-time-updates--event-integration)
+- [Summary](#summary)
 
 ## Architecture Overview
 

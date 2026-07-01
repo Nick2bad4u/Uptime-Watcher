@@ -10,7 +10,7 @@
  * calculations.
  */
 
-import type { Monitor, Site } from "@shared/types";
+import type { Site } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

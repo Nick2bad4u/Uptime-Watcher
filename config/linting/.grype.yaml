@@ -26,15 +26,15 @@ db:
     cache-dir: "~/Library/Caches/grype/db"
 
     # Database freshness requirements (5 days maximum age)
-    max-allowed-built-age: 120h0m0s
+    max-allowed-built-age: "120h0m0s"
 
-    max-update-check-frequency: 2h0m0s # maximum update check frequency
+    max-update-check-frequency: "2h0m0s" # maximum update check frequency
 
     # Updated URL for latest database schema and features
     # Update check requirements and timeouts
     require-update-check: false
-    update-available-timeout: 30s # timeout for update availability check
-    update-download-timeout: 5m0s # timeout for database download
+    update-available-timeout: "30s" # timeout for update availability check
+    update-download-timeout: "5m0s" # timeout for database download
     update-url: "https://grype.anchore.io/databases"
 
     validate-age: true
@@ -160,7 +160,7 @@ external-sources:
     # Maven repository search with optimized rate limiting
     maven:
         base-url: "https://search.maven.org/solrsearch/select"
-        rate-limit: 200ms # optimized for better performance
+        rate-limit: "200ms" # optimized for better performance
 
         search-maven-upstream: true
 fail-on-severity: "" # negligible, low, medium, high, critical
@@ -318,6 +318,7 @@ vex-add: [] # VEX statuses to consider as ignored rules
 
 # VEX (Vulnerability Exploitability eXchange) configuration for modern vulnerability management
 vex-documents: []
+
 # Modern usage examples and best practices:
 #
 # Basic vulnerability scan with risk prioritization:

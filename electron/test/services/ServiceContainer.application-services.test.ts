@@ -10,7 +10,7 @@ import { ServiceContainer } from "../../services/ServiceContainer.js";
 
 // Mock the TypedEventBus module with factory function
 vi.mock("../../events/TypedEventBus.js", () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Required for mock
     const { EventEmitter } = require("node:events");
 
     // eslint-disable-next-line unicorn/prefer-event-target -- Tests rely on Node.js EventEmitter semantics for parity with production TypedEventBus.

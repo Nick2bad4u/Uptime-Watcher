@@ -12,7 +12,7 @@ import {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "@shared/utils/siteStatus";
-import { arrayFirst, isEmpty, safeCastTo   } from "ts-extras";
+import { arrayFirst, isEmpty, safeCastTo } from "ts-extras";
 import { describe, expect, it } from "vitest";
 /**
  * Site Status Utility Tests
@@ -165,29 +165,23 @@ describe("siteStatus exports", () => {
 
 describe("siteStatus Property-based Tests", () => {
     // Arbitraries for test data generation
-    const monitorStatusArb = safeCastTo<fc.Arbitrary<MonitorStatus>>(fc.constantFrom(
-        "up",
-        "down",
-        "pending",
-        "paused"
-    ));
-    const siteStatusArb = safeCastTo<fc.Arbitrary<SiteStatus>>(fc.constantFrom(
-        "up",
-        "down",
-        "pending",
-        "paused",
-        "mixed",
-        "unknown"
-    ));
+    const monitorStatusArb = safeCastTo<fc.Arbitrary<MonitorStatus>>(
+        fc.constantFrom("up", "down", "pending", "paused")
+    );
+    const siteStatusArb = safeCastTo<fc.Arbitrary<SiteStatus>>(
+        fc.constantFrom("up", "down", "pending", "paused", "mixed", "unknown")
+    );
 
     const monitorArb = fc.record({
         monitoring: fc.boolean(),
         status: monitorStatusArb,
     });
 
-    const siteForStatusArb = safeCastTo<fc.Arbitrary<SiteForStatus>>(fc.record({
-        monitors: fc.array(monitorArb, { maxLength: 10, minLength: 0 }),
-    }));
+    const siteForStatusArb = safeCastTo<fc.Arbitrary<SiteForStatus>>(
+        fc.record({
+            monitors: fc.array(monitorArb, { maxLength: 10, minLength: 0 }),
+        })
+    );
 
     describe(calculateSiteMonitoringStatus, () => {
         test.prop([siteForStatusArb])(
@@ -513,7 +507,9 @@ describe("siteStatus Property-based Tests", () => {
                         break;
                     }
                     case "unknown": {
-                        expect(lowerDescription).toMatch(/no monitors|unknown/v);
+                        expect(lowerDescription).toMatch(
+                            /no monitors|unknown/v
+                        );
 
                         break;
                     }

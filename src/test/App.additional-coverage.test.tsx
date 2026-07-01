@@ -19,13 +19,14 @@ import {
     type MockedFunction,
 } from "vitest";
 import "@testing-library/jest-dom";
-import React from "react";
+import * as React from "react";
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
 
 import { isDevelopment } from "@shared/utils/environment";
+import { objectAssign } from "ts-extras";
 
 import { App } from "../App";
 import { defaultSettings } from "../stores/settings/state";
@@ -400,7 +401,7 @@ describe("App Additional Coverage Tests", () => {
         unsubscribeFromStatusUpdatesMock = vi.fn();
 
         // Reset all mock state to defaults
-        Object.assign(mockUpdatesStoreState, {
+        objectAssign(mockUpdatesStoreState, {
             updateStatus: "idle" as const,
             updateError: undefined,
             applyUpdateStatus: vi.fn(),
@@ -410,7 +411,7 @@ describe("App Additional Coverage Tests", () => {
             subscribeToStatusUpdates: vi.fn(),
         });
 
-        Object.assign(mockSitesStoreState, {
+        objectAssign(mockSitesStoreState, {
             sites: [
                 {
                     id: "1",
@@ -462,14 +463,14 @@ describe("App Additional Coverage Tests", () => {
             setSelectedMonitorId: vi.fn(),
         });
 
-        Object.assign(mockErrorStoreState, {
+        objectAssign(mockErrorStoreState, {
             lastError: undefined,
             isLoading: false,
             setIsLoading: vi.fn(),
             clearError: vi.fn(),
         });
 
-        Object.assign(mockUIStoreState, {
+        objectAssign(mockUIStoreState, {
             showAddSiteModal: false,
             showSettings: false,
             showSiteDetails: false,
@@ -498,7 +499,7 @@ describe("App Additional Coverage Tests", () => {
             syncActiveSiteDetailsTab: vi.fn(),
         });
 
-        Object.assign(mockSettingsStoreState, {
+        objectAssign(mockSettingsStoreState, {
             initializeSettings: initializeSettingsMock,
             resetSettings: vi.fn(),
             settings: { ...defaultSettings },
@@ -516,7 +517,7 @@ describe("App Additional Coverage Tests", () => {
                 : mockSettingsStoreState
         );
 
-        Object.assign(mockThemeState, {
+        objectAssign(mockThemeState, {
             isDark: false,
             toggleTheme: vi.fn(),
         });

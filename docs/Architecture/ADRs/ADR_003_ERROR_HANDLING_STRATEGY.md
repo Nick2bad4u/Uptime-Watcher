@@ -18,17 +18,17 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Error Handling Layers](#error-handling-layers)
-5. [Error Categories and Handling](#error-categories-and-handling)
-6. [Monitoring and Observability](#monitoring-and-observability)
-7. [Consequences](#consequences)
-8. [Quality Assurance](#quality-assurance)
-9. [Implementation Guidelines](#implementation-guidelines)
-10. [Compliance](#compliance)
-11. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Error Handling Layers](#error-handling-layers)
+- [Error Categories and Handling](#error-categories-and-handling)
+- [Monitoring and Observability](#monitoring-and-observability)
+- [Consequences](#consequences)
+- [Quality Assurance](#quality-assurance)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 
@@ -208,7 +208,8 @@ There are two supported patterns for constructing this context:
     async () => {
      const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
      getState().updateSettings({ historyLimit: sanitizedLimit });
-     const backendLimit = await SettingsService.updateHistoryLimit(sanitizedLimit);
+     const backendLimit =
+      await SettingsService.updateHistoryLimit(sanitizedLimit);
      // ...normalize and apply backendLimit...
     },
     {
@@ -224,7 +225,9 @@ There are two supported patterns for constructing this context:
       });
      },
      setLoading: (loading) => {
-      useErrorStore.getState().setOperationLoading("updateHistoryLimit", loading);
+      useErrorStore
+       .getState()
+       .setOperationLoading("updateHistoryLimit", loading);
      },
     }
    );

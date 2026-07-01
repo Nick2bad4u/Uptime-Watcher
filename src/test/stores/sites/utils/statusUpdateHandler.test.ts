@@ -9,6 +9,7 @@ import type { MonitorStatus, Site } from "@shared/types";
 import { StatusUpdateManager } from "../../../../stores/sites/utils/statusUpdateHandler";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { isDevelopment } from "@shared/utils/environment";
+import { objectAssign } from "ts-extras";
 import { EventsService } from "../../../../services/EventsService";
 import { logger } from "../../../../services/logger";
 
@@ -30,7 +31,7 @@ const mockConsole = {
     debug: vi.fn(),
 };
 
-Object.assign(console, mockConsole);
+objectAssign(console, mockConsole);
 
 // Mock EventsService
 vi.mock("../../../../services/EventsService", () => ({
@@ -270,9 +271,15 @@ describe("StatusUpdateHandler", () => {
 
             await manager.subscribe();
 
-            expect(mockEventsService.onMonitorStatusChanged).toHaveBeenCalledWith();
-            expect(mockEventsService.onMonitoringStarted).toHaveBeenCalledWith();
-            expect(mockEventsService.onMonitoringStopped).toHaveBeenCalledWith();
+            expect(
+                mockEventsService.onMonitorStatusChanged
+            ).toHaveBeenCalledWith();
+            expect(
+                mockEventsService.onMonitoringStarted
+            ).toHaveBeenCalledWith();
+            expect(
+                mockEventsService.onMonitoringStopped
+            ).toHaveBeenCalledWith();
         });
 
         it("should cleanup existing subscriptions before subscribing again", async ({
@@ -333,7 +340,9 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(manager.isSubscribed()).toBeFalsy();
-            expect(() => { manager.unsubscribe(); }).not.toThrow();
+            expect(() => {
+                manager.unsubscribe();
+            }).not.toThrow();
             expect(manager.isSubscribed()).toBeFalsy();
         });
     });

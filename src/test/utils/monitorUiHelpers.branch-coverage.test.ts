@@ -7,7 +7,7 @@
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { MockInstance } from "vitest";
 
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 /**
@@ -22,7 +22,7 @@ const createMonitorConfig = (
     const baseConfig: MonitorTypeConfig = {
         description: overrides.description ?? `${type.toUpperCase()} monitor`,
         displayName: overrides.displayName ?? type.toUpperCase(),
-        fields: overrides.fields ?? (safeCastTo<MonitorTypeConfig["fields"]>([])),
+        fields: overrides.fields ?? safeCastTo<MonitorTypeConfig["fields"]>([]),
         type,
         version: overrides.version ?? "1.0.0",
     };

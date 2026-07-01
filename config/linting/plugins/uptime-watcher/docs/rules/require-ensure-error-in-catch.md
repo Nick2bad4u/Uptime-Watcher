@@ -16,9 +16,9 @@ This rule has no options.
 
 ```ts
 try {
-    throw new Error("boom");
+ throw new Error("boom");
 } catch (error) {
-    console.log(error.message);
+ console.log(error.message);
 }
 ```
 
@@ -26,9 +26,9 @@ try {
 
 ```ts
 try {
-    throw new Error("boom");
+ throw new Error("boom");
 } catch (error) {
-    ensureError(error);
-    console.log(error.message);
+ ensureError(error);
+ console.log(error.message);
 }
 ```

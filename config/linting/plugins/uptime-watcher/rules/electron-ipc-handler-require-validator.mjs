@@ -96,7 +96,6 @@ export const electronIpcHandlerRequireValidatorRule = {
                         node: node.callee,
                     });
                 }
-
             },
         };
     },

@@ -60,8 +60,7 @@ export interface RemoteEndpointPayload {
  * Result produced while resolving monitor-specific configuration.
  */
 export type RemoteMonitorConfigResult<TContext> =
-    | { context: TContext; kind: "success" }
-    | { kind: "error"; message: string };
+    { context: TContext; kind: "success" } | { kind: "error"; message: string };
 
 /**
  * Behaviour contract required to integrate a remote monitor with the shared
@@ -171,7 +170,9 @@ export function createRemoteMonitorService<
                         failureLogLevel: behavior.failureLogLevel ?? "warn",
                         maxRetries: totalAttempts,
                         operationName,
-                        ...(executionArgs.signal && { signal: executionArgs.signal }),
+                        ...(executionArgs.signal && {
+                            signal: executionArgs.signal,
+                        }),
                     }
                 );
             } catch (error) {

@@ -61,10 +61,9 @@ export class SiteDeletionError extends Error {
         identifier: string,
         options: { cause?: unknown } = {}
     ) {
-        const normalizedCause =
-            isDefined(options.cause)
-                ? ensureError(options.cause)
-                : undefined;
+        const normalizedCause = isDefined(options.cause)
+            ? ensureError(options.cause)
+            : undefined;
         const causeMessage =
             normalizedCause?.message ?? "Unknown site deletion cause";
         const message =
@@ -105,7 +104,6 @@ export function deleteSiteWithAdapters(
     try {
         monitorAdapter.deleteBySiteIdentifier(identifier);
     } catch (error) {
-        // eslint-disable-next-line ex/use-error-cause -- SiteDeletionError normalizes the provided cause internally.
         throw new SiteDeletionError("monitors", identifier, { cause: error });
     }
     const isSiteDeleted = siteAdapter.delete(identifier);

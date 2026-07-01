@@ -48,18 +48,17 @@ import {
 
 const createMonitorSample = (
     overrides: Partial<Monitor> & Pick<Monitor, "id" | "type">
-): Monitor =>
-    ({
-        activeOperations: [],
-        checkInterval: 60 * 1000,
-        history: [],
-        monitoring: true,
-        responseTime: 0,
-        retryAttempts: 2,
-        status: "up",
-        timeout: 5 * 1000,
-        ...overrides,
-    });
+): Monitor => ({
+    activeOperations: [],
+    checkInterval: 60 * 1000,
+    history: [],
+    monitoring: true,
+    responseTime: 0,
+    retryAttempts: 2,
+    status: "up",
+    timeout: 5 * 1000,
+    ...overrides,
+});
 
 const VALID_MONITOR_SAMPLES: readonly Monitor[] = [
     createMonitorSample({
@@ -746,7 +745,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
                 activeOperations: fc.array(
-                    fc.constantFrom(' '.repeat(3), "  \t  ", " \n ", ""),
+                    fc.constantFrom(" ".repeat(3), "  \t  ", " \n ", ""),
                     { minLength: 1 }
                 ),
             }),

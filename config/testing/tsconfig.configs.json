@@ -22,7 +22,11 @@
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.configs.tsbuildinfo",
-        "types": ["node", "vite/client", "vitest/globals"]
+        "types": [
+            "node",
+            "vite/client",
+            "vitest/globals"
+        ]
     },
     "exclude": [
         "node_modules",

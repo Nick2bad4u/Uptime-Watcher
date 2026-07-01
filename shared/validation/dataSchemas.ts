@@ -48,7 +48,6 @@ export const serializedDatabaseBackupResultSchema: z.ZodType<{
         ),
         // Intentionally allow blank/whitespace names from upstream callers.
         // Renderer-side download logic performs fallback filename generation.
-        // eslint-disable-next-line zod/prefer-string-schema-with-trim -- blank names are valid input for fallback behavior.
         fileName: z.string(),
         metadata: serializedDatabaseBackupMetadataSchema,
     })

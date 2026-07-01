@@ -766,7 +766,7 @@ describe("historyQuery utilities", () => {
                 fc.oneof(
                     fc.constant(""),
                     fc.string({ maxLength: 0 }),
-                    fc.constant(' '.repeat(3)),
+                    fc.constant(" ".repeat(3)),
                     fc
                         .string({ minLength: 1, maxLength: 5 })
                         .map((s) => s.trim())

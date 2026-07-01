@@ -38,6 +38,6 @@ const userData = app.getPath("userData");
 import { app } from "electron";
 
 export function getUserDataPath(): string {
-  return app.getPath("userData");
+ return app.getPath("userData");
 }
 ```

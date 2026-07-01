@@ -17,7 +17,12 @@ import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospectio
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { arrayIncludes, isDefined, isPresent } from "ts-extras";
 
-import type { EventKey, EventMiddleware, TypedEventMap } from "./TypedEventBus";
+import type {
+    EventKey,
+    EventMiddleware,
+    EventPayloadValue,
+    TypedEventMap,
+} from "./TypedEventBus";
 
 import { logger as baseLogger } from "../utils/logger";
 import { tryStructuredClone } from "./utils/structuredClone";
@@ -260,20 +265,19 @@ type ValidatorMap<EventMap extends TypedEventMap> = Partial<{
     [K in EventKey<EventMap>]: ValidatorFunction<EventMap[K]>;
 }>;
 
-/* eslint-disable etc/no-misused-generics -- Middleware factories allow explicit type arguments but cannot infer generics from their parameter lists by design. */
 /** Middleware stack helpers exposed to consumers. */
 export interface MiddlewareStacks {
     custom: <EventMap extends TypedEventMap>(
         middlewares: EventMiddleware<EventMap>[]
     ) => EventMiddleware<EventMap>;
     development: <
-        EventMap extends TypedEventMap = TypedEventMap,
+        EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
     >() => EventMiddleware<EventMap>;
     production: <
-        EventMap extends TypedEventMap = TypedEventMap,
+        EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
     >() => EventMiddleware<EventMap>;
     testing: <
-        EventMap extends TypedEventMap = TypedEventMap,
+        EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
     >() => EventMiddleware<EventMap>;
 }
 
@@ -281,7 +285,7 @@ export interface MiddlewareStacks {
  * Composes multiple {@link EventMiddleware} functions into a single chain.
  */
 export function composeMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(...middlewares: EventMiddleware<EventMap>[]): EventMiddleware<EventMap> {
     return (event, data, next) => {
         let index = 0;
@@ -309,7 +313,7 @@ export function composeMiddleware<
  * Emits detailed debug logs for every event when enabled.
  */
 export function createDebugMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(
     options: { enabled?: boolean; verbose?: boolean } = {}
 ): EventMiddleware<EventMap> {
@@ -326,9 +330,9 @@ export function createDebugMiddleware<
         const processingContext = {
             event: typedEvent,
             ...(verbose && {
-                      data: formatLoggableData(data),
-                      serializedData: safeSerialize(data),
-                  }),
+                data: formatLoggableData(data),
+                serializedData: safeSerialize(data),
+            }),
             timestamp: startTime,
         };
 
@@ -353,7 +357,7 @@ export function createDebugMiddleware<
  * Captures middleware errors and optionally continues execution.
  */
 export function createErrorHandlingMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(
     options: {
         continueOnError?: boolean;
@@ -407,7 +411,7 @@ export function createErrorHandlingMiddleware<
  * Filters events using allow/block lists or a custom predicate.
  */
 export function createFilterMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(
     options: {
         allowList?: EventKey<EventMap>[];
@@ -455,7 +459,7 @@ export function createFilterMiddleware<
  * Logs every event with optional payload serialization.
  */
 export function createLoggingMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(
     options: {
         filter?: (eventName: EventKey<EventMap>) => boolean;
@@ -497,7 +501,7 @@ export function createLoggingMiddleware<
  * Tracks event counts and timing information for observability.
  */
 export function createMetricsMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(
     options: {
         metricsCallback?: MetricsCallback<EventKey<EventMap>>;
@@ -538,7 +542,7 @@ export function createMetricsMiddleware<
  * Throttles high-frequency events using burst and sustained-rate limits.
  */
 export function createRateLimitMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(
     options: {
         burstLimit?: number;
@@ -598,7 +602,7 @@ export function createRateLimitMiddleware<
  * Validates event payloads before they reach business logic handlers.
  */
 export function createValidationMiddleware<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(validators: ValidatorMap<EventMap>): EventMiddleware<EventMap> {
     return (event, data, next) => {
         const typedEvent = event as EventKey<EventMap>;
@@ -662,7 +666,7 @@ const createCustomStack = <EventMap extends TypedEventMap>(
 ): EventMiddleware<EventMap> => composeMiddleware<EventMap>(...middlewares);
 
 function createDevelopmentStack<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(): EventMiddleware<EventMap> {
     return composeMiddleware<EventMap>(
         createErrorHandlingMiddleware<EventMap>({ continueOnError: true }),
@@ -675,7 +679,7 @@ function createDevelopmentStack<
 }
 
 function createProductionStack<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(): EventMiddleware<EventMap> {
     return composeMiddleware<EventMap>(
         createErrorHandlingMiddleware<EventMap>({ continueOnError: true }),
@@ -695,7 +699,7 @@ function createProductionStack<
 }
 
 function createTestingStack<
-    EventMap extends TypedEventMap = TypedEventMap,
+    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
 >(): EventMiddleware<EventMap> {
     return composeMiddleware<EventMap>(
         createErrorHandlingMiddleware<EventMap>({ continueOnError: false }),
@@ -712,4 +716,3 @@ export const MIDDLEWARE_STACKS: MiddlewareStacks = {
     production: createProductionStack,
     testing: createTestingStack,
 };
-/* eslint-enable etc/no-misused-generics -- Restore default linting after middleware factories */

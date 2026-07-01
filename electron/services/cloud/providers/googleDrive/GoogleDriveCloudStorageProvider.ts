@@ -10,7 +10,14 @@ import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { arrayAt, arrayJoin, isEmpty, objectHasIn, safeCastTo, stringSplit } from "ts-extras";
+import {
+    arrayAt,
+    arrayJoin,
+    isEmpty,
+    objectHasIn,
+    safeCastTo,
+    stringSplit,
+} from "ts-extras";
 
 import type {
     CloudObjectEntry,

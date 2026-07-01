@@ -100,7 +100,7 @@ const getCallableProperty = (
  */
 const resolveCurrentDirectory = (): string => {
     try {
-        return import.meta.dirname;
+        return path.dirname(fileURLToPath(import.meta.url));
     } catch {
         const globalFilename = Reflect.get(globalThis, "__filename");
         if (typeof globalFilename === "string" && globalFilename.length > 0) {
@@ -119,8 +119,8 @@ const resolveCurrentDirectory = (): string => {
 const currentDirectory = resolveCurrentDirectory();
 
 /**
- * Attempts to resolve Electron's app path when the runtime exposes the
- * required `app` lifecycle methods.
+ * Attempts to resolve Electron's app path when the runtime exposes the required
+ * `app` lifecycle methods.
  *
  * @remarks
  * Some unit tests partially mock the `electron` module and omit the `app`
@@ -239,8 +239,8 @@ export class WindowService {
      *
      * @remarks
      * Electron rejects pending `loadURL` / `loadFile` promises when a window is
-     * closed before navigation completes. That is expected during app
-     * teardown and should not escalate into a fatal process shutdown.
+     * closed before navigation completes. That is expected during app teardown
+     * and should not escalate into a fatal process shutdown.
      */
     private isMainWindowClosing = false;
 
@@ -388,7 +388,7 @@ export class WindowService {
             errorName: result.errorName,
             url: result.safeUrlForLogging,
             ...(typeof result.errorCode === "string" &&
-            result.errorCode.length > 0 && { errorCode: result.errorCode }),
+                result.errorCode.length > 0 && { errorCode: result.errorCode }),
         });
     }
 
@@ -533,7 +533,7 @@ export class WindowService {
         class ViteDevServerNotReadyError extends Error {
             public override readonly name = "ViteDevServerNotReadyError";
 
-            public constructor(message: string, options: ErrorOptions) {
+            public constructor(message: string, options?: ErrorOptions) {
                 super(message, options);
             }
         }
@@ -790,7 +790,12 @@ export class WindowService {
                 permission,
                 grantPermission
             ) => {
-                if (!setHas<string, string>(this.loggedDeniedPermissions, permission)) {
+                if (
+                    !setHas<string, string>(
+                        this.loggedDeniedPermissions,
+                        permission
+                    )
+                ) {
                     this.loggedDeniedPermissions.add(permission);
                     logger.warn("[WindowService] Denied permission request", {
                         permission,

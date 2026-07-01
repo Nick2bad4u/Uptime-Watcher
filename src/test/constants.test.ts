@@ -7,7 +7,7 @@ import type { ArrayValues } from "type-fest";
 
 import { fc, test } from "@fast-check/vitest";
 import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import { arrayAt, objectEntries, objectValues   } from "ts-extras";
+import { arrayAt, objectEntries, objectValues } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -932,13 +932,8 @@ describe("Application Constants", () => {
 
                 for (const option of FALLBACK_MONITOR_TYPE_OPTIONS) {
                     expect(option).toHaveProperty(property);
-                    expect(typeof option[property]).toBe(
-                        "string"
-                    );
-                    expect(
-                        (option[property])
-                            .length
-                    ).toBeGreaterThan(0);
+                    expect(typeof option[property]).toBe("string");
+                    expect(option[property].length).toBeGreaterThan(0);
                 }
             }
         );
@@ -979,8 +974,9 @@ describe("Application Constants", () => {
                 expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
 
                 let unlimitedCount = 0;
-                const finiteOptions: ArrayValues<typeof HISTORY_LIMIT_OPTIONS>[] =
-                    [];
+                const finiteOptions: ArrayValues<
+                    typeof HISTORY_LIMIT_OPTIONS
+                >[] = [];
 
                 // All options should have valid structure
                 for (const option of HISTORY_LIMIT_OPTIONS) {
@@ -1094,9 +1090,7 @@ describe("Application Constants", () => {
                 expect(CHART_TIME_RANGES).toBeDefined();
 
                 // Chart periods should be numbers (milliseconds)
-                for (const [key, period] of objectEntries(
-                    CHART_TIME_PERIODS
-                )) {
+                for (const [key, period] of objectEntries(CHART_TIME_PERIODS)) {
                     expect(typeof key).toBe("string");
                     expect(typeof period).toBe("number");
                     expect(period).toBeGreaterThan(0);

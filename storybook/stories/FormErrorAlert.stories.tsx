@@ -41,9 +41,9 @@ const InteractiveStory = (args: FormErrorAlertProps): ReactElement => {
                 onClearError={handleClear}
             />
             <ThemedButton
-                onClick={() =>
-                    { setMessage("Validation failed: URL is required."); }
-                }
+                onClick={() => {
+                    setMessage("Validation failed: URL is required.");
+                }}
                 size="sm"
                 variant="secondary"
             >

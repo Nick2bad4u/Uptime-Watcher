@@ -12,7 +12,7 @@
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
 import { objectKeys } from "ts-extras";
-import { describe, expect, it, test } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // Custom arbitraries for database testing
 const arbitraryString = fc.string({ minLength: 1, maxLength: 100 });
@@ -137,7 +137,8 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                 expect(identifier.length).toBeGreaterThan(0);
 
                 // Validate UUID format (basic check)
-                const uuidRegex = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iv;
+                const uuidRegex =
+                    /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iv;
                 expect(uuidRegex.test(identifier)).toBeTruthy();
             }
         );

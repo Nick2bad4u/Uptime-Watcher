@@ -13,7 +13,7 @@ const mockedLogger = vi.hoisted(() => ({
     warn: vi.fn(),
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: mockedLogger,
 }));
 

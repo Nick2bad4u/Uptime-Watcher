@@ -89,9 +89,7 @@ export type SitesTelemetryStagePayload =
 type MutableSitesTelemetryPayload = UnknownRecord;
 
 type OperationTelemetryInput =
-    | OperationTelemetryConfig
-    | SitesTelemetryPayload
-    | undefined;
+    OperationTelemetryConfig | SitesTelemetryPayload | undefined;
 
 interface NormalizedTelemetry {
     readonly base: MutableSitesTelemetryPayload;

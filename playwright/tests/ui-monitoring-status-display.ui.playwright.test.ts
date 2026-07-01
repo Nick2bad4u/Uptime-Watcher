@@ -88,8 +88,12 @@ test.describe(
                 await expect.soft(statusDisplay).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(statusDisplay).toContainText(/monitor status/i);
-                await expect.soft(statusDisplay).toContainText(/(0|1)\/1 active/v);
+                await expect
+                    .soft(statusDisplay)
+                    .toContainText(/monitor status/i);
+                await expect
+                    .soft(statusDisplay)
+                    .toContainText(/(0|1)\/1 active/v);
                 await expect.soft(statusDisplay).toContainText(/website url/i);
                 await expect.soft(statusDisplay).toContainText("example.com");
 

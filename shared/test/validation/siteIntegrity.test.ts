@@ -43,7 +43,9 @@ describe("siteIntegrity", () => {
             buildSite("site-2", "Site 2"),
         ];
 
-        expect(() => { ensureUniqueSiteIdentifiers(uniqueSites); }).not.toThrow();
+        expect(() => {
+            ensureUniqueSiteIdentifiers(uniqueSites);
+        }).not.toThrow();
     });
 
     it("ensureUniqueSiteIdentifiers throws descriptive error when duplicates detected", () => {
@@ -52,9 +54,9 @@ describe("siteIntegrity", () => {
             buildSite("duplicate", "Duplicate B"),
         ];
 
-        expect(() =>
-            { ensureUniqueSiteIdentifiers(duplicateSites, "shared-test"); }
-        ).toThrow(DuplicateSiteIdentifierError);
+        expect(() => {
+            ensureUniqueSiteIdentifiers(duplicateSites, "shared-test");
+        }).toThrow(DuplicateSiteIdentifierError);
 
         try {
             ensureUniqueSiteIdentifiers(duplicateSites, "shared-test");

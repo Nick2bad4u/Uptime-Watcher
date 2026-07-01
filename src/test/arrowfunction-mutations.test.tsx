@@ -273,7 +273,7 @@ describe("ArrowFunction Mutations", () => {
                 12,
             ]);
 
-            const sum = Math.sumPrecise(numbers);
+            const sum = numbers.reduce((total, number) => total + number, 0);
             expect(sum).toBe(21);
 
             const firstEven = numbers.find((n) => n % 2 === 0);
@@ -304,7 +304,9 @@ describe("ArrowFunction Mutations", () => {
                             <button
                                 data-testid={`button-${item}`}
                                 key={item}
-                                onClick={() => { handleClick(item); }}
+                                onClick={() => {
+                                    handleClick(item);
+                                }}
                             >
                                 {item}
                             </button>
@@ -331,7 +333,9 @@ describe("ArrowFunction Mutations", () => {
         it("should handle Promise and async operations", async () => {
             const asyncOperation = async (value: number) =>
                 new Promise<number>((resolve) => {
-                    setTimeout(() => { resolve(value * 2); }, 10);
+                    setTimeout(() => {
+                        resolve(value * 2);
+                    }, 10);
                 });
 
             const values = [

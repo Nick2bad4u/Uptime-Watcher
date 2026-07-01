@@ -79,11 +79,7 @@ export type ChartScalePosition = "center" | ChartPosition;
  * @public
  */
 export type ChartScaleType =
-    | "category"
-    | "linear"
-    | "logarithmic"
-    | "time"
-    | "timeseries";
+    "category" | "linear" | "logarithmic" | "time" | "timeseries";
 
 /**
  * Chart.js alignment values for titles and legends.
@@ -98,11 +94,7 @@ export type ChartAlignment = "center" | "end" | "start";
  * @public
  */
 export type ChartFontStyle =
-    | "inherit"
-    | "initial"
-    | "italic"
-    | "normal"
-    | "oblique";
+    "inherit" | "initial" | "italic" | "normal" | "oblique";
 
 /**
  * CSS font-weight values for Chart.js font configurations.
@@ -511,7 +503,7 @@ export function hasPlugins(
         return false;
     }
 
-    const {plugins} = configRecord;
+    const { plugins } = configRecord;
     return typeof plugins === "object" && plugins !== null;
 }
 
@@ -537,7 +529,7 @@ export function hasScales(
         return false;
     }
 
-    const {scales} = configRecord;
+    const { scales } = configRecord;
     return typeof scales === "object" && scales !== null;
 }
 

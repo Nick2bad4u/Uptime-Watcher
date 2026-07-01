@@ -492,8 +492,10 @@ function initializeEnhancements(): CleanupFunction {
     let routeChangeTimer: null | ReturnType<typeof setTimeout> = null;
 
     const observer = new MutationObserver(() => {
-        if (typeof location === "undefined" ||
-            location.pathname === lastPathname) {
+        if (
+            typeof location === "undefined" ||
+            location.pathname === lastPathname
+        ) {
             return;
         }
 
@@ -539,7 +541,11 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
 
 // Export for manual initialization if needed
 if (typeof window !== "undefined") {
-    globalThis.initializeAdvancedFeatures = initializeAdvancedFeatures;
+    Object.defineProperty(globalThis, "initializeAdvancedFeatures", {
+        configurable: true,
+        value: initializeAdvancedFeatures,
+        writable: true,
+    });
 }
 
 // ES Module export

@@ -2,8 +2,6 @@
  * Cloud sync manifest types (ADR-015/ADR-016).
  */
 
-/* eslint-disable zod/prefer-string-schema-with-trim -- Cloud sync protocol parsing must preserve payload strings/keys exactly and avoid lossy normalization. */
-
 import {
     type CloudEncryptionConfig,
     cloudEncryptionConfigSchema,
@@ -124,5 +122,3 @@ export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
         devices,
     };
 }
-
-/* eslint-enable zod/prefer-string-schema-with-trim -- End protocol-preserving no-trim exception scope. */

@@ -19,9 +19,9 @@ export const LOGGER_INTERFACES_MODULE_MARKER =
  * Base logger interface with core logging methods.
  *
  * @remarks
- * Defines the minimum contract for all logger implementations across the
- * app. All logging methods accept a message string followed by optional
- * additional arguments for structured logging and context information.
+ * Defines the minimum contract for all logger implementations across the app.
+ * All logging methods accept a message string followed by optional additional
+ * arguments for structured logging and context information.
  *
  * @public
  */

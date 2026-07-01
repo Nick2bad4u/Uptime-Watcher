@@ -5,7 +5,7 @@ $repoRoot = Resolve-Path "$PSScriptRoot\.."
 
 # Create docs/changelogs directory if it doesn't exist
 $changelogDir = "$repoRoot\docs\changelogs"
-if (!(Test-Path $changelogDir)) {
+if (! (Test-Path $changelogDir)) {
     New-Item -ItemType Directory -Path $changelogDir -Force | Out-Null
     Write-Output "Created directory: $changelogDir"
 }

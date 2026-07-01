@@ -31,21 +31,18 @@ const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
 // Mock window.matchMedia before other imports
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation(
-        (query) =>
-            ({
-                addEventListener: vi.fn(),
-                dispatchEvent: vi.fn(),
-                matches: false,
-                media: query,
-                onchange: null,
-                removeEventListener: vi.fn(),
-            })
-    ),
+    value: vi.fn().mockImplementation((query) => ({
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        matches: false,
+        media: query,
+        onchange: null,
+        removeEventListener: vi.fn(),
+    })),
 });
 
 // Also mock the theme manager to avoid deep dependencies
-vi.mock(import('../../../theme/ThemeManager'), () => ({
+vi.mock("../../../theme/ThemeManager", () => ({
     ThemeManager: {
         getTheme: vi.fn(() => "light"),
         getSystemThemePreference: vi.fn(() => "light"),
@@ -53,7 +50,7 @@ vi.mock(import('../../../theme/ThemeManager'), () => ({
     },
 }));
 
-vi.mock(import('../../../theme/useTheme'), () => ({
+vi.mock("../../../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({
         currentTheme: {
             colors: {
@@ -142,14 +139,14 @@ vi.mock(import('../../../theme/useTheme'), () => ({
     ),
 }));
 
-vi.mock(import('../../../services/chartConfig'), () => {
+vi.mock("../../../services/chartConfig", () => {
     const ChartConfigServiceMock = vi.fn(function ChartConfigServiceMock(
         this: any
     ) {
-        vi.spyOn(this, 'getLineChartConfig').mockReturnValue({});
-        vi.spyOn(this, 'getBarChartConfig').mockReturnValue({});
-        vi.spyOn(this, 'getDoughnutChartConfig').mockReturnValue({});
-        vi.spyOn(this, 'getBaseConfig').mockReturnValue({});
+        vi.spyOn(this, "getLineChartConfig").mockReturnValue({});
+        vi.spyOn(this, "getBarChartConfig").mockReturnValue({});
+        vi.spyOn(this, "getDoughnutChartConfig").mockReturnValue({});
+        vi.spyOn(this, "getBaseConfig").mockReturnValue({});
     });
 
     return {
@@ -157,18 +154,18 @@ vi.mock(import('../../../services/chartConfig'), () => {
     };
 });
 
-vi.mock(import('../../../theme/components'), () => ({
+vi.mock("../../../theme/components", () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (
         <div {...props}>{children}</div>
     )),
 }));
 
 // Mock the hook and all dependencies
-vi.mock(import('../../../hooks/site/useSiteDetails'), () => ({
+vi.mock("../../../hooks/site/useSiteDetails", () => ({
     useSiteDetails: vi.fn(),
 }));
 
-vi.mock(import('../../../components/SiteDetails/SiteDetailsHeader'), () => ({
+vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
     SiteDetailsHeader: vi.fn(({ site, selectedMonitor }) => (
         <div data-testid="site-details-header">
             <span>Site: {site?.name || "Unknown"}</span>
@@ -177,7 +174,7 @@ vi.mock(import('../../../components/SiteDetails/SiteDetailsHeader'), () => ({
     )),
 }));
 
-vi.mock(import('../../../components/SiteDetails/SiteDetailsNavigation'), () => ({
+vi.mock("../../../components/SiteDetails/SiteDetailsNavigation", () => ({
     SiteDetailsNavigation: vi.fn(
         ({ setActiveSiteDetailsTab, activeSiteDetailsTab }) => (
             <div data-testid="site-details-navigation">
@@ -205,37 +202,37 @@ vi.mock(import('../../../components/SiteDetails/SiteDetailsNavigation'), () => (
     ),
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/OverviewTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/OverviewTab", () => ({
     OverviewTab: vi.fn(() => (
         <div data-testid="overview-tab-content">Overview Content</div>
     )),
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/SiteOverviewTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/SiteOverviewTab", () => ({
     SiteOverviewTab: vi.fn(() => (
         <div data-testid="site-overview-tab-content">Site Overview Content</div>
     )),
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/HistoryTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/HistoryTab", () => ({
     HistoryTab: vi.fn(() => (
         <div data-testid="history-tab-content">History Content</div>
     )),
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/AnalyticsTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/AnalyticsTab", () => ({
     AnalyticsTab: vi.fn(() => (
         <div data-testid="analytics-tab-content">Analytics Content</div>
     )),
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/SettingsTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/SettingsTab", () => ({
     SettingsTab: vi.fn(() => (
         <div data-testid="settings-tab-content">Settings Content</div>
     )),
 }));
 
-vi.mock(import('../../../components/error/DefaultErrorFallback'), () => ({
+vi.mock("../../../components/error/DefaultErrorFallback", () => ({
     DefaultErrorFallback: vi.fn(({ error, resetErrorBoundary }) => (
         <div data-testid="error-fallback">
             <p>Error: {error?.message}</p>

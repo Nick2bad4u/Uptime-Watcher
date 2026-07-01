@@ -112,9 +112,11 @@ export const sharedNoOutsideImportsRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                if (node.callee.type !== "Identifier" ||
+                if (
+                    node.callee.type !== "Identifier" ||
                     node.callee.name !== "require" ||
-                    node.arguments.length === 0) {
+                    node.arguments.length === 0
+                ) {
                     return;
                 }
 
@@ -123,12 +125,8 @@ export const sharedNoOutsideImportsRule = {
                     firstArgument?.type === "Literal" &&
                     typeof firstArgument.value === "string"
                 ) {
-                    handleModuleSpecifier(
-                        firstArgument,
-                        firstArgument.value
-                    );
+                    handleModuleSpecifier(firstArgument, firstArgument.value);
                 }
-
             },
 
             /**

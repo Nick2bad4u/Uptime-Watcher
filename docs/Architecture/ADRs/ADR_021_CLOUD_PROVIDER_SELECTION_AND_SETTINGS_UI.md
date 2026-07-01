@@ -23,19 +23,19 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision drivers](#decision-drivers)
-4. [Decision](#decision)
-5. [UX / Information architecture](#ux--information-architecture)
-6. [Provider roadmap](#provider-roadmap)
-7. [Why only one provider at a time](#why-only-one-provider-at-a-time)
-8. [Multi-provider future (non-blocking)](#multi-provider-future-non-blocking)
-9. [Implementation notes](#implementation-notes)
-10. [Testing & validation](#testing--validation)
-11. [Consequences](#consequences)
-12. [Related ADRs](#related-adrs)
-13. [Review](#review)
+- [Status](#status)
+- [Context](#context)
+- [Decision drivers](#decision-drivers)
+- [Decision](#decision)
+- [UX / Information architecture](#ux--information-architecture)
+- [Provider roadmap](#provider-roadmap)
+- [Why only one provider at a time](#why-only-one-provider-at-a-time)
+- [Multi-provider future (non-blocking)](#multi-provider-future-non-blocking)
+- [Implementation notes](#implementation-notes)
+- [Testing & validation](#testing--validation)
+- [Consequences](#consequences)
+- [Related ADRs](#related-adrs)
+- [Review](#review)
 
 ## Status
 

@@ -18,14 +18,14 @@ tags:
 
 ## Table of Contents
 
-1. [1. Who Should Use This Guide](#1-who-should-use-this-guide)
-2. [2. End-to-End Flyover](#2-end-to-end-flyover)
-3. [3. Architecture Recap](#3-architecture-recap)
-4. [4. File Impact Matrix](#4-file-impact-matrix)
-5. [5. Step-by-Step Implementation](#5-step-by-step-implementation)
-6. [6. Troubleshooting and FAQ](#6-troubleshooting-and-faq)
-7. [7. Appendix - Reference Snippets](#7-appendix---reference-snippets)
-8. [8. Change Log for This Guide](#8-change-log-for-this-guide)
+- [1. Who Should Use This Guide](#1-who-should-use-this-guide)
+- [2. End-to-End Flyover](#2-end-to-end-flyover)
+- [3. Architecture Recap](#3-architecture-recap)
+- [4. File Impact Matrix](#4-file-impact-matrix)
+- [5. Step-by-Step Implementation](#5-step-by-step-implementation)
+- [6. Troubleshooting and FAQ](#6-troubleshooting-and-faq)
+- [7. Appendix - Reference Snippets](#7-appendix---reference-snippets)
+- [8. Change Log for This Guide](#8-change-log-for-this-guide)
 
 ## 1. Who Should Use This Guide
 

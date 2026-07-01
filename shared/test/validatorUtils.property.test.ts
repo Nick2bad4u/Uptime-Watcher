@@ -229,7 +229,7 @@ describe("Validator Utils Property-Based Tests", () => {
 
             const invalidIdentifiers = [
                 "", // Empty
-                ' '.repeat(3), // Whitespace only
+                " ".repeat(3), // Whitespace only
                 "test@email", // Special characters
                 "test.name", // Dots not allowed
                 "test name", // Spaces not allowed
@@ -530,7 +530,9 @@ describe("Validator Utils Property-Based Tests", () => {
                 // Generate identifiers that must have at least one alphanumeric character
                 fc
                     .string({ minLength: 1 })
-                    .filter((s) => /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u.test(s))
+                    .filter((s) =>
+                        /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u.test(s)
+                    )
             ),
         ])(
             "should return true for arrays of valid identifiers",

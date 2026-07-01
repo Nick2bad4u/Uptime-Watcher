@@ -21,28 +21,28 @@ multi-ecosystem-groups:
             - "dependencies"
 
 updates:
-    - package-ecosystem: github-actions
+    - package-ecosystem: "github-actions"
       cooldown:
           default-days: 3
           include: ["*"]
-      directory: /
+      directory: "/"
       allow:
           # Allow both direct and indirect updates for all packages
           - dependency-type: "all"
       labels:
           - "github-actions"
-      multi-ecosystem-group: dependabot-all
-      rebase-strategy: auto
+      multi-ecosystem-group: "dependabot-all"
+      rebase-strategy: "auto"
       patterns:
           - "*"
 
-    - package-ecosystem: npm
+    - package-ecosystem: "npm"
       cooldown:
           default-days: 3
           include: ["*"]
-      directory: /
-      rebase-strategy: auto
-      versioning-strategy: increase
+      directory: "/"
+      rebase-strategy: "auto"
+      versioning-strategy: "increase"
       allow:
           # Allow both direct and indirect updates for all packages
           - dependency-type: "all"
@@ -62,17 +62,17 @@ updates:
           - dependency-name: "tough-cookie"
       labels:
           - "npm"
-      multi-ecosystem-group: dependabot-all
+      multi-ecosystem-group: "dependabot-all"
       patterns:
           - "*"
 
-    - package-ecosystem: npm
+    - package-ecosystem: "npm"
       cooldown:
           default-days: 3
           include: ["*"]
-      directory: /docs/docusaurus
-      rebase-strategy: auto
-      versioning-strategy: increase
+      directory: "/docs/docusaurus"
+      rebase-strategy: "auto"
+      versioning-strategy: "increase"
       allow:
           # Allow both direct and indirect updates for all packages
           - dependency-type: "all"
@@ -83,6 +83,6 @@ updates:
           - dependency-name: "tough-cookie"
       labels:
           - "npm"
-      multi-ecosystem-group: dependabot-all
+      multi-ecosystem-group: "dependabot-all"
       patterns:
           - "*"

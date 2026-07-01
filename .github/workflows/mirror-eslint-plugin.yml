@@ -1,7 +1,7 @@
 # Mirror the internal uptime-watcher ESLint plugin folder to a separate GitHub repo
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Mirror ESLint Plugin Repo
-run-name: Mirror ESLint Plugin Repo
+name: "Mirror ESLint Plugin Repo"
+run-name: "Mirror ESLint Plugin Repo"
 
 on:
     push:
@@ -14,7 +14,7 @@ on:
     workflow_dispatch:
 
 permissions:
-    contents: read
+    contents: "read"
 
 concurrency:
     group: "eslint-plugin-mirror"
@@ -22,26 +22,26 @@ concurrency:
 
 jobs:
     mirror:
-        name: Mirror plugin folder
-        runs-on: ubuntu-latest
-        if: github.repository == 'Nick2bad4u/Uptime-Watcher'
+        name: "Mirror plugin folder"
+        runs-on: "ubuntu-latest"
+        if: "github.repository == 'Nick2bad4u/Uptime-Watcher'"
         timeout-minutes: 20
         env:
             SOURCE_DIR: "config/linting/plugins/uptime-watcher"
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
                   fetch-depth: 1
 
-            - name: Resolve target repository
-              id: target
-              shell: bash
+            - name: "Resolve target repository"
+              id: "target"
+              shell: "bash"
               run: |
                   set -euo pipefail
 
@@ -54,8 +54,8 @@ jobs:
 
                   echo "repo=${TARGET_REPO}" >> "${GITHUB_OUTPUT}"
 
-            - name: Validate required token
-              shell: bash
+            - name: "Validate required token"
+              shell: "bash"
               run: |
                   set -euo pipefail
 
@@ -65,22 +65,22 @@ jobs:
                       exit 1
                   fi
 
-            - name: Prepare mirror working directory
-              shell: bash
+            - name: "Prepare mirror working directory"
+              shell: "bash"
               run: |
                   set -euo pipefail
 
                   rm -rf ./temp/eslint-plugin-mirror
                   mkdir -p ./temp/eslint-plugin-mirror
 
-            - name: Push to target repository
-              shell: bash
-              working-directory: ./temp/eslint-plugin-mirror
+            - name: "Push to target repository"
+              shell: "bash"
+              working-directory: "./temp/eslint-plugin-mirror"
               env:
-                  SOURCE_DIR: ${{ env.SOURCE_DIR }}
-                  TARGET_REPO: ${{ steps.target.outputs.repo }}
-                  TARGET_BRANCH: main
-                  MIRROR_TOKEN: ${{ secrets['ESLINT_PLUGIN_MIRROR_TOKEN'] }}
+                  SOURCE_DIR: "${{ env.SOURCE_DIR }}"
+                  TARGET_REPO: "${{ steps.target.outputs.repo }}"
+                  TARGET_BRANCH: "main"
+                  MIRROR_TOKEN: "${{ secrets['ESLINT_PLUGIN_MIRROR_TOKEN'] }}"
               run: |
                   set -euo pipefail
 

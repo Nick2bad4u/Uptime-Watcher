@@ -5,7 +5,7 @@
 import { fc, test } from "@fast-check/vitest";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { act, renderHook } from "@testing-library/react";
-import { arrayAt, isInteger, objectEntries   } from "ts-extras";
+import { arrayAt, isInteger, objectEntries } from "ts-extras";
 import {
     afterAll,
     afterEach,
@@ -44,7 +44,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -56,14 +56,14 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
 // Mock store utils (partial) so new exports (e.g. createPersistConfig) remain available.
-vi.mock(import('../../../stores/utils'), async (importOriginal) => {
+vi.mock("../../../stores/utils", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -73,7 +73,7 @@ vi.mock(import('../../../stores/utils'), async (importOriginal) => {
 });
 
 // Mock withErrorHandling from shared utils (partial) to retain ApplicationError, etc.
-vi.mock(import('../../../../shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../../shared/utils/errorHandling")
@@ -184,8 +184,9 @@ describe(useSettingsStore, () => {
                 return await fn();
             } catch (error: unknown) {
                 // Match the real withErrorHandling behavior: extract error message
-                const errorMessage =
-                    Error.isError(error) ? error.message : String(error);
+                const errorMessage = Error.isError(error)
+                    ? error.message
+                    : String(error);
                 (handlers as any).setError?.(errorMessage);
                 throw error;
             } finally {
@@ -317,7 +318,9 @@ describe(useSettingsStore, () => {
                 await result.current.initializeSettings();
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledWith();
             expect(result.current.settings.historyLimit).toBe(500);
         });
 

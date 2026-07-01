@@ -10,7 +10,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { fc, test } from "@fast-check/vitest";
 import { hasScales } from "@shared/types/chartConfig";
-import { not, objectEntries, safeCastTo   } from "ts-extras";
+import { not, objectEntries, safeCastTo } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -748,8 +748,9 @@ describe("Chart Utilities", () => {
             expect(getNestedScaleProperty(config, "x", "values.empty")).toBe(
                 ""
             );
-            expect(getNestedScaleProperty(config, "x", "values.null")).toBeNull(
-                );
+            expect(
+                getNestedScaleProperty(config, "x", "values.null")
+            ).toBeNull();
         });
     });
 
@@ -1137,8 +1138,9 @@ describe("Chart Utilities", () => {
             ])("should handle falsy values correctly", (config) => {
                 // Property: Should distinguish between undefined and other falsy values
                 expect(getScaleProperty(config, "x", "nullValue")).toBeNull();
-                expect(getScaleProperty(config, "x", "undefinedValue")).toBeUndefined(
-                    );
+                expect(
+                    getScaleProperty(config, "x", "undefinedValue")
+                ).toBeUndefined();
                 expect(getScaleProperty(config, "x", "falseValue")).toBeFalsy();
                 expect(getScaleProperty(config, "x", "zeroValue")).toBe(0);
                 expect(getScaleProperty(config, "x", "emptyString")).toBe("");
@@ -1349,8 +1351,9 @@ describe("Chart Utilities", () => {
                 expect(getNestedScaleProperty(config, "x", "emptyString")).toBe(
                     ""
                 );
-                expect(getNestedScaleProperty(config, "x", "nullValue")).toBeNull(
-                    );
+                expect(
+                    getNestedScaleProperty(config, "x", "nullValue")
+                ).toBeNull();
                 expect(
                     getNestedScaleProperty(config, "x", "falseValue")
                 ).toBeFalsy();
@@ -1437,8 +1440,8 @@ describe("Chart Utilities", () => {
                     ).toBe(getScaleProperty(config, "y", "beginAtZero"));
 
                     // Property: getNestedScaleProperty should access nested properties correctly
-                    const expectedTitleText = (
-                        safeCastTo<UnknownRecord>(config.scales.x.title)
+                    const expectedTitleText = safeCastTo<UnknownRecord>(
+                        config.scales.x.title
                     )["text"];
                     expect(
                         getNestedScaleProperty(config, "x", "title.text")

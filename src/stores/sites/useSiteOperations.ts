@@ -2,8 +2,7 @@
  * Site operations module. Handles CRUD operations for sites and monitor
  * management.
  *
- * Uses centralized error store for consistent error handling across the
- * app.
+ * Uses centralized error store for consistent error handling across the app.
  *
  * @packageDocumentation
  */
@@ -326,7 +325,8 @@ export const createSiteOperationsActions = (
         await withSiteOperation(
             "deleteSite",
             async () => {
-                const isRemoved = await deps.services.site.removeSite(identifier);
+                const isRemoved =
+                    await deps.services.site.removeSite(identifier);
                 if (!isRemoved) {
                     throw new Error(
                         `Site removal failed for ${identifier}: Backend returned false`

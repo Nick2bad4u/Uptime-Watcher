@@ -849,7 +849,9 @@ describe("Events Domain API", () => {
         it("should work even when no listeners are registered", () => {
             const freshApi = createEventsApi();
 
-            expect(() => { freshApi.removeAllListeners(); }).not.toThrow();
+            expect(() => {
+                freshApi.removeAllListeners();
+            }).not.toThrow();
             expect(mockIpcRenderer.removeListener).not.toHaveBeenCalled();
         });
     });
@@ -950,7 +952,9 @@ describe("Events Domain API", () => {
                         const site = createSiteFixture({
                             identifier: siteOverrides.identifier,
                             monitoring: siteOverrides.monitoring,
-                            ...(siteOverrides.name !== undefined && { name: siteOverrides.name }),
+                            ...(siteOverrides.name !== undefined && {
+                                name: siteOverrides.name,
+                            }),
                             monitors: [monitor],
                         });
 

@@ -279,7 +279,7 @@ describe("Monitor Types Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const types: MonitorType[] = ["http", "port"];
-            const config: { enabled: boolean; type: MonitorType; } = {
+            const config: { enabled: boolean; type: MonitorType } = {
                 type: "http",
                 enabled: true,
             };

@@ -11,7 +11,7 @@
  */
 
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
-import type { PartialDeep, UnknownArray  } from "type-fest";
+import type { PartialDeep, UnknownArray } from "type-fest";
 
 import { objectAssign } from "ts-extras";
 import { vi } from "vitest";
@@ -159,7 +159,7 @@ export const createSitesStoreMock = (
         statusSubscriptionSummary: undefined,
     };
 
-    return objectAssign(store, overrides);
+    return objectAssign(store, overrides) as unknown as SitesStore;
 };
 
 /**

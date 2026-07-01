@@ -2,7 +2,7 @@
  * Tests for shared/types modules to improve coverage
  */
 
-import { arrayFirst, arrayIncludes  } from "ts-extras";
+import { arrayFirst, arrayIncludes } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 // Import the actual types to test them These imports will help with coverage of type definitions
@@ -99,7 +99,9 @@ describe("Shared Types Coverage", () => {
             expect(
                 validateField(arrayFirst(fieldValidations)!, "Test Site")
             ).toBeTruthy();
-            expect(validateField(arrayFirst(fieldValidations)!, "")).toBeFalsy();
+            expect(
+                validateField(arrayFirst(fieldValidations)!, "")
+            ).toBeFalsy();
             expect(
                 validateField(fieldValidations[1]!, "https://example.com")
             ).toBeTruthy();
@@ -183,12 +185,15 @@ describe("Shared Types Coverage", () => {
 
             const validator: MonitorValidator = {
                 validateType: (type: string) =>
-                    arrayIncludes([
-                        "dns",
-                        "http",
-                        "ping",
-                        "port",
-                    ], type),
+                    arrayIncludes(
+                        [
+                            "dns",
+                            "http",
+                            "ping",
+                            "port",
+                        ],
+                        type
+                    ),
                 validateInterval: (interval: number) =>
                     interval >= 30_000 && interval <= 3_600_000,
                 validateTimeout: (timeout: number) =>
@@ -339,8 +344,7 @@ describe("Shared Types Coverage", () => {
                         pending: "#f59e0b",
                         unknown: "#6b7280",
                     };
-                    return (statusColors[status] ??
-                        statusColors["unknown"])!;
+                    return (statusColors[status] ?? statusColors["unknown"])!;
                 },
                 getSpacingValue: (size: string) => {
                     const spacing: Record<string, number> = {
@@ -425,7 +429,9 @@ describe("Shared Types Coverage", () => {
             expect(validationResult.isValid).toBeFalsy();
             expect(validationResult.errors).toHaveLength(1);
             expect(validationResult.warnings).toHaveLength(1);
-            expect(arrayFirst(validationResult.errors)?.code).toBe("REQUIRED_FIELD");
+            expect(arrayFirst(validationResult.errors)?.code).toBe(
+                "REQUIRED_FIELD"
+            );
             expect(validationResult.metadata?.validator).toBe("SiteValidator");
         });
 
@@ -499,7 +505,9 @@ describe("Shared Types Coverage", () => {
             expect(
                 applyValidationRule(arrayFirst(validationRules)!, "Test Site")
             ).toBeTruthy();
-            expect(applyValidationRule(arrayFirst(validationRules)!, "")).toBeFalsy();
+            expect(
+                applyValidationRule(arrayFirst(validationRules)!, "")
+            ).toBeFalsy();
             expect(
                 applyValidationRule(validationRules[1]!, "https://example.com")
             ).toBeTruthy();

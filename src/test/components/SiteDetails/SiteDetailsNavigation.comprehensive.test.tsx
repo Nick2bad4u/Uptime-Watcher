@@ -14,7 +14,7 @@ import {
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import * as React from "react";
-import { arrayFirst, isEmpty  } from "ts-extras";
+import { arrayFirst, isEmpty } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SiteDetailsNavigationProperties } from "../../../components/SiteDetails/SiteDetailsNavigation";
@@ -41,7 +41,7 @@ const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
 );
 
 // Mock the logger
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         user: {
             action: vi.fn(),
@@ -50,7 +50,7 @@ vi.mock(import('../../../services/logger'), () => ({
 }));
 
 // Mock the theme components
-vi.mock(import('../../../theme/components'), () => ({
+vi.mock("../../../theme/components", () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (
         <div data-testid="themed-box" {...props}>
             {children}
@@ -77,7 +77,7 @@ vi.mock(import('../../../theme/components'), () => ({
 }));
 
 vi.mock(
-    import('../../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
         MonitorSelector: ({
             className,
@@ -114,7 +114,7 @@ vi.mock(
 
 // Mock the SiteMonitoringButton
 vi.mock(
-    import('../../../components/common/SiteMonitoringButton/SiteMonitoringButton'),
+    "../../../components/common/SiteMonitoringButton/SiteMonitoringButton",
     () => ({
         SiteMonitoringButton: vi.fn(
             ({ isLoading, onStartSiteMonitoring, onStopSiteMonitoring }) => (
@@ -336,9 +336,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            const selector = screen.getByTestId(
-                "monitor-selector"
-            );
+            const selector = screen.getByTestId("monitor-selector");
             expect(selector).toHaveValue(httpMonitorId);
         });
 
@@ -384,9 +382,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 handleMonitorIdChange,
             });
 
-            const selector = screen.getByTestId(
-                "monitor-selector"
-            );
+            const selector = screen.getByTestId("monitor-selector");
             fireEvent.change(selector, { target: { value: portMonitorId } });
 
             expect(handleMonitorIdChange).toHaveBeenCalledWith();

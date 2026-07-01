@@ -247,7 +247,7 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             expect(result).toMatch(/^site-[\da-z]+-0\d{3}$/v);
-            expect(stringSplit(result, "-", 3)[2]).toMatch(/^0\d{3}$/v); // Should start with 0 followed by 3-digit microseconds
+            expect(result.split("-", 3)[2]).toMatch(/^0\d{3}$/v); // Should start with 0 followed by 3-digit microseconds
 
             mockNow.mockRestore();
             globalThis.crypto = originalCrypto;
@@ -393,9 +393,8 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Fallback Behavior", "type");
 
-            (
-                crypto as unknown as { randomUUID: unknown }
-            ).randomUUID = "not a function";
+            (crypto as unknown as { randomUUID: unknown }).randomUUID =
+                "not a function";
 
             const result = generateUuid();
 
@@ -411,10 +410,7 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Fallback Behavior", "type");
 
-            Reflect.deleteProperty(
-                globalThis,
-                "crypto"
-            );
+            Reflect.deleteProperty(globalThis, "crypto");
 
             const result = generateUuid();
 

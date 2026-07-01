@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { objectAssign, safeCastTo, arrayFirst   } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
@@ -28,7 +28,7 @@ const tooltipMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../components/common/Tooltip/Tooltip'), () => tooltipMock);
+vi.mock("../../components/common/Tooltip/Tooltip", () => tooltipMock);
 
 const themedTextMock = vi.hoisted(() => ({
     ThemedText: ({ children, ...props }: { children?: ReactNode }) => (
@@ -36,7 +36,7 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedText'), () => themedTextMock);
+vi.mock("../../theme/components/ThemedText", () => themedTextMock);
 
 interface ThemedButtonMockProps {
     "aria-label"?: string;
@@ -50,9 +50,11 @@ interface ThemedButtonMockProps {
     variant?: string;
 }
 
-const themedButtonInvocations = vi.hoisted(() => safeCastTo<ThemedButtonMockProps[]>([]));
+const themedButtonInvocations = vi.hoisted(() =>
+    safeCastTo<ThemedButtonMockProps[]>([])
+);
 
-vi.mock(import('../../theme/components/ThemedButton'), () => ({
+vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: (props: ThemedButtonMockProps) => {
         themedButtonInvocations.push(props);
         const {
@@ -83,7 +85,7 @@ vi.mock(import('../../theme/components/ThemedButton'), () => ({
     },
 }));
 
-vi.mock(import('../../utils/icons'), () => ({
+vi.mock("../../utils/icons", () => ({
     AppIcons: {
         actions: {
             refresh: ({ size }: { size: number }) => (
@@ -111,7 +113,7 @@ const deriveStatusSubscriptionHealthMock = vi.hoisted(() =>
     >(() => healthState.value)
 );
 
-vi.mock(import('../../hooks/useStatusSubscriptionHealth'), () => ({
+vi.mock("../../hooks/useStatusSubscriptionHealth", () => ({
     deriveStatusSubscriptionHealth: (
         summary?: StatusUpdateSubscriptionSummary
     ) => deriveStatusSubscriptionHealthMock(summary),
@@ -142,8 +144,8 @@ const createSiteStoreSnapshot = vi.hoisted(() => () => ({
     statusSubscriptionSummary: siteStoreState.summary,
 }));
 
-vi.mock(import('../../stores/sites/useSitesStore'), () => {
-    const useSitesStoreMock = objectAssign(
+vi.mock("../../stores/sites/useSitesStore", () => {
+    const useSitesStoreMock = Object.assign(
         <Selection,>(
             selector?: (
                 state: ReturnType<typeof createSiteStoreSnapshot>
@@ -280,9 +282,11 @@ describe("StatusSubscriptionIndicator coverage", () => {
         expect(retryButtonsCollection.length).toBeGreaterThan(0);
         fireEvent.click(arrayFirst(retryButtonsCollection)!);
 
-        await waitFor(() =>
-            { expect(siteStoreState.retryStatusSubscription).toHaveBeenCalledWith(); }
-        );
+        await waitFor(() => {
+            expect(
+                siteStoreState.retryStatusSubscription
+            ).toHaveBeenCalledWith();
+        });
 
         expect(
             screen.getByText("Last retry attached 3/3 channels.")

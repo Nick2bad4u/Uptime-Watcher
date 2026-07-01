@@ -9,9 +9,9 @@ repository.
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 
 export default [
-    // Generic (unscoped) presets.
-    uptimeWatcherPlugin.configs.recommended,
-    // Or: uptimeWatcherPlugin.configs["flat/recommended"],
+ // Generic (unscoped) presets.
+ uptimeWatcherPlugin.configs.recommended,
+ // Or: uptimeWatcherPlugin.configs["flat/recommended"],
 ];
 ```
 
@@ -24,9 +24,9 @@ These are exported as **arrays** of flat-config items, so they must be spread:
 import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 
 export default [
-    ...uptimeWatcherPlugin.configs.repo,
-    // Or: ...uptimeWatcherPlugin.configs["repo/core"],
-    // Or: ...uptimeWatcherPlugin.configs["repo/drift-guards"],
+ ...uptimeWatcherPlugin.configs.repo,
+ // Or: ...uptimeWatcherPlugin.configs["repo/core"],
+ // Or: ...uptimeWatcherPlugin.configs["repo/drift-guards"],
 ];
 ```
 

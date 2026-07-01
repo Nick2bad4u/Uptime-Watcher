@@ -15,7 +15,12 @@
  * influence architectural behaviour (logging, test modes, user-data routing)
  * rather than attempting to mirror the entire process.env surface.
  */
-import { isDefined, isFinite as isFiniteNumber, objectEntries, safeCastTo } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteNumber,
+    objectEntries,
+    safeCastTo,
+} from "ts-extras";
 
 export interface KnownEnvironmentVariables {
     /** Token used by coverage reporting tooling when present. */

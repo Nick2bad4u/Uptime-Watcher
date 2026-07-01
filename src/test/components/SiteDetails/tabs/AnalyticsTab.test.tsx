@@ -7,7 +7,7 @@ import type { ChartOptions } from "chart.js";
 import type { ReactNode } from "react";
 
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
+import { arrayAt, arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AnalyticsTabProperties } from "../../../../components/SiteDetails/tabs/AnalyticsTab";
@@ -45,10 +45,6 @@ interface ChartInvocation {
     readonly options: unknown;
 }
 
-interface AvailabilityState {
-    variant: "danger" | "success" | "warning";
-}
-
 const {
     availabilityState,
     badgeInvocations,
@@ -67,10 +63,12 @@ const {
     responseTimeChartInvocations: safeCastTo<ChartInvocation[]>([]),
     statusChartInvocations: safeCastTo<ChartInvocation[]>([]),
     uptimeChartInvocations: safeCastTo<ChartInvocation[]>([]),
-    userActionLogs: safeCastTo<{
-        readonly event: string;
-        readonly payload: unknown;
-    }[]>([]),
+    userActionLogs: safeCastTo<
+        {
+            readonly event: string;
+            readonly payload: unknown;
+        }[]
+    >([]),
     errorLogs: safeCastTo<(readonly [string, Error])[]>([]),
 }));
 
@@ -86,7 +84,7 @@ const themeStub = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         onClick,
@@ -107,13 +105,13 @@ vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/components/ThemedCard'), () => ({
+vi.mock("../../../../theme/components/ThemedCard", () => ({
     ThemedCard: ({ children }: { readonly children: ReactNode }) => (
         <section>{children}</section>
     ),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedBadge'), () => ({
+vi.mock("../../../../theme/components/ThemedBadge", () => ({
     ThemedBadge: ({
         children,
         size,
@@ -128,7 +126,7 @@ vi.mock(import('../../../../theme/components/ThemedBadge'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/components/ThemedProgress'), () => ({
+vi.mock("../../../../theme/components/ThemedProgress", () => ({
     ThemedProgress: ({
         showLabel,
         value,
@@ -143,7 +141,7 @@ vi.mock(import('../../../../theme/components/ThemedProgress'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({
         children,
         style,
@@ -153,7 +151,7 @@ vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     }) => <span style={style}>{children}</span>,
 }));
 
-vi.mock(import('../../../../theme/useTheme'), () => ({
+vi.mock("../../../../theme/useTheme", () => ({
     useTheme: () => ({
         currentTheme: themeStub,
     }),
@@ -166,7 +164,7 @@ vi.mock(import('../../../../theme/useTheme'), () => ({
     }),
 }));
 
-vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
+vi.mock("../../../../components/common/MonitorUiComponents", () => ({
     ConditionalResponseTime: ({
         children,
     }: {
@@ -174,28 +172,28 @@ vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
     }) => <>{children}</>,
 }));
 
-vi.mock(import('../../../../components/SiteDetails/charts/ResponseTimeChart'), () => ({
+vi.mock("../../../../components/SiteDetails/charts/ResponseTimeChart", () => ({
     ResponseTimeChart: ({ data, options }: ChartInvocation) => {
         responseTimeChartInvocations.push({ data, options });
         return <div data-testid="response-time-chart" />;
     },
 }));
 
-vi.mock(import('../../../../components/SiteDetails/charts/StatusChart'), () => ({
+vi.mock("../../../../components/SiteDetails/charts/StatusChart", () => ({
     StatusChart: ({ data, options }: ChartInvocation) => {
         statusChartInvocations.push({ data, options });
         return <div data-testid="status-chart" />;
     },
 }));
 
-vi.mock(import('../../../../components/SiteDetails/charts/UptimeChart'), () => ({
+vi.mock("../../../../components/SiteDetails/charts/UptimeChart", () => ({
     UptimeChart: ({ data, options }: ChartInvocation) => {
         uptimeChartInvocations.push({ data, options });
         return <div data-testid="uptime-chart" />;
     },
 }));
 
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         error: (message: string, error: Error) => {
             errorLogs.push([message, error]);

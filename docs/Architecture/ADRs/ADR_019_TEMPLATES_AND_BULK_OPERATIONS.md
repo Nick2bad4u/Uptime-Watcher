@@ -21,14 +21,14 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Consequences](#consequences)
-5. [Implementation](#implementation)
-6. [Testing & Validation](#testing--validation)
-7. [Related ADRs](#related-adrs)
-8. [Review](#review)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Consequences](#consequences)
+- [Implementation](#implementation)
+- [Testing & Validation](#testing--validation)
+- [Related ADRs](#related-adrs)
+- [Review](#review)
 
 ## Status
 

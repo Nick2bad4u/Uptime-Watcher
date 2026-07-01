@@ -1,46 +1,8 @@
 {
     "$schema": "https://www.schemastore.org/any.json",
-    "baseDir": ".",
-    "tsConfig": "./tsconfig.json",
-    "fileExtensions": [
-        "ts",
-        "tsx",
-        "mts",
-        "cts",
-        "js",
-        "jsx",
-        "mjs",
-        "cjs"
-    ],
-    "includeNpm": true,
-    "layout": "dot",
-    "rankdir": "LR",
-    "fontName": "Inter",
-    "fontSize": "12px",
     "backgroundColor": "#0b0f19",
-    "nodeShape": "box",
-    "nodeStyle": "rounded",
-    "nodeColor": "#1f4aff",
-    "noDependencyColor": "#00bfa6",
+    "baseDir": ".",
     "cyclicNodeColor": "#ff5f6d",
-    "edgeColor": "#4c5d80",
-    "excludeRegExp": [
-        "^\\.cache/",
-        "^coverage/",
-        "^dist/",
-        "^storybook-static/",
-        "^temp/",
-        "^playwright/",
-        "^benchmarks/",
-        "^docs/",
-        "^scripts/",
-        ".*\\.test\\.[tj]sx?$",
-        ".*\\.spec\\.[tj]sx?$",
-        ".*\\.stories\\.[tj]sx?$",
-        "^tailwindcss$",
-        "^tailwind-scrollbar-hide(/v4)?$",
-        "^tw-animate-css$"
-    ],
     "detectiveOptions": {
         "ts": {
             "skipTypeImports": false
@@ -102,5 +64,43 @@
         "tsx": {
             "skipTypeImports": false
         }
-    }
+    },
+    "edgeColor": "#4c5d80",
+    "excludeRegExp": [
+        "^\\.cache/",
+        "^coverage/",
+        "^dist/",
+        "^storybook-static/",
+        "^temp/",
+        "^playwright/",
+        "^benchmarks/",
+        "^docs/",
+        "^scripts/",
+        ".*\\.test\\.[tj]sx?$",
+        ".*\\.spec\\.[tj]sx?$",
+        ".*\\.stories\\.[tj]sx?$",
+        "^tailwindcss$",
+        "^tailwind-scrollbar-hide(/v4)?$",
+        "^tw-animate-css$"
+    ],
+    "fileExtensions": [
+        "ts",
+        "tsx",
+        "mts",
+        "cts",
+        "js",
+        "jsx",
+        "mjs",
+        "cjs"
+    ],
+    "fontName": "Inter",
+    "fontSize": "12px",
+    "includeNpm": true,
+    "layout": "dot",
+    "noDependencyColor": "#00bfa6",
+    "nodeColor": "#1f4aff",
+    "nodeShape": "box",
+    "nodeStyle": "rounded",
+    "rankdir": "LR",
+    "tsConfig": "./tsconfig.json"
 }

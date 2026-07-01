@@ -36,7 +36,7 @@ const mockStoreState = {
     toggleSiteDetailsHeaderCollapsed: mockToggleHeaderCollapsed,
 };
 
-vi.mock(import('../../../stores/ui/useUiStore'), () => ({
+vi.mock("../../../stores/ui/useUiStore", () => ({
     useUIStore: (selector?: (state: typeof mockStoreState) => unknown) =>
         typeof selector === "function"
             ? selector(mockStoreState)
@@ -44,7 +44,7 @@ vi.mock(import('../../../stores/ui/useUiStore'), () => ({
 }));
 
 // Mock the theme hooks
-vi.mock(import('../../../hooks/useThemeStyles'), () => ({
+vi.mock("../../../hooks/useThemeStyles", () => ({
     useThemeStyles: () => ({
         headerStyle: { backgroundColor: "#ffffff" },
         overlayStyle: { opacity: 0.1 },
@@ -53,7 +53,7 @@ vi.mock(import('../../../hooks/useThemeStyles'), () => ({
 }));
 
 // Mock the ScreenshotThumbnail component
-vi.mock(import('../../../components/SiteDetails/ScreenshotThumbnail'), () => ({
+vi.mock("../../../components/SiteDetails/ScreenshotThumbnail", () => ({
     ScreenshotThumbnail: ({
         siteName,
         url,
@@ -72,8 +72,8 @@ vi.mock(import('../../../components/SiteDetails/ScreenshotThumbnail'), () => ({
 }));
 
 // Mock theme components
-vi.mock(import('../../../theme/components'), () => ({
-    StatusIndicator: ({ status, size }: { size: string; status: string; }) => (
+vi.mock("../../../theme/components", () => ({
+    StatusIndicator: ({ status, size }: { size: string; status: string }) => (
         <div
             data-size={size}
             data-status={status}
@@ -95,7 +95,7 @@ vi.mock(import('../../../theme/components'), () => ({
 }));
 
 // Mock MonitoringStatusDisplay
-vi.mock(import('../../../components/SiteDetails/MonitoringStatusDisplay'), () => ({
+vi.mock("../../../components/SiteDetails/MonitoringStatusDisplay", () => ({
     MonitoringStatusDisplay: ({ monitors }: any) => (
         <div data-testid="monitoring-status-display">
             Monitoring {monitors.length} monitors

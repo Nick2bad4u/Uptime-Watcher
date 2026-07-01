@@ -30,7 +30,7 @@ import {
     validateExternalOpenUrlCandidate,
 } from "@shared/utils/urlSafety";
 import * as fc from "fast-check";
-import { arrayAt, objectEntries, safeCastTo   } from "ts-extras";
+import { arrayAt, objectEntries, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Removed unused Site type import
@@ -59,13 +59,13 @@ const createStoreErrorHandlerMock = vi.hoisted(() =>
     }))
 );
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => mockErrorStore),
     },
 }));
 
-vi.mock(import('../../../stores/utils/storeErrorHandling'), () => ({
+vi.mock("../../../stores/utils/storeErrorHandling", () => ({
     createStoreErrorHandler: createStoreErrorHandlerMock,
 }));
 
@@ -79,12 +79,12 @@ const mockLogger = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: mockLogger,
 }));
 
 // Mock SystemService for openExternal functionality
-vi.mock(import('../../../services/SystemService'), () => ({
+vi.mock("../../../services/SystemService", () => ({
     SystemService: {
         openExternal: vi.fn().mockResolvedValue(true),
     },
@@ -1059,9 +1059,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             resetUIStore();
 
             // Act & Assert - setting undefined site should not crash
-            expect(() =>
-                { useUIStore.getState().selectSite(undefined); }
-            ).not.toThrow();
+            expect(() => {
+                useUIStore.getState().selectSite(undefined);
+            }).not.toThrow();
             expect(
                 useUIStore.getState().selectedSiteIdentifier
             ).toBeUndefined();
@@ -1078,9 +1078,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
                 try {
                     // Act & Assert - should not crash
-                    expect(() =>
-                        { useUIStore.getState().openExternal(url); }
-                    ).not.toThrow();
+                    expect(() => {
+                        useUIStore.getState().openExternal(url);
+                    }).not.toThrow();
                 } finally {
                     // Restore electronAPI
                     if (globalThis.window && originalAPI) {

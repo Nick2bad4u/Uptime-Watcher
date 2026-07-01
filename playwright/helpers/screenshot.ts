@@ -4,7 +4,7 @@
  * Provides utilities to take screenshots with consistent naming and location.
  */
 
-import type { ElectronApplication, Page  } from "@playwright/test";
+import type { ElectronApplication, Page } from "@playwright/test";
 
 import { test } from "@playwright/test";
 
@@ -37,7 +37,7 @@ export const SCREENSHOT_CONFIG = {
  * @param options - Optional screenshot options
  */
 export async function takeScreenshot(
-    pageOrApp: Awaited<ReturnType<ElectronApplication["firstWindow"]>>  ,
+    pageOrApp: Awaited<ReturnType<ElectronApplication["firstWindow"]>>,
     name: string,
     options: Parameters<Page["screenshot"]>[0] = {}
 ): Promise<void> {
@@ -75,7 +75,7 @@ export async function takeScreenshot(
  * @param step - Debug step description
  */
 export async function debugScreenshot(
-    pageOrApp: Awaited<ReturnType<ElectronApplication["firstWindow"]>>  ,
+    pageOrApp: Awaited<ReturnType<ElectronApplication["firstWindow"]>>,
     step: string
 ): Promise<void> {
     await takeScreenshot(pageOrApp, `debug-${step}`);

@@ -104,7 +104,7 @@ export const AppSidebar: NamedExoticComponent = memo(
 
         const sitesByIdentifier = useMemo(
             () =>
-                new Map(sites.map((site) => [site, site.identifier] as const)),
+                new Map(sites.map((site) => [site.identifier, site] as const)),
             [sites]
         );
 

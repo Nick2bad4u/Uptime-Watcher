@@ -12,21 +12,21 @@ const baseUrl = process.env["DOCUSAURUS_BASE_URL"] ?? "/Uptime-Watcher/";
 const enableExperimentalFaster =
     process.env["DOCUSAURUS_ENABLE_EXPERIMENTAL"] === "true";
 
-const removeHeadAttrFlagKey = [
+const removeHeadAttrFlagKey: string = [
     "remove",
     "Le",
     "gacyPostBuildHeadAttribute",
 ].join("");
 
-const futureConfig = {
+const futureConfig: Config["future"] = {
     ...(enableExperimentalFaster && {
-              experimental_faster: {
-                  mdxCrossCompilerCache: true,
-                  rspackBundler: true,
-                  rspackPersistentCache: true,
-                  ssgWorkerThreads: true,
-              },
-          }),
+        experimental_faster: {
+            mdxCrossCompilerCache: true,
+            rspackBundler: true,
+            rspackPersistentCache: true,
+            ssgWorkerThreads: true,
+        },
+    }),
     v4: {
         [removeHeadAttrFlagKey]: true,
         // NOTE: Enabling cascade layers currently breaks our production CSS output
@@ -35,14 +35,14 @@ const futureConfig = {
         // Re-enable only after verifying the build output CSS is valid.
         useCssCascadeLayers: false,
     },
-} satisfies Config["future"];
+};
 
-const socialCardImage = new URL(
+const socialCardImage: string = new URL(
     "img/uptime-watcher-social-card.jpg",
     `${siteUrl}${baseUrl}`
 ).href;
 
-const modernEnhancementsClientModule = fileURLToPath(
+const modernEnhancementsClientModule: string = fileURLToPath(
     new URL("src/js/modernEnhancements.ts", import.meta.url)
 );
 
@@ -57,7 +57,7 @@ const pwaMaskIconColor = "#71B041";
  * Controls the docs, blog, pages, theming, plugins, and deployment settings
  * used when building the documentation site hosted on GitHub Pages.
  */
-const config = {
+const config: Config = {
     // Set the /<baseUrl>/ pathname under which your site is served
     baseUrl,
     baseUrlIssueBanner: true,

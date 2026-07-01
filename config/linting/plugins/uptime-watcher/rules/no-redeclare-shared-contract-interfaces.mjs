@@ -15,7 +15,11 @@
 export const noRedeclareSharedContractInterfacesRule = {
     /**
      * @param {{
-     *     report: (arg0: { node: any; messageId: string; data: { name: any } }) => void;
+     *     report: (arg0: {
+     *         node: any;
+     *         messageId: string;
+     *         data: { name: any };
+     *     }) => void;
      * }} context
      */
     create(context) {

@@ -499,9 +499,9 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
                     const result = formatTitleSuffix(testMonitor);
 
                     // Should still work, as JavaScript coerces null to string
-                    expect(
-                        typeof result === "string" || result === null
-                    ).toBe(true);
+                    expect(typeof result === "string" || result === null).toBe(
+                        true
+                    );
                 }
             );
         });

@@ -1,6 +1,6 @@
 /**
- * Auto-updater service for the Uptime Watcher app. Handles automatic
- * app updates using electron-updater.
+ * Auto-updater service for the Uptime Watcher app. Handles automatic app
+ * updates using electron-updater.
  */
 
 import {
@@ -14,8 +14,8 @@ import { autoUpdater } from "electron-updater";
 import { logger } from "../../utils/logger";
 
 /**
- * Service responsible for handling app auto-updates. Manages update
- * checking, downloading, and installation.
+ * Service responsible for handling app auto-updates. Manages update checking,
+ * downloading, and installation.
  *
  * @remarks
  * This service wraps electron-updater functionality and provides a clean
@@ -170,8 +170,8 @@ export class AutoUpdaterService {
      * - Update-downloaded: Download completed
      * - Error: Update process errors
      *
-     * Call this method only once per app instance to avoid duplicate
-     * event listeners.
+     * Call this method only once per app instance to avoid duplicate event
+     * listeners.
      *
      * @returns Void
      */

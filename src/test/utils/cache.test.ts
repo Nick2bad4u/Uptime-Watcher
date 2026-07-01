@@ -9,7 +9,7 @@
  */
 
 import { fc, test } from "@fast-check/vitest";
-import { arrayFirst, isDefined  } from "ts-extras";
+import { arrayFirst, isDefined } from "ts-extras";
 import {
     afterEach,
     beforeEach,
@@ -614,7 +614,9 @@ describe("Cache Utilities", () => {
                 await annotate("Type: Caching", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
-                expect(() => { cache.cleanup(); }).not.toThrow();
+                expect(() => {
+                    cache.cleanup();
+                }).not.toThrow();
                 expect(cache.size).toBe(0);
             });
 
@@ -1133,7 +1135,7 @@ describe("Cache Utilities", () => {
                                 k,
                                 v,
                                 t,
-                            ]) => [k, [t, v] as const]
+                            ]) => [k, [v, t] as const]
                         )
                     ),
                 ];
@@ -1549,9 +1551,7 @@ describe("Cache Utilities", () => {
                         cache.set(key, value);
 
                         // Property: has() and get() should be consistent
-                        expect(cache.has(key)).toBe(
-                            isDefined(cache.get(key))
-                        );
+                        expect(cache.has(key)).toBe(isDefined(cache.get(key)));
 
                         if (cache.has(key)) {
                             expect(cache.get(key)).toBe(value);

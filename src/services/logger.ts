@@ -49,9 +49,9 @@ interface LoggerInterface extends UnifiedLogger {
      * Raw access to the underlying electron-log instance.
      *
      * @remarks
-     * Use with caution! Direct access bypasses the app's logging
-     * conventions and structured format. Only use for advanced scenarios where
-     * the standard logger methods are insufficient.
+     * Use with caution! Direct access bypasses the app's logging conventions
+     * and structured format. Only use for advanced scenarios where the standard
+     * logger methods are insufficient.
      *
      * @example
      *
@@ -174,11 +174,7 @@ const buildFinalArgs = (
     context: unknown
 ): Readonly<UnknownArray> =>
     context
-        ? [
-              arrayFirst(logArgs),
-              context,
-              ...logArgs.slice(1),
-          ]
+        ? [arrayFirst(logArgs), context, ...logArgs.slice(1)]
         : [...logArgs];
 
 type LogMethodName = "debug" | "error" | "info" | "silly" | "verbose" | "warn";

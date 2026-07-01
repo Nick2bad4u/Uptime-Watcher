@@ -28,9 +28,7 @@ describe(MonitorManager, () => {
 
     beforeEach(() => {
         dependencies = {
-            databaseService: {
-                /* Mock */
-            },
+            databaseService: {/* Mock */},
             eventEmitter: { emitTyped: vi.fn() },
             getHistoryLimit: () => 10,
             getSitesCache: () => ({ get: vi.fn(), set: vi.fn() }),

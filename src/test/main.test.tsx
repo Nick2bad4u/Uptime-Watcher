@@ -19,21 +19,21 @@ const mockAppLogger = {
     error: vi.fn(),
 };
 
-vi.mock(import('../services/logger'), () => ({
+vi.mock("../services/logger", () => ({
     logger: {
         app: mockAppLogger,
     },
 }));
 
-vi.mock(import('react-dom/client'), () => ({
+vi.mock("react-dom/client", () => ({
     createRoot: mockCreateRoot,
 }));
 
-vi.mock(import('../App'), () => ({
+vi.mock("../App", () => ({
     App: () => "MockedApp",
 }));
 
-vi.mock(import('../index.css'), () => ({}));
+vi.mock("../index.css", () => ({}));
 
 describe("main.tsx - Application Entry Point", () => {
     beforeEach(() => {

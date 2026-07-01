@@ -17,10 +17,14 @@
  * @packageDocumentation
  */
 
-/* eslint-disable prefer-named-capture-group */
-
 import { fc, test as fcTest } from "@fast-check/vitest";
-import { arrayFirst, arrayJoin, isEmpty, objectKeys, safeCastTo     } from "ts-extras";
+import {
+    arrayFirst,
+    arrayJoin,
+    isEmpty,
+    objectKeys,
+    safeCastTo,
+} from "ts-extras";
 import { afterEach, beforeEach, describe, expect } from "vitest";
 
 // --- Type declarations to help TS infer fast-check outputs ---
@@ -76,7 +80,7 @@ interface SiteState {
 }
 
 type StateAction =
-    | { payload: any; type: "BULK_STATUS_UPDATE" | "UPDATE_STATUS"; }
+    | { payload: any; type: "BULK_STATUS_UPDATE" | "UPDATE_STATUS" }
     | {
           payload: MonitorState | Partial<MonitorState>;
           type:
@@ -368,11 +372,7 @@ describe("comprehensive State Management Fuzzing", () => {
                         enabled?: boolean | undefined;
                         name?: string | undefined;
                         status?:
-                            | "down"
-                            | "paused"
-                            | "pending"
-                            | "up"
-                            | undefined;
+                            "down" | "paused" | "pending" | "up" | undefined;
                     };
                 }[]
             ) => {
@@ -537,7 +537,9 @@ describe("comprehensive State Management Fuzzing", () => {
                     } {
                         const validator =
                             this.validators[
-                                safeCastTo<keyof typeof this.validators>(actionToDispatch.type)
+                                safeCastTo<keyof typeof this.validators>(
+                                    actionToDispatch.type
+                                )
                             ];
 
                         if (!validator) {
@@ -724,10 +726,9 @@ describe("comprehensive State Management Fuzzing", () => {
                             } catch (error) {
                                 const failed = {
                                     ...action,
-                                    error:
-                                        Error.isError(error)
-                                            ? error.message
-                                            : "Unknown error",
+                                    error: Error.isError(error)
+                                        ? error.message
+                                        : "Unknown error",
                                     processedAt: new Date(),
                                     success: false,
                                 };
@@ -833,10 +834,9 @@ describe("comprehensive State Management Fuzzing", () => {
                             };
                         } catch (error) {
                             return {
-                                error:
-                                    Error.isError(error)
-                                        ? error.message
-                                        : "Deserialization failed",
+                                error: Error.isError(error)
+                                    ? error.message
+                                    : "Deserialization failed",
                                 state: null,
                                 success: false,
                             };
@@ -867,10 +867,9 @@ describe("comprehensive State Management Fuzzing", () => {
                         } catch (error) {
                             return {
                                 data: null,
-                                error:
-                                    Error.isError(error)
-                                        ? error.message
-                                        : "Serialization failed",
+                                error: Error.isError(error)
+                                    ? error.message
+                                    : "Serialization failed",
                                 success: false,
                             };
                         }
@@ -942,12 +941,14 @@ describe("comprehensive State Management Fuzzing", () => {
                         );
 
                         // Property: Date objects should be restored (if they were valid originally)
+                        const originalMonitor = arrayFirst(
+                            stateSnapshot.monitors
+                        );
                         if (
                             stateSnapshot.monitors.length > 0 &&
-                            arrayFirst(stateSnapshot.monitors)
+                            originalMonitor
                         ) {
-                            const originalDate =
-                                arrayFirst(stateSnapshot.monitors).createdAt;
+                            const originalDate = originalMonitor.createdAt;
                             const deserializedDate =
                                 deserialResult.state.monitors[0]?.createdAt;
 
@@ -1076,10 +1077,9 @@ describe("comprehensive State Management Fuzzing", () => {
                                 };
                             } catch (error) {
                                 attempts.push({
-                                    error:
-                                        Error.isError(error)
-                                            ? error.message
-                                            : "Unknown error",
+                                    error: Error.isError(error)
+                                        ? error.message
+                                        : "Unknown error",
                                     strategy: i,
                                     success: false,
                                 });
@@ -1205,5 +1205,3 @@ describe("comprehensive State Management Fuzzing", () => {
         );
     });
 });
-
-/* eslint-enable prefer-named-capture-group */

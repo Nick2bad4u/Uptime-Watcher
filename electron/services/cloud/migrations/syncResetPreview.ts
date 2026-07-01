@@ -1,7 +1,12 @@
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
-import { isDefined, isFinite as isFiniteNumber, objectKeys, safeCastTo } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteNumber,
+    objectKeys,
+    safeCastTo,
+} from "ts-extras";
 
 import type { CloudObjectEntry } from "../providers/CloudStorageProvider.types";
 
@@ -84,9 +89,9 @@ export function buildCloudSyncResetPreview(args: {
         }
     }
 
-    const perDevice: PreviewDevice[] = [...safeCastTo<Iterable<PreviewDevice>>(
-        perDeviceMap.values()
-    )];
+    const perDevice: PreviewDevice[] = [
+        ...safeCastTo<Iterable<PreviewDevice>>(perDeviceMap.values()),
+    ];
     perDevice.sort((a, b) => a.deviceId.localeCompare(b.deviceId));
 
     const deviceIds = objectKeys(args.manifest.devices);

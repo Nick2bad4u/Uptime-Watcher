@@ -6,7 +6,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { arrayAt, arrayFirst  } from "ts-extras";
+import { arrayAt, arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SiteTableRowProperties } from "../../../../components/Dashboard/SiteList/SiteTableRow";
@@ -14,7 +14,7 @@ import type { SiteTableRowProperties } from "../../../../components/Dashboard/Si
 import { SiteTableRow } from "../../../../components/Dashboard/SiteList/SiteTableRow";
 import { useSite } from "../../../../hooks/site/useSite";
 
-vi.mock(import('../../../../hooks/site/useSite'), () => ({
+vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: vi.fn(),
 }));
 
@@ -35,7 +35,7 @@ interface MockActionButtonGroupProps {
 let actionButtonProps: MockActionButtonGroupProps | undefined;
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
         MonitorSelector: ({
             className,
@@ -51,7 +51,9 @@ vi.mock(
                 <button
                     className={className}
                     data-testid="monitor-selector"
-                    onClick={() => { onChange({ target: { value: "monitor-2" } }); }}
+                    onClick={() => {
+                        onChange({ target: { value: "monitor-2" } });
+                    }}
                     type="button"
                 >
                     selector:{selectedMonitorId}
@@ -62,7 +64,7 @@ vi.mock(
 );
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
         ActionButtonGroup: (props: MockActionButtonGroupProps) => {
             actionButtonProps = props;
@@ -80,14 +82,14 @@ vi.mock(
     })
 );
 
-vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => ({
+vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
     MarqueeText: ({ text }: { readonly text: string }) => {
         marqueeTextCalls.push(text);
         return <span data-testid="marquee-text">{text}</span>;
     },
 }));
 
-vi.mock(import('../../../../components/common/StatusBadge'), () => ({
+vi.mock("../../../../components/common/StatusBadge", () => ({
     StatusBadge: ({
         formatter,
         label,
@@ -99,7 +101,7 @@ vi.mock(import('../../../../components/common/StatusBadge'), () => ({
     }) => <span data-testid="status-badge">{formatter(label, status)}</span>,
 }));
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({
         children,
         className,

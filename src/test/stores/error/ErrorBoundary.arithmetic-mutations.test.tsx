@@ -15,7 +15,7 @@
 
 import type { JSX } from "react";
 
-import { fireEvent, render, screen  } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 // Import the jest-dom matchers for toBeInTheDocument
 import "@testing-library/jest-dom";
@@ -89,7 +89,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
 
         // Mock console.error to suppress error boundary log output
         const originalConsoleError = console.error;
-        vi.spyOn(console, 'error').mockImplementation();
+        vi.spyOn(console, "error").mockReturnValue(undefined);
 
         try {
             // Set component to throw error initially
@@ -145,7 +145,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         annotate("Type: Arithmetic Operations", "type");
 
         const originalConsoleError = console.error;
-        vi.spyOn(console, 'error').mockImplementation();
+        vi.spyOn(console, "error").mockReturnValue(undefined);
 
         try {
             // First mount with error
@@ -182,7 +182,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
 
             // Second retry - retryCount should be 1 + 1 = 2
             isGlobalShouldThrow = false;
-            const retryButton2 = screen.getByRole("button", { name: /retry/iv });
+            const retryButton2 = screen.getByRole("button", {
+                name: /retry/iv,
+            });
             fireEvent.click(retryButton2);
 
             // Should succeed again - demonstrating consistent arithmetic
@@ -209,7 +211,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         annotate("Type: Arithmetic Operations", "type");
 
         const originalConsoleError = console.error;
-        vi.spyOn(console, 'error').mockImplementation();
+        vi.spyOn(console, "error").mockReturnValue(undefined);
 
         try {
             // This test validates that retryCount arithmetic affects the key prop
@@ -248,7 +250,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
 
             // Second retry should increment retryCount to 2
             isGlobalShouldThrow = false;
-            const retryButton2 = screen.getByRole("button", { name: /retry/iv });
+            const retryButton2 = screen.getByRole("button", {
+                name: /retry/iv,
+            });
             fireEvent.click(retryButton2);
 
             // Should see normal content again - key should have changed due to retryCount increment

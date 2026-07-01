@@ -21,7 +21,7 @@
 
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
-import { arrayAt, arrayFirst, stringSplit   } from "ts-extras";
+import { arrayAt, arrayFirst, stringSplit } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type {
@@ -268,7 +268,7 @@ describe("themeManager Property-Based Tests", () => {
 
         // Mock DOM environment
         originalDocument = document;
-        originalWindow = globalThis;
+        originalWindow = globalThis.window;
         globalThis.document = mockDocument as any;
         globalThis.window = mockWindow as any;
 
@@ -287,7 +287,9 @@ describe("themeManager Property-Based Tests", () => {
         "should successfully apply any valid theme to DOM",
         (theme) => {
             // Apply theme should not throw and should call style setProperty
-            expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
+            expect(() => {
+                themeManager.applyTheme(theme);
+            }).not.toThrow();
 
             // Verify CSS properties were set
             expect(
@@ -413,9 +415,7 @@ describe("themeManager Property-Based Tests", () => {
             const availableThemes = themeManager.getAvailableThemes();
 
             if (isValid) {
-                expect(availableThemes).toContain(
-                    potentialThemeName
-                );
+                expect(availableThemes).toContain(potentialThemeName);
             } else {
                 expect(availableThemes).not.toContain(
                     potentialThemeName as ThemeName
@@ -508,7 +508,9 @@ describe("themeManager Property-Based Tests", () => {
             );
 
             // Cleanup should not throw
-            expect(() => { cleanup(); }).not.toThrow();
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
         }
     );
 
@@ -518,8 +520,9 @@ describe("themeManager Property-Based Tests", () => {
             const cssVariables = themeManager.generateCSSVariables(theme);
 
             // Split into lines and check format
-            const lines = stringSplit(cssVariables, "\n")
-                .filter((line) => line.trim().length > 0);
+            const lines = stringSplit(cssVariables, "\n").filter(
+                (line) => line.trim().length > 0
+            );
 
             // First line should be :root {
             expect(arrayFirst(lines)!.trim()).toBe(":root {");
@@ -530,7 +533,9 @@ describe("themeManager Property-Based Tests", () => {
             // Middle lines should be CSS variables
             const variableLines = lines.slice(1, -1);
             for (const line of variableLines) {
-                expect(line).toMatch(/^\s+--[\w-]+:\s*(?:\S.*|[\t\v\f \xa0\u{1680}\u{2000}-\u{200a}\u{202F}\u{205f}\u{3000}\u{feff}]);$/u);
+                expect(line).toMatch(
+                    /^\s+--[\w-]+:\s*(?:\S.*|[\t\v\f \xA0\u{1680}\u{2000}-\u{200A}\u{202F}\u{205F}\u{3000}\u{FEFF}]);$/u
+                );
             }
 
             // Should contain expected variable types
@@ -558,7 +563,9 @@ describe("themeManager Property-Based Tests", () => {
 
         const theme = themes.light;
 
-        expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
+        expect(() => {
+            themeManager.applyTheme(theme);
+        }).not.toThrow();
     });
 
     it("should handle missing window gracefully", () => {

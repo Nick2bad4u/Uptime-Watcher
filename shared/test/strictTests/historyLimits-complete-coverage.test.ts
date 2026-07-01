@@ -48,9 +48,7 @@ describe(normalizeHistoryLimit, () => {
     });
 
     it("throws a RangeError when the value is infinite or above the maximum", () => {
-        expect(() => normalizeHistoryLimit(Infinity)).toThrow(
-            RangeError
-        );
+        expect(() => normalizeHistoryLimit(Infinity)).toThrow(RangeError);
         expect(() =>
             normalizeHistoryLimit(customRules.maxLimit + 1, customRules)
         ).toThrow(RangeError);

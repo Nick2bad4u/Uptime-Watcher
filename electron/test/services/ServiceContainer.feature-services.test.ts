@@ -15,7 +15,7 @@ import { ServiceContainer } from "../../services/ServiceContainer.js";
 // setupMiddleware) without prototype corruption caused by function-based
 // constructor mocks.
 vi.mock("../../events/TypedEventBus.js", () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock in tests
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Required for mock in tests
     const { EventEmitter } = require("node:events");
 
     // eslint-disable-next-line unicorn/prefer-event-target -- Production TypedEventBus extends EventEmitter; mock must preserve the same base for compatibility

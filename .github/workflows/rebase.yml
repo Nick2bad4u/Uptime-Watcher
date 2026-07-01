@@ -1,44 +1,43 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Automatic Rebase
-run-name: Automatic rebase
+name: "Automatic Rebase"
+run-name: "Automatic rebase"
 
 on:
     issue_comment:
-        types: [created]
+        types: ["created"]
 permissions:
-    contents: read
+    contents: "read"
 
 jobs:
     rebase:
         permissions:
-            contents: write # for cirrus-actions/rebase to push code to rebase
-            pull-requests: read # for cirrus-actions/rebase to get info about PR
-        name: Rebase
-        runs-on: ubuntu-latest
+            contents: "write" # for cirrus-actions/rebase to push code to rebase
+            pull-requests: "read" # for cirrus-actions/rebase to get info about PR
+        name: "Rebase"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 15
         if: >-
-            github.event.issue.pull_request != '' &&
-            (
+            github.event.issue.pull_request != '' && (
               contains(github.event.comment.body, '/rebase') ||
               contains(github.event.comment.body, '/autosquash')
             )
         concurrency:
-            group: rebase-${{ github.ref }}
+            group: "rebase-${{ github.ref }}"
             cancel-in-progress: false
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout the latest code
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout the latest code"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  token: "${{ secrets.GITHUB_TOKEN }}"
                   fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
-            - name: Automatic Rebase
-              uses: cirrus-actions/rebase@b87d48154a87a85666003575337e27b8cd65f691 # 1.8
+            - name: "Automatic Rebase"
+              uses: "cirrus-actions/rebase@b87d48154a87a85666003575337e27b8cd65f691" # 1.8
               with:
-                  autosquash: ${{ contains(github.event.comment.body, '/autosquash') || contains(github.event.comment.body, '/rebase-autosquash') }}
+                  autosquash: "${{ contains(github.event.comment.body, '/autosquash') || contains(github.event.comment.body, '/rebase-autosquash') }}"
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

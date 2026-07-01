@@ -3,9 +3,9 @@
  *
  * @remarks
  * Contains configuration values, UI constants, fallback data, and type
- * definitions used throughout the frontend app. This module serves as
- * the single source of truth for application-wide constants to ensure
- * consistency and maintainability.
+ * definitions used throughout the frontend app. This module serves as the
+ * single source of truth for application-wide constants to ensure consistency
+ * and maintainability.
  *
  * @example
  *

@@ -3,9 +3,9 @@
  *
  * @remarks
  * Provides consistent caching behavior, event emission, statistics, and
- * invalidation strategies across the entire app. Features TTL
- * expiration, LRU eviction, bulk operations, and comprehensive metrics tracking
- * for optimal performance monitoring.
+ * invalidation strategies across the entire app. Features TTL expiration, LRU
+ * eviction, bulk operations, and comprehensive metrics tracking for optimal
+ * performance monitoring.
  *
  * @packageDocumentation
  */
@@ -741,7 +741,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         if (options?.emitEvent ?? true) {
             this.emitEvent("internal:cache:item-cached", {
                 key,
-                ...((requestedTTL > 0) && { ttl: requestedTTL }),
+                ...(requestedTTL > 0 && { ttl: requestedTTL }),
             });
         }
     }

@@ -343,9 +343,17 @@ export const CloudSection = ({
                 ? UnlockIcon
                 : LockIcon;
         return <IconComponent aria-hidden size={buttonIconSize} />;
-    }, [buttonIconSize, encryptionMode, isEncryptionLocked, LockIcon, UnlockIcon]);
+    }, [
+        buttonIconSize,
+        encryptionMode,
+        isEncryptionLocked,
+        LockIcon,
+        UnlockIcon,
+    ]);
 
-    const notConfiguredHint = renderCloudNotConfiguredHint({ configured: isConfigured });
+    const notConfiguredHint = renderCloudNotConfiguredHint({
+        configured: isConfigured,
+    });
 
     return (
         <SettingsSection

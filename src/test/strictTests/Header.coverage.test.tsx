@@ -5,7 +5,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Header } from "../../components/Header/Header";
@@ -28,7 +28,7 @@ const tooltipModuleMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../components/common/Tooltip/Tooltip'), () => tooltipModuleMock);
+vi.mock("../../components/common/Tooltip/Tooltip", () => tooltipModuleMock);
 
 const themedTextModuleMock = vi.hoisted(() => ({
     ThemedText: ({
@@ -51,7 +51,7 @@ const themedTextModuleMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedText'), () => themedTextModuleMock);
+vi.mock("../../theme/components/ThemedText", () => themedTextModuleMock);
 
 const themedBoxModuleMock = vi.hoisted(() => ({
     ThemedBox: ({
@@ -76,7 +76,7 @@ const themedBoxModuleMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedBox'), () => themedBoxModuleMock);
+vi.mock("../../theme/components/ThemedBox", () => themedBoxModuleMock);
 
 const statusIndicatorRenderSpy = vi.hoisted(() => ({
     render: vi.fn(({ status }: { status: string }) => (
@@ -84,7 +84,7 @@ const statusIndicatorRenderSpy = vi.hoisted(() => ({
     )),
 }));
 
-vi.mock(import('../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../theme/components/StatusIndicator", () => ({
     StatusIndicator: statusIndicatorRenderSpy.render,
 }));
 
@@ -94,7 +94,7 @@ const statusSubscriptionIndicatorSpy = vi.hoisted(() => ({
     )),
 }));
 
-vi.mock(import('../../components/Header/StatusSubscriptionIndicator'), () => ({
+vi.mock("../../components/Header/StatusSubscriptionIndicator", () => ({
     StatusSubscriptionIndicator: statusSubscriptionIndicatorSpy.component,
 }));
 
@@ -104,7 +104,7 @@ const uiStoreState = vi.hoisted(() => ({
     setShowSettings: vi.fn(),
 }));
 
-vi.mock(import('../../stores/ui/useUiStore'), () => ({
+vi.mock("../../stores/ui/useUiStore", () => ({
     useUIStore: (selector?: unknown) => {
         const state = {
             setShowAddSiteModal: uiStoreState.setShowAddSiteModal,
@@ -123,9 +123,8 @@ const themeState = vi.hoisted(() => ({
     toggleTheme: vi.fn(),
 }));
 
-vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
-    const actual =
-        (await importOriginal());
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>();
     return {
         ...actual,
         useTheme: () => ({
@@ -156,7 +155,7 @@ const metricsState = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../hooks/useGlobalMonitoringMetrics'), () => ({
+vi.mock("../../hooks/useGlobalMonitoringMetrics", () => ({
     useGlobalMonitoringMetrics: () => metricsState.metrics,
 }));
 

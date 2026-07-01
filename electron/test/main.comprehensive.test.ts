@@ -403,7 +403,9 @@ describe("main.ts - Electron Main Process", () => {
 
             if (beforeExitHandler) {
                 // The beforeExit handler doesn't throw synchronously - it logs and handles errors internally
-                expect(() => { beforeExitHandler(); }).not.toThrow();
+                expect(() => {
+                    beforeExitHandler();
+                }).not.toThrow();
 
                 // Give some time for the async cleanup to run and error handling to complete
                 await new Promise((resolve) => setTimeout(resolve, 100));

@@ -126,13 +126,15 @@ describe("Final Function Coverage Push", () => {
         };
         const isSiteResult = siteSchemas.validateSiteData(validSite).success;
         expect(
-            typeof isSiteResult === "boolean" || typeof isSiteResult === "object"
+            typeof isSiteResult === "boolean" ||
+                typeof isSiteResult === "object"
         ).toBeTruthy();
 
         const invalidSite = {};
         const isSiteResult2 = siteSchemas.validateSiteData(invalidSite).success;
         expect(
-            typeof isSiteResult2 === "boolean" || typeof isSiteResult2 === "object"
+            typeof isSiteResult2 === "boolean" ||
+                typeof isSiteResult2 === "object"
         ).toBeTruthy();
     });
 
@@ -149,7 +151,6 @@ describe("Final Function Coverage Push", () => {
         annotate("Component: final-function-coverage-push", "component");
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
-
 
         const typeGuards = await import("../../shared/utils/typeGuards");
 
@@ -369,7 +370,6 @@ describe("Final Function Coverage Push", () => {
 
         const typeHelpers = await import("../../shared/utils/typeHelpers");
         for (const key of objectKeys(typeHelpers)) {
-
             const fn = (typeHelpers as any)[key];
             if (typeof fn === "function") {
                 try {

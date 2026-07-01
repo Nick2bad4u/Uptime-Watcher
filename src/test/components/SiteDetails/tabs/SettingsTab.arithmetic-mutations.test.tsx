@@ -27,7 +27,7 @@ let sampledMonitorUrl: string;
 const monitorIdentifierRef = { value: "" };
 
 // Mock all external dependencies
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         info: vi.fn(),
@@ -36,7 +36,7 @@ vi.mock(import('../../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/useTheme'), () => ({
+vi.mock("../../../../theme/useTheme", () => ({
     useTheme: () => ({
         currentTheme: {
             name: "light",
@@ -177,7 +177,7 @@ vi.mock(import('../../../../theme/useTheme'), () => ({
     useThemeValue: () => "mockValue",
 }));
 
-vi.mock(import('../../../../utils/monitorTypeHelper'), () => ({
+vi.mock("../../../../utils/monitorTypeHelper", () => ({
     getMonitorTypeConfig: vi.fn().mockResolvedValue({
         fields: [
             {
@@ -189,7 +189,7 @@ vi.mock(import('../../../../utils/monitorTypeHelper'), () => ({
     }),
 }));
 
-vi.mock(import('../../../../utils/fallbacks'), () => ({
+vi.mock("../../../../utils/fallbacks", () => ({
     getMonitorDisplayIdentifier: vi.fn(() => monitorIdentifierRef.value),
     getMonitorTypeDisplayLabel: vi.fn().mockReturnValue("URL"),
     UiDefaults: {
@@ -198,14 +198,14 @@ vi.mock(import('../../../../utils/fallbacks'), () => ({
     },
 }));
 
-vi.mock(import('../../../../utils/time'), () => ({
+vi.mock("../../../../utils/time", () => ({
     formatRetryAttemptsText: vi.fn(
         (attempts: number) => `${attempts + 1} attempts + backoff`
     ),
     getIntervalLabel: vi.fn((interval: number) => `${interval / 1000}s`),
 }));
 
-vi.mock(import('../../../../constants'), () => ({
+vi.mock("../../../../constants", () => ({
     CHECK_INTERVALS: [
         30_000,
         60_000,

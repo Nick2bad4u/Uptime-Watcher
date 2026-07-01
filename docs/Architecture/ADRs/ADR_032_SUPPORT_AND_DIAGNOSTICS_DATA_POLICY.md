@@ -116,15 +116,15 @@ Additional restricted data:
 
 ### 3.1) Example inclusion matrix
 
-| Category                          | Default | User opt-in  | Notes                                                   |
-| --------------------------------- | ------- | ------------ | ------------------------------------------------------- |
-| App version / build info          | ✅       | n/a          | Safe and required                                       |
-| OS + runtime info                 | ✅       | n/a          | Avoid unique hardware identifiers                       |
-| Log excerpts (recent)             | ✅       | n/a          | Must be redacted                                        |
-| Full logs                         | ❌       | ✅            | Can include sensitive context; redaction still required |
-| Monitor list (URLs)               | ❌       | ✅            | Explicit acknowledgement required                       |
-| Cloud provider status (no tokens) | ✅       | n/a          | Account labels must be masked or excluded by default    |
-| Database file                     | ❌       | ✅ (advanced) | Must warn that it can contain sensitive URLs            |
+| Category                          | Default | User opt-in   | Notes                                                   |
+| --------------------------------- | ------- | ------------- | ------------------------------------------------------- |
+| App version / build info          | ✅      | n/a           | Safe and required                                       |
+| OS + runtime info                 | ✅      | n/a           | Avoid unique hardware identifiers                       |
+| Log excerpts (recent)             | ✅      | n/a           | Must be redacted                                        |
+| Full logs                         | ❌      | ✅            | Can include sensitive context; redaction still required |
+| Monitor list (URLs)               | ❌      | ✅            | Explicit acknowledgement required                       |
+| Cloud provider status (no tokens) | ✅      | n/a           | Account labels must be masked or excluded by default    |
+| Database file                     | ❌      | ✅ (advanced) | Must warn that it can contain sensitive URLs            |
 
 ### 4) Redaction policy
 

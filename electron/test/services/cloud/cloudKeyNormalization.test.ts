@@ -52,7 +52,11 @@ describe("cloudKeyNormalization", () => {
     });
 
     it("assertCloudObjectKey rejects empty and trailing slash keys", () => {
-        expect(() => { assertCloudObjectKey(""); }).toThrow("cannot be empty");
-        expect(() => { assertCloudObjectKey("backups/"); }).toThrow("must not end");
+        expect(() => {
+            assertCloudObjectKey("");
+        }).toThrow("cannot be empty");
+        expect(() => {
+            assertCloudObjectKey("backups/");
+        }).toThrow("must not end");
     });
 });

@@ -1,10 +1,12 @@
 # @example
 
 <!-- prettier-ignore-start -->
-|    |    |
-| -- | -- |
+
+|                  |                                                                  |
+| ---------------- | ---------------------------------------------------------------- |
 | Standardization: | [Extended](https://tsdoc.org/pages/spec/standardization_groups/) |
-| Syntax kind: | [Block tag](https://tsdoc.org/pages/spec/tag_kinds/) |
+| Syntax kind:     | [Block tag](https://tsdoc.org/pages/spec/tag_kinds/)             |
+
 <!-- prettier-ignore-end -->
 
 ## Usage
@@ -20,6 +22,7 @@ as a title for the example. Otherwise, the documentation tool can index the exam
 For this code sample, the generated titles might be **"Example"** and **"Example 2"**:
 
 <!-- prettier-ignore -->
+
 ````ts
 
 /**
@@ -47,6 +50,7 @@ export function add(x: number, y: number): number {}
 For this code sample, the generated title might be **"Example: Parsing a basic JSON file"**:
 
 <!-- prettier-ignore -->
+
 ````ts
 
 /**

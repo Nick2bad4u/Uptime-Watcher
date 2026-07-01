@@ -76,12 +76,12 @@ test.describe(
                 });
 
                 expect.soft(properties).not.toBeNull();
-                expect.soft(
-                    properties?.highlight.trim().length ?? 0
-                ).toBeGreaterThan(0);
-                expect.soft(
-                    properties?.borderWeak.trim().length ?? 0
-                ).toBeGreaterThan(0);
+                expect
+                    .soft(properties?.highlight.trim().length ?? 0)
+                    .toBeGreaterThan(0);
+                expect
+                    .soft(properties?.borderWeak.trim().length ?? 0)
+                    .toBeGreaterThan(0);
             }
         );
 
@@ -97,9 +97,9 @@ test.describe(
 
                 await ensureCardLayout(page);
 
-                const initialClasses = await page.evaluate(() => (
-                        document.querySelector(".site-grid")?.className ?? ""
-                    ));
+                const initialClasses = await page.evaluate(
+                    () => document.querySelector(".site-grid")?.className ?? ""
+                );
                 expect.soft(initialClasses).toContain("site-grid--stacked");
 
                 const listButton = page.getByRole("button", { name: "List" });
@@ -116,9 +116,9 @@ test.describe(
                 const miniButton = page.getByRole("button", { name: "Mini" });
                 await miniButton.click();
 
-                const compactClasses = await page.evaluate(() => (
-                        document.querySelector(".site-grid")?.className ?? ""
-                    ));
+                const compactClasses = await page.evaluate(
+                    () => document.querySelector(".site-grid")?.className ?? ""
+                );
                 expect.soft(compactClasses).toContain("site-grid--compact");
             }
         );
@@ -136,27 +136,26 @@ test.describe(
 
                 await ensureCardLayout(page);
 
-                await expect.soft(
-                    getSiteCardLocator(page, createdSite.name)
-                ).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect
+                    .soft(getSiteCardLocator(page, createdSite.name))
+                    .toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
 
                 const largeButton = page.getByRole("button", { name: "Large" });
                 await largeButton.click();
 
                 const gridButton = page.getByRole("button", { name: "Grid" });
-                await expect.soft(gridButton).toHaveAttribute(
-                    "aria-pressed",
-                    /false|true/v
-                );
+                await expect
+                    .soft(gridButton)
+                    .toHaveAttribute("aria-pressed", /false|true/v);
 
                 await gridButton.click();
-                await expect.soft(gridButton).toHaveAttribute(
-                    "aria-pressed",
-                    "true",
-                    { timeout: WAIT_TIMEOUTS.MEDIUM }
-                );
+                await expect
+                    .soft(gridButton)
+                    .toHaveAttribute("aria-pressed", "true", {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
                 await expect
                     .poll(
                         () =>
@@ -176,11 +175,11 @@ test.describe(
                     name: "Stacked",
                 });
                 await stackedButton.click();
-                await expect.soft(stackedButton).toHaveAttribute(
-                    "aria-pressed",
-                    "true",
-                    { timeout: WAIT_TIMEOUTS.MEDIUM }
-                );
+                await expect
+                    .soft(stackedButton)
+                    .toHaveAttribute("aria-pressed", "true", {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
                 await expect
                     .poll(
                         () =>

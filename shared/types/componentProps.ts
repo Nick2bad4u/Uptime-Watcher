@@ -223,8 +223,7 @@ export type ClickWithEventHandler<TElement extends HTMLElement = HTMLElement> =
  * @public
  */
 export type ClickFlexibleHandler<TElement extends HTMLElement = HTMLElement> =
-    | (() => void)
-    | ((event: MouseEvent<TElement>) => void);
+    (() => void) | ((event: MouseEvent<TElement>) => void);
 
 /**
  * Value-based change handler for form components.
@@ -247,8 +246,8 @@ export type ChangeWithEventHandler<
  *
  * @remarks
  * This namespace provides convenient access to all event handler types used
- * throughout the app. It promotes consistency and makes it easier to
- * discover available handler types.
+ * throughout the app. It promotes consistency and makes it easier to discover
+ * available handler types.
  */
 // eslint-disable-next-line @typescript-eslint/no-namespace -- Namespace provides organized access to event handler types for better developer experience and API consistency
 export namespace EventHandlers {

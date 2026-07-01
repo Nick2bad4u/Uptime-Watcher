@@ -44,14 +44,14 @@ Use this as a cleanup baseline, not as a failure threshold.
 
 Prefer names that describe why the test exists:
 
-| Suffix or term | Use for |
-| -------------- | ------- |
-| `.test` | Default behavior/unit tests with stable user or module expectations. |
-| `.regression.test` | A specific bug that must not return. Link or name the behavior in the test title. |
-| `.integration.test` | Cross-module behavior that needs real wiring or persistence boundaries. |
-| `.property.test` | Fast-check/property tests where generated input is the main value. |
-| `.fuzz.test` | Broad generated-input stress tests that are intentionally less scenario-specific. |
-| `.benchmark.test` | Performance checks that are not ordinary correctness tests. |
+| Suffix or term      | Use for                                                                           |
+| ------------------- | --------------------------------------------------------------------------------- |
+| `.test`             | Default behavior/unit tests with stable user or module expectations.              |
+| `.regression.test`  | A specific bug that must not return. Link or name the behavior in the test title. |
+| `.integration.test` | Cross-module behavior that needs real wiring or persistence boundaries.           |
+| `.property.test`    | Fast-check/property tests where generated input is the main value.                |
+| `.fuzz.test`        | Broad generated-input stress tests that are intentionally less scenario-specific. |
+| `.benchmark.test`   | Performance checks that are not ordinary correctness tests.                       |
 
 Avoid adding new `final`, `100`, `coverage`, `coverage-boost`, `missing-lines`,
 or `comprehensive` names. If a coverage-oriented suite must remain, its file

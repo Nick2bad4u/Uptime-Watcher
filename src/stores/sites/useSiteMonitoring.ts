@@ -178,9 +178,15 @@ export const createSiteMonitoringActions = (
                 siteIdentifier: statusUpdate.siteIdentifier,
                 status: statusUpdate.status,
                 timestamp: statusUpdate.timestamp,
-                ...(isDefined(statusUpdate.details) && { details: statusUpdate.details }),
-                ...(isDefined(statusUpdate.previousStatus) && { previousStatus: statusUpdate.previousStatus }),
-                ...(isDefined(statusUpdate.responseTime) && { responseTime: statusUpdate.responseTime }),
+                ...(isDefined(statusUpdate.details) && {
+                    details: statusUpdate.details,
+                }),
+                ...(isDefined(statusUpdate.previousStatus) && {
+                    previousStatus: statusUpdate.previousStatus,
+                }),
+                ...(isDefined(statusUpdate.responseTime) && {
+                    responseTime: statusUpdate.responseTime,
+                }),
             };
 
             const updatedSites = safeApplyStatusUpdate(

@@ -23,7 +23,7 @@ interface Site {
 }
 
 // Mock all the sub-hooks
-vi.mock(import('../../../hooks/site/useSiteMonitor'), () => ({
+vi.mock("../../../hooks/site/useSiteMonitor", () => ({
     useSiteMonitor: vi.fn(() => ({
         filteredHistory: [
             { timestamp: Date.now(), status: "up", responseTime: 100 },
@@ -44,7 +44,7 @@ vi.mock(import('../../../hooks/site/useSiteMonitor'), () => ({
     })),
 }));
 
-vi.mock(import('../../../hooks/site/useSiteStats'), () => ({
+vi.mock("../../../hooks/site/useSiteStats", () => ({
     useSiteStats: vi.fn(() => ({
         uptime: 99.5,
         averageResponseTime: 150,
@@ -52,7 +52,7 @@ vi.mock(import('../../../hooks/site/useSiteStats'), () => ({
     })),
 }));
 
-vi.mock(import('../../../hooks/site/useSiteActions'), () => ({
+vi.mock("../../../hooks/site/useSiteActions", () => ({
     useSiteActions: vi.fn(() => ({
         handleCheckNow: vi.fn(),
         handleStartMonitoring: vi.fn(),
@@ -63,7 +63,7 @@ vi.mock(import('../../../hooks/site/useSiteActions'), () => ({
     })),
 }));
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(
         (selector?: (state: { isLoading: boolean }) => unknown) => {
             const state = {

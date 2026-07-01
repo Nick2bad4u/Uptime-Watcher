@@ -18,15 +18,15 @@ tags:
 
 ## Table of Contents
 
-1. [Why This Exists](#why-this-exists)
-2. [Configuration Overview](#configuration-overview)
-3. [Running the Suite](#running-the-suite)
-4. [Execution Flow](#execution-flow)
-5. [Writing Tests](#writing-tests)
-6. [Coverage](#coverage)
-7. [Mocking Network Traffic with MSW](#mocking-network-traffic-with-msw)
-8. [CI Reporting Outputs](#ci-reporting-outputs)
-9. [Troubleshooting](#troubleshooting)
+- [Why This Exists](#why-this-exists)
+- [Configuration Overview](#configuration-overview)
+- [Running the Suite](#running-the-suite)
+- [Execution Flow](#execution-flow)
+- [Writing Tests](#writing-tests)
+- [Coverage](#coverage)
+- [Mocking Network Traffic with MSW](#mocking-network-traffic-with-msw)
+- [CI Reporting Outputs](#ci-reporting-outputs)
+- [Troubleshooting](#troubleshooting)
 
 ## Why This Exists
 

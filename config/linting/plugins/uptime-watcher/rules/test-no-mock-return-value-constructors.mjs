@@ -93,11 +93,13 @@ export const testNoMockReturnValueConstructorsRule = {
                 const callee = unwrapExpression(node.callee);
 
                 // Vi.mocked(...)
-                return callee?.type === "MemberExpression" &&
+                return (
+                    callee?.type === "MemberExpression" &&
                     callee.object?.type === "Identifier" &&
                     callee.object.name === "vi" &&
                     callee.property?.type === "Identifier" &&
-                    callee.property.name === "mocked";
+                    callee.property.name === "mocked"
+                );
             },
             unwrapExpression = (/** @type {any} */ node) => {
                 let current = node;

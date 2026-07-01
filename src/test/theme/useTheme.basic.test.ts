@@ -13,7 +13,7 @@ import {
     useThemeValue,
 } from "../../theme/useTheme";
 
-vi.mock(import('../../stores/settings/useSettingsStore'), () => ({
+vi.mock("../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(() => ({
         settings: { theme: "light" },
         updateSettings: vi.fn(),

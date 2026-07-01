@@ -29,7 +29,7 @@
 # - labeler.yml does NOT contain colors/descriptions. The script uses embedded
 #   defaults for known labels, and (unless -Strict) a fallback for unknown labels.
 # =============================================================================
-"CI/CD":
+CI/CD:
     - changed-files:
           - any-glob-to-any-file:
                 - ".github/workflows/**"
@@ -44,7 +44,7 @@ backend:
                 - "server/**/*"
                 - "api/**/*"
 
-"breaking change":
+breaking change:
     - body:
           - pattern: "(?i)breaking change"
           - pattern: "(?i)breaking"
@@ -129,7 +129,7 @@ frontend:
                 - "src/components/**/*"
                 - "src/pages/**/*"
 
-"good first issue":
+good first issue:
     - body:
           - pattern: "(?i)good first issue"
           - pattern: "(?i)beginner friendly"
@@ -139,7 +139,7 @@ frontend:
           - pattern: "(?i)beginner"
           - pattern: "(?i)starter"
 
-"help wanted":
+help wanted:
     - body:
           - pattern: "(?i)help wanted"
           - pattern: "(?i)looking for help"

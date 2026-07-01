@@ -53,10 +53,7 @@ function describeValue(v: unknown): string {
  * @throws Always throws an error including a description of the unexpected
  *   value.
  */
-export function assertNever(
-    value: never,
-    context = "exhaustive-check"
-): never {
+export function assertNever(value: never, context = "exhaustive-check"): never {
     throw new Error(
         `[${context}] Reached unreachable code with value: ${describeValue(value)}`
     );

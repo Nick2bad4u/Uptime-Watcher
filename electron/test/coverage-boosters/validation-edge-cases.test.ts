@@ -20,7 +20,7 @@ describe("Validation Error Paths and Edge Cases", () => {
 
             const validateUrl = (
                 url: string
-            ): { protocol?: string; valid: boolean; } => {
+            ): { protocol?: string; valid: boolean } => {
                 try {
                     const parsed = new URL(url);
                     return { valid: true, protocol: parsed.protocol };

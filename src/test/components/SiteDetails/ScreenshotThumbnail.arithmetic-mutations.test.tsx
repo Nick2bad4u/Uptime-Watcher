@@ -33,7 +33,7 @@ import {
 } from "../../../components/SiteDetails/ScreenshotThumbnail";
 
 // Mock the logger (following existing pattern)
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         user: {
@@ -44,14 +44,14 @@ vi.mock(import('../../../services/logger'), () => ({
 }));
 
 // Mock theme hook (following existing pattern)
-vi.mock(import('../../../theme/useTheme'), () => ({
+vi.mock("../../../theme/useTheme", () => ({
     useTheme: () => ({
         themeName: "light",
     }),
 }));
 
 // Mock useUIStore (following existing pattern)
-vi.mock(import('../../../stores/ui/useUiStore'), () => ({
+vi.mock("../../../stores/ui/useUiStore", () => ({
     useUIStore: (
         selector?: (state: { openExternal: () => void }) => unknown
     ) => {
@@ -64,7 +64,7 @@ vi.mock(import('../../../stores/ui/useUiStore'), () => ({
 }));
 
 // Mock useMount hook (following existing pattern)
-vi.mock(import('../../../hooks/useMount'), () => ({
+vi.mock("../../../hooks/useMount", () => ({
     useMount: vi.fn((initCallback) => {
         setTimeout(() => {
             initCallback();
@@ -73,7 +73,7 @@ vi.mock(import('../../../hooks/useMount'), () => ({
 }));
 
 // Mock navigation to prevent JSDOM errors
-vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation();
+vi.spyOn(HTMLAnchorElement.prototype, "click").mockReturnValue(undefined);
 const originalSetAttribute = Element.prototype.setAttribute;
 Element.prototype.setAttribute = function (name: string, value: string) {
     if (
@@ -82,7 +82,8 @@ Element.prototype.setAttribute = function (name: string, value: string) {
         value.startsWith("http")
     ) {
         // Use a hash URL instead of the actual URL to prevent JSDOM navigation
-        originalSetAttribute.call(this, name, "#"); return;
+        originalSetAttribute.call(this, name, "#");
+        return;
     }
     originalSetAttribute.call(this, name, value);
 };
@@ -136,7 +137,9 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         });
 
         // Mock getBoundingClientRect
-        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(createMockRect());
+        vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue(
+            createMockRect()
+        );
 
         // Mock document.body for portal container
         if (!document.body) {

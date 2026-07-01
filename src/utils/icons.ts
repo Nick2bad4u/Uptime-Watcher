@@ -2,9 +2,9 @@
  * Centralized icon system using react-icons.
  *
  * @remarks
- * Provides a consistent, type-safe way to use icons throughout the app.
- * All icons are sourced from `react-icons` to ensure visual consistency and
- * reduce bundle size compared to inline SVG or emoji.
+ * Provides a consistent, type-safe way to use icons throughout the app. All
+ * icons are sourced from `react-icons` to ensure visual consistency and reduce
+ * bundle size compared to inline SVG or emoji.
  *
  * @public
  */

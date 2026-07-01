@@ -281,9 +281,9 @@ describe("timeout Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(
-                isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)
-            ).toBe(false);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)).toBe(
+                false
+            );
             expect(isValidTimeoutMs(0)).toBe(false);
             expect(isValidTimeoutMs(-1000)).toBe(false);
         });
@@ -297,9 +297,9 @@ describe("timeout Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(
-                isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)
-            ).toBe(false);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)).toBe(
+                false
+            );
             expect(isValidTimeoutMs(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
@@ -351,9 +351,9 @@ describe("timeout Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(
-                isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 1)
-            ).toBe(false);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 1)).toBe(
+                false
+            );
             expect(isValidTimeoutSeconds(0)).toBe(false);
             expect(isValidTimeoutSeconds(-1)).toBe(false);
         });
@@ -367,9 +367,9 @@ describe("timeout Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(
-                isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 1)
-            ).toBe(false);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 1)).toBe(
+                false
+            );
             expect(isValidTimeoutSeconds(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
@@ -612,9 +612,9 @@ describe("timeout Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(getTimeoutSeconds()).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
-            expect(
-                isValidTimeoutSeconds(DEFAULT_REQUEST_TIMEOUT_SECONDS)
-            ).toBe(true);
+            expect(isValidTimeoutSeconds(DEFAULT_REQUEST_TIMEOUT_SECONDS)).toBe(
+                true
+            );
         });
     });
 

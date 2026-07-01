@@ -70,10 +70,7 @@ export function attachForwardedMetadata<TPayload extends object>(
         return payload;
     }
 
-    const metaCandidate = Reflect.get(
-        source,
-        FORWARDED_METADATA_PROPERTY_KEY
-    );
+    const metaCandidate = Reflect.get(source, FORWARDED_METADATA_PROPERTY_KEY);
 
     if (!isEventMetadataGuard(metaCandidate)) {
         return payload;
@@ -83,7 +80,7 @@ export function attachForwardedMetadata<TPayload extends object>(
         source,
         ORIGINAL_METADATA_PROPERTY_KEY
     )
-        ? (Reflect.get(source, ORIGINAL_METADATA_PROPERTY_KEY))
+        ? Reflect.get(source, ORIGINAL_METADATA_PROPERTY_KEY)
         : undefined;
 
     const originalMeta = isEventMetadataGuard(originalMetaCandidate)

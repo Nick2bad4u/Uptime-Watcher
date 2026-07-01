@@ -19,17 +19,17 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Service Categories](#service-categories)
-5. [Initialization Sequence](#initialization-sequence)
-6. [Event Forwarding Architecture](#event-forwarding-architecture)
-7. [Consequences](#consequences)
-8. [Implementation Guidelines](#implementation-guidelines)
-9. [Testing Considerations](#testing-considerations)
-10. [Compliance](#compliance)
-11. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Service Categories](#service-categories)
+- [Initialization Sequence](#initialization-sequence)
+- [Event Forwarding Architecture](#event-forwarding-architecture)
+- [Consequences](#consequences)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Testing Considerations](#testing-considerations)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 

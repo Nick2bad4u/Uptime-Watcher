@@ -4,7 +4,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { objectKeys, objectValues  } from "ts-extras";
+import { objectKeys, objectValues } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 describe("Monitor Form Data Types Coverage Tests", () => {
@@ -435,7 +435,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
             const testValue = (
                 value: number,
-                range: { max: number; min: number; }
+                range: { max: number; min: number }
             ) => value >= range.min && value <= range.max;
 
             expect(testValue(30_000, fieldRanges.checkInterval)).toBeTruthy();

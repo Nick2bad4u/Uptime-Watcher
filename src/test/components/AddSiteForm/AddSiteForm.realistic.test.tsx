@@ -25,7 +25,7 @@ import { useAddSiteForm } from "../../../components/SiteDetails/useAddSiteForm";
 // Mock the useAddSiteForm hook using vi.hoisted - keeping as backup
 const mockUseAddSiteForm = vi.hoisted(() => vi.fn());
 
-vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
+vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: mockUseAddSiteForm,
 }));
 
@@ -52,7 +52,7 @@ const renderForm = async (): Promise<void> => {
 // no beforeAll / afterAll hook - warnings should not be necessary with proper mocks
 
 // Mock stores
-vi.mock(import('../../../stores/useErrorStore'), () => ({
+vi.mock("../../../stores/useErrorStore", () => ({
     useErrorStore: vi.fn(() => ({
         clearError: vi.fn(),
         isLoading: false,
@@ -73,7 +73,7 @@ const mockSiteEntries = [
     },
 ];
 
-vi.mock(import('../../../stores/useSitesStore'), () => ({
+vi.mock("../../../stores/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
         addMonitorToSite: vi.fn(),
         createSite: vi.fn(),
@@ -82,7 +82,7 @@ vi.mock(import('../../../stores/useSitesStore'), () => ({
 }));
 
 // Mock hooks
-vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
+vi.mock("../../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: vi.fn(() => ({
         isLoading: false,
         options: [
@@ -92,14 +92,13 @@ vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
     })),
 }));
 
-vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
 // Mock constants (partial to preserve other exports)
-vi.mock(import('../../../constants'), async (importOriginal) => {
-    const actual =
-        (await importOriginal());
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>();
     return {
         ...actual,
         ARIA_LABEL: {
@@ -126,7 +125,7 @@ vi.mock(import('../../../constants'), async (importOriginal) => {
 });
 
 // Mock other components
-vi.mock(import('../../../components/AddSiteForm/DynamicMonitorFields'), () => ({
+vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => {
         if (monitorType === "http") {
             return (
@@ -190,11 +189,11 @@ vi.mock(import('../../../components/AddSiteForm/DynamicMonitorFields'), () => ({
     },
 }));
 
-vi.mock(import('../../../utils/data/generateUuid'), () => ({
+vi.mock("../../../utils/data/generateUuid", () => ({
     generateUuid: vi.fn(() => "test-uuid"),
 }));
 
-vi.mock(import('../../../utils/logger'), () => ({
+vi.mock("../../../utils/logger", () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -569,7 +568,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            vi.spyOn(mockFormHook, 'isFormValid').mockReturnValue(true);
+            vi.spyOn(mockFormHook, "isFormValid").mockReturnValue(true);
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
             await renderForm();

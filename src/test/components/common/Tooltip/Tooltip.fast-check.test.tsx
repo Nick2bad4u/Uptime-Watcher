@@ -72,7 +72,9 @@ describe("Tooltip fast-check coverage", () => {
         expect(document.querySelector(".tooltip")).toBeNull();
 
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).not.toBeNull();
+            },
             { timeout: 500 }
         );
         const tooltip = document.querySelector(".tooltip");
@@ -81,7 +83,9 @@ describe("Tooltip fast-check coverage", () => {
 
         fireEvent.blur(trigger);
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).toBeNull();
+            },
             { timeout: 500 }
         );
 
@@ -102,13 +106,17 @@ describe("Tooltip fast-check coverage", () => {
         const trigger = document.querySelector("button")!;
         fireEvent.keyDown(trigger, { key: "Enter" });
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).not.toBeNull();
+            },
             { timeout: 500 }
         );
 
         fireEvent.keyDown(trigger, { key: "Escape" });
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).toBeNull();
+            },
             { timeout: 500 }
         );
 
@@ -122,31 +130,37 @@ describe("Tooltip fast-check coverage", () => {
             </Tooltip>
         );
 
-        const container = document.querySelector(
-            ".tooltip-container"
-        )!;
+        const container = document.querySelector(".tooltip-container")!;
 
         fireEvent.mouseEnter(container);
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).not.toBeNull();
+            },
             { timeout: 500 }
         );
 
         fireEvent.mouseLeave(container);
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).toBeNull();
+            },
             { timeout: 700 }
         );
 
         fireEvent.touchStart(container);
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).not.toBeNull();
+            },
             { timeout: 500 }
         );
 
         fireEvent.touchEnd(container);
         await waitFor(
-            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
+            () => {
+                expect(document.querySelector(".tooltip")).toBeNull();
+            },
             { timeout: 700 }
         );
 
@@ -189,18 +203,16 @@ describe("Tooltip fast-check coverage", () => {
                 </Tooltip>
             );
 
-            const container = document.querySelector(
-                ".tooltip-container"
-            )!;
+            const container = document.querySelector(".tooltip-container")!;
             fireEvent.mouseEnter(container);
             await waitFor(
-                () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
+                () => {
+                    expect(document.querySelector(".tooltip")).not.toBeNull();
+                },
                 { timeout: 500 }
             );
 
-            const tooltip = document.querySelector(
-                ".tooltip"
-            )!;
+            const tooltip = document.querySelector<HTMLElement>(".tooltip")!;
             expect(tooltip).not.toBeNull();
             expect(tooltip).toHaveClass(`tooltip--${position}`);
             expect(tooltip).toHaveClass(tooltipClass);

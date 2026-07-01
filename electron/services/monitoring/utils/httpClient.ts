@@ -259,9 +259,7 @@ function enforceRedirectSafety(options: unknown): void {
     const auth = typeof options["auth"] === "string" ? options["auth"] : "";
 
     if (protocol.length > 0 && !setHas(ALLOWED_REDIRECT_PROTOCOLS, protocol)) {
-        const error = new Error(
-            `Unsupported redirect protocol: ${protocol}`
-        );
+        const error = new Error(`Unsupported redirect protocol: ${protocol}`);
         Reflect.set(error, "code", "UW_UNSUPPORTED_REDIRECT_PROTOCOL");
         throw error;
     }

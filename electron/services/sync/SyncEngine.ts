@@ -21,7 +21,16 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import { isDefined, isFinite as isFiniteNumber, isSafeInteger, objectEntries, objectHasIn, objectKeys, objectValues, setHas } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteNumber,
+    isSafeInteger,
+    objectEntries,
+    objectHasIn,
+    objectKeys,
+    objectValues,
+    setHas,
+} from "ts-extras";
 
 import type { CloudStorageProvider } from "../cloud/providers/CloudStorageProvider.types";
 
@@ -151,8 +160,7 @@ export class SyncEngine {
 
         const deviceId = await this.getOrCreateDeviceId();
 
-        // Read the remote manifest first so we can advance nextOpId if the local settings have been reset but the
-        // deviceId is still present.
+        // Read the remote manifest first so we can advance nextOpId if the local settings have been reset but the deviceId is still present.
         //
         // Without this, we can accidentally reuse old opIds which may be
         // treated as already-compacted and dropped by other devices.
@@ -239,8 +247,10 @@ export class SyncEngine {
 
                   const compactedUpTo =
                       compacted[metadata.deviceId]?.compactedUpToOpId;
-                  return compactedUpTo === undefined ||
-                      metadata.lastOpId > compactedUpTo;
+                  return (
+                      compactedUpTo === undefined ||
+                      metadata.lastOpId > compactedUpTo
+                  );
               })
             : opObjects;
 
@@ -318,8 +328,7 @@ export class SyncEngine {
 
         await transport.writeManifest(nextManifest);
 
-        // Best-effort cleanup: delete the previous snapshot and any fully compacted operation objects to keep remote
-        // storage bounded.
+        // Best-effort cleanup: delete the previous snapshot and any fully compacted operation objects to keep remote storage bounded.
         //
         // @remarks
         // This is especially important when enabling encryption after older
@@ -333,7 +342,10 @@ export class SyncEngine {
                 const compactedUpTo =
                     nextManifest.devices[metadata.deviceId]?.compactedUpToOpId;
 
-                if (isDefined(compactedUpTo) && metadata.lastOpId <= compactedUpTo) {
+                if (
+                    isDefined(compactedUpTo) &&
+                    metadata.lastOpId <= compactedUpTo
+                ) {
                     keysToDelete.push(entry.key);
                 }
             }
@@ -563,9 +575,11 @@ export class SyncEngine {
         return deviceId;
     }
 
-    private async getNextOpId(): Promise<number> { const raw = await this.settings.get(SETTINGS_KEY_NEXT_OP_ID);
+    private async getNextOpId(): Promise<number> {
+        const raw = await this.settings.get(SETTINGS_KEY_NEXT_OP_ID);
         const value = raw ? Number(raw) : 0;
-        return isFiniteNumber(value) && value >= 0 ? value : 0; }
+        return isFiniteNumber(value) && value >= 0 ? value : 0;
+    }
 
     private async getBaseline(): Promise<CloudSyncBaseline> {
         const raw = await this.settings.get(SETTINGS_KEY_BASELINE);
@@ -780,7 +794,10 @@ export class SyncEngine {
 
         const nextMonitor: Record<string, CloudSyncEntityState> = {};
         for (const [monitorId, entity] of objectEntries(state.monitor)) {
-            if (isDefined(entity.deleted) || setHas(keepMonitorIds, monitorId)) {
+            if (
+                isDefined(entity.deleted) ||
+                setHas(keepMonitorIds, monitorId)
+            ) {
                 nextMonitor[monitorId] = entity;
             }
         }

@@ -8,7 +8,6 @@ import {
     CacheKeys,
     isStandardizedCacheKey,
     parseCacheKey,
-    type StandardizedCacheKey,
 } from "@shared/utils/cacheKeys";
 import { describe, expect, it } from "vitest";
 
@@ -79,9 +78,7 @@ describe("cacheKeys Direct Function Coverage", () => {
         });
 
         // Test 3-part keys
-        expect(
-            parseCacheKey("monitor:operation:test")
-        ).toEqual({
+        expect(parseCacheKey("monitor:operation:test")).toEqual({
             prefix: "monitor",
             operation: "operation",
             identifier: "test",
@@ -94,8 +91,8 @@ describe("cacheKeys Direct Function Coverage", () => {
         expect(() => parseCacheKey(":missing")).toThrow(
             "Invalid cache key format"
         );
-        expect(() =>
-            parseCacheKey("missing::")
-        ).toThrow("Invalid cache key format");
+        expect(() => parseCacheKey("missing::")).toThrow(
+            "Invalid cache key format"
+        );
     });
 });

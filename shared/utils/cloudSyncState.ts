@@ -308,17 +308,18 @@ function applyOperation(
         return;
     }
 
-    state[operation.entityType][operation.entityId] =
-        isDefined(existingDeletion)
-            ? {
-                  ...entity,
-                  deleted: existingDeletion,
-                  fields: nextFields,
-              }
-            : {
-                  ...entity,
-                  fields: nextFields,
-              };
+    state[operation.entityType][operation.entityId] = isDefined(
+        existingDeletion
+    )
+        ? {
+              ...entity,
+              deleted: existingDeletion,
+              fields: nextFields,
+          }
+        : {
+              ...entity,
+              fields: nextFields,
+          };
 }
 
 /**
@@ -330,9 +331,7 @@ export function applyCloudSyncOperationsToState(
 ): CloudSyncState {
     const state = cloneState(initialState);
 
-    const sorted = [...operations].toSorted(
-        compareOperationsDeterministic
-    );
+    const sorted = [...operations].toSorted(compareOperationsDeterministic);
     for (const operation of sorted) {
         applyOperation(state, operation);
     }
@@ -348,9 +347,7 @@ export function applyCloudSyncOperations(
 ): CloudSyncState {
     const state = createEmptyState();
 
-    const sorted = [...operations].toSorted(
-        compareOperationsDeterministic
-    );
+    const sorted = [...operations].toSorted(compareOperationsDeterministic);
     for (const operation of sorted) {
         applyOperation(state, operation);
     }

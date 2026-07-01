@@ -181,7 +181,6 @@ type StoryDecoratorContext = StoryDecoratorParams[1];
 
 type StoryDecoratorParams = Parameters<Decorator>;
 
-// eslint-disable-next-line react-refresh/only-export-components -- Internal component accompanying utility exports within Storybook helpers.
 const SiteStoryDecorator = ({
     context,
     getSites,

@@ -61,9 +61,7 @@ interface MonitorCreatedEvent extends BaseDomainEvent {
 }
 
 type DomainEvent =
-    | SiteCreatedEvent
-    | SiteStatusChangedEvent
-    | MonitorCreatedEvent;
+    SiteCreatedEvent | SiteStatusChangedEvent | MonitorCreatedEvent;
 
 class MockDomainEventFactory {
     private eventIdCounter = 0;

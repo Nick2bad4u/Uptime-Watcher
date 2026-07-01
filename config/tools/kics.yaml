@@ -153,22 +153,22 @@ preview-lines: 5
 
 # Output Configuration
 report-formats:
-    - json
-    - sarif
-    - html
-    - sonarqube
+    - "json"
+    - "sarif"
+    - "html"
+    - "sonarqube"
 timeout: 120
 # Core Scanning Configuration
 type:
-    - Terraform
-    - Kubernetes
-    - CloudFormation
-    - Ansible
-    - OpenAPI
-    - DockerCompose
-    - Crossplane
-    - Pulumi
-    - ServerlessFW
+    - "Terraform"
+    - "Kubernetes"
+    - "CloudFormation"
+    - "Ansible"
+    - "OpenAPI"
+    - "DockerCompose"
+    - "Crossplane"
+    - "Pulumi"
+    - "ServerlessFW"
 
 # Verbosity and Logging
 verbose: true

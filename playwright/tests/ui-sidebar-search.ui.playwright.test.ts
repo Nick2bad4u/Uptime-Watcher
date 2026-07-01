@@ -87,54 +87,62 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await expect.soft(navigation.getByRole("button")).toHaveCount(
-                    createdSiteNames.length,
-                    {
+                await expect
+                    .soft(navigation.getByRole("button"))
+                    .toHaveCount(createdSiteNames.length, {
                         timeout: WAIT_TIMEOUTS.LONG,
-                    }
-                );
+                    });
 
                 const alphaSiteName = createdSiteNames[0]!;
                 const betaSiteName = createdSiteNames[1]!;
 
                 await searchBox.fill("Alpha");
-                await expect.soft(navigation.getByRole("button")).toHaveCount(1, {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                await expect.soft(
-                    navigation.getByRole("button", {
-                        name: new RegExp(alphaSiteName),
-                    })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(navigation.getByRole("button"))
+                    .toHaveCount(1, {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
+                await expect
+                    .soft(
+                        navigation.getByRole("button", {
+                            name: new RegExp(alphaSiteName),
+                        })
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await searchBox.fill("Beta");
-                await expect.soft(navigation.getByRole("button")).toHaveCount(1, {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                await expect.soft(
-                    navigation.getByRole("button", {
-                        name: new RegExp(betaSiteName),
-                    })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(navigation.getByRole("button"))
+                    .toHaveCount(1, {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
+                await expect
+                    .soft(
+                        navigation.getByRole("button", {
+                            name: new RegExp(betaSiteName),
+                        })
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await searchBox.fill("Nope");
-                await expect.soft(navigation.getByRole("button")).toHaveCount(0, {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                await expect.soft(
-                    navigation.getByText("No sites match your search.")
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(navigation.getByRole("button"))
+                    .toHaveCount(0, {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
+                await expect
+                    .soft(navigation.getByText("No sites match your search."))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await searchBox.fill("");
-                await expect.soft(navigation.getByRole("button")).toHaveCount(
-                    createdSiteNames.length,
-                    {
+                await expect
+                    .soft(navigation.getByRole("button"))
+                    .toHaveCount(createdSiteNames.length, {
                         timeout: WAIT_TIMEOUTS.MEDIUM,
-                    }
-                );
-                await expect.soft(
-                    navigation.getByText("No sites match your search.")
-                ).toBeHidden({ timeout: WAIT_TIMEOUTS.SHORT });
+                    });
+                await expect
+                    .soft(navigation.getByText("No sites match your search."))
+                    .toBeHidden({ timeout: WAIT_TIMEOUTS.SHORT });
             }
         );
     }

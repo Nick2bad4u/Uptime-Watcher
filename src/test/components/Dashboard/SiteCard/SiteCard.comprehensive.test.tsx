@@ -10,8 +10,8 @@ import {
 } from "../../../utils/mockFactories";
 
 // Mock theme components
-vi.mock(import('../../../../theme/components'), async (importOriginal) => {
-    const actual = (await importOriginal());
+vi.mock("../../../../theme/components", async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>();
     return {
         ...actual,
         ThemedBox: ({ children, ...props }: any) => (
@@ -28,7 +28,7 @@ vi.mock(import('../../../../theme/components'), async (importOriginal) => {
 });
 
 // Mock the SiteCard components
-vi.mock(import('../SiteCardHeader'), () => ({
+vi.mock("../SiteCardHeader", () => ({
     SiteCardHeader: () => (
         <div data-testid="site-card-header">
             Site Header <div data-testid="site-card-footer">Site Footer</div>
@@ -36,24 +36,24 @@ vi.mock(import('../SiteCardHeader'), () => ({
     ),
 }));
 
-vi.mock(import('../SiteCardStatus'), () => ({
+vi.mock("../SiteCardStatus", () => ({
     SiteCardStatus: () => <div data-testid="site-card-status">Site Status</div>,
 }));
 
-vi.mock(import('../SiteCardHistory'), () => ({
+vi.mock("../SiteCardHistory", () => ({
     SiteCardHistory: () => (
         <div data-testid="site-card-history">Site History</div>
     ),
 }));
 
-vi.mock(import('../SiteCardMetrics'), () => ({
+vi.mock("../SiteCardMetrics", () => ({
     SiteCardMetrics: () => (
         <div data-testid="site-card-metrics-content">Site Metrics</div>
     ),
 }));
 
 // Mock the hooks
-vi.mock(import('../../../../hooks/site/useSite'), () => ({
+vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: vi.fn(() => {
         const mockSite = createMockSite({
             identifier: "test-site-1",

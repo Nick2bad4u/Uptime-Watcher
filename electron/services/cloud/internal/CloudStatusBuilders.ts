@@ -18,7 +18,9 @@ type CloudProviderWithAccountLabel = CloudStorageProvider & {
 function hasAccountLabel(
     provider: CloudStorageProvider
 ): provider is CloudProviderWithAccountLabel {
-    if (!objectHasIn(castUnchecked<UnknownRecord>(provider), "getAccountLabel")) {
+    if (
+        !objectHasIn(castUnchecked<UnknownRecord>(provider), "getAccountLabel")
+    ) {
         return false;
     }
 
@@ -99,7 +101,9 @@ const buildCloudStatusSummary = (
         ...buildLastErrorSpread(lastError),
         lastSyncAt: common.lastSyncAt,
         provider: overrides.provider,
-        ...(overrides.providerDetails && { providerDetails: overrides.providerDetails }),
+        ...(overrides.providerDetails && {
+            providerDetails: overrides.providerDetails,
+        }),
         syncEnabled: common.syncEnabled,
     };
 };

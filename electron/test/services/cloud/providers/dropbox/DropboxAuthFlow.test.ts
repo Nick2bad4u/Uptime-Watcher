@@ -22,7 +22,9 @@ vi.mock("electron", () => ({
     },
 }));
 
-async function httpGet(url: string): Promise<{ body: string; statusCode: number; }> {
+async function httpGet(
+    url: string
+): Promise<{ body: string; statusCode: number }> {
     return new Promise((resolve, reject) => {
         const client = new URL(url).protocol === "https:" ? https : http;
         const request = client.get(url, (response) => {
@@ -185,7 +187,9 @@ describe(DropboxAuthFlow, () => {
             const redirectUri = authorizeUrl.searchParams.get("redirect_uri");
 
             if (redirectUri === null || state === null) {
-                throw new Error("Expected redirect_uri and state in authorize URL");
+                throw new Error(
+                    "Expected redirect_uri and state in authorize URL"
+                );
             }
 
             const callbackUrl = new URL(redirectUri);

@@ -4,12 +4,12 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, test, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock the hooks and dependencies
-vi.mock(import('@/hooks/useDelayedButtonLoading'), () => ({
+vi.mock("@/hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => ({
         loading: false,
         startLoading: vi.fn(),
@@ -17,20 +17,20 @@ vi.mock(import('@/hooks/useDelayedButtonLoading'), () => ({
     }),
 }));
 
-vi.mock(import('@/hooks/useDynamicHelpText'), () => ({
+vi.mock("@/hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: () => ({
         getHelpText: vi.fn(() => "Help text"),
     }),
 }));
 
-vi.mock(import('@/hooks/useMonitorFields'), () => ({
+vi.mock("@/hooks/useMonitorFields", () => ({
     useMonitorFields: () => ({
         getFieldsForType: vi.fn(() => []),
         getRequiredFieldsForType: vi.fn(() => []),
     }),
 }));
 
-vi.mock(import('@/hooks/useMonitorTypes'), () => ({
+vi.mock("@/hooks/useMonitorTypes", () => ({
     useMonitorTypes: () => ({
         types: [
             { value: "http", label: "HTTP" },
@@ -42,7 +42,7 @@ vi.mock(import('@/hooks/useMonitorTypes'), () => ({
     }),
 }));
 
-vi.mock(import('@/stores/sites/useSiteSync'), () => ({
+vi.mock("@/stores/sites/useSiteSync", () => ({
     useSiteSync: () => ({
         addSite: vi.fn(),
     }),
@@ -54,8 +54,8 @@ const commitFieldChange = async (
 ): Promise<void> => {
     if (
         !(element instanceof HTMLInputElement) &&
-            !(element instanceof HTMLSelectElement) &&
-            !(element instanceof HTMLTextAreaElement)
+        !(element instanceof HTMLSelectElement) &&
+        !(element instanceof HTMLTextAreaElement)
     ) {
         return;
     }

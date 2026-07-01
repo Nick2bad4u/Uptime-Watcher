@@ -4,7 +4,7 @@
 
 import { fc, test } from "@fast-check/vitest";
 import { webcrypto } from "node:crypto";
-import { arrayFirst, stringSplit  } from "ts-extras";
+import { arrayFirst, stringSplit } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { generateUuid } from "../utils/data/generateUuid";
@@ -53,7 +53,9 @@ describe("UUID Generation", () => {
             const uuid = generateUuid();
 
             // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-            expect(uuid).toMatch(/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iv);
+            expect(uuid).toMatch(
+                /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iv
+            );
         });
     });
 
@@ -302,7 +304,7 @@ describe("UUID Generation", () => {
             }
 
             // Should have different random parts (high probability)
-            const randomParts = ids.map((id) => stringSplit(id, "-", 2)[1]);
+            const randomParts = ids.map((id) => id.split("-", 2)[1]);
             const uniqueRandomParts = new Set(randomParts);
             expect(uniqueRandomParts.size).toBeGreaterThan(1);
         });
@@ -505,7 +507,9 @@ describe("UUID Generation", () => {
                         { length: numRequests },
                         (_, i) =>
                             new Promise<string>((resolve) => {
-                                setTimeout(() => { resolve(generateUuid()); }, i);
+                                setTimeout(() => {
+                                    resolve(generateUuid());
+                                }, i);
                             })
                     )
                 );

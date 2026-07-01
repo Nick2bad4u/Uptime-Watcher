@@ -266,7 +266,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     timeout: 5000,
                     retryAttempts: 3,
                     history: [],
-                    activeOperations: [' '.repeat(3), "valid"], // Whitespace-only strings should be invalid
+                    activeOperations: [" ".repeat(3), "valid"], // Whitespace-only strings should be invalid
                 })
             ).toBeFalsy();
         });

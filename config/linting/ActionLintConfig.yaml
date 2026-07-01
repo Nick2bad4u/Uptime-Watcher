@@ -7,64 +7,64 @@
 # Comprehensive list for Electron + Node.js + TypeScript projects
 config-variables:
     # Environment and deployment
-    - ENVIRONMENT
-    - NODE_ENV
-    - CI_ENVIRONMENT
-    - DEPLOYMENT_ENV
-    - STAGE
+    - "ENVIRONMENT"
+    - "NODE_ENV"
+    - "CI_ENVIRONMENT"
+    - "DEPLOYMENT_ENV"
+    - "STAGE"
 
     # Version and build configuration
-    - NODE_VERSION
-    - ELECTRON_VERSION
-    - BUILD_TARGET
-    - TARGET_ARCH
-    - RELEASE_CHANNEL
-    - VERSION_OVERRIDE
+    - "NODE_VERSION"
+    - "ELECTRON_VERSION"
+    - "BUILD_TARGET"
+    - "TARGET_ARCH"
+    - "RELEASE_CHANNEL"
+    - "VERSION_OVERRIDE"
 
     # Build and compilation
-    - DEBUG_MODE
-    - BUILD_TYPE
-    - COMPILE_TARGET
-    - OPTIMIZATION_LEVEL
+    - "DEBUG_MODE"
+    - "BUILD_TYPE"
+    - "COMPILE_TARGET"
+    - "OPTIMIZATION_LEVEL"
 
     # Platform specific
-    - RUNNER_OS
-    - RUNNER_ARCH
-    - TARGET_PLATFORM
+    - "RUNNER_OS"
+    - "RUNNER_ARCH"
+    - "TARGET_PLATFORM"
 
     # Security and authentication
-    - GITHUB_TOKEN
-    - NPM_TOKEN
-    - SIGNING_CERT
+    - "GITHUB_TOKEN"
+    - "NPM_TOKEN"
+    - "SIGNING_CERT"
 
     # Package and distribution
-    - REGISTRY_URL
-    - PACKAGE_SCOPE
-    - PUBLISH_CHANNEL
+    - "REGISTRY_URL"
+    - "PACKAGE_SCOPE"
+    - "PUBLISH_CHANNEL"
 
     # Testing and quality
-    - COVERAGE_THRESHOLD
-    - TEST_TIMEOUT
-    - LINT_LEVEL
+    - "COVERAGE_THRESHOLD"
+    - "TEST_TIMEOUT"
+    - "LINT_LEVEL"
 
 # Path-specific configurations for different workflow types
 # Enhanced security and performance patterns for 2025
 paths:
     # Build workflows - comprehensive patterns for Electron applications
-    ".github/workflows/Build.{yml,yaml}":
+    .github/workflows/Build.{yml,yaml}:
         ignore:
             # Shell script patterns - allow advanced shell features for build scripts
             # Warning about Unused Patch Number - Intented for now
             # Match SC2034 (or any SC2034 message) — allow nothing or any trailing text after the colon
             - "^shellcheck reported issue in this script: SC2034:.*"
-    ".github/workflows/summary.{yml,yaml}":
+    .github/workflows/summary.{yml,yaml}:
         ignore:
             # Match unknown permission scope "SOMETHING" (matches any scope name inside quotes)
             # prettier-ignore
             - "^unknown permission scope \"[^\"]+\".*"
 secrets:
-    - GITHUB_TOKEN
-    - DOCUSAURUS_BACKUP_TOKEN
+    - "GITHUB_TOKEN"
+    - "DOCUSAURUS_BACKUP_TOKEN"
 
 # Configuration for self-hosted runner environments
 # Supports modern GitHub-hosted and enterprise self-hosted runners

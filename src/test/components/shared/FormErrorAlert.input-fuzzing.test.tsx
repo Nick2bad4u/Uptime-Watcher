@@ -57,7 +57,7 @@ import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock themed components
-vi.mock(import('../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../theme/components/ThemedBox", () => ({
     ThemedBox: vi.fn(({ children, className, variant, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -73,7 +73,7 @@ vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../theme/components/ThemedText", () => ({
     ThemedText: vi.fn(({ children, className, size, variant, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -90,7 +90,7 @@ vi.mock(import('../../../theme/components/ThemedText'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: vi.fn(
         ({ children, onClick, className, size, variant, ...props }) => {
             const safeProps = sanitizeDomProps(props);
@@ -122,7 +122,7 @@ const errorMessageArbitrary = fc.oneof(
     fc.constant("Validation error: Invalid input"),
     fc.constant("Server error: 500 Internal Server Error"),
     fc.constant(""),
-    fc.constant(' '.repeat(3)), // Whitespace only
+    fc.constant(" ".repeat(3)), // Whitespace only
     fc.constant("Error with special characters: !@#$%^&*()"),
     fc.constant("Multi-line\nerror\nmessage"),
     fc.constant("Error with\ttabs\tand\tspaces"),
@@ -220,8 +220,9 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                         .trim();
 
                     const actualText =
-                        errorText.textContent?.replaceAll(/\s+/gv, " ").trim() ||
-                        "";
+                        errorText.textContent
+                            ?.replaceAll(/\s+/gv, " ")
+                            .trim() || "";
 
                     if (normalizedExpected) {
                         expect(actualText).toBe(normalizedExpected);

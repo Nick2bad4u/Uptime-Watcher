@@ -37,9 +37,9 @@ export const UpdateNotificationBanner: NamedExoticComponent<{
 
     if (
         updateStatus !== "available" &&
-            updateStatus !== "downloading" &&
-            updateStatus !== "downloaded" &&
-            updateStatus !== "error"
+        updateStatus !== "downloading" &&
+        updateStatus !== "downloaded" &&
+        updateStatus !== "error"
     ) {
         return null;
     }

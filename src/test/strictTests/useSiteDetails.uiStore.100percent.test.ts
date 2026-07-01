@@ -7,14 +7,14 @@ import type { SiteDetailsTab } from "../../stores/ui/types";
 
 import { useSiteDetailsUiStore } from "../../hooks/site/useSiteDetails.uiStore";
 
-vi.mock(import('zustand/react/shallow'), () => ({
+vi.mock("zustand/react/shallow", () => ({
     useShallow: <TState, TSlice>(selector: (state: TState) => TSlice) =>
         selector,
 }));
 
 const mockUseUIStore = vi.fn();
 
-vi.mock(import('../../stores/ui/useUiStore'), () => ({
+vi.mock("../../stores/ui/useUiStore", () => ({
     useUIStore: <TSlice>(selector: (state: unknown) => TSlice): TSlice =>
         safeCastTo<TSlice>(mockUseUIStore(selector)),
 }));
@@ -42,9 +42,9 @@ describe(useSiteDetailsUiStore, () => {
         expect(result.current.siteDetailsChartTimeRange).toBe("24h");
 
         // Should exist and be callable even if the store doesn't expose it
-        expect(() =>
-            { result.current.syncActiveSiteDetailsTab("site-1"); }
-        ).not.toThrow();
+        expect(() => {
+            result.current.syncActiveSiteDetailsTab("site-1");
+        }).not.toThrow();
     });
 
     it("passes through syncActiveSiteDetailsTab when provided", () => {

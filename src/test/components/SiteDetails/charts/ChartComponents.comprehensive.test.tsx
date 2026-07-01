@@ -20,7 +20,7 @@ type ChartJsMockComponentProperties = Readonly<{
     options?: unknown;
 }>;
 
-vi.mock(import('react-chartjs-2'), () => ({
+vi.mock("react-chartjs-2", () => ({
     Line: ({ data, options }: ChartJsMockComponentProperties) => (
         <div data-chart-type="line" data-testid="line-chart">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>

@@ -15,47 +15,49 @@ import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesSto
 import { createMonitorTypeConfig } from "../../utils/createMonitorTypeConfig";
 
 // Mock the store utils module
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
 // Mock the electron API
 const mockElectronAPI = {
     monitorTypes: {
-        getMonitorTypes: vi.fn().mockResolvedValue(safeCastTo<MonitorTypeConfig[]>([
-            createMonitorTypeConfig({
-                description: "HTTP monitoring",
-                displayName: "HTTP",
-                fields: [
-                    {
-                        label: "URL",
-                        name: "url",
-                        required: true,
-                        type: "url",
-                    },
-                ],
-                type: "http",
-            }),
-            createMonitorTypeConfig({
-                description: "Port monitoring",
-                displayName: "Port",
-                fields: [
-                    {
-                        label: "Host",
-                        name: "host",
-                        required: true,
-                        type: "text",
-                    },
-                    {
-                        label: "Port",
-                        name: "port",
-                        required: true,
-                        type: "number",
-                    },
-                ],
-                type: "port",
-            }),
-        ])),
+        getMonitorTypes: vi.fn().mockResolvedValue(
+            safeCastTo<MonitorTypeConfig[]>([
+                createMonitorTypeConfig({
+                    description: "HTTP monitoring",
+                    displayName: "HTTP",
+                    fields: [
+                        {
+                            label: "URL",
+                            name: "url",
+                            required: true,
+                            type: "url",
+                        },
+                    ],
+                    type: "http",
+                }),
+                createMonitorTypeConfig({
+                    description: "Port monitoring",
+                    displayName: "Port",
+                    fields: [
+                        {
+                            label: "Host",
+                            name: "host",
+                            required: true,
+                            type: "text",
+                        },
+                        {
+                            label: "Port",
+                            name: "port",
+                            required: true,
+                            type: "number",
+                        },
+                    ],
+                    type: "port",
+                }),
+            ])
+        ),
         validateMonitorData: vi.fn().mockResolvedValue({
             success: true,
             errors: [],
@@ -107,8 +109,9 @@ describe(useMonitorTypesStore, () => {
         expect(result.current.monitorTypes).toEqual([]);
         expect(result.current.fieldConfigs).toEqual({});
         expect(result.current.isLoaded).toBeFalsy();
-        expect(useErrorStore.getState().getStoreError("monitor-types")).toBeUndefined(
-            );
+        expect(
+            useErrorStore.getState().getStoreError("monitor-types")
+        ).toBeUndefined();
     });
 
     it("should load monitor types successfully", async ({ task, annotate }) => {

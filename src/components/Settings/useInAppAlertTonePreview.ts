@@ -33,7 +33,9 @@ export function useInAppAlertTonePreview(args: {
     } = args;
 
     const pendingVolumeRef = useRef(clampNormalizedVolume(inAppAlertVolume));
-    const volumePreviewTimeoutRef = useRef<null | number>(null);
+    const volumePreviewTimeoutRef = useRef<null | ReturnType<
+        typeof setTimeout
+    >>(null);
 
     const clearVolumePreviewTimeout = useCallback(() => {
         if (volumePreviewTimeoutRef.current === null) {

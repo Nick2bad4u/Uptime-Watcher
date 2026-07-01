@@ -11,7 +11,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock all dependencies
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             clearError: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     }),
 }));
 
-vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             addMonitorToSite: vi.fn().mockResolvedValue(undefined),
@@ -37,7 +37,7 @@ vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     }),
 }));
 
-vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
+vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: vi.fn(() => ({
         // Current hook-based form API shape (minimal subset for these smoke
         // tests). The enhanced AddSiteForm tests exercise the full surface;
@@ -104,7 +104,7 @@ vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
     })),
 }));
 
-vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
+vi.mock("../../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: vi.fn(() => ({
         monitorTypes: [
             { id: "http", label: "HTTP/HTTPS" },
@@ -121,7 +121,7 @@ vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
     })),
 }));
 
-vi.mock(import('../../../hooks/useDynamicHelpText'), () => ({
+vi.mock("../../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: vi.fn(() => ({
         helpText: "Default help text",
         error: null,
@@ -129,16 +129,16 @@ vi.mock(import('../../../hooks/useDynamicHelpText'), () => ({
     })),
 }));
 
-vi.mock(import('../../../components/AddSiteForm/Submit'), () => ({
+vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
-vi.mock(import('../../../utils/data/generateUuid'), () => ({
+vi.mock("../../../utils/data/generateUuid", () => ({
     generateUuid: vi.fn(() => "test-uuid-123"),
 }));
 
 // Mock FormFields components
-vi.mock(import('../../../components/AddSiteForm/FormFields'), () => ({
+vi.mock("../../../components/AddSiteForm/FormFields", () => ({
     RadioGroup: ({ children }: { children: React.ReactNode }) => (
         <div data-testid="radio-group">{children}</div>
     ),
@@ -150,13 +150,13 @@ vi.mock(import('../../../components/AddSiteForm/FormFields'), () => ({
     ),
 }));
 
-vi.mock(import('../../../components/AddSiteForm/DynamicMonitorFields'), () => ({
+vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     DynamicMonitorFields: () => (
         <div data-testid="dynamic-monitor-fields">Dynamic fields</div>
     ),
 }));
 
-vi.mock(import('../../../theme/components'), () => ({
+vi.mock("../../../theme/components", () => ({
     ThemedBox: ({ children, ...props }: any) => (
         <div data-testid="themed-box" {...props}>
             {children}

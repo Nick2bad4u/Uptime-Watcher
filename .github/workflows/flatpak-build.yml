@@ -2,8 +2,8 @@
 # This workflow builds your Electron app as a Flatpak using flatpak-builder directly.
 
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Build Flatpak
-run-name: Build Flatpak · ${{ github.event_name }}
+name: "Build Flatpak"
+run-name: "Build Flatpak · ${{ github.event_name }}"
 
 on:
     workflow_dispatch:
@@ -11,33 +11,33 @@ on:
         workflows: ["Build and Release Electron App"]
         branches: ["main"]
         types:
-            - completed
+            - "completed"
 
 permissions:
-    contents: write
+    contents: "write"
 
 concurrency:
-    group: flatpak-build-${{ github.ref }}
-    cancel-in-progress: ${{ false }}
+    group: "flatpak-build-${{ github.ref }}"
+    cancel-in-progress: "${{ false }}"
 
 jobs:
     build-flatpak:
-        name: Build Flatpak bundle
-        runs-on: ubuntu-latest
+        name: "Build Flatpak bundle"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 60
         defaults:
             run:
-                shell: bash
+                shell: "bash"
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout repository"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
 
-            - name: Free disk space (Flatpak builds are huge)
+            - name: "Free disk space (Flatpak builds are huge)"
               run: |
                   echo "Disk usage before cleanup:"
                   df -h
@@ -51,18 +51,18 @@ jobs:
                   echo "Disk usage after cleanup:"
                   df -h
 
-            - name: Cache Flatpak runtimes and SDKs
-              uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+            - name: "Cache Flatpak runtimes and SDKs"
+              uses: "actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae" # v5.0.5
               with:
                   path: |
                       /var/lib/flatpak
                       ~/.local/share/flatpak
-                  key: ${{ runner.os }}-flatpak-runtimes-24.08
+                  key: "${{ runner.os }}-flatpak-runtimes-24.08"
                   restore-keys: |
                       ${{ runner.os }}-flatpak-runtimes-
               continue-on-error: true
 
-            - name: Install Flatpak and flatpak-builder
+            - name: "Install Flatpak and flatpak-builder"
               run: |
                   sudo apt-get update
                   sudo apt-get install -y flatpak flatpak-builder elfutils libarchive-tools
@@ -84,7 +84,7 @@ jobs:
                   flatpak list --user --runtime
               continue-on-error: true
 
-            - name: Verify Flatpak components
+            - name: "Verify Flatpak components"
               run: |
                   echo "Verifying required Flatpak components are available (user scope)"
                   echo "Available runtimes:"
@@ -100,15 +100,15 @@ jobs:
 
             # Removed duplicate SDK extension install step (handled above system-wide)
 
-            - name: Set up Node.js
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Set up Node.js"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Cache build artifacts and dependencies
-              uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+            - name: "Cache build artifacts and dependencies"
+              uses: "actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae" # v5.0.5
               with:
                   path: |
                       node_modules
@@ -118,23 +118,23 @@ jobs:
                       dist
                       **/.rspack-cache
                       **/.webpack-cache
-                  key: ${{ runner.os }}-flatpak-build-${{ hashFiles('**/package-lock.json') }}
+                  key: "${{ runner.os }}-flatpak-build-${{ hashFiles('**/package-lock.json') }}"
                   restore-keys: |
                       ${{ runner.os }}-flatpak-build-
                       ${{ runner.os }}-node-
                   enableCrossOsArchive: true
 
-            - name: Install dependencies
+            - name: "Install dependencies"
               run: |
                   echo "Installing Node.js dependencies..."
                   npm install --force --no-audit --no-fund --progress=false
                   echo "Dependencies installed successfully"
 
-            - name: Build application
+            - name: "Build application"
               run: |
                   npm run build
 
-            - name: Prune devDependencies (reduce Flatpak size)
+            - name: "Prune devDependencies (reduce Flatpak size)"
               run: |
                   echo "Pruning devDependencies to reduce node_modules footprint..."
                   # npm v11 re-checks peer graphs during prune. Our Storybook 10
@@ -146,7 +146,7 @@ jobs:
                   echo "Disk usage after prune:"
                   df -h
 
-            - name: Smoke-check build artifacts
+            - name: "Smoke-check build artifacts"
               run: |
                   echo "Checking for dist/main.js and sqlite wasm..."
                   if [ ! -f "dist/main.js" ]; then
@@ -161,10 +161,10 @@ jobs:
                     exit 1
                   fi
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: Build Flatpak
+            - name: "Build Flatpak"
               run: |
                   echo "Starting Flatpak build process..."
                   echo "Current directory contents:"
@@ -185,12 +185,12 @@ jobs:
                   ls -la build-dir/ || echo "build-dir not created"
                   ls -la dist/ || echo "dist not found"
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
                   CI: true
                   DEBUG: "@malept/flatpak-bundler"
 
-            - name: Create FlatPak bundle
+            - name: "Create FlatPak bundle"
               run: |
                   cd .
                   ls -l
@@ -198,26 +198,26 @@ jobs:
                   # Use the correct app ID from the manifest and the flatpak-repo produced by flatpak-builder
                   flatpak build-bundle flatpak-repo Uptime-Watcher.flatpak io.github.uptimewatcher
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
                   CI: true
                   DEBUG: "@malept/flatpak-bundler"
 
             # Optionally, upload the FlatPak bundle as an artifact
-            - name: Upload FlatPak bundle
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+            - name: "Upload FlatPak bundle"
+              uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
               with:
-                  name: flatpak-bundle
-                  path: ./Uptime-Watcher.flatpak
+                  name: "flatpak-bundle"
+                  path: "./Uptime-Watcher.flatpak"
 
-            - name: Zip Flatpak bundle
+            - name: "Zip Flatpak bundle"
               run: |
                   cd .
                   ls -l
                   zip Uptime-Watcher.flatpak.zip Uptime-Watcher.flatpak
 
-            - name: Get latest release tag
-              id: get_release
-              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+            - name: "Get latest release tag"
+              id: "get_release"
+              uses: "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3" # v9.0.0
               with:
                   script: |
                       const releases = await github.rest.repos.listReleases({
@@ -228,17 +228,17 @@ jobs:
                         throw new Error('No releases found');
                       }
                       return releases.data[0].tag_name;
-                  result-encoding: string
+                  result-encoding: "string"
 
-            - name: Rename Flatpak and zip with version
+            - name: "Rename Flatpak and zip with version"
               run: |
                   cd .
                   mv Uptime-Watcher.flatpak Uptime-Watcher-${{ steps.get_release.outputs.result }}.flatpak
                   mv Uptime-Watcher.flatpak.zip Uptime-Watcher-${{ steps.get_release.outputs.result }}.flatpak.zip
 
-            - name: Upload .flatpak and .zip to latest release
+            - name: "Upload .flatpak and .zip to latest release"
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  RELEASE_TAG: ${{ steps.get_release.outputs.result }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                  RELEASE_TAG: "${{ steps.get_release.outputs.result }}"
               run: |
                   gh release upload "$RELEASE_TAG" "./Uptime-Watcher-${RELEASE_TAG}.flatpak" "./Uptime-Watcher-${RELEASE_TAG}.flatpak.zip" --clobber

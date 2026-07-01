@@ -133,7 +133,7 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
 
             const processValue = (
                 value: unknown
-            ): { isValid: boolean; type: string; } => {
+            ): { isValid: boolean; type: string } => {
                 if (value === null || value === undefined) {
                     return { type: "empty", isValid: false };
                 }
@@ -247,7 +247,7 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
 
             const validateObject = (
                 obj: unknown
-            ): { reason: string; valid: boolean; } => {
+            ): { reason: string; valid: boolean } => {
                 if (obj === null) {
                     return { valid: false, reason: "null" };
                 }

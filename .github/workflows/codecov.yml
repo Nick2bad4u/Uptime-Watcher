@@ -1,79 +1,79 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Run Tests and Upload Coverage
-run-name: Run Tests And Upload Coverage
+name: "Run Tests and Upload Coverage"
+run-name: "Run Tests And Upload Coverage"
 
 # Prevent multiple test runs from conflicting
 concurrency:
-    group: codecov-${{ github.ref }}
+    group: "codecov-${{ github.ref }}"
     cancel-in-progress: true
 
 on:
     push:
-        branches: [main]
+        branches: ["main"]
     pull_request:
-        branches: [main]
+        branches: ["main"]
     merge_group:
         types:
-            - checks_requested
-        branches: [main]
+            - "checks_requested"
+        branches: ["main"]
     workflow_dispatch:
 
-# Permissions required for test execution and coverage upload
+        # Permissions required for test execution and coverage upload
 permissions:
-    contents: read
+    contents: "read"
 
 jobs:
     test:
-        name: Run tests and collect coverage
-        runs-on: ubuntu-latest
+        name: "Run tests and collect coverage"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 60
         defaults:
             run:
-                shell: bash
+                shell: "bash"
 
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout
-              id: checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout"
+              id: "checkout"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
                   fetch-depth: 5
 
-            - name: Set up Node
-              id: setup-node
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Set up Node"
+              id: "setup-node"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Install dependencies
-              id: install-deps
-              run: npm install --force
+            - name: "Install dependencies"
+              id: "install-deps"
+              run: "npm install --force"
 
-            - name: Build Frontend and Backend
-              id: build
+            - name: "Build Frontend and Backend"
+              id: "build"
               run: |
                   npm run build
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
-            - name: Build Storybook Bundle
-              id: build-storybook
+            - name: "Build Storybook Bundle"
+              id: "build-storybook"
               run: |
                   npm run build-storybook
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
             # Run frontend tests with coverage
-            - name: Run frontend tests
-              id: test-frontend
+            - name: "Run frontend tests"
+              id: "test-frontend"
               run: |
                   mkdir -p coverage
                   # Clean any existing coverage to avoid conflicts
@@ -81,11 +81,11 @@ jobs:
                   npx vitest run --config vitest.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
             # Run electron tests with coverage
-            - name: Run electron tests
-              id: test-electron
+            - name: "Run electron tests"
+              id: "test-electron"
               run: |
                   mkdir -p coverage/electron
                   # Clean any existing coverage to avoid conflicts
@@ -93,11 +93,11 @@ jobs:
                   npx vitest run --config vitest.electron.config.ts --coverage --reporter=dot --reporter=junit --outputFile=coverage/electron/electron-test-report.junit.xml
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
             # Run shared tests with coverage
-            - name: Run shared tests
-              id: test-shared
+            - name: "Run shared tests"
+              id: "test-shared"
               run: |
                   mkdir -p coverage/shared
                   # Clean any existing coverage to avoid conflicts
@@ -105,10 +105,10 @@ jobs:
                   npx vitest run --config vitest.shared.config.ts --coverage --reporter=dot --reporter=junit --outputFile=coverage/shared/shared-test-report.junit.xml
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
             # Verify coverage files exist
-            - name: Verify coverage files
+            - name: "Verify coverage files"
               run: |
                   echo "=== Checking coverage files ==="
                   ls -la coverage/ || echo "No coverage directory"
@@ -125,101 +125,101 @@ jobs:
               continue-on-error: true
 
             # Upload frontend coverage to Codecov
-            - name: Upload frontend coverage to Codecov
-              id: upload-frontend-coverage
-              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+            - name: "Upload frontend coverage to Codecov"
+              id: "upload-frontend-coverage"
+              uses: "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f" # v7.0.0
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  slug: Nick2bad4u/Uptime-Watcher
-                  files: ./coverage/lcov.info
-                  flags: frontend
-                  name: frontend-coverage
+                  token: "${{ secrets.CODECOV_TOKEN }}"
+                  slug: "Nick2bad4u/Uptime-Watcher"
+                  files: "./coverage/lcov.info"
+                  flags: "frontend"
+                  name: "frontend-coverage"
                   verbose: true
                   fail_ci_if_error: false
                   disable_search: true
-                  directory: ./coverage
-                  root_dir: ./
-                  working-directory: ./
+                  directory: "./coverage"
+                  root_dir: "./"
+                  working-directory: "./"
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
             # Upload electron coverage to Codecov
-            - name: Upload electron coverage to Codecov
-              id: upload-electron-coverage
-              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+            - name: "Upload electron coverage to Codecov"
+              id: "upload-electron-coverage"
+              uses: "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f" # v7.0.0
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  slug: Nick2bad4u/Uptime-Watcher
-                  files: ./coverage/electron/lcov.info
-                  flags: electron
-                  name: electron-coverage
+                  token: "${{ secrets.CODECOV_TOKEN }}"
+                  slug: "Nick2bad4u/Uptime-Watcher"
+                  files: "./coverage/electron/lcov.info"
+                  flags: "electron"
+                  name: "electron-coverage"
                   verbose: true
                   fail_ci_if_error: false
                   disable_search: true
-                  directory: ./coverage/electron
-                  root_dir: ./
-                  working-directory: ./
+                  directory: "./coverage/electron"
+                  root_dir: "./"
+                  working-directory: "./"
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
             # Upload shared coverage to Codecov
-            - name: Upload shared coverage to Codecov
-              id: upload-shared-coverage
-              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+            - name: "Upload shared coverage to Codecov"
+              id: "upload-shared-coverage"
+              uses: "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f" # v7.0.0
               with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  slug: Nick2bad4u/Uptime-Watcher
-                  files: ./coverage/shared/lcov.info
-                  flags: shared
-                  name: shared-coverage
+                  token: "${{ secrets.CODECOV_TOKEN }}"
+                  slug: "Nick2bad4u/Uptime-Watcher"
+                  files: "./coverage/shared/lcov.info"
+                  flags: "shared"
+                  name: "shared-coverage"
                   verbose: true
                   fail_ci_if_error: false
                   disable_search: true
-                  directory: ./coverage/shared
-                  root_dir: ./
-                  working-directory: ./
+                  directory: "./coverage/shared"
+                  root_dir: "./"
+                  working-directory: "./"
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
 
             # Upload test results
-            - name: Upload frontend test results to Codecov
-              id: upload-frontend-test-results
-              uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
+            - name: "Upload frontend test results to Codecov"
+              id: "upload-frontend-test-results"
+              uses: "codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3" # v1.2.1
               with:
-                  files: ./coverage/frontend-test-report.junit.xml
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  flags: frontend-tests
-                  name: frontend-test-results
+                  files: "./coverage/frontend-test-report.junit.xml"
+                  token: "${{ secrets.CODECOV_TOKEN }}"
+                  flags: "frontend-tests"
+                  name: "frontend-test-results"
                   verbose: true
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
                   CODECOV_VERBOSE: true
 
-            - name: Upload electron test results to Codecov
-              id: upload-electron-test-results
-              uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
+            - name: "Upload electron test results to Codecov"
+              id: "upload-electron-test-results"
+              uses: "codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3" # v1.2.1
               with:
-                  files: ./coverage/electron/electron-test-report.junit.xml
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  flags: electron-tests
-                  name: electron-test-results
+                  files: "./coverage/electron/electron-test-report.junit.xml"
+                  token: "${{ secrets.CODECOV_TOKEN }}"
+                  flags: "electron-tests"
+                  name: "electron-test-results"
                   verbose: true
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
                   CODECOV_VERBOSE: true
 
-            - name: Upload shared test results to Codecov
-              id: upload-shared-test-results
-              uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
+            - name: "Upload shared test results to Codecov"
+              id: "upload-shared-test-results"
+              uses: "codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3" # v1.2.1
               with:
-                  files: ./coverage/shared/shared-test-report.junit.xml
-                  token: ${{ secrets.CODECOV_TOKEN }}
-                  flags: shared-tests
-                  name: shared-test-results
+                  files: "./coverage/shared/shared-test-report.junit.xml"
+                  token: "${{ secrets.CODECOV_TOKEN }}"
+                  flags: "shared-tests"
+                  name: "shared-test-results"
                   verbose: true
               continue-on-error: true
               env:
-                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+                  CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
                   CODECOV_VERBOSE: true

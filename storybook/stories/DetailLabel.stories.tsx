@@ -54,7 +54,8 @@ const WithFormatFailure = ({
 
     useMount(
         () => {
-            const monitorTypes = globalThis.electronAPI.monitorTypes as {
+            const monitorTypes = (globalThis as any).electronAPI
+                .monitorTypes as {
                 formatMonitorDetail: FormatMonitorDetail;
             };
 
@@ -68,7 +69,8 @@ const WithFormatFailure = ({
                 return;
             }
 
-            const monitorTypes = globalThis.electronAPI.monitorTypes as {
+            const monitorTypes = (globalThis as any).electronAPI
+                .monitorTypes as {
                 formatMonitorDetail: FormatMonitorDetail;
             };
 

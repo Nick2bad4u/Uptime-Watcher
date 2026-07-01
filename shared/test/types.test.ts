@@ -2,8 +2,8 @@
  * Comprehensive test suite for shared/types.ts
  *
  * Tests for validation functions and type guards that ensure type safety across
- * the app. These functions are critical for validating data integrity
- * between frontend and backend.
+ * the app. These functions are critical for validating data integrity between
+ * frontend and backend.
  *
  * @file Tests for shared type validation functions
  */
@@ -17,7 +17,6 @@ import {
     isSiteStatus,
     type Monitor,
     type MonitorStatus,
-    type MonitorType,
     type SiteStatus,
     validateMonitor,
 } from "../types";

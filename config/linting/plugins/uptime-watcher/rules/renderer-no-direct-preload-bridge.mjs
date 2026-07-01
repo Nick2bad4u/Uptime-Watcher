@@ -13,8 +13,8 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 // Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
- * ESLint rule preventing renderer app code from accessing
- * `window.electronAPI` directly.
+ * ESLint rule preventing renderer app code from accessing `window.electronAPI`
+ * directly.
  *
  * @remarks
  * The renderer should reach the preload bridge via the established service
@@ -26,7 +26,11 @@ export const rendererNoDirectPreloadBridgeRule = {
     /**
      * @param {{
      *     getFilename: () => any;
-     *     report: (arg0: { data: { owner: string }; messageId: string; node: any }) => void;
+     *     report: (arg0: {
+     *         data: { owner: string };
+     *         messageId: string;
+     *         node: any;
+     *     }) => void;
      * }} context
      */
     create(context) {

@@ -38,7 +38,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -61,16 +61,16 @@ const mockMonitoringService = vi.hoisted(() => ({
     stopMonitoringForSite: vi.fn(),
 }));
 
-vi.mock(import('../../../services/SiteService'), () => ({
+vi.mock("../../../services/SiteService", () => ({
     SiteService: mockSiteService,
 }));
 
-vi.mock(import('../../../services/MonitoringService'), () => ({
+vi.mock("../../../services/MonitoringService", () => ({
     MonitoringService: mockMonitoringService,
 }));
 
 // Mock services first - these need to be hoisted above imports
-vi.mock(import('../../../services/DataService'), () => ({
+vi.mock("../../../services/DataService", () => ({
     DataService: {
         isConnected: vi.fn().mockReturnValue(true),
         downloadSqliteBackup: vi
@@ -82,7 +82,7 @@ vi.mock(import('../../../services/DataService'), () => ({
     },
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -91,7 +91,7 @@ vi.mock(import('../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         Error.isError(error) ? error : new Error(String(error))
     ),
@@ -105,7 +105,7 @@ vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
     }),
 }));
 
-vi.mock(import('../../../../shared/utils'), () => ({
+vi.mock("../../../../shared/utils", () => ({
     // Add any shared utils that might be imported
     validateInput: vi.fn().mockReturnValue({ isValid: true }),
     formatError: vi.fn((error) => error.message),
@@ -551,7 +551,9 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             const syncStatus = await store.getSyncStatus();
             expect(syncStatus).toEqual(mockSyncStatus);
-            expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalledWith();
+            expect(
+                mockElectronAPI.stateSync.getSyncStatus
+            ).toHaveBeenCalledWith();
 
             await store.syncSites();
             await store.fullResyncSites();

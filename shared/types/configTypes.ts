@@ -3,8 +3,8 @@
  *
  * @remarks
  * These types provide better type safety for configuration values stored in the
- * database and used throughout the app. All values are stored as
- * strings in the database but represent different underlying types.
+ * database and used throughout the app. All values are stored as strings in the
+ * database but represent different underlying types.
  *
  * @packageDocumentation
  */

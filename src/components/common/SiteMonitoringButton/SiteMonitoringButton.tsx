@@ -82,9 +82,8 @@ export interface SiteMonitoringButtonProperties extends CoreComponentProperties 
  *
  * @remarks
  * This component provides a consistent interface for site-wide monitoring
- * controls across different parts of the app. It automatically switches
- * between start and stop states based on whether all monitors are currently
- * running.
+ * controls across different parts of the app. It automatically switches between
+ * start and stop states based on whether all monitors are currently running.
  *
  * Key features:
  *

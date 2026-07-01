@@ -76,13 +76,11 @@ export const ORIGINAL_METADATA_SYMBOL: unique symbol = Symbol(
  *
  * @public
  */
-export interface EventBusDiagnostics<
-    EventMap extends TypedEventMap = Record<string, EventPayloadValue>,
-> {
+export interface EventBusDiagnostics {
     /** Unique identifier for this event bus instance. */
     busId: string;
     /** Number of listeners registered for each event. */
-    listenerCounts: Partial<Record<EventKey<EventMap>, number>>;
+    listenerCounts: Record<string, number>;
     /** Maximum number of listeners allowed per event. */
     maxListeners: number;
     /** Maximum number of middleware functions allowed. */
@@ -148,9 +146,7 @@ type NonArrayObjectPayload = InternalNonArrayObjectPayload;
  * Supported event payload value for the typed event bus.
  */
 export type EventPayloadValue =
-    | ArrayPayload
-    | NonArrayObjectPayload
-    | PrimitivePayload;
+    ArrayPayload | NonArrayObjectPayload | PrimitivePayload;
 
 type PrimitiveEventPayload<Value extends PrimitivePayload> = Readonly<{
     _meta: EventMetadata;
@@ -529,13 +525,19 @@ export class TypedEventBus<
      * @returns Diagnostic data including listener counts and middleware
      *   information.
      */
-    public getDiagnostics(): EventBusDiagnostics<EventMap> {
-        const listenerCounts: Partial<Record<EventKey<EventMap>, number>> = {};
+    public getDiagnostics(): EventBusDiagnostics {
+        const listenerCountEntries: [EventKey<EventMap>, number][] = [];
         for (const eventName of this.eventNames()) {
-            if (this.isKnownEvent(eventName)) {
-                listenerCounts[eventName] = this.listenerCount(eventName);
+            if (!this.isKnownEvent(eventName)) {
+                continue;
             }
+
+            listenerCountEntries.push([
+                eventName,
+                this.listenerCount(eventName),
+            ]);
         }
+        const listenerCounts = Object.fromEntries(listenerCountEntries);
 
         return {
             busId: this.busId,
@@ -906,7 +908,6 @@ export class TypedEventBus<
  *
  * @returns A new {@link TypedEventBus} instance.
  */
-// eslint-disable-next-line etc/no-misused-generics -- EventMap must be explicitly provided for type safety
 export function createTypedEventBus<EventMap extends TypedEventMap>(
     name?: string,
     options?: { maxMiddleware?: number }

@@ -131,7 +131,7 @@ vi.mock("../../services/database/serviceFactory", () => ({
             clear: vi.fn(() => {
                 store.clear();
             }),
-            replaceAll: vi.fn((items: { data: Site; key: string; }[]) => {
+            replaceAll: vi.fn((items: { data: Site; key: string }[]) => {
                 store.clear();
                 for (const { key, data } of items) {
                     store.set(key, data);

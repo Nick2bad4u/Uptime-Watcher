@@ -4,7 +4,9 @@ import {
 } from "../_internal/typed-rule.mjs";
 
 /**
- * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} node
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression
+ *     | null
+ *     | undefined} node
  */
 const isEnsureErrorCall = (node) => {
     if (!node || node.type !== "CallExpression") {
@@ -17,7 +19,9 @@ const isEnsureErrorCall = (node) => {
 };
 
 /**
- * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} expression
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression
+ *     | null
+ *     | undefined} expression
  */
 const unwrapEnsureErrorCall = (expression) => {
     if (!expression) {

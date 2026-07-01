@@ -71,8 +71,10 @@ const shouldHideFooterHelpText = (value: string): boolean => {
     }
 
     // Interval guidance is shown as an explicit, more actionable footer bullet.
-    return (normalized.includes("monitoring interval") ||
-        normalized.includes("check interval"));
+    return (
+        normalized.includes("monitoring interval") ||
+        normalized.includes("check interval")
+    );
 };
 
 /**

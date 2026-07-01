@@ -305,10 +305,7 @@ export function useOverflowMarquee<
 
             return function cleanupOverflowObservation(): void {
                 if (shouldAttachWindowListener) {
-                    window.removeEventListener(
-                        "resize",
-                        handleResize
-                    );
+                    window.removeEventListener("resize", handleResize);
                 }
 
                 if (!supportsResizeObserver || !element) {

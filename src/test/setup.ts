@@ -3,14 +3,14 @@
  * components.
  */
 
-import type { UnknownArray, UnknownRecord  } from "type-fest";
+import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import fc from "fast-check";
 import { webcrypto } from "node:crypto";
 import { EventEmitter } from "node:events";
-import { safeCastTo, stringSplit  } from "ts-extras";
+import { safeCastTo, stringSplit } from "ts-extras";
 import { beforeEach, expect, type MockInstance, vi } from "vitest";
 
 import { useErrorStore } from "../stores/error/useErrorStore";
@@ -22,11 +22,11 @@ import "./vitest-context-setup";
 // crashes originating from third-party role maps while keeping matchers
 // available. Vitest hoists vi.mock calls, so these apply before consumers are
 // loaded.
-vi.mock(import('aria-query/lib/etc/roles/ariaLiteralRoles'), () => ({
+vi.mock("aria-query/lib/etc/roles/ariaLiteralRoles", () => ({
     __esModule: true as const,
     default: [] as const,
 }));
-vi.mock(import('aria-query/lib/etc/roles/ariaLiteralRoles.js'), () => ({
+vi.mock("aria-query/lib/etc/roles/ariaLiteralRoles.js", () => ({
     __esModule: true as const,
     default: [] as const,
 }));
@@ -45,7 +45,7 @@ const originalEmitWarning = process.emitWarning.bind(
     process
 ) as GenericEmitWarning;
 
-process.emitWarning = ((warning: unknown, ...args: unknown[]) => {
+process.emitWarning = (warning: unknown, ...args: unknown[]) => {
     const message =
         typeof warning === "string"
             ? warning
@@ -63,7 +63,7 @@ process.emitWarning = ((warning: unknown, ...args: unknown[]) => {
     }
 
     originalEmitWarning(warning, ...args);
-});
+};
 
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment
@@ -103,7 +103,7 @@ process.on("unhandledRejection", (reason: unknown) => {
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
+const baseNumRuns = safeCastTo<{ numRuns?: number }>(current).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
@@ -174,31 +174,27 @@ class MockResizeObserver {
     private readonly callback: ResizeObserverCallback;
 
     /** Observe spy for assertions. */
-    public readonly observe: ReturnType<typeof vi.fn>;
+    public readonly observe = vi.fn((_target: Element): void => undefined);
 
     /** Unobserve spy for assertions. */
-    public readonly unobserve: ReturnType<typeof vi.fn>;
+    public readonly unobserve = vi.fn((_target: Element): void => undefined);
 
     /** Disconnect spy for assertions. */
-    public readonly disconnect: ReturnType<typeof vi.fn>;
+    public readonly disconnect = vi.fn((): void => undefined);
 
     constructor(callback: ResizeObserverCallback) {
         this.callback = callback;
-        vi.spyOn(this, 'observe').mockImplementation();
-        vi.spyOn(this, 'unobserve').mockImplementation();
-        vi.spyOn(this, 'disconnect').mockImplementation();
     }
 
     /**
      * Utility helper for tests to manually trigger callbacks.
      */
     public trigger(entries: ResizeObserverEntry[] = []): void {
-        this.callback(entries, this as unknown as ResizeObserver);
+        this.callback(entries, this);
     }
 }
 
-globalThis.ResizeObserver =
-    MockResizeObserver as unknown as typeof ResizeObserver;
+globalThis.ResizeObserver = MockResizeObserver;
 
 /**
  * Minimal Web Storage implementation used when Node.js exposes an incomplete
@@ -243,8 +239,10 @@ const createStorageShim = (): StorageShim => {
         clear(): void {
             storage.clear();
         },
-        getItem: (key: string): null | string => storage.has(key) ? (storage.get(key) ?? null) : null,
-        key: (index: number): null | string => [...storage.keys()][index] ?? null,
+        getItem: (key: string): null | string =>
+            storage.has(key) ? (storage.get(key) ?? null) : null,
+        key: (index: number): null | string =>
+            [...storage.keys()][index] ?? null,
         removeItem(key: string): void {
             storage.delete(key);
         },
@@ -264,7 +262,7 @@ const hasValidStorage = (candidate: unknown): candidate is StorageShim => {
     }
 
     const descriptor = Reflect.getOwnPropertyDescriptor(candidate, "length");
-    const lengthValue = (safeCastTo<{ length?: unknown }>(candidate)).length;
+    const lengthValue = safeCastTo<{ length?: unknown }>(candidate).length;
     const hasLength =
         typeof lengthValue === "number" ||
         (typeof descriptor?.get === "function" &&
@@ -275,8 +273,7 @@ const hasValidStorage = (candidate: unknown): candidate is StorageShim => {
     }
 
     return STORAGE_METHODS.every(
-        (method) =>
-            typeof (candidate as UnknownRecord)[method] === "function"
+        (method) => typeof (candidate as UnknownRecord)[method] === "function"
     );
 };
 
@@ -369,7 +366,7 @@ Object.defineProperty(document.body, "classList", {
 
 // Individual tests should manage their own DOM setup for getElementById
 
-vi.mock(import('electron-log/renderer'), () => ({
+vi.mock("electron-log/renderer", () => ({
     default: {
         info: vi.fn(),
         error: vi.fn(),
@@ -522,7 +519,7 @@ const mockTheme = {
 };
 
 // Mock theme context globally with complete functionality
-vi.mock(import('../theme/useTheme'), () => ({
+vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
         ...mockTheme,
         availableThemes: [

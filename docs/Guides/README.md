@@ -68,13 +68,13 @@ For new developers, start with these essential guides:
 
 ### Setup and configuration
 
-| Guide                                           | Description                                    | Audience         |
-| ----------------------------------------------- | ---------------------------------------------- | ---------------- |
-| [Environment setup](./ENVIRONMENT_SETUP.md)     | Complete development environment configuration | New contributors |
-| [Dependency install debt](./DEPENDENCY_INSTALL_DEBT.md) | Forced npm install blockers and exit criteria | Maintainers      |
-| [Lint guardrails](./LINT_GUARDRAILS_AND_CUSTOM_RULES.md) | Custom ESLint rules and docs/test checks | Maintainers      |
-| [Docusaurus setup](./DOCUSAURUS_SETUP_GUIDE.md) | Documentation site configuration               | Maintainers      |
-| [Vite performance](./VITE_PERFORMANCE.md)       | Build optimization and performance tuning      | Build engineers  |
+| Guide                                                    | Description                                    | Audience         |
+| -------------------------------------------------------- | ---------------------------------------------- | ---------------- |
+| [Environment setup](./ENVIRONMENT_SETUP.md)              | Complete development environment configuration | New contributors |
+| [Dependency install debt](./DEPENDENCY_INSTALL_DEBT.md)  | Forced npm install blockers and exit criteria  | Maintainers      |
+| [Lint guardrails](./LINT_GUARDRAILS_AND_CUSTOM_RULES.md) | Custom ESLint rules and docs/test checks       | Maintainers      |
+| [Docusaurus setup](./DOCUSAURUS_SETUP_GUIDE.md)          | Documentation site configuration               | Maintainers      |
+| [Vite performance](./VITE_PERFORMANCE.md)                | Build optimization and performance tuning      | Build engineers  |
 
 ### Troubleshooting and support
 

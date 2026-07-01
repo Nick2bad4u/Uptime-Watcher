@@ -27,5 +27,5 @@ mainWindow.webContents.executeJavaScript("alert('hi')");
 ### Correct
 
 ```ts
-await mainWindow.webContents.send("some-channel", { /* validated payload */ });
+await mainWindow.webContents.send("some-channel", {/* validated payload */});
 ```

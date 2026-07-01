@@ -10,7 +10,7 @@ import {
 } from "../utils/createSitesStoreMock";
 
 // Mock the hooks
-vi.mock(import('../../components/SiteDetails/useAddSiteForm'), () => ({
+vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: () => ({
         addMode: "existing",
         baselineUrl: "",
@@ -105,7 +105,7 @@ vi.mock(import('../../components/SiteDetails/useAddSiteForm'), () => ({
     }),
 }));
 
-vi.mock(import('../../hooks/useMonitorTypes'), () => ({
+vi.mock("../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: () => ({
         options: [
             { label: "HTTP", value: "http" },
@@ -118,7 +118,7 @@ vi.mock(import('../../hooks/useMonitorTypes'), () => ({
 }));
 
 // Mock the stores
-vi.mock(import('../../stores/error/useErrorStore'), () => ({
+vi.mock("../../stores/error/useErrorStore", () => ({
     useErrorStore: (() => {
         const state = {
             clearAllErrors: vi.fn(),
@@ -170,7 +170,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 (globalThis as any).__useSitesStoreMock_basic__ = useSitesStoreMock;
 
-vi.mock(import('../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../stores/sites/useSitesStore", () => ({
     useSitesStore: (selector?: any, equality?: any) =>
         (globalThis as any).__useSitesStoreMock_basic__?.(selector, equality),
 }));
@@ -184,13 +184,13 @@ const resetSitesStoreState = (): void => {
 };
 
 // Mock other hooks
-vi.mock(import('../../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => ({
         isShowingLoading: false,
     }),
 }));
 
-vi.mock(import('../../hooks/useDynamicHelpText'), () => ({
+vi.mock("../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: () => ({
         host: "Enter host address",
         port: "Enter port number",

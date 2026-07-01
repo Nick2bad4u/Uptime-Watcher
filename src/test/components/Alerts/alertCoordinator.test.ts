@@ -15,7 +15,7 @@ import {
 } from "../../../stores/alerts/useAlertStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock(import('../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../services/NotificationPreferenceService'), () => ({
+vi.mock("../../../services/NotificationPreferenceService", () => ({
     NotificationPreferenceService: {
         initialize: vi.fn().mockResolvedValue(undefined),
         updatePreferences: vi.fn().mockResolvedValue(undefined),

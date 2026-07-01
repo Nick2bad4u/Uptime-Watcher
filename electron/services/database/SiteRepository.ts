@@ -537,7 +537,8 @@ export class SiteRepository {
                 );
                 // Apply consistent data normalization
                 const name = site.name ?? SITE_DEFAULTS.NAME;
-                const isMonitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
+                const isMonitoring =
+                    site.monitoring ?? SITE_DEFAULTS.MONITORING;
                 const monitoringValue: 0 | 1 = isMonitoring ? 1 : 0;
 
                 stmt.run([

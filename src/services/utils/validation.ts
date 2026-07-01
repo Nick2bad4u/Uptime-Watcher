@@ -158,7 +158,6 @@ export function validateServicePayload<T>(
         } catch (error: unknown) {
             const diagnosticSuffix = stringifyDiagnostics(diagnostics);
 
-            // eslint-disable-next-line ex/use-error-cause -- ApplicationError preserves the underlying cause via its constructor options.
             throw new ApplicationError({
                 cause: error,
                 code: "RENDERER_SERVICE_VALIDATOR_THREW",

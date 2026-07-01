@@ -388,9 +388,9 @@ describe(SettingsRepository, () => {
                 };
                 mockDatabase.prepare = vi.fn().mockReturnValue(mockStatement);
 
-                expect(() =>
-                    { repository.bulkInsertInternal(mockDatabase, settings); }
-                ).toThrow("Statement error");
+                expect(() => {
+                    repository.bulkInsertInternal(mockDatabase, settings);
+                }).toThrow("Statement error");
                 expect(mockStatement.finalize).toHaveBeenCalled();
             });
         });

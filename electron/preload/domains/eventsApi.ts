@@ -48,7 +48,12 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
-import { isDefined, isFinite as isFiniteNumber, objectValues, safeCastTo } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteNumber,
+    objectValues,
+    safeCastTo,
+} from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {
@@ -312,10 +317,12 @@ const isHistoryLimitUpdatedEventDataPayload = (
         return false;
     }
 
-    return !(isDefined(previousLimit) &&
+    return !(
+        isDefined(previousLimit) &&
         (typeof previousLimit !== "number" ||
             !isFiniteNumber(previousLimit) ||
-            previousLimit < 0));
+            previousLimit < 0)
+    );
 };
 
 const isSiteAddedSource = createStringUnionGuard(SITE_ADDED_SOURCES);

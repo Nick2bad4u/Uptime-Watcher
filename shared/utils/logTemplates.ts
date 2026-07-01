@@ -1,7 +1,6 @@
 import type { Simplify, TaggedUnion, UnknownRecord, ValueOf } from "type-fest";
 /**
- * Standardized log message templates for consistent logging across the
- * app.
+ * Standardized log message templates for consistent logging across the app.
  *
  * @remarks
  * This module provides templates for common log messages to ensure consistency
@@ -543,9 +542,7 @@ export function interpolateLogTemplate(
             const resolvedKey = groups?.["variableName"] ?? key;
             const value = variables[resolvedKey];
 
-            return isPresent(value)
-                ? formatValue(value)
-                : match;
+            return isPresent(value) ? formatValue(value) : match;
         }
     );
 }

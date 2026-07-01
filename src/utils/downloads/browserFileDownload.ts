@@ -57,10 +57,9 @@ export function clickDownloadAnchor(args: {
     try {
         anchor.click();
     } catch (domError) {
-        const error =
-            Error.isError(domError)
-                ? domError
-                : new Error(getUserFacingErrorDetail(domError));
+        const error = Error.isError(domError)
+            ? domError
+            : new Error(getUserFacingErrorDetail(domError));
         warnLogger?.warn("DOM click failed, retrying direct click", error);
         anchor.click();
     } finally {

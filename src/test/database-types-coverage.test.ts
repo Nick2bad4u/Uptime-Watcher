@@ -821,7 +821,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const row = {
-                key: ' '.repeat(3),
+                key: " ".repeat(3),
                 value: "some-value",
             };
 

@@ -111,9 +111,11 @@ test.describe(
                 }
 
                 await openAddSiteModal(page);
-                await expect.soft(page.getByTestId("add-site-form")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect
+                    .soft(page.getByTestId("add-site-form"))
+                    .toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
                 await closeModal(page, "escape");
 
                 await waitForDialogTeardown(page, "add-site-modal");
@@ -130,21 +132,25 @@ test.describe(
                 await expect.soft(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    page
-                        .getByRole("banner")
-                        .getByRole("button", { name: /add new site/i })
-                ).toBeVisible();
+                await expect
+                    .soft(
+                        page
+                            .getByRole("banner")
+                            .getByRole("button", { name: /add new site/i })
+                    )
+                    .toBeVisible();
 
                 await page.setViewportSize({ width: 1920, height: 1080 });
                 await expect.soft(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    page
-                        .getByRole("banner")
-                        .getByRole("button", { name: /open settings/i })
-                ).toBeVisible();
+                await expect
+                    .soft(
+                        page
+                            .getByRole("banner")
+                            .getByRole("button", { name: /open settings/i })
+                    )
+                    .toBeVisible();
             }
         );
     }

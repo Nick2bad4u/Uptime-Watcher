@@ -33,8 +33,8 @@ npm install --force=false --dry-run --no-audit --no-fund
 
 ## Current blockers
 
-| Package                            | Current version | Required peer range | Repo version | Status                                                                |
-| ---------------------------------- | --------------- | ------------------- | ------------ | --------------------------------------------------------------------- |
+| Package                             | Current version | Required peer range | Repo version | Status                                                                |
+| ----------------------------------- | --------------- | ------------------- | ------------ | --------------------------------------------------------------------- |
 | `@rushstack/eslint-plugin-security` | `0.14.2`        | ESLint 6 through 9  | `10.3.0`     | No newer npm release exists; keep forced installs and re-check later. |
 
 The plugin remains wired into `eslint.config.mjs` through
@@ -43,8 +43,8 @@ lint signal rather than simply cleaning unused metadata.
 
 ## Cleared blockers
 
-| Package                                   | Resolution                                                                 |
-| ----------------------------------------- | -------------------------------------------------------------------------- |
+| Package                                    | Resolution                                                                                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
 | `@arthurgeron/eslint-plugin-react-usememo` | Removed because all of its rules were disabled and the latest release still peers only `eslint@^9.0.0`. |
 
 ## Exit criteria

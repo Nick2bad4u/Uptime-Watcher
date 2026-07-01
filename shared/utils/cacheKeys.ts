@@ -90,8 +90,8 @@ function createCacheKey(
  *
  * @remarks
  * Provides domain-specific key generation functions that ensure consistent
- * cache key patterns across the entire app. All functions return
- * properly formatted cache keys following the established conventions.
+ * cache key patterns across the entire app. All functions return properly
+ * formatted cache keys following the established conventions.
  *
  * @public
  */

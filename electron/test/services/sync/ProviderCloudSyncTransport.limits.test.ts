@@ -1,4 +1,7 @@
-import type { CloudObjectEntry, CloudStorageProvider  } from "@electron/services/cloud/providers/CloudStorageProvider.types";
+import type {
+    CloudObjectEntry,
+    CloudStorageProvider,
+} from "@electron/services/cloud/providers/CloudStorageProvider.types";
 import type { CloudProviderKind } from "@shared/types/cloud";
 import type { CloudSyncOperation } from "@shared/types/cloudSync";
 
@@ -393,7 +396,6 @@ describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
                 )
             ).rejects.toThrow(/exceeds size limit/i);
         } finally {
-            // eslint-disable-next-line require-atomic-updates -- test-only env restore
             process.env[envKey] = original;
         }
     });

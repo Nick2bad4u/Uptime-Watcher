@@ -13,6 +13,9 @@ import { MonitorTypesService } from "../../services/MonitorTypesService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
+const isStringArray = (value: unknown): value is string[] =>
+    Array.isArray(value) && value.every((item) => typeof item === "string");
+
 /**
  * Creates the operational slice wiring monitor type service calls.
  */
@@ -158,22 +161,36 @@ export const createMonitorTypesOperationsSlice = (
                 const validationResult =
                     await MonitorTypesService.validateMonitorData(type, data);
 
-                if (!Array.isArray(validationResult.errors)) {
+                const errorsCandidate: unknown = validationResult.errors;
+                if (!isStringArray(errorsCandidate)) {
                     throw new TypeError(
                         "Invalid validation result received: errors payload missing"
                     );
                 }
 
+                const warningsCandidate: unknown = validationResult.warnings;
+                if (
+                    warningsCandidate !== undefined &&
+                    !isStringArray(warningsCandidate)
+                ) {
+                    throw new TypeError(
+                        "Invalid validation result received: warnings payload malformed"
+                    );
+                }
+
+                const errors = [...errorsCandidate];
+                const warnings = warningsCandidate
+                    ? [...warningsCandidate]
+                    : [];
+
                 const normalizedResult: ValidationResult = {
                     data: validationResult.data,
-                    errors: [...validationResult.errors],
+                    errors,
                     metadata: validationResult.metadata
                         ? { ...validationResult.metadata }
                         : {},
                     success: validationResult.success,
-                    warnings: validationResult.warnings
-                        ? [...validationResult.warnings]
-                        : [],
+                    warnings,
                 };
 
                 logStoreAction("MonitorTypesStore", "validateMonitorData", {

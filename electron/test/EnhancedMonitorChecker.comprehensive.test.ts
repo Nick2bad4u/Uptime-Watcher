@@ -217,7 +217,10 @@ describe(EnhancedMonitorChecker, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        const isResult = await checker.stopMonitoring("test-site-1", "monitor-1");
+        const isResult = await checker.stopMonitoring(
+            "test-site-1",
+            "monitor-1"
+        );
 
         expect(typeof isResult).toBe("boolean");
         expect(mockConfig.monitorRepository.update).toHaveBeenCalled();

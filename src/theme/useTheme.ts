@@ -470,10 +470,7 @@ export function useThemeClasses(): UseThemeClassesReturn {
     const getTextClass = useCallback(
         (
             variant:
-                | "inverse"
-                | "primary"
-                | "secondary"
-                | "tertiary" = "primary"
+                "inverse" | "primary" | "secondary" | "tertiary" = "primary"
         ) => ({
             color: `var(--color-text-${variant})`,
         }),

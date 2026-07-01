@@ -2,9 +2,8 @@
  * Error store types and interfaces for centralized error management.
  *
  * @remarks
- * Defines the structure for error state management across the app,
- * including global errors, store-specific errors, and operation loading
- * states.
+ * Defines the structure for error state management across the app, including
+ * global errors, store-specific errors, and operation loading states.
  *
  * @packageDocumentation
  */
@@ -66,8 +65,8 @@ export interface ErrorState {
  *
  * @remarks
  * Merges error state and actions into a single interface for the Zustand store.
- * Provides complete error management functionality for the app with
- * flattened type display for better developer experience.
+ * Provides complete error management functionality for the app with flattened
+ * type display for better developer experience.
  *
  * @public
  */

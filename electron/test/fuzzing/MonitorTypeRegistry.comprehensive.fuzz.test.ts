@@ -25,8 +25,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
 import type { BaseMonitorConfig } from "../../services/monitoring/MonitorTypeRegistry.types";
-import type { IMonitorService } from "../../services/monitoring/types";
-
 import {
     createMonitorWithTypeGuards,
     getAllMonitorTypeConfigs,
@@ -72,7 +70,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
         it("should handle edge case strings", () => {
             const edgeCases = [
                 "",
-                ' '.repeat(3),
+                " ".repeat(3),
                 "\n\t",
                 "🚀",
                 "test123",
@@ -182,23 +180,24 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                         required: true,
                     },
                 ],
-                serviceFactory: () =>
-                    ({
-                        check: vi.fn().mockResolvedValue({
-                            status: "up" as const,
-                            responseTime: 100,
-                            timestamp: Date.now(),
-                        }),
-                        getType: vi.fn().mockReturnValue("http"),
-                        updateConfig: vi.fn(),
+                serviceFactory: () => ({
+                    check: vi.fn().mockResolvedValue({
+                        status: "up" as const,
+                        responseTime: 100,
+                        timestamp: Date.now(),
                     }),
+                    getType: vi.fn().mockReturnValue("http"),
+                    updateConfig: vi.fn(),
+                }),
                 validationSchema: z.object({
                     type: z.string(),
                     url: z.string().url(),
                 }),
             };
 
-            expect(() => { registerMonitorType(validConfig); }).not.toThrow();
+            expect(() => {
+                registerMonitorType(validConfig);
+            }).not.toThrow();
             expect(isValidMonitorType(validConfig.type)).toBeTruthy();
             expect(getMonitorTypeConfig(validConfig.type)).toBeDefined();
         });
@@ -268,19 +267,20 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                             description: "For field testing",
                             version: "1.0.0",
                             fields: [field],
-                            serviceFactory: () =>
-                                ({
-                                    check: vi.fn().mockResolvedValue({
-                                        status: "up" as const,
-                                    }),
-                                    getType: vi.fn().mockReturnValue("http"),
-                                    updateConfig: vi.fn(),
+                            serviceFactory: () => ({
+                                check: vi.fn().mockResolvedValue({
+                                    status: "up" as const,
                                 }),
+                                getType: vi.fn().mockReturnValue("http"),
+                                updateConfig: vi.fn(),
+                            }),
                             validationSchema: z.object({ type: z.string() }),
                         };
 
                         // Property: registration with valid field should not throw
-                        expect(() => { registerMonitorType(config); }).not.toThrow();
+                        expect(() => {
+                            registerMonitorType(config);
+                        }).not.toThrow();
                     }
                 )
             );
@@ -311,14 +311,11 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 description: "For guard testing",
                 version: "1.0.0",
                 fields: [],
-                serviceFactory: () =>
-                    ({
-                        check: vi
-                            .fn()
-                            .mockResolvedValue({ status: "up" as const }),
-                        getType: vi.fn().mockReturnValue("http"),
-                        updateConfig: vi.fn(),
-                    }),
+                serviceFactory: () => ({
+                    check: vi.fn().mockResolvedValue({ status: "up" as const }),
+                    getType: vi.fn().mockReturnValue("http"),
+                    updateConfig: vi.fn(),
+                }),
                 validationSchema: z.object({ type: z.string() }),
             };
 
@@ -451,14 +448,13 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     description: "For memory testing",
                     version: "1.0.0",
                     fields: [],
-                    serviceFactory: () =>
-                        ({
-                            check: vi
-                                .fn()
-                                .mockResolvedValue({ status: "up" as const }),
-                            getType: vi.fn().mockReturnValue(monitorType),
-                            updateConfig: vi.fn(),
-                        }),
+                    serviceFactory: () => ({
+                        check: vi
+                            .fn()
+                            .mockResolvedValue({ status: "up" as const }),
+                        getType: vi.fn().mockReturnValue(monitorType),
+                        updateConfig: vi.fn(),
+                    }),
                     validationSchema: z.object({ type: z.string() }),
                 };
 

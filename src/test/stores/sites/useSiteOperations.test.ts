@@ -3,7 +3,7 @@
  * and monitor management
  */
 
-import { type Monitor, type Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 import {
@@ -14,6 +14,7 @@ import {
     vi,
     type MockInstance,
 } from "vitest";
+import { objectAssign } from "ts-extras";
 
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 
@@ -21,7 +22,7 @@ import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperat
 import * as siteOperationHelpers from "../../../stores/sites/utils/operationHelpers";
 
 // Mock external dependencies
-vi.mock(import('../../../services/logger'));
+vi.mock("../../../services/logger");
 
 const mockErrorStore = {
     clearStoreError: vi.fn(),
@@ -29,13 +30,13 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => mockErrorStore),
     },
 }));
 
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
@@ -51,7 +52,7 @@ vi.mock(import('../../../stores/utils'), () => ({
     }),
 }));
 
-vi.mock(import('../../../stores/sites/utils/fileDownload'), () => ({
+vi.mock("../../../stores/sites/utils/fileDownload", () => ({
     handleSQLiteBackupDownload: vi.fn(
         async (callback) =>
             // Actually call the callback to trigger the electron API call
@@ -59,7 +60,7 @@ vi.mock(import('../../../stores/sites/utils/fileDownload'), () => ({
     ),
 }));
 
-vi.mock(import('../../../stores/sites/utils/monitorOperations'), () => ({
+vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
     normalizeMonitor: vi.fn((monitor) => monitor),
     updateMonitorInSite: vi.fn((site, monitorId, updates) => ({
         ...site,
@@ -76,10 +77,8 @@ const mockElectronAPI = (
 const getRestoreMock = (): MockInstance =>
     mockElectronAPI.data.restoreSqliteBackup;
 if (!mockElectronAPI.data.restoreSqliteBackup) {
-    vi.spyOn(
-        mockElectronAPI.data as Record<string, unknown>,
-        "restoreSqliteBackup"
-    ).mockImplementation(async () => ({
+    objectAssign(mockElectronAPI.data, {
+        restoreSqliteBackup: vi.fn(async () => ({
             metadata: {
                 appVersion: "0.0.0-test",
                 checksum: "restore-checksum",
@@ -91,7 +90,8 @@ if (!mockElectronAPI.data.restoreSqliteBackup) {
             },
             preRestoreFileName: "pre-restore.sqlite",
             restoredAt: Date.now(),
-        }));
+        })),
+    });
 }
 
 describe(createSiteOperationsActions, () => {
@@ -633,7 +633,9 @@ describe(createSiteOperationsActions, () => {
                 ...mockSite,
                 monitors: [mockMonitor, secondMonitor],
             };
-            vi.spyOn(mockDeps, 'getSites').mockImplementation(() => [siteWithMultipleMonitors]);
+            vi.spyOn(mockDeps, "getSites").mockReturnValue([
+                siteWithMultipleMonitors,
+            ]);
 
             await actions.removeMonitorFromSite("test-site", "monitor-1");
 

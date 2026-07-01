@@ -12,7 +12,7 @@ import {
 } from "@shared/types";
 import * as errorHandling from "@shared/utils/errorHandling";
 import * as fc from "fast-check";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppCaches } from "../../utils/cache";
@@ -31,14 +31,14 @@ const mockMonitorTypesStore = {
     monitorTypes: safeCastTo<MonitorTypeConfig[]>([]),
 };
 
-vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: {
         getState: vi.fn(() => mockMonitorTypesStore),
     },
 }));
 
 // Mock dependencies
-vi.mock(import('../../utils/cache'), () => ({
+vi.mock("../../utils/cache", () => ({
     AppCaches: {
         monitorTypes: {
             clear: vi.fn(),
@@ -58,7 +58,7 @@ vi.mock(import('../../utils/cache'), () => ({
     }),
 }));
 
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     convertError: vi.fn(),
     ensureError: vi.fn(),
     withErrorHandling: vi.fn(),
@@ -753,7 +753,7 @@ describe("monitorTypeHelper", () => {
     // Property-based Tests
     describe("property-based Tests", () => {
         const monitorTypeKeyArb = fc.constantFrom(
-            ...(safeCastTo<readonly MonitorType[]>(BASE_MONITOR_TYPES))
+            ...safeCastTo<readonly MonitorType[]>(BASE_MONITOR_TYPES)
         );
 
         const monitorFieldOptionArb = fc.record({
@@ -930,7 +930,7 @@ describe("monitorTypeHelper", () => {
             test.prop([
                 fc.array(monitorTypeConfigArb, { maxLength: 5, minLength: 1 }),
                 fc.constantFrom(
-                    ...(safeCastTo<readonly MonitorType[]>(BASE_MONITOR_TYPES))
+                    ...safeCastTo<readonly MonitorType[]>(BASE_MONITOR_TYPES)
                 ),
             ])(
                 "should return undefined when monitor type not found",

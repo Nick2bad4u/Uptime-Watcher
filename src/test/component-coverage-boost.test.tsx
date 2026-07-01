@@ -5,9 +5,14 @@
 import type { MonitorTypeOption } from "@shared/types/monitorTypes";
 import type * as React from "react";
 
-import { arrayFirst, arrayIncludes, isEmpty, safeCastTo    } from "ts-extras";
+import {
+    arrayFirst,
+    arrayIncludes,
+    isEmpty,
+    safeCastTo,
+    arrayJoin,
+} from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
-import { arrayJoin } from "ts-extras";
 
 // Mock React components for testing uncovered component paths Removed unused MockComponent to fix TS6133
 
@@ -140,12 +145,15 @@ describe("Component Coverage Boost", () => {
                 getTabKey: (tab: string, siteIdentifier: string) =>
                     `${tab}-${siteIdentifier}`,
                 isValidTab: (tab: string) =>
-                    arrayIncludes([
-                        "analytics",
-                        "history",
-                        "overview",
-                        "settings",
-                    ], tab),
+                    arrayIncludes(
+                        [
+                            "analytics",
+                            "history",
+                            "overview",
+                            "settings",
+                        ],
+                        tab
+                    ),
                 getDefaultTab: () => "overview",
                 handleTabChange: (
                     currentState: SiteDetailsState,
@@ -280,7 +288,8 @@ describe("Component Coverage Boost", () => {
                     { key: "settings", label: "Settings", icon: "⚙️" },
                 ],
                 getActiveItem: (items: NavigationItem[], currentTab: string) =>
-                    items.find((item) => item.key === currentTab) || arrayFirst(items),
+                    items.find((item) => item.key === currentTab) ||
+                    arrayFirst(items),
                 getNextTab: (items: NavigationItem[], currentTab: string) => {
                     const currentIndex = items.findIndex(
                         (item) => item.key === currentTab
@@ -342,7 +351,7 @@ describe("Component Coverage Boost", () => {
 
             // Test SiteCardHistory.tsx areHistoryPropsEqual function (lines 36-65)
             interface SiteCardHistoryProps {
-                filteredHistory: { status: string; timestamp: number; }[];
+                filteredHistory: { status: string; timestamp: number }[];
                 monitor: Monitor | undefined;
             }
 
@@ -364,8 +373,12 @@ describe("Component Coverage Boost", () => {
                 ) {
                     return false;
                 }
-                const prevTimestamp = arrayFirst(prev.filteredHistory)?.timestamp;
-                const nextTimestamp = arrayFirst(next.filteredHistory)?.timestamp;
+                const prevTimestamp = arrayFirst(
+                    prev.filteredHistory
+                )?.timestamp;
+                const nextTimestamp = arrayFirst(
+                    next.filteredHistory
+                )?.timestamp;
                 if (prevTimestamp !== nextTimestamp) {
                     return false;
                 }
@@ -385,9 +398,11 @@ describe("Component Coverage Boost", () => {
                 ) {
                     return false;
                 }
-                return prevMonitor.url === nextMonitor.url &&
+                return (
+                    prevMonitor.url === nextMonitor.url &&
                     prevMonitor.port === nextMonitor.port &&
-                    prevMonitor.host === nextMonitor.host;
+                    prevMonitor.host === nextMonitor.host
+                );
             };
 
             const baseHistory = [{ timestamp: 1000, status: "up" }];
@@ -854,7 +869,7 @@ describe("Component Coverage Boost", () => {
 
             // Test AddSiteForm.tsx uncovered lines
             interface FormData {
-                monitors: { name: string; type: string; }[];
+                monitors: { name: string; type: string }[];
                 siteName: string;
                 url: string;
             }
@@ -911,8 +926,9 @@ describe("Component Coverage Boost", () => {
             );
             expect(formValidation.validateSiteName("Valid Name")).toBeNull();
             expect(formValidation.validateUrl("")).toBe("URL is required");
-            expect(formValidation.validateUrl("https://example.com")).toBeNull(
-                );
+            expect(
+                formValidation.validateUrl("https://example.com")
+            ).toBeNull();
             expect(formValidation.validateUrl("invalid")).toBe(
                 "Invalid URL format"
             );
@@ -1429,7 +1445,7 @@ describe("Component Coverage Boost", () => {
                     return "F";
                 },
                 calculateMTTR: (
-                    incidents: { endTime: string; startTime: string; }[]
+                    incidents: { endTime: string; startTime: string }[]
                 ) => {
                     if (isEmpty(incidents)) return 0;
                     let totalDowntime = 0;

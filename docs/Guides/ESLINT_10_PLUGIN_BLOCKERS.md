@@ -83,8 +83,8 @@ Additional wrapped compatibility candidates:
 These packages are either still in use or already removed because their peer
 dependency metadata blocks non-forced installs with ESLint 10:
 
-| Package                                   | Current status | ESLint peer range | Resolution status                                                      |
-| ----------------------------------------- | -------------- | ----------------- | ---------------------------------------------------------------------- |
+| Package                                    | Current status | ESLint peer range | Resolution status                                                      |
+| ------------------------------------------ | -------------- | ----------------- | ---------------------------------------------------------------------- |
 | `@rushstack/eslint-plugin-security`        | Enabled        | 6 through 9       | Kept for `@rushstack/security/no-unsafe-regexp`; no newer npm release. |
 | `@arthurgeron/eslint-plugin-react-usememo` | Removed        | 9 only            | Removed because all configured rules were already `off`.               |
 

@@ -2,10 +2,10 @@
  * Centralized fallback and default value utilities for robust error handling.
  *
  * @remarks
- * Provides type-safe fallback handling across the app with consistent
- * error handling, default value management, and UI state recovery patterns.
- * This module ensures the app remains functional even when expected
- * data is missing or invalid.
+ * Provides type-safe fallback handling across the app with consistent error
+ * handling, default value management, and UI state recovery patterns. This
+ * module ensures the app remains functional even when expected data is missing
+ * or invalid.
  *
  * @example
  *
@@ -35,7 +35,13 @@ import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isDefined, isPresent, setHas, stringSplit } from "ts-extras";
+import {
+    arrayJoin,
+    isDefined,
+    isPresent,
+    setHas,
+    stringSplit,
+} from "ts-extras";
 
 import { logger } from "../services/logger";
 
@@ -117,9 +123,9 @@ export function withSyncErrorHandling<T>(
  * immutability.
  *
  * @remarks
- * Centralized defaults that ensure consistent behavior across the app
- * when data is missing or components need fallback values. Uses
- * {@link ReadonlyDeep} to guarantee immutability of the configuration object.
+ * Centralized defaults that ensure consistent behavior across the app when data
+ * is missing or components need fallback values. Uses {@link ReadonlyDeep} to
+ * guarantee immutability of the configuration object.
  *
  * @public
  */
@@ -229,19 +235,11 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
 >([
     [
         "cdn-edge-consistency",
-        (
-            monitor
-        ):
-            | string
-            | undefined => monitor.baselineUrl ?? undefined,
+        (monitor): string | undefined => monitor.baselineUrl ?? undefined,
     ],
     [
         "dns",
-        (
-            monitor
-        ):
-            | string
-            | undefined => {
+        (monitor): string | undefined => {
             if (!monitor.host) {
                 return undefined;
             }
@@ -260,39 +258,23 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     ["ping", (monitor): string | undefined => monitor.host ?? undefined],
     [
         "port",
-        (
-            monitor
-        ):
-            | string
-            | undefined =>
+        (monitor): string | undefined =>
             monitor.host && monitor.port
                 ? `${monitor.host}:${monitor.port}`
                 : undefined,
     ],
     [
         "replication",
-        (
-            monitor
-        ):
-            | string
-            | undefined =>
+        (monitor): string | undefined =>
             monitor.primaryStatusUrl ?? monitor.replicaStatusUrl ?? undefined,
     ],
     [
         "server-heartbeat",
-        (
-            monitor
-        ):
-            | string
-            | undefined => monitor.url ?? undefined,
+        (monitor): string | undefined => monitor.url ?? undefined,
     ],
     [
         "ssl",
-        (
-            monitor
-        ):
-            | string
-            | undefined => {
+        (monitor): string | undefined => {
             if (!monitor.host) {
                 return undefined;
             }
@@ -302,11 +284,7 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     ],
     [
         "websocket-keepalive",
-        (
-            monitor
-        ):
-            | string
-            | undefined => monitor.url ?? undefined,
+        (monitor): string | undefined => monitor.url ?? undefined,
     ],
 ]);
 

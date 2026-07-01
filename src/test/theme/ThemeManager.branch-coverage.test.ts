@@ -78,7 +78,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock window as undefined to simulate SSR
-            const originalWindow = globalThis;
+            const originalWindow = globalThis.window;
             Object.defineProperty(globalThis, "window", {
                 value: undefined,
                 writable: true,
@@ -89,7 +89,9 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             expect(typeof cleanup).toBe("function");
 
             // Cleanup function should not throw
-            expect(() => { cleanup(); }).not.toThrow();
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
 
             // Restore window
             Object.defineProperty(globalThis, "window", {
@@ -294,7 +296,10 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 documentElement: {
                     value: {
                         classList: mockDocumentElementClassList,
-                        style: { setProperty: vi.fn(), removeProperty: vi.fn() },
+                        style: {
+                            setProperty: vi.fn(),
+                            removeProperty: vi.fn(),
+                        },
                     },
                     writable: true,
                 },

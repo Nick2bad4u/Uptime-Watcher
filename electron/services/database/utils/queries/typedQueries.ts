@@ -337,9 +337,11 @@ const isValidHistoryEntryRow = (
         return false;
     }
 
-    return !isDefined(responseTime) ||
+    return (
+        !isDefined(responseTime) ||
         typeof responseTime === "number" ||
-        typeof responseTime === "string";
+        typeof responseTime === "string"
+    );
 };
 
 const HISTORY_ROW_VALIDATION: RowValidationOptions<HistoryRow> = {

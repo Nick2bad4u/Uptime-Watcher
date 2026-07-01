@@ -15,13 +15,7 @@ import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
-import {
-    arrayJoin,
-    isDefined,
-    isPresent,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+import { arrayJoin, isDefined, isPresent, safeCastTo, setHas } from "ts-extras";
 
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
@@ -497,8 +491,8 @@ function toSnakeCase(str: string): string {
 
     // Handle leading uppercase to avoid leading underscore
     return str
-            .replace(/^[A-Z]/u, (match) => match.toLowerCase())
-            .replaceAll(/[A-Z]/gu, (letter) => `_${letter.toLowerCase()}`);
+        .replace(/^[A-Z]/u, (match) => match.toLowerCase())
+        .replaceAll(/[A-Z]/gu, (letter) => `_${letter.toLowerCase()}`);
 }
 
 /**

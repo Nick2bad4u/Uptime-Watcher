@@ -3,9 +3,9 @@
  * detection.
  *
  * @remarks
- * Manages theme switching throughout the app including automatic
- * detection of system preferences and manual theme overrides. Provides a
- * singleton service for consistent theme management across components.
+ * Manages theme switching throughout the app including automatic detection of
+ * system preferences and manual theme overrides. Provides a singleton service
+ * for consistent theme management across components.
  *
  * Note: Empty constructor and no-op functions are intentional design patterns.
  */
@@ -14,7 +14,13 @@ import type { UnknownRecord } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import deepEqual from "fast-deep-equal";
-import { arrayJoin, objectEntries, objectHasIn, objectHasOwn, objectKeys } from "ts-extras";
+import {
+    arrayJoin,
+    objectEntries,
+    objectHasIn,
+    objectHasOwn,
+    objectKeys,
+} from "ts-extras";
 
 import type { SystemThemePreference } from "./components/types";
 import type { Theme, ThemeName } from "./types";
@@ -34,8 +40,8 @@ const isCssVariableKey = (value: PropertyKey): value is CssVariableKey =>
 const toCssToken = (value: CssVariableKey): string => value.toString();
 
 /**
- * Singleton service for managing app themes. Handles theme selection,
- * system preference detection, and automatic switching.
+ * Singleton service for managing app themes. Handles theme selection, system
+ * preference detection, and automatic switching.
  */
 export class ThemeManager {
     /** Singleton instance */
@@ -539,8 +545,8 @@ export class ThemeManager {
  *
  * @remarks
  * Provides convenient access to theme management functionality throughout the
- * app. This singleton ensures consistent theme state and provides a
- * centralized API for theme operations.
+ * app. This singleton ensures consistent theme state and provides a centralized
+ * API for theme operations.
  *
  * @example
  *

@@ -323,8 +323,8 @@ export interface ErrorCatalogInterface {
  *
  * @remarks
  * This catalog provides all error messages organized by functional domain for
- * easy access and consistent usage across the app. Each domain contains
- * related error messages that can be used throughout the codebase.
+ * easy access and consistent usage across the app. Each domain contains related
+ * error messages that can be used throughout the codebase.
  *
  * @public
  */

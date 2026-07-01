@@ -105,7 +105,6 @@ const resolveStorybookModuleDirectory = (): string => {
             return import.meta.dirname;
         }
 
-        // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Fallback for environments lacking import.meta.dirname support.
         return path.dirname(fileURLToPath(import.meta.url));
     } catch (error: unknown) {
         throw createConfigError(
@@ -272,7 +271,10 @@ export const createStorybookPlugins = (
 export const createStorybookBaseViteConfig = (
     options?: StorybookBaseConfigOptions
 ): StorybookBaseConfig => {
-    const optimizeDepsInclude = new Set<string>(Iterator.concat((options?.additionalOptimizeDeps ?? []), storybookOptimizeDepsInclude));
+    const optimizeDepsInclude = new Set<string>([
+        ...(options?.additionalOptimizeDeps ?? []),
+        ...storybookOptimizeDepsInclude,
+    ]);
     const optimizeDepsExclude = new Set<string>([
         "@shared/constants",
         "@shared/types",
@@ -336,6 +338,5 @@ export const ensureStorybookCoverageDirectory = async (): Promise<void> => {
         );
     }
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Path was validated to reside within the project root above.
     await mkdir(storybookCoverageDirectory, { recursive: true });
 };

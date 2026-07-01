@@ -238,9 +238,7 @@ describe("SslMonitor service", () => {
         delete (monitorWithoutWarning as Partial<typeof monitor>)
             .certificateWarningDays;
 
-        const result = await sslMonitor.check(
-            monitorWithoutWarning
-        );
+        const result = await sslMonitor.check(monitorWithoutWarning);
 
         expect(result.status).toBe("degraded");
     });

@@ -20,12 +20,12 @@ tags:
 
 ## Table of Contents
 
-1. [Purpose](#purpose)
-2. [Job Descriptor](#job-descriptor)
-3. [Steps](#steps)
-4. [Helpers](#helpers)
-5. [Testing Guidance](#testing-guidance)
-6. [Checklist](#checklist)
+- [Purpose](#purpose)
+- [Job Descriptor](#job-descriptor)
+- [Steps](#steps)
+- [Helpers](#helpers)
+- [Testing Guidance](#testing-guidance)
+- [Checklist](#checklist)
 
 ## Purpose
 

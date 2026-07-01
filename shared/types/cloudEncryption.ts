@@ -14,8 +14,7 @@ export const CLOUD_ENCRYPTION_CONFIG_VERSION = 1 as const;
 
 /** Union of all supported cloud encryption configuration variants. */
 export type CloudEncryptionConfig =
-    | CloudEncryptionConfigNone
-    | CloudEncryptionConfigPassphrase;
+    CloudEncryptionConfigNone | CloudEncryptionConfigPassphrase;
 
 /** Base fields shared by all encryption configuration variants. */
 export interface CloudEncryptionConfigBase {

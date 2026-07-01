@@ -86,8 +86,10 @@ export function createMonitorConfig(
     return { checkInterval, retryAttempts, timeout };
 }
 
-function resolveFiniteNumber(source: unknown): number | undefined { if (typeof source === "number") {
-        return isFiniteNumber(source) ? source : undefined; }
+function resolveFiniteNumber(source: unknown): number | undefined {
+    if (typeof source === "number") {
+        return isFiniteNumber(source) ? source : undefined;
+    }
 
     if (typeof source === "string") {
         const trimmed = source.trim();

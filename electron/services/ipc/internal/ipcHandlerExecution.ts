@@ -36,8 +36,7 @@ export interface HandlerExecutionSuccess<T> {
 
 /** Execution result union for IPC handlers. */
 export type HandlerExecutionResult<T> =
-    | HandlerExecutionFailure
-    | HandlerExecutionSuccess<T>;
+    HandlerExecutionFailure | HandlerExecutionSuccess<T>;
 
 /**
  * Executes an IPC handler and captures timing + error metadata.

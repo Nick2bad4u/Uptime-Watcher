@@ -4,8 +4,8 @@
  *
  * @remarks
  * This module provides standardized validation functions for common form
- * patterns found across the app, including required field validation,
- * string validation, URL validation, and custom validation helpers.
+ * patterns found across the app, including required field validation, string
+ * validation, URL validation, and custom validation helpers.
  *
  * @packageDocumentation
  */

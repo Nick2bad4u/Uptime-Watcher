@@ -60,6 +60,8 @@ describe(extractNestedFieldValue, () => {
         expect(
             extractNestedFieldValue({ details: {} }, "details.missing")
         ).toBe(undefined);
-        expect(extractNestedFieldValue({ details: {} }, ' '.repeat(3))).toBe(undefined);
+        expect(extractNestedFieldValue({ details: {} }, " ".repeat(3))).toBe(
+            undefined
+        );
     });
 });

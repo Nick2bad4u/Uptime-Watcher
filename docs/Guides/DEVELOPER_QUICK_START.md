@@ -18,17 +18,17 @@ tags:
 
 ## Table of Contents
 
-1. [📋 Overview](#-overview)
-2. [⚡ Quick Setup](#-quick-setup)
-3. [🏗️ Architecture Quick Reference](#️-architecture-quick-reference)
-4. [🔄 Data Flow Architecture](#-data-flow-architecture)
-5. [🛠️ Common Development Tasks](#️-common-development-tasks)
-6. [🔧 Available Scripts](#-available-scripts)
-7. [🎯 Key Development Patterns](#-key-development-patterns)
-8. [🚨 Important Guidelines](#-important-guidelines)
-9. [🐛 Debugging](#-debugging)
-10. [📚 Essential Documentation](#-essential-documentation)
-11. [🎯 Next Steps](#-next-steps)
+- [📋 Overview](#-overview)
+- [⚡ Quick Setup](#-quick-setup)
+- [🏗️ Architecture Quick Reference](#️-architecture-quick-reference)
+- [🔄 Data Flow Architecture](#-data-flow-architecture)
+- [🛠️ Common Development Tasks](#️-common-development-tasks)
+- [🔧 Available Scripts](#-available-scripts)
+- [🎯 Key Development Patterns](#-key-development-patterns)
+- [🚨 Important Guidelines](#-important-guidelines)
+- [🐛 Debugging](#-debugging)
+- [📚 Essential Documentation](#-essential-documentation)
+- [🎯 Next Steps](#-next-steps)
 
 ## 📋 Overview
 

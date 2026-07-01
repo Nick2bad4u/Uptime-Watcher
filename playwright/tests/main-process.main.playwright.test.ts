@@ -46,16 +46,18 @@ test.describe(
                 });
 
                 // Test app module
-                const appPath = await electronApp.evaluate(async ({ app }) => app.getAppPath());
+                const appPath = await electronApp.evaluate(async ({ app }) =>
+                    app.getAppPath()
+                );
                 expect.soft(appPath).toBeTruthy();
                 expect.soft(typeof appPath).toBe("string");
 
                 // Test process information
                 const processInfo = await electronApp.evaluate(async () => ({
-                        platform: process.platform,
-                        arch: process.arch,
-                        version: process.version,
-                    }));
+                    platform: process.platform,
+                    arch: process.arch,
+                    version: process.version,
+                }));
 
                 expect.soft(processInfo.platform).toBeTruthy();
                 expect.soft(processInfo.arch).toBeTruthy();
@@ -130,10 +132,10 @@ test.describe(
                 // Test app ready state
                 const readyState = await electronApp.evaluate(
                     async ({ app }) => ({
-                            isReady: app.isReady(),
-                            name: app.getName(),
-                            locale: app.getLocale(),
-                        })
+                        isReady: app.isReady(),
+                        name: app.getName(),
+                        locale: app.getLocale(),
+                    })
                 );
 
                 expect.soft(readyState.isReady).toBe(true);
@@ -166,20 +168,20 @@ test.describe(
                 // Get system information
                 const systemInfo = await electronApp.evaluate(
                     async ({ app }) => ({
-                            version: app.getVersion(),
-                            locale: app.getLocale(),
-                            systemLocale: app.getSystemLocale(),
-                            preferredSystemLanguages:
-                                app.getPreferredSystemLanguages(),
-                        })
+                        version: app.getVersion(),
+                        locale: app.getLocale(),
+                        systemLocale: app.getSystemLocale(),
+                        preferredSystemLanguages:
+                            app.getPreferredSystemLanguages(),
+                    })
                 );
 
                 expect.soft(systemInfo.version).toBeTruthy();
                 expect.soft(systemInfo.locale).toBeTruthy();
                 expect.soft(systemInfo.systemLocale).toBeTruthy();
-                expect.soft(Array.isArray(systemInfo.preferredSystemLanguages)).toBe(
-                    true
-                );
+                expect
+                    .soft(Array.isArray(systemInfo.preferredSystemLanguages))
+                    .toBe(true);
 
                 await electronApp.close();
             }

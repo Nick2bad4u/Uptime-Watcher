@@ -4,7 +4,7 @@
  * report
  */
 
-import { arrayAt, arrayFirst, arrayIncludes, stringSplit    } from "ts-extras";
+import { arrayAt, arrayFirst, arrayIncludes, stringSplit } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 describe("Comprehensive Coverage Boost Tests", () => {

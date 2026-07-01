@@ -18,7 +18,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
 
 // Mock all external dependencies
-vi.mock(import('../../../../stores/settings/useSettingsStore'), () => ({
+vi.mock("../../../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: (selector?: unknown) => {
         const state = {
             settings: { historyLimit: 25 },
@@ -34,7 +34,7 @@ vi.mock(import('../../../../stores/settings/useSettingsStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -46,7 +46,7 @@ vi.mock(import('../../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../../../theme/components/StatusIndicator", () => ({
     StatusIndicator: ({
         children,
         ...props
@@ -57,7 +57,7 @@ vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         ...props
@@ -66,7 +66,7 @@ vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedCard'), () => ({
+vi.mock("../../../../theme/components/ThemedCard", () => ({
     ThemedCard: ({
         children,
         ...props
@@ -75,7 +75,7 @@ vi.mock(import('../../../../theme/components/ThemedCard'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedSelect'), () => ({
+vi.mock("../../../../theme/components/ThemedSelect", () => ({
     ThemedSelect: ({
         children,
         ...props
@@ -84,7 +84,7 @@ vi.mock(import('../../../../theme/components/ThemedSelect'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({
         children,
         ...props
@@ -93,7 +93,7 @@ vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ),
 }));
 
-vi.mock(import('../../common/MonitorUiComponents'), () => ({
+vi.mock("../../common/MonitorUiComponents", () => ({
     DetailLabel: ({
         children,
         ...props

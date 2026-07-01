@@ -48,7 +48,7 @@ const buildListenerStates = (attachedCount: number) =>
     }));
 
 // Mock all dependencies
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -58,11 +58,11 @@ vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
+vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         Error.isError(error) ? error : new Error(String(error))
     ),
@@ -73,7 +73,7 @@ vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
     ),
 }));
 
-vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
+vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
         return {
             subscribe: vi.fn(async () => ({
@@ -88,7 +88,7 @@ vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
     }),
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -97,7 +97,7 @@ vi.mock(import('../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../utils/errorHandling'), () => ({
+vi.mock("../../../utils/errorHandling", () => ({
     ensureError: vi.fn((error) => error),
 }));
 
@@ -108,7 +108,7 @@ const mockStateSyncService = vi.hoisted(() => ({
     requestFullSync: vi.fn(),
 }));
 
-vi.mock(import('../../../services/StateSyncService'), () => ({
+vi.mock("../../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 

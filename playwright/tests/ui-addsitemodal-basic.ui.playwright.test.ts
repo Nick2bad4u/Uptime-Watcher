@@ -72,9 +72,9 @@ test.describe(
                 const dialogClassName = await dialog.evaluate(
                     (element) => element.className
                 );
-                expect.soft(dialogClassName).toContain(
-                    "modal-shell--accent-success"
-                );
+                expect
+                    .soft(dialogClassName)
+                    .toContain("modal-shell--accent-success");
 
                 const submitButton = dialog.getByRole("button", {
                     name: /add site/i,
@@ -156,126 +156,135 @@ test.describe(
                 );
 
                 expect.soft(monitorTypeValues.length).toBeGreaterThanOrEqual(5);
-                expect.soft(
-                    monitorTypeValues.some((option) => option.value === "http")
-                ).toBe(true);
-                expect.soft(
-                    monitorTypeValues.every(
-                        (option) => option.label.trim().length > 0
+                expect
+                    .soft(
+                        monitorTypeValues.some(
+                            (option) => option.value === "http"
+                        )
                     )
-                ).toBe(true);
+                    .toBe(true);
+                expect
+                    .soft(
+                        monitorTypeValues.every(
+                            (option) => option.label.trim().length > 0
+                        )
+                    )
+                    .toBe(true);
             }
         );
 
-        test(
-            "should enforce server heartbeat dynamic field validation before creation",
-            {
-                // Isolated Electron lifecycle event timing on slower machines
-                // can cause sporadic failures here; allow two automatic retries
-                // before surfacing as a real failure.
-                retries: 2,
-                tag: ["@validation", "@monitor-types"],
-            },
-            async () => {
-                test.setTimeout(70_000);
-                const heartbeatSiteName = generateSiteName(
-                    "Server Heartbeat Validation"
-                );
+        test.describe("server heartbeat dynamic field validation", () => {
+            // Isolated Electron lifecycle event timing on slower machines can
+            // cause sporadic failures here; allow two automatic retries before
+            // surfacing as a real failure.
+            test.describe.configure({ retries: 2 });
 
-                await test.step("Open modal and submit without heartbeat fields to trigger validation", async () => {
-                    await openAddSiteModal(page);
-                    await fillAddSiteForm(page, {
-                        monitorType: "server-heartbeat",
-                        name: heartbeatSiteName,
-                    });
-
-                    const heartbeatFieldLabels = [
-                        /heartbeat url/iv,
-                        /status field/i,
-                        /expected status/i,
-                        /timestamp field/i,
-                        /max drift \(seconds\)/i,
-                    ];
-
-                    for (const label of heartbeatFieldLabels) {
-                        const fieldInput = page.getByLabel(label);
-                        // Dynamic fields render asynchronously after the monitor-type
-                        // dropdown changes — wait for each field to be visible and
-                        // editable before clearing it.
-                        await fieldInput.waitFor({
-                            state: "visible",
-                            timeout: WAIT_TIMEOUTS.MEDIUM,
-                        });
-                        await expect.soft(fieldInput).toBeEditable({
-                            timeout: WAIT_TIMEOUTS.SHORT,
-                        });
-                        await fieldInput.fill("");
-                    }
-
-                    await page.getByTestId("add-site-submit").click();
-
-                    // Invalid submissions should keep the modal open.
-                    await expect.soft(
-                        page.getByTestId("add-site-modal")
-                    ).toBeVisible({
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
-                    });
-
-                    await expect.soft(page.getByTestId("add-site-form")).toBeVisible(
-                        {
-                            timeout: WAIT_TIMEOUTS.MEDIUM,
-                        }
+            test(
+                "should enforce server heartbeat dynamic field validation before creation",
+                {
+                    tag: ["@validation", "@monitor-types"],
+                },
+                async () => {
+                    test.setTimeout(70_000);
+                    const heartbeatSiteName = generateSiteName(
+                        "Server Heartbeat Validation"
                     );
 
-                    const siteCountAfterInvalid = await page.evaluate(
-                        async () => {
-                            const automationWindow =
-                                globalThis as typeof globalThis & {
-                                electronAPI?: {
-                                    sites?: {
-                                        getSites?: () => Promise<unknown>;
+                    await test.step("Open modal and submit without heartbeat fields to trigger validation", async () => {
+                        await openAddSiteModal(page);
+                        await fillAddSiteForm(page, {
+                            monitorType: "server-heartbeat",
+                            name: heartbeatSiteName,
+                        });
+
+                        const heartbeatFieldLabels = [
+                            /heartbeat url/iv,
+                            /status field/i,
+                            /expected status/i,
+                            /timestamp field/i,
+                            /max drift \(seconds\)/i,
+                        ];
+
+                        for (const label of heartbeatFieldLabels) {
+                            const fieldInput = page.getByLabel(label);
+                            // Dynamic fields render asynchronously after the monitor-type
+                            // dropdown changes — wait for each field to be visible and
+                            // editable before clearing it.
+                            await fieldInput.waitFor({
+                                state: "visible",
+                                timeout: WAIT_TIMEOUTS.MEDIUM,
+                            });
+                            await expect.soft(fieldInput).toBeEditable({
+                                timeout: WAIT_TIMEOUTS.SHORT,
+                            });
+                            await fieldInput.fill("");
+                        }
+
+                        await page.getByTestId("add-site-submit").click();
+
+                        // Invalid submissions should keep the modal open.
+                        await expect
+                            .soft(page.getByTestId("add-site-modal"))
+                            .toBeVisible({
+                                timeout: WAIT_TIMEOUTS.MEDIUM,
+                            });
+
+                        await expect
+                            .soft(page.getByTestId("add-site-form"))
+                            .toBeVisible({
+                                timeout: WAIT_TIMEOUTS.MEDIUM,
+                            });
+
+                        const siteCountAfterInvalid = await page.evaluate(
+                            async () => {
+                                const automationWindow =
+                                    globalThis as typeof globalThis & {
+                                        electronAPI?: {
+                                            sites?: {
+                                                getSites?: () => Promise<unknown>;
+                                            };
+                                        };
                                     };
-                                };
-                            };
 
-                            const response =
-                                await automationWindow.electronAPI?.sites?.getSites?.();
-                            return Array.isArray(response)
-                                ? response.length
-                                : 0;
-                        }
-                    );
-                    expect.soft(siteCountAfterInvalid).toBe(0);
-                });
-
-                await test.step("Fill heartbeat fields and create monitor", async () => {
-                    await fillAddSiteForm(page, {
-                        dynamicFields: [
-                            { label: "Status Field", value: "data.status" },
-                            { label: "Expected Status", value: "running" },
-                            {
-                                label: "Timestamp Field",
-                                value: "data.timestamp",
-                            },
-                            { label: "Max Drift (seconds)", value: "60" },
-                        ],
-                        monitorType: "server-heartbeat",
-                        name: heartbeatSiteName,
-                        url: "https://heartbeat.example.com/api",
+                                const response =
+                                    await automationWindow.electronAPI?.sites?.getSites?.();
+                                return Array.isArray(response)
+                                    ? response.length
+                                    : 0;
+                            }
+                        );
+                        expect.soft(siteCountAfterInvalid).toBe(0);
                     });
 
-                    await submitAddSiteForm(page);
-                    await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
+                    await test.step("Fill heartbeat fields and create monitor", async () => {
+                        await fillAddSiteForm(page, {
+                            dynamicFields: [
+                                { label: "Status Field", value: "data.status" },
+                                { label: "Expected Status", value: "running" },
+                                {
+                                    label: "Timestamp Field",
+                                    value: "data.timestamp",
+                                },
+                                { label: "Max Drift (seconds)", value: "60" },
+                            ],
+                            monitorType: "server-heartbeat",
+                            name: heartbeatSiteName,
+                            url: "https://heartbeat.example.com/api",
+                        });
 
-                    const heartbeatSiteCard = getSiteCardLocator(
-                        page,
-                        heartbeatSiteName
-                    );
-                    await expect.soft(heartbeatSiteCard).toBeVisible({
-                        timeout: WAIT_TIMEOUTS.LONG,
+                        await submitAddSiteForm(page);
+                        await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
+
+                        const heartbeatSiteCard = getSiteCardLocator(
+                            page,
+                            heartbeatSiteName
+                        );
+                        await expect.soft(heartbeatSiteCard).toBeVisible({
+                            timeout: WAIT_TIMEOUTS.LONG,
+                        });
                     });
-                });
-            }
-        );
+                }
+            );
+        });
     }
 );

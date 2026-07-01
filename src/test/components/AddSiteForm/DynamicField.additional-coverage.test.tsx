@@ -19,7 +19,7 @@ import { logger } from "../../../services/logger";
 import { ThemeProvider } from "../../../theme/components/ThemeProvider";
 
 // Mock the logger
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),

@@ -47,8 +47,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
         siteValidator = new SiteValidator();
 
         const latestInstance = monitorValidatorCtor.latestInstance;
-        mockMonitorValidator = (latestInstance ??
-            new monitorValidatorCtor());
+        mockMonitorValidator = latestInstance ?? new monitorValidatorCtor();
     });
 
     describe("Constructor", () => {

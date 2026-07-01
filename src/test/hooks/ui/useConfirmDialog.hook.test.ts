@@ -12,7 +12,7 @@ import {
     requestConfirmation,
 } from "../../../stores/ui/useConfirmDialogStore";
 
-vi.mock(import('../../../stores/ui/useConfirmDialogStore'), () => ({
+vi.mock("../../../stores/ui/useConfirmDialogStore", () => ({
     requestConfirmation: vi.fn(),
 }));
 

@@ -715,25 +715,19 @@ describe("cacheKeys", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            const result1 = parseCacheKey(
-                "config:history-limit"
-            );
+            const result1 = parseCacheKey("config:history-limit");
             expect(result1).toEqual({
                 prefix: "config",
                 identifier: "history-limit",
             });
 
-            const result2 = parseCacheKey(
-                "site:site-123"
-            );
+            const result2 = parseCacheKey("site:site-123");
             expect(result2).toEqual({
                 prefix: "site",
                 identifier: "site-123",
             });
 
-            const result3 = parseCacheKey(
-                "monitor:monitor-456"
-            );
+            const result3 = parseCacheKey("monitor:monitor-456");
             expect(result3).toEqual({
                 prefix: "monitor",
                 identifier: "monitor-456",
@@ -749,27 +743,21 @@ describe("cacheKeys", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            const result1 = parseCacheKey(
-                "config:validation:monitor-config"
-            );
+            const result1 = parseCacheKey("config:validation:monitor-config");
             expect(result1).toEqual({
                 prefix: "config",
                 operation: "validation",
                 identifier: "monitor-config",
             });
 
-            const result2 = parseCacheKey(
-                "monitor:site:site-456"
-            );
+            const result2 = parseCacheKey("monitor:site:site-456");
             expect(result2).toEqual({
                 prefix: "monitor",
                 operation: "site",
                 identifier: "site-456",
             });
 
-            const result3 = parseCacheKey(
-                "validation:monitor-type:http"
-            );
+            const result3 = parseCacheKey("validation:monitor-type:http");
             expect(result3).toEqual({
                 prefix: "validation",
                 operation: "monitor-type",
@@ -786,13 +774,13 @@ describe("cacheKeys", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() =>
-                parseCacheKey("config:")
-            ).toThrow("Invalid cache key format: config:");
+            expect(() => parseCacheKey("config:")).toThrow(
+                "Invalid cache key format: config:"
+            );
 
-            expect(() =>
-                parseCacheKey("monitor:operation:")
-            ).toThrow("Invalid cache key format: monitor:operation:");
+            expect(() => parseCacheKey("monitor:operation:")).toThrow(
+                "Invalid cache key format: monitor:operation:"
+            );
         });
 
         it("should throw error for invalid two-part format", async ({
@@ -804,9 +792,9 @@ describe("cacheKeys", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() =>
-                parseCacheKey(":identifier")
-            ).toThrow("Invalid cache key format: :identifier");
+            expect(() => parseCacheKey(":identifier")).toThrow(
+                "Invalid cache key format: :identifier"
+            );
             // Note: 'prefix:' with empty identifier is now valid
         });
 
@@ -819,15 +807,15 @@ describe("cacheKeys", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() =>
-                parseCacheKey(":operation:identifier")
-            ).toThrow("Invalid cache key format: :operation:identifier");
-            expect(() =>
-                parseCacheKey("prefix::identifier")
-            ).toThrow("Invalid cache key format: prefix::identifier");
-            expect(() =>
-                parseCacheKey("prefix:operation:")
-            ).toThrow("Invalid cache key format: prefix:operation:");
+            expect(() => parseCacheKey(":operation:identifier")).toThrow(
+                "Invalid cache key format: :operation:identifier"
+            );
+            expect(() => parseCacheKey("prefix::identifier")).toThrow(
+                "Invalid cache key format: prefix::identifier"
+            );
+            expect(() => parseCacheKey("prefix:operation:")).toThrow(
+                "Invalid cache key format: prefix:operation:"
+            );
         });
 
         it("should handle complex identifiers", async ({ task, annotate }) => {
@@ -859,18 +847,14 @@ describe("cacheKeys", () => {
 
             // Test round-trip: generate -> parse
             const configKey = CacheKeys.config.byName("test-config");
-            const parsedConfig = parseCacheKey(
-                configKey
-            );
+            const parsedConfig = parseCacheKey(configKey);
             expect(parsedConfig).toEqual({
                 prefix: "config",
                 identifier: "test-config",
             });
 
             const monitorKey = CacheKeys.monitor.bySite("test-site");
-            const parsedMonitor = parseCacheKey(
-                monitorKey
-            );
+            const parsedMonitor = parseCacheKey(monitorKey);
             expect(parsedMonitor).toEqual({
                 prefix: "monitor",
                 operation: "site",

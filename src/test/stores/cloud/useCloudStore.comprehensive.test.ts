@@ -58,9 +58,9 @@ const cloudServiceMock = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../../services/CloudService'), () => cloudServiceMock);
+vi.mock("../../../services/CloudService", () => cloudServiceMock);
 
-vi.mock(import('../../../stores/utils/storeErrorHandling'), () => ({
+vi.mock("../../../stores/utils/storeErrorHandling", () => ({
     createStoreErrorHandler: () => ({
         clearError: () => {},
         setError: () => {},

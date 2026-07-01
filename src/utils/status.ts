@@ -4,8 +4,8 @@
  * @remarks
  * Provides emoji icons and formatting for different status types. This utility
  * module centralizes status formatting logic to ensure consistent display of
- * monitor and site statuses throughout the app interface. All status
- * values are expected to be lowercase single-word strings.
+ * monitor and site statuses throughout the app interface. All status values are
+ * expected to be lowercase single-word strings.
  *
  * @public
  */

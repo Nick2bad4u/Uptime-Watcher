@@ -2,9 +2,9 @@
  * Theme provider component for initializing and providing theme context.
  *
  * @remarks
- * Wraps the app or components to provide theme context and initialize
- * the theme system. This component ensures that theme settings are available
- * throughout the component tree and handles theme initialization on mount.
+ * Wraps the app or components to provide theme context and initialize the theme
+ * system. This component ensures that theme settings are available throughout
+ * the component tree and handles theme initialization on mount.
  *
  * @packageDocumentation
  */
@@ -63,7 +63,10 @@ const ThemeProviderComponent = ({
 
     let composite: null | ReactElement = null;
     for (const child of validChildren) {
-        composite = composite === null ? child : (
+        composite =
+            composite === null ? (
+                child
+            ) : (
                 <>
                     {composite}
                     {child}

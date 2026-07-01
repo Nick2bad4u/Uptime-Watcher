@@ -165,7 +165,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 Number.NEGATIVE_INFINITY,
                 NaN,
                 "",
-                ' '.repeat(3),
+                " ".repeat(3),
                 "0",
                 "false",
                 false,
@@ -247,8 +247,9 @@ describe("Utility Files - Missing Branch Coverage", () => {
             for (const error of errors) {
                 // Should handle any error type without throwing
                 expect(() => {
-                    const errorString =
-                        Error.isError(error) ? error.message : String(error);
+                    const errorString = Error.isError(error)
+                        ? error.message
+                        : String(error);
                     expect(typeof errorString).toBe("string");
                 }).not.toThrow();
             }
@@ -338,7 +339,9 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 Promise.resolve(0),
                 Promise.resolve(false),
                 new Promise((resolve) =>
-                    setTimeout(() => { resolve("delayed"); }, 1)
+                    setTimeout(() => {
+                        resolve("delayed");
+                    }, 1)
                 ),
             ];
 
@@ -360,7 +363,9 @@ describe("Utility Files - Missing Branch Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => { reject(new Error("Timeout")); }, 10)
+                setTimeout(() => {
+                    reject(new Error("Timeout"));
+                }, 10)
             );
 
             const racePromise = Promise.race([

@@ -39,17 +39,17 @@ const mockElectronAPI = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
 
 vi.mock(
-    import('../../services/utils/createIpcServiceHelpers'),
+    "../../services/utils/createIpcServiceHelpers",
     async (importOriginal) => {
         const actual =
             await importOriginal<
@@ -278,7 +278,9 @@ describe("StateSyncService", () => {
 
         mockElectronAPI.stateSync.requestFullSync.mockReturnValue(
             new Promise((resolve) => {
-                resolveFullSync = () => { resolve(fullSyncPayload); };
+                resolveFullSync = () => {
+                    resolve(fullSyncPayload);
+                };
             })
         );
 
@@ -393,7 +395,9 @@ describe("StateSyncService", () => {
         let resolveFullSync: (() => void) | undefined;
         mockElectronAPI.stateSync.requestFullSync.mockReturnValueOnce(
             new Promise((resolve) => {
-                resolveFullSync = () => { resolve(fullSyncPayload); };
+                resolveFullSync = () => {
+                    resolve(fullSyncPayload);
+                };
             })
         );
 
@@ -506,7 +510,9 @@ describe("StateSyncService", () => {
             const initialErrorCount = mockLogger.error.mock.calls.length;
             const cleanup = await StateSyncService.onStateSyncEvent(callback);
 
-            expect(() => { cleanup(); }).not.toThrow();
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
 
             const cleanupErrorCall =
                 mockLogger.error.mock.calls[initialErrorCount];

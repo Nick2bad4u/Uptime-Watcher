@@ -293,7 +293,6 @@ const CLOUD_CHANNELS_DEFINITION: CloudChannelMap = {
     requestSyncNow: "cloud-request-sync-now",
     resetRemoteSyncState: "cloud-reset-remote-sync",
     restoreBackup: "cloud-restore-backup",
-    // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- IPC channel name, not a secret.
     setEncryptionPassphrase: "cloud-set-encryption-passphrase",
     uploadLatestBackup: "cloud-upload-latest-backup",
 };

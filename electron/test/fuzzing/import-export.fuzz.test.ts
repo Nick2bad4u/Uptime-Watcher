@@ -98,10 +98,7 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
 
         attachAdapter(mockConfig.repositories.settings, {
             bulkInsert: (db: unknown, values: unknown) =>
-                mockConfig.repositories.settings.bulkInsertInternal(
-                    db,
-                    values
-                ),
+                mockConfig.repositories.settings.bulkInsertInternal(db, values),
             deleteAll: (db: unknown) =>
                 mockConfig.repositories.settings.deleteAllInternal(db),
         });

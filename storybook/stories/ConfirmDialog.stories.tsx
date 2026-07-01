@@ -33,9 +33,9 @@ const withDialogState: Decorator = (StoryComponent, context) => {
                 title: tone === "danger" ? "Delete Site" : "Enable Analytics",
                 tone,
                 ...(isWithDetails && {
-                          details:
-                              "This action cannot be undone and will remove all monitoring history.",
-                      }),
+                    details:
+                        "This action cannot be undone and will remove all monitoring history.",
+                }),
             } satisfies ReturnType<
                 typeof useConfirmDialogStore.getState
             >["request"];

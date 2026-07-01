@@ -1,9 +1,8 @@
 /**
  * Service for data import/export operations.
  *
- * Provides a testable, dependency-injected service for app data
- * management. Handles importing and exporting sites, monitors, history, and
- * settings data.
+ * Provides a testable, dependency-injected service for app data management.
+ * Handles importing and exporting sites, monitors, history, and settings data.
  */
 
 import type { Site, StatusHistory } from "@shared/types";
@@ -96,7 +95,6 @@ const isImportValidationFailure = (
     result: ImportValidationResult
 ): result is ImportValidationFailureResult => !result.ok;
 
-// eslint-disable-next-line sonarjs/function-return-type -- Returns a Jsonifiable union (object/array/primitive) by design.
 const toJsonifiable = (value: unknown): Jsonifiable => {
     if (value === null) {
         return null;
@@ -176,8 +174,8 @@ export class DataImportExportService {
     };
 
     /**
-     * Export all app data as JSON string. Pure data operation without
-     * side effects.
+     * Export all app data as JSON string. Pure data operation without side
+     * effects.
      */
     public async exportAllData(): Promise<string> {
         try {
@@ -371,10 +369,9 @@ export class DataImportExportService {
         error: unknown,
         context: string
     ): Promise<never> {
-        const normalizedError =
-            Error.isError(error)
-                ? error
-                : new Error(getUserFacingErrorDetail(error));
+        const normalizedError = Error.isError(error)
+            ? error
+            : new Error(getUserFacingErrorDetail(error));
         const message = `${context}: ${normalizedError.message}`;
 
         this.logger.error(message, error);

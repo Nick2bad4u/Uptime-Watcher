@@ -9,6 +9,7 @@
 
 import { test, fc } from "@fast-check/vitest";
 import { describe, expect, it } from "vitest";
+import { arrayJoin } from "ts-extras";
 
 import {
     createStatusIdentifier,
@@ -187,7 +188,7 @@ describe("status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon(" ")).toBe("⚪");
-                expect(getStatusIcon(' '.repeat(3))).toBe("⚪");
+                expect(getStatusIcon(" ".repeat(3))).toBe("⚪");
                 expect(getStatusIcon("\t")).toBe("⚪");
                 expect(getStatusIcon("\n")).toBe("⚪");
             });
@@ -469,7 +470,7 @@ describe("status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon(" ")).toBe("⚪  "); // First char uppercased, rest lowercased
-                expect(formatStatusWithIcon(' '.repeat(3))).toBe("⚪    ");
+                expect(formatStatusWithIcon(" ".repeat(3))).toBe("⚪    ");
             });
 
             it("should handle special characters correctly", async ({
@@ -784,9 +785,7 @@ describe("status Utilities", () => {
             );
 
             test.prop([
-                fc
-                    .string()
-                    .filter((s) => !knownStatuses.has(s.toLowerCase())),
+                fc.string().filter((s) => !knownStatuses.has(s.toLowerCase())),
             ])(
                 "should return default icon for unknown statuses",
                 (unknownStatus) => {
@@ -800,7 +799,7 @@ describe("status Utilities", () => {
             test.prop([
                 fc.oneof(
                     fc.constant(""),
-                    fc.constant(' '.repeat(3)),
+                    fc.constant(" ".repeat(3)),
                     fc.constant("\t\n")
                 ),
             ])(
@@ -855,7 +854,7 @@ describe("status Utilities", () => {
                     expect(result).toContain(expectedText);
 
                     // Property: Should have proper spacing
-                    expect(result).toMatch(/^.+ .+$/u);
+                    expect(result).toMatch(/^.[^\n\r \u{2028}\u{2029}]* .+$/u);
                 }
             );
 
@@ -867,7 +866,7 @@ describe("status Utilities", () => {
                     const result = formatStatusWithIcon(status);
 
                     // Property: Should always contain an icon and text separated by space
-                    expect(result).toMatch(/^.+ .+$/u);
+                    expect(result).toMatch(/^.[^\n\r \u{2028}\u{2029}]* .+$/u);
 
                     // Property: Should contain expected icon
                     const expectedIcon = getStatusIcon(status);
@@ -913,8 +912,14 @@ describe("status Utilities", () => {
 
                     // For text comparison, we need to be flexible about spacing issues
                     // Both should produce the same capitalized text
-                    const lowercaseText = lowercaseParts.slice(1).join(" ");
-                    const uppercaseText = uppercaseParts.slice(1).join(" ");
+                    const lowercaseText = arrayJoin(
+                        lowercaseParts.slice(1),
+                        " "
+                    );
+                    const uppercaseText = arrayJoin(
+                        uppercaseParts.slice(1),
+                        " "
+                    );
 
                     expect(lowercaseText).toBe(uppercaseText);
                 }
@@ -925,18 +930,19 @@ describe("status Utilities", () => {
             test.prop([
                 fc.string({ maxLength: 30, minLength: 1 }).filter((s) => {
                     // Filter to valid inputs that produce valid camelCase
-                    if (!/^[A-Za-z\s\-_]+$/u.test(s)) return false;
+                    if (!/^[\s\-A-Z_a-z]+$/u.test(s)) return false;
                     if (s.trim().length === 0) return false;
 
                     // Test that the function would produce valid camelCase
-                    const words = s.toLowerCase().split(/[\s_-]+/u);
-                    const camelCased = words
-                        .map((word, index) =>
+                    const words = s.toLowerCase().split(/[\s\-_]+/u);
+                    const camelCased = arrayJoin(
+                        words.map((word, index) =>
                             index === 0
                                 ? word
                                 : word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join("");
+                        ),
+                        ""
+                    );
 
                     // Must produce valid camelCase: non-empty and starts with lowercase
                     return (
@@ -1004,7 +1010,7 @@ describe("status Utilities", () => {
             test.prop([
                 fc
                     .string({ maxLength: 20, minLength: 1 })
-                    .filter((s) => /^[a-zA-Z]+$/v.test(s)),
+                    .filter((s) => /^[A-Za-z]+$/v.test(s)),
             ])(
                 "should handle alphabetic strings without separators",
                 (text) => {
@@ -1020,11 +1026,11 @@ describe("status Utilities", () => {
                 fc.array(
                     fc
                         .string({ maxLength: 10, minLength: 1 })
-                        .filter((s) => /^[a-zA-Z]+$/v.test(s)),
+                        .filter((s) => /^[A-Za-z]+$/v.test(s)),
                     { maxLength: 5, minLength: 2 }
                 ),
             ])("should combine multiple words into camelCase", (words) => {
-                const phrase = words.join(" ");
+                const phrase = arrayJoin(words, " ");
                 const result: StatusIdentifier = createStatusIdentifier(phrase);
 
                 // Property: Should start with lowercase first word
@@ -1089,18 +1095,19 @@ describe("status Utilities", () => {
             test.prop([
                 fc.string({ minLength: 1 }).filter((s) => {
                     // Filter to valid inputs that produce valid camelCase
-                    if (!/^[A-Za-z\s\-_]+$/u.test(s)) return false;
+                    if (!/^[\s\-A-Z_a-z]+$/u.test(s)) return false;
                     if (s.trim().length === 0) return false;
 
                     // Test that the function would produce valid camelCase
-                    const words = s.toLowerCase().split(/[\s_-]+/u);
-                    const camelCased = words
-                        .map((word, index) =>
+                    const words = s.toLowerCase().split(/[\s\-_]+/u);
+                    const camelCased = arrayJoin(
+                        words.map((word, index) =>
                             index === 0
                                 ? word
                                 : word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join("");
+                        ),
+                        ""
+                    );
 
                     // Must produce valid camelCase: non-empty and starts with lowercase
                     return (

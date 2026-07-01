@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock structured renderer logger so we can assert initialization errors are logged consistently
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockAppLogger = {
         error: vi.fn(),
         performance: vi.fn(),
@@ -47,18 +47,18 @@ vi.mock(import('../services/logger'), () => {
 });
 
 // Simple mocks without complex implementations
-vi.mock(import('react-dom/client'), () => ({
+vi.mock("react-dom/client", () => ({
     createRoot: vi.fn(() => ({
         render: vi.fn(),
         unmount: vi.fn(),
     })),
 }));
 
-vi.mock(import('../App'), () => ({
+vi.mock("../App", () => ({
     default: () => "App Component",
 }));
 
-vi.mock(import('../index.css'), () => ({}));
+vi.mock("../index.css", () => ({}));
 
 describe("main.tsx - Application Entry Point", () => {
     let originalConsoleError: typeof console.error;
@@ -72,7 +72,7 @@ describe("main.tsx - Application Entry Point", () => {
 
         // Spy on console.error
         originalConsoleError = console.error;
-        vi.spyOn(console, 'error').mockImplementation();
+        vi.spyOn(console, "error").mockReturnValue(undefined);
     });
 
     afterEach(() => {

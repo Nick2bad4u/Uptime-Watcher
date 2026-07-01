@@ -22,7 +22,7 @@ process.setMaxListeners(MAX_LISTENERS);
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
+const baseNumRuns = safeCastTo<{ numRuns?: number }>(current).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)

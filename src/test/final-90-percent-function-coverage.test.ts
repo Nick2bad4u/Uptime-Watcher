@@ -26,7 +26,7 @@ describe("Final 90% Function Coverage Push", () => {
             const testValue1 = "test";
             const testValue2 = 123;
             const testValue3 = null;
-            const testValue4;
+            const testValue4 = undefined;
             const testValue5 = {};
             const testValue6: string[] = [];
 

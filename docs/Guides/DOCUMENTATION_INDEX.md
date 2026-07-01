@@ -17,12 +17,12 @@ tags:
 
 ## Table of Contents
 
-1. [Quick links](#quick-links)
-2. [� Documentation structure](#-documentation-structure)
-3. [🎯 Documentation by Role](#-documentation-by-role)
-4. [🔍 Documentation by Topic](#-documentation-by-topic)
-5. [📋 Documentation Maintenance](#-documentation-maintenance)
-6. [🎯 Recommended Reading Paths](#-recommended-reading-paths)
+- [Quick links](#quick-links)
+- [� Documentation structure](#-documentation-structure)
+- [🎯 Documentation by Role](#-documentation-by-role)
+- [🔍 Documentation by Topic](#-documentation-by-topic)
+- [📋 Documentation Maintenance](#-documentation-maintenance)
+- [🎯 Recommended Reading Paths](#-recommended-reading-paths)
 
 ## Quick links
 

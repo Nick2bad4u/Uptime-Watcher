@@ -19,7 +19,6 @@ export function deriveCloudBackupOriginalPath(fileName: string): string {
         return "backup.sqlite";
     }
 
-    // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
     const segments = trimmed.split(/[/\\]/u).filter(Boolean);
     return arrayAt(segments, -1) ?? "backup.sqlite";
 }

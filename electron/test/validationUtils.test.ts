@@ -37,7 +37,7 @@ describe("Shared Validation Utils", () => {
             await annotate("Component: Shared Validation Utils", "component");
 
             expect(isNonEmptyString("")).toBeFalsy();
-            expect(isNonEmptyString(' '.repeat(3))).toBeFalsy(); // Only whitespace
+            expect(isNonEmptyString(" ".repeat(3))).toBeFalsy(); // Only whitespace
             expect(isNonEmptyString(null)).toBeFalsy();
             expect(isNonEmptyString(undefined)).toBeFalsy();
             expect(isNonEmptyString(123)).toBeFalsy();
@@ -138,7 +138,7 @@ describe("Shared Validation Utils", () => {
             await annotate("Component: Shared Validation Utils", "component");
 
             expect(isValidIdentifier("")).toBeFalsy();
-            expect(isValidIdentifier(' '.repeat(3))).toBeFalsy();
+            expect(isValidIdentifier(" ".repeat(3))).toBeFalsy();
             expect(isValidIdentifier("test@name")).toBeFalsy();
             expect(isValidIdentifier("test.name")).toBeFalsy();
             expect(isValidIdentifier("test name")).toBeFalsy();

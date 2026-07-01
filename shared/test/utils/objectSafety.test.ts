@@ -51,12 +51,12 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             expect(iterationResults.length).toBeGreaterThan(0);
 
             // Test safeObjectIteration with null input (should not throw)
-            expect(() =>
-                { objectSafetyModule.safeObjectIteration(
+            expect(() => {
+                objectSafetyModule.safeObjectIteration(
                     null,
                     (k, v) => `${k}:${v}`
-                ); }
-            ).not.toThrow();
+                );
+            }).not.toThrow();
 
             // Test safeObjectOmit function
             const omitResult = objectSafetyModule.safeObjectOmit(testObj, [

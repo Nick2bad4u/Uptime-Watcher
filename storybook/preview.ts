@@ -1,4 +1,3 @@
-// eslint-disable-next-line sonarjs/no-implicit-dependencies -- Storybook uses Vite alias to load global styles
 import "@app/index.css";
 import type { ThemeName } from "@app/theme/types";
 import type { Decorator, Preview } from "@storybook/react";

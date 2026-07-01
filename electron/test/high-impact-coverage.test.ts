@@ -360,7 +360,6 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-
                 const typeGuardsModule =
                     await import("../../shared/utils/typeGuards.js");
                 // eslint-enable-next-line unicorn/no-keyword-prefix
@@ -437,9 +436,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                     expect(
                         typeGuardsModule.isFiniteNumber(-Infinity)
                     ).toBeFalsy();
-                    expect(
-                        typeGuardsModule.isFiniteNumber(NaN)
-                    ).toBeFalsy();
+                    expect(typeGuardsModule.isFiniteNumber(NaN)).toBeFalsy();
                     expect(typeGuardsModule.isFiniteNumber("42")).toBeFalsy();
                     expect(typeGuardsModule.isFiniteNumber(null)).toBeFalsy();
                     expect(

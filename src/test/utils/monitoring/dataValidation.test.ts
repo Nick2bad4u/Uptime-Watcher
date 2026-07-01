@@ -38,14 +38,15 @@ const safeHttpUrlArb = fc
             segments,
             query,
         ]) => {
-            const path = segments.length > 0 ? `/${arrayJoin(segments, "/")}` : "";
+            const path =
+                segments.length > 0 ? `/${arrayJoin(segments, "/")}` : "";
             const queryPart = query ? `?${query}=1` : "";
             return `${scheme}://${host}${path}${queryPart}`;
         }
     );
 
 // Mock the logger
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         app: {
             error: vi.fn(),
@@ -277,9 +278,9 @@ describe("monitoring Data Validation", () => {
             expect(isValidUrl("https://www.example.com")).toBe(true);
             expect(isValidUrl("https://example.com:443")).toBe(true);
             expect(isValidUrl("https://example.com/path")).toBe(true);
-            expect(
-                isValidUrl("https://example.com/path?query=value")
-            ).toBe(true);
+            expect(isValidUrl("https://example.com/path?query=value")).toBe(
+                true
+            );
             expect(isValidUrl("https://example.com#anchor")).toBe(true);
         });
 
@@ -375,9 +376,9 @@ describe("monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             // Validator.js rejects URLs with unencoded spaces for security
-            expect(
-                isValidUrl("https://example.com/path with spaces")
-            ).toBe(false);
+            expect(isValidUrl("https://example.com/path with spaces")).toBe(
+                false
+            );
             expect(
                 isValidUrl("https://example.com/path%20with%20encoded%20spaces")
             ).toBe(true);

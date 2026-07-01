@@ -10,6 +10,7 @@ import type { Monitor } from "@shared/types";
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { isPresent } from "ts-extras";
 
 import {
     isNullOrUndefined,
@@ -57,14 +58,14 @@ const buildMinimalMonitor = (overrides: Partial<Monitor>): Monitor =>
     }) as Monitor;
 
 // Mock the logger module
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         error: vi.fn(),
     },
 }));
 
 // Mock the error handling utilities
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         Error.isError(error) ? error : new Error(String(error))
     ),
@@ -237,11 +238,12 @@ describe("fallback Utilities", () => {
                 }
             );
 
-            test.prop([
-                fc.anything().filter((v) => v !== null && v !== undefined),
-            ])("should return false for any defined value", (value) => {
-                expect(isNullOrUndefined(value)).toBe(false);
-            });
+            test.prop([fc.anything().filter(isPresent)])(
+                "should return false for any defined value",
+                (value) => {
+                    expect(isNullOrUndefined(value)).toBe(false);
+                }
+            );
         });
     });
 
@@ -303,7 +305,9 @@ describe("fallback Utilities", () => {
             );
 
             // Should not throw when called
-            expect(() => { handler(); }).not.toThrow();
+            expect(() => {
+                handler();
+            }).not.toThrow();
         });
 
         it("should work with different operation names", async ({
@@ -352,7 +356,9 @@ describe("fallback Utilities", () => {
                     const handler = withAsyncErrorHandling(mockAsyncOp, "test");
 
                     // Should not throw when handler is called
-                    expect(() => { handler(); }).not.toThrow();
+                    expect(() => {
+                        handler();
+                    }).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
                     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -370,7 +376,9 @@ describe("fallback Utilities", () => {
                     const handler = withAsyncErrorHandling(mockAsyncOp, "test");
 
                     // Should not throw when handler is called, even if async op fails
-                    expect(() => { handler(); }).not.toThrow();
+                    expect(() => {
+                        handler();
+                    }).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
                     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -731,7 +739,7 @@ describe("fallback Utilities", () => {
     });
 
     describe(getMonitorDisplayIdentifier, () => {
-        describe("hTTP monitors", () => {
+        describe("HTTP monitors", () => {
             it("should return URL for HTTP monitor", async ({
                 annotate,
                 task,

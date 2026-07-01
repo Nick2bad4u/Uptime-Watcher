@@ -196,7 +196,9 @@ describe("Additional Coverage Tests", () => {
 
             const asyncFunction = async () =>
                 new Promise((resolve) => {
-                    setTimeout(() => { resolve("success"); }, 1);
+                    setTimeout(() => {
+                        resolve("success");
+                    }, 1);
                 });
 
             const result = await asyncFunction();

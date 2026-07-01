@@ -1,5 +1,3 @@
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
-/* eslint-disable @typescript-eslint/no-unnecessary-type-parameters, sonarjs/pseudo-random -- Disable Strict Rules */
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,

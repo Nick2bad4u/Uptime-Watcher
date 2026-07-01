@@ -17,7 +17,7 @@ import { SyncMaintenancePanel } from "../../../../components/Settings/cloud/Sync
 
 const formatFullTimestampMock = vi.hoisted(() => vi.fn(() => "2025-01-01"));
 
-vi.mock(import('../../../../utils/time'), () => ({
+vi.mock("../../../../utils/time", () => ({
     formatFullTimestamp: formatFullTimestampMock,
 }));
 
@@ -25,7 +25,7 @@ const writeClipboardTextMock = vi.hoisted(() =>
     vi.fn(async (_text: string) => {})
 );
 
-vi.mock(import('../../../../services/SystemService'), () => ({
+vi.mock("../../../../services/SystemService", () => ({
     SystemService: {
         writeClipboardText: writeClipboardTextMock,
     },

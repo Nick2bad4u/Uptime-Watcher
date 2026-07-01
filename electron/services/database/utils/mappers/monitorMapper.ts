@@ -1,12 +1,11 @@
 /**
- * Utilities for mapping monitor data between database rows and app
- * objects.
+ * Utilities for mapping monitor data between database rows and app objects.
  *
  * @remarks
- * Provides conversion between raw database rows (snake_case) and app
- * monitor objects (camelCase). Integrates with the dynamic monitor type schema
- * system for extensibility. All mapping functions are type-safe and log errors
- * with full context.
+ * Provides conversion between raw database rows (snake_case) and app monitor
+ * objects (camelCase). Integrates with the dynamic monitor type schema system
+ * for extensibility. All mapping functions are type-safe and log errors with
+ * full context.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -111,8 +110,7 @@ function getSanitizedExpectedStatusCode(value: unknown): number | undefined {
  * @remarks
  * Uses centralized validation utilities for safe integer conversion with bounds
  * checking. Replaces manual Number() conversions with validator-based
- * safeInteger() function to prevent invalid data from reaching the app
- * layer.
+ * safeInteger() function to prevent invalid data from reaching the app layer.
  *
  * @param dynamicMonitor - Mapped monitor data from database
  *

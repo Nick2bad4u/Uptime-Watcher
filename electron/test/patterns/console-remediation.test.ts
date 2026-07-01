@@ -82,11 +82,7 @@ describe("Console Statement Remediation", () => {
             const match = consoleRegex.exec(line);
             if (match) {
                 const type = match.groups?.["method"] as
-                    | "debug"
-                    | "error"
-                    | "info"
-                    | "log"
-                    | "warn";
+                    "debug" | "error" | "info" | "log" | "warn";
 
                 // Get some context around the line
                 const startLine = Math.max(0, index - 2);

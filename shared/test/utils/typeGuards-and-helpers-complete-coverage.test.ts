@@ -710,7 +710,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const response = { success: true, data: "test" };
             const validator = (
                 value: unknown
-            ): value is { data: string; success: boolean; } =>
+            ): value is { data: string; success: boolean } =>
                 typeof value === "object" &&
                 value !== null &&
                 "success" in value &&
@@ -980,7 +980,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             const validator = (
                 value: unknown
-            ): value is { age: number; name: string; } =>
+            ): value is { age: number; name: string } =>
                 typeof value === "object" &&
                 value !== null &&
                 "name" in value &&

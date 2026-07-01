@@ -55,8 +55,10 @@ export function hasHttpAuthorityDelimiterIssue(
         return true;
     }
 
-    return (normalizedValue.startsWith("https:") &&
-        normalizedValue.slice(6, 8) !== "//");
+    return (
+        normalizedValue.startsWith("https:") &&
+        normalizedValue.slice(6, 8) !== "//"
+    );
 }
 
 /**

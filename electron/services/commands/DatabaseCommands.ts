@@ -151,8 +151,7 @@ export abstract class DatabaseCommand<
 
     /** Optional history limit updater for settings propagation */
     protected readonly updateHistoryLimit:
-        | ((limit: number) => Promise<void>)
-        | undefined;
+        ((limit: number) => Promise<void>) | undefined;
 
     /**
      * Emits a failure event for the command operation.

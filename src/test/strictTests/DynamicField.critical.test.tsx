@@ -26,7 +26,7 @@ import { logger } from "../../services/logger";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock the logger
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -151,9 +151,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
                 />
             );
 
-            const input = screen.getByLabelText(
-                "Port (required)"
-            );
+            const input = screen.getByLabelText("Port (required)");
 
             // Directly test the onChange handler by dispatching an event with invalid value
             // This simulates what would happen if invalid text somehow reached the handler
@@ -867,7 +865,9 @@ describe("DynamicField - Comprehensive Coverage", () => {
                     label: `Field ${index}`,
                     type: fieldData.type,
                     required: false,
-                    ...(("options" in fieldData) && { options: fieldData.options }),
+                    ...("options" in fieldData && {
+                        options: fieldData.options,
+                    }),
                 };
 
                 const mockOnChange = vi.fn();

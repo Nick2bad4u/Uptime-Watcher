@@ -312,7 +312,7 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidSiteRow({ identifier: null })).toBeFalsy();
             expect(isValidSiteRow({ identifier: 123 })).toBeFalsy();
             expect(isValidSiteRow({ identifier: "" })).toBeFalsy();
-            expect(isValidSiteRow({ identifier: ' '.repeat(3) })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: " ".repeat(3) })).toBeFalsy();
         });
     });
     describe(safeGetRowProperty, () => {

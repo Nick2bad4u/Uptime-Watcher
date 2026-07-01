@@ -258,11 +258,11 @@ const mockSites = [
 ];
 
 // Setup mocks with static implementations
-vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
+vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: vi.fn(() => createMockFormState()),
 }));
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => {
+vi.mock("../../../stores/error/useErrorStore", () => {
     const state = {
         clearAllErrors: vi.fn(),
         clearAllLoading: vi.fn(),
@@ -288,7 +288,7 @@ vi.mock(import('../../../stores/error/useErrorStore'), () => {
     return { useErrorStore };
 });
 
-vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn((selector?: (candidate: unknown) => unknown) => {
         const state = {
             addMonitorToSite: vi.fn().mockResolvedValue(undefined),
@@ -301,7 +301,7 @@ vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     }),
 }));
 
-vi.mock(import('../../../stores/monitor/useMonitorTypesStore'), () => {
+vi.mock("../../../stores/monitor/useMonitorTypesStore", () => {
     const state = {
         fieldConfigs: new Map(),
         formatMonitorDetail: vi.fn(async () => ""),
@@ -333,7 +333,7 @@ vi.mock(import('../../../stores/monitor/useMonitorTypesStore'), () => {
     };
 });
 
-vi.mock(import('@app/hooks/useMonitorFields'), () => ({
+vi.mock("@app/hooks/useMonitorFields", () => ({
     useMonitorFields: vi.fn(() => ({
         error: undefined,
         getFields: (monitorType: string) => {
@@ -375,22 +375,20 @@ vi.mock(import('@app/hooks/useMonitorFields'), () => ({
     })),
 }));
 
-vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
+vi.mock("../../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: vi.fn(() => ({
         monitorTypes: mockMonitorTypes,
-        options: mockMonitorTypes.map(
-            (type): MonitorTypeOption => ({
-                label: type.displayName,
-                value: type.type,
-            })
-        ),
+        options: mockMonitorTypes.map((type): MonitorTypeOption => ({
+            label: type.displayName,
+            value: type.type,
+        })),
         isLoading: false,
         error: undefined,
         refreshMonitorTypes: vi.fn(),
     })),
 }));
 
-vi.mock(import('../../../hooks/useDynamicHelpText'), () => ({
+vi.mock("../../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: vi.fn(() => ({
         helpText: "Default help text",
         error: undefined,
@@ -398,13 +396,12 @@ vi.mock(import('../../../hooks/useDynamicHelpText'), () => ({
     })),
 }));
 
-vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false), // Returns boolean directly
 }));
 
-vi.mock(import('../../../constants'), async (importOriginal) => {
-    const actual =
-        (await importOriginal());
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>();
     return {
         ...actual,
         CHECK_INTERVALS: [
@@ -1281,7 +1278,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             });
 
             // Mock the isFormValid function to return true for valid form
-            vi.spyOn(mockFormActions, 'isFormValid').mockImplementation().mockReturnValue(true);
+            vi.spyOn(mockFormActions, "isFormValid").mockReturnValue(true);
             mockUseAddSiteForm.mockReturnValue(mockFormActions);
 
             // Mock the error store to show no loading state
@@ -1781,12 +1778,10 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             const refreshMonitorTypes = vi.fn();
 
             mockUseMonitorTypes.mockReturnValue({
-                options: mockMonitorTypes.map(
-                    (type): MonitorTypeOption => ({
-                        label: type.displayName,
-                        value: type.type,
-                    })
-                ),
+                options: mockMonitorTypes.map((type): MonitorTypeOption => ({
+                    label: type.displayName,
+                    value: type.type,
+                })),
                 isLoading: false,
                 error: undefined,
                 refresh: refreshMonitorTypes,

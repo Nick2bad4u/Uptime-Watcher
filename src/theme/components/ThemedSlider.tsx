@@ -2,10 +2,10 @@
  * Themed slider component with consistent styling and accessibility support.
  *
  * @remarks
- * Provides a range input that adopts the app's theme tokens for the
- * track and thumb. The component exposes the standard set of range input
- * properties alongside accessibility attributes, ensuring a11y-compliant volume
- * and intensity controls throughout the UI surface.
+ * Provides a range input that adopts the app's theme tokens for the track and
+ * thumb. The component exposes the standard set of range input properties
+ * alongside accessibility attributes, ensuring a11y-compliant volume and
+ * intensity controls throughout the UI surface.
  *
  * @example Basic slider usage:
  *
@@ -114,7 +114,6 @@ const ThemedSliderComponent = ({
     return (
         <input
             aria-describedby={ariaDescribedBy}
-            // eslint-disable-next-line react-hooks/invariant -- ariaLabel is provided by typed props and may intentionally be undefined.
             aria-label={ariaLabel}
             aria-valuetext={ariaValueText}
             className={`themed-slider ${className}`.trim()}

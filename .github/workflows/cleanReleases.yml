@@ -1,62 +1,62 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Clean Old Releases
-run-name: Clean Old Releases
+name: "Clean Old Releases"
+run-name: "Clean Old Releases"
 
 concurrency:
-    group: clean-releases-${{ github.event_name }}-${{ github.event.workflow_run.id || github.run_id }}
+    group: "clean-releases-${{ github.event_name }}-${{ github.event.workflow_run.id || github.run_id }}"
     cancel-in-progress: true
 
 on:
     workflow_run:
         workflows: ["Build and Release Electron App"]
         types:
-            - completed
+            - "completed"
         branches:
-            - main
+            - "main"
     workflow_dispatch:
         inputs:
             keep_last:
                 description: "Number of most recent releases to keep"
                 required: true
-                type: number
+                type: "number"
                 default: 10
             delete_tags:
                 description: "Also delete git tags (true/false)"
                 required: true
-                type: boolean
+                type: "boolean"
                 default: true
 
 permissions:
-    contents: write
+    contents: "write"
 
 jobs:
     clean-releases:
-        name: Clean old releases
-        runs-on: ubuntu-latest
+        name: "Clean old releases"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 30
         defaults:
             run:
-                shell: bash
+                shell: "bash"
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout repository"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
 
-            - name: Set up git user
+            - name: "Set up git user"
               run: |
                   git config --global user.name "Nick2bad4u"
                   git config --global user.email "20943337+Nick2bad4u@users.noreply.github.com"
               env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            - name: Clean old releases and tags
+                  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+            - name: "Clean old releases and tags"
               env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  KEEP_LAST: ${{ inputs.keep_last }}
-                  DELETE_TAGS: ${{ inputs.delete_tags }}
+                  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                  KEEP_LAST: "${{ inputs.keep_last }}"
+                  DELETE_TAGS: "${{ inputs.delete_tags }}"
               run: |
                   KEEP_LAST=${KEEP_LAST:-10}
                   DELETE_TAGS=${DELETE_TAGS:-true}

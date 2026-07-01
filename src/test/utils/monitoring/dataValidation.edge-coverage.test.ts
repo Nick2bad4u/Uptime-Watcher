@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { safeGetHostname } from "../../../utils/monitoring/dataValidation";
 
 // Mock isValidUrl to return true but still allow URL constructor to fail
-vi.mock(import('../../../../shared/validation/validatorUtils'), () => ({
+vi.mock("../../../../shared/validation/validatorUtils", () => ({
     isValidUrl: vi.fn(() => true), // Always return true to bypass early validation
 }));
 
@@ -170,7 +170,7 @@ describe("dataValidation - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Reset mocks to normal behavior for integration tests
-            vi.doMock(import('../../../../shared/validation/validatorUtils'), () => ({
+            vi.doMock("../../../../shared/validation/validatorUtils", () => ({
                 isValidUrl: (url: string) => URL.canParse(url),
             }));
 

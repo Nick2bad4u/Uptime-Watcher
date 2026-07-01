@@ -391,7 +391,7 @@ const hasDisallowedUrlCharacters = (
         return true;
     }
 
-    return (!allowBackticks && value.includes("`"));
+    return !allowBackticks && value.includes("`");
 };
 
 /**

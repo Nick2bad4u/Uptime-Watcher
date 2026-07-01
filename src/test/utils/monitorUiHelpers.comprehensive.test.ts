@@ -1,4 +1,4 @@
-import type { Monitor, MonitorType  } from "@shared/types";
+import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
@@ -62,7 +62,7 @@ const mockCacheGet = cacheMocks.get;
 const mockCacheSet = cacheMocks.set;
 const mockCacheClear = cacheMocks.clear;
 
-vi.mock(import('../../utils/cache'), () => ({
+vi.mock("../../utils/cache", () => ({
     AppCaches: {
         uiHelpers: {
             clear: cacheMocks.clear,
@@ -72,7 +72,7 @@ vi.mock(import('../../utils/cache'), () => ({
     },
 }));
 
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
         async <T>(
             operation: () => Promise<T>,
@@ -92,18 +92,18 @@ const mockGetAvailableMonitorTypes =
     monitorTypeHelperMocks.getAvailableMonitorTypes;
 const mockGetMonitorTypeConfig = monitorTypeHelperMocks.getMonitorTypeConfig;
 
-vi.mock(import('../../utils/monitorTypeHelper'), () => ({
+vi.mock("../../utils/monitorTypeHelper", () => ({
     getAvailableMonitorTypes: monitorTypeHelperMocks.getAvailableMonitorTypes,
     getMonitorTypeConfig: monitorTypeHelperMocks.getMonitorTypeConfig,
 }));
 
-vi.mock(import('../../services/MonitorTypesService'), () => ({
+vi.mock("../../services/MonitorTypesService", () => ({
     MonitorTypesService: monitorTypesServiceMocks,
 }));
 
 const loadMonitorTypesMock = monitorTypesStoreState.loadMonitorTypes;
 
-vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: {
         getState: () => monitorTypesStoreState,
     },
@@ -120,8 +120,7 @@ const createConfig = (
 ): MonitorTypeConfig => {
     const baseConfig = {
         description: overrides.description ?? "Monitor configuration",
-        displayName:
-            overrides.displayName ?? `${type.toUpperCase()} Monitor`,
+        displayName: overrides.displayName ?? `${type.toUpperCase()} Monitor`,
         fields:
             overrides.fields ??
             ([
@@ -156,8 +155,7 @@ const createConfig = (
             detailFormats: {
                 ...detailFormatsRest,
                 analyticsLabel:
-                    analyticsLabel ??
-                    `${type.toUpperCase()} Response Time`,
+                    analyticsLabel ?? `${type.toUpperCase()} Response Time`,
             },
             display: {
                 ...displayRest,

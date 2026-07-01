@@ -57,9 +57,11 @@ test.describe(
                 });
 
                 // Wait for any content to appear in the root element
-                await expect.soft(window.getByTestId("app-root")).not.toBeEmpty({
-                    timeout: 10_000,
-                });
+                await expect
+                    .soft(window.getByTestId("app-root"))
+                    .not.toBeEmpty({
+                        timeout: 10_000,
+                    });
 
                 // Take a screenshot of the loaded UI
                 await window.screenshot({
@@ -249,10 +251,9 @@ test.describe(
                             return false;
                         }),
                         new Promise((_, reject) =>
-                            setTimeout(
-                                () => { reject(new Error("Timeout")); },
-                                10_000
-                            )
+                            setTimeout(() => {
+                                reject(new Error("Timeout"));
+                            }, 10_000)
                         ),
                     ]);
 

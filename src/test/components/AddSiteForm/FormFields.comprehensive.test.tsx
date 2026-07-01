@@ -13,7 +13,7 @@ import { SelectField } from "../../../components/AddSiteForm/SelectField";
 import { TextField } from "../../../components/AddSiteForm/TextField";
 
 // Mock all dependencies
-vi.mock(import('../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../theme/components/ThemedBox", () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (
         <div data-testid="themed-box" {...props}>
             {children}
@@ -21,7 +21,7 @@ vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     )),
 }));
 
-vi.mock(import('../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../theme/components/ThemedText", () => ({
     ThemedText: vi.fn(({ children, ...props }) => (
         <span data-testid="themed-text" {...props}>
             {children}
@@ -29,7 +29,7 @@ vi.mock(import('../../../theme/components/ThemedText'), () => ({
     )),
 }));
 
-vi.mock(import('../../../theme/components/ThemedInput'), () => ({
+vi.mock("../../../theme/components/ThemedInput", () => ({
     ThemedInput: vi.fn(({ onChange, value, placeholder, ...props }) => (
         <input
             {...props}
@@ -41,7 +41,7 @@ vi.mock(import('../../../theme/components/ThemedInput'), () => ({
     )),
 }));
 
-vi.mock(import('../../../theme/components/ThemedSelect'), () => ({
+vi.mock("../../../theme/components/ThemedSelect", () => ({
     ThemedSelect: vi.fn(({ children, value, onChange, ...props }) => (
         <select
             {...props}
@@ -54,7 +54,7 @@ vi.mock(import('../../../theme/components/ThemedSelect'), () => ({
     )),
 }));
 
-vi.mock(import('../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: vi.fn(({ children, onClick, ...props }) => (
         <button {...props} data-testid="themed-button" onClick={onClick}>
             {children}

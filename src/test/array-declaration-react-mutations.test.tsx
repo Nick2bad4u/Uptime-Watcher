@@ -41,8 +41,7 @@ describe("React Component Array Declaration Mutation Tests", () => {
                 "mutation"
             );
 
-            // Test the useCallback hooks with empty dependency arrays These should run only once during component
-            // initialization
+            // Test the useCallback hooks with empty dependency arrays These should run only once during component initialization
 
             const TestComponent = () => {
                 const [showLoadingOverlay, setShowLoadingOverlay] =

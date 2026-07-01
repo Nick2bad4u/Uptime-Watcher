@@ -14,7 +14,13 @@ import type { BaseMonitorSchemaType } from "@shared/types/schemaTypes";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-import { arrayIncludes, isDefined, isEmpty, setHas, stringSplit } from "ts-extras";
+import {
+    arrayIncludes,
+    isDefined,
+    isEmpty,
+    setHas,
+    stringSplit,
+} from "ts-extras";
 import * as z from "zod";
 
 import { monitorIdSchema } from "./monitorFieldSchemas";
@@ -33,7 +39,6 @@ import { isValidHost } from "./validatorUtils";
 const statusHistorySchema = z
     .object({
         // Preserve raw status detail text when validating history entries.
-        // eslint-disable-next-line zod/prefer-string-schema-with-trim -- Validation must not normalize persisted monitor data.
         details: z.string().optional(),
         responseTime: z.number(),
         status: z.enum(statusHistoryEnumValues),
@@ -101,7 +106,6 @@ const hostValidationSchema = z
 const baseMonitorSchema: BaseMonitorSchemaType = z
     .object({
         // Preserve raw active operation identifiers when validating monitor state.
-        // eslint-disable-next-line zod/prefer-string-schema-with-trim -- Validation must not normalize persisted monitor data.
         activeOperations: z.array(z.string()).optional(),
         checkInterval: z
             .number()
@@ -365,7 +369,6 @@ const edgeLocationListSchema = z
     .trim()
     .min(1, "At least one edge endpoint is required")
     .refine((value) => {
-        // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
         const entries = value
             .split(/[\n\r,]+/u)
             .map((entry) => entry.trim())

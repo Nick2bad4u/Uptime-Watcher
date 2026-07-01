@@ -13,7 +13,7 @@ const mockError = vi.fn();
 const mockVerbose = vi.fn();
 const mockSilly = vi.fn();
 
-vi.mock(import('electron-log/renderer'), () => ({
+vi.mock("electron-log/renderer", () => ({
     default: {
         debug: mockDebug,
         info: mockInfo,
@@ -713,7 +713,7 @@ describe("Logger Service - Basic Coverage", () => {
                 },
             };
 
-            vi.doMock(import('electron-log/renderer'), () => ({
+            vi.doMock("electron-log/renderer", () => ({
                 default: mockLogWithoutFile,
             }));
 

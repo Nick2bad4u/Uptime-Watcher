@@ -1847,7 +1847,9 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
 
             const objWithFunction = {
                 ...createValidSite(),
-                callback: () => { console.log("test"); },
+                callback: () => {
+                    console.log("test");
+                },
             };
             const result = SiteHandlerValidators.addSite([objWithFunction]);
             expect(isValidationFailure(result)).toBeTruthy();

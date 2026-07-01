@@ -13,12 +13,12 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation";
 
 // Mock all dependencies
-vi.mock(import('../../../stores/sites/useSitesStore'));
-vi.mock(import('../../../stores/error/useErrorStore'));
-vi.mock(import('../../../stores/ui/useUiStore'));
-vi.mock(import('../../../hooks/site/useSiteAnalytics'));
-vi.mock(import('../../../utils/monitorValidation'));
-vi.mock(import('../../../services/logger'));
+vi.mock("../../../stores/sites/useSitesStore");
+vi.mock("../../../stores/error/useErrorStore");
+vi.mock("../../../stores/ui/useUiStore");
+vi.mock("../../../hooks/site/useSiteAnalytics");
+vi.mock("../../../utils/monitorValidation");
+vi.mock("../../../services/logger");
 
 const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseErrorStore = vi.mocked(useErrorStore);

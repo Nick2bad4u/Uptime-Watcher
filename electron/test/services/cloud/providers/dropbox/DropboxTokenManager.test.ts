@@ -42,17 +42,16 @@ describe(DropboxTokenManager, () => {
             appKey: "app-key",
             secretStore,
             tokenStorageKey: "cloud.dropbox.tokens",
-            authFactory: () =>
-                ({
-                    getAccessToken,
-                    getAccessTokenExpiresAt,
-                    getRefreshToken: () => "refresh",
-                    refreshAccessToken,
-                    setAccessToken: () => {},
-                    setAccessTokenExpiresAt: () => {},
-                    setClientId: () => {},
-                    setRefreshToken: () => {},
-                }),
+            authFactory: () => ({
+                getAccessToken,
+                getAccessTokenExpiresAt,
+                getRefreshToken: () => "refresh",
+                refreshAccessToken,
+                setAccessToken: () => {},
+                setAccessTokenExpiresAt: () => {},
+                setClientId: () => {},
+                setRefreshToken: () => {},
+            }),
         });
 
         await manager.storeTokens({
@@ -88,17 +87,16 @@ describe(DropboxTokenManager, () => {
             appKey: "app-key",
             secretStore,
             tokenStorageKey: "cloud.dropbox.tokens",
-            authFactory: () =>
-                ({
-                    getAccessToken,
-                    getAccessTokenExpiresAt,
-                    getRefreshToken: () => "refresh",
-                    refreshAccessToken,
-                    setAccessToken: () => {},
-                    setAccessTokenExpiresAt: () => {},
-                    setClientId: () => {},
-                    setRefreshToken: () => {},
-                }),
+            authFactory: () => ({
+                getAccessToken,
+                getAccessTokenExpiresAt,
+                getRefreshToken: () => "refresh",
+                refreshAccessToken,
+                setAccessToken: () => {},
+                setAccessTokenExpiresAt: () => {},
+                setClientId: () => {},
+                setRefreshToken: () => {},
+            }),
         });
 
         await manager.storeTokens({

@@ -22,7 +22,7 @@ No options.
 import { BrowserWindow } from "electron";
 
 export function createWindow() {
-  return new BrowserWindow({});
+ return new BrowserWindow({});
 }
 ```
 

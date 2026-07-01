@@ -98,13 +98,13 @@ const { statusIconInvocations, createIconStub } = vi.hoisted(() => {
     } as const;
 });
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({ children, ...props }: ThemedComponentProperties) => (
-        <span {...(props)}>{children}</span>
+        <span {...props}>{children}</span>
     ),
 }));
 
-vi.mock(import('../../../../utils/icons'), () => ({
+vi.mock("../../../../utils/icons", () => ({
     AppIcons: {
         metrics: {
             activity: createIconStub("activity"),
@@ -121,7 +121,7 @@ vi.mock(import('../../../../utils/icons'), () => ({
     },
 }));
 
-vi.mock(import('../../../../components/common/Tooltip/Tooltip'), () => ({
+vi.mock("../../../../components/common/Tooltip/Tooltip", () => ({
     Tooltip: ({ children }: TooltipProperties) => (
         <>{children({ "data-tooltip": "stub" })}</>
     ),

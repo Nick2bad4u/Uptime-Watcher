@@ -3,11 +3,11 @@
  *
  * @remarks
  * Provides functionality to automatically refresh data from the backend when
- * users return to the app after being away. Uses window focus events to
- * trigger full backend synchronization when enabled. Errors are handled
- * internally by the store's error handling system through
- * {@link useSitesStore}'s `withErrorHandling` wrapper, so the fire-and-forget
- * void pattern is safe here.
+ * users return to the app after being away. Uses window focus events to trigger
+ * full backend synchronization when enabled. Errors are handled internally by
+ * the store's error handling system through {@link useSitesStore}'s
+ * `withErrorHandling` wrapper, so the fire-and-forget void pattern is safe
+ * here.
  *
  * @public
  */

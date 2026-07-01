@@ -17,10 +17,10 @@ tags:
 
 ## Table of Contents
 
-1. [1. Electron Platform Audits](#1-electron-platform-audits)
-2. [2. Renderer Audits](#2-renderer-audits)
-3. [3. Zustand Store Typing Audit (2025-11-28)](#3-zustand-store-typing-audit-2025-11-28)
-4. [4. Repo-Wide File Review Tracker (2025-12-01)](#4-repo-wide-file-review-tracker-2025-12-01)
+- [1. Electron Platform Audits](#1-electron-platform-audits)
+- [2. Renderer Audits](#2-renderer-audits)
+- [3. Zustand Store Typing Audit (2025-11-28)](#3-zustand-store-typing-audit-2025-11-28)
+- [4. Repo-Wide File Review Tracker (2025-12-01)](#4-repo-wide-file-review-tracker-2025-12-01)
 
 ## 1. Electron Platform Audits
 
@@ -178,11 +178,11 @@ helpers and their shared counterparts.
 
 #### Recommended Follow-ups (Renderer Types Audit)
 
-| Roadmap Item | Scope                    | Action                                                                                                                     |
-| ------------ | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| 34           | `monitorFormData.ts`     | Import shared monitor configuration inputs, enforce `RequireAllOrNone`, and align `type` fields with `MonitorType`.        |
+| Roadmap Item | Scope                    | Action                                                                                                                      |
+| ------------ | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| 34           | `monitorFormData.ts`     | Import shared monitor configuration inputs, enforce `RequireAllOrNone`, and align `type` fields with `MonitorType`.         |
 | 35           | `src/types/ipc.ts`       | ✅ Completed (2026-02-01): remove renderer-local IPC helpers and use `shared/utils/ipcResponse.ts` + `shared/types/ipc.ts`. |
-| 38           | Renderer monitor helpers | Update `monitorUiHelpers.ts` / `monitorTitleFormatters.ts` to depend on the shared unions once the form types are fixed.   |
+| 38           | Renderer monitor helpers | Update `monitorUiHelpers.ts` / `monitorTitleFormatters.ts` to depend on the shared unions once the form types are fixed.    |
 
 ## 3. Zustand Store Typing Audit (2025-11-28)
 
@@ -368,8 +368,8 @@ the rationale for its modifications.
 | src/test/working-utility-coverage.test.ts                                  | Reviewed | Coverage harness now passes serializable object to safeJsonStringifyWithFallback per new guard behavior.                                                   |
 | src/theme/ThemeManager.ts                                                  | Reviewed | Color variable handling now uses typed helpers for emitting CSS properties and avoids unsafe type assertions.                                              |
 | src/theme/useTheme.ts                                                      | Reviewed | Added resolveThemeColorPath helper using shared isRecord guard for safer color lookup.                                                                     |
-| src/types/ipc.ts                                                           | Reviewed | ✅ Removed (2026-02-01) in favour of `shared/utils/ipcResponse.ts` + `shared/types/ipc.ts` to eliminate duplicate IPC envelope helpers.                     |
-| src/types/monitor-forms.ts                                                 | Reviewed | ✅ Removed (2026-02-01) to eliminate duplication with `monitorFormData.ts`; renderer form typing now lives in `src/types/monitorFormData.ts`.               |
+| src/types/ipc.ts                                                           | Reviewed | ✅ Removed (2026-02-01) in favour of `shared/utils/ipcResponse.ts` + `shared/types/ipc.ts` to eliminate duplicate IPC envelope helpers.                    |
+| src/types/monitor-forms.ts                                                 | Reviewed | ✅ Removed (2026-02-01) to eliminate duplication with `monitorFormData.ts`; renderer form typing now lives in `src/types/monitorFormData.ts`.              |
 | src/types/monitorFormData.ts                                               | Reviewed | Monitor form types now reuse RequireAllOrNone helpers, non-empty string guards, and refined type guards for replication/heartbeat.                         |
 | src/types/typeUtils.ts                                                     | Reviewed | Added RequireAllOrNoneFields helper ensuring grouped form fields stay in sync.                                                                             |
 | src/utils/monitorTitleFormatters.ts                                        | Reviewed | Formatter registry now uses typed monitor keys, supports custom maps, and exposes reset helper.                                                            |

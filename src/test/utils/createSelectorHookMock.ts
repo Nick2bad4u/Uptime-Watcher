@@ -1,4 +1,3 @@
-import { objectAssign } from "ts-extras";
 import { vi } from "vitest";
 
 type Selector<State, Result> = (state: State) => Result;
@@ -37,10 +36,10 @@ export function createSelectorHookMock<State extends object>(
         ) => (typeof selector === "function" ? selector(state) : state)
     ) as unknown as SelectorHookMock<State>;
 
-    vi.spyOn(mock, 'getState').mockReturnValue(state);
-    vi.spyOn(mock, 'setState').mockImplementation((partial) => {
+    vi.spyOn(mock, "getState").mockReturnValue(state);
+    vi.spyOn(mock, "setState").mockImplementation((partial) => {
         const next = typeof partial === "function" ? partial(state) : partial;
-        objectAssign(state, next);
+        Object.assign(state, next);
     });
 
     return mock;

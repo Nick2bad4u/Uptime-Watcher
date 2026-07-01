@@ -35,9 +35,9 @@ import type { Theme } from "../theme/types";
  * Bundle of chart options returned by {@link createChartConfigs}.
  *
  * @remarks
- * Provides preconfigured Chart.js options scoped to the app's
- * monitoring dashboard. Consumers typically spread these options when rendering
- * `<Bar />`, `<Doughnut />`, or `<Line />` components.
+ * Provides preconfigured Chart.js options scoped to the app's monitoring
+ * dashboard. Consumers typically spread these options when rendering `<Bar />`,
+ * `<Doughnut />`, or `<Line />` components.
  *
  * @public
  */
@@ -241,8 +241,8 @@ interface BaseChartConfigCommon {
  *
  * @remarks
  * Centralizes all chart configurations to ensure consistency and
- * maintainability across the app. The service automatically applies
- * theme colors, fonts, and spacing to all chart configurations.
+ * maintainability across the app. The service automatically applies theme
+ * colors, fonts, and spacing to all chart configurations.
  *
  * @public
  *

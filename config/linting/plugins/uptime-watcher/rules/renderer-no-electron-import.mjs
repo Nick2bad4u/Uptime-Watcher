@@ -135,9 +135,11 @@ export const rendererNoElectronImportRule = {
              * }} node
              */
             CallExpression(node) {
-                if (node.callee.type !== "Identifier" ||
+                if (
+                    node.callee.type !== "Identifier" ||
                     node.callee.name !== "require" ||
-                    node.arguments.length === 0) {
+                    node.arguments.length === 0
+                ) {
                     return;
                 }
 
@@ -146,12 +148,8 @@ export const rendererNoElectronImportRule = {
                     firstArgument?.type === "Literal" &&
                     typeof firstArgument.value === "string"
                 ) {
-                    handleStaticSpecifier(
-                        firstArgument,
-                        firstArgument.value
-                    );
+                    handleStaticSpecifier(firstArgument, firstArgument.value);
                 }
-
             },
 
             /**

@@ -50,20 +50,16 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false)]
-    [string]$RootPath = ".",
-
+    [string] $RootPath = ".",
     [Parameter(Mandatory = $false)]
     [ValidateSet("Table", "List", "Json", "Detailed")]
-    [string]$OutputFormat = "Detailed",
-
+    [string] $OutputFormat = "Detailed",
     [Parameter(Mandatory = $false)]
-    [string[]]$ExcludePaths = @(),
-
+    [string[]] $ExcludePaths = @(),
     [Parameter(Mandatory = $false)]
-    [switch]$SkipNodeModules,
-
+    [switch] $SkipNodeModules,
     [Parameter(Mandatory = $false)]
-    [switch]$ShowOnlyProjectTests
+    [switch] $ShowOnlyProjectTests
 )
 
 # Set error action preference
@@ -121,11 +117,11 @@ $AllExcludePaths = $DefaultExcludePaths + $ExcludePaths
 
 # Add node_modules exclusion if requested
 if ($SkipNodeModules -or $ShowOnlyProjectTests) {
-    $AllExcludePaths += @("**/node_modules/**", "*node_modules*")
+    $AllExcludePaths += @( "**/node_modules/**", "*node_modules*" )
 }
 
 function Write-Header {
-    param([string]$Title)
+    param([string] $Title)
 
     Write-Host ""
     Write-Host "=" * 60 -ForegroundColor Cyan
@@ -136,8 +132,8 @@ function Write-Header {
 
 function Get-RelativePath {
     param(
-        [string]$Path,
-        [string]$BasePath
+        [string] $Path,
+        [string] $BasePath
     )
 
     try {
@@ -151,9 +147,9 @@ function Get-RelativePath {
 
 function Find-TestFiles {
     param(
-        [string]$SearchPath,
-        [string[]]$Patterns,
-        [string[]]$ExcludeDirs
+        [string] $SearchPath,
+        [string[]] $Patterns,
+        [string[]] $ExcludeDirs
     )
 
     $testFiles = @()
@@ -173,22 +169,26 @@ function Find-TestFiles {
 
                     # Handle wildcard patterns and direct path matches
                     if ($normalizedExcludeDir.Contains("*")) {
-                        if ($normalizedRelativePath -like $normalizedExcludeDir) {
+                        if (
+                            $normalizedRelativePath -like $normalizedExcludeDir
+                        ) {
                             $shouldExclude = $true
                             break
                         }
                     }
-                    elseif ($normalizedRelativePath -like "$normalizedExcludeDir/*" -or
-                            $normalizedRelativePath -eq $normalizedExcludeDir -or
-                            $normalizedRelativePath.Contains("/node_modules/") -or
-                            $normalizedRelativePath.Contains("\node_modules\")) {
+                    elseif (
+                        $normalizedRelativePath -like "$normalizedExcludeDir/*" -or
+                        $normalizedRelativePath -eq $normalizedExcludeDir -or
+                        $normalizedRelativePath.Contains("/node_modules/") -or
+                        $normalizedRelativePath.Contains("\node_modules\")
+                    ) {
                         $shouldExclude = $true
                         break
                     }
                 }
 
                 if (-not $shouldExclude) {
-                    $testFiles += [PSCustomObject]@{
+                    $testFiles += [PSCustomObject] @{
                         Name = $file.Name
                         Path = $relativePath
                         FullPath = $file.FullName
@@ -209,8 +209,8 @@ function Find-TestFiles {
 
 function Test-IsInMainTestDir {
     param(
-        [string]$FilePath,
-        [string[]]$MainDirs
+        [string] $FilePath,
+        [string[]] $MainDirs
     )
 
     foreach ($mainDir in $MainDirs) {
@@ -239,8 +239,18 @@ try {
     foreach ($dir in $MainTestDirs) {
         $fullDir = Join-Path $ResolvedRootPath $dir
         $exists = Test-Path $fullDir
-        $status = if ($exists) { "✓" } else { "✗" }
-        Write-Host "  $status $dir" -ForegroundColor $(if ($exists) { "Green" } else { "Red" })
+        $status = if ($exists) {
+            "✓"
+        } else {
+            "✗"
+        }
+        Write-Host "  $status $dir" -ForegroundColor $(
+            if ($exists) {
+                "Green"
+            } else {
+                "Red"
+            }
+        )
     }
     Write-Host ""
 
@@ -263,11 +273,17 @@ try {
     $nodeModulesTests = @()
 
     foreach ($testFile in $allTestFiles) {
-        if (-not (Test-IsInMainTestDir -FilePath $testFile.Path -MainDirs $MainTestDirs)) {
+        if (
+            -not (
+                Test-IsInMainTestDir -FilePath $testFile.Path -MainDirs $MainTestDirs
+            )
+        ) {
             $orphanedTests += $testFile
 
             # Categorize the orphaned tests
-            if ($testFile.Path -match "node_modules" -or $testFile.Path -match "docs[\\/]docusaurus[\\/]") {
+            if (
+                $testFile.Path -match "node_modules" -or $testFile.Path -match "docs[\\/]docusaurus[\\/]"
+            ) {
                 $nodeModulesTests += $testFile
             }
             else {
@@ -293,7 +309,8 @@ try {
 
         switch ($OutputFormat) {
             "Table" {
-                $orphanedTests | Format-Table -Property Name, Directory, Path -AutoSize
+                $orphanedTests
+                    | Format-Table -Property Name, Directory, Path -AutoSize
             }
             "List" {
                 foreach ($test in $orphanedTests) {
@@ -308,15 +325,19 @@ try {
                 if ($projectOrphanedTests.Count -gt 0) {
                     Write-Host "🔍 PROJECT TEST FILES (outside main test directories):" -ForegroundColor Yellow
                     Write-Host ""
-                    $projectOrphanedTests | Format-Table -Property Name, Directory, Path -AutoSize
+                    $projectOrphanedTests
+                        | Format-Table -Property Name, Directory, Path -AutoSize
                     Write-Host ""
                 }
 
-                if ($nodeModulesTests.Count -gt 0 -and -not $ShowOnlyProjectTests) {
+                if (
+                    $nodeModulesTests.Count -gt 0 -and -not $ShowOnlyProjectTests
+                ) {
                     Write-Host "📦 NODE_MODULES TEST FILES:" -ForegroundColor Cyan
                     Write-Host "  (Found $($nodeModulesTests.Count) test files in dependencies)" -ForegroundColor Gray
                     if ($nodeModulesTests.Count -le 10) {
-                        $nodeModulesTests | Format-Table -Property Name, Path -AutoSize
+                        $nodeModulesTests
+                            | Format-Table -Property Name, Path -AutoSize
                     }
                     else {
                         Write-Host "  Use -OutputFormat Table to see all $($nodeModulesTests.Count) files" -ForegroundColor Gray
@@ -338,12 +359,23 @@ try {
     Write-Host "Summary:" -ForegroundColor Cyan
     Write-Host "  Total test files: $($allTestFiles.Count)" -ForegroundColor White
     Write-Host "  In main test dirs: $($allTestFiles.Count - $orphanedTests.Count - $nodeModulesTests.Count)" -ForegroundColor Green
-    Write-Host "  Project orphaned: $($projectOrphanedTests.Count)" -ForegroundColor $(if ($projectOrphanedTests.Count -eq 0) { "Green" } else { "Yellow" })
+    Write-Host "  Project orphaned: $($projectOrphanedTests.Count)" -ForegroundColor $(
+        if ($projectOrphanedTests.Count -eq 0) {
+            "Green"
+        } else {
+            "Yellow"
+        }
+    )
     if (-not $ShowOnlyProjectTests) {
         Write-Host "  Node modules: $($nodeModulesTests.Count)" -ForegroundColor Cyan
-        Write-Host "  Total orphaned: $($orphanedTests.Count)" -ForegroundColor $(if ($orphanedTests.Count -eq 0) { "Green" } else { "Red" })
+        Write-Host "  Total orphaned: $($orphanedTests.Count)" -ForegroundColor $(
+            if ($orphanedTests.Count -eq 0) {
+                "Green"
+            } else {
+                "Red"
+            }
+        )
     }
-
 }
 catch {
     Write-Error "Script execution failed: $($_.Exception.Message)"

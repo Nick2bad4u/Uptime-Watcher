@@ -32,7 +32,7 @@ import {
 import { installElectronApiMock } from "./electronApiMock";
 
 // Mock dependencies
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     convertError: vi.fn(),
     ensureError: vi.fn(),
     withErrorHandling: vi.fn(),
@@ -40,10 +40,9 @@ vi.mock(import('@shared/utils/errorHandling'), () => ({
 }));
 
 vi.mock(
-    import('@shared/validation/monitorSchemas'),
+    "@shared/validation/monitorSchemas",
     async (importOriginal): Promise<unknown> => {
-        const actual =
-            (await importOriginal());
+        const actual = await importOriginal<Record<string, unknown>>();
 
         return {
             ...actual,
@@ -54,7 +53,7 @@ vi.mock(
 );
 
 // Mock the monitor types store
-vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: {
         getState: vi.fn(),
     },
@@ -707,7 +706,7 @@ describe("monitor Validation Utilities", () => {
                 data: undefined,
                 errors: [
                     "The 'url' field is required",
-                    "\"url\" must be a valid URL",
+                    '"url" must be a valid URL',
                     "url: invalid format",
                     "url contains invalid characters",
                 ],
@@ -726,7 +725,7 @@ describe("monitor Validation Utilities", () => {
 
             expect(result).toEqual([
                 "The 'url' field is required",
-                "\"url\" must be a valid URL",
+                '"url" must be a valid URL',
                 "url: invalid format",
                 "url contains invalid characters",
             ]);
@@ -818,11 +817,7 @@ describe("monitor Validation Utilities", () => {
                 "url",
                 "invalid"
             );
-            const portResult = await validateMonitorField(
-                "port",
-                "port",
-                NaN
-            );
+            const portResult = await validateMonitorField("port", "port", NaN);
 
             expect(urlResult).toEqual(["URL field is invalid"]);
             expect(portResult).toEqual(["PORT field error"]);
@@ -1782,9 +1777,7 @@ describe("monitor Validation Utilities", () => {
 
                     expect(result.type).toBe(monitorType);
                     expect(result.monitoring).toBe(baseData.monitoring);
-                    expect(result.checkInterval).toBe(
-                        baseData.checkInterval
-                    );
+                    expect(result.checkInterval).toBe(baseData.checkInterval);
                     expect(result.timeout).toBe(baseData.timeout);
                     expect(result.retryAttempts).toBe(baseData.retryAttempts);
                     expect(result.responseTime).toBe(-1); // Default value
@@ -1889,7 +1882,9 @@ describe("monitor Validation Utilities", () => {
                     );
 
                     // Verify the function was called (don't check exact parameters due to complexity)
-                    expect(mockStore.validateMonitorData).toHaveBeenCalledWith();
+                    expect(
+                        mockStore.validateMonitorData
+                    ).toHaveBeenCalledWith();
                 }
             );
         });

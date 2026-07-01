@@ -652,8 +652,8 @@ export const createSiteSyncActions = (
                             status: synchronized ? "success" : "failure",
                             success: synchronized,
                             ...(!synchronized && {
-                                      failureReason: "backend-not-synchronized",
-                                  }),
+                                failureReason: "backend-not-synchronized",
+                            }),
                         } satisfies SitesTelemetryPayload;
 
                         logStoreAction(

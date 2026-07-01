@@ -10,7 +10,7 @@
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
 import { generateCorrelationId } from "@shared/utils/correlation";
-import { beforeEach, describe, expect, it, test, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type {
     UptimeEventName,
@@ -19,6 +19,14 @@ import type {
 
 // Import event system modules
 import { TypedEventBus } from "../../../electron/events/TypedEventBus";
+
+async function emitFuzzEvent(
+    eventBus: TypedEventBus<UptimeEvents>,
+    eventType: UptimeEventName,
+    payload: unknown
+): Promise<void> {
+    return eventBus.emitTyped(eventType, payload as never);
+}
 
 // Custom arbitraries for event system testing
 const arbitraryEventType = fc.constantFrom(
@@ -113,7 +121,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Test event emission doesn't throw
                 await expect(
-                    eventBus.emitTyped(eventType as UptimeEventName, payload)
+                    emitFuzzEvent(
+                        eventBus,
+                        eventType as UptimeEventName,
+                        payload
+                    )
                 ).resolves.not.toThrow();
             }
         );
@@ -146,7 +158,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 eventBus.onTyped(eventType as UptimeEventName, listener);
 
                 // Emit event
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await emitFuzzEvent(
+                    eventBus,
+                    eventType as UptimeEventName,
+                    payload
+                );
 
                 // Verify listener was called
                 expect(listener).toHaveBeenCalledTimes(1);
@@ -165,7 +181,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
             // Emit multiple events
             for (const payload of payloads) {
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await emitFuzzEvent(
+                    eventBus,
+                    eventType as UptimeEventName,
+                    payload
+                );
             }
 
             // Verify listener call count
@@ -190,7 +210,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
             // Emit events and verify isolation
             for (const eventType of eventTypes) {
-                await eventBus.emitTyped(eventType as UptimeEventName, {
+                await emitFuzzEvent(eventBus, eventType as UptimeEventName, {
                     test: true,
                 });
             }
@@ -228,7 +248,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 }
 
                 // Emit event
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await emitFuzzEvent(
+                    eventBus,
+                    eventType as UptimeEventName,
+                    payload
+                );
 
                 // Verify all listeners were called
                 for (const listener of listeners) {
@@ -369,7 +393,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 eventBus.registerMiddleware(middleware);
 
                 eventBus.onTyped(eventType as UptimeEventName, listener);
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await emitFuzzEvent(
+                    eventBus,
+                    eventType as UptimeEventName,
+                    payload
+                );
 
                 // Verify middleware and listener were called
                 expect(middleware).toHaveBeenCalledTimes(1);
@@ -408,7 +436,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Event emission should throw due to middleware error
                 await expect(
-                    eventBus.emitTyped(eventType as UptimeEventName, payload)
+                    emitFuzzEvent(
+                        eventBus,
+                        eventType as UptimeEventName,
+                        payload
+                    )
                 ).rejects.toThrow("Middleware error");
 
                 // Cleanup
@@ -568,7 +600,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Emit event - should not throw despite error listener (emitTyped handles errors gracefully)
                 await expect(
-                    eventBus.emitTyped(eventType as UptimeEventName, payload)
+                    emitFuzzEvent(
+                        eventBus,
+                        eventType as UptimeEventName,
+                        payload
+                    )
                 ).resolves.not.toThrow();
 
                 eventBus.offTyped(eventType as UptimeEventName, errorListener);

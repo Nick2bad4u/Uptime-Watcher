@@ -5,8 +5,7 @@
  * @remarks
  * Provides safe parsing functions with comprehensive validation and error
  * handling for monitoring-related data. These utilities ensure that invalid
- * input data doesn't crash the app and provides meaningful fallback
- * values.
+ * input data doesn't crash the app and provides meaningful fallback values.
  *
  * Key features:
  *

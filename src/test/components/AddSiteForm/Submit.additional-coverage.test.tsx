@@ -27,7 +27,7 @@ import type { Logger } from "../../../services/logger";
 import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 
 // Mock the validation functions
-vi.mock(import('../../../utils/monitorValidation'), () => ({
+vi.mock("../../../utils/monitorValidation", () => ({
     createMonitorObject: vi.fn(() => ({
         id: "mock-monitor-id",
         type: "http",
@@ -65,12 +65,12 @@ vi.mock(import('../../../utils/monitorValidation'), () => ({
 }));
 
 // Mock the error handling utility
-vi.mock(import('../../../utils/errorHandling'), () => ({
+vi.mock("../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn((fn) => fn()),
 }));
 
 // Mock the fallbacks
-vi.mock(import('../../../utils/fallbacks'), () => ({
+vi.mock("../../../utils/fallbacks", () => ({
     truncateForLogging: vi.fn((str) => str),
 }));
 

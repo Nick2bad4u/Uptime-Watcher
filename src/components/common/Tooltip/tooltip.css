@@ -140,7 +140,7 @@
 }
 
 /* Light theme adjustments */
-.theme-light .tooltip,
+[data-theme="light"] .tooltip,
 [data-theme="light"] .tooltip {
     --tooltip-border-color: color-mix(
         in srgb,
@@ -174,7 +174,7 @@
 }
 
 /* Dark & high contrast theme adjustments */
-.theme-dark .tooltip,
+[data-theme="dark"] .tooltip,
 .theme-high-contrast .tooltip,
 [data-theme="dark"] .tooltip {
     --tooltip-border-color: color-mix(

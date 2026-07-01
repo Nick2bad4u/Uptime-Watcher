@@ -7,19 +7,14 @@ import { AppIcons } from "../../../utils/icons";
  * {@link src/components/Settings/cloud/CloudProviderSetupPanel#CloudProviderSetupPanel}.
  */
 export type CloudProviderSetupPanelConnectionSiteStatus =
-    | "down"
-    | "pending"
-    | "up";
+    "down" | "pending" | "up";
 
 /**
  * Supported tabs inside
  * {@link src/components/Settings/cloud/CloudProviderSetupPanel#CloudProviderSetupPanel}.
  */
 export type CloudProviderSetupPanelTabKey =
-    | "dropbox"
-    | "filesystem"
-    | "google-drive"
-    | "webdav";
+    "dropbox" | "filesystem" | "google-drive" | "webdav";
 
 /**
  * Tab descriptor used to render the provider tab strip.

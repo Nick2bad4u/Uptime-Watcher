@@ -15,7 +15,9 @@ describe("HttpRateLimiter abort support", () => {
 
             let resolveSlow: () => void = () => {};
             const slowBarrier = new Promise<boolean>((resolve) => {
-                resolveSlow = () => { resolve(true); };
+                resolveSlow = () => {
+                    resolve(true);
+                };
             });
 
             const slowOperation = vi.fn(async () => {

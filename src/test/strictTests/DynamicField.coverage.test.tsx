@@ -5,14 +5,14 @@
 import type { ReactNode } from "react";
 
 import { render, screen } from "@testing-library/react";
-import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
+import { arrayAt, arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DynamicField } from "../../components/AddSiteForm/DynamicField";
 
 const loggerErrorMock = vi.hoisted(() => vi.fn());
 
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: loggerErrorMock,
@@ -46,15 +46,19 @@ interface SelectFieldMockProps {
 }
 
 const textFieldProps = vi.hoisted(() => safeCastTo<TextFieldMockProps[]>([]));
-const selectFieldProps = vi.hoisted(() => safeCastTo<SelectFieldMockProps[]>([]));
+const selectFieldProps = vi.hoisted(() =>
+    safeCastTo<SelectFieldMockProps[]>([])
+);
 
-vi.mock(import('../../components/AddSiteForm/TextField'), () => ({
+vi.mock("../../components/AddSiteForm/TextField", () => ({
     TextField: (props: TextFieldMockProps) => {
         textFieldProps.push(props);
         return (
             <input
                 data-testid={`text-field-${props.id}`}
-                onChange={(event) => { props.onChange(event.currentTarget.value); }}
+                onChange={(event) => {
+                    props.onChange(event.currentTarget.value);
+                }}
                 type={props.type}
                 value={props.value}
             />
@@ -62,13 +66,15 @@ vi.mock(import('../../components/AddSiteForm/TextField'), () => ({
     },
 }));
 
-vi.mock(import('../../components/AddSiteForm/SelectField'), () => ({
+vi.mock("../../components/AddSiteForm/SelectField", () => ({
     SelectField: (props: SelectFieldMockProps) => {
         selectFieldProps.push(props);
         return (
             <select
                 data-testid={`select-field-${props.id}`}
-                onChange={(event) => { props.onChange(event.currentTarget.value); }}
+                onChange={(event) => {
+                    props.onChange(event.currentTarget.value);
+                }}
                 value={props.value}
             >
                 {(props.options ?? []).map((option) => (
@@ -87,7 +93,7 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: themedTextMock.component,
 }));
 

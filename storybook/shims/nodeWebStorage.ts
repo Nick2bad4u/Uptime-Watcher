@@ -138,7 +138,6 @@ class MemoryStorage implements StorageLike {
      *
      * The method name intentionally matches the Web Storage API.
      */
-    // eslint-disable-next-line function-name/starts-with-verb -- mirrored from the DOM Storage API
     public key(index: number): null | string {
         if (index < 0 || index >= this.#store.size) {
             return null;
@@ -184,7 +183,6 @@ const installStorage = (name: StorageName): void => {
     defineStorageProperty(globalThis, name, storage);
 
     const windowCandidate = Reflect.get(globalThis, "window");
-    // eslint-disable-next-line sonarjs/different-types-comparison -- null check is required for DOM Storage parity
     if (typeof windowCandidate === "object" && windowCandidate !== null) {
         const maybeStorage = readStorageCandidate(windowCandidate, name);
         if (!isStorageLike(maybeStorage)) {

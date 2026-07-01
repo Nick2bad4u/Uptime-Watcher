@@ -18,17 +18,17 @@ tags:
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Architecture](#architecture)
-3. [Configuration Files](#configuration-files)
-4. [Project Documents Integration](#project-documents-integration)
-5. [Build Process](#build-process)
-6. [Key Features](#key-features)
-7. [Customization](#customization)
-8. [Best Practices](#best-practices)
-9. [Troubleshooting](#troubleshooting)
-10. [Scripts Reference](#scripts-reference)
-11. [🎯 Quick Reference](#-quick-reference)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Configuration Files](#configuration-files)
+- [Project Documents Integration](#project-documents-integration)
+- [Build Process](#build-process)
+- [Key Features](#key-features)
+- [Customization](#customization)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Scripts Reference](#scripts-reference)
+- [🎯 Quick Reference](#-quick-reference)
 
 ## Overview
 

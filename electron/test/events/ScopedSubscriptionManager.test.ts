@@ -52,7 +52,9 @@ describe(ScopedSubscriptionManager, () => {
             throw secondError;
         });
 
-        expect(() => { manager.clearAll(); }).toThrow(AggregateError);
+        expect(() => {
+            manager.clearAll();
+        }).toThrow(AggregateError);
     });
 
     it("invokes error callback when suppression is enabled", () => {

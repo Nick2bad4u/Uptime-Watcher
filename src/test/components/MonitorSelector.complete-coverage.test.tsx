@@ -9,14 +9,14 @@ import { createValidMonitor } from "@shared/test/testHelpers";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { forwardRef } from "react";
-import { arrayFirst, objectHasOwn  } from "ts-extras";
+import { arrayFirst, objectHasOwn } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock ThemedSelect
-vi.mock(import('../../theme/components/ThemedSelect'), () => ({
+vi.mock("../../theme/components/ThemedSelect", () => ({
     ThemedSelect: forwardRef<HTMLSelectElement, any>(
         ({ children, className, fluid, tone, ...rest }, ref) => (
             <select
@@ -196,9 +196,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             renderMonitorSelector({ monitors: [], selectedMonitorId: "" });
 
             const select = screen.getByTestId("themed-select");
-            const wrapper = select.closest(
-                ".monitor-selector__wrapper"
-            )!;
+            const wrapper = select.closest(".monitor-selector__wrapper")!;
 
             expect(select).toBeDisabled();
             expect(select).toHaveValue("");
@@ -225,9 +223,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             renderMonitorSelector({ selectedMonitorId: "missing-monitor" });
 
             const select = screen.getByTestId("themed-select");
-            const wrapper = select.closest(
-                ".monitor-selector__wrapper"
-            )!;
+            const wrapper = select.closest(".monitor-selector__wrapper")!;
 
             expect(select).not.toBeDisabled();
             expect(select).toHaveValue("");
@@ -273,15 +269,11 @@ describe("MonitorSelector - Complete Coverage", () => {
             const user = userEvent.setup();
             renderMonitorSelector();
 
-            const select = screen.getByTestId(
-                "themed-select"
-            );
+            const select = screen.getByTestId("themed-select");
             const focusSpy = vi
                 .spyOn(select, "focus")
                 .mockReturnValue(undefined);
-            const wrapper = select.closest(
-                ".monitor-selector__wrapper"
-            )!;
+            const wrapper = select.closest(".monitor-selector__wrapper")!;
 
             await user.click(select);
             select.focus();
@@ -755,7 +747,9 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             const options = screen.queryAllByRole("option");
             expect(options).toHaveLength(1);
-            expect(arrayFirst(options)).toHaveTextContent("No monitors available");
+            expect(arrayFirst(options)).toHaveTextContent(
+                "No monitors available"
+            );
             expect(arrayFirst(options)).toBeDisabled();
         });
 

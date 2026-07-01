@@ -61,8 +61,9 @@ describe("MonitorRepository simple orchestration", () => {
 
         mockDatabaseService = {
             executeTransaction: vi.fn(
-                async (callback: (db: MockDb) => Promise<void> | void) =>
-                    { await callback(mockDb); }
+                async (callback: (db: MockDb) => Promise<void> | void) => {
+                    await callback(mockDb);
+                }
             ),
             getDatabase: vi.fn(() => mockDb),
         };

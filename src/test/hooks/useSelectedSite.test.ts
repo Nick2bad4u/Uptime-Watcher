@@ -14,11 +14,11 @@ import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 
 // Mock the store hooks
-vi.mock(import('../../stores/ui/useUiStore'), () => ({
+vi.mock("../../stores/ui/useUiStore", () => ({
     useUIStore: vi.fn(),
 }));
 
-vi.mock(import('../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(),
 }));
 

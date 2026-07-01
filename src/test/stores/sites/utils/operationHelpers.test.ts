@@ -36,7 +36,7 @@ import { installElectronApiMock } from "../../../utils/electronApiMock";
 import { createMockFunction } from "../../../utils/mockFactories";
 
 // Mock the error catalog
-vi.mock(import('../../../../../shared/utils/errorCatalog'), () => ({
+vi.mock("../../../../../shared/utils/errorCatalog", () => ({
     ERROR_CATALOG: {
         sites: {
             NOT_FOUND: "Site not found",
@@ -45,7 +45,7 @@ vi.mock(import('../../../../../shared/utils/errorCatalog'), () => ({
 }));
 
 // Mock the error handling utility
-vi.mock(import('../../../../../shared/utils/errorHandling'), () => ({
+vi.mock("../../../../../shared/utils/errorHandling", () => ({
     withErrorHandling: vi.fn(),
     ensureError: vi.fn((error) =>
         Error.isError(error) ? error : new Error(String(error))
@@ -53,11 +53,11 @@ vi.mock(import('../../../../../shared/utils/errorHandling'), () => ({
 }));
 
 // Mock the store action logging
-vi.mock(import('../../../../stores/utils'), () => ({
+vi.mock("../../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -67,12 +67,12 @@ vi.mock(import('../../../../services/logger'), () => ({
 }));
 
 // Mock the store error handling
-vi.mock(import('../../../../stores/utils/storeErrorHandling'), () => ({
+vi.mock("../../../../stores/utils/storeErrorHandling", () => ({
     createStoreErrorHandler: vi.fn(),
 }));
 
 // Mock the monitor operations
-vi.mock(import('../../../../stores/sites/utils/monitorOperations'), () => ({
+vi.mock("../../../../stores/sites/utils/monitorOperations", () => ({
     updateMonitorInSite: vi.fn(),
 }));
 
@@ -293,9 +293,9 @@ describe("OperationHelpers", () => {
                 name: "Updated Duplicate",
             };
 
-            expect(() => { applySavedSiteToStore(savedSite, mockDeps); }).toThrow(
-                DuplicateSiteIdentifierError
-            );
+            expect(() => {
+                applySavedSiteToStore(savedSite, mockDeps);
+            }).toThrow(DuplicateSiteIdentifierError);
             expect(setSitesSpy).not.toHaveBeenCalled();
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected while persisting backend snapshot",
@@ -484,7 +484,10 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
             // Get the operation passed to withErrorHandling
-            const [wrappedOperation] = arrayAt(mockWithErrorHandling.mock.calls, -1)!;
+            const [wrappedOperation] = arrayAt(
+                mockWithErrorHandling.mock.calls,
+                -1
+            )!;
 
             mockLogStoreAction.mockClear();
 
@@ -534,8 +537,10 @@ describe("OperationHelpers", () => {
             expect(mockLogStoreAction).toHaveBeenCalledTimes(2);
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(2);
 
-            const [wrappedOperationAgain] =
-                arrayAt(mockWithErrorHandling.mock.calls, -1)!;
+            const [wrappedOperationAgain] = arrayAt(
+                mockWithErrorHandling.mock.calls,
+                -1
+            )!;
 
             mockLogStoreAction.mockClear();
             mockOperation.mockClear();
@@ -613,7 +618,7 @@ describe("OperationHelpers", () => {
 
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const syncError = new Error("Sync failed");
-            vi.spyOn(mockDeps, 'syncSites').mockImplementation().mockRejectedValue(syncError);
+            vi.spyOn(mockDeps, "syncSites").mockRejectedValue(syncError);
             const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
@@ -792,8 +797,10 @@ describe("OperationHelpers", () => {
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
-            const [wrappedOperationReturn] =
-                arrayAt(mockWithErrorHandling.mock.calls, -1)!;
+            const [wrappedOperationReturn] = arrayAt(
+                mockWithErrorHandling.mock.calls,
+                -1
+            )!;
 
             mockLogStoreAction.mockClear();
 
@@ -861,8 +868,10 @@ describe("OperationHelpers", () => {
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
-            const [wrappedOperationReturnAgain] =
-                arrayAt(mockWithErrorHandling.mock.calls, -1)!;
+            const [wrappedOperationReturnAgain] = arrayAt(
+                mockWithErrorHandling.mock.calls,
+                -1
+            )!;
 
             mockLogStoreAction.mockClear();
 
@@ -945,7 +954,7 @@ describe("OperationHelpers", () => {
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const syncError = new Error("Sync failed");
-            vi.spyOn(mockDeps, 'syncSites').mockImplementation().mockRejectedValue(syncError);
+            vi.spyOn(mockDeps, "syncSites").mockRejectedValue(syncError);
             const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error

@@ -26,8 +26,8 @@ export function isObject(value: unknown): value is UnknownRecord {
  * Checks whether a value is a `number` excluding `NaN`.
  *
  * @remarks
- * This guard considers both positive and negative infinity as numbers. Use
- * { @link isFiniteNumber } when infinities should be rejected.
+ * This guard considers both positive and negative infinity as numbers. Use {
+ * @link isFiniteNumber } when infinities should be rejected.
  *
  * @param value - Value to evaluate.
  *
@@ -237,7 +237,9 @@ export function isNonNullObject(value: unknown): value is UnknownRecord {
  *
  * @returns `true` when the value is greater than zero and finite.
  */
-export function isPositiveNumber(value: unknown): value is number { return isNumber(value) && isFiniteNumber(value) && value > 0; }
+export function isPositiveNumber(value: unknown): value is number {
+    return isNumber(value) && isFiniteNumber(value) && value > 0;
+}
 
 /**
  * Checks whether a value is a string.

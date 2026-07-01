@@ -34,7 +34,6 @@ export function validateOAuthAuthorizeUrl(args: {
         requireHttps: true,
     });
 
-
     if (!validation.ok) {
         if (validation.reason === EXTERNAL_OPEN_HTTPS_REQUIRED_REASON) {
             throw new Error(

@@ -28,7 +28,13 @@ import {
     isValidPort,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import { arrayFirst, isFinite as isFiniteNumber, objectEntries, safeCastTo, setHas } from "ts-extras";
+import {
+    arrayFirst,
+    isFinite as isFiniteNumber,
+    objectEntries,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 /**
  * Baseline defaults applied to every monitor regardless of type.
@@ -319,18 +325,23 @@ function applyHttpKeywordMonitorDefaults(
     applyHttpMonitorDefaults(monitor, filteredData);
 
     const keywordValue = filteredData.bodyKeyword;
-    monitor.bodyKeyword = typeof keywordValue === "string" && keywordValue.trim() ? keywordValue.trim() : "status: ok";
+    monitor.bodyKeyword =
+        typeof keywordValue === "string" && keywordValue.trim()
+            ? keywordValue.trim()
+            : "status: ok";
 }
 
 function applyHttpStatusMonitorDefaults(
     monitor: Monitor,
     filteredData: Partial<Monitor>
-): void { applyHttpMonitorDefaults(monitor, filteredData);
+): void {
+    applyHttpMonitorDefaults(monitor, filteredData);
 
     const statusValue = filteredData.expectedStatusCode;
     if (typeof statusValue === "number" && isFiniteNumber(statusValue)) {
         const clamped = Math.trunc(statusValue);
-        monitor.expectedStatusCode = Math.min(599, Math.max(100, clamped)); } else {
+        monitor.expectedStatusCode = Math.min(599, Math.max(100, clamped));
+    } else {
         monitor.expectedStatusCode = 200;
     }
 }
@@ -466,9 +477,11 @@ function applyHttpLatencyMonitorDefaults(
         isFiniteNumber(maxResponseTime)
     ) {
         numericLatency = Math.trunc(maxResponseTime);
-    } else if (typeof maxResponseTime === "string") { const parsed = Number.parseFloat(maxResponseTime);
+    } else if (typeof maxResponseTime === "string") {
+        const parsed = Number.parseFloat(maxResponseTime);
         if (isFiniteNumber(parsed)) {
-            numericLatency = Math.trunc(parsed); }
+            numericLatency = Math.trunc(parsed);
+        }
     }
 
     monitor.maxResponseTime = Math.max(1, numericLatency);
@@ -492,9 +505,11 @@ function applyWebsocketKeepaliveMonitorDefaults(
         isFiniteNumber(maxPongDelayValue)
     ) {
         maxPongDelay = Math.trunc(maxPongDelayValue);
-    } else if (typeof maxPongDelayValue === "string") { const parsed = Number.parseInt(maxPongDelayValue, 10);
+    } else if (typeof maxPongDelayValue === "string") {
+        const parsed = Number.parseInt(maxPongDelayValue, 10);
         if (isFiniteNumber(parsed)) {
-            maxPongDelay = parsed; }
+            maxPongDelay = parsed;
+        }
     }
 
     monitor.maxPongDelayMs = Math.min(Math.max(maxPongDelay, 10), 60_000);
@@ -527,9 +542,11 @@ function applyServerHeartbeatMonitorDefaults(
     let maxDrift = SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS;
     if (typeof maxDriftValue === "number" && isFiniteNumber(maxDriftValue)) {
         maxDrift = Math.trunc(maxDriftValue);
-    } else if (typeof maxDriftValue === "string") { const parsed = Number.parseInt(maxDriftValue, 10);
+    } else if (typeof maxDriftValue === "string") {
+        const parsed = Number.parseInt(maxDriftValue, 10);
         if (isFiniteNumber(parsed)) {
-            maxDrift = parsed; }
+            maxDrift = parsed;
+        }
     }
 
     monitor.heartbeatMaxDriftSeconds = Math.min(
@@ -561,9 +578,11 @@ function applyReplicationMonitorDefaults(
     let maxLagSeconds = REPLICATION_DEFAULT_MAX_LAG_SECONDS;
     if (typeof maxLagValue === "number" && isFiniteNumber(maxLagValue)) {
         maxLagSeconds = Math.trunc(maxLagValue);
-    } else if (typeof maxLagValue === "string") { const parsed = Number.parseInt(maxLagValue, 10);
+    } else if (typeof maxLagValue === "string") {
+        const parsed = Number.parseInt(maxLagValue, 10);
         if (isFiniteNumber(parsed)) {
-            maxLagSeconds = parsed; }
+            maxLagSeconds = parsed;
+        }
     }
 
     monitor.maxReplicationLagSeconds = Math.min(

@@ -50,9 +50,7 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(stringConversionModule.safeStringify(123)).toBe("123");
             expect(stringConversionModule.safeStringify(-456)).toBe("-456");
             expect(stringConversionModule.safeStringify(3.14)).toBe("3.14");
-            expect(stringConversionModule.safeStringify(NaN)).toBe(
-                "NaN"
-            );
+            expect(stringConversionModule.safeStringify(NaN)).toBe("NaN");
             expect(stringConversionModule.safeStringify(Infinity)).toBe(
                 "Infinity"
             );

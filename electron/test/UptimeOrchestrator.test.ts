@@ -297,9 +297,9 @@ describe(UptimeOrchestrator, () => {
             const invalidOrchestrator = new UptimeOrchestrator(
                 invalidDependencies
             );
-            expect(() =>
-                { invalidOrchestrator.validateInitialization(); }
-            ).toThrow(
+            expect(() => {
+                invalidOrchestrator["validateInitialization"]();
+            }).toThrow(
                 "DatabaseManager not properly initialized - missing initialize method"
             );
         });
@@ -322,9 +322,9 @@ describe(UptimeOrchestrator, () => {
             const invalidOrchestrator = new UptimeOrchestrator(
                 invalidDependencies
             );
-            expect(() =>
-                { invalidOrchestrator.validateInitialization(); }
-            ).toThrow(
+            expect(() => {
+                invalidOrchestrator["validateInitialization"]();
+            }).toThrow(
                 "SiteManager not properly initialized - missing initialize method"
             );
         });
@@ -347,9 +347,9 @@ describe(UptimeOrchestrator, () => {
             const invalidOrchestrator = new UptimeOrchestrator(
                 invalidDependencies
             );
-            expect(() =>
-                { invalidOrchestrator.validateInitialization(); }
-            ).toThrow(
+            expect(() => {
+                invalidOrchestrator["validateInitialization"]();
+            }).toThrow(
                 "MonitorManager not properly initialized - missing startMonitoring method"
             );
         });
@@ -1410,8 +1410,7 @@ describe(UptimeOrchestrator, () => {
             );
 
             const emittedPayload = emitTypedSpy.mock.calls.at(-1)?.[1] as
-                | Record<string, unknown>
-                | undefined;
+                Record<string, unknown> | undefined;
             expect(emittedPayload).toBeDefined();
             expect(Object.hasOwn(emittedPayload!, "_meta")).toBeTruthy();
             const forwardedMeta = (
@@ -1423,9 +1422,9 @@ describe(UptimeOrchestrator, () => {
             expect(forwardedMeta.eventName).toBe("site:added");
 
             expect(forwardedSiteAddedEvents).toHaveLength(1);
-            expect(
-                forwardedSiteAddedEvents[0]?._originalMeta!
-            ).toStrictEqual(metadata);
+            expect(forwardedSiteAddedEvents[0]?._originalMeta!).toStrictEqual(
+                metadata
+            );
         });
 
         it("should forward site addition source metadata", async ({

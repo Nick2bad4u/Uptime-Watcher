@@ -36,7 +36,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -48,7 +48,7 @@ const mockLogger = vi.hoisted(() => ({
     warn: vi.fn(),
     debug: vi.fn(),
 }));
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
 
@@ -65,7 +65,7 @@ const mockWithUtilityErrorHandling = vi.hoisted(() =>
     )
 );
 
-vi.mock(import('../../../shared/utils/errorHandling'), async () => {
+vi.mock("../../../shared/utils/errorHandling", async () => {
     const actual = await vi.importActual<
         typeof import("../../../shared/utils/errorHandling")
     >("../../../shared/utils/errorHandling");
@@ -122,12 +122,21 @@ function createMockSaveResult(
     overrides: Partial<SerializedDatabaseBackupSaveResult> = {}
 ): SerializedDatabaseBackupSaveResult {
     if ("canceled" in overrides && !overrides.canceled) {
+        type CompletedSaveResult = Extract<
+            SerializedDatabaseBackupSaveResult,
+            { readonly canceled: false }
+        >;
+        const resultOverrides = { ...overrides } as Partial<
+            Omit<CompletedSaveResult, "canceled">
+        >;
+        Reflect.deleteProperty(resultOverrides, "canceled");
+
         return {
             canceled: false,
             fileName: "backup.sqlite",
             filePath: "/tmp/backup.sqlite",
             metadata: createMockBackupResult().metadata,
-            ...overrides,
+            ...resultOverrides,
         };
     }
 
@@ -635,14 +644,17 @@ describe("DataService", () => {
 
         it("should handle missing electron API gracefully", async () => {
             // Remove the electronAPI
-            delete globalThis.electronAPI;
+            Reflect.deleteProperty(globalThis, "electronAPI");
 
             await expect(DataService.exportData()).rejects.toThrow();
         });
 
         it("should handle partial electron API gracefully", async () => {
             // Remove specific method
-            delete globalThis.electronAPI.data.exportData;
+            Reflect.deleteProperty(
+                (globalThis as any).electronAPI.data,
+                "exportData"
+            );
 
             await expect(DataService.exportData()).rejects.toThrow();
         });

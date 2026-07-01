@@ -1,6 +1,6 @@
 /**
- * Centralized error store for managing app errors and loading states.
- * Provides global error handling and store-specific error tracking.
+ * Centralized error store for managing app errors and loading states. Provides
+ * global error handling and store-specific error tracking.
  *
  * @remarks
  * This store implements a comprehensive error management system that supports:
@@ -10,8 +10,8 @@
  * - Operation-specific loading states for fine-grained UI feedback
  * - Centralized error clearing and recovery mechanisms
  *
- * The store integrates with the app's error boundary system and
- * provides standardized error handling patterns across all app stores.
+ * The store integrates with the app's error boundary system and provides
+ * standardized error handling patterns across all app stores.
  *
  * @example
  *

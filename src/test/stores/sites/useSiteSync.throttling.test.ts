@@ -16,13 +16,13 @@ const withErrorHandlingMock = vi.hoisted(() =>
     vi.fn(async <T>(operation: () => Promise<T>) => await operation())
 );
 
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: ensureErrorMock,
     withErrorHandling: withErrorHandlingMock,
 }));
 
 const logStoreActionMock = vi.hoisted(() => vi.fn());
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: logStoreActionMock,
 }));
 
@@ -31,7 +31,7 @@ const createStoreErrorHandlerMock = vi.hoisted(() =>
         setError: vi.fn(),
     }))
 );
-vi.mock(import('../../../stores/utils/storeErrorHandling'), () => ({
+vi.mock("../../../stores/utils/storeErrorHandling", () => ({
     createStoreErrorHandler: createStoreErrorHandlerMock,
 }));
 
@@ -41,7 +41,7 @@ const loggerMock = vi.hoisted(() => ({
     info: vi.fn(),
     warn: vi.fn(),
 }));
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: loggerMock,
 }));
 
@@ -50,7 +50,7 @@ const stateSyncServiceMock = vi.hoisted(() => ({
     onStateSyncEvent: vi.fn(),
     requestFullSync: vi.fn(),
 }));
-vi.mock(import('../../../services/StateSyncService'), () => ({
+vi.mock("../../../services/StateSyncService", () => ({
     StateSyncService: stateSyncServiceMock,
 }));
 
@@ -69,7 +69,7 @@ const statusUpdateManagerConstructor = vi.hoisted(() =>
         };
     })
 );
-vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
+vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: statusUpdateManagerConstructor,
 }));
 

@@ -100,7 +100,7 @@ const buildAddSiteFormState = (
     }) as ReturnType<typeof useAddSiteForm>;
 
 // Mock all external dependencies
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -114,7 +114,7 @@ vi.mock(import('../services/logger'), () => {
     };
 });
 
-vi.mock(import('../stores/error/useErrorStore'), () => ({
+vi.mock("../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             clearError: vi.fn(),
@@ -126,7 +126,7 @@ vi.mock(import('../stores/error/useErrorStore'), () => ({
     }),
 }));
 
-vi.mock(import('../stores/sites/useSitesStore'), () => ({
+vi.mock("../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             addMonitorToSite: vi.fn(),
@@ -137,7 +137,7 @@ vi.mock(import('../stores/sites/useSitesStore'), () => ({
     }),
 }));
 
-vi.mock(import('../hooks/useMonitorTypes'), () => ({
+vi.mock("../hooks/useMonitorTypes", () => ({
     useMonitorTypes: vi.fn(() => ({
         options: [
             { label: "HTTP/HTTPS", value: "http" },
@@ -147,18 +147,18 @@ vi.mock(import('../hooks/useMonitorTypes'), () => ({
     })),
 }));
 
-vi.mock(import('../hooks/useDynamicHelpText'), () => ({
+vi.mock("../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: vi.fn(() => ({
         primary: "Test help text",
         secondary: "Secondary help text",
     })),
 }));
 
-vi.mock(import('../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
-vi.mock(import('../components/SiteDetails/useAddSiteForm'), async () => {
+vi.mock("../components/SiteDetails/useAddSiteForm", async () => {
     const actual = await vi.importActual<
         typeof import("../components/SiteDetails/useAddSiteForm")
     >("../components/SiteDetails/useAddSiteForm");
@@ -169,7 +169,7 @@ vi.mock(import('../components/SiteDetails/useAddSiteForm'), async () => {
     };
 });
 
-vi.mock(import('../constants'), () => ({
+vi.mock("../constants", () => ({
     CHECK_INTERVALS: [
         { label: "1 minute", value: 60_000 },
         { label: "5 minutes", value: 300_000 },
@@ -177,7 +177,7 @@ vi.mock(import('../constants'), () => ({
 }));
 
 // Mock all form components
-vi.mock(import('../components/AddSiteForm/RadioGroup'), () => ({
+vi.mock("../components/AddSiteForm/RadioGroup", () => ({
     RadioGroup: ({ onChange, value, options }: any) => (
         <div data-testid="radio-group">
             {options.map((option: any) => (
@@ -193,7 +193,7 @@ vi.mock(import('../components/AddSiteForm/RadioGroup'), () => ({
     ),
 }));
 
-vi.mock(import('../components/AddSiteForm/SelectField'), () => ({
+vi.mock("../components/AddSiteForm/SelectField", () => ({
     SelectField: ({ onChange, value, options, id }: any) => (
         <select
             data-testid={id}
@@ -209,7 +209,7 @@ vi.mock(import('../components/AddSiteForm/SelectField'), () => ({
     ),
 }));
 
-vi.mock(import('../components/AddSiteForm/TextField'), () => ({
+vi.mock("../components/AddSiteForm/TextField", () => ({
     TextField: ({ onChange, value, id }: any) => (
         <input
             data-testid={id}
@@ -219,11 +219,11 @@ vi.mock(import('../components/AddSiteForm/TextField'), () => ({
     ),
 }));
 
-vi.mock(import('../components/AddSiteForm/DynamicMonitorFields'), () => ({
+vi.mock("../components/AddSiteForm/DynamicMonitorFields", () => ({
     DynamicMonitorFields: () => <div data-testid="dynamic-fields" />,
 }));
 
-vi.mock(import('../components/common/ErrorAlert/ErrorAlert'), () => ({
+vi.mock("../components/common/ErrorAlert/ErrorAlert", () => ({
     ErrorAlert: ({ message, onDismiss }: any) => (
         <div data-testid="error-alert">
             {message}
@@ -234,11 +234,11 @@ vi.mock(import('../components/common/ErrorAlert/ErrorAlert'), () => ({
     ),
 }));
 
-vi.mock(import('../theme/components/ThemedBox'), () => ({
+vi.mock("../theme/components/ThemedBox", () => ({
     ThemedBox: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock(import('../theme/components/ThemedButton'), () => ({
+vi.mock("../theme/components/ThemedButton", () => ({
     ThemedButton: ({ children, onClick, disabled }: any) => (
         <button disabled={disabled} onClick={onClick}>
             {children}
@@ -246,13 +246,13 @@ vi.mock(import('../theme/components/ThemedButton'), () => ({
     ),
 }));
 
-vi.mock(import('../theme/components/ThemedText'), () => ({
+vi.mock("../theme/components/ThemedText", () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (
         <span>{children}</span>
     ),
 }));
 
-vi.mock(import('../components/AddSiteForm/Submit'), () => ({
+vi.mock("../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
@@ -649,17 +649,17 @@ describe("100% Coverage Edge Cases", () => {
 
             // Test valid monitor type
             fireEvent.change(select, { target: { value: "http" } });
-            await waitFor(() =>
-                { expect(setMonitorType).toHaveBeenCalledWith("http"); }
-            );
+            await waitFor(() => {
+                expect(setMonitorType).toHaveBeenCalledWith("http");
+            });
 
             // Test invalid monitor type - check that logger.error was called with some message
             fireEvent.change(select, { target: { value: "invalid" } });
-            await waitFor(() =>
-                { expect(logger.error).toHaveBeenCalledWith(
+            await waitFor(() => {
+                expect(logger.error).toHaveBeenCalledWith(
                     expect.stringContaining("Invalid monitor type value")
-                ); }
-            );
+                );
+            });
         });
 
         it("should handle check interval validation", () => {

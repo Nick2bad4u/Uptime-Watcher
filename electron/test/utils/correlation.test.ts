@@ -112,7 +112,6 @@ describe("Correlation Utility", () => {
             // Test that no character appears in the same position too often
             for (let pos = 0; pos < 16; pos++) {
                 const chars = ids.map((id) => id[pos]);
-                // eslint-disable-next-line unicorn/no-array-reduce
                 const charCounts = chars.reduce<Record<string, number>>(
                     (acc, char) => {
                         if (char) {

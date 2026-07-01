@@ -468,7 +468,14 @@ export const useSettingsController = ({
                 volumePercent={volumePercent}
             />
         ),
-        [handleInAppAlertPreviewClick, handleInAppAlertVolumeChange, isAutomaticPreviewSuppressed, isSliderDisabled, isVolumeSilent, volumePercent]
+        [
+            handleInAppAlertPreviewClick,
+            handleInAppAlertVolumeChange,
+            isAutomaticPreviewSuppressed,
+            isSliderDisabled,
+            isVolumeSilent,
+            volumePercent,
+        ]
     );
 
     const systemNotificationsControl = useMemo(
@@ -644,7 +651,7 @@ export const useSettingsController = ({
     const handleRestoreFileChange = useCallback(
         async (event: ChangeEvent<HTMLInputElement>) => {
             const input = event.currentTarget;
-            const [file] = [...input.files ?? []];
+            const [file] = [...(input.files ?? [])];
             if (!file) {
                 return;
             }

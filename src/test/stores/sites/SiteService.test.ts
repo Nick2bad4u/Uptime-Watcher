@@ -26,13 +26,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock store utilities
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
@@ -534,8 +534,8 @@ describe("SiteService", () => {
                 ?.electronAPI;
             const originalGlobalBridge = (globalThis as any).electronAPI;
 
-            globalThis.electronAPI = undefined;
-            (globalThis as any).electronAPI = undefined;
+            Reflect.deleteProperty(globalThis, "electronAPI");
+            Reflect.deleteProperty(globalThis, "electronAPI");
 
             try {
                 await expect(SiteService.getSites()).rejects.toThrow(
@@ -551,7 +551,11 @@ describe("SiteService", () => {
                     MOCK_BRIDGE_ERROR_MESSAGE
                 );
             } finally {
-                globalThis.electronAPI = originalWindowBridge;
+                Object.defineProperty(globalThis, "electronAPI", {
+                    configurable: true,
+                    value: originalWindowBridge,
+                    writable: true,
+                });
                 (globalThis as any).electronAPI = originalGlobalBridge;
             }
         });
@@ -570,9 +574,7 @@ describe("SiteService", () => {
             });
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                validSite
-            );
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(validSite);
 
             await SiteService.addSite(validSite);
 

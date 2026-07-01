@@ -64,7 +64,7 @@ const cloneVersions = (
 const buildProcessSnapshot = (
     overrides: Partial<ProcessSnapshot> = {}
 ): ProcessSnapshot => {
-    const defaultEnv = (mockProcess.env ?? {});
+    const defaultEnv = mockProcess.env ?? {};
     const env = Object.hasOwn(overrides, "env")
         ? (overrides.env ?? {})
         : cloneRecord(defaultEnv);

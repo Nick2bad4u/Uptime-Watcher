@@ -1,7 +1,12 @@
 import type { StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { arrayJoin, isDefined, isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
+import {
+    arrayJoin,
+    isDefined,
+    isFinite as isFiniteNumber,
+    safeCastTo,
+} from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 

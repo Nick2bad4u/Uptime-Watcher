@@ -243,7 +243,8 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             // Both should be true here, but with values in between:
             const leftBetween = 945;
             const overlayRightBetween = leftBetween + overlayW; // 1045
-            const isCorrectOverflowBetween = overlayRightBetween > viewportLimit; // 1045 > 992 = true
+            const isCorrectOverflowBetween =
+                overlayRightBetween > viewportLimit; // 1045 > 992 = true
             const isMutant2OverflowBetween = overlayRightBetween > mutant2Limit; // 1045 > 1008 = true
 
             expect(isCorrectOverflowBetween).toBeTruthy();

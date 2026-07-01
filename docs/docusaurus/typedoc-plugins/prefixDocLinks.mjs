@@ -1,6 +1,5 @@
 // @ts-check
 
-
 /*
  * TypeDoc renderer plugin: prefix bare intra-doc Markdown file links with `./`.
  *

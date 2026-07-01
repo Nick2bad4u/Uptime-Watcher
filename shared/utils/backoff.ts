@@ -57,7 +57,8 @@ export type BackoffStrategy = "exponential" | "linear";
  *   schedule negative timeouts or throw while handling an already-failing
  *   operation.
  */
-export function calculateBackoffDelayMs(options: BackoffDelayOptions): number { const attemptIndex = isFiniteNumber(options.attemptIndex)
+export function calculateBackoffDelayMs(options: BackoffDelayOptions): number {
+    const attemptIndex = isFiniteNumber(options.attemptIndex)
         ? Math.max(0, Math.trunc(options.attemptIndex))
         : 0;
 
@@ -66,7 +67,8 @@ export function calculateBackoffDelayMs(options: BackoffDelayOptions): number { 
         : 0;
 
     if (initialDelayMs === 0) {
-        return 0; }
+        return 0;
+    }
 
     if (options.strategy === "linear") {
         return initialDelayMs * (attemptIndex + 1);

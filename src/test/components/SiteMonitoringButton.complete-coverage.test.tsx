@@ -24,7 +24,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../theme/components/ThemedButton'), () => ({
+vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         onClick,
@@ -50,7 +50,7 @@ vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ),
 }));
 
-vi.mock(import('../../utils/icons'), () => {
+vi.mock("../../utils/icons", () => {
     const createIcon = (name: string) => {
         const Icon = ({
             className,
@@ -103,7 +103,9 @@ vi.mock(import('../../utils/icons'), () => {
 const renderWithTheme = (ui: ReactElement) =>
     render(<ThemeProvider>{ui}</ThemeProvider>);
 const expectButtonIcon = (button: HTMLElement, iconName: string): void => {
-    const icon = button.querySelector(`svg[data-icon="${CSS.escape(iconName)}"]`);
+    const icon = button.querySelector(
+        `svg[data-icon="${CSS.escape(iconName)}"]`
+    );
     expect(icon).not.toBeNull();
 };
 

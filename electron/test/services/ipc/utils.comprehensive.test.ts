@@ -71,8 +71,7 @@ vi.mock("@shared/validation/validatorUtils", () => ({
         return /^[\da-f]+$/v.test(value);
     }),
     isValidUrl: vi.fn(
-        (value) =>
-            typeof value === "string" && /^https?:\/\/\S+$/v.test(value)
+        (value) => typeof value === "string" && /^https?:\/\/\S+$/v.test(value)
     ),
 }));
 
@@ -153,7 +152,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = IpcValidators.optionalString(' '.repeat(3), "testParam");
+                const result = IpcValidators.optionalString(
+                    " ".repeat(3),
+                    "testParam"
+                );
                 expect(result).toBe(
                     "testParam must be a non-empty string when provided"
                 );
@@ -282,10 +284,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = IpcValidators.requiredNumber(
-                    NaN,
-                    "testParam"
-                );
+                const result = IpcValidators.requiredNumber(NaN, "testParam");
                 expect(result).toBe("testParam must be a valid number");
             });
 
@@ -665,7 +664,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = IpcValidators.requiredString(' '.repeat(3), "testParam");
+                const result = IpcValidators.requiredString(
+                    " ".repeat(3),
+                    "testParam"
+                );
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
@@ -1700,14 +1702,14 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 // Any channel with declared parameters must provide a validator.
                 const paramHandler = async (_value: string) => "param handler";
 
-                expect(() =>
-                    { registerStandardizedIpcHandler(
+                expect(() => {
+                    registerStandardizedIpcHandler(
                         CHANNELS_FOR_TESTS.validatedExecution,
                         paramHandler as never,
                         null,
                         registeredHandlers
-                    ); }
-                ).toThrow(/Missing validateParams/v);
+                    );
+                }).toThrow(/Missing validateParams/v);
             });
 
             it("should execute registered handler with validation", async ({
@@ -1907,14 +1909,14 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     registeredHandlers
                 );
 
-                expect(() =>
-                    { registerStandardizedIpcHandler(
+                expect(() => {
+                    registerStandardizedIpcHandler(
                         CHANNELS_FOR_TESTS.duplicate,
                         vi.fn(),
                         null,
                         registeredHandlers
-                    ); }
-                ).toThrow(
+                    );
+                }).toThrow(
                     `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`
                 );
 
@@ -1950,14 +1952,14 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                     throw registrationError;
                 });
 
-                expect(() =>
-                    { registerStandardizedIpcHandler(
+                expect(() => {
+                    registerStandardizedIpcHandler(
                         CHANNELS_FOR_TESTS.failure,
                         vi.fn(),
                         vi.fn().mockReturnValue(null),
                         registeredHandlers
-                    ); }
-                ).toThrow(registrationError);
+                    );
+                }).toThrow(registrationError);
 
                 expect(
                     registeredHandlers.has(CHANNELS_FOR_TESTS.failure)

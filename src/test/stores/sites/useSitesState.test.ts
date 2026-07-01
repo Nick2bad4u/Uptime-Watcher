@@ -7,7 +7,15 @@ import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 import { arrayFirst } from "ts-extras";
-import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type Mock,
+    vi,
+} from "vitest";
 
 import { logger } from "../../../services/logger";
 import {
@@ -19,11 +27,11 @@ import { buildMonitoringLockKey } from "../../../stores/sites/utils/optimisticMo
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock logging
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -310,9 +318,9 @@ describe("useSitesState", () => {
                 },
             ];
 
-            expect(() => { stateActions.setSites(duplicateSites); }).toThrow(
-                DuplicateSiteIdentifierError
-            );
+            expect(() => {
+                stateActions.setSites(duplicateSites);
+            }).toThrow(DuplicateSiteIdentifierError);
             expect(logger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected while replacing sites state",
                 expect.objectContaining({

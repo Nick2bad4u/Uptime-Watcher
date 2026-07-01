@@ -18,17 +18,17 @@ tags:
 
 ## Table of Contents
 
-1. [📋 Prerequisites](#-prerequisites)
-2. [🔧 Development Environment](#-development-environment)
-3. [🚀 Project Setup](#-project-setup)
-4. [🔍 Development Tools](#-development-tools)
-5. [⚙️ IDE-Specific Setup](#️-ide-specific-setup)
-6. [🧪 Testing Environment](#-testing-environment)
-7. [🔒 Security Setup](#-security-setup)
-8. [🐳 Optional: Docker Setup](#-optional-docker-setup)
-9. [🚀 Performance Optimization](#-performance-optimization)
-10. [📱 Platform-Specific Setup](#-platform-specific-setup)
-11. [✅ Verification Checklist](#-verification-checklist)
+- [📋 Prerequisites](#-prerequisites)
+- [🔧 Development Environment](#-development-environment)
+- [🚀 Project Setup](#-project-setup)
+- [🔍 Development Tools](#-development-tools)
+- [⚙️ IDE-Specific Setup](#️-ide-specific-setup)
+- [🧪 Testing Environment](#-testing-environment)
+- [🔒 Security Setup](#-security-setup)
+- [🐳 Optional: Docker Setup](#-optional-docker-setup)
+- [🚀 Performance Optimization](#-performance-optimization)
+- [📱 Platform-Specific Setup](#-platform-specific-setup)
+- [✅ Verification Checklist](#-verification-checklist)
 
 ## 📋 Prerequisites
 

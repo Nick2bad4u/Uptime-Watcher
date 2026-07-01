@@ -87,9 +87,9 @@ export const STATE_SYNC_SOURCE: StateSyncSourceConstants = Object.freeze({
  *
  * @public
  */
-export const STATE_SYNC_SOURCES: readonly StateSyncSource[] = Object.freeze(
-    [...STATE_SYNC_SOURCE_VALUES]
-);
+export const STATE_SYNC_SOURCES: readonly StateSyncSource[] = Object.freeze([
+    ...STATE_SYNC_SOURCE_VALUES,
+]);
 
 const STATE_SYNC_ACTION_VALUES = [
     "bulk-sync",
@@ -136,9 +136,9 @@ export const STATE_SYNC_ACTION: StateSyncActionConstants = Object.freeze({
  *
  * @public
  */
-export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] = Object.freeze(
-    [...STATE_SYNC_ACTION_VALUES]
-);
+export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] = Object.freeze([
+    ...STATE_SYNC_ACTION_VALUES,
+]);
 
 /**
  * Type guard ensuring a candidate is a valid {@link StateSyncAction}.

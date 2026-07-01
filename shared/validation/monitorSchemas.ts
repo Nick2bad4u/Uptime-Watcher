@@ -420,7 +420,10 @@ export class MonitorUnknownFieldError extends Error {
 
     public readonly monitorType: string;
 
-    public constructor(args: { fieldName: string; monitorType: string }, options: ErrorOptions) {
+    public constructor(
+        args: { fieldName: string; monitorType: string },
+        options?: ErrorOptions
+    ) {
         super(`Unknown field: ${args.fieldName}`, options);
         this.name = "MonitorUnknownFieldError";
         this.fieldName = args.fieldName;

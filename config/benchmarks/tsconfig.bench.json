@@ -32,6 +32,11 @@
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
         "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.bench.tsbuildinfo",
+        "types": [
+            "node",
+            "vite/client",
+            "vitest/globals"
+        ],
         "useUnknownInCatchVariables": false
     },
     "exclude": [

@@ -97,8 +97,7 @@ export interface CompleteMonitor {
  *
  * @remarks
  * Represents a site with all required properties for comprehensive testing.
- * This interface includes the core site properties used throughout the
- * app.
+ * This interface includes the core site properties used throughout the app.
  *
  * @public
  */
@@ -163,7 +162,7 @@ export const createMockMonitorDeep = (
     overrides: PartialDeep<CompleteMonitor> = {}
 ): CompleteMonitor => {
     const base = createMockMonitor();
-    return objectAssign(base, overrides);
+    return objectAssign(base, overrides) as unknown as CompleteMonitor;
 };
 
 /**

@@ -54,7 +54,7 @@ interface TestEvents extends Record<string, EventPayloadValue> {
     "null-event": null;
     "number-event": number;
     "object-event": { data: string; nested: { value: number } };
-    "object-with-meta": { _meta: string; data: string; };
+    "object-with-meta": { _meta: string; data: string };
     "primitive-boolean": boolean;
     "string-event": string;
     "undefined-event": undefined;
@@ -264,7 +264,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             bus.registerMiddleware(mockMiddleware);
             bus.registerMiddleware(mockMiddleware2);
 
-            expect(() => { bus.registerMiddleware(vi.fn()); }).toThrow(
+            expect(() => {
+                bus.registerMiddleware(vi.fn());
+            }).toThrow(
                 "Maximum middleware limit (2) exceeded. Consider increasing maxMiddleware or combining middleware functions."
             );
         });
@@ -925,8 +927,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle BigInt values", async () => {
             eventBus.onTyped("string-event", mockListener);
 
-            const bigIntValue =
-                123_456_789_012_345_678_901_234_567_890n;
+            const bigIntValue = 123_456_789_012_345_678_901_234_567_890n;
 
             await eventBus.emitTyped("string-event", bigIntValue as any);
 
@@ -1053,7 +1054,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
 
             // Should only remove first occurrence
-            const isSecondRemove = eventBus.removeMiddleware(duplicateMiddleware);
+            const isSecondRemove =
+                eventBus.removeMiddleware(duplicateMiddleware);
             expect(isSecondRemove).toBeTruthy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });

@@ -206,12 +206,16 @@ describe("AbortUtils Function Coverage Tests", () => {
 
         test("should reject when signal aborts during operation", async () => {
             const operation = new Promise((resolve) => {
-                setTimeout(() => { resolve("success"); }, 200);
+                setTimeout(() => {
+                    resolve("success");
+                }, 200);
             });
             const controller = new AbortController();
 
             // Abort after 100ms
-            setTimeout(() => { controller.abort(); }, 100);
+            setTimeout(() => {
+                controller.abort();
+            }, 100);
 
             await expect(
                 raceWithAbort(operation, controller.signal)

@@ -11,11 +11,11 @@ import type {
 import { StatusAlertToaster } from "../../../components/Alerts/StatusAlertToaster";
 import { useAlertStore } from "../../../stores/alerts/useAlertStore";
 
-vi.mock(import('../../../stores/alerts/useAlertStore'), () => ({
+vi.mock("../../../stores/alerts/useAlertStore", () => ({
     useAlertStore: vi.fn(),
 }));
 
-vi.mock(import('../../../components/Alerts/StatusAlertToast'), () => ({
+vi.mock("../../../components/Alerts/StatusAlertToast", () => ({
     StatusAlertToast: ({
         alert,
         onDismiss,
@@ -25,7 +25,9 @@ vi.mock(import('../../../components/Alerts/StatusAlertToast'), () => ({
     }) => (
         <div
             data-testid={`status-alert-${alert.id}`}
-            onClick={() => { onDismiss(alert.id); }}
+            onClick={() => {
+                onDismiss(alert.id);
+            }}
         >
             {alert.id}
         </div>

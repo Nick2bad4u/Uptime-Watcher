@@ -7,7 +7,7 @@ import type { Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import { render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ThemeName } from "../../../../theme/types";
@@ -30,7 +30,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 (globalThis as any).__useSitesStoreMock_siteList__ = useSitesStoreMock;
 
-vi.mock(import('../../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../../stores/sites/useSitesStore", () => ({
     useSitesStore: (selector?: any, equality?: any) =>
         (globalThis as any).__useSitesStoreMock_siteList__?.(
             selector,
@@ -38,12 +38,12 @@ vi.mock(import('../../../../stores/sites/useSitesStore'), () => ({
         ),
 }));
 
-vi.mock(import('../../../../theme/useTheme'), () => ({
+vi.mock("../../../../theme/useTheme", () => ({
     useTheme: vi.fn(),
 }));
 
 // Mock the components
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCard'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCard", () => ({
     SiteCard: vi.fn(({ site }) => (
         <div data-testid={`site-card-${site.identifier}`}>
             Site Card for {site.identifier}
@@ -51,7 +51,7 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCard'), () => ({
     )),
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteList/EmptyState'), () => ({
+vi.mock("../../../../components/Dashboard/SiteList/EmptyState", () => ({
     EmptyState: vi.fn(() => (
         <div data-testid="empty-state">No sites configured</div>
     )),
@@ -68,11 +68,10 @@ const resetSitesStoreState = (): void => {
 
 const setSitesSnapshot = (sites: Site[] | undefined): void => {
     updateSitesStoreMock(sitesStoreState, {
-        sites: (sites ?? []),
+        sites: sites ?? [],
     });
     if (sites === undefined) {
-        (safeCastTo<UnknownRecord>(sitesStoreState))["sites"] =
-            undefined;
+        safeCastTo<UnknownRecord>(sitesStoreState)["sites"] = undefined;
     }
 };
 
@@ -392,7 +391,7 @@ describe(SiteList, () => {
                 otherProperty: "test",
             };
             setSitesSnapshot(mockStore.sites);
-            (safeCastTo<UnknownRecord>(sitesStoreState))["otherProperty"] =
+            safeCastTo<UnknownRecord>(sitesStoreState)["otherProperty"] =
                 mockStore.otherProperty;
             mockUseTheme.mockReturnValue(createMockTheme(false));
 

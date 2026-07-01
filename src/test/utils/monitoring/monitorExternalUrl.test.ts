@@ -12,7 +12,7 @@ describe(normalizeMonitorExternalUrl, () => {
     it("returns empty string for invalid inputs", () => {
         expect(normalizeMonitorExternalUrl("not-a-url")).toBe("");
         expect(normalizeMonitorExternalUrl(123)).toBe("");
-        expect(normalizeMonitorExternalUrl(' '.repeat(3))).toBe("");
+        expect(normalizeMonitorExternalUrl(" ".repeat(3))).toBe("");
     });
 
     it("rejects URLs containing auth credentials", () => {

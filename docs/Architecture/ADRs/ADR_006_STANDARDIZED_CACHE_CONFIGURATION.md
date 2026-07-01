@@ -18,13 +18,13 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Consequences](#consequences)
-5. [Implementation](#implementation)
-6. [Related ADRs](#related-adrs)
-7. [Review](#review)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Consequences](#consequences)
+- [Implementation](#implementation)
+- [Related ADRs](#related-adrs)
+- [Review](#review)
 
 ## Status
 

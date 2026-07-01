@@ -9,7 +9,7 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayAt, safeCastTo  } from "ts-extras";
+import { arrayAt, safeCastTo } from "ts-extras";
 import "@testing-library/jest-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -152,14 +152,14 @@ const applySettingsOverrides = (overrides: Partial<AppSettings> = {}): void => {
  */
 const getLastSettingsUpdate = (): null | Partial<AppSettings> => {
     const lastCall = arrayAt(mocks.updateSettings.mock.calls, -1);
-    return (lastCall?.[0]) ?? null;
+    return lastCall?.[0] ?? null;
 };
 
-vi.mock(import('../../../hooks/ui/useConfirmDialog'), () => ({
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => mocks.confirm,
 }));
 
-vi.mock(import('../../../stores/settings/useSettingsStore'), () => ({
+vi.mock("../../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: (selector?: (state: unknown) => unknown) => {
         const store = {
             persistHistoryLimit: mocks.persistHistoryLimit,
@@ -177,7 +177,7 @@ vi.mock(import('../../../stores/settings/useSettingsStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: (selector?: unknown) => {
         const state = {
             clearError: mocks.clearError,
@@ -192,7 +192,7 @@ vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: (selector?: (state: unknown) => unknown) => {
         const state = {
             saveSqliteBackup: mocks.saveSqliteBackup,
@@ -202,7 +202,7 @@ vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     },
 }));
 
-vi.mock(import('../../../theme/useTheme'), () => ({
+vi.mock("../../../theme/useTheme", () => ({
     useTheme: () => ({
         availableThemes: [
             "light",
@@ -235,18 +235,18 @@ vi.mock(import('../../../theme/useTheme'), () => ({
         }),
 }));
 
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: mocks.logger,
 }));
 
-vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => ({
         delayedLoading: false,
         isLoading: storeState.error.isLoading,
     }),
 }));
 
-vi.mock(import('../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../theme/components/ThemedBox", () => ({
     ThemedBox: vi.fn(({ children, className, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -257,7 +257,7 @@ vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../theme/components/ThemedText", () => ({
     ThemedText: vi.fn(({ children, className, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -272,7 +272,7 @@ vi.mock(import('../../../theme/components/ThemedText'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: vi.fn(({ children, disabled, onClick, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -288,7 +288,7 @@ vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/components/ThemedSelect'), () => ({
+vi.mock("../../../theme/components/ThemedSelect", () => ({
     ThemedSelect: vi.fn(({ children, disabled, onChange, value, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -305,7 +305,7 @@ vi.mock(import('../../../theme/components/ThemedSelect'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/components/ThemedCheckbox'), () => ({
+vi.mock("../../../theme/components/ThemedCheckbox", () => ({
     ThemedCheckbox: vi.fn(({ checked, disabled, onChange, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -321,23 +321,23 @@ vi.mock(import('../../../theme/components/ThemedCheckbox'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../../theme/components/StatusIndicator", () => ({
     StatusIndicator: vi.fn(({ status }) => (
         <div data-status={status} data-testid="status-indicator" />
     )),
 }));
 
-vi.mock(import('../../../components/common/ErrorAlert/ErrorAlert'), () => ({
+vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
     ErrorAlert: vi.fn(({ message }) => (
         <div data-testid="error-alert">{message}</div>
     )),
 }));
 
-vi.mock(import('../../../components/common/Tooltip/Tooltip'), () => ({
+vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
     Tooltip: vi.fn(({ children }) => <>{children}</>),
 }));
 
-vi.mock(import('../../../components/shared/SettingItem'), () => ({
+vi.mock("../../../components/shared/SettingItem", () => ({
     SettingItem: vi.fn(({ control, description, title }) => (
         <div data-testid="setting-item">
             <div>{title}</div>
@@ -348,11 +348,11 @@ vi.mock(import('../../../components/shared/SettingItem'), () => ({
 }));
 
 // Cloud sync is tested separately; exclude it from notification fuzz scenarios.
-vi.mock(import('../../../components/Settings/CloudSettingsSection'), () => ({
+vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
     CloudSettingsSection: (): null => null,
 }));
 
-vi.mock(import('../../../utils/icons'), () => {
+vi.mock("../../../utils/icons", () => {
     const Icon = () => <span data-testid="app-icon" />;
     const IconSizes = {
         lg: 24,
@@ -402,7 +402,7 @@ vi.mock(import('../../../utils/icons'), () => {
     };
 });
 
-vi.mock(import('../../../constants'), () => ({
+vi.mock("../../../constants", () => ({
     ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 1000,
     HISTORY_LIMIT_OPTIONS: [

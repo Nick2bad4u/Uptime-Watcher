@@ -16,7 +16,12 @@ import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
-import { arrayJoin, isEmpty, isFinite as isFiniteNumber, objectHasIn } from "ts-extras";
+import {
+    arrayJoin,
+    isEmpty,
+    isFinite as isFiniteNumber,
+    objectHasIn,
+} from "ts-extras";
 
 import type {
     IMonitorService,
@@ -133,23 +138,20 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         );
 
         if (!baselineResult.success) {
-            const baselineError =
-                objectHasIn(
-                    castUnchecked<Record<PropertyKey, unknown>>(baselineResult),
-                    "error"
-                )
-                    ? baselineResult.error
-                    : "Unknown baseline failure";
+            const baselineError = objectHasIn(
+                castUnchecked<Record<PropertyKey, unknown>>(baselineResult),
+                "error"
+            )
+                ? baselineResult.error
+                : "Unknown baseline failure";
             throw new Error(`Baseline request failed: ${baselineError}`);
         }
 
         const edgeResults = await Promise.all(
-            edgeEndpoints.map(
-                async (endpoint): Promise<EdgeResult> => ({
-                    endpoint,
-                    result: await this.fetchEndpoint(endpoint, timeout, signal),
-                })
-            )
+            edgeEndpoints.map(async (endpoint): Promise<EdgeResult> => ({
+                endpoint,
+                result: await this.fetchEndpoint(endpoint, timeout, signal),
+            }))
         );
 
         const failureResults = edgeResults.filter(

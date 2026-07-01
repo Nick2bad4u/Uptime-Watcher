@@ -154,7 +154,8 @@ export const CloudProviderSetupPanelProviderPanel = ({
         activeProviderTab !== null && activeProviderTab === selectedProviderTab;
     const isConfiguredForSelectedProvider =
         configured && isSelectedProviderActive;
-    const isConnectedForSelectedProvider = connected && isSelectedProviderActive;
+    const isConnectedForSelectedProvider =
+        connected && isSelectedProviderActive;
 
     const tab = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(
         (entry) => entry.key === selectedProviderTab

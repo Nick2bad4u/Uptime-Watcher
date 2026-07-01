@@ -1,10 +1,10 @@
 /**
- * Settings store for managing app preferences and configuration.
- * Handles user settings, theme preferences, and backend synchronization.
+ * Settings store for managing app preferences and configuration. Handles user
+ * settings, theme preferences, and backend synchronization.
  *
  * @remarks
- * This store manages all app settings with automatic persistence and
- * backend synchronization. It provides:
+ * This store manages all app settings with automatic persistence and backend
+ * synchronization. It provides:
  *
  * - Persistent storage using Zustand persist middleware
  * - Backend synchronization for critical settings

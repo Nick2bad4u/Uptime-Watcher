@@ -2,7 +2,14 @@ import type { UnknownArray, UnknownRecord, Writable } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
-import { isDefined, isEmpty, objectEntries, objectHasIn, safeCastTo, setHas } from "ts-extras";
+import {
+    isDefined,
+    isEmpty,
+    objectEntries,
+    objectHasIn,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 /** Supported logging severity levels emitted by the structured logger. */
 export type LogSeverity = "debug" | "error" | "info" | "warn";
@@ -215,7 +222,7 @@ const maskAuthTokens = (value: string): string => {
         // Strip the entire scheme+token (policy/tests prefer not leaking even
         // the presence of auth headers).
         /(?:basic|bearer|token)\s+[\w+\-./~]+=*/giu,
-        SECRET_PLACEHOLDER
+        () => SECRET_PLACEHOLDER
     );
 
     return applySecretReplacements(masked, collectSecretReplacements(masked));
@@ -298,8 +305,13 @@ function normalizeNonPlainObject(
             value: {
                 message: normalizeLogString(candidate.message),
                 name: normalizeLogString(candidate.name),
-                ...(candidate.stack && { stack: normalizeLogString(candidate.stack) }),
-                ...(objectHasIn(castUnchecked<UnknownRecord>(errorWithCause), "cause") && { cause: normalize(errorWithCause.cause) }),
+                ...(candidate.stack && {
+                    stack: normalizeLogString(candidate.stack),
+                }),
+                ...(objectHasIn(
+                    castUnchecked<UnknownRecord>(errorWithCause),
+                    "cause"
+                ) && { cause: normalize(errorWithCause.cause) }),
             } satisfies UnknownRecord,
         };
     }
@@ -365,7 +377,9 @@ export const normalizeLogValue = (value: unknown): unknown => {
         if (isRecord(candidate)) {
             const sanitizedRecord: UnknownRecord = {};
             for (const [key, entry] of objectEntries(candidate)) {
-                sanitizedRecord[key] = isSecretMetadataKey(key) ? SECRET_PLACEHOLDER : normalize(entry);
+                sanitizedRecord[key] = isSecretMetadataKey(key)
+                    ? SECRET_PLACEHOLDER
+                    : normalize(entry);
             }
             return sanitizedRecord;
         }

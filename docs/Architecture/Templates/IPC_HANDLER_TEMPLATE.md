@@ -18,16 +18,16 @@ tags:
 
 ## Table of Contents
 
-1. [File Structure](#file-structure)
-2. [Handler Implementation Template](#handler-implementation-template)
-3. [Validation Functions Template](#validation-functions-template)
-4. [Preload API Extension Template](#preload-api-extension-template)
-5. [Type Definitions Template](#type-definitions-template)
-6. [Test Template](#test-template)
-7. [Integration Checklist](#integration-checklist)
-8. [Channel Naming Convention](#channel-naming-convention)
-9. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
-10. [Error Handling](#error-handling)
+- [File Structure](#file-structure)
+- [Handler Implementation Template](#handler-implementation-template)
+- [Validation Functions Template](#validation-functions-template)
+- [Preload API Extension Template](#preload-api-extension-template)
+- [Type Definitions Template](#type-definitions-template)
+- [Test Template](#test-template)
+- [Integration Checklist](#integration-checklist)
+- [Channel Naming Convention](#channel-naming-convention)
+- [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
+- [Error Handling](#error-handling)
 
 ## File Structure
 
@@ -44,7 +44,6 @@ electron/services/ipc/
 ## Handler Implementation Template
 
 ````typescript
-
 /**
  * IPC handlers for [DOMAIN] operations.
  *
@@ -212,7 +211,6 @@ export function registerExampleHandlers(deps: {
 Add validation functions to `validators/example.ts` or import them from `../validation/exampleValidation.ts`:
 
 ````typescript
-
 /**
  * Validation functions for [DOMAIN] IPC operations.
  *

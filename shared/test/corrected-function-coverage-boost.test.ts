@@ -75,9 +75,7 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
                 cacheKeysModule.isStandardizedCacheKey("invalid")
             ).toBeFalsy();
 
-            const parsedKey = cacheKeysModule.parseCacheKey(
-                "config:test"
-            );
+            const parsedKey = cacheKeysModule.parseCacheKey("config:test");
             expect(parsedKey.prefix).toBe("config");
             expect(parsedKey.identifier).toBe("test");
         });

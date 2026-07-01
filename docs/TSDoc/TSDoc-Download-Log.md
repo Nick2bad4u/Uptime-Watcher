@@ -50,7 +50,7 @@
   ↳ Hash: `2e7e95298fab61325c285d87ac9b7a13f462062e247f04933195d88ec777e330`
 - ✅ TSDoc-Tag-Virtual.md
   ↳ Hash: `4bcd6e65775422f85d8df57d985a52e9dcb8c502831fafab87a3b1281aa7e0dc`
-- 📘 TSDoc-Spec-Overview.md
+- 📘 TSDoc-Spec-Overview\.md
   ↳ Hash: `dc4c262cb6acef40b70f5adcff0d29939a89a9a53525dc253885c70babc5c4ab`
 - 📘 TSDoc-Spec-StandardizationGroups.md
   ↳ Hash: `e39b8abf073d6a8a93be76d5ebcf7066fe0ac54ef5c193627bba8889d05e0c16`

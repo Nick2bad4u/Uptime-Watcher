@@ -42,44 +42,44 @@
 
 ## Recommended General Order for Block Tags:
 
-- _Summary_ (first line, no tag)  
+- _Summary_ (first line, no tag)\
   (Always begins the comment, not a tag.)
 
-- `@remarks`  
+- `@remarks`\
   Additional information or context.
 
-- `@deprecated`  
+- `@deprecated`\
   If the API is deprecated, state it early.
 
-- `@example`  
+- `@example`\
   Show usage before listing technical details.
 
-- `@typeParam`  
+- `@typeParam`\
   Document generic parameters before regular parameters.
 
-- `@param`  
+- `@param`\
   List all function or method parameters, one per tag.
 
-- `@returns`  
+- `@returns`\
   Describe what the function returns.
 
-- `@throws`  
+- `@throws`\
   List possible exceptions/errors.
 
-- `@defaultValue`  
+- `@defaultValue`\
   For properties/parameters with defaults.
 
-- `@see`  
+- `@see`\
   Cross-references.
 
-- `@decorator`  
+- `@decorator`\
   If applicable.
 
-- `@privateRemarks`  
+- `@privateRemarks`\
   Internal documentation (usually at the end).
 
-- Modifier tags (such as `@public`, `@protected`, `@internal`, `@beta`, etc.)  
+- Modifier tags (such as `@public`, `@protected`, `@internal`, `@beta`, etc.)\
   These are typically placed at the very beginning of the comment block (after the summary and before block tags), or even outside the comment block, depending on your project's conventions.
 
-- Inline tags  
+- Inline tags\
   Used within the summary or other tag descriptions as needed (e.g., `{@link ...}`).

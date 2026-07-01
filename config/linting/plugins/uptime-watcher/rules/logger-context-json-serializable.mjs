@@ -90,8 +90,7 @@ const isBigIntLiteralTypeName = (typeName) => {
 const isLikelyTypeParameterName = (typeName) => /^[A-Z]\w*$/v.test(typeName);
 
 /**
- * @param {
- *     | import("@typescript-eslint/utils").TSESTree.Expression
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression
  *     | import("@typescript-eslint/utils").TSESTree.SpreadElement} arg
  *
  * @returns {arg is import("@typescript-eslint/utils").TSESTree.Expression}

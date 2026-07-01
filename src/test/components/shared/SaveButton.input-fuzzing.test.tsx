@@ -33,7 +33,7 @@ import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayJoin, stringSplit  } from "ts-extras";
+import { arrayJoin } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, type Mock, vi } from "vitest";
 
 import { SaveButton } from "../../../components/shared/SaveButton";
@@ -41,7 +41,7 @@ import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock ThemedButton component
-vi.mock(import('../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: vi.fn(
         ({
             children,
@@ -167,9 +167,10 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     const button = screen.getByTestId("themed-button");
                     expect(button).toBeInTheDocument();
                     // Normalize whitespace for text content comparison
-                    const normalizedText = arrayJoin(button.textContent
-                        ?.split(/\s+/v), " ")
-                        .trim();
+                    const normalizedText = arrayJoin(
+                        button.textContent?.split(/\s+/v),
+                        " "
+                    ).trim();
 
                     // The icon is an SVG (no text), so only the label is
                     // expected in textContent.
@@ -559,7 +560,8 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     const normalizedClassName = className.trim();
 
                     if (normalizedClassName.length > 0) {
-                        const expectedClasses = stringSplit(normalizedClassName, /\s+/v)
+                        const expectedClasses = normalizedClassName
+                            .split(/\s+/v)
                             .filter((candidate) => candidate.length > 0);
 
                         if (expectedClasses.length > 0) {

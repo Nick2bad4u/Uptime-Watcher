@@ -27,11 +27,11 @@ It complements the existing [Site Loading & Monitoring Orchestration](./SITE_LOA
 
 ## Table of Contents
 
-1. [High-Level Startup Phases](#high-level-startup-phases)
-2. [`database:transaction-completed` Event Semantics](#databasetransaction-completed-event-semantics)
-3. [Data Import & Cache Synchronization](#data-import--cache-synchronization)
-4. [Site Lifecycle Flows](#site-lifecycle-flows)
-5. [Maintenance Checklist](#maintenance-checklist)
+- [High-Level Startup Phases](#high-level-startup-phases)
+- [`database:transaction-completed` Event Semantics](#databasetransaction-completed-event-semantics)
+- [Data Import & Cache Synchronization](#data-import--cache-synchronization)
+- [Site Lifecycle Flows](#site-lifecycle-flows)
+- [Maintenance Checklist](#maintenance-checklist)
 
 ## High-Level Startup Phases
 
@@ -360,14 +360,14 @@ The import flow reuses the same primitives:
 When evolving initialization, import, or site lifecycle flows:
 
 - [ ] Update this document whenever new `database:transaction-completed`
-  operations or import-related events are introduced.
+      operations or import-related events are introduced.
 - [ ] Keep `ImportDataCommand` free of `sites:state-synchronized` emissions;
-  bulk sync must remain coordinated by `SiteManager`/`UptimeOrchestrator`.
+      bulk sync must remain coordinated by `SiteManager`/`UptimeOrchestrator`.
 - [ ] Maintain the separation between database-level and orchestrator-level
-  initialization events; do not reuse operation identifiers for distinct
-  phases.
+      initialization events; do not reuse operation identifiers for distinct
+      phases.
 - [ ] Ensure new site/monitor flows continue to use shared monitor validation
-  and creation utilities.
+      and creation utilities.
 - [ ] Keep renderer bootstrap (`App.initializeApp`) resilient by guarding
-  top-level initialization with `try/catch` and reporting errors through
-  `useErrorStore`.
+      top-level initialization with `try/catch` and reporting errors through
+      `useErrorStore`.

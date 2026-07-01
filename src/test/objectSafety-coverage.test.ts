@@ -15,7 +15,7 @@ import {
     typedObjectValues,
 } from "@shared/utils/objectSafety";
 import * as fc from "fast-check";
-import { arrayFirst, objectHasOwn, objectKeys   } from "ts-extras";
+import { arrayFirst, objectHasOwn, objectKeys } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 /** Arbitrary for generating test objects with known values */

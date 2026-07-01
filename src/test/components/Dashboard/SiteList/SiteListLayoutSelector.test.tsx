@@ -12,7 +12,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteListLayoutSelector } from "../../../../components/Dashboard/SiteList/SiteListLayoutSelector";
 
-vi.mock(import('../../../../components/common/Tooltip/Tooltip'), () => ({
+vi.mock("../../../../components/common/Tooltip/Tooltip", () => ({
     Tooltip: ({
         children,
     }: {
@@ -20,7 +20,7 @@ vi.mock(import('../../../../components/common/Tooltip/Tooltip'), () => ({
     }) => <>{children({})}</>,
 }));
 
-vi.mock(import('../../../../utils/icons'), () => {
+vi.mock("../../../../utils/icons", () => {
     const createIcon = (name: string) => {
         const Icon = ({
             className,

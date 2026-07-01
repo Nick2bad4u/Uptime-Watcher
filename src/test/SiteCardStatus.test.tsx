@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { SiteCardStatus } from "../components/Dashboard/SiteCard/SiteCardStatus";
 
 // Mock StatusBadge to isolate SiteCardStatus logic
-vi.mock(import('../components/common/StatusBadge'), () => ({
+vi.mock("../components/common/StatusBadge", () => ({
     StatusBadge: (props: any) => (
         <div
             data-label={props.label}

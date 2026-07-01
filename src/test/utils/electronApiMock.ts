@@ -1,6 +1,6 @@
-import type { PartialDeep, UnknownRecord  } from "type-fest";
+import type { PartialDeep, UnknownRecord } from "type-fest";
 
-import { objectEntries, objectHasIn, safeCastTo   } from "ts-extras";
+import { objectEntries, objectHasIn, safeCastTo } from "ts-extras";
 
 import type { ElectronAPI } from "../../types";
 
@@ -74,20 +74,18 @@ export const installElectronApiMock = (
         ensureWindow?: boolean;
     } = {}
 ): { mock: ElectronAPI; restore: () => void } => {
-    const original = safeCastTo<| ElectronAPI
-        | undefined>(Reflect.get(globalThis, "electronAPI"));
+    const original = safeCastTo<ElectronAPI | undefined>(
+        Reflect.get(globalThis, "electronAPI")
+    );
 
     if (!original) {
         throw new Error(
-            "installElectronApiMock requires the global test setup to install globalThis.electronAPI"
+            "installElectronApiMock requires the global test setup to install window.electronAPI"
         );
     }
 
     const mock = shallowCloneApi(original);
-    mergeInto(
-        mock as unknown as PlainObject,
-        overrides
-    );
+    mergeInto(mock as unknown as PlainObject, overrides);
 
     const isHadWindow = objectHasIn(globalThis, "window");
     const isCreatedWindow = options.ensureWindow === true && !isHadWindow;
@@ -136,7 +134,7 @@ export const installElectronApiMock = (
         }
 
         if (isCreatedWindow) {
-            delete (safeCastTo<UnknownRecord>(globalThis))["window"];
+            delete safeCastTo<UnknownRecord>(globalThis)["window"];
         }
     };
 

@@ -425,9 +425,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const result = parseCacheKey(
-                "site:backend-site-123"
-            );
+            const result = parseCacheKey("site:backend-site-123");
             expect(result).toEqual({
                 prefix: "site",
                 identifier: "backend-site-123",
@@ -443,9 +441,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const result = parseCacheKey(
-                "monitor:operation:backend-123"
-            );
+            const result = parseCacheKey("monitor:operation:backend-123");
             expect(result).toEqual({
                 prefix: "monitor",
                 operation: "operation",
@@ -462,9 +458,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const result = parseCacheKey(
-                "config:validation:backend-config"
-            );
+            const result = parseCacheKey("config:validation:backend-config");
             expect(result).toEqual({
                 prefix: "config",
                 operation: "validation",
@@ -481,9 +475,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const result = parseCacheKey(
-                "site:loading:backend-site-456"
-            );
+            const result = parseCacheKey("site:loading:backend-site-456");
             expect(result).toEqual({
                 prefix: "site",
                 operation: "loading",
@@ -500,9 +492,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const result = parseCacheKey(
-                "validation:monitor-type:http"
-            );
+            const result = parseCacheKey("validation:monitor-type:http");
             expect(result).toEqual({
                 prefix: "validation",
                 operation: "monitor-type",
@@ -519,9 +509,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const result = parseCacheKey(
-                "config:backend-setting_001"
-            );
+            const result = parseCacheKey("config:backend-setting_001");
             expect(result).toEqual({
                 prefix: "config",
                 identifier: "backend-setting_001",
@@ -537,9 +525,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
                 "component"
             );
 
-            const result = parseCacheKey(
-                "monitor:backend.monitor.complex_123"
-            );
+            const result = parseCacheKey("monitor:backend.monitor.complex_123");
             expect(result).toEqual({
                 prefix: "monitor",
                 identifier: "backend.monitor.complex_123",

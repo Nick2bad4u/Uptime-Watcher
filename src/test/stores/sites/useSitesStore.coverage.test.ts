@@ -11,7 +11,7 @@ describe("useSitesStore (module coverage)", () => {
     it("should load and expose a zustand store", async () => {
         // Avoid impacting unrelated tests: only mock these service modules for
         // the duration of this test's dynamic import.
-        vi.doMock(import('../../../services/SiteService'), () => ({
+        vi.doMock("../../../services/SiteService", () => ({
             SiteService: {
                 addSite: vi.fn(async (site: Site) => site),
                 getSites: vi.fn(async () => mockSites),
@@ -20,17 +20,16 @@ describe("useSitesStore (module coverage)", () => {
                 }),
                 removeSite: vi.fn(async () => true),
                 updateSite: vi.fn(
-                    async (_identifier: string, updates: Partial<Site>) =>
-                        ({
-                            // Minimal shape for this test; callers in these tests do
-                            // not depend on fields beyond identifier.
-                            identifier: updates.identifier ?? "mock-site",
-                        })
+                    async (_identifier: string, updates: Partial<Site>) => ({
+                        // Minimal shape for this test; callers in these tests do
+                        // not depend on fields beyond identifier.
+                        identifier: updates.identifier ?? "mock-site",
+                    })
                 ),
             },
         }));
 
-        vi.doMock(import('../../../services/MonitoringService'), () => ({
+        vi.doMock("../../../services/MonitoringService", () => ({
             MonitoringService: {
                 startMonitoring: vi.fn(async () => ({
                     attempted: 0,
@@ -55,7 +54,7 @@ describe("useSitesStore (module coverage)", () => {
             },
         }));
 
-        vi.doMock(import('../../../services/DataService'), () => ({
+        vi.doMock("../../../services/DataService", () => ({
             DataService: {
                 downloadSqliteBackup: vi.fn(async () => ({
                     success: true,

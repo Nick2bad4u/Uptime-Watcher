@@ -40,7 +40,7 @@ const mockElectronAPI = {
 let restoreElectronApi: (() => void) | undefined;
 
 // Mock error store
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -51,7 +51,7 @@ vi.mock(import('../../../stores/error/useErrorStore'), () => ({
 }));
 
 // Mock store utils
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn) => await fn()),
 }));

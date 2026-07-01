@@ -51,13 +51,15 @@ export const defaultSettings: AppSettings = {
 const clampInAppAlertVolume = (
     value: unknown,
     fallback: number = DEFAULT_IN_APP_ALERT_VOLUME
-): number => { const sanitizedFallback = isFiniteNumber(fallback)
+): number => {
+    const sanitizedFallback = isFiniteNumber(fallback)
         ? fallback
         : DEFAULT_IN_APP_ALERT_VOLUME;
     const numeric = safeNumberConversion(value, sanitizedFallback);
 
     if (!isFiniteNumber(numeric)) {
-        return sanitizedFallback; }
+        return sanitizedFallback;
+    }
 
     if (numeric <= 0) {
         return 0;

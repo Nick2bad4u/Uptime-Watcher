@@ -3,7 +3,7 @@
  * exposure to renderer process.
  */
 
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { Site, StatusUpdate } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

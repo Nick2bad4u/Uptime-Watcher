@@ -26,7 +26,6 @@ import { isFinite as isFiniteNumber, isInteger, safeCastTo } from "ts-extras";
 
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
-
 const URL_VALIDATION_OPTIONS = {
     allowSingleQuotes: true,
     require_tld: false,
@@ -37,7 +36,6 @@ const FQDN_VALIDATION_OPTIONS = {
     allow_underscores: true,
     require_tld: false,
 } as const;
-
 
 const WEBSOCKET_URL_VALIDATION_OPTIONS = {
     ...URL_VALIDATION_OPTIONS,

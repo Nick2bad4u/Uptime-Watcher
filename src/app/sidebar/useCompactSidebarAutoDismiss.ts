@@ -61,7 +61,9 @@ export function useCompactSidebarAutoDismiss(args: {
                 }
             };
 
-            document.addEventListener("pointerdown", handlePointerDown, {capture: true});
+            document.addEventListener("pointerdown", handlePointerDown, {
+                capture: true,
+            });
 
             return () => {
                 document.removeEventListener(

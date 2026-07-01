@@ -1,4 +1,4 @@
-import { arrayFirst, arrayJoin, stringSplit   } from "ts-extras";
+import { arrayFirst, arrayJoin, stringSplit } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -297,7 +297,9 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         const formatDate = (date: Date | number | string): string => {
             const d = new Date(date);
             if (Number.isNaN(d.getTime())) return "Invalid Date";
-            return arrayFirst(stringSplit(d.toISOString(), "T")) || "Invalid Date";
+            return (
+                arrayFirst(stringSplit(d.toISOString(), "T")) || "Invalid Date"
+            );
         };
 
         const now = new Date("2023-12-01T10:30:00Z");
@@ -385,13 +387,15 @@ describe("Precision Function Coverage - Targeted Functions", () => {
 
         // Test cache key generation
         const generateCacheKey = (...args: any[]): string =>
-            arrayJoin(args
-                .map((arg) => {
+            arrayJoin(
+                args.map((arg) => {
                     if (typeof arg === "object") {
                         return JSON.stringify(arg);
                     }
                     return String(arg);
-                }), "|");
+                }),
+                "|"
+            );
 
         expect(generateCacheKey("a", 1, true)).toBe("a|1|true");
         expect(generateCacheKey({ key: "value" }, [1, 2])).toBe(

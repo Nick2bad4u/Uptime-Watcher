@@ -1,7 +1,5 @@
 // @ts-check
 
-
-
 const SCHEME_RE = /^[A-Za-z][+\-.A-Za-z]*:/v;
 
 /**

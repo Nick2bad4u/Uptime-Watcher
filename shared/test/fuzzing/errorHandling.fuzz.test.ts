@@ -309,7 +309,7 @@ describe("withErrorHandling backend fuzz coverage", () => {
     ])(
         "should fuzz-log failures with provided logger",
         async (operationName, errorMessage) => {
-            const logCalls: { error: unknown; message: string; }[] = [];
+            const logCalls: { error: unknown; message: string }[] = [];
             const logger = {
                 error: vi.fn((msg: string, err: unknown) => {
                     logCalls.push({ message: msg, error: err });
@@ -402,7 +402,7 @@ describe("withErrorHandling frontend fuzz integration", () => {
             setLoadingFalseThrows: boolean;
             setLoadingTrueThrows: boolean;
         },
-        state: { error: string | undefined; loading: boolean; }
+        state: { error: string | undefined; loading: boolean }
     ): ErrorHandlingFrontendStore & {
         calls: { method: string; payload?: unknown }[];
     } => {
@@ -527,7 +527,7 @@ describe("withErrorHandling frontend fuzz integration", () => {
                         return rejection === errorValue;
                     }
 
-                    if (!(Error.isError(rejection))) {
+                    if (!Error.isError(rejection)) {
                         return false;
                     }
 
@@ -542,10 +542,9 @@ describe("withErrorHandling frontend fuzz integration", () => {
                 const setErrorCall = store.calls.find(
                     (call) => call.method === "setError"
                 );
-                const expectedMessage =
-                    Error.isError(errorValue)
-                        ? errorValue.message
-                        : convertError(errorValue).error.message;
+                const expectedMessage = Error.isError(errorValue)
+                    ? errorValue.message
+                    : convertError(errorValue).error.message;
                 expect(setErrorCall?.payload).toBe(expectedMessage);
 
                 const originalErrorLog = consoleErrorSpy.mock.calls.find(

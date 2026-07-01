@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HeaderControls } from "../../../components/Header/HeaderControls";
 
-vi.mock(import('../../../components/common/Tooltip/Tooltip'), () => ({
+vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
     Tooltip: ({
         children,
     }: {

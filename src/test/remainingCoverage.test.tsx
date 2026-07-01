@@ -9,13 +9,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ThemedIconButton } from "../theme/components/ThemedIconButton";
 
 // Mock the stores and other dependencies
-vi.mock(import('../stores'), () => ({
+vi.mock("../stores", () => ({
     useErrorStore: vi.fn(),
     useSettingsStore: vi.fn(),
     useSitesStore: vi.fn(),
 }));
 
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),

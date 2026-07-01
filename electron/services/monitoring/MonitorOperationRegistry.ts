@@ -120,8 +120,7 @@ export class MonitorOperationRegistry {
     public cancelOperations(monitorId: string): void {
         let cancelledCount = 0;
         for (const [, operation] of this.activeOperations) {
-            if (operation.monitorId !== monitorId ||
-                operation.signal.aborted) {
+            if (operation.monitorId !== monitorId || operation.signal.aborted) {
                 continue;
             }
 
@@ -228,8 +227,12 @@ export class MonitorOperationRegistry {
 
         const signal = mergeAbortSignals({
             baseSignal,
-            ...(options?.additionalSignals && { additionalSignals: options.additionalSignals }),
-            ...((typeof options?.timeoutMs === "number") && { timeoutMs: options.timeoutMs }),
+            ...(options?.additionalSignals && {
+                additionalSignals: options.additionalSignals,
+            }),
+            ...(typeof options?.timeoutMs === "number" && {
+                timeoutMs: options.timeoutMs,
+            }),
         });
 
         const operation: MonitorCheckOperation = {

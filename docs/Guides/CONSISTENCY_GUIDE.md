@@ -22,16 +22,16 @@ This document outlines the architectural patterns, conventions, and standards fo
 
 ## Table of Contents
 
-1. [Error Handling Standards](#error-handling-standards)
-2. [Logging Patterns](#logging-patterns)
-3. [Dependency Injection](#dependency-injection)
-4. [Code Documentation](#code-documentation)
-5. [Architectural Patterns](#architectural-patterns)
-6. [TypeScript Standards](#typescript-standards)
-7. [Testing Conventions](#testing-conventions)
-8. [Implementation Checklist](#implementation-checklist)
-9. [Validation Commands](#validation-commands)
-10. [Contributing](#contributing)
+- [Error Handling Standards](#error-handling-standards)
+- [Logging Patterns](#logging-patterns)
+- [Dependency Injection](#dependency-injection)
+- [Code Documentation](#code-documentation)
+- [Architectural Patterns](#architectural-patterns)
+- [TypeScript Standards](#typescript-standards)
+- [Testing Conventions](#testing-conventions)
+- [Implementation Checklist](#implementation-checklist)
+- [Validation Commands](#validation-commands)
+- [Contributing](#contributing)
 
 ## Error Handling Standards
 

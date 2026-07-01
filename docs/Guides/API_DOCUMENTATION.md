@@ -18,8 +18,8 @@ tags:
 
 ## Table of Contents
 
-1. [📋 Overview](#-overview)
-2. [☁️ Cloud Sync & Backups IPC](#️-cloud-sync--backups-ipc)
+- [📋 Overview](#-overview)
+- [☁️ Cloud Sync & Backups IPC](#️-cloud-sync--backups-ipc)
 
 ## 📋 Overview
 

@@ -114,8 +114,8 @@ describe("IPC Communication Fuzzing Tests", () => {
                             input === undefined ||
                             typeof input !== "object" ||
                             !("success" in input) ||
-                            typeof (safeCastTo<{ success: unknown }>(input)).success !==
-                                "boolean"
+                            typeof safeCastTo<{ success: unknown }>(input)
+                                .success !== "boolean"
                         ) {
                             expect(isResult).toBeFalsy();
                         }
@@ -157,7 +157,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                 fc.property(fc.anything(), (input: unknown) => {
                     if (isIpcResponse(input)) {
                         // May throw or return data based on success flag
-                        if ((safeCastTo<{ success: boolean }>(input)).success) {
+                        if (safeCastTo<{ success: boolean }>(input).success) {
                             expect(() => extractIpcData(input)).not.toThrow();
                         } else {
                             expect(() => extractIpcData(input)).toThrow();

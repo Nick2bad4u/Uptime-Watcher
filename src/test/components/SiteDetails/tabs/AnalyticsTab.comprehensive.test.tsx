@@ -24,7 +24,7 @@ import {
 import { logger } from "../../../../services/logger";
 
 // Mock all external dependencies
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -48,7 +48,7 @@ vi.mock(import('../../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/components'), () => ({
+vi.mock("../../../../theme/components", () => ({
     ThemedBadge: ({
         children,
         variant,
@@ -153,7 +153,7 @@ vi.mock(import('../../../../theme/components'), () => ({
     },
 }));
 
-vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
+vi.mock("../../../../components/common/MonitorUiComponents", () => ({
     ConditionalResponseTime: ({
         children,
         monitorType,
@@ -169,12 +169,12 @@ vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
 }));
 
 // Mock the monitorUiHelpers to prevent async operations
-vi.mock(import('../../../../utils/monitorUiHelpers'), () => ({
+vi.mock("../../../../utils/monitorUiHelpers", () => ({
     supportsResponseTime: vi.fn(() => true), // Synchronous function
     formatMonitorDetail: vi.fn(() => "mocked detail"), // Synchronous function
 }));
 
-vi.mock(import('../../../../components/SiteDetails/charts/ResponseTimeChart'), () => ({
+vi.mock("../../../../components/SiteDetails/charts/ResponseTimeChart", () => ({
     ResponseTimeChart: () => (
         <div data-chart-type="line" data-testid="response-time-chart">
             Line Chart
@@ -182,7 +182,7 @@ vi.mock(import('../../../../components/SiteDetails/charts/ResponseTimeChart'), (
     ),
 }));
 
-vi.mock(import('../../../../components/SiteDetails/charts/StatusChart'), () => ({
+vi.mock("../../../../components/SiteDetails/charts/StatusChart", () => ({
     StatusChart: () => (
         <div data-chart-type="bar" data-testid="status-chart">
             Bar Chart
@@ -190,7 +190,7 @@ vi.mock(import('../../../../components/SiteDetails/charts/StatusChart'), () => (
     ),
 }));
 
-vi.mock(import('../../../../components/SiteDetails/charts/UptimeChart'), () => ({
+vi.mock("../../../../components/SiteDetails/charts/UptimeChart", () => ({
     UptimeChart: () => (
         <div data-chart-type="doughnut" data-testid="uptime-chart">
             Doughnut Chart

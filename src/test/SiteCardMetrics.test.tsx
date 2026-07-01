@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { SiteCardMetrics } from "../components/Dashboard/SiteCard/SiteCardMetrics";
 
 // Mock MetricCard to isolate SiteCardMetrics logic
-vi.mock(import('../components/Dashboard/SiteCard/components/MetricCard'), () => ({
+vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
     MetricCard: ({ label, value }: any) => (
         <div data-label={label} data-testid="metric-card" data-value={value}>
             {label}:{value}
@@ -13,7 +13,7 @@ vi.mock(import('../components/Dashboard/SiteCard/components/MetricCard'), () => 
 }));
 
 // Simplify Tooltip behaviour for deterministic rendering
-vi.mock(import('../components/common/Tooltip/Tooltip'), () => ({
+vi.mock("../components/common/Tooltip/Tooltip", () => ({
     Tooltip: ({ children }: any) => (
         <div data-testid="tooltip-wrapper">
             {typeof children === "function" ? children({}) : children}

@@ -47,7 +47,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.oneof(
                     fc.constant(""),
-                    fc.constant(' '.repeat(3)),
+                    fc.constant(" ".repeat(3)),
                     fc.constant("\t\n\r"),
                     fc.integer(),
                     fc.boolean(),
@@ -129,7 +129,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.oneof(
                     fc.constant(""),
-                    fc.constant(' '.repeat(3)),
+                    fc.constant(" ".repeat(3)),
                     fc.string().filter((s) => s.includes(" ")),
                     fc.string().filter((s) => s.includes("@")),
                     fc.integer(),

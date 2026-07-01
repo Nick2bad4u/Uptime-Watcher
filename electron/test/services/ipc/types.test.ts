@@ -262,8 +262,6 @@ describe("IPC Types", () => {
             expect(response.data).toBeUndefined();
         });
     });
-
-    // eslint-disable-next-line vitest/prefer-describe-function-title
     describe("IpcParameterValidator", () => {
         it("should define a function that returns null for valid parameters", async ({
             task,

@@ -24,9 +24,9 @@ No options.
 
 ```ts
 new BrowserWindow({
-  webPreferences: {
-    nodeIntegration: true,
-  },
+ webPreferences: {
+  nodeIntegration: true,
+ },
 });
 ```
 
@@ -34,11 +34,11 @@ new BrowserWindow({
 
 ```ts
 new BrowserWindow({
-  webPreferences: {
-    contextIsolation: true,
-    sandbox: true,
-    nodeIntegration: false,
-    webviewTag: false,
-  },
+ webPreferences: {
+  contextIsolation: true,
+  sandbox: true,
+  nodeIntegration: false,
+  webviewTag: false,
+ },
 });
 ```

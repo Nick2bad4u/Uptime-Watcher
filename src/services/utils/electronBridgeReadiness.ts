@@ -25,7 +25,10 @@ const BASE_ERROR_MESSAGE =
 class BridgeNotReadyYetError extends Error {
     public readonly diagnostics: BridgeReadinessDiagnostics;
 
-    public constructor(diagnostics: BridgeReadinessDiagnostics, options: ErrorOptions) {
+    public constructor(
+        diagnostics: BridgeReadinessDiagnostics,
+        options?: ErrorOptions
+    ) {
         super("Electron bridge not ready yet", options);
         this.name = "BridgeNotReadyYetError";
         this.diagnostics = diagnostics;
@@ -115,8 +118,7 @@ const getGlobalWindow = (): unknown => {
 };
 
 type ObjectLike =
-    | ((...args: Readonly<UnknownArray>) => unknown)
-    | UnknownRecord;
+    ((...args: Readonly<UnknownArray>) => unknown) | UnknownRecord;
 
 const isObjectLike = (value: unknown): value is ObjectLike =>
     (typeof value === "object" || typeof value === "function") &&

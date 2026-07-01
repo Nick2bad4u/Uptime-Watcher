@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 
 // Mock all dependencies
-vi.mock(import('../../../../hooks/site/useSite'), () => ({
+vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: vi.fn(() => ({
         checkCount: 1000,
         filteredHistory: [],
@@ -35,12 +35,12 @@ vi.mock(import('../../../../hooks/site/useSite'), () => ({
     })),
 }));
 
-vi.mock(import('@shared/utils/siteStatus'), () => ({
+vi.mock("@shared/utils/siteStatus", () => ({
     getSiteDisplayStatus: vi.fn(() => "operational"),
     getSiteStatusVariant: vi.fn(() => "success"),
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHeader'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     SiteCardHeader: vi.fn(({ site, display, interactions, monitoring }) => (
         <div data-testid="site-card-header" onClick={interactions?.onCheckNow}>
             Header: {site?.site?.name || "Unknown"} | Loading:{" "}
@@ -51,7 +51,7 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHeader'), () =
     )),
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardStatus'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
     SiteCardStatus: vi.fn(({ selectedMonitorId, status }) => (
         <div data-testid="site-card-status">
             Status: {status} (Monitor: {selectedMonitorId})
@@ -59,7 +59,7 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardStatus'), () =
     )),
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardMetrics'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
     SiteCardMetrics: vi.fn(
         ({
             metrics,
@@ -72,14 +72,16 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardMetrics'), () 
         }) => (
             <div data-testid="site-card-metrics-content">
                 Metrics:{" "}
-                {arrayJoin(metrics
-                    .map((metric) => `${metric.label}: ${metric.value}`), " | ")}
+                {arrayJoin(
+                    metrics.map((metric) => `${metric.label}: ${metric.value}`),
+                    " | "
+                )}
             </div>
         )
     ),
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHistory'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
     SiteCardHistory: vi.fn(({ filteredHistory, monitor }) => (
         <div data-testid="site-card-history">
             History: {filteredHistory?.length || 0} items | Monitor:{" "}

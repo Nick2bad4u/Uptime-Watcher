@@ -315,9 +315,7 @@ export function typedObjectEntries<T extends UnknownRecord>(
  *
  * @returns Array of keys with proper typing
  */
-export function typedObjectKeys<T extends UnknownRecord>(
-    obj: T
-): (keyof T)[] {
+export function typedObjectKeys<T extends UnknownRecord>(obj: T): (keyof T)[] {
     return safeCastTo<(keyof T)[]>(objectKeys(obj));
 }
 

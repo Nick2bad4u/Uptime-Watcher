@@ -587,7 +587,7 @@ export type IpcInvokeChannelResult<TChannel extends IpcInvokeChannel> =
  * @public
  */
 export type VoidIpcInvokeChannel = {
-    [TChannel in IpcInvokeChannel]: IpcInvokeChannelResult<TChannel> extends undefined
-        ? TChannel
-        : never;
+    [
+        TChannel in IpcInvokeChannel
+    ]: IpcInvokeChannelResult<TChannel> extends undefined ? TChannel : never;
 }[IpcInvokeChannel];

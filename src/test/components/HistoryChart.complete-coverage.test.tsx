@@ -22,7 +22,7 @@ type MiniChartBarMockProperties = Readonly<{
     timestamp: number;
 }>;
 
-vi.mock(import('../../theme/components/MiniChartBar'), () => ({
+vi.mock("../../theme/components/MiniChartBar", () => ({
     MiniChartBar: ({
         status,
         responseTime,
@@ -46,7 +46,7 @@ type ThemedTextMockProperties = PropsWithChildren<
         Readonly<{ size?: string; variant?: string }>
 >;
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: ({
         children,
         size,
@@ -362,7 +362,10 @@ describe("HistoryChart - Complete Coverage", () => {
             // Check first bar (down@1234567890 is older, shown first after reversal)
             expect(arrayFirst(bars)).toHaveAttribute("data-status", "down");
             expect(arrayFirst(bars)).toHaveAttribute("data-response-time", "0");
-            expect(arrayFirst(bars)).toHaveAttribute("data-timestamp", "1234567890");
+            expect(arrayFirst(bars)).toHaveAttribute(
+                "data-timestamp",
+                "1234567890"
+            );
 
             // Check second bar (up@1234567891 is newer, shown second after reversal)
             expect(bars[1]).toHaveAttribute("data-status", "up");

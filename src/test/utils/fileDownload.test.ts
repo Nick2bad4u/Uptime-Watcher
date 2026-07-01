@@ -18,7 +18,7 @@ import {
 } from "../../stores/sites/utils/fileDownload";
 
 // Mock the logger service
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -124,14 +124,10 @@ describe("file Download Utility", () => {
             expect(document.createElement).toHaveBeenCalledWith("a");
             expect(mockAnchor.href).toBe("mock-object-url");
             expect(mockAnchor.download).toBe(fileName);
-            expect(document.body.append).toHaveBeenCalledWith(
-                mockAnchor
-            );
+            expect(document.body.append).toHaveBeenCalledWith(mockAnchor);
             expect(mockAnchor.click).toHaveBeenCalledWith();
             expect(mockAnchor.remove).toHaveBeenCalledWith();
-            expect(URL.revokeObjectURL).toHaveBeenCalledWith(
-                "mock-object-url"
-            );
+            expect(URL.revokeObjectURL).toHaveBeenCalledWith("mock-object-url");
         });
 
         it("should use default mimeType when not provided", async ({
@@ -166,7 +162,7 @@ describe("file Download Utility", () => {
             const fileName = "test.txt";
 
             // Mock append to throw an error
-            document.body.append = vi.fn().mockImplementation(() => {
+            vi.spyOn(document.body, "append").mockImplementation(() => {
                 throw new Error("DOM error");
             });
 
@@ -188,11 +184,13 @@ describe("file Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            URL.createObjectURL = vi.fn().mockImplementation(() => {
+            vi.spyOn(URL, "createObjectURL").mockImplementation(() => {
                 throw new Error("createObjectURL failed");
             });
 
-            expect(() => { downloadFile({ buffer, fileName }); }).toThrow();
+            expect(() => {
+                downloadFile({ buffer, fileName });
+            }).toThrow();
         });
 
         it("should handle createElement errors", async ({ annotate, task }) => {
@@ -204,13 +202,13 @@ describe("file Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            document.createElement = vi
-                .fn()
-                .mockImplementation(() => {
-                    throw new Error("createElement failed");
-                });
+            vi.spyOn(document, "createElement").mockImplementation(() => {
+                throw new Error("createElement failed");
+            });
 
-            expect(() => { downloadFile({ buffer, fileName }); }).toThrow();
+            expect(() => {
+                downloadFile({ buffer, fileName });
+            }).toThrow();
         });
 
         it("should handle appendChild errors with fallback attempt", async ({
@@ -226,14 +224,16 @@ describe("file Download Utility", () => {
             const fileName = "test.txt";
 
             // Mock append to throw appendChild specific error
-            document.body.append = vi.fn().mockImplementation(() => {
+            vi.spyOn(document.body, "append").mockImplementation(() => {
                 throw new Error("appendChild failed");
             });
 
             // The fallback will try the same createAndTriggerDownload again, so append will fail again
             // This means the fallback also fails and should throw "File download failed"
             // Fallback retry uses a direct click without DOM attachment.
-            expect(() => { downloadFile({ buffer, fileName }); }).not.toThrow();
+            expect(() => {
+                downloadFile({ buffer, fileName });
+            }).not.toThrow();
 
             // Verify that append was called (indicating both primary and fallback attempts)
             expect(document.body.append).toHaveBeenCalledWith();
@@ -251,7 +251,7 @@ describe("file Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
+            vi.spyOn(mockAnchor, "click").mockImplementation(() => {
                 throw new Error("Click failed");
             });
 
@@ -261,9 +261,7 @@ describe("file Download Utility", () => {
                 // Expected to fail
             }
 
-            expect(URL.revokeObjectURL).toHaveBeenCalledWith(
-                "mock-object-url"
-            );
+            expect(URL.revokeObjectURL).toHaveBeenCalledWith("mock-object-url");
         });
 
         it("should handle non-Error objects in catch blocks", async ({
@@ -278,7 +276,7 @@ describe("file Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            document.body.append = vi.fn().mockImplementation(() => {
+            vi.spyOn(document.body, "append").mockImplementation(() => {
                 throw "String error";
             });
 
@@ -361,9 +359,9 @@ describe("file Download Utility", () => {
                     downloadFile({ buffer, fileName });
 
                     expect(mockAnchor.download).toBe(fileName);
-                    expect(
-                        document.body.append
-                    ).toHaveBeenCalledWith(mockAnchor);
+                    expect(document.body.append).toHaveBeenCalledWith(
+                        mockAnchor
+                    );
                     expect(mockAnchor.click).toHaveBeenCalledWith();
                 }
             );
@@ -487,7 +485,8 @@ describe("file Download Utility", () => {
                     const result = generateBackupFileName(prefix);
 
                     // Extract the timestamp part
-                    const timestampMatch = /-(?<timestamp>\d{4}-\d{2}-\d{2})\./.exec(result);
+                    const timestampMatch =
+                        /-(?<timestamp>\d{4}-\d{2}-\d{2})\./.exec(result);
 
                     expect(timestampMatch).not.toBeNull();
 
@@ -732,7 +731,7 @@ describe("file Download Utility", () => {
             const backup = buildBackupResult(new Uint8Array([1]));
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
+            vi.spyOn(mockAnchor, "click").mockImplementation(() => {
                 throw new Error("Click failed");
             });
 
@@ -753,7 +752,7 @@ describe("file Download Utility", () => {
             const backup = buildBackupResult(new Uint8Array([1]));
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
+            vi.spyOn(mockAnchor, "click").mockImplementation(() => {
                 throw "String error";
             });
 
@@ -774,7 +773,7 @@ describe("file Download Utility", () => {
             const backup = buildBackupResult(new Uint8Array([1]));
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
+            vi.spyOn(mockAnchor, "click").mockImplementation(() => {
                 throw new Error("Click failed");
             });
 
@@ -782,9 +781,7 @@ describe("file Download Utility", () => {
                 handleSQLiteBackupDownload(mockDownloadFunction)
             ).rejects.toThrow();
 
-            expect(URL.revokeObjectURL).toHaveBeenCalledWith(
-                "mock-object-url"
-            );
+            expect(URL.revokeObjectURL).toHaveBeenCalledWith("mock-object-url");
         });
 
         it("should handle download function rejection", async ({

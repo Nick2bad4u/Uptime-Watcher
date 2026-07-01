@@ -7,7 +7,7 @@ Write-Output "Setting up metrics branch for repository stats..." -ForegroundColo
 git checkout --orphan metrics
 
 # Remove all files from the new branch
-git rm -rf .
+git rm -rf.
 
 # Create a simple README for the metrics branch
 @"
@@ -19,7 +19,8 @@ This branch contains automatically generated repository statistics and metrics.
 - `metrics.repository.svg` - Repository statistics image
 
 This branch is automatically updated by GitHub Actions.
-"@ | Out-File -FilePath "README.md" -Encoding UTF8
+"@
+    | Out-File -FilePath "README.md" -Encoding UTF8
 
 # Add and commit the initial README
 git add README.md

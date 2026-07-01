@@ -196,11 +196,10 @@ describe("DatabaseManager Foundation Tests", () => {
         };
 
         // @ts-expect-error - overriding private property for testing
-        databaseManager.siteLoadingOrchestrator =
-            mockSiteLoadingOrchestrator;
+        databaseManager.siteLoadingOrchestrator = mockSiteLoadingOrchestrator;
 
         // Ensure the site cache has all required methods
-        const siteCache = databaseManager.siteCache;
+        const siteCache = databaseManager["siteCache"];
         if (siteCache) {
             siteCache.clear = vi.fn();
             siteCache.set = vi.fn();

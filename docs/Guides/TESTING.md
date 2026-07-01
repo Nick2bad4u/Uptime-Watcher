@@ -18,7 +18,7 @@ tags:
 
 ## Table of Contents
 
-1. [Setup Summary](#setup-summary)
+- [Setup Summary](#setup-summary)
 
 ## Setup Summary
 

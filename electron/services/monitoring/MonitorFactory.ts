@@ -44,8 +44,8 @@ export interface MonitorServiceResult {
      */
     configurationApplied: boolean;
     /**
-     * Configuration error message if app failed (only present when
-     * there's an error)
+     * Configuration error message if app failed (only present when there's an
+     * error)
      */
     configurationError?: string;
     /** The monitor service instance */
@@ -159,8 +159,8 @@ export function getAvailableMonitorTypes(): readonly string[] {
  *
  * @remarks
  * Same as {@link getMonitor} but returns detailed result including configuration
- * app status. Use this method when you need to know if configuration
- * was successfully applied.
+ * app status. Use this method when you need to know if configuration was
+ * successfully applied.
  *
  * @example
  *
@@ -242,7 +242,6 @@ export function getMonitorWithResult(
                 normalizedError
             );
 
-            // eslint-disable-next-line ex/use-error-cause -- MonitorConfigurationError forwards the cause to Error via its constructor
             throw new MonitorConfigurationError(
                 type,
                 normalizedError.message,

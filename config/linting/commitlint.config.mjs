@@ -16,7 +16,7 @@
  * @see {@link https://www.conventionalcommits.org/ | Conventional Commits Specification}
  */
 
-export default /** @type {CommitlintConfig} */ {
+const commitlintConfig = /** @type {CommitlintConfig} */ {
     $schema: "https://www.schemastore.org/commitlintrc.json",
 
     /**
@@ -342,3 +342,5 @@ export default /** @type {CommitlintConfig} */ {
         ],
     },
 };
+
+export default commitlintConfig;

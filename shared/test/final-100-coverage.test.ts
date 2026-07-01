@@ -77,11 +77,7 @@ describe("Final 100% Coverage Tests", () => {
 
             // Test with field that doesn't exist to trigger different error path
             expect(() => {
-                validateMonitorField(
-                    "http",
-                    "nonExistentField",
-                    "someValue"
-                );
+                validateMonitorField("http", "nonExistentField", "someValue");
             }).toThrow("Unknown field: nonExistentField");
         });
     });

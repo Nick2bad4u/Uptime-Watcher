@@ -32,7 +32,7 @@ import {
 import { logger } from "../services/logger";
 
 // Mock the logger
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -55,12 +55,12 @@ const mockSystemService = vi.hoisted(() => ({
     quitAndInstall: vi.fn(),
 }));
 
-vi.mock(import('../services/SystemService'), () => ({
+vi.mock("../services/SystemService", () => ({
     SystemService: mockSystemService,
 }));
 
 // Mock the store utils (partial) so createPersistConfig remains available.
-vi.mock(import('../stores/utils'), async (importOriginal) => {
+vi.mock("../stores/utils", async (importOriginal) => {
     const actual = await importOriginal<typeof import("../stores/utils")>();
     return {
         ...actual,
@@ -69,14 +69,14 @@ vi.mock(import('../stores/utils'), async (importOriginal) => {
 });
 
 // Mock the theme hook
-vi.mock(import('../theme/useTheme'), () => ({
+vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
         themeName: "dark" as const,
     }),
 }));
 
 // Prevent JSDOM navigation errors by mocking HTMLAnchorElement.prototype.click
-vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation();
+vi.spyOn(HTMLAnchorElement.prototype, "click").mockReturnValue(undefined);
 
 // Mock the anchor element href setter to use hash URLs to prevent JSDOM navigation errors
 const originalSetAttribute = Element.prototype.setAttribute;
@@ -87,7 +87,8 @@ Element.prototype.setAttribute = function (name: string, value: string) {
         value.startsWith("http")
     ) {
         // Use a hash URL instead of the actual URL to prevent JSDOM navigation
-        originalSetAttribute.call(this, name, "#"); return;
+        originalSetAttribute.call(this, name, "#");
+        return;
     }
     originalSetAttribute.call(this, name, value);
 };
@@ -138,8 +139,9 @@ describe(ScreenshotThumbnail, () => {
         });
 
         // Mock ElementInternals for the anchor element
-        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation()
-            .mockReturnValue(createMockBoundingClientRect());
+        vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue(
+            createMockBoundingClientRect()
+        );
 
         // Mock location methods to prevent navigation errors in JSDOM
         Object.defineProperties(globalThis, {
@@ -163,7 +165,9 @@ describe(ScreenshotThumbnail, () => {
         });
 
         // Mock getBoundingClientRect
-        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(createMockBoundingClientRect());
+        vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue(
+            createMockBoundingClientRect()
+        );
     });
 
     afterEach(() => {
@@ -1640,7 +1644,10 @@ describe(ScreenshotThumbnail, () => {
                 x: 10,
                 y: 10,
             };
-            vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(mockRect1);
+            vi.spyOn(
+                Element.prototype,
+                "getBoundingClientRect"
+            ).mockReturnValue(mockRect1);
 
             Object.defineProperties(globalThis, {
                 innerWidth: {
@@ -1684,7 +1691,10 @@ describe(ScreenshotThumbnail, () => {
                 x: 1800,
                 y: 1000,
             };
-            vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(mockRect2);
+            vi.spyOn(
+                Element.prototype,
+                "getBoundingClientRect"
+            ).mockReturnValue(mockRect2);
 
             const caseTwoProps = createThumbnailProps();
             const { unmount: unmount2 } = render(
@@ -1706,7 +1716,10 @@ describe(ScreenshotThumbnail, () => {
             unmount2();
 
             // Restore defaults
-            vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(createMockBoundingClientRect());
+            vi.spyOn(
+                Element.prototype,
+                "getBoundingClientRect"
+            ).mockReturnValue(createMockBoundingClientRect());
         });
 
         it("should handle all event combinations that can clear timeouts", ({
@@ -1778,16 +1791,16 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // This test demonstrates that the current useEffect implementation has a closure issue The cleanup
-            // function captures the initial undefined values of the refs,
-            // not their current values at cleanup time
+            // This test demonstrates that the current useEffect implementation has a closure issue The cleanup function captures the initial undefined values of the refs, not their current values at cleanup time
 
             const props = createThumbnailProps();
             const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
             // The component should still unmount cleanly even though the cleanup
             // doesn't actually clear the current timeout/portal refs due to closure
-            expect(() => { unmount(); }).not.toThrow();
+            expect(() => {
+                unmount();
+            }).not.toThrow();
 
             // This test documents the current behavior - the cleanup lines 59-60 and 65-66
             // are not actually reachable with the current implementation due to the

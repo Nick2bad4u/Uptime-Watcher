@@ -7,7 +7,7 @@ import type { ChangeEventHandler, ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OverviewTab } from "../../components/SiteDetails/tabs/OverviewTab";
@@ -17,9 +17,10 @@ const availabilityMock = vi.hoisted(() => ({
     getAvailabilityVariant: vi.fn(() => "success" as const),
 }));
 
-vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
-    const actual =
-        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual = safeCastTo<typeof import("../../theme/useTheme")>(
+        await importOriginal()
+    );
     return {
         ...actual,
         useAvailabilityColors: () => availabilityMock,
@@ -38,7 +39,7 @@ vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
 
 const statusIndicatorProps = vi.hoisted(() => safeCastTo<UnknownRecord[]>([]));
 
-vi.mock(import('../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../theme/components/StatusIndicator", () => ({
     StatusIndicator: (props: UnknownRecord) => {
         statusIndicatorProps.push(props);
         return <span data-testid="status-indicator" />;
@@ -109,31 +110,31 @@ const ThemedSelectMock = vi.hoisted(() =>
 );
 const ThemedTextMock = vi.hoisted(() => createThemedComponent("themed-text"));
 
-vi.mock(import('../../theme/components/ThemedCard'), () => ({
+vi.mock("../../theme/components/ThemedCard", () => ({
     ThemedCard: ThemedCardMock,
 }));
-vi.mock(import('../../theme/components/ThemedBadge'), () => ({
+vi.mock("../../theme/components/ThemedBadge", () => ({
     ThemedBadge: ThemedBadgeMock,
 }));
-vi.mock(import('../../theme/components/ThemedButton'), () => ({
+vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ThemedButtonMock,
 }));
-vi.mock(import('../../theme/components/ThemedInput'), () => ({
+vi.mock("../../theme/components/ThemedInput", () => ({
     ThemedInput: ThemedInputMock,
 }));
-vi.mock(import('../../theme/components/ThemedProgress'), () => ({
+vi.mock("../../theme/components/ThemedProgress", () => ({
     ThemedProgress: ThemedProgressMock,
 }));
-vi.mock(import('../../theme/components/ThemedSelect'), () => ({
+vi.mock("../../theme/components/ThemedSelect", () => ({
     ThemedSelect: ThemedSelectMock,
 }));
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: ThemedTextMock,
 }));
 
 const loggerAction = vi.hoisted(() => vi.fn());
 
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         user: {
             action: loggerAction,

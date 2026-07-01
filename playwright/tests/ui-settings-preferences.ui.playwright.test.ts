@@ -29,9 +29,11 @@ async function toggleCheckboxAndRevert(
 
     const toggleCheckbox = async (): Promise<void> => {
         await page.evaluate((accessibleLabel) => {
-            const target = [...document.querySelectorAll<HTMLInputElement>(
+            const target = [
+                ...document.querySelectorAll<HTMLInputElement>(
                     'input[type="checkbox"][aria-label]'
-                )].find(
+                ),
+            ].find(
                 (element) =>
                     element.getAttribute("aria-label") === accessibleLabel
             );
@@ -47,16 +49,14 @@ async function toggleCheckboxAndRevert(
     };
 
     await toggleCheckbox();
-    await expect.soft(page.getByLabel(label)).toHaveJSProperty(
-        "checked",
-        !isInitialState
-    );
+    await expect
+        .soft(page.getByLabel(label))
+        .toHaveJSProperty("checked", !isInitialState);
 
     await toggleCheckbox();
-    await expect.soft(page.getByLabel(label)).toHaveJSProperty(
-        "checked",
-        isInitialState
-    );
+    await expect
+        .soft(page.getByLabel(label))
+        .toHaveJSProperty("checked", isInitialState);
 }
 
 async function selectAlternateOption(
@@ -188,9 +188,11 @@ test.describe(
             },
             async () => {
                 await openSettingsModal(page);
-                await expect.soft(page.getByTestId("settings-modal")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect
+                    .soft(page.getByTestId("settings-modal"))
+                    .toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
 
                 await toggleCheckboxAndRevert(
                     page,
@@ -218,9 +220,11 @@ test.describe(
             },
             async () => {
                 await openSettingsModal(page);
-                await expect.soft(page.getByTestId("settings-modal")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect
+                    .soft(page.getByTestId("settings-modal"))
+                    .toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
 
                 const historySelect = page.getByLabel(
                     "Maximum number of history records to keep per site"
@@ -259,17 +263,21 @@ test.describe(
 
                 await waitForThemeApplication(page, initialTheme);
 
-                await expect.soft(
-                    page.getByRole("button", {
-                        name: "Export monitoring data",
-                    })
-                ).toBeEnabled();
-                await expect.soft(
-                    page.getByRole("button", { name: "Refresh history" })
-                ).toBeEnabled();
-                await expect.soft(
-                    page.getByRole("button", { name: "Reset everything" })
-                ).toBeEnabled();
+                await expect
+                    .soft(
+                        page.getByRole("button", {
+                            name: "Export monitoring data",
+                        })
+                    )
+                    .toBeEnabled();
+                await expect
+                    .soft(page.getByRole("button", { name: "Refresh history" }))
+                    .toBeEnabled();
+                await expect
+                    .soft(
+                        page.getByRole("button", { name: "Reset everything" })
+                    )
+                    .toBeEnabled();
             }
         );
     }

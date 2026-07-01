@@ -22,10 +22,9 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 
 // Mock the dependencies
-vi.mock(import('../../stores/ui/useUiStore'));
-vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
-    const actual =
-        (await importOriginal());
+vi.mock("../../stores/ui/useUiStore");
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>();
     return {
         ...actual,
         useTheme: vi.fn(),
@@ -45,7 +44,7 @@ vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
         })),
     };
 });
-vi.mock(import('../../components/AddSiteForm/AddSiteForm'), () => ({
+vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
     AddSiteForm: ({ onSuccess }: { onSuccess: () => void }) => (
         <div data-testid="add-site-form">
             <button data-testid="mock-success-button" onClick={onSuccess}>
@@ -56,7 +55,7 @@ vi.mock(import('../../components/AddSiteForm/AddSiteForm'), () => ({
 }));
 
 // Mock themed components with unique test-ids
-vi.mock(import('../../theme/components/ThemedBox'), () => ({
+vi.mock("../../theme/components/ThemedBox", () => ({
     ThemedBox: ({ children, className, ...props }: any) => (
         <div
             className={className}
@@ -72,7 +71,7 @@ vi.mock(import('../../theme/components/ThemedBox'), () => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedButton'), () => ({
+vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ({ children, onClick, ...props }: any) => (
         <button data-testid="themed-button" onClick={onClick} {...props}>
             {children}
@@ -80,7 +79,7 @@ vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ),
 }));
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: ({ children, ...props }: any) => (
         <span data-testid="themed-text" {...props}>
             {children}

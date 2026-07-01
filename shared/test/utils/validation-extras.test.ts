@@ -46,7 +46,7 @@ describe("getMonitorValidationErrors (canonical Zod)", () => {
         expect(getMonitorValidationErrors({})).toEqual([
             "Monitor type is required",
         ]);
-        expect(getMonitorValidationErrors({ type: ' '.repeat(3) })).toEqual([
+        expect(getMonitorValidationErrors({ type: " ".repeat(3) })).toEqual([
             "Monitor type is required",
         ]);
     });
@@ -130,7 +130,7 @@ describe("validateSiteData (canonical Zod)", () => {
     it("rejects missing/invalid site fields", () => {
         const result = validateSiteData({
             identifier: "",
-            name: ' '.repeat(3),
+            name: " ".repeat(3),
             monitoring: true,
             monitors: [],
         });

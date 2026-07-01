@@ -3,9 +3,9 @@ import type { JSX } from "react/jsx-runtime";
  * Main App component for Uptime Watcher app.
  *
  * @remarks
- * Manages global state, modals, notifications, and renders the main app
- * layout. Coordinates between different views and handles application-wide
- * state management.
+ * Manages global state, modals, notifications, and renders the main app layout.
+ * Coordinates between different views and handles application-wide state
+ * management.
  */
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
@@ -75,10 +75,10 @@ import { useTheme } from "./theme/useTheme";
  * Main app component that serves as the root of the Uptime Watcher app.
  *
  * @remarks
- * This is the primary entry point component that orchestrates the entire
- * app including state management, theming, error handling, and
- * real-time updates. Uses deferred state updates via timeouts to comply with
- * React best practices.
+ * This is the primary entry point component that orchestrates the entire app
+ * including state management, theming, error handling, and real-time updates.
+ * Uses deferred state updates via timeouts to comply with React best
+ * practices.
  *
  * @example
  *
@@ -268,8 +268,8 @@ export const App: NamedExoticComponent = memo(
         });
 
         /**
-         * Initializes the app by setting up stores, cache sync, and
-         * status update subscriptions.
+         * Initializes the app by setting up stores, cache sync, and status
+         * update subscriptions.
          *
          * @remarks
          * This function performs sequential initialization to avoid state
@@ -422,11 +422,7 @@ export const App: NamedExoticComponent = memo(
 
             const isNext = !isSidebarOpen;
             persistSidebarPreference(isNext);
-        }, [
-            isCompactViewport,
-            isSidebarOpen,
-            persistSidebarPreference,
-        ]);
+        }, [isCompactViewport, isSidebarOpen, persistSidebarPreference]);
 
         const globalMetrics = useGlobalMonitoringMetrics();
 
@@ -451,12 +447,7 @@ export const App: NamedExoticComponent = memo(
 
             applyUpdateStatus("idle");
             setUpdateError(undefined);
-        }, [
-            applyUpdate,
-            applyUpdateStatus,
-            setUpdateError,
-            updateStatus,
-        ]);
+        }, [applyUpdate, applyUpdateStatus, setUpdateError, updateStatus]);
 
         /**
          * Handles closing the settings modal.

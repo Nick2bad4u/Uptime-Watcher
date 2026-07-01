@@ -12,7 +12,6 @@ import {
     createStorybookReactPluginOptions,
     storybookCoverageExcludeGlobs,
     storybookCoverageIncludeGlobs,
-    // eslint-disable-next-line import-x/extensions -- storybook wants an extension
 } from "./viteSharedConfig.ts";
 
 /**

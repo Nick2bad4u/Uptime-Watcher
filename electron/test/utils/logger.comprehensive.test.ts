@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 // The logger test should test the logger interface, not the underlying electron-log implementation.
-// Since the logger utility is a wrapper around electron-log and provides structured logging with prefixes,
-// the important thing to test is that the logger functions work correctly, not that they call specific electron-log
-// methods. For comprehensive testing of the logger functionality, we should test: 1.
+// Since the logger utility is a wrapper around electron-log and provides structured logging with prefixes, the important thing to test is that the logger functions work correctly, not that they call specific electron-log methods. For comprehensive testing of the logger functionality, we should test: 1.
 // That logger functions exist and are callable 2. That different loggers (logger, dbLogger, monitorLogger) are distinct
 // 3. That the logger handles various argument types correctly 4.
 // That error logging handles Error objects vs other types appropriately Import the actual logger functions to test
@@ -39,18 +37,20 @@ describe("Logger Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 // These tests verify the logger can be called without throwing errors
-                expect(() => { logger.debug("Debug message"); }).not.toThrow();
-                expect(() =>
-                    { logger.info("Info message", {
+                expect(() => {
+                    logger.debug("Debug message");
+                }).not.toThrow();
+                expect(() => {
+                    logger.info("Info message", {
                         key: "value",
-                    }); }
-                ).not.toThrow();
-                expect(() =>
-                    { logger.warn("Warning message", "extra", 123); }
-                ).not.toThrow();
-                expect(() =>
-                    { logger.error("Error message", new Error("test")); }
-                ).not.toThrow();
+                    });
+                }).not.toThrow();
+                expect(() => {
+                    logger.warn("Warning message", "extra", 123);
+                }).not.toThrow();
+                expect(() => {
+                    logger.error("Error message", new Error("test"));
+                }).not.toThrow();
             });
 
             it("should handle Error objects in error method", async ({
@@ -65,9 +65,9 @@ describe("Logger Utilities", () => {
                 const error = new Error("Test error");
                 error.stack = "Error stack trace";
 
-                expect(() =>
-                    { logger.error("Error occurred", error); }
-                ).not.toThrow();
+                expect(() => {
+                    logger.error("Error occurred", error);
+                }).not.toThrow();
             });
 
             it("should handle non-Error objects in error method", async ({
@@ -81,9 +81,9 @@ describe("Logger Utilities", () => {
 
                 const errorObject = { code: 500, message: "Server error" };
 
-                expect(() =>
-                    { logger.error("Custom error", errorObject); }
-                ).not.toThrow();
+                expect(() => {
+                    logger.error("Custom error", errorObject);
+                }).not.toThrow();
             });
 
             it("should handle edge cases", async ({ task, annotate }) => {
@@ -92,12 +92,18 @@ describe("Logger Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(() => { logger.info(""); }).not.toThrow();
-                expect(() => { logger.debug("Just message"); }).not.toThrow();
-                expect(() => { logger.error("Null error", null); }).not.toThrow();
-                expect(() =>
-                    { logger.error("Undefined error", undefined); }
-                ).not.toThrow();
+                expect(() => {
+                    logger.info("");
+                }).not.toThrow();
+                expect(() => {
+                    logger.debug("Just message");
+                }).not.toThrow();
+                expect(() => {
+                    logger.error("Null error", null);
+                }).not.toThrow();
+                expect(() => {
+                    logger.error("Undefined error", undefined);
+                }).not.toThrow();
             });
         });
 
@@ -127,27 +133,27 @@ describe("Logger Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(() =>
-                    { dbLogger.debug("Executing query", {
+                expect(() => {
+                    dbLogger.debug("Executing query", {
                         sql: "SELECT * FROM users",
-                    }); }
-                ).not.toThrow();
-                expect(() =>
-                    { dbLogger.info("Database migration completed", {
+                    });
+                }).not.toThrow();
+                expect(() => {
+                    dbLogger.info("Database migration completed", {
                         version: "1.2.0",
-                    }); }
-                ).not.toThrow();
-                expect(() =>
-                    { dbLogger.warn("Connection pool low", {
+                    });
+                }).not.toThrow();
+                expect(() => {
+                    dbLogger.warn("Connection pool low", {
                         available: 2,
                         total: 10,
-                    }); }
-                ).not.toThrow();
+                    });
+                }).not.toThrow();
 
                 const dbError = new Error("Connection timeout");
-                expect(() =>
-                    { dbLogger.error("Database connection failed", dbError); }
-                ).not.toThrow();
+                expect(() => {
+                    dbLogger.error("Database connection failed", dbError);
+                }).not.toThrow();
             });
         });
 
@@ -177,28 +183,28 @@ describe("Logger Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                expect(() =>
-                    { monitorLogger.debug("Response time recorded", {
+                expect(() => {
+                    monitorLogger.debug("Response time recorded", {
                         time: 245,
                         url: "https://example.com",
-                    }); }
-                ).not.toThrow();
-                expect(() =>
-                    { monitorLogger.info("Monitor check started", {
+                    });
+                }).not.toThrow();
+                expect(() => {
+                    monitorLogger.info("Monitor check started", {
                         siteIdentifier: "abc123",
-                    }); }
-                ).not.toThrow();
-                expect(() =>
-                    { monitorLogger.warn("High response time detected", {
+                    });
+                }).not.toThrow();
+                expect(() => {
+                    monitorLogger.warn("High response time detected", {
                         responseTime: 5000,
                         threshold: 3000,
-                    }); }
-                ).not.toThrow();
+                    });
+                }).not.toThrow();
 
                 const timeoutError = new Error("Request timeout");
-                expect(() =>
-                    { monitorLogger.error("Monitor check failed", timeoutError); }
-                ).not.toThrow();
+                expect(() => {
+                    monitorLogger.error("Monitor check failed", timeoutError);
+                }).not.toThrow();
             });
         });
 

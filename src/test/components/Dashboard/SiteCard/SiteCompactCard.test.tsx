@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { STATUS_KIND } from "@shared/types";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { arrayAt, arrayFirst  } from "ts-extras";
+import { arrayAt, arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteCompactCard } from "../../../../components/Dashboard/SiteCard/SiteCompactCard";
@@ -14,11 +14,11 @@ const mockUseSite = vi.hoisted(() => vi.fn());
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
 const actionButtonCalls: { disabled: boolean; isMonitoring: boolean }[] = [];
 
-vi.mock(import('../../../../hooks/site/useSite'), () => ({
+vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: mockUseSite,
 }));
 
-vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../../theme/components/ThemedBox", () => ({
     ThemedBox: ({ children, onClick }: any) => (
         <div data-testid="themed-box" onClick={onClick}>
             {children}
@@ -26,26 +26,26 @@ vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (
         <span>{children}</span>
     ),
 }));
 
-vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../../../theme/components/StatusIndicator", () => ({
     StatusIndicator: ({ status }: { status: string }) => (
         <span data-testid={`status-indicator-${status}`} />
     ),
 }));
 
-vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => ({
+vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
     MarqueeText: ({ text }: { text: string }) => (
         <span data-testid="marquee-text">{text}</span>
     ),
 }));
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
         MonitorSelector: ({ selectedMonitorId, onChange }: any) => {
             monitorSelectorCalls.push({ selectedMonitorId });
@@ -64,7 +64,7 @@ vi.mock(
 );
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
         ActionButtonGroup: ({ disabled, isMonitoring, onCheckNow }: any) => {
             actionButtonCalls.push({ disabled, isMonitoring });

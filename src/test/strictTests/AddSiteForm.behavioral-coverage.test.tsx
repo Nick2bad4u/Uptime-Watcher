@@ -14,7 +14,7 @@ import {
     waitFor,
     within,
 } from "@testing-library/react";
-import { objectEntries, safeCastTo, arrayFirst   } from "ts-extras";
+import { objectEntries, safeCastTo, arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DynamicMonitorFieldsProperties } from "../../components/AddSiteForm/DynamicMonitorFields";
@@ -33,7 +33,7 @@ import { createMockSite } from "../utils/mockFactories";
 
 const handleSubmitMock = vi.fn();
 
-vi.mock(import('../../components/AddSiteForm/Submit'), () => ({
+vi.mock("../../components/AddSiteForm/Submit", () => ({
     handleSubmit: (...args: Parameters<typeof handleSubmitMock>) =>
         handleSubmitMock(...args),
 }));
@@ -47,14 +47,14 @@ const loggerModuleMock = vi.hoisted(() => ({
     },
 }));
 
-vi.mock(import('../../services/logger'), () => loggerModuleMock);
+vi.mock("../../services/logger", () => loggerModuleMock);
 
 const loggerErrorMock = loggerModuleMock.logger.error;
 const loggerWarnMock = loggerModuleMock.logger.warn;
 
 const useAddSiteFormMock = vi.fn<() => UseAddSiteFormReturn>();
 
-vi.mock(import('../../components/SiteDetails/useAddSiteForm'), () => ({
+vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: () => useAddSiteFormMock(),
 }));
 
@@ -75,7 +75,7 @@ const sitesStoreState = createSitesStoreMock({
 const useSitesStoreMock: SelectorHookMock<SitesStore> =
     createSelectorHookMock(sitesStoreState);
 
-vi.mock(import('../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../stores/sites/useSitesStore", () => ({
     get useSitesStore() {
         if (!useSitesStoreMock) {
             throw new Error("useSitesStoreMock accessed before initialization");
@@ -87,7 +87,7 @@ vi.mock(import('../../stores/sites/useSitesStore'), () => ({
 
 const useErrorStoreMock = vi.fn();
 
-vi.mock(import('../../stores/error/useErrorStore'), () => ({
+vi.mock("../../stores/error/useErrorStore", () => ({
     useErrorStore: (selector?: (state: unknown) => unknown) => {
         const state = useErrorStoreMock();
         return typeof selector === "function" ? selector(state) : state;
@@ -96,13 +96,13 @@ vi.mock(import('../../stores/error/useErrorStore'), () => ({
 
 const useMonitorTypesMock = vi.fn();
 
-vi.mock(import('../../hooks/useMonitorTypes'), () => ({
+vi.mock("../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: () => useMonitorTypesMock(),
 }));
 
 const useDelayedButtonLoadingMock = vi.fn();
 
-vi.mock(import('../../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: (
         ...args: Parameters<typeof useDelayedButtonLoadingMock>
     ) => useDelayedButtonLoadingMock(...args),
@@ -110,14 +110,14 @@ vi.mock(import('../../hooks/useDelayedButtonLoading'), () => ({
 
 const useDynamicHelpTextMock = vi.fn();
 
-vi.mock(import('../../hooks/useDynamicHelpText'), () => ({
+vi.mock("../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: (...args: Parameters<typeof useDynamicHelpTextMock>) =>
         useDynamicHelpTextMock(...args),
 }));
 
 const selectFieldProps = new Map<string, SelectFieldProperties>();
 
-vi.mock(import('../../components/AddSiteForm/SelectField'), () => ({
+vi.mock("../../components/AddSiteForm/SelectField", () => ({
     SelectField: (props: SelectFieldProperties) => {
         selectFieldProps.set(props.id, props);
         return (
@@ -130,7 +130,7 @@ vi.mock(import('../../components/AddSiteForm/SelectField'), () => ({
 
 const textFieldProps = new Map<string, UnknownRecord>();
 
-vi.mock(import('../../components/AddSiteForm/TextField'), () => ({
+vi.mock("../../components/AddSiteForm/TextField", () => ({
     TextField: (props: UnknownRecord) => {
         textFieldProps.set(props["id"] as string, props);
         return (
@@ -150,7 +150,7 @@ interface RadioGroupProperties {
 
 let radioGroupProps: RadioGroupProperties | undefined;
 
-vi.mock(import('../../components/AddSiteForm/RadioGroup'), () => ({
+vi.mock("../../components/AddSiteForm/RadioGroup", () => ({
     RadioGroup: (props: RadioGroupProperties) => {
         radioGroupProps = props;
         return (
@@ -163,7 +163,7 @@ vi.mock(import('../../components/AddSiteForm/RadioGroup'), () => ({
 
 let dynamicMonitorFieldsProps: DynamicMonitorFieldsProperties | undefined;
 
-vi.mock(import('../../components/AddSiteForm/DynamicMonitorFields'), () => ({
+vi.mock("../../components/AddSiteForm/DynamicMonitorFields", () => ({
     DynamicMonitorFields: (props: DynamicMonitorFieldsProperties) => {
         dynamicMonitorFieldsProps = props;
         return <div data-testid="mock-dynamic-fields" />;
@@ -174,7 +174,7 @@ interface SurfaceContainerProperties extends HTMLAttributes<HTMLDivElement> {
     readonly children?: ReactNode;
 }
 
-vi.mock(import('../../components/shared/SurfaceContainer'), () => ({
+vi.mock("../../components/shared/SurfaceContainer", () => ({
     SurfaceContainer: ({ children, ...props }: SurfaceContainerProperties) => (
         <div {...props}>{children}</div>
     ),
@@ -200,7 +200,7 @@ interface ThemedButtonSnapshot {
 
 let themedButtonProps: ThemedButtonSnapshot | undefined;
 
-vi.mock(import('../../theme/components/ThemedButton'), () => ({
+vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         loading = false,
@@ -240,7 +240,7 @@ interface ErrorAlertProperties {
 
 let errorAlertProps: ErrorAlertProperties | undefined;
 
-vi.mock(import('../../components/common/ErrorAlert/ErrorAlert'), () => ({
+vi.mock("../../components/common/ErrorAlert/ErrorAlert", () => ({
     ErrorAlert: (props: ErrorAlertProperties) => {
         errorAlertProps = props;
         return (
@@ -255,7 +255,7 @@ interface ThemedTextProperties extends HTMLAttributes<HTMLSpanElement> {
     readonly children?: ReactNode;
 }
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: ({ children, ...props }: ThemedTextProperties) => (
         <span {...props}>{children}</span>
     ),
@@ -472,7 +472,8 @@ describe("AddSiteForm behavioral coverage", () => {
         for (const [fieldName, handler] of objectEntries(onChange)) {
             handler(123);
             const setterName = getSetterName(fieldName);
-            const setter = (safeCastTo<FormStateReferences>(formStateRefs))[setterName];
+            const setter =
+                safeCastTo<FormStateReferences>(formStateRefs)[setterName];
             expect(setter).toBeDefined();
             expect(setter).toHaveBeenCalledWith("123");
         }
@@ -534,7 +535,9 @@ describe("AddSiteForm behavioral coverage", () => {
         const form = screen.getByTestId("add-site-form");
         fireEvent.submit(form);
 
-        await waitFor(() => { expect(handleSubmitMock).toHaveBeenCalledTimes(1); });
+        await waitFor(() => {
+            expect(handleSubmitMock).toHaveBeenCalledTimes(1);
+        });
         const callArguments = arrayFirst(handleSubmitMock.mock.calls);
         expect(callArguments).toBeDefined();
         const submissionPayload = callArguments?.[1];
@@ -548,7 +551,9 @@ describe("AddSiteForm behavioral coverage", () => {
         // onSuccess has been invoked is sufficient to confirm the success
         // pipeline executed; the underlying form reset behavior is covered by
         // dedicated store tests.
-        await waitFor(() => { expect(onSuccess).toHaveBeenCalledWith(); });
+        await waitFor(() => {
+            expect(onSuccess).toHaveBeenCalledWith();
+        });
         expect(useDelayedButtonLoadingMock).toHaveBeenCalledWith(false);
         expect(themedButtonProps?.loading).toBeFalsy();
     });
@@ -560,13 +565,15 @@ describe("AddSiteForm behavioral coverage", () => {
         render(<AddSiteForm />);
         const form = screen.getByTestId("add-site-form");
         fireEvent.submit(form);
-        await waitFor(() => { expect(handleSubmitMock).toHaveBeenCalledWith(); });
-        await waitFor(() =>
-            { expect(loggerErrorMock).toHaveBeenCalledWith(
+        await waitFor(() => {
+            expect(handleSubmitMock).toHaveBeenCalledWith();
+        });
+        await waitFor(() => {
+            expect(loggerErrorMock).toHaveBeenCalledWith(
                 "Form submission failed:",
                 expect.objectContaining({ message: "network failure" })
-            ); }
-        );
+            );
+        });
     });
 
     it("displays errors and clears them via alert dismiss", () => {
@@ -599,7 +606,9 @@ describe("AddSiteForm behavioral coverage", () => {
         });
         render(<AddSiteForm />);
         expect(
-            within(screen.getByTestId("add-site-form")).queryByText(/guidance/iv)
+            within(screen.getByTestId("add-site-form")).queryByText(
+                /guidance/iv
+            )
         ).toBeNull();
     });
 });

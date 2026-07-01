@@ -52,9 +52,9 @@ describe("Database Schema", () => {
         mockDatabase.run.mockImplementation(() => {
             throw new Error("Database error");
         });
-        expect(() => { createDatabaseTables(mockDatabase as any); }).toThrow(
-            "Database error"
-        );
+        expect(() => {
+            createDatabaseTables(mockDatabase as any);
+        }).toThrow("Database error");
     });
 
     describe("Property-Based Database Schema Tests", () => {
@@ -117,9 +117,9 @@ describe("Database Schema", () => {
                         });
 
                         // Act & Assert
-                        expect(() =>
-                            { createDatabaseTables(testDatabase as any); }
-                        ).toThrow(errorMessage);
+                        expect(() => {
+                            createDatabaseTables(testDatabase as any);
+                        }).toThrow(errorMessage);
                     }
                 )
             );
@@ -208,9 +208,9 @@ describe("Database Schema", () => {
 
                         // Act & Assert
                         if (shouldSucceed) {
-                            expect(() =>
-                                { createDatabaseTables(testDatabase as any); }
-                            ).not.toThrow();
+                            expect(() => {
+                                createDatabaseTables(testDatabase as any);
+                            }).not.toThrow();
 
                             // Verify SQL commands are well-formed
                             const allCalls = testDatabase.run.mock.calls;
@@ -226,9 +226,9 @@ describe("Database Schema", () => {
                                 expect(sqlCommand.length).toBeGreaterThan(10);
                             }
                         } else {
-                            expect(() =>
-                                { createDatabaseTables(testDatabase as any); }
-                            ).toThrow("Mock SQL error");
+                            expect(() => {
+                                createDatabaseTables(testDatabase as any);
+                            }).toThrow("Mock SQL error");
                         }
                     }
                 )

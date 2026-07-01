@@ -18,15 +18,15 @@ tags:
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Current Testing Architecture](#current-testing-architecture)
-3. [Validated Testing Patterns](#validated-testing-patterns)
-4. [Current Testing Configuration](#current-testing-configuration)
-5. [Test Structure Templates](#test-structure-templates)
-6. [Testing Best Practices](#testing-best-practices)
-7. [Common Testing Patterns](#common-testing-patterns)
-8. [Testing Tools and Commands](#testing-tools-and-commands)
-9. [Success Metrics](#success-metrics)
+- [Overview](#overview)
+- [Current Testing Architecture](#current-testing-architecture)
+- [Validated Testing Patterns](#validated-testing-patterns)
+- [Current Testing Configuration](#current-testing-configuration)
+- [Test Structure Templates](#test-structure-templates)
+- [Testing Best Practices](#testing-best-practices)
+- [Common Testing Patterns](#common-testing-patterns)
+- [Testing Tools and Commands](#testing-tools-and-commands)
+- [Success Metrics](#success-metrics)
 
 ## Overview
 

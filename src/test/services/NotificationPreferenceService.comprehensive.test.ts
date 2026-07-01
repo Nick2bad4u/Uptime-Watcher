@@ -22,7 +22,7 @@ const wrapMock = vi.hoisted(() =>
         ) =>
             vi.fn(async (preferences: NotificationPreferenceUpdate) => {
                 await ensureInitializedMock();
-                return handler(globalThis.electronAPI, preferences);
+                return handler((globalThis as any).electronAPI, preferences);
             })
     )
 );
@@ -34,7 +34,7 @@ const getHelpersMock = vi.hoisted(() =>
     }))
 );
 
-vi.mock(import('../../services/utils/createIpcServiceHelpers'), () => ({
+vi.mock("../../services/utils/createIpcServiceHelpers", () => ({
     getIpcServiceHelpers: getHelpersMock,
 }));
 
@@ -89,7 +89,7 @@ describe("NotificationPreferenceService", () => {
         };
 
         const bridge = (
-            globalThis.electronAPI as unknown as ReturnType<
+            (globalThis as any).electronAPI as unknown as ReturnType<
                 typeof createElectronApi
             >
         ).notifications;

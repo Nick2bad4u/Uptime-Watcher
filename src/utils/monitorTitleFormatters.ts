@@ -1,7 +1,7 @@
 import type { Monitor, MonitorType } from "@shared/types";
 
 import { validateMonitorType } from "@shared/utils/validation";
-import { objectAssign, objectKeys  } from "ts-extras";
+import { objectAssign, objectKeys } from "ts-extras";
 
 /** Function that produces a human-readable suffix for monitor titles. */
 export type TitleSuffixFormatter = (monitor: Monitor) => string;

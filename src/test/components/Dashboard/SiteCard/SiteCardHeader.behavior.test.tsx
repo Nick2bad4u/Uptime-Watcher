@@ -21,7 +21,7 @@ const monitorSelectorPropsSpy = vi.fn();
 const actionButtonGroupPropsSpy = vi.fn();
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     async (importOriginal) => {
         const actual =
             await importOriginal<
@@ -37,11 +37,11 @@ vi.mock(
                 return (
                     <button
                         data-testid="monitor-selector"
-                        onClick={() =>
-                            { props.onChange({
+                        onClick={() => {
+                            props.onChange({
                                 target: { value: "monitor-2" },
-                            } as ChangeEvent<HTMLSelectElement>); }
-                        }
+                            } as ChangeEvent<HTMLSelectElement>);
+                        }}
                         type="button"
                     >
                         mock-monitor-selector
@@ -53,7 +53,7 @@ vi.mock(
 );
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     async (importOriginal) => {
         const actual =
             await importOriginal<
@@ -110,7 +110,7 @@ vi.mock(
     }
 );
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardFooter'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
     SiteCardFooter: () => <div data-testid="site-card-footer">mock-footer</div>,
 }));
 

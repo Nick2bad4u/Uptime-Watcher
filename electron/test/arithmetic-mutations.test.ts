@@ -143,8 +143,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Timing", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation: File: electron/services/monitoring/HttpMonitor.ts, Line: 92
-            // Original: const since = now - last; Mutated: now + last
+            // This test specifically targets the mutation: File: electron/services/monitoring/HttpMonitor.ts, Line: 92 Original: const since = now - last; Mutated: now + last
 
             const last = 1000; // Last check timestamp
             const now = 1500; // Current timestamp
@@ -175,8 +174,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Timing", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation: File: electron/services/monitoring/HttpMonitor.ts, Line: 97
-            // Original: const waitFor = needDelay ? this.minIntervalMs - since : 25; Mutated:
+            // This test specifically targets the mutation: File: electron/services/monitoring/HttpMonitor.ts, Line: 97 Original: const waitFor = needDelay ? this.minIntervalMs - since : 25; Mutated:
             // this.minIntervalMs + since
 
             const minIntervalMs = 1000;
@@ -378,8 +376,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Retry Logic", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation: File: electron/utils/operationalHooks.ts, Line: 149
-            // Original: return initialDelay * attempt; Mutated:
+            // This test specifically targets the mutation: File: electron/utils/operationalHooks.ts, Line: 149 Original: return initialDelay * attempt; Mutated:
             // initialDelay / attempt
 
             const initialDelay = 1000;

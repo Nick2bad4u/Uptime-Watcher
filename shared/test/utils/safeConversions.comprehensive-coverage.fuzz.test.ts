@@ -104,9 +104,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             );
 
             // NaN should return default
-            expect(safeNumberConversion(NaN, defaultValue)).toBe(
-                defaultValue
-            );
+            expect(safeNumberConversion(NaN, defaultValue)).toBe(defaultValue);
 
             // Null/undefined should return default
             expect(safeNumberConversion(null, defaultValue)).toBe(defaultValue);

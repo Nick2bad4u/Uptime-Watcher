@@ -7,8 +7,8 @@ import {
 } from "@shared/ipc/rendererEvents";
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 /**
- * Main app service that orchestrates all other services and coordinates
- * app lifecycle across the Electron backend.
+ * Main app service that orchestrates all other services and coordinates app
+ * lifecycle across the Electron backend.
  *
  * @remarks
  * Uses dependency injection through {@link ServiceContainer} to manage all
@@ -102,8 +102,8 @@ const hasCloseFunction = (
 };
 
 /**
- * High-level coordinator responsible for wiring Electron app lifecycle
- * events to the underlying service container and orchestrator.
+ * High-level coordinator responsible for wiring Electron app lifecycle events
+ * to the underlying service container and orchestrator.
  *
  * @public
  */
@@ -268,8 +268,8 @@ export class ApplicationService {
      *
      * @remarks
      * Performs ordered initialization of all services through the
-     * {@link ServiceContainer}, creates the main app window, and sets up
-     * event handlers and auto-updater. This method is called automatically when
+     * {@link ServiceContainer}, creates the main app window, and sets up event
+     * handlers and auto-updater. This method is called automatically when
      * Electron's 'ready' event fires. Errors are caught and logged by the
      * calling {@link setupApplication} method.
      *
@@ -345,8 +345,8 @@ export class ApplicationService {
     }
 
     /**
-     * Removes app event listeners. Called during cleanup to prevent
-     * memory leaks.
+     * Removes app event listeners. Called during cleanup to prevent memory
+     * leaks.
      *
      * @internal
      */
@@ -367,8 +367,8 @@ export class ApplicationService {
      * - Initialize the auto-updater mechanism
      * - Perform initial update check with error handling
      *
-     * Update check errors are logged but not re-thrown to prevent app
-     * startup failures due to network issues.
+     * Update check errors are logged but not re-thrown to prevent app startup
+     * failures due to network issues.
      *
      * @internal
      */
@@ -781,13 +781,13 @@ export class ApplicationService {
                         action: payload.action,
                         revision: payload.revision,
                         siteIdentifier: payload.siteIdentifier,
-                        ...((typeof sitesCount === "number") && { sitesCount }),
+                        ...(typeof sitesCount === "number" && { sitesCount }),
                         ...(delta && {
-                                  deltaAddedCount: delta.addedSites.length,
-                                  deltaRemovedCount:
-                                      delta.removedSiteIdentifiers.length,
-                                  deltaUpdatedCount: delta.updatedSites.length,
-                              }),
+                            deltaAddedCount: delta.addedSites.length,
+                            deltaRemovedCount:
+                                delta.removedSiteIdentifiers.length,
+                            deltaUpdatedCount: delta.updatedSites.length,
+                        }),
                         source: payload.source,
                     }
                 );

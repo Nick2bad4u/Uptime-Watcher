@@ -15,18 +15,19 @@
     Lists all files under D:\Projects and saves the output to D:\filelist.txt
 #>
 
-param (
-    [string]$Path = ".",
-    [string]$OutputFile
+param(
+    [string] $Path = ".",
+    [string] $OutputFile
 )
 
 function Get-FileBySubdirectory {
-    param (
-        [string]$Directory
+    param(
+        [string] $Directory
     )
 
     # Get all subdirectories recursively
-    $subdirs = Get-ChildItem -Path $Directory -Directory -Recurse | Sort-Object FullName
+    $subdirs = Get-ChildItem -Path $Directory -Directory -Recurse
+        | Sort-Object FullName
 
     # Add the root directory
     $subdirs = @(Get-Item -Path $Directory) + $subdirs

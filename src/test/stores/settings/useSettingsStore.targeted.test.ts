@@ -19,7 +19,7 @@ import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock the entire constants module
-vi.mock(import('../../../constants'), () => ({
+vi.mock("../../../constants", () => ({
     DEFAULT_HISTORY_LIMIT: 100,
 }));
 
@@ -30,14 +30,14 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
 // Mock store utils (partial) so required exports like createPersistConfig remain available.
-vi.mock(import('../../../stores/utils'), async (importOriginal) => {
+vi.mock("../../../stores/utils", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
 
@@ -54,7 +54,7 @@ vi.mock(import('../../../stores/utils'), async (importOriginal) => {
 });
 
 // Mock withErrorHandling from shared utils (partial) to retain ApplicationError, etc.
-vi.mock(import('../../../../shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../../shared/utils/errorHandling")
@@ -83,7 +83,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -178,7 +178,9 @@ describe("useSettingsStore - Targeted Coverage", () => {
             expect(state.settings.historyLimit).toBe(250);
 
             // Verify API calls
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledWith();
         });
 
         it("should handle backend errors in syncFromBackend", async ({

@@ -1,60 +1,61 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Codacy Coverage Reporter
-run-name: Codacy Coverage Reporter
+name: "Codacy Coverage Reporter"
+run-name: "Codacy Coverage Reporter"
 
 # Prevent multiple coverage runs from conflicting
 concurrency:
-    group: codacy-coverage-${{ github.ref }}
+    group: "codacy-coverage-${{ github.ref }}"
     cancel-in-progress: true
 
 on:
     push:
         branches:
-            - main
+            - "main"
 
-permissions: # added using https://github.com/step-security/secure-repo
-    contents: read
+permissions:
+    # added using https://github.com/step-security/secure-repo
+    contents: "read"
 
 jobs:
     codacy-coverage-reporter:
-        name: codacy-coverage-reporter
-        runs-on: ubuntu-latest
+        name: "codacy-coverage-reporter"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 60
         defaults:
             run:
-                shell: bash
+                shell: "bash"
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout
-              id: checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout"
+              id: "checkout"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
                   fetch-depth: 0
 
-            - name: Set up Node
-              id: setup-node
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Set up Node"
+              id: "setup-node"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Install dependencies
-              id: install-deps
-              run: npm install --force
+            - name: "Install dependencies"
+              id: "install-deps"
+              run: "npm install --force"
 
-            - name: Build Frontend and Backend
-              id: build
+            - name: "Build Frontend and Backend"
+              id: "build"
               run: |
                   npm run build
 
             # Run frontend tests with coverage
-            - name: Run frontend tests
-              id: test-frontend
+            - name: "Run frontend tests"
+              id: "test-frontend"
               continue-on-error: true
               run: |
                   mkdir -p coverage
@@ -63,8 +64,8 @@ jobs:
                   npx vitest run --coverage --reporter=verbose --reporter=junit --outputFile=coverage/frontend-test-report.junit.xml
 
             # Run electron tests with coverage
-            - name: Run electron tests
-              id: test-electron
+            - name: "Run electron tests"
+              id: "test-electron"
               continue-on-error: true
               run: |
                   mkdir -p coverage/electron
@@ -73,8 +74,8 @@ jobs:
                   npx vitest run --config vitest.electron.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/electron/electron-test-report.junit.xml
 
             # Run shared tests with coverage
-            - name: Run shared tests
-              id: test-shared
+            - name: "Run shared tests"
+              id: "test-shared"
               continue-on-error: true
               run: |
                   mkdir -p coverage/shared
@@ -83,7 +84,7 @@ jobs:
                   npx vitest run --config vitest.shared.config.ts --coverage --reporter=verbose --reporter=junit --outputFile=coverage/shared/shared-test-report.junit.xml
 
             # Verify coverage files exist
-            - name: Verify coverage files
+            - name: "Verify coverage files"
               run: |
                   echo "=== Checking coverage files ==="
                   ls -la coverage/ || echo "No coverage directory"
@@ -98,9 +99,9 @@ jobs:
                   echo "=== Test report files ==="
                   find coverage/ -name "*.junit.xml" || echo "No junit files"
 
-            - name: Run codacy-coverage-reporter
-              uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
+            - name: "Run codacy-coverage-reporter"
+              uses: "codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699" # v1.3.0
               with:
-                  project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-                  api-token: ${{ secrets.CODACY_API_TOKEN }}
-                  coverage-reports: ./coverage/lcov.info,./coverage/electron/lcov.info,./coverage/shared/lcov.info
+                  project-token: "${{ secrets.CODACY_PROJECT_TOKEN }}"
+                  api-token: "${{ secrets.CODACY_API_TOKEN }}"
+                  coverage-reports: "./coverage/lcov.info,./coverage/electron/lcov.info,./coverage/shared/lcov.info"

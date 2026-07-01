@@ -1,10 +1,12 @@
 # @label
 
 <!-- prettier-ignore-start -->
-|    |    |
-| -- | -- |
+
+|                  |                                                              |
+| ---------------- | ------------------------------------------------------------ |
 | Standardization: | [Core](https://tsdoc.org/pages/spec/standardization_groups/) |
-| Syntax kind: | [Inline tag](https://tsdoc.org/pages/spec/tag_kinds/) |
+| Syntax kind:     | [Inline tag](https://tsdoc.org/pages/spec/tag_kinds/)        |
+
 <!-- prettier-ignore-end -->
 
 ## Usage

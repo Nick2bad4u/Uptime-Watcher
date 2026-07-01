@@ -52,7 +52,9 @@ export async function launchAppForMonitorTesting(): Promise<{
 
 export async function openAddSiteModal(window: Page): Promise<void> {
     await window.getByRole("button", { name: /add new site/i }).click();
-    await expect.soft(window.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+    await expect
+        .soft(window.getByRole("dialog"))
+        .toBeVisible({ timeout: 5000 });
 }
 
 export async function selectMonitorType(
@@ -76,5 +78,7 @@ export async function verifySiteCreated(
     window: Page,
     siteName: string
 ): Promise<void> {
-    await expect.soft(window.getByText(siteName)).toBeVisible({ timeout: 7000 });
+    await expect
+        .soft(window.getByText(siteName))
+        .toBeVisible({ timeout: 7000 });
 }

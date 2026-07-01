@@ -60,7 +60,9 @@ test.describe(
                 const initialLabel = await themeButton.evaluate(
                     (node) => node.getAttribute("aria-label") ?? ""
                 );
-                expect.soft(initialLabel).toMatch(/switch to (dark|light) theme/i);
+                expect
+                    .soft(initialLabel)
+                    .toMatch(/switch to (dark|light) theme/i);
 
                 await themeButton.click();
 
@@ -79,10 +81,12 @@ test.describe(
                 const updatedThemeButton = page.getByRole("button", {
                     name: /switch to (dark|light) theme/i,
                 });
-                await expect.soft(updatedThemeButton).toHaveAttribute(
-                    "aria-label",
-                    /switch to (dark|light) theme/i
-                );
+                await expect
+                    .soft(updatedThemeButton)
+                    .toHaveAttribute(
+                        "aria-label",
+                        /switch to (dark|light) theme/i
+                    );
                 const toggledLabel = await updatedThemeButton.evaluate(
                     (node) => node.getAttribute("aria-label") ?? ""
                 );
@@ -100,11 +104,13 @@ test.describe(
 
                 const modal = page.getByTestId("settings-modal");
                 await expect.soft(modal).toBeVisible();
-                await expect.soft(modal).toHaveClass(/modal-shell--accent-success/v);
+                await expect
+                    .soft(modal)
+                    .toHaveClass(/modal-shell--accent-success/v);
 
-                await expect.soft(
-                    modal.getByTestId("modal-accent-icon")
-                ).toBeVisible();
+                await expect
+                    .soft(modal.getByTestId("modal-accent-icon"))
+                    .toBeVisible();
 
                 const accentValue = await modal.evaluate((element) =>
                     getComputedStyle(element).getPropertyValue("--modal-accent")

@@ -181,8 +181,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             // This test documents that undefined is properly handled
             expect(safeStringify(undefined)).toBe("");
 
-            // Note: The 'default' case is theoretically unreachable in JavaScript since typeof only returns known
-            // string values. This would require a future JavaScript version to add new types, or engine bugs.
+            // Note: The 'default' case is theoretically unreachable in JavaScript since typeof only returns known string values. This would require a future JavaScript version to add new types, or engine bugs.
             // We cannot easily test this path without mocking typeof behavior.
         });
 

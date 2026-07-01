@@ -33,8 +33,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            // Call ALL functions using both named imports and namespace import This ensures that every function in ts
-            // is executed
+            // Call ALL functions using both named imports and namespace import This ensures that every function in ts is executed
 
             // Test basic object for multiple functions
             const sampleRecord = { alpha: 1, beta: 2 };

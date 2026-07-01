@@ -79,10 +79,11 @@ export class SiteLifecycleCoordinator {
 
         try {
             // Phase 1: Stop monitoring immediately (reversible)
-            isMonitoringStopped = await this.monitorManager.stopMonitoringForSite(
-                siteIdentifier,
-                monitorId
-            );
+            isMonitoringStopped =
+                await this.monitorManager.stopMonitoringForSite(
+                    siteIdentifier,
+                    monitorId
+                );
 
             // If stopping monitoring failed, log warning but continue with
             // database removal. The monitor may not be running, but the database

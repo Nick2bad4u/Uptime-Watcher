@@ -4,8 +4,8 @@
  *
  * @remarks
  * This component provides a styled select dropdown that integrates with the
- * app's theme system. It supports accessibility attributes, various
- * event handlers, and automatic styling based on the current theme. The select
+ * app's theme system. It supports accessibility attributes, various event
+ * handlers, and automatic styling based on the current theme. The select
  * component handles focus states, disabled states, and provides consistent
  * visual appearance across the app.
  *

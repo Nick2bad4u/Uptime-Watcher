@@ -85,8 +85,9 @@ export class SiteLoadingError extends Error {
     public constructor(message: string, options?: ErrorOptions) {
         super(`Failed to load sites: ${message}`, options);
         this.name = "SiteLoadingError";
-        const causeStack =
-            Error.isError(options?.cause) ? options.cause.stack : undefined;
+        const causeStack = Error.isError(options?.cause)
+            ? options.cause.stack
+            : undefined;
         if (causeStack && this.stack) {
             // Preserve both stack traces for better debugging
             this.stack = `${this.stack}\nCaused by: ${causeStack}`;
@@ -115,8 +116,9 @@ export class DataImportExportError extends Error {
         super(message, options);
         this.name = "DataImportExportError";
 
-        const causeStack =
-            Error.isError(options?.cause) ? options.cause.stack : undefined;
+        const causeStack = Error.isError(options?.cause)
+            ? options.cause.stack
+            : undefined;
         if (causeStack && this.stack) {
             this.stack = `${this.stack}\nCaused by: ${causeStack}`;
         }
@@ -138,7 +140,7 @@ export class SiteNotFoundError extends Error {
      *
      * @param identifier - The site identifier that was not found
      */
-    public constructor(identifier: string, options: ErrorOptions) {
+    public constructor(identifier: string, options?: ErrorOptions) {
         super(`Site not found: ${identifier}`, options);
         this.name = "SiteNotFoundError";
     }

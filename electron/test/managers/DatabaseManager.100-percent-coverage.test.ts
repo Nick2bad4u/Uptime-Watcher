@@ -262,8 +262,8 @@ describe("DatabaseManager - 100% Coverage", () => {
         (databaseManager as any).commandExecutor = mockCommandExecutor;
 
         // Ensure siteCache is properly mocked if it's undefined
-        if (!(databaseManager as any).siteCache) {
-            (databaseManager as any).siteCache = {
+        if (!(databaseManager as any)["siteCache"]) {
+            (databaseManager as any)["siteCache"] = {
                 set: vi.fn(),
                 get: vi.fn(),
                 has: vi.fn(),
@@ -796,9 +796,9 @@ describe("DatabaseManager - 100% Coverage", () => {
             await expect(
                 databaseManager.setHistoryLimit(undefined as any)
             ).rejects.toThrow(TypeError);
-            await expect(
-                databaseManager.setHistoryLimit(NaN)
-            ).rejects.toThrow(TypeError);
+            await expect(databaseManager.setHistoryLimit(NaN)).rejects.toThrow(
+                TypeError
+            );
         });
 
         it("should normalize non-integer values", async ({
@@ -1018,7 +1018,7 @@ describe("DatabaseManager - 100% Coverage", () => {
                         monitoring: false,
                     },
                 ];
-                const mockSiteCache = (databaseManager as any).siteCache;
+                const mockSiteCache = (databaseManager as any)["siteCache"];
                 mockSiteCache.entries.mockReturnValue(
                     mockSites.map((site) => [site.identifier, site])
                 );

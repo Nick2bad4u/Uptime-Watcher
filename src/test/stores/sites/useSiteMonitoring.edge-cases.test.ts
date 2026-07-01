@@ -16,15 +16,15 @@ const ensureErrorMock = vi.hoisted(() =>
     )
 );
 
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     ensureError: ensureErrorMock,
-    withErrorHandling: vi.fn(
-        async (operation: () => Promise<void>) => { await operation(); }
-    ),
+    withErrorHandling: vi.fn(async (operation: () => Promise<void>) => {
+        await operation();
+    }),
 }));
 
 const logStoreActionMock = vi.hoisted(() => vi.fn());
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: logStoreActionMock,
 }));
 
@@ -34,7 +34,7 @@ const loggerMock = vi.hoisted(() => ({
     info: vi.fn(),
     warn: vi.fn(),
 }));
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: loggerMock,
 }));
 

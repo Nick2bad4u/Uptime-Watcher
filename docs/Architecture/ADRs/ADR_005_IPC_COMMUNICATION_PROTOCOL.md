@@ -19,17 +19,17 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Communication Patterns](#communication-patterns)
-5. [Channel Naming Convention](#channel-naming-convention)
-6. [Security Considerations](#security-considerations)
-7. [Testing Strategy](#testing-strategy)
-8. [Consequences](#consequences)
-9. [Implementation Requirements](#implementation-requirements)
-10. [Compliance](#compliance)
-11. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Communication Patterns](#communication-patterns)
+- [Channel Naming Convention](#channel-naming-convention)
+- [Security Considerations](#security-considerations)
+- [Testing Strategy](#testing-strategy)
+- [Consequences](#consequences)
+- [Implementation Requirements](#implementation-requirements)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 

@@ -21,9 +21,9 @@ const isJsonSerializableObject = (
     value: object
 ): value is Jsonifiable & object =>
     !(value instanceof Map) &&
-        !(value instanceof Set) &&
-        !(value instanceof WeakMap) &&
-        !(value instanceof WeakSet);
+    !(value instanceof Set) &&
+    !(value instanceof WeakMap) &&
+    !(value instanceof WeakSet);
 
 /**
  * Safely converts any value to a string, handling all JavaScript types with

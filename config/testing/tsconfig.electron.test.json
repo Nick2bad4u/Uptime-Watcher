@@ -24,7 +24,11 @@
         },
         "rootDir": "../..",
         "tsBuildInfoFile": "../../.cache/tsbuildinfo/tsconfig.electron.test.tsbuildinfo",
-        "types": ["electron", "node", "vitest/globals"]
+        "types": [
+            "electron",
+            "node",
+            "vitest/globals"
+        ]
     },
     "exclude": [
         "node_modules",

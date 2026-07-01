@@ -6,7 +6,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
+import { arrayAt, arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AnalyticsTabProperties } from "../../../components/SiteDetails/tabs/AnalyticsTab";
@@ -20,15 +20,15 @@ import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 
 const waitForAnimationMock = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 
-vi.mock(import('../../../hooks/site/useSiteDetails'), () => ({
+vi.mock("../../../hooks/site/useSiteDetails", () => ({
     useSiteDetails: vi.fn(),
 }));
 
-vi.mock(import('../../../utils/time/waitForAnimation'), () => ({
+vi.mock("../../../utils/time/waitForAnimation", () => ({
     waitForAnimation: waitForAnimationMock,
 }));
 
-vi.mock(import('../../../theme/useTheme'), () => ({
+vi.mock("../../../theme/useTheme", () => ({
     useTheme: () => ({
         currentTheme: {
             colors: {
@@ -45,7 +45,7 @@ vi.mock(import('../../../theme/useTheme'), () => ({
     }),
 }));
 
-vi.mock(import('../../../services/chartConfig'), () => ({
+vi.mock("../../../services/chartConfig", () => ({
     ChartConfigService: class {
         getLineChartConfig() {
             return { kind: "line" };
@@ -67,25 +67,25 @@ const analyticsTabProps: AnalyticsTabProperties[] = [];
 const historyTabProps: HistoryTabProperties[] = [];
 const settingsTabProps: SettingsTabProperties[] = [];
 
-vi.mock(import('../../../components/SiteDetails/SiteDetailsHeader'), () => ({
+vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
     SiteDetailsHeader: ({ children }: { readonly children?: ReactNode }) => (
         <header data-testid="site-details-header">{children}</header>
     ),
 }));
 
-vi.mock(import('../../../components/SiteDetails/SiteDetailsNavigation'), () => ({
+vi.mock("../../../components/SiteDetails/SiteDetailsNavigation", () => ({
     SiteDetailsNavigation: () => (
         <nav data-testid="site-details-navigation">navigation</nav>
     ),
 }));
 
-vi.mock(import('../../../components/shared/SurfaceContainer'), () => ({
+vi.mock("../../../components/shared/SurfaceContainer", () => ({
     SurfaceContainer: ({ children }: { readonly children?: ReactNode }) => (
         <section data-testid="surface-container">{children}</section>
     ),
 }));
 
-vi.mock(import('../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../theme/components/ThemedBox", () => ({
     ThemedBox: ({
         children,
         ...props
@@ -96,35 +96,35 @@ vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ),
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/SiteOverviewTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/SiteOverviewTab", () => ({
     SiteOverviewTab: (props: SiteOverviewTabProperties) => {
         siteOverviewTabProps.push(props);
         return <div data-testid="site-overview-tab">site overview</div>;
     },
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/OverviewTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/OverviewTab", () => ({
     OverviewTab: (props: OverviewTabProperties) => {
         overviewTabProps.push(props);
         return <div data-testid="monitor-overview-tab">overview</div>;
     },
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/AnalyticsTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/AnalyticsTab", () => ({
     AnalyticsTab: (props: AnalyticsTabProperties) => {
         analyticsTabProps.push(props);
         return <div data-testid="analytics-tab">analytics</div>;
     },
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/HistoryTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/HistoryTab", () => ({
     HistoryTab: (props: HistoryTabProperties) => {
         historyTabProps.push(props);
         return <div data-testid="history-tab">history</div>;
     },
 }));
 
-vi.mock(import('../../../components/SiteDetails/tabs/SettingsTab'), () => ({
+vi.mock("../../../components/SiteDetails/tabs/SettingsTab", () => ({
     SettingsTab: (props: SettingsTabProperties) => {
         settingsTabProps.push(props);
         return <div data-testid="settings-tab">settings</div>;
@@ -156,9 +156,7 @@ const createHookState = (
     overrides: UnknownRecord = {}
 ): ReturnType<typeof useSiteDetails> => {
     const { analytics: analyticsOverride, ...restOverrides } = overrides;
-    const analyticsOverrides = analyticsOverride as
-        | undefined
-        | UnknownRecord;
+    const analyticsOverrides = analyticsOverride as undefined | UnknownRecord;
 
     const analyticsBase = {
         avgResponseTime: 200,
@@ -188,11 +186,13 @@ const createHookState = (
         uptime: "95.5%",
     };
 
-    const mergedAnalytics = safeCastTo<UnknownRecord & {
-        p50?: number;
-        p95?: number;
-        p99?: number;
-    }>({
+    const mergedAnalytics = safeCastTo<
+        UnknownRecord & {
+            p50?: number;
+            p95?: number;
+            p99?: number;
+        }
+    >({
         ...analyticsBase,
         ...analyticsOverrides,
     });
@@ -294,7 +294,9 @@ describe(SiteDetails, () => {
         await user.click(overlay);
 
         expect(waitForAnimationMock).toHaveBeenCalledWith();
-        await waitFor(() => { expect(onClose).toHaveBeenCalledWith(); });
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalledWith();
+        });
     });
 
     it("closes when the overlay receives keyboard dismissal", async () => {
@@ -309,7 +311,9 @@ describe(SiteDetails, () => {
         fireEvent.keyDown(overlay, { key: "Escape" });
 
         expect(waitForAnimationMock).toHaveBeenCalledWith();
-        await waitFor(() => { expect(onClose).toHaveBeenCalledWith(); });
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalledWith();
+        });
     });
 
     it("does not close when clicking inside the modal content", async () => {
@@ -411,8 +415,8 @@ describe(SiteDetails, () => {
         expect(typeof props.handleSaveInterval).toBe("function");
 
         props.handleSaveInterval();
-        await waitFor(() =>
-            { expect(handleSaveInterval).toHaveBeenCalledTimes(1); }
-        );
+        await waitFor(() => {
+            expect(handleSaveInterval).toHaveBeenCalledTimes(1);
+        });
     });
 });

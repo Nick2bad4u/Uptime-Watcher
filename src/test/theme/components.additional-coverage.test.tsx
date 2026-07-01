@@ -17,9 +17,10 @@ import { ThemedProgress } from "../../theme/components/ThemedProgress";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 
 // Mock theme hooks with factory function to avoid hoisting issues
-vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
-    const actual =
-        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual = safeCastTo<typeof import("../../theme/useTheme")>(
+        await importOriginal()
+    );
     return {
         ...actual,
         useTheme: vi.fn(() => ({
@@ -126,7 +127,7 @@ vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
 });
 
 // Mock status utilities
-vi.mock(import('../../utils/status'), () => {
+vi.mock("../../utils/status", () => {
     const formatStatusLabel = vi.fn(
         (status: string) => status.charAt(0).toUpperCase() + status.slice(1)
     );
@@ -154,13 +155,13 @@ vi.mock(import('../../utils/status'), () => {
 });
 
 // Mock time utilities
-vi.mock(import('../../utils/time'), () => ({
+vi.mock("../../utils/time", () => ({
     formatResponseTime: vi.fn((time?: number) => (time ? `${time}ms` : "0ms")),
 }));
 
 // Mock constants (partial to preserve other exports used by stores/settings)
-vi.mock(import('../../constants'), async (importOriginal) => {
-    const actual = (await importOriginal());
+vi.mock("../../constants", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../../constants")>();
     return {
         ...actual,
         ARIA_LABEL: "aria-label",

@@ -2,8 +2,8 @@
 # It uses the crazy-max/ghaction-virustotal action and your provided API key (should be stored as a secret in production).
 
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Virus Total Scan
-run-name: Virus Total Scan
+name: "Virus Total Scan"
+run-name: "Virus Total Scan"
 
 on:
     workflow_dispatch:
@@ -11,43 +11,43 @@ on:
         workflows: ["Build and Release Electron App"]
         branches: ["main"]
         types:
-            - completed
+            - "completed"
     schedule:
         - cron: "33 3 1 * *" # Every month at 3:33 AM UTC
 
 permissions:
-    contents: read
+    contents: "read"
 
 concurrency:
-    group: virustotal-${{ github.ref }}
-    cancel-in-progress: ${{ false }}
+    group: "virustotal-${{ github.ref }}"
+    cancel-in-progress: "${{ false }}"
 
 defaults:
     run:
-        shell: bash
+        shell: "bash"
 
 jobs:
     virustotal:
-        name: Scan release assets with VirusTotal
-        runs-on: ubuntu-latest
+        name: "Scan release assets with VirusTotal"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 30
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Download latest release assets
-              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
+            - name: "Download latest release assets"
+              uses: "robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f" # v1.13
               with:
                   latest: true
                   fileName: "*"
-                  out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
-            - name: VirusTotal Scan
-              uses: crazy-max/ghaction-virustotal@936d8c5c00afe97d3d9a1af26d017cfdf26800a2 # v5.0.0
+                  out-file-path: "release-dist"
+                  token: "${{ secrets.GITHUB_TOKEN }}"
+            - name: "VirusTotal Scan"
+              uses: "crazy-max/ghaction-virustotal@936d8c5c00afe97d3d9a1af26d017cfdf26800a2" # v5.0.0
               with:
-                  vt_api_key: ${{ secrets.VT_API_KEY }}
+                  vt_api_key: "${{ secrets.VT_API_KEY }}"
                   files: |
                       release-dist/*
                       release-dist/**/*

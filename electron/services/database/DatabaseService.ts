@@ -3,8 +3,8 @@
  *
  * @remarks
  * Provides centralized database initialization, connection management, and
- * transaction utilities for the app. Uses node-sqlite3-wasm for
- * database operations.
+ * transaction utilities for the app. Uses node-sqlite3-wasm for database
+ * operations.
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -157,8 +157,7 @@ export class DatabaseService {
     ): Promise<T> {
         const db = this.getDatabase();
 
-        // Nested transaction scenario: use SAVEPOINT so callers still get an atomic boundary even when already inside
-        // a broader transaction.
+        // Nested transaction scenario: use SAVEPOINT so callers still get an atomic boundary even when already inside a broader transaction.
         //
         // SQLite doesn't support nested BEGIN/COMMIT, but savepoints are the
         // supported mechanism.

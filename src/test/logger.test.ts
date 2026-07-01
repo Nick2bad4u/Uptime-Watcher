@@ -23,7 +23,7 @@ const mockLog = {
     warn: vi.fn(),
 };
 
-vi.mock(import('electron-log/renderer'), () => ({
+vi.mock("electron-log/renderer", () => ({
     default: mockLog,
 }));
 

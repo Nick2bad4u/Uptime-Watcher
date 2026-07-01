@@ -60,7 +60,7 @@ describe("dataSchemas", () => {
 
         const parsed = validateSerializedDatabaseBackupResult({
             buffer,
-            fileName: ' '.repeat(3),
+            fileName: " ".repeat(3),
             metadata: {
                 appVersion: "1.0.0",
                 checksum: "abc",

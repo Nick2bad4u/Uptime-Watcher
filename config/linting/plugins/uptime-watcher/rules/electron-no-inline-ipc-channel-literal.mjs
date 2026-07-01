@@ -50,8 +50,7 @@ export const electronNoInlineIpcChannelLiteralRule = {
         }
 
         /**
-         * @param {
-         *     | import("@typescript-eslint/utils").TSESTree.Expression
+         * @param {import("@typescript-eslint/utils").TSESTree.Expression
          *     | import("@typescript-eslint/utils").TSESTree.SpreadElement
          *     | null
          *     | undefined} argument
@@ -68,8 +67,10 @@ export const electronNoInlineIpcChannelLiteralRule = {
                 return true;
             }
 
-            return argument.type === "TemplateLiteral" &&
-                argument.expressions.length === 0;
+            return (
+                argument.type === "TemplateLiteral" &&
+                argument.expressions.length === 0
+            );
         }
 
         return {

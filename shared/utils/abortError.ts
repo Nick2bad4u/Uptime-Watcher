@@ -39,7 +39,7 @@ export function createAbortError(args?: {
  * Checks whether an unknown value is a standardized abort error.
  */
 export function isAbortError(value: unknown): value is AbortError {
-    if (!(Error.isError(value))) {
+    if (!Error.isError(value)) {
         return false;
     }
 

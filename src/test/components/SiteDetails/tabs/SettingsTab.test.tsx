@@ -23,7 +23,7 @@ let sampledMonitorUrl: string;
 const monitorIdentifierRef = { value: "" };
 
 // Mock all external dependencies
-vi.mock(import('../../../../constants'), () => ({
+vi.mock("../../../../constants", () => ({
     CHECK_INTERVALS: [
         30_000,
         60_000,
@@ -37,7 +37,7 @@ vi.mock(import('../../../../constants'), () => ({
     ARIA_LABEL: "aria-label",
 }));
 
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -49,7 +49,7 @@ vi.mock(import('../../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/useTheme'), () => ({
+vi.mock("../../../../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({
         currentTheme: {
             name: "light",
@@ -190,7 +190,7 @@ vi.mock(import('../../../../theme/useTheme'), () => ({
     useThemeValue: vi.fn(() => "mockValue"),
 }));
 
-vi.mock(import('../../../../utils/monitorTypeHelper'), () => ({
+vi.mock("../../../../utils/monitorTypeHelper", () => ({
     getMonitorTypeConfig: vi.fn().mockResolvedValue({
         fields: [
             {
@@ -202,7 +202,7 @@ vi.mock(import('../../../../utils/monitorTypeHelper'), () => ({
     }),
 }));
 
-vi.mock(import('../../../../utils/fallbacks'), () => ({
+vi.mock("../../../../utils/fallbacks", () => ({
     getMonitorDisplayIdentifier: vi.fn(() => monitorIdentifierRef.value),
     getMonitorTypeDisplayLabel: vi.fn().mockReturnValue("URL"),
     UiDefaults: {
@@ -211,7 +211,7 @@ vi.mock(import('../../../../utils/fallbacks'), () => ({
     },
 }));
 
-vi.mock(import('../../../../utils/time'), () => ({
+vi.mock("../../../../utils/time", () => ({
     formatRetryAttemptsText: vi.fn().mockReturnValue("3 retry attempts"),
     getIntervalLabel: vi.fn().mockImplementation((interval) => {
         const value = typeof interval === "number" ? interval : interval.value;
@@ -219,11 +219,11 @@ vi.mock(import('../../../../utils/time'), () => ({
     }),
 }));
 
-vi.mock(import('../../../../utils/duration'), () => ({
+vi.mock("../../../../utils/duration", () => ({
     calculateMaxDuration: vi.fn().mockReturnValue("45 seconds"),
 }));
 
-vi.mock(import('../../../../utils/errorHandling'), () => ({
+vi.mock("../../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi
         .fn()
         .mockImplementation(async (fn, _desc, fallback) => {

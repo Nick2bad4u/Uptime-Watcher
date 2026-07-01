@@ -210,7 +210,7 @@ export function buildDiagnosticsPayload(args: {
         },
         context: {
             provider: args.status?.provider ?? null,
-            ...(providerDetails && { providerDetails }),
+            ...(providerDetails !== undefined && { providerDetails }),
             configured: args.status?.configured ?? false,
             connected: args.status?.connected ?? false,
             encryptionLocked: args.encryptionLocked,

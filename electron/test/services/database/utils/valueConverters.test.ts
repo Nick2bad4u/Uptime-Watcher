@@ -549,7 +549,7 @@ describe("Value Converters Utility", () => {
             await annotate("Component: Value Converters Utility", "component");
 
             expect(safeNumberConvert("  42  ")).toBe(42);
-            expect(safeNumberConvert(' '.repeat(3))).toBe(0);
+            expect(safeNumberConvert(" ".repeat(3))).toBe(0);
             expect(safeNumberConvert("\t\n\r")).toBe(0);
         });
         it("should handle scientific notation", async ({ task, annotate }) => {

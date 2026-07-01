@@ -298,8 +298,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
 
             expect(checkMock).toHaveBeenCalledTimes(1);
             const signal = checkMock.mock.calls[0]?.[1] as
-                | AbortSignal
-                | undefined;
+                AbortSignal | undefined;
             expect(signal).toBeDefined();
             expect(signal?.aborted).toBeTruthy();
             expect(result?.status).toBe("down");

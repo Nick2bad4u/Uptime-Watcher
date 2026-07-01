@@ -416,7 +416,10 @@ export const CloudSettingsSection = (): JSX.Element => {
                 return;
             }
 
-            const uniqueDeviceCount = new Set(Iterator.concat(preview.deviceIds, preview.operationDeviceIds)).size;
+            const uniqueDeviceCount = new Set([
+                ...preview.deviceIds,
+                ...preview.operationDeviceIds,
+            ]).size;
             const expected = `RESET ${uniqueDeviceCount}`;
             const typed = await requestPrompt({
                 confirmLabel: "Confirm reset",
@@ -486,7 +489,12 @@ export const CloudSettingsSection = (): JSX.Element => {
                 </ThemedText>
             </div>
         ),
-        [handleSyncEnabledChange, isConnected, isSettingSyncEnabled, isSyncEnabled]
+        [
+            handleSyncEnabledChange,
+            isConnected,
+            isSettingSyncEnabled,
+            isSyncEnabled,
+        ]
     );
 
     return (

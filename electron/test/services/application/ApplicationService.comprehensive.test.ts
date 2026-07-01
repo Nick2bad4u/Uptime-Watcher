@@ -560,7 +560,9 @@ describe(ApplicationService, () => {
             mockUptimeOrchestrator.stopMonitoring.mockReturnValueOnce(
                 new Promise((resolve, reject) => {
                     // Simulate async operation that can be cancelled
-                    const timeout = setTimeout(() => { resolve(undefined); }, 1000);
+                    const timeout = setTimeout(() => {
+                        resolve(undefined);
+                    }, 1000);
 
                     // Handle cancellation properly
                     customSignal.addEventListener("abort", () => {
@@ -580,7 +582,9 @@ describe(ApplicationService, () => {
             const cleanupPromise = applicationService.cleanup();
 
             // Simulate cancellation after a short delay
-            setTimeout(() => { abortController.abort(); }, 10);
+            setTimeout(() => {
+                abortController.abort();
+            }, 10);
 
             // Assert - Should handle cancellation
             await expect(cleanupPromise).rejects.toThrow("Operation aborted");
@@ -879,7 +883,9 @@ describe(ApplicationService, () => {
 
             // Act - Start ready handler and cancel update check
             const readyPromise = readyHandler?.();
-            setTimeout(() => { abortController.abort(); }, 10);
+            setTimeout(() => {
+                abortController.abort();
+            }, 10);
 
             // Wait for completion
             await readyPromise;

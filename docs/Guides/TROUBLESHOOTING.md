@@ -18,11 +18,11 @@ tags:
 
 ## Table of Contents
 
-1. [🚨 Common Issues & Solutions](#-common-issues--solutions)
-2. [🔍 Debugging Techniques](#-debugging-techniques)
-3. [🛠️ Development Tools](#️-development-tools)
-4. [🔧 Performance Optimization](#-performance-optimization)
-5. [📞 Getting Help](#-getting-help)
+- [🚨 Common Issues & Solutions](#-common-issues--solutions)
+- [🔍 Debugging Techniques](#-debugging-techniques)
+- [🛠️ Development Tools](#️-development-tools)
+- [🔧 Performance Optimization](#-performance-optimization)
+- [📞 Getting Help](#-getting-help)
 
 ## 🚨 Common Issues & Solutions
 

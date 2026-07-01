@@ -1437,9 +1437,7 @@ describe("monitorTitleFormatters", () => {
             ])(
                 "should format HTTP monitor titles with valid URLs",
                 (monitor) => {
-                    const result = formatTitleSuffix(
-                        monitor
-                    );
+                    const result = formatTitleSuffix(monitor);
 
                     expect(result).toBe(` (${monitor.url})`);
                     expect(result).toContain(monitor.url);
@@ -1463,9 +1461,7 @@ describe("monitorTitleFormatters", () => {
             ])(
                 "should format port monitor titles with host and port",
                 (monitor) => {
-                    const result = formatTitleSuffix(
-                        monitor
-                    );
+                    const result = formatTitleSuffix(monitor);
 
                     expect(result).toBe(` (${monitor.host}:${monitor.port})`);
                     expect(result).toContain(monitor.host);
@@ -1497,9 +1493,7 @@ describe("monitorTitleFormatters", () => {
             ])(
                 "should format DNS monitor titles with record type and host",
                 (monitor) => {
-                    const result = formatTitleSuffix(
-                        monitor
-                    );
+                    const result = formatTitleSuffix(monitor);
 
                     expect(result).toBe(
                         ` (${monitor.recordType} ${monitor.host})`

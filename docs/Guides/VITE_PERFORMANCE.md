@@ -18,17 +18,17 @@ tags:
 
 ## Table of Contents
 
-1. [🔧 Available Scripts](#-available-scripts)
-2. [📊 How to Use Profiling](#-how-to-use-profiling)
-3. [🚀 Warmup Configuration](#-warmup-configuration)
-4. [🎯 Performance Benefits](#-performance-benefits)
-5. [🔍 Identifying Additional Warmup Candidates](#-identifying-additional-warmup-candidates)
-6. [⚡ Current Performance Optimizations](#-current-performance-optimizations)
-7. [🎯 Performance Best Practices](#-performance-best-practices)
-8. [📚 Related Resources](#-related-resources)
-9. [🎯 Quick Reference](#-quick-reference)
-10. [📝 Notes](#-notes)
-11. [🚨 Troubleshooting](#-troubleshooting)
+- [🔧 Available Scripts](#-available-scripts)
+- [📊 How to Use Profiling](#-how-to-use-profiling)
+- [🚀 Warmup Configuration](#-warmup-configuration)
+- [🎯 Performance Benefits](#-performance-benefits)
+- [🔍 Identifying Additional Warmup Candidates](#-identifying-additional-warmup-candidates)
+- [⚡ Current Performance Optimizations](#-current-performance-optimizations)
+- [🎯 Performance Best Practices](#-performance-best-practices)
+- [📚 Related Resources](#-related-resources)
+- [🎯 Quick Reference](#-quick-reference)
+- [📝 Notes](#-notes)
+- [🚨 Troubleshooting](#-troubleshooting)
 
 ## 🔧 Available Scripts
 

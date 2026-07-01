@@ -1,7 +1,7 @@
 # Build and backup Docusaurus documentation to backup repository
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Build and Backup Docusaurus Documentation
-run-name: Build And Backup Docusaurus Documentation
+name: "Build and Backup Docusaurus Documentation"
+run-name: "Build And Backup Docusaurus Documentation"
 
 on:
     # Runs on pushes targeting the default branch when docs/docusaurus changes
@@ -19,10 +19,10 @@ on:
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
-# Sets permissions for the GITHUB_TOKEN
+        # Sets permissions for the GITHUB_TOKEN
 permissions:
-    contents: read
-    actions: read
+    contents: "read"
+    actions: "read"
 
 # Prevent concurrent backup runs
 concurrency:
@@ -31,37 +31,37 @@ concurrency:
 
 defaults:
     run:
-        shell: bash
+        shell: "bash"
 
 jobs:
     build-and-backup:
-        name: Build and Backup Documentation
-        runs-on: ubuntu-latest
+        name: "Build and Backup Documentation"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 60
         env:
-            DOCUSAURUS_BACKUP_REPO: Nick2bad4u/Uptime-Watcher-Docusaurus
-            DOCUSAURUS_BACKUP_BRANCH: main
+            DOCUSAURUS_BACKUP_REPO: "Nick2bad4u/Uptime-Watcher-Docusaurus"
+            DOCUSAURUS_BACKUP_BRANCH: "main"
 
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: "Checkout repository"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
                   fetch-depth: 0 # Need full history for git subtree operations
 
-            - name: Setup Node.js
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - name: "Setup Node.js"
+              uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
-                  node-version-file: .node-version
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+                  node-version-file: ".node-version"
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
 
-            - name: Cache dependencies and build artifacts
-              uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+            - name: "Cache dependencies and build artifacts"
+              uses: "actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae" # v5.0.5
               with:
                   path: |
                       node_modules
@@ -74,24 +74,24 @@ jobs:
                       docs/docusaurus/build/.cache
                       **/.rspack-cache
                       **/.webpack-cache
-                  key: ${{ runner.os }}-backup-build-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
+                  key: "${{ runner.os }}-backup-build-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}"
                   restore-keys: |
                       ${{ runner.os }}-backup-build-${{ hashFiles('**/package-lock.json') }}-
                       ${{ runner.os }}-backup-build-
 
-            - name: Configure Git
+            - name: "Configure Git"
               run: |
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-            - name: Install dependencies - Main App
-              run: npm install --force
+            - name: "Install dependencies - Main App"
+              run: "npm install --force"
 
-            - name: Install dependencies - Docusaurus
-              run: cd docs/docusaurus && npm install --force
+            - name: "Install dependencies - Docusaurus"
+              run: "cd docs/docusaurus && npm install --force"
 
-            - name: Check for changes in docs/docusaurus
-              id: check_changes
+            - name: "Check for changes in docs/docusaurus"
+              id: "check_changes"
               run: |
                   set -euo pipefail
 
@@ -120,30 +120,30 @@ jobs:
                       echo "ℹ️ No changes detected in documentation-related directories"
                   fi
 
-            - name: Build before TypeDoc
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+            - name: "Build before TypeDoc"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
               run: |
                   echo "🏗️ Building main application..."
                   # Build files
                   npm run build:electron-vite
 
-            - name: Generate unified TypeDoc documentation
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+            - name: "Generate unified TypeDoc documentation"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
               run: |
                   echo "📚 Generating TypeDoc documentation..."
                   # Generate unified TypeDoc documentation for all source code (Frontend, Backend, Shared)
                   npm run docs:typedoc
               continue-on-error: true
 
-            - name: Build Docusaurus website
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+            - name: "Build Docusaurus website"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
               run: |
                   echo "🔨 Building Docusaurus website..."
                   npm run docusaurus:build
                   echo "✅ Docusaurus build completed"
 
-            - name: List build output
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+            - name: "List build output"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
               run: |
                   echo "📁 Build output contents:"
                   if [ -d "docs/docusaurus/build" ]; then
@@ -152,9 +152,9 @@ jobs:
                       echo "❌ Build directory not found"
                   fi
 
-            - name: Validate backup token
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
-              shell: bash
+            - name: "Validate backup token"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
+              shell: "bash"
               env:
                   DOCUSAURUS_BACKUP_TOKEN: "${{ secrets.DOCUSAURUS_BACKUP_TOKEN }}"
               run: |
@@ -165,9 +165,9 @@ jobs:
                       exit 1
                   fi
 
-            - name: Clone backup repository
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
-              shell: bash
+            - name: "Clone backup repository"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
+              shell: "bash"
               env:
                   DOCUSAURUS_BACKUP_TOKEN: "${{ secrets.DOCUSAURUS_BACKUP_TOKEN }}"
               run: |
@@ -178,8 +178,8 @@ jobs:
                   cd backup-repo
                   git checkout "${DOCUSAURUS_BACKUP_BRANCH}" 2>/dev/null || git checkout -b "${DOCUSAURUS_BACKUP_BRANCH}"
 
-            - name: Sync documentation artifacts to backup repository
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+            - name: "Sync documentation artifacts to backup repository"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
               run: |
                   echo "🧽 Cleaning tracked files in backup repository"
                   rsync -a --delete \
@@ -189,9 +189,9 @@ jobs:
                       --exclude 'build/.cache/' \
                       docs/docusaurus/ backup-repo/
 
-            - name: Commit and push backup repository
-              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
-              working-directory: backup-repo
+            - name: "Commit and push backup repository"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
+              working-directory: "backup-repo"
               run: |
                   echo "📝 Preparing backup commit"
                   git add --all
@@ -204,8 +204,8 @@ jobs:
                   echo "🚀 Pushing to backup repository"
                   git push origin ${{ env.DOCUSAURUS_BACKUP_BRANCH }}
 
-            - name: Summary
-              if: always()
+            - name: "Summary"
+              if: "always()"
               run: |
                   echo "## 📚 Docusaurus Build & Backup Summary" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY

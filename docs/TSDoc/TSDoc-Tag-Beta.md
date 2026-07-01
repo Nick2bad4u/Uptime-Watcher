@@ -1,11 +1,13 @@
 # @beta
 
 <!-- prettier-ignore-start -->
-|    |    |
-| -- | -- |
+
+|                  |                                                                       |
+| ---------------- | --------------------------------------------------------------------- |
 | Standardization: | [Discretionary](https://tsdoc.org/pages/spec/standardization_groups/) |
-| Syntax kind: | [Modifier](https://tsdoc.org/pages/spec/tag_kinds/) |
-| Synonyms: | [@experimental](https://tsdoc.org/pages/tags/experimental/) |
+| Syntax kind:     | [Modifier](https://tsdoc.org/pages/spec/tag_kinds/)                   |
+| Synonyms:        | [@experimental](https://tsdoc.org/pages/tags/experimental/)           |
+
 <!-- prettier-ignore-end -->
 
 ## Suggested meaning

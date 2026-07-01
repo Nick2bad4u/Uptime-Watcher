@@ -23,7 +23,7 @@ import { useAvailabilityColors } from "../../../../theme/useTheme";
 import { getIntervalLabel } from "../../../../utils/time";
 
 // Mock all external dependencies
-vi.mock(import('../../../../constants'), () => ({
+vi.mock("../../../../constants", () => ({
     ARIA_LABEL: "aria-label",
     CHECK_INTERVALS: [
         { label: "Custom (45 seconds)", value: 45_000 },
@@ -35,7 +35,7 @@ vi.mock(import('../../../../constants'), () => ({
     TRANSITION_ALL: "all 0.2s ease-in-out",
 }));
 
-vi.mock(import('../../../../services/logger'), () => ({
+vi.mock("../../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -47,7 +47,7 @@ vi.mock(import('../../../../services/logger'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/useTheme'), () => ({
+vi.mock("../../../../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({
         availableThemes: ["light", "dark"],
         currentTheme: {
@@ -134,7 +134,7 @@ type StatusIndicatorMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../../../theme/components/StatusIndicator", () => ({
     StatusIndicator: ({
         children,
         className,
@@ -158,7 +158,7 @@ type ThemedBadgeMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../../../theme/components/ThemedBadge'), () => ({
+vi.mock("../../../../theme/components/ThemedBadge", () => ({
     ThemedBadge: ({
         children,
         className,
@@ -189,7 +189,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     ButtonHTMLAttributes<HTMLButtonElement>
 >;
 
-vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         className,
@@ -213,7 +213,7 @@ type ThemedCardMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../../../theme/components/ThemedCard'), () => ({
+vi.mock("../../../../theme/components/ThemedCard", () => ({
     ThemedCard: ({
         children,
         className,
@@ -252,7 +252,7 @@ vi.mock(import('../../../../theme/components/ThemedCard'), () => ({
 
 type ThemedInputMockProperties = InputHTMLAttributes<HTMLInputElement>;
 
-vi.mock(import('../../../../theme/components/ThemedInput'), () => ({
+vi.mock("../../../../theme/components/ThemedInput", () => ({
     ThemedInput: ({ className, ...props }: ThemedInputMockProperties) => (
         <input
             className={withBaseClass("themed-input", className)}
@@ -266,7 +266,7 @@ type ThemedProgressMockProperties = HTMLAttributes<HTMLDivElement> & {
     readonly showLabel?: boolean;
 };
 
-vi.mock(import('../../../../theme/components/ThemedProgress'), () => ({
+vi.mock("../../../../theme/components/ThemedProgress", () => ({
     ThemedProgress: ({
         className,
         showLabel: _showLabel,
@@ -284,7 +284,7 @@ type ThemedSelectMockProperties = PropsWithChildren<
     SelectHTMLAttributes<HTMLSelectElement>
 >;
 
-vi.mock(import('../../../../theme/components/ThemedSelect'), () => ({
+vi.mock("../../../../theme/components/ThemedSelect", () => ({
     ThemedSelect: ({
         children,
         className,
@@ -304,7 +304,7 @@ type ThemedTextMockProperties = PropsWithChildren<
     HTMLAttributes<HTMLSpanElement>
 >;
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({
         children,
         className,
@@ -320,11 +320,11 @@ vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../utils/monitoring/dataValidation'), () => ({
+vi.mock("../../../../utils/monitoring/dataValidation", () => ({
     parseUptimeValue: vi.fn((value: string) => Number.parseFloat(value)),
 }));
 
-vi.mock(import('../../../../utils/time'), () => ({
+vi.mock("../../../../utils/time", () => ({
     getIntervalLabel: vi.fn((interval: number) => {
         if (interval < 60_000) return `${interval / 1000}s`;
         return `${interval / 60_000}m`;
@@ -461,7 +461,9 @@ describe(OverviewTab, () => {
             render(<OverviewTab {...baseProps} />);
 
             // Check if uptime is displayed
-            expect(arrayFirst(screen.getAllByText("99.5%"))).toBeInTheDocument();
+            expect(
+                arrayFirst(screen.getAllByText("99.5%"))
+            ).toBeInTheDocument();
         });
 
         it("should show response time statistics", ({ task, annotate }) => {
@@ -846,7 +848,9 @@ describe(OverviewTab, () => {
 
             render(<OverviewTab {...baseProps} uptime="100.0" />);
 
-            expect(arrayFirst(screen.getAllByText("100.0%"))).toBeInTheDocument();
+            expect(
+                arrayFirst(screen.getAllByText("100.0%"))
+            ).toBeInTheDocument();
         });
 
         it("should handle 0% uptime", ({ task, annotate }) => {

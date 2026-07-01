@@ -56,7 +56,7 @@ const getHelpersMock = vi.hoisted(() =>
     }))
 );
 
-vi.mock(import('../../services/utils/createIpcServiceHelpers'), () => ({
+vi.mock("../../services/utils/createIpcServiceHelpers", () => ({
     getIpcServiceHelpers: getHelpersMock,
 }));
 
@@ -66,12 +66,12 @@ const loggerMock = vi.hoisted(() => ({
     info: vi.fn(),
     warn: vi.fn(),
 }));
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: loggerMock,
 }));
 
 const ensureErrorMock = vi.hoisted(() => vi.fn((error: unknown) => error));
-vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
 

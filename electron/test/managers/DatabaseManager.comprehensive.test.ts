@@ -11,7 +11,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes.js";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import type { DatabaseManagerDependencies, DatabaseManager as DatabaseManagerType  } from "../../managers/DatabaseManager";
+import type {
+    DatabaseManagerDependencies,
+    DatabaseManager as DatabaseManagerType,
+} from "../../managers/DatabaseManager";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import { DataImportExportService } from "../../services/database/DataImportExportService";
@@ -32,10 +35,7 @@ const { DatabaseCommandExecutor } = vi.hoisted(() => {
             ) {
                 return Promise.resolve("/path/to/backup.json");
             }
-            if (
-                command &&
-                command.constructor.name === "ExportDataCommand"
-            ) {
+            if (command && command.constructor.name === "ExportDataCommand") {
                 return Promise.resolve('{"sites": [], "settings": []}');
             }
             return Promise.resolve(undefined);
@@ -164,7 +164,7 @@ vi.mock("../../services/database/serviceFactory", () => ({
             clear: vi.fn(() => {
                 store.clear();
             }),
-            replaceAll: vi.fn((items: { data: Site; key: string; }[]) => {
+            replaceAll: vi.fn((items: { data: Site; key: string }[]) => {
                 store.clear();
                 for (const { key, data } of items) {
                     store.set(key, data);
@@ -284,13 +284,11 @@ const initializeTransactionAdapters = (): void => {
     attachTransactionAdapter(mockHistoryRepository, {
         pruneAllHistory: (db: unknown, limit: unknown) =>
             mockHistoryRepository.pruneAllHistoryInternal(db, limit),
-        deleteAll: (db: unknown) =>
-            mockHistoryRepository.deleteAllInternal(db),
+        deleteAll: (db: unknown) => mockHistoryRepository.deleteAllInternal(db),
     });
 
     attachTransactionAdapter(mockMonitorRepository, {
-        deleteAll: (db: unknown) =>
-            mockMonitorRepository.deleteAllInternal(db),
+        deleteAll: (db: unknown) => mockMonitorRepository.deleteAllInternal(db),
     });
 
     attachTransactionAdapter(mockSiteRepository, {

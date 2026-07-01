@@ -20,15 +20,15 @@ const mockMonitoringService = {
 };
 
 // Mock the stores and services
-vi.mock(import('../stores/utils'), () => ({
+vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock(import('../stores/error/withErrorHandling'), () => ({
+vi.mock("../stores/error/withErrorHandling", () => ({
     withErrorHandling: vi.fn((fn) => fn),
 }));
 
-vi.mock(import('../services/monitoring'), () => ({
+vi.mock("../services/monitoring", () => ({
     MonitoringService: mockMonitoringService,
 }));
 
@@ -47,7 +47,7 @@ const mockSitesStore = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(mockSitesStore);
 
-vi.mock(import('../stores/sites/useSitesStore'), () => ({
+vi.mock("../stores/sites/useSitesStore", () => ({
     useSitesStore: useSitesStoreMock,
 }));
 

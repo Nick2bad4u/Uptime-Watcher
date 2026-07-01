@@ -30,15 +30,14 @@ import {
     validateMonitorFormData,
 } from "../../utils/monitorValidation";
 
-vi.mock(import('@shared/utils/errorHandling'), () => ({
+vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(),
 }));
 
 vi.mock(
-    import('@shared/validation/monitorSchemas'),
+    "@shared/validation/monitorSchemas",
     async (importOriginal): Promise<unknown> => {
-        const actual =
-            (await importOriginal());
+        const actual = await importOriginal<Record<string, unknown>>();
 
         return {
             ...actual,
@@ -324,10 +323,10 @@ const missingFieldCases = advancedMonitorScenarios.flatMap((scenario) =>
     scenario.requiredFields.map(
         (field) =>
             [
-                field,
                 field.field,
-                scenario,
                 scenario.type,
+                field,
+                scenario,
             ] as const
     )
 );
@@ -361,9 +360,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
             expect(result).toEqual({ errors: [], success: true, warnings: [] });
 
             for (const { field } of requiredFields) {
-                const fieldValue = (safeCastTo<UnknownRecord>(validData))[
-                    field
-                ];
+                const fieldValue = safeCastTo<UnknownRecord>(validData)[field];
 
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith(
                     type,
@@ -410,7 +407,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
 
     it("validates DNS expectedValue only when it contains content", async () => {
         const whitespaceData = {
-            expectedValue: ' '.repeat(3),
+            expectedValue: " ".repeat(3),
             host: "dns.example.com",
             recordType: "A",
         } satisfies PartialMonitorFormDataByType<"dns">;

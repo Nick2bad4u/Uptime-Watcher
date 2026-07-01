@@ -16,55 +16,55 @@ evaluate-variables: true
 
 # Framework selection - only scan relevant frameworks for this project
 framework:
-    - github_actions
-    - github_configuration
-    - dockerfile
-    - secrets
-    - yaml
-    - json
+    - "github_actions"
+    - "github_configuration"
+    - "dockerfile"
+    - "secrets"
+    - "yaml"
+    - "json"
 
 # Hard fail on high and critical issues
-hard-fail-on: HIGH,CRITICAL
+hard-fail-on: "HIGH,CRITICAL"
 
 # Output format for better integration with CI/CD
-output: cli,sarif
-output-file-path: console,checkov-results.sarif
+output: "cli,sarif"
+output-file-path: "console,checkov-results.sarif"
 
 scan-secrets-history: false # Disabled to avoid performance impact in CI
 
 # Skip specific checks with detailed justifications
 skip-check:
     # GitHub Actions Permission Checks
-    - CKV_GHA_1 # Require job permissions write-all to be set to false
+    - "CKV_GHA_1" # Require job permissions write-all to be set to false
     # Justification: Electron app build process requires write access for artifact uploads and releases
-    - CKV2_GHA_1 # Ensure top-level permissions are not set to write-all
+    - "CKV2_GHA_1" # Ensure top-level permissions are not set to write-all
     # Justification: Desktop app build workflow needs comprehensive permissions for secure artifact management
 
     # GitHub Actions Pinning Checks
-    - CKV_GHA_6 # Require checkout action to be pinned to SHA version
+    - "CKV_GHA_6" # Require checkout action to be pinned to SHA version
     # Justification: Using semantic versioning (@v4) for official actions provides better maintainability
     # and security updates while maintaining readability. Risk is mitigated by using only official actions.
 
     # Workflow Input Checks
-    - CKV_GHA_7 # Ensure workflow_dispatch inputs are NOT empty/blank
+    - "CKV_GHA_7" # Ensure workflow_dispatch inputs are NOT empty/blank
     # Justification: Manual trigger workflows without inputs are legitimate for this desktop application
     # where simple build/test triggers don't require parameters
 
-# Security enhancements
-# Enable secret scanning for all file types
-# Scan secrets in git history
-# Soft fail on low severity issues
-# Skip paths that don't need security scanning
+    # Security enhancements
+    # Enable secret scanning for all file types
+    # Scan secrets in git history
+    # Soft fail on low severity issues
+    # Skip paths that don't need security scanning
 skip-path:
-    - node_modules/
-    - dist/
-    - coverage/
-    - .vscode/
-    - docs/assets/
+    - "node_modules/"
+    - "dist/"
+    - "coverage/"
+    - ".vscode/"
+    - "docs/assets/"
     - "**/icons/**"
-    - html/
-    - release/
-    - .secretlintrc.json
-    - docs/
-    - shared/test/validation/schemas.test.ts
-soft-fail-on: LOW
+    - "html/"
+    - "release/"
+    - ".secretlintrc.json"
+    - "docs/"
+    - "shared/test/validation/schemas.test.ts"
+soft-fail-on: "LOW"

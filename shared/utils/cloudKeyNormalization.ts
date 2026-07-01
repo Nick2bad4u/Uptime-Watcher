@@ -137,12 +137,14 @@ function assertWithinByteLengthBudget(
 function assertWithinByteLengthBudgetIfValid(
     value: string,
     maxByteLength: number | undefined
-): void { if (
+): void {
+    if (
         typeof maxByteLength !== "number" ||
-            !isFiniteNumber(maxByteLength) ||
+        !isFiniteNumber(maxByteLength) ||
         maxByteLength <= 0
     ) {
-        return; }
+        return;
+    }
 
     assertWithinByteLengthBudget(value, maxByteLength);
 }

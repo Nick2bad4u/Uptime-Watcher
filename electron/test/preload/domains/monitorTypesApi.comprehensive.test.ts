@@ -8,10 +8,15 @@
  * - Malformed payloads from the main process are rejected
  */
 
-import type { BASE_MONITOR_TYPES, Monitor , MonitorFieldDefinition, type MonitorType  } from "@shared/types";
+import type {
+    Monitor,
+    MonitorFieldDefinition,
+    MonitorType,
+} from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
+import { BASE_MONITOR_TYPES } from "@shared/types";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

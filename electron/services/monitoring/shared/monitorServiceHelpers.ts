@@ -190,7 +190,6 @@ export function parseMonitorUrlList(value: string): string[] {
         return [];
     }
 
-    // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
     return value
         .split(URL_LIST_SEPARATOR)
         .map((entry) => entry.trim())

@@ -49,9 +49,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "should return one of the three monitoring states",
             (site) => {
-                const result = calculateSiteMonitoringStatus(
-                    site
-                );
+                const result = calculateSiteMonitoringStatus(site);
                 expect([
                     "running",
                     "stopped",
@@ -71,9 +69,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
                 }));
                 const site = { monitors: allMonitoring };
 
-                const result = calculateSiteMonitoringStatus(
-                    site
-                );
+                const result = calculateSiteMonitoringStatus(site);
                 expect(result).toBe("running");
             }
         );
@@ -89,9 +85,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
                 }));
                 const site = { monitors: noneMonitoring };
 
-                const result = calculateSiteMonitoringStatus(
-                    site
-                );
+                const result = calculateSiteMonitoringStatus(site);
                 expect(result).toBe("stopped");
             }
         );
@@ -111,9 +105,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
                 }));
 
                 const site = { monitors: mixedMonitors };
-                const result = calculateSiteMonitoringStatus(
-                    site
-                );
+                const result = calculateSiteMonitoringStatus(site);
 
                 const monitoringCount = mixedMonitors.filter(
                     (m) => m.monitoring
@@ -409,15 +401,9 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "display status should be consistent with monitoring and operational status",
             (site) => {
-                const monitoringStatus = calculateSiteMonitoringStatus(
-                    site
-                );
-                const operationalStatus = calculateSiteStatus(
-                    site
-                );
-                const displayStatus = getSiteDisplayStatus(
-                    site
-                );
+                const monitoringStatus = calculateSiteMonitoringStatus(site);
+                const operationalStatus = calculateSiteStatus(site);
+                const displayStatus = getSiteDisplayStatus(site);
 
                 if (site.monitors.length === 0) {
                     expect(monitoringStatus).toBe("stopped");
@@ -448,9 +434,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "status variant should match display status",
             (site) => {
-                const displayStatus = getSiteDisplayStatus(
-                    site
-                );
+                const displayStatus = getSiteDisplayStatus(site);
                 const variant = getSiteStatusVariant(displayStatus);
 
                 switch (displayStatus) {
@@ -497,12 +481,8 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "monitoring status should be deterministic",
             (site) => {
-                const result1 = calculateSiteMonitoringStatus(
-                    site
-                );
-                const result2 = calculateSiteMonitoringStatus(
-                    site
-                );
+                const result1 = calculateSiteMonitoringStatus(site);
+                const result2 = calculateSiteMonitoringStatus(site);
                 expect(result1).toBe(result2);
             }
         );
@@ -510,19 +490,11 @@ describe("SiteStatus utilities fuzzing tests", () => {
         test.prop([siteArbitrary])(
             "all results should be valid enum values",
             (site) => {
-                const monitoringStatus = calculateSiteMonitoringStatus(
-                    site
-                );
-                const operationalStatus = calculateSiteStatus(
-                    site
-                );
-                const displayStatus = getSiteDisplayStatus(
-                    site
-                );
+                const monitoringStatus = calculateSiteMonitoringStatus(site);
+                const operationalStatus = calculateSiteStatus(site);
+                const displayStatus = getSiteDisplayStatus(site);
                 const variant = getSiteStatusVariant(displayStatus);
-                const description = getSiteStatusDescription(
-                    site
-                );
+                const description = getSiteStatusDescription(site);
 
                 expect([
                     "running",

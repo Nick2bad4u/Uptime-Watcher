@@ -26,7 +26,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 
 // Mock the theme system
-vi.mock(import('../../../theme/ThemeContext'), () => ({
+vi.mock("../../../theme/ThemeContext", () => ({
     useTheme: () => ({
         currentTheme: {
             name: "light",
@@ -57,7 +57,7 @@ vi.mock(import('../../../theme/ThemeContext'), () => ({
 }));
 
 // Mock utilities
-vi.mock(import('../../../utils'), () => ({
+vi.mock("../../../utils", () => ({
     cn: (...classes: string[]) => arrayJoin(classes.filter(Boolean), " "),
 }));
 

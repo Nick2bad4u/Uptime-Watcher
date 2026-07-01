@@ -15,10 +15,8 @@
  * @tags ["test", "theme", "hooks", "coverage"]
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import { act, renderHook } from "@testing-library/react";
-import { arrayIncludes, safeCastTo  } from "ts-extras";
+import { arrayIncludes, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
@@ -31,7 +29,7 @@ import {
 } from "../../theme/useTheme";
 
 // Mock the settings store
-vi.mock(import('../../stores/settings/useSettingsStore'));
+vi.mock("../../stores/settings/useSettingsStore");
 
 // Mock ThemeManager
 const mockThemeManager = {
@@ -170,16 +168,18 @@ const mockThemeManager = {
         return () => {}; // Return cleanup function
     }),
     getSystemThemePreference: vi.fn().mockReturnValue("light"),
-    _systemThemeCallback: safeCastTo<((isDark: boolean) => void) | undefined>(undefined),
+    _systemThemeCallback: safeCastTo<((isDark: boolean) => void) | undefined>(
+        undefined
+    ),
 };
 
-vi.mock(import('../../theme/ThemeManager'), () => ({
+vi.mock("../../theme/ThemeManager", () => ({
     themeManager: mockThemeManager,
 }));
 
 // Mock UI_DELAYS
-vi.mock(import('../../constants'), async (importOriginal) => {
-    const actual = (await importOriginal());
+vi.mock("../../constants", async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>();
     return {
         ...actual,
         UI_DELAYS: {
@@ -191,16 +191,19 @@ vi.mock(import('../../constants'), async (importOriginal) => {
 // Mock site status type guard
 const mockIsSiteStatus = vi.hoisted(() =>
     vi.fn((status: string) =>
-        arrayIncludes([
-            "down",
-            "pending",
-            "unknown",
-            "up",
-        ], status)
+        arrayIncludes(
+            [
+                "down",
+                "pending",
+                "unknown",
+                "up",
+            ],
+            status
+        )
     )
 );
 
-vi.mock(import('../../../shared/utils/typeHelpers'), () => ({
+vi.mock("../../../shared/utils/typeHelpers", () => ({
     isSiteStatus: mockIsSiteStatus,
 }));
 
@@ -424,7 +427,9 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             await new Promise((resolve) => setTimeout(resolve, 1));
 
             // Test that the hook works correctly without errors
-            expect(() => { rerender(); }).not.toThrow();
+            expect(() => {
+                rerender();
+            }).not.toThrow();
         });
 
         it("should handle system theme changes", async ({ task, annotate }) => {
@@ -929,9 +934,15 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(typeof result.current.setTheme).toBe("function");
 
             await act(async () => {
-                expect(() => { result.current.setTheme("dark"); }).not.toThrow();
-                expect(() => { result.current.setTheme("light"); }).not.toThrow();
-                expect(() => { result.current.setTheme("system"); }).not.toThrow();
+                expect(() => {
+                    result.current.setTheme("dark");
+                }).not.toThrow();
+                expect(() => {
+                    result.current.setTheme("light");
+                }).not.toThrow();
+                expect(() => {
+                    result.current.setTheme("system");
+                }).not.toThrow();
             });
         });
 

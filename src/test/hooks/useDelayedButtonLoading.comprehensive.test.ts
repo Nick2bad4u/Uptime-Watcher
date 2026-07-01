@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 
 // Mock the constants
-vi.mock(import('../../constants'), () => ({
+vi.mock("../../constants", () => ({
     UI_DELAYS: {
         LOADING_BUTTON: 100,
         STATE_UPDATE_DEFER: 50,
@@ -382,7 +382,7 @@ describe(useDelayedButtonLoading, () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock zero delays
-            vi.doMock(import('../../constants'), () => ({
+            vi.doMock("../../constants", () => ({
                 UI_DELAYS: {
                     LOADING_BUTTON: 0,
                     STATE_UPDATE_DEFER: 0,

@@ -18,13 +18,13 @@ tags:
 
 ## Table of Contents
 
-1. [🔧 Editing and filesystem operations](#-editing-and-filesystem-operations)
-2. [🔍 Reading and search](#-reading-and-search)
-3. [🧪 Commands, tasks, and test runs](#-commands-tasks-and-test-runs)
-4. [🧰 Diagnostics and IDE integration](#-diagnostics-and-ide-integration)
-5. [Documentation linting gotchas (Markdown + TSDoc)](#documentation-linting-gotchas-markdown--tsdoc)
-6. [🗂️ Orchestration and meta-tools](#️-orchestration-and-meta-tools)
-7. [🌐 External documentation helpers](#-external-documentation-helpers)
+- [🔧 Editing and filesystem operations](#-editing-and-filesystem-operations)
+- [🔍 Reading and search](#-reading-and-search)
+- [🧪 Commands, tasks, and test runs](#-commands-tasks-and-test-runs)
+- [🧰 Diagnostics and IDE integration](#-diagnostics-and-ide-integration)
+- [Documentation linting gotchas (Markdown + TSDoc)](#documentation-linting-gotchas-markdown--tsdoc)
+- [🗂️ Orchestration and meta-tools](#️-orchestration-and-meta-tools)
+- [🌐 External documentation helpers](#-external-documentation-helpers)
 
 ## 🔧 Editing and filesystem operations
 

@@ -23,8 +23,6 @@
  * @packageDocumentation
  */
 
-import type { MonitorType } from "@shared/types";
-
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { secureRandomFloat } from "@shared/test/testHelpers";
@@ -43,7 +41,7 @@ import {
     isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import { isInteger, not, objectKeys   } from "ts-extras";
+import { isInteger, objectKeys } from "ts-extras";
 import { describe, expect } from "vitest";
 
 // Constants to avoid lint issues with numeric literals
@@ -64,7 +62,7 @@ describe("validation Utils Property-Based Tests", () => {
             expect(isNonEmptyString(str)).toBe(true);
         });
 
-        fcTest.prop([fc.constantFrom("", ' '.repeat(3), "\t", "\n", "  \n  ")])(
+        fcTest.prop([fc.constantFrom("", " ".repeat(3), "\t", "\n", "  \n  ")])(
             "should reject empty or whitespace-only strings",
             (str) => {
                 expect(isNonEmptyString(str)).toBe(false);
@@ -176,7 +174,7 @@ describe("validation Utils Property-Based Tests", () => {
             fc.oneof(
                 fc.constantFrom(
                     "",
-                    ' '.repeat(3),
+                    " ".repeat(3),
                     "___",
                     "---",
                     "@invalid",
@@ -234,7 +232,7 @@ describe("validation Utils Property-Based Tests", () => {
                             .filter((s) => s.includes("@") || s.includes(" "))
                     ),
                     fc.array(fc.oneof(fc.integer(), fc.boolean())),
-                    fc.array(fc.constantFrom("", ' '.repeat(3), "___"))
+                    fc.array(fc.constantFrom("", " ".repeat(3), "___"))
                 )
                 .filter((arr) => arr.length > 0),
         ])("should reject arrays with invalid identifiers", (invalidArray) => {
@@ -267,7 +265,7 @@ describe("validation Utils Property-Based Tests", () => {
                 fc.constantFrom("123.45", "abc", "", "  ", "12.0", "1e5"),
                 fc
                     .double()
-                    .filter(not(isInteger))
+                    .filter((value) => !isInteger(value))
                     .map((d) => d.toString())
             ),
         ])("should reject non-integer strings", (invalid) => {
@@ -809,9 +807,7 @@ describe("validation Utils Property-Based Tests", () => {
                 .map((fullMonitor) => {
                     // Create partial monitor with undefined values to satisfy exactOptionalPropertyTypes
                     const partial: any = {};
-                    const keys = objectKeys(
-                        fullMonitor
-                    );
+                    const keys = objectKeys(fullMonitor);
 
                     for (const key of keys) {
                         if (secureRandomFloat() > 0.3) {
@@ -854,9 +850,9 @@ describe("validation Utils Property-Based Tests", () => {
             const errors = getMonitorValidationErrors(httpMonitor);
 
             // Should not have URL-related errors for valid HTTP monitors
-            expect(
-                errors.some((e) => e.toLowerCase().startsWith("url:"))
-            ).toBe(false);
+            expect(errors.some((e) => e.toLowerCase().startsWith("url:"))).toBe(
+                false
+            );
         });
 
         fcTest.prop([
@@ -897,7 +893,7 @@ describe("validation Utils Property-Based Tests", () => {
                 fc.constant(null),
                 fc.constant(undefined),
                 fc.string({ maxLength: 0 }),
-                fc.constantFrom(' '.repeat(3), "\t\t", "\n\n")
+                fc.constantFrom(" ".repeat(3), "\t\t", "\n\n")
             ),
         ])(
             "should handle empty/null/whitespace inputs consistently",

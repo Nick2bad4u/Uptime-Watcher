@@ -18,7 +18,7 @@ import { BASE_MONITOR_TYPES } from "@shared/types";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import fc from "fast-check";
 import { objectKeys } from "ts-extras";
-import { describe, expect, it, test } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
     addMonitorToSite,
@@ -232,9 +232,7 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
         });
 
 // Generate monitor with mixed type contamination
-const arbitraryContaminatedMonitor = (): fc.Arbitrary<
-    UnknownRecord
-> =>
+const arbitraryContaminatedMonitor = (): fc.Arbitrary<UnknownRecord> =>
     fc.record({
         id: arbitraryMixedValue(),
         type: arbitraryMixedValue(),
@@ -321,9 +319,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
         it("should handle contaminated input gracefully", () => {
             fc.assert(
                 fc.property(arbitraryContaminatedMonitor(), (contaminated) => {
-                    const monitor = createDefaultMonitor(
-                        contaminated
-                    );
+                    const monitor = createDefaultMonitor(contaminated);
 
                     // Should still create a valid monitor despite contamination
                     expect(monitor).toHaveProperty("id");
@@ -477,9 +473,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             fc.assert(
                 fc.property(arbitraryContaminatedMonitor(), (contaminated) => {
                     try {
-                        const normalized = normalizeMonitor(
-                            contaminated
-                        );
+                        const normalized = normalizeMonitor(contaminated);
 
                         // Should still produce valid monitor
                         expect(normalized).toHaveProperty("id");
@@ -713,13 +707,13 @@ describe("Monitor Operations Fuzzing Tests", () => {
                     );
 
                     if (isMonitorExists) {
-                        expect(() =>
-                            { validateMonitorExists(site, randomId); }
-                        ).not.toThrow();
+                        expect(() => {
+                            validateMonitorExists(site, randomId);
+                        }).not.toThrow();
                     } else {
-                        expect(() =>
-                            { validateMonitorExists(site, randomId); }
-                        ).toThrow();
+                        expect(() => {
+                            validateMonitorExists(site, randomId);
+                        }).toThrow();
                     }
                 })
             );
@@ -728,9 +722,9 @@ describe("Monitor Operations Fuzzing Tests", () => {
         it("validateMonitorExists should throw for undefined site", () => {
             fc.assert(
                 fc.property(fc.string(), (monitorId) => {
-                    expect(() =>
-                        { validateMonitorExists(undefined, monitorId); }
-                    ).toThrow();
+                    expect(() => {
+                        validateMonitorExists(undefined, monitorId);
+                    }).toThrow();
                 })
             );
         });

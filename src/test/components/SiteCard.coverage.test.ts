@@ -112,9 +112,13 @@ describe("SiteCard Component Coverage Tests", () => {
                 "monitor-1"
             );
             expect(interactionProps.onStartMonitoring).toHaveBeenCalledWith();
-            expect(interactionProps.onStartSiteMonitoring).toHaveBeenCalledWith();
+            expect(
+                interactionProps.onStartSiteMonitoring
+            ).toHaveBeenCalledWith();
             expect(interactionProps.onStopMonitoring).toHaveBeenCalledWith();
-            expect(interactionProps.onStopSiteMonitoring).toHaveBeenCalledWith();
+            expect(
+                interactionProps.onStopSiteMonitoring
+            ).toHaveBeenCalledWith();
         });
 
         describe("SiteCard Hook Integration", () => {
@@ -492,8 +496,10 @@ describe("SiteCard Component Coverage Tests", () => {
                 }
 
                 const avgResponseTime =
-                    Math.sumPrecise(responseTimes) /
-                    responseTimes.length;
+                    responseTimes.reduce(
+                        (total, responseTime) => total + responseTime,
+                        0
+                    ) / responseTimes.length;
                 expect(avgResponseTime).toBeGreaterThan(0);
             });
 

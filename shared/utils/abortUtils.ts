@@ -418,8 +418,7 @@ export async function retryWithAbort<T>(
             // eslint-disable-next-line no-await-in-loop -- retry operations require sequential awaits
             return await operation();
         } catch (error) {
-            lastError =
-                Error.isError(error) ? error : new Error(String(error));
+            lastError = Error.isError(error) ? error : new Error(String(error));
 
             // Don't delay after the last attempt
             if (attempt === maxRetries) {
@@ -561,8 +560,9 @@ export async function raceWithAbort<T>(
         let isListenerAttached = false;
 
         function rejectWith(reason: unknown): void {
-            const error =
-                Error.isError(reason) ? reason : new Error(String(reason));
+            const error = Error.isError(reason)
+                ? reason
+                : new Error(String(reason));
             reject(error);
         }
 

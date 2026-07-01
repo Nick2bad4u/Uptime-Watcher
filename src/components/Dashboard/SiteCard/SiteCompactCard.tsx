@@ -151,8 +151,9 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             typeof uptime === "number" && isFiniteNumber(uptime)
                 ? `${uptime.toFixed(1)}%`
                 : "—";
-        const responseDisplay =
-            isDefined(responseTime) ? `${responseTime} ms` : "—";
+        const responseDisplay = isDefined(responseTime)
+            ? `${responseTime} ms`
+            : "—";
         const checksDisplay = checkCount.toLocaleString();
         const runningSummary = useMemo(
             () => `${runningMonitors}/${totalMonitors}`,

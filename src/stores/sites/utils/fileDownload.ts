@@ -141,7 +141,7 @@ function handleDownloadError(
     fileName: string,
     mimeType: string
 ): void {
-    if (!(Error.isError(error))) {
+    if (!Error.isError(error)) {
         logger.error("File download failed", ensureError(error));
         throw new Error("File download failed");
     }
@@ -284,10 +284,9 @@ export async function handleSQLiteBackupDownload(
             warnLogger: FILE_DOWNLOAD_WARN_LOGGER,
         });
     } catch (clickError) {
-        const normalizedClickError =
-            Error.isError(clickError)
-                ? clickError
-                : new Error(getUserFacingErrorDetail(clickError));
+        const normalizedClickError = Error.isError(clickError)
+            ? clickError
+            : new Error(getUserFacingErrorDetail(clickError));
 
         logger.error("Failed to trigger download click", normalizedClickError);
 

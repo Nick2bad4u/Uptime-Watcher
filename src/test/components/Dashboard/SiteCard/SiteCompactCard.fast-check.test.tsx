@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
 import { render, screen, within } from "@testing-library/react";
-import { beforeEach, afterAll, describe, expect, vi } from "vitest";
+import { beforeEach, afterAll, describe, expect, vi, it } from "vitest";
 
 import type { MarqueeTextProperties } from "../../../../components/common/MarqueeText/MarqueeText";
 import type { ActionButtonGroupProperties } from "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup";
@@ -31,7 +31,7 @@ const { ActionButtonGroupMock, MonitorSelectorMock, StatusIndicatorMock } =
         StatusIndicatorMock: vi.fn(),
     }));
 
-vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => ({
+vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
     MarqueeText: (props: MarqueeTextProperties) => (
         <div data-testid="marquee-text" data-text={props.text}>
             {props.text}
@@ -40,7 +40,7 @@ vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => (
 }));
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
         MonitorSelector: (props: MonitorSelectorProperties) => {
             MonitorSelectorMock(props);
@@ -54,7 +54,7 @@ vi.mock(
 );
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
         ActionButtonGroup: (props: ActionButtonGroupProperties) => {
             ActionButtonGroupMock(props);
@@ -69,7 +69,7 @@ vi.mock(
     })
 );
 
-vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../../../theme/components/StatusIndicator", () => ({
     StatusIndicator: (props: StatusIndicatorProperties) => {
         StatusIndicatorMock(props);
         return (
@@ -81,7 +81,7 @@ vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
     },
 }));
 
-vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../../theme/components/ThemedBox", () => ({
     ThemedBox: ({
         children,
         className,
@@ -106,7 +106,7 @@ vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({
         children,
         className,
@@ -121,7 +121,7 @@ vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ),
 }));
 
-vi.mock(import('../../../../hooks/site/useSite'), () => ({
+vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: vi.fn(),
 }));
 
@@ -314,10 +314,7 @@ describe("SiteCompactCard", () => {
             expect(
                 screen.getByText(
                     new RegExp(
-                        expectedSummary.replaceAll(
-                            /[$()*+.?[\\\]^{|}]/gu,
-                            "$&"
-                        )
+                        expectedSummary.replaceAll(/[$()*+.?[\\\]^{|}]/gu, "$&")
                     )
                 )
             ).toBeInTheDocument();
@@ -386,7 +383,9 @@ describe("SiteCompactCard", () => {
         const view = render(<SiteCompactCard site={scenario.site} />);
 
         try {
-            expect(screen.getByText(/No Monitor Selected/u)).toBeInTheDocument();
+            expect(
+                screen.getByText(/No Monitor Selected/u)
+            ).toBeInTheDocument();
             const uptimeMetric = screen
                 .getByText("Uptime")
                 .closest(".site-card__compact-metric");

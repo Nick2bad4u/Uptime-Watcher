@@ -7,9 +7,9 @@
  * maintain user preferences across sessions while keeping transient state (like
  * modal visibility) in memory only.
  *
- * The store follows the app's modular architecture by separating UI
- * concerns from business logic, allowing components to focus on presentation
- * while delegating state management to this centralized store.
+ * The store follows the app's modular architecture by separating UI concerns
+ * from business logic, allowing components to focus on presentation while
+ * delegating state management to this centralized store.
  *
  * @example
  *
@@ -173,7 +173,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     logger.user.action("External URL failed", {
                         error: underlyingError.message,
                         url: urlForMessage,
-                        ...(context?.siteName && { siteName: context.siteName }),
+                        ...(context?.siteName && {
+                            siteName: context.siteName,
+                        }),
                     });
 
                     logStoreAction("UIStore", "openExternalFailed", {
@@ -210,7 +212,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                             }
                             logger.user.action("External URL opened", {
                                 url: urlForMessage,
-                                ...(context?.siteName && { siteName: context.siteName }),
+                                ...(context?.siteName && {
+                                    siteName: context.siteName,
+                                }),
                             });
                         }, errorHandler);
                     } catch (error: unknown) {

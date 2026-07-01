@@ -16,8 +16,8 @@ import { logger } from "../../services/logger";
 import { getMonitorTypeOptions } from "../../utils/monitorTypeHelper";
 
 // Mock dependencies
-vi.mock(import('../../services/logger'));
-vi.mock(import('../../utils/monitorTypeHelper'));
+vi.mock("../../services/logger");
+vi.mock("../../utils/monitorTypeHelper");
 
 const mockLogger = vi.mocked(logger);
 const mockGetMonitorTypeOptions = vi.mocked(getMonitorTypeOptions);
@@ -26,7 +26,7 @@ describe("useMonitorTypes Hook", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset logger methods
-        vi.spyOn(mockLogger, 'error').mockImplementation();
+        vi.spyOn(mockLogger, "error").mockReturnValue(undefined);
     });
 
     afterEach(() => {
@@ -904,7 +904,6 @@ describe("useMonitorTypes Hook", () => {
                     expect(refreshCount).toBeLessThanOrEqual(5);
                 } finally {
                     // Restore original console.error
-                    // eslint-disable-next-line require-atomic-updates -- console restore for test
                     console.error = originalConsoleError;
                 }
             }
@@ -1032,7 +1031,9 @@ describe("useMonitorTypes Hook", () => {
 
             mockGetMonitorTypeOptions.mockReturnValue(
                 new Promise((resolve) =>
-                    setTimeout(() => { resolve(mockOptions); }, delayMs)
+                    setTimeout(() => {
+                        resolve(mockOptions);
+                    }, delayMs)
                 )
             );
 

@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Testing Requirement */
-/* eslint-disable no-script-url, prefer-template, unicorn/prefer-string-replace-all, prefer-named-capture-group, arrow-body-style, unicorn/numeric-separators-style -- Testing malicious patterns and security vulnerabilities */
+/* eslint-disable no-script-url, prefer-template, unicorn/prefer-string-replace-all, arrow-body-style, unicorn/numeric-separators-style -- Testing malicious patterns and security vulnerabilities */
 
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";

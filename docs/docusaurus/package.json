@@ -36,6 +36,7 @@
         "css:types": "node -e \"const { run } = require('typed-css-modules/lib/run'); run('src', { pattern: '**/*.module.css' }).catch((error) => { console.error(error); process.exit(1); });\"",
         "css:types:check": "node -e \"const { run } = require('typed-css-modules/lib/run'); run('src', { listDifferent: true, pattern: '**/*.module.css' }).catch((error) => { console.error(error); process.exit(1); });\"",
         "deploy": "docusaurus deploy",
+        "docs:api": "typedoc --options typedoc.config.json",
         "docusaurus": "docusaurus",
         "generate-docs": "npm run generate-docs:default",
         "generate-docs:app": "typedoc --options ../../typedoc.json",
@@ -53,8 +54,7 @@
         "typecheck": "npm run typecheck:build && npm run css:types:check",
         "typecheck:build": "tsc --project tsconfig.json --noEmit",
         "write-heading-ids": "docusaurus write-heading-ids",
-        "write-translations": "docusaurus write-translations",
-        "docs:api": "typedoc --options typedoc.config.json"
+        "write-translations": "docusaurus write-translations"
     },
     "dependencies": {
         "@docusaurus/core": "^3.10.1",

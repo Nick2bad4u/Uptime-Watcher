@@ -36,12 +36,7 @@ interface ConnectionPoolConfig {
 interface ConnectionOperation {
     operationId: string;
     operationType:
-        | "acquire"
-        | "release"
-        | "validate"
-        | "create"
-        | "destroy"
-        | "timeout";
+        "acquire" | "release" | "validate" | "create" | "destroy" | "timeout";
     startTime: number;
     endTime: number;
     success: boolean;

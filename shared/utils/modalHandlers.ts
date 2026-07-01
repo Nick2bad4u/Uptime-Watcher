@@ -72,9 +72,7 @@ export function useEscapeKeyModalHandler(
                     (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
                 );
 
-                const openModal = sortedConfigs.find(
-                    (config) => config.isOpen
-                );
+                const openModal = sortedConfigs.find((config) => config.isOpen);
                 if (openModal) {
                     event.preventDefault();
                     openModal.onClose();

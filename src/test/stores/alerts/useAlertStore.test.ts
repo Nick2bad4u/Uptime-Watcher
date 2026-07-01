@@ -15,7 +15,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 import { STATUS_KIND } from "@shared/types";
 import fc from "fast-check";
-import { arrayAt, arrayFirst  } from "ts-extras";
+import { arrayAt, arrayFirst } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -230,7 +230,7 @@ describe(useAlertStore, () => {
                 identifier: "  site-slug   ",
                 monitoring: true,
                 monitors: [],
-                name: ' '.repeat(3),
+                name: " ".repeat(3),
             },
             siteIdentifier: "   outer-id   ",
         });
@@ -244,10 +244,10 @@ describe(useAlertStore, () => {
     it("derives site name from the event identifier when site name and identifier are blank", () => {
         const update = createStatusUpdate({
             site: {
-                identifier: ' '.repeat(3),
+                identifier: " ".repeat(3),
                 monitoring: true,
                 monitors: [],
-                name: ' '.repeat(3),
+                name: " ".repeat(3),
             },
             siteIdentifier: "   event-id   ",
         });
@@ -261,12 +261,12 @@ describe(useAlertStore, () => {
     it("falls back to unknown-site when no site identifiers are available", () => {
         const base = createStatusUpdate({
             site: {
-                identifier: ' '.repeat(3),
+                identifier: " ".repeat(3),
                 monitoring: true,
                 monitors: [],
-                name: ' '.repeat(3),
+                name: " ".repeat(3),
             },
-            siteIdentifier: ' '.repeat(3),
+            siteIdentifier: " ".repeat(3),
         });
 
         const alert = mapStatusUpdateToAlert(base);

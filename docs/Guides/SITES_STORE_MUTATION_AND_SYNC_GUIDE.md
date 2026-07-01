@@ -41,12 +41,12 @@ the single source of truth and update both together.
 
 ## Table of Contents
 
-1. [Mutation pipeline](#mutation-pipeline)
-2. [Realtime subscription diagnostics](#realtime-subscription-diagnostics)
-3. [State sync pipeline](#state-sync-pipeline)
-4. [Monitoring lifecycle resync policy](#monitoring-lifecycle-resync-policy)
-5. [Logging conventions](#logging-conventions)
-6. [Related documentation](#related-documentation)
+- [Mutation pipeline](#mutation-pipeline)
+- [Realtime subscription diagnostics](#realtime-subscription-diagnostics)
+- [State sync pipeline](#state-sync-pipeline)
+- [Monitoring lifecycle resync policy](#monitoring-lifecycle-resync-policy)
+- [Logging conventions](#logging-conventions)
+- [Related documentation](#related-documentation)
 
 ## Mutation pipeline
 

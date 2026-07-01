@@ -9,6 +9,7 @@ assignees: []
 ### What happened?
 
 ### Steps to reproduce
+
 1.
 2.
 3.
@@ -16,6 +17,7 @@ assignees: []
 ### Expected behavior
 
 ### Environment
+
 - OS:
 - App version/commit:
 

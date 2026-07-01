@@ -25,7 +25,7 @@ import {
     secureRandomFloat,
     secureRandomInt,
 } from "@shared/test/testHelpers";
-import { arrayJoin, isEmpty, isInteger, safeCastTo    } from "ts-extras";
+import { arrayJoin, isEmpty, isInteger, safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect } from "vitest";
 
 // =============================================================================
@@ -96,10 +96,9 @@ const monitorDbData = fc.record({
         sqlInjectionStrings
     ),
     timeout: fc.integer({ max: 30_000, min: 1000 }),
-    type: safeCastTo<fc.Arbitrary<MonitorType | string>>(fc.oneof(
-        fc.constantFrom("http", "ping", "dns", "port"),
-        fc.string()
-    )),
+    type: safeCastTo<fc.Arbitrary<MonitorType | string>>(
+        fc.oneof(fc.constantFrom("http", "ping", "dns", "port"), fc.string())
+    ),
     updated_at: fc.date({ max: new Date(), min: new Date(2020, 0, 1) }),
     url: fc.oneof(fc.webUrl(), fc.string()),
 });
@@ -580,11 +579,13 @@ describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
                     // Simulate a safe query function that validates input
                     const hasSqlInjection =
                         /drop\s+table/iv.test(userInput) ||
-                        /delete\s+from.*where.*or[^\n\r1\u{2028}\u{2029}]*1[^\n\r=\u{2028}\u{2029}]*=.*1/iv.test(userInput) ||
+                        /delete\s+from.*where.*or[^\n\r1\u{2028}\u{2029}]*1[^\n\r=\u{2028}\u{2029}]*=.*1/iv.test(
+                            userInput
+                        ) ||
                         /union\s+select/i.test(userInput) ||
                         /waitfor\s+delay/iv.test(userInput) ||
                         /admin\s*(?:'\s*)?--/iv.test(userInput) ||
-                        userInput.includes('\'--') ||
+                        userInput.includes("'--") ||
                         /;\s*--/v.test(userInput) ||
                         /\/\*.*\*\//v.test(userInput) ||
                         /'\s*or\s*'1'\s*=\s*'1/iv.test(userInput) ||
@@ -696,7 +697,7 @@ describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
                     validateMonitorData,
                     "validateMonitorData",
                     monitorData
-                ) as { errors: string[]; valid: boolean; };
+                ) as { errors: string[]; valid: boolean };
 
                 // Property: Validation should never throw
                 expect(result).toHaveProperty("valid");
@@ -728,10 +729,7 @@ describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
                     const errors: string[] = [];
 
                     // Monitor ID reference
-                    if (
-                        !isInteger(data.monitor_id) ||
-                        data.monitor_id <= 0
-                    ) {
+                    if (!isInteger(data.monitor_id) || data.monitor_id <= 0) {
                         errors.push("Invalid monitor_id reference");
                     }
 
@@ -781,7 +779,7 @@ describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
                     validateStatusUpdate,
                     "validateStatusUpdate",
                     statusData
-                ) as { errors: string[]; valid: boolean; };
+                ) as { errors: string[]; valid: boolean };
 
                 // Property: Validation result should be properly structured
                 expect(result).toHaveProperty("valid");
@@ -926,10 +924,9 @@ describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
                         return { data: "Operation completed", success: true };
                     } catch (error) {
                         return {
-                            error:
-                                Error.isError(error)
-                                    ? error.message
-                                    : "Unknown error",
+                            error: Error.isError(error)
+                                ? error.message
+                                : "Unknown error",
                             recovered: true,
                             success: false,
                         };
@@ -1739,7 +1736,8 @@ describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
                         auditTrail: securityEvents.map(
                             (event, idx) => `${idx + 1}. ${event}`
                         ),
-                        encryptionActive: ctx.encryptionEnabled && isSessionValid,
+                        encryptionActive:
+                            ctx.encryptionEnabled && isSessionValid,
                         securityEvents,
                         sessionValid: isSessionValid,
                     };
@@ -2418,7 +2416,8 @@ describe("comprehensive Database Operations Fuzzing (Part 2)", () => {
                         baselineQueryTime: baselinePerformance,
                         cardinality: operation.expectedRows,
                         executionSuccess: isOperationSuccess,
-                        indexHealthy: isOperationSuccess && !isMaintenanceRequired,
+                        indexHealthy:
+                            isOperationSuccess && !isMaintenanceRequired,
                         maintenanceRequired: isMaintenanceRequired,
                         operationType: operation.operationType,
                         optimizedQueryTime: indexedPerformance,
@@ -2517,8 +2516,7 @@ describe("comprehensive Database Operations Fuzzing (Part 2)", () => {
                             lockRequired: isLockRequired,
                             operation: op.operationType,
                             success:
-                                isEmpty(conflicts) ||
-                                secureRandomBoolean(0.7),
+                                isEmpty(conflicts) || secureRandomBoolean(0.7),
                             table: op.targetTable,
                         });
                     }
@@ -3202,7 +3200,8 @@ describe("comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     return {
                         alertGenerated: isAlertGenerated,
-                        automaticRecoveryTriggered: isAutomaticRecoveryTriggered,
+                        automaticRecoveryTriggered:
+                            isAutomaticRecoveryTriggered,
                         basePerformanceMs: basePerformance,
                         constrainedPerformanceMs: constrainedPerformance,
                         constraintType: resourceConstraint.constraintType,
@@ -3325,7 +3324,8 @@ describe("comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     const isOperationsStillPossible =
                         !isSystemFailure &&
-                        (overallResourcePressure < 0.9 || isGracefulDegradation);
+                        (overallResourcePressure < 0.9 ||
+                            isGracefulDegradation);
 
                     return {
                         activeConstraints,

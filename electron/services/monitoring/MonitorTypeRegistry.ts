@@ -118,8 +118,7 @@ export function isValidMonitorType(type: string): type is MonitorType {
  * @internal
  */
 type MonitorTypeValidationResult =
-    | { error: string; success: false }
-    | { success: true; value: MonitorType };
+    { error: string; success: false } | { success: true; value: MonitorType };
 
 function validateMonitorTypeInternal(
     type: unknown
@@ -273,10 +272,9 @@ export function createMonitorWithTypeGuards(
     // Use internal type validation to avoid circular dependency
     const validationResult = validateMonitorTypeInternal(type);
     if (!validationResult.success) {
-        const errorMessage =
-            objectHasIn(validationResult, "error")
-                ? validationResult.error
-                : "Invalid monitor type";
+        const errorMessage = objectHasIn(validationResult, "error")
+            ? validationResult.error
+            : "Invalid monitor type";
         return {
             errors: [errorMessage],
             success: false,

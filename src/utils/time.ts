@@ -2,8 +2,8 @@
  * Centralized utility functions for time and formatting.
  *
  * @remarks
- * Provides consistent time formatting throughout the app with support
- * for various time scales: milliseconds for precise measurements,
+ * Provides consistent time formatting throughout the app with support for
+ * various time scales: milliseconds for precise measurements,
  * seconds/minutes/hours for human-readable durations, and relative timestamps
  * for recent events. All functions handle edge cases gracefully and provide
  * fallback values for invalid inputs to optimize readability in monitoring

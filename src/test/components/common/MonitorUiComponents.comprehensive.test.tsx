@@ -21,8 +21,8 @@ import {
 } from "../../../utils/monitorUiHelpers";
 
 // Mock the dependencies
-vi.mock(import('../../../services/logger'));
-vi.mock(import('../../../utils/monitorUiHelpers'), () => ({
+vi.mock("../../../services/logger");
+vi.mock("../../../utils/monitorUiHelpers", () => ({
     supportsResponseTime: vi.fn(),
     formatMonitorDetail: vi.fn(),
 }));

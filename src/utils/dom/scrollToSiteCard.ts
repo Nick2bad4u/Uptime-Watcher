@@ -3,9 +3,9 @@
  * surfaces (e.g. the sidebar quick switcher).
  *
  * @remarks
- * The app uses `data-site-identifier` in multiple places (sidebar
- * buttons, site cards, and table rows). A naive `document.querySelector` may
- * therefore match the sidebar element itself rather than the dashboard card.
+ * The app uses `data-site-identifier` in multiple places (sidebar buttons, site
+ * cards, and table rows). A naive `document.querySelector` may therefore match
+ * the sidebar element itself rather than the dashboard card.
  *
  * This helper scopes the search to the main site list container
  * (`[data-testid="site-list"]`) to ensure the correct element is targeted.

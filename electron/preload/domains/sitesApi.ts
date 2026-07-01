@@ -99,8 +99,11 @@ function safeParseSiteArray(
     }
 
     const firstIssue = arrayFirst(parsed.error.issues);
-    const firstPathSegment = firstIssue ? arrayFirst(firstIssue.path) : undefined;
-    const firstIndex = typeof firstPathSegment === "number" ? firstPathSegment : undefined;
+    const firstPathSegment = firstIssue
+        ? arrayFirst(firstIssue.path)
+        : undefined;
+    const firstIndex =
+        typeof firstPathSegment === "number" ? firstPathSegment : undefined;
     const indexSuffix =
         typeof firstIndex === "number"
             ? ` (first failure at index ${firstIndex})`

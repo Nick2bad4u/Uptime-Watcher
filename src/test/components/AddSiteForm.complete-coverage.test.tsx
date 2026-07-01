@@ -37,7 +37,7 @@ const globalWithSitesStoreMock =
     globalThis as unknown as GlobalWithSitesStoreMock;
 globalWithSitesStoreMock.__useSitesStoreMock__ = useSitesStoreMock;
 
-vi.mock(import('../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../stores/sites/useSitesStore", () => ({
     useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -59,7 +59,7 @@ const resetSitesStoreState = (): void => {
     });
 };
 
-vi.mock(import('../../stores/error/useErrorStore'), () => ({
+vi.mock("../../stores/error/useErrorStore", () => ({
     useErrorStore: (() => {
         const state = {
             clearAllErrors: vi.fn(),
@@ -101,7 +101,7 @@ vi.mock(import('../../stores/error/useErrorStore'), () => ({
 }));
 
 // Mock the hooks
-vi.mock(import('../../components/SiteDetails/useAddSiteForm'), () => ({
+vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: () => ({
         addMode: "existing",
         checkIntervalMs: 30,
@@ -126,7 +126,7 @@ vi.mock(import('../../components/SiteDetails/useAddSiteForm'), () => ({
     }),
 }));
 
-vi.mock(import('../../hooks/useMonitorTypes'), () => ({
+vi.mock("../../hooks/useMonitorTypes", () => ({
     useMonitorTypes: () => ({
         options: [
             { label: "HTTP", value: "http" },
@@ -138,7 +138,7 @@ vi.mock(import('../../hooks/useMonitorTypes'), () => ({
     }),
 }));
 
-vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: (selector?: unknown) => {
         const state = {
             isLoaded: true,
@@ -174,11 +174,11 @@ vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
     },
 }));
 
-vi.mock(import('../../hooks/useDelayedButtonLoading'), () => ({
+vi.mock("../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => false,
 }));
 
-vi.mock(import('../../hooks/useDynamicHelpText'), () => ({
+vi.mock("../../hooks/useDynamicHelpText", () => ({
     useDynamicHelpText: () => ({}),
 }));
 

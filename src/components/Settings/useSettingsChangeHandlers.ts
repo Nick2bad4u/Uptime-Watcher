@@ -1,6 +1,5 @@
 /**
- * Change app helpers for
- * {@link src/components/Settings/Settings#Settings}.
+ * Change app helpers for {@link src/components/Settings/Settings#Settings}.
  *
  * @remarks
  * Extracted from `Settings.tsx` to keep the component focused on rendering and
@@ -10,7 +9,13 @@
 import type { ArrayValues } from "type-fest";
 
 import { useCallback } from "react";
-import { isDefined, objectHasIn, objectKeys, safeCastTo, setHas } from "ts-extras";
+import {
+    isDefined,
+    objectHasIn,
+    objectKeys,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 import type { AppSettings } from "../../stores/types";
 
@@ -90,11 +95,7 @@ export function useSettingsChangeHandlers(args: {
                 ) {
                     Reflect.set(nextSettings, allowedKey, newValue);
 
-                    logger.user.settingsChange(
-                        allowedKey,
-                        oldValue,
-                        newValue
-                    );
+                    logger.user.settingsChange(allowedKey, oldValue, newValue);
                 }
             }
 

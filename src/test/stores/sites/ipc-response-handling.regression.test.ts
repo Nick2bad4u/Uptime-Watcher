@@ -6,7 +6,7 @@ import { SiteService } from "../../../services/SiteService";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 import { createMockSite } from "../../utils/mockFactories";
 
-vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: vi.fn(async () => undefined),
 }));
 

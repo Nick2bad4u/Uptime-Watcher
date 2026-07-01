@@ -18,12 +18,12 @@ tags:
 
 ## Table of Contents
 
-1. [Simple Store Template](#simple-store-template)
-2. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
-3. [Complex Store with Modules Template](#complex-store-with-modules-template)
-4. [Module Template](#module-template)
-5. [Testing Template](#testing-template)
-6. [Customization Checklist](#customization-checklist)
+- [Simple Store Template](#simple-store-template)
+- [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
+- [Complex Store with Modules Template](#complex-store-with-modules-template)
+- [Module Template](#module-template)
+- [Testing Template](#testing-template)
+- [Customization Checklist](#customization-checklist)
 
 ## Simple Store Template
 
@@ -38,7 +38,6 @@ For stores with straightforward state that don't require modular composition:
 <!-- keep template code outside of the audit list -->
 
 <!-- prettier-ignore -->
-
 ````typescript
 
 /**

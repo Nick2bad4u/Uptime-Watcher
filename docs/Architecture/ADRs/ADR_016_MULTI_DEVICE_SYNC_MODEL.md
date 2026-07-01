@@ -20,15 +20,15 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Conflict Resolution](#conflict-resolution)
-5. [Consequences](#consequences)
-6. [Implementation](#implementation)
-7. [Testing & Validation](#testing--validation)
-8. [Related ADRs](#related-adrs)
-9. [Review](#review)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Conflict Resolution](#conflict-resolution)
+- [Consequences](#consequences)
+- [Implementation](#implementation)
+- [Testing & Validation](#testing--validation)
+- [Related ADRs](#related-adrs)
+- [Review](#review)
 
 ## Status
 

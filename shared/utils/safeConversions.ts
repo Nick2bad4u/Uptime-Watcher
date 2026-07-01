@@ -74,12 +74,15 @@ export function safeNumberConversion(value: unknown, defaultValue = 0): number {
 const clampTimeoutDefault = (
     value: number,
     minimum: number
-): TimeoutMilliseconds => { const normalizedMinimum = Math.max(minimum, MIN_TIMEOUT_MILLISECONDS);
+): TimeoutMilliseconds => {
+    const normalizedMinimum = Math.max(minimum, MIN_TIMEOUT_MILLISECONDS);
     const finiteValue = isFiniteNumber(value) ? value : normalizedMinimum;
     const bounded = Math.min(
-        Math.max(finiteValue, normalizedMinimum), MAX_TIMEOUT_MILLISECONDS
+        Math.max(finiteValue, normalizedMinimum),
+        MAX_TIMEOUT_MILLISECONDS
     );
-    return toTimeoutMilliseconds(bounded); };
+    return toTimeoutMilliseconds(bounded);
+};
 
 /**
  * Safely converts a value to a check interval (minimum 1000ms) with fallback.
@@ -90,7 +93,8 @@ const clampTimeoutDefault = (
 export function safeParseCheckInterval(
     value: unknown,
     defaultValue: number | TimeoutMilliseconds = DEFAULT_CHECK_INTERVAL
-): TimeoutMilliseconds { const normalizedDefault =
+): TimeoutMilliseconds {
+    const normalizedDefault =
         typeof defaultValue === "number"
             ? clampTimeoutDefault(Math.trunc(defaultValue), 1000)
             : defaultValue;
@@ -100,7 +104,8 @@ export function safeParseCheckInterval(
     // Enforce a minimum of 1000ms; clamp extremely large intervals
     if (normalized >= 1000 && isFiniteNumber(normalized)) {
         const bounded = Math.min(normalized, MAX_TIMEOUT_MILLISECONDS);
-        return toTimeoutMilliseconds(bounded); }
+        return toTimeoutMilliseconds(bounded);
+    }
 
     return normalizedDefault;
 }
@@ -133,10 +138,12 @@ export function safeParseFloat(value: unknown, defaultValue = 0): number {
         return value;
     }
 
-    if (isString(value)) { // ParseFloat accepts e.g. "123.45abc" -> 123.45
+    if (isString(value)) {
+        // ParseFloat accepts e.g. "123.45abc" -> 123.45
         // Reject non-finite results like Infinity/-Infinity from strings
         const parsed = Number.parseFloat(value);
-        return isFiniteNumber(parsed) ? parsed : defaultValue; }
+        return isFiniteNumber(parsed) ? parsed : defaultValue;
+    }
 
     return defaultValue;
 }
@@ -164,10 +171,12 @@ export function safeParseFloat(value: unknown, defaultValue = 0): number {
  *
  * @returns Valid integer or the default value
  */
-export function safeParseInt(value: unknown, defaultValue = 0): number { if (isNumber(value)) {
+export function safeParseInt(value: unknown, defaultValue = 0): number {
+    if (isNumber(value)) {
         // Return default value for non-finite numbers (Infinity, -Infinity, NaN)
         if (!isFiniteNumber(value)) {
-            return defaultValue; }
+            return defaultValue;
+        }
         // For finite numeric inputs, apply Math.floor to get integer
         return Math.floor(value);
     }
@@ -273,8 +282,10 @@ export function safeParsePort(
  *
  * @returns Valid positive integer `(> 0)`, or the default value
  */
-export function safeParsePositiveInt(value: unknown, defaultValue = 1): number { const result = safeParseInt(value, defaultValue);
-    return result > 0 && isFiniteNumber(result) ? result : defaultValue; }
+export function safeParsePositiveInt(value: unknown, defaultValue = 1): number {
+    const result = safeParseInt(value, defaultValue);
+    return result > 0 && isFiniteNumber(result) ? result : defaultValue;
+}
 
 /**
  * Safely converts a value to a retry attempts count (0-10) with fallback.
@@ -332,7 +343,8 @@ export function safeParseRetryAttempts(
 export function safeParseTimeout(
     value: unknown,
     defaultValue: number | TimeoutMilliseconds = DEFAULT_TIMEOUT
-): TimeoutMilliseconds { const normalizedDefault =
+): TimeoutMilliseconds {
+    const normalizedDefault =
         typeof defaultValue === "number"
             ? clampTimeoutDefault(defaultValue, MIN_TIMEOUT_MILLISECONDS)
             : defaultValue;
@@ -340,7 +352,8 @@ export function safeParseTimeout(
     const parsed = safeNumberConversion(value, normalizedDefault);
 
     if (!isFiniteNumber(parsed) || parsed <= 0) {
-        return normalizedDefault; }
+        return normalizedDefault;
+    }
 
     const bounded = Math.min(parsed, MAX_TIMEOUT_MILLISECONDS);
     return toTimeoutMilliseconds(bounded);
@@ -374,7 +387,8 @@ export function safeParseTimeout(
 export function safeParseTimestamp(
     value: unknown,
     defaultValue?: number
-): number { const currentTime = Date.now();
+): number {
+    const currentTime = Date.now();
     const fallback = defaultValue ?? currentTime;
     const upperBound = currentTime + 86_400_000;
     const parsed = safeNumberConversion(value, fallback);
@@ -382,4 +396,5 @@ export function safeParseTimestamp(
     // Basic timestamp validation (must be positive, finite, and reasonable)
     return parsed > 0 && isFiniteNumber(parsed) && parsed <= upperBound
         ? parsed
-        : fallback; }
+        : fallback;
+}

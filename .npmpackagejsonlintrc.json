@@ -1,3 +1,22 @@
 {
-  "extends": "npm-package-json-lint-config-nick2bad4u"
+    "extends": "npm-package-json-lint-config-nick2bad4u",
+    "rules": {
+        "no-git-devDependencies": "off",
+        "prefer-caret-version-devDependencies": "off",
+        "require-files": "off",
+        "require-type": "off",
+        "require-types": "off",
+        "valid-values-author": [
+            "error",
+            [
+                "Nick2bad4u",
+                "nick2bad4u",
+                "Typpi",
+                "Nick",
+                "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com>",
+                "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://github.com/Nick2bad4u)",
+                "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://nick2bad4u.github.io/Uptime-Watcher/)"
+            ]
+        ]
+    }
 }

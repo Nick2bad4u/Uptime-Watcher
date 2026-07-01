@@ -4,12 +4,12 @@
  */
 
 // Import types
-import type { Monitor, MonitorType, Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 
 import { fc } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
 import { BASE_MONITOR_TYPES, DEFAULT_MONITOR_STATUS } from "@shared/types";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 // Import all functions to test
@@ -149,41 +149,45 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         dnsMonitorArb
     );
 
-    const siteArb = safeCastTo<fc.Arbitrary<Site>>(fc.record({
-        identifier: siteIdArb,
-        name: fc.string({ minLength: 1, maxLength: 100 }),
-        monitoring: fc.boolean(),
-        monitors: fc.uniqueArray(monitorArb, {
-            maxLength: 10,
-            selector: (monitor) => monitor.id,
-        }),
-    }));
+    const siteArb = safeCastTo<fc.Arbitrary<Site>>(
+        fc.record({
+            identifier: siteIdArb,
+            name: fc.string({ minLength: 1, maxLength: 100 }),
+            monitoring: fc.boolean(),
+            monitors: fc.uniqueArray(monitorArb, {
+                maxLength: 10,
+                selector: (monitor) => monitor.id,
+            }),
+        })
+    );
 
     // Create a partial monitor generator that properly handles Partial<Monitor> type
-    const partialMonitorArb = safeCastTo<fc.Arbitrary<Partial<Monitor>>>(fc.record(
-        {
-            id: fc.option(monitorIdArb),
-            type: fc.option(monitorTypeArb),
-            url: fc.option(urlArb),
-            host: fc.option(hostArb),
-            port: fc.option(portArb),
-            recordType: fc.option(
-                fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT", "NS")
-            ),
-            expectedValue: fc.option(
-                fc.string({ minLength: 1, maxLength: 50 })
-            ),
-            status: fc.option(
-                fc.constantFrom("up", "down", "pending", "paused")
-            ),
-            monitoring: fc.option(fc.boolean()),
-            responseTime: fc.option(fc.integer({ min: -1, max: 10_000 })),
-            timeout: fc.option(timeoutArb),
-            checkInterval: fc.option(checkIntervalArb),
-            retryAttempts: fc.option(retryAttemptsArb),
-        },
-        { requiredKeys: [] }
-    ));
+    const partialMonitorArb = safeCastTo<fc.Arbitrary<Partial<Monitor>>>(
+        fc.record(
+            {
+                id: fc.option(monitorIdArb),
+                type: fc.option(monitorTypeArb),
+                url: fc.option(urlArb),
+                host: fc.option(hostArb),
+                port: fc.option(portArb),
+                recordType: fc.option(
+                    fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT", "NS")
+                ),
+                expectedValue: fc.option(
+                    fc.string({ minLength: 1, maxLength: 50 })
+                ),
+                status: fc.option(
+                    fc.constantFrom("up", "down", "pending", "paused")
+                ),
+                monitoring: fc.option(fc.boolean()),
+                responseTime: fc.option(fc.integer({ min: -1, max: 10_000 })),
+                timeout: fc.option(timeoutArb),
+                checkInterval: fc.option(checkIntervalArb),
+                retryAttempts: fc.option(retryAttemptsArb),
+            },
+            { requiredKeys: [] }
+        )
+    );
 
     describe("addMonitorToSite function coverage", () => {
         it("should add monitors to sites with immutable updates", () => {
@@ -667,9 +671,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     (site) => {
                         const targetMonitor = arrayFirst(site.monitors);
                         expect(targetMonitor).toBeDefined(); // Assert it exists
-                        expect(() =>
-                            { validateMonitorExists(site, targetMonitor!.id); }
-                        ).not.toThrow();
+                        expect(() => {
+                            validateMonitorExists(site, targetMonitor!.id);
+                        }).not.toThrow();
                     }
                 )
             );
@@ -685,9 +689,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                             return; // Skip this test case
                         }
 
-                        expect(() =>
-                            { validateMonitorExists(site, nonExistentId); }
-                        ).toThrow();
+                        expect(() => {
+                            validateMonitorExists(site, nonExistentId);
+                        }).toThrow();
                     }
                 )
             );
@@ -698,9 +702,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                 fc.property(
                     fc.string({ minLength: 1, maxLength: 50 }),
                     (monitorId) => {
-                        expect(() =>
-                            { validateMonitorExists(undefined, monitorId); }
-                        ).toThrow();
+                        expect(() => {
+                            validateMonitorExists(undefined, monitorId);
+                        }).toThrow();
                     }
                 )
             );

@@ -15,14 +15,14 @@ import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { getMonitorHelpTexts } from "../../utils/monitorUiHelpers";
 
 // Mock the logger module
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         warn: vi.fn(),
     },
 }));
 
 // Mock the getMonitorHelpTexts utility
-vi.mock(import('../../utils/monitorUiHelpers'), () => ({
+vi.mock("../../utils/monitorUiHelpers", () => ({
     getMonitorHelpTexts: vi.fn(),
 }));
 
@@ -222,7 +222,11 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
+                {
+                    initialProps: {
+                        monitorType: safeCastTo<MonitorType>("http"),
+                    },
+                }
             );
 
             // Wait for first load
@@ -273,7 +277,11 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
+                {
+                    initialProps: {
+                        monitorType: safeCastTo<MonitorType>("http"),
+                    },
+                }
             );
 
             // Wait for first load to fail
@@ -368,7 +376,11 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
+                {
+                    initialProps: {
+                        monitorType: safeCastTo<MonitorType>("http"),
+                    },
+                }
             );
 
             // Should be loading first request
@@ -487,7 +499,11 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
+                {
+                    initialProps: {
+                        monitorType: safeCastTo<MonitorType>("http"),
+                    },
+                }
             );
 
             // Quickly change types

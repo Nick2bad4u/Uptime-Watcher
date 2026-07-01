@@ -413,7 +413,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             class Cache {
                 private readonly cache = new Map<
                     string,
-                    { expiry: number; value: any; }
+                    { expiry: number; value: any }
                 >();
 
                 set(key: string, value: any, ttl: number) {
@@ -749,7 +749,11 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 return (
                     <div>
                         <span data-testid="count">{count}</span>
-                        <button onClick={() => { setCount(count + 1); }}>
+                        <button
+                            onClick={() => {
+                                setCount(count + 1);
+                            }}
+                        >
                             Increment
                         </button>
                     </div>
@@ -787,7 +791,9 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                     <form>
                         <input
                             data-testid="input"
-                            onChange={(e) => { setValue(e.target.value); }}
+                            onChange={(e) => {
+                                setValue(e.target.value);
+                            }}
                             type="text"
                             value={value}
                         />

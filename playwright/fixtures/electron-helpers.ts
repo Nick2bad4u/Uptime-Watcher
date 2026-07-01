@@ -372,10 +372,14 @@ export async function launchElectronApp(
         async () => {
             await Promise.allSettled([
                 new Promise<void>((resolve) =>
-                    stdoutStream.end(() => { resolve(); })
+                    stdoutStream.end(() => {
+                        resolve();
+                    })
                 ),
                 new Promise<void>((resolve) =>
-                    stderrStream.end(() => { resolve(); })
+                    stderrStream.end(() => {
+                        resolve();
+                    })
                 ),
             ]);
         },
@@ -471,11 +475,11 @@ export async function launchElectronApp(
         app as ElectronApplication & {
             firstWindow: ElectronApplication["firstWindow"];
         }
-    ).firstWindow = (async () => {
+    ).firstWindow = async () => {
         const page = await originalFirstWindow();
         attachWindowMetadata(page);
         return page;
-    });
+    };
 
     app.on("close", () => {
         void (async (): Promise<void> => {
@@ -495,7 +499,7 @@ export async function launchElectronApp(
             app as ElectronApplication & {
                 close: ElectronApplication["close"];
             }
-        ).close = (async () => {
+        ).close = async () => {
             let coverageError: unknown;
 
             if (!isCoverageCollected) {
@@ -528,7 +532,7 @@ export async function launchElectronApp(
             if (closeError) {
                 throw closeError;
             }
-        });
+        };
     } else {
         const originalClose = app.close.bind(app);
 
@@ -536,7 +540,7 @@ export async function launchElectronApp(
             app as ElectronApplication & {
                 close: ElectronApplication["close"];
             }
-        ).close = (async () => {
+        ).close = async () => {
             let closeError: unknown;
             try {
                 await originalClose();
@@ -554,7 +558,7 @@ export async function launchElectronApp(
             if (closeError) {
                 throw closeError;
             }
-        });
+        };
     }
 
     return app;

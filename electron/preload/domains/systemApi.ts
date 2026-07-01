@@ -3,9 +3,9 @@
  *
  * @remarks
  * This module provides type-safe IPC communication for system-level operations
- * such as external app launching. As a thin wrapper over the bridge
- * factory, exceptions are intentionally propagated to the frontend for handling
- * at the UI level.
+ * such as external app launching. As a thin wrapper over the bridge factory,
+ * exceptions are intentionally propagated to the frontend for handling at the
+ * UI level.
  *
  * @packageDocumentation
  */

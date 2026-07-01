@@ -74,8 +74,8 @@ export interface ModalProperties {
     readonly headerIcon?: ReactNode;
 
     /**
-     * If true, the app root (#root) is set to inert/aria-hidden while
-     * this modal is open.
+     * If true, the app root (#root) is set to inert/aria-hidden while this
+     * modal is open.
      *
      * @defaultValue true
      */
@@ -359,11 +359,7 @@ export const Modal = ({
                 priority: escapePriority,
             },
         ],
-        [
-            escapePriority,
-            handleCloseTopMost,
-            isOpen,
-        ]
+        [escapePriority, handleCloseTopMost, isOpen]
     );
 
     useEscapeKeyModalHandler(escapeConfigs);
@@ -400,11 +396,7 @@ export const Modal = ({
                 }
             };
         },
-        [
-            isBlocking,
-            isOpen,
-            modalId,
-        ]
+        [isBlocking, isOpen, modalId]
     );
 
     useEffect(
@@ -463,7 +455,9 @@ export const Modal = ({
                 }
             };
 
-            document.addEventListener("keydown", handleKeyDownCapture, {capture: true});
+            document.addEventListener("keydown", handleKeyDownCapture, {
+                capture: true,
+            });
 
             return () => {
                 document.removeEventListener(
@@ -513,11 +507,7 @@ export const Modal = ({
         }
 
         onRequestClose();
-    }, [
-        closeOnOverlayClick,
-        modalId,
-        onRequestClose,
-    ]);
+    }, [closeOnOverlayClick, modalId, onRequestClose]);
 
     const handleCloseButtonClick = useCallback((): void => {
         handleCloseTopMost();

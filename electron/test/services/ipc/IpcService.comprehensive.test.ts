@@ -203,14 +203,20 @@ describe("IpcService - Comprehensive Coverage", () => {
             frameId: 1,
             processId: 1,
             sender: {} as any,
-            senderFrame: {} as any,
+            senderFrame: {
+                isDestroyed: () => false,
+                url: "http://localhost:5173",
+            } as any,
         } as IpcMainInvokeEvent;
 
         mockMainEvent = {
             frameId: 1,
             processId: 1,
             sender: {} as any,
-            senderFrame: {} as any,
+            senderFrame: {
+                isDestroyed: () => false,
+                url: "http://localhost:5173",
+            } as any,
             ports: [],
             reply: vi.fn(),
             returnValue: undefined,

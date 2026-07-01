@@ -2,8 +2,8 @@
  * Theme system type definitions.
  *
  * @remarks
- * Defines the structure and interfaces for the app's theming system
- * including colors, typography, spacing, and visual effects.
+ * Defines the structure and interfaces for the app's theming system including
+ * colors, typography, spacing, and visual effects.
  */
 
 import { arrayIncludes, safeCastTo } from "ts-extras";
@@ -202,11 +202,7 @@ export interface ThemeColors {
  * Available theme names in the app.
  */
 export type ThemeName =
-    | "custom"
-    | "dark"
-    | "high-contrast"
-    | "light"
-    | "system";
+    "custom" | "dark" | "high-contrast" | "light" | "system";
 
 /**
  * Shadow system interface for elevation and depth. Defines consistent shadow

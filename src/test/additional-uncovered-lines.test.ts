@@ -9,13 +9,13 @@ import { arrayFirst } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock all dependencies
-vi.mock(import('../stores'), () => ({
+vi.mock("../stores", () => ({
     useErrorStore: vi.fn(),
     useSitesStore: vi.fn(),
     useUIStore: vi.fn(),
 }));
 
-vi.mock(import('../hooks/site/useSiteAnalytics'), () => ({
+vi.mock("../hooks/site/useSiteAnalytics", () => ({
     useSiteAnalytics: vi.fn(() => ({
         data: null,
         error: null,
@@ -23,7 +23,7 @@ vi.mock(import('../hooks/site/useSiteAnalytics'), () => ({
     })),
 }));
 
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         error: vi.fn(),
         site: { error: vi.fn() },
@@ -47,8 +47,8 @@ describe("Additional Uncovered Lines Tests", () => {
         document.body.replaceChildren();
 
         // Mock global URL methods
-        vi.spyOn(URL, 'createObjectURL').mockReturnValue("blob:test");
-        vi.spyOn(URL, 'revokeObjectURL').mockImplementation();
+        vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:test");
+        vi.spyOn(URL, "revokeObjectURL").mockReturnValue(undefined);
     });
 
     afterEach(() => {

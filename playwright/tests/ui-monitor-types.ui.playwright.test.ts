@@ -290,7 +290,9 @@ test.describe(
             void completion;
 
             const timeoutOutcome = new Promise<"timeout">((resolve) => {
-                timeoutHandle = setTimeout(() => { resolve("timeout"); }, timeoutMs);
+                timeoutHandle = setTimeout(() => {
+                    resolve("timeout");
+                }, timeoutMs);
             });
 
             const outcome = await Promise.race([completion, timeoutOutcome]);
@@ -316,8 +318,7 @@ test.describe(
         test.afterEach(async () => {
             const pageReference = page as Page | undefined;
             const electronReference = electronApp as
-                | ElectronApplication
-                | undefined;
+                ElectronApplication | undefined;
 
             await runWithSoftTimeout(
                 "removeAllSites cleanup",
@@ -344,125 +345,136 @@ test.describe(
             );
         });
 
-        test(
-            "should create monitors for every supported type",
-            {
-                // Creating one monitor per registered type is a long-running
-                // workflow; allow a single automatic retry to absorb any
-                // intermittent Electron IPC race that can surface on slower
-                // machines.
-                retries: 1,
-                tag: ["@workflow", "@all-monitor-types"],
-            },
-            async () => {
-                // The preload bridge is attached asynchronously; poll until
-                // getMonitorTypes is callable before evaluating.
-                await page.waitForFunction(
-                    () => {
-                        const w = globalThis as typeof globalThis & {
+        test.describe("all monitor type workflow retries", () => {
+            // Creating one monitor per registered type is a long-running
+            // workflow; allow a single automatic retry to absorb any
+            // intermittent Electron IPC race that can surface on slower
+            // machines.
+            test.describe.configure({ retries: 1 });
+
+            test(
+                "should create monitors for every supported type",
+                {
+                    tag: ["@workflow", "@all-monitor-types"],
+                },
+                async () => {
+                    // The preload bridge is attached asynchronously; poll until
+                    // getMonitorTypes is callable before evaluating.
+                    await page.waitForFunction(
+                        () => {
+                            const w = globalThis as typeof globalThis & {
+                                electronAPI?: {
+                                    monitorTypes?: {
+                                        getMonitorTypes?: unknown;
+                                    };
+                                };
+                            };
+                            return (
+                                typeof w.electronAPI?.monitorTypes
+                                    ?.getMonitorTypes === "function"
+                            );
+                        },
+                        { timeout: WAIT_TIMEOUTS.APP_INITIALIZATION }
+                    );
+
+                    const monitorConfigs = (await page.evaluate(async () => {
+                        const scopedWindow = globalThis as typeof globalThis & {
                             electronAPI?: {
                                 monitorTypes?: {
-                                    getMonitorTypes?: unknown;
+                                    getMonitorTypes?: () => Promise<
+                                        MonitorTypeConfig[]
+                                    >;
                                 };
                             };
                         };
-                        return (
-                            typeof w.electronAPI?.monitorTypes
-                                ?.getMonitorTypes === "function"
-                        );
-                    },
-                    { timeout: WAIT_TIMEOUTS.APP_INITIALIZATION }
-                );
 
-                const monitorConfigs = (await page.evaluate(async () => {
-                    const scopedWindow = globalThis as typeof globalThis & {
-                        electronAPI?: {
-                            monitorTypes?: {
-                                getMonitorTypes?: () => Promise<
-                                    MonitorTypeConfig[]
-                                >;
-                            };
-                        };
-                    };
+                        const requestMonitorTypes =
+                            scopedWindow.electronAPI?.monitorTypes
+                                ?.getMonitorTypes;
 
-                    const requestMonitorTypes =
-                        scopedWindow.electronAPI?.monitorTypes?.getMonitorTypes;
+                        return typeof requestMonitorTypes === "function"
+                            ? await requestMonitorTypes()
+                            : ([] as MonitorTypeConfig[]);
+                    })) as unknown;
 
-                    return typeof requestMonitorTypes === "function"
-                        ? await requestMonitorTypes()
-                        : ([] as MonitorTypeConfig[]);
-                })) as unknown;
+                    const typedConfigs =
+                        filterMonitorTypeConfigs(monitorConfigs);
 
-                const typedConfigs = filterMonitorTypeConfigs(monitorConfigs);
+                    expect.soft(typedConfigs.length).toBeGreaterThan(0);
 
-                expect.soft(typedConfigs.length).toBeGreaterThan(0);
+                    const actualTypes = [
+                        ...new Set(typedConfigs.map((config) => config.type)),
+                    ].sort((first, second) => first.localeCompare(second));
 
-                const actualTypes = [...new Set(typedConfigs.map((config) => config.type))].sort((first, second) => first.localeCompare(second));
-
-                const expectedTypes = [...BASE_MONITOR_TYPES].sort(
-                    (first, second) => first.localeCompare(second)
-                );
-
-                expect.soft(actualTypes).toStrictEqual(expectedTypes);
-
-                const scenarios = typedConfigs
-                    .map(buildMonitorScenario)
-                    .sort((first, second) =>
-                        first.monitorType.localeCompare(second.monitorType)
+                    const expectedTypes = [...BASE_MONITOR_TYPES].sort(
+                        (first, second) => first.localeCompare(second)
                     );
 
-                expect.soft(scenarios).toHaveLength(expectedTypes.length);
+                    expect.soft(actualTypes).toStrictEqual(expectedTypes);
 
-                const createdSiteNames: string[] = [];
-
-                for (const scenario of scenarios) {
-                    // Guard against the Electron renderer being closed mid-loop
-                    // (can happen under memory pressure after many IPC calls).
-                    if (page.isClosed()) {
-                        throw new Error(
-                            `Page closed unexpectedly before creating monitor type '${scenario.monitorType}'`
+                    const scenarios = typedConfigs
+                        .map(buildMonitorScenario)
+                        .sort((first, second) =>
+                            first.monitorType.localeCompare(second.monitorType)
                         );
-                    }
 
-                    const siteName = generateSiteName(
-                        `${scenario.siteLabel} Coverage`
-                    );
-                    createdSiteNames.push(siteName);
+                    expect.soft(scenarios).toHaveLength(expectedTypes.length);
 
-                    await test.step(`create monitor type: ${scenario.monitorType}`, async () => {
-                        await createSiteViaModal(page, {
-                            dynamicFields: scenario.dynamicFields,
-                            monitorType: scenario.monitorType,
-                            name: siteName,
-                            ...(scenario.url && { url: scenario.url }),
+                    const createdSiteNames: string[] = [];
+
+                    for (const scenario of scenarios) {
+                        // Guard against the Electron renderer being closed mid-loop
+                        // (can happen under memory pressure after many IPC calls).
+                        if (page.isClosed()) {
+                            throw new Error(
+                                `Page closed unexpectedly before creating monitor type '${scenario.monitorType}'`
+                            );
+                        }
+
+                        const siteName = generateSiteName(
+                            `${scenario.siteLabel} Coverage`
+                        );
+                        createdSiteNames.push(siteName);
+
+                        await test.step(`create monitor type: ${scenario.monitorType}`, async () => {
+                            await createSiteViaModal(page, {
+                                dynamicFields: scenario.dynamicFields,
+                                monitorType: scenario.monitorType,
+                                name: siteName,
+                                ...(scenario.url && { url: scenario.url }),
+                            });
                         });
-                    });
-                }
-
-                const expectedSiteCount = scenarios.length;
-                const siteCountLabel = page.getByTestId("site-count-label");
-                await expect.soft(siteCountLabel).toHaveText(
-                    new RegExp(`Tracking ${expectedSiteCount} sites?`)
-                );
-
-                // Open one of the created sites to ensure details render after bulk creation.
-                expect.soft(
-                    createdSiteNames.length,
-                    "expected at least one created site"
-                ).toBeGreaterThan(0);
-                const lastSite = createdSiteNames.at(-1);
-                if (!lastSite) {
-                    throw new Error("expected at least one created site");
-                }
-                await openSiteDetails(page, lastSite);
-                await expect.soft(page.getByTestId("site-overview-tab")).toBeVisible(
-                    {
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
                     }
-                );
-                await closeSiteDetails(page);
-            }
-        );
+
+                    const expectedSiteCount = scenarios.length;
+                    const siteCountLabel = page.getByTestId("site-count-label");
+                    await expect
+                        .soft(siteCountLabel)
+                        .toHaveText(
+                            new RegExp(`Tracking ${expectedSiteCount} sites?`)
+                        );
+
+                    // Open one of the created sites to ensure details render after bulk creation.
+                    expect
+                        .soft(
+                            createdSiteNames.length,
+                            "expected at least one created site"
+                        )
+                        .toBeGreaterThan(0);
+                    const lastSite = createdSiteNames.at(-1);
+                    if (!lastSite) {
+                        throw new Error("expected at least one created site");
+                    }
+                    await openSiteDetails(page, lastSite);
+                    await expect
+                        .soft(page.getByTestId("site-overview-tab"))
+                        .toBeVisible({
+                            timeout: WAIT_TIMEOUTS.MEDIUM,
+                        });
+                    await closeSiteDetails(page);
+                }
+            );
+        });
 
         test(
             "should create an HTTP monitor using URL configuration",
@@ -485,9 +497,9 @@ test.describe(
                 await expect.soft(siteOverviewTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    siteOverviewTab.getByText(httpHost, { exact: false })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(siteOverviewTab.getByText(httpHost, { exact: false }))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
             }
         );
@@ -516,11 +528,13 @@ test.describe(
                 await expect.soft(siteOverviewTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    siteOverviewTab.getByText(`${hostValue}:${portValue}`, {
-                        exact: false,
-                    })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(
+                        siteOverviewTab.getByText(`${hostValue}:${portValue}`, {
+                            exact: false,
+                        })
+                    )
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
             }
         );
@@ -545,9 +559,9 @@ test.describe(
                 await expect.soft(siteOverviewTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    siteOverviewTab.getByText(pingHost, { exact: false })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await expect
+                    .soft(siteOverviewTab.getByText(pingHost, { exact: false }))
+                    .toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
             }
         );

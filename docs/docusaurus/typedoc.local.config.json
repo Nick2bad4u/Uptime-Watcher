@@ -1,207 +1,207 @@
 {
-  "externalSymbolLinkMappings": {
-    "@types/react": {
-      "React.Component.render": "https://react.dev/reference/react/Component#render",
-      "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
-      "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
-      "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
-      "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops"
+    "$schema": "https://typedoc.org/schema.json",
+    "categoryOrder": [
+        "Frontend Components",
+        "Frontend Stores",
+        "Frontend Hooks",
+        "Frontend Utils",
+        "Backend Services",
+        "Backend Managers",
+        "Backend Database",
+        "Backend Events",
+        "Backend Utils",
+        "Shared Types",
+        "Shared Utils",
+        "Shared Validation",
+        "Constants",
+        "*"
+    ],
+    "coverageOutputPath": "static/img/coverage",
+    "entryPointStrategy": "expand",
+    "entryPoints": [
+        "../../src",
+        "../../electron",
+        "../../shared"
+    ],
+    "exclude": [
+        "**/dist/**",
+        "**/node_modules/**",
+        "**/coverage/**",
+        "**/build/**",
+        "**/out/**",
+        "**/tmp/**",
+        "**/test/**",
+        "**/tests/**",
+        "**/spec/**",
+        "**/specs/**",
+        "**/examples/**",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/mock*",
+        "**/test-*",
+        "**/setupTests*"
+    ],
+    "extends": [
+        "typedoc-config-nick2bad4u/typedoc.json"
+    ],
+    "externalSymbolLinkMappings": {
+        "@types/react": {
+            "React.Component.render": "https://react.dev/reference/react/Component#render",
+            "React.Component.setState": "https://react.dev/reference/react/Component#setstate",
+            "React.ComponentLifecycle.componentDidMount": "https://react.dev/reference/react/Component#componentdidmount",
+            "React.NewLifecycle.getSnapshotBeforeUpdate": "https://react.dev/reference/react/Component#getsnapshotbeforeupdate",
+            "React.StaticLifecycle.getDerivedStateFromProps": "https://react.dev/reference/react/Component#getderivedstatefromprops"
+        },
+        "axios": {
+            "AxiosAdapter": "https://axios-http.com/docs/adapters",
+            "AxiosHeaders": "https://axios-http.com/docs/req_config#request-headers"
+        },
+        "chart.js": {
+            "Chart": "https://www.chartjs.org/docs/latest/getting-started/",
+            "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
+            "ChartData": "https://www.chartjs.org/docs/latest/general/data-structures.html",
+            "ChartOptions": "https://www.chartjs.org/docs/latest/configuration/",
+            "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html",
+            "Plugin": "https://www.chartjs.org/docs/developers/plugins.html",
+            "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html"
+        },
+        "chartjs-adapter-date-fns": {
+            "DateAdapter": "https://www.chartjs.org/docs/latest/axes/cartesian/time.html#date-adapters"
+        },
+        "chartjs-plugin-zoom": {
+            "Zoom": "https://www.chartjs.org/chartjs-plugin-zoom/latest/"
+        },
+        "electron": {
+            "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
+            "Electron.CrossProcessExports.safeStorage": "https://www.electronjs.org/docs/latest/api/safe-storage",
+            "Menu": "https://www.electronjs.org/docs/latest/api/menu",
+            "Notification": "https://www.electronjs.org/docs/latest/api/notification",
+            "Tray": "https://www.electronjs.org/docs/latest/api/tray",
+            "app": "https://www.electronjs.org/docs/latest/api/app",
+            "dialog": "https://www.electronjs.org/docs/latest/api/dialog",
+            "ipcMain": "https://www.electronjs.org/docs/latest/api/ipc-main",
+            "ipcRenderer": "https://www.electronjs.org/docs/latest/api/ipc-renderer",
+            "shell": "https://www.electronjs.org/docs/latest/api/shell",
+            "webContents": "https://www.electronjs.org/docs/latest/api/web-contents"
+        },
+        "electron-log": {
+            "LogLevel": "https://github.com/megahertz/electron-log#log-level",
+            "Logger": "https://github.com/megahertz/electron-log#logger"
+        },
+        "electron-updater": {
+            "UpdateInfo": "https://www.electron.build/auto-update#updateinfo",
+            "autoUpdater": "https://www.electron.build/auto-update"
+        },
+        "is-port-reachable": {
+            "\"is-port-reachable\"": "https://github.com/sindresorhus/is-port-reachable",
+            "isPortReachable": "https://github.com/sindresorhus/is-port-reachable"
+        },
+        "node-sqlite3-wasm": {
+            "\"node-sqlite3-wasm\".Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
+            "Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
+            "Statement": "https://github.com/tndrle/node-sqlite3-wasm#statement"
+        },
+        "ping": {
+            "ping": "https://github.com/danielzzz/node-ping"
+        },
+        "react-chartjs-2": {
+            "Bar": "https://react-chartjs-2.js.org/components/bar",
+            "Doughnut": "https://react-chartjs-2.js.org/components/doughnut",
+            "Line": "https://react-chartjs-2.js.org/components/line",
+            "Pie": "https://react-chartjs-2.js.org/components/pie",
+            "Radar": "https://react-chartjs-2.js.org/components/radar",
+            "Scatter": "https://react-chartjs-2.js.org/components/scatter"
+        },
+        "react-icons": {
+            "IconType": "https://react-icons.github.io/react-icons/"
+        },
+        "tailwindcss": {
+            "Config": "https://tailwindcss.com/docs/configuration"
+        },
+        "uptime-watcher": {
+            "AddSiteForm": "#",
+            "AxiosError": "https://axios-http.com/docs/handling_errors",
+            "ConfigurationManager": "#",
+            "DatabaseBackupResult": "#",
+            "EnhancedLifecycleHost": "#",
+            "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+            "IpcResponse.metadata": "#",
+            "Logger": "#",
+            "LoggerAdapter": "#",
+            "MigrationOrchestrator": "#",
+            "Monitor": "#",
+            "MonitorManager": "#",
+            "MonitorOperationRegistry.registerOperation": "#",
+            "MonitorStatusUpdateService.updateStatus": "#",
+            "MonitorTypeRegistry.getAllTypes": "#",
+            "MonitorTypeRegistry.isValidType": "#",
+            "MonitorValidator": "#",
+            "OperationTimeoutManager.createTimeout": "#",
+            "PortCheckError": "#",
+            "SafeParseReturnType": "https://zod.dev/?id=safeparse",
+            "SerializedDatabaseBackupResult": "#",
+            "ServiceContainer": "#",
+            "SiteLoadingError": "#",
+            "SiteManager": "#",
+            "SiteSnapshotParseResult": "#",
+            "StatusSubscriptionIndicator": "#",
+            "StatusUpdate": "#",
+            "StatusUpdateParseResult": "#",
+            "TypedEventBus.emitTyped": "#",
+            "UptimeOrchestrator": "#",
+            "UptimeOrchestratorDependencies": "#",
+            "ValidationResult": "#",
+            "VersionManager": "#",
+            "__global.Window.electronAPI": "https://www.electronjs.org/docs/latest/api/context-bridge",
+            "createIpcServiceHelpers": "#",
+            "createMonitorConfig": "#",
+            "extractMonitorConfig": "#",
+            "getMonitorTypeConfig": "#",
+            "hasValidHost": "#",
+            "performSinglePortCheck": "#",
+            "useSiteAnalytics": "#",
+            "validateMonitorHost": "#"
+        },
+        "validator": {
+            "isEmail": "https://github.com/validatorjs/validator.js#validators",
+            "isIP": "https://github.com/validatorjs/validator.js#validators",
+            "isPort": "https://github.com/validatorjs/validator.js#validators",
+            "isURL": "https://github.com/validatorjs/validator.js#validators"
+        },
+        "zustand": {
+            "StateCreator": "https://docs.pmnd.rs/zustand/guides/typescript#state-creator",
+            "StoreApi": "https://docs.pmnd.rs/zustand/guides/typescript#store-api",
+            "create": "https://docs.pmnd.rs/zustand/getting-started/introduction"
+        }
     },
-    "axios": {
-      "AxiosAdapter": "https://axios-http.com/docs/adapters",
-      "AxiosHeaders": "https://axios-http.com/docs/req_config#request-headers"
+    "favicon": "../../src/components/icons/icon-64.png",
+    "gitRemote": "origin",
+    "gitRevision": "main",
+    "githubPages": true,
+    "hideGenerator": false,
+    "hostedBaseUrl": "https://nick2bad4u.github.io/Uptime-Watcher/",
+    "includeHierarchySummary": true,
+    "json": "docs/typedoc.json",
+    "name": "Uptime Watcher - Complete Documentation",
+    "out": "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs",
+    "prettierConfigFile": "../../prettier.config.mjs",
+    "pretty": true,
+    "projectDocuments": [
+        "../../docs/Architecture/**/*.md",
+        "../../docs/Guides/**/*.md",
+        "../../docs/InteractiveCharts/**/*.md",
+        "../../docs/Testing/**/*.md",
+        "../../docs/TSDoc/**/*.md",
+        "../../README.md"
+    ],
+    "readme": "../../README.md",
+    "searchGroupBoosts": {
+        "Classes": 1.5,
+        "Functions": 1.2,
+        "Interfaces": 1.3,
+        "Types": 1.1
     },
-    "chart.js": {
-      "Chart": "https://www.chartjs.org/docs/latest/getting-started/",
-      "ChartConfiguration": "https://www.chartjs.org/docs/latest/configuration/",
-      "ChartData": "https://www.chartjs.org/docs/latest/general/data-structures.html",
-      "ChartOptions": "https://www.chartjs.org/docs/latest/configuration/",
-      "InteractionItem": "https://www.chartjs.org/docs/latest/configuration/interactions.html",
-      "Plugin": "https://www.chartjs.org/docs/developers/plugins.html",
-      "TooltipItem": "https://www.chartjs.org/docs/latest/configuration/tooltip.html"
-    },
-    "chartjs-adapter-date-fns": {
-      "DateAdapter": "https://www.chartjs.org/docs/latest/axes/cartesian/time.html#date-adapters"
-    },
-    "chartjs-plugin-zoom": {
-      "Zoom": "https://www.chartjs.org/chartjs-plugin-zoom/latest/"
-    },
-    "electron": {
-      "BrowserWindow": "https://www.electronjs.org/docs/latest/api/browser-window",
-      "Electron.CrossProcessExports.safeStorage": "https://www.electronjs.org/docs/latest/api/safe-storage",
-      "Menu": "https://www.electronjs.org/docs/latest/api/menu",
-      "Notification": "https://www.electronjs.org/docs/latest/api/notification",
-      "Tray": "https://www.electronjs.org/docs/latest/api/tray",
-      "app": "https://www.electronjs.org/docs/latest/api/app",
-      "dialog": "https://www.electronjs.org/docs/latest/api/dialog",
-      "ipcMain": "https://www.electronjs.org/docs/latest/api/ipc-main",
-      "ipcRenderer": "https://www.electronjs.org/docs/latest/api/ipc-renderer",
-      "shell": "https://www.electronjs.org/docs/latest/api/shell",
-      "webContents": "https://www.electronjs.org/docs/latest/api/web-contents"
-    },
-    "electron-log": {
-      "LogLevel": "https://github.com/megahertz/electron-log#log-level",
-      "Logger": "https://github.com/megahertz/electron-log#logger"
-    },
-    "electron-updater": {
-      "UpdateInfo": "https://www.electron.build/auto-update#updateinfo",
-      "autoUpdater": "https://www.electron.build/auto-update"
-    },
-    "is-port-reachable": {
-      "\"is-port-reachable\"": "https://github.com/sindresorhus/is-port-reachable",
-      "isPortReachable": "https://github.com/sindresorhus/is-port-reachable"
-    },
-    "node-sqlite3-wasm": {
-      "\"node-sqlite3-wasm\".Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
-      "Database": "https://github.com/tndrle/node-sqlite3-wasm#database",
-      "Statement": "https://github.com/tndrle/node-sqlite3-wasm#statement"
-    },
-    "ping": {
-      "ping": "https://github.com/danielzzz/node-ping"
-    },
-    "react-chartjs-2": {
-      "Bar": "https://react-chartjs-2.js.org/components/bar",
-      "Doughnut": "https://react-chartjs-2.js.org/components/doughnut",
-      "Line": "https://react-chartjs-2.js.org/components/line",
-      "Pie": "https://react-chartjs-2.js.org/components/pie",
-      "Radar": "https://react-chartjs-2.js.org/components/radar",
-      "Scatter": "https://react-chartjs-2.js.org/components/scatter"
-    },
-    "react-icons": {
-      "IconType": "https://react-icons.github.io/react-icons/"
-    },
-    "tailwindcss": {
-      "Config": "https://tailwindcss.com/docs/configuration"
-    },
-    "uptime-watcher": {
-      "AddSiteForm": "#",
-      "AxiosError": "https://axios-http.com/docs/handling_errors",
-      "ConfigurationManager": "#",
-      "DatabaseBackupResult": "#",
-      "EnhancedLifecycleHost": "#",
-      "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-      "IpcResponse.metadata": "#",
-      "Logger": "#",
-      "LoggerAdapter": "#",
-      "MigrationOrchestrator": "#",
-      "Monitor": "#",
-      "MonitorManager": "#",
-      "MonitorOperationRegistry.registerOperation": "#",
-      "MonitorStatusUpdateService.updateStatus": "#",
-      "MonitorTypeRegistry.getAllTypes": "#",
-      "MonitorTypeRegistry.isValidType": "#",
-      "MonitorValidator": "#",
-      "OperationTimeoutManager.createTimeout": "#",
-      "PortCheckError": "#",
-      "SafeParseReturnType": "https://zod.dev/?id=safeparse",
-      "SerializedDatabaseBackupResult": "#",
-      "ServiceContainer": "#",
-      "SiteLoadingError": "#",
-      "SiteManager": "#",
-      "SiteSnapshotParseResult": "#",
-      "StatusSubscriptionIndicator": "#",
-      "StatusUpdate": "#",
-      "StatusUpdateParseResult": "#",
-      "TypedEventBus.emitTyped": "#",
-      "UptimeOrchestrator": "#",
-      "UptimeOrchestratorDependencies": "#",
-      "ValidationResult": "#",
-      "VersionManager": "#",
-      "__global.Window.electronAPI": "https://www.electronjs.org/docs/latest/api/context-bridge",
-      "createIpcServiceHelpers": "#",
-      "createMonitorConfig": "#",
-      "extractMonitorConfig": "#",
-      "getMonitorTypeConfig": "#",
-      "hasValidHost": "#",
-      "performSinglePortCheck": "#",
-      "useSiteAnalytics": "#",
-      "validateMonitorHost": "#"
-    },
-    "validator": {
-      "isEmail": "https://github.com/validatorjs/validator.js#validators",
-      "isIP": "https://github.com/validatorjs/validator.js#validators",
-      "isPort": "https://github.com/validatorjs/validator.js#validators",
-      "isURL": "https://github.com/validatorjs/validator.js#validators"
-    },
-    "zustand": {
-      "StateCreator": "https://docs.pmnd.rs/zustand/guides/typescript#state-creator",
-      "StoreApi": "https://docs.pmnd.rs/zustand/guides/typescript#store-api",
-      "create": "https://docs.pmnd.rs/zustand/getting-started/introduction"
-    }
-  },
-  "favicon": "../../src/components/icons/icon-64.png",
-  "gitRevision": "main",
-  "hideGenerator": false,
-  "extends": [
-    "typedoc-config-nick2bad4u/typedoc.json"
-  ],
-  "hostedBaseUrl": "https://nick2bad4u.github.io/Uptime-Watcher/",
-  "categoryOrder": [
-    "Frontend Components",
-    "Frontend Stores",
-    "Frontend Hooks",
-    "Frontend Utils",
-    "Backend Services",
-    "Backend Managers",
-    "Backend Database",
-    "Backend Events",
-    "Backend Utils",
-    "Shared Types",
-    "Shared Utils",
-    "Shared Validation",
-    "Constants",
-    "*"
-  ],
-  "includeHierarchySummary": true,
-  "entryPoints": [
-    "../../src",
-    "../../electron",
-    "../../shared"
-  ],
-  "searchInDocuments": true,
-  "exclude": [
-    "**/dist/**",
-    "**/node_modules/**",
-    "**/coverage/**",
-    "**/build/**",
-    "**/out/**",
-    "**/tmp/**",
-    "**/test/**",
-    "**/tests/**",
-    "**/spec/**",
-    "**/specs/**",
-    "**/examples/**",
-    "**/*.test.*",
-    "**/*.spec.*",
-    "**/mock*",
-    "**/test-*",
-    "**/setupTests*"
-  ],
-  "tsconfig": "tsconfig.typedoc.json",
-  "$schema": "https://typedoc.org/schema.json",
-  "json": "docs/typedoc.json",
-  "entryPointStrategy": "expand",
-  "prettierConfigFile": "../../prettier.config.mjs",
-  "coverageOutputPath": "static/img/coverage",
-  "searchInComments": true,
-  "gitRemote": "origin",
-  "githubPages": true,
-  "readme": "../../README.md",
-  "name": "Uptime Watcher - Complete Documentation",
-  "out": "C:/Users/Nick/Dropbox/PC (2)/Documents/GitHub/Uptime-Watcher/docs/docusaurus/docs",
-  "pretty": true,
-  "projectDocuments": [
-    "../../docs/Architecture/**/*.md",
-    "../../docs/Guides/**/*.md",
-    "../../docs/InteractiveCharts/**/*.md",
-    "../../docs/Testing/**/*.md",
-    "../../docs/TSDoc/**/*.md",
-    "../../README.md"
-  ],
-  "searchGroupBoosts": {
-    "Classes": 1.5,
-    "Functions": 1.2,
-    "Interfaces": 1.3,
-    "Types": 1.1
-  }
+    "searchInComments": true,
+    "searchInDocuments": true,
+    "tsconfig": "tsconfig.typedoc.json"
 }

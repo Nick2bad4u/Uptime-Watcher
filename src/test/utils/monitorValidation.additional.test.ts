@@ -217,7 +217,7 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data: Partial<DnsFormData> = {
-                expectedValue: ' '.repeat(3), // Whitespace only should be ignored
+                expectedValue: " ".repeat(3), // Whitespace only should be ignored
                 host: "example.com",
                 recordType: "A",
                 type: "dns",

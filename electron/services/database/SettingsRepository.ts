@@ -1,10 +1,10 @@
 /**
- * Repository for app settings persistence and management using the
- * repository pattern.
+ * Repository for app settings persistence and management using the repository
+ * pattern.
  *
  * @remarks
- * Handles CRUD operations for app configuration settings with type-safe
- * value handling, validation, and atomic updates. Provides centralized settings
+ * Handles CRUD operations for app configuration settings with type-safe value
+ * handling, validation, and atomic updates. Provides centralized settings
  * management with proper transaction support and error handling.
  *
  * Key features:
@@ -64,8 +64,8 @@ import {
 import { querySettingsRows } from "./utils/queries/typedQueries";
 
 /**
- * Defines the dependencies required by the SettingsRepository for managing
- * app settings persistence.
+ * Defines the dependencies required by the SettingsRepository for managing app
+ * settings persistence.
  *
  * @remarks
  * Provides the required DatabaseService for all settings operations. This

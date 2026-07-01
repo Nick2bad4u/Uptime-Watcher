@@ -4,8 +4,8 @@
  *
  * @remarks
  * Centralizes business logic for configuration decisions and caches validation
- * results. Provides consistent configuration management across the app
- * with built-in validation, caching, and business rule enforcement.
+ * results. Provides consistent configuration management across the app with
+ * built-in validation, caching, and business rule enforcement.
  *
  * Key responsibilities:
  *
@@ -68,8 +68,7 @@ import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { MonitorValidator } from "./validators/MonitorValidator";
 import { SiteValidator } from "./validators/SiteValidator";
 
-// ValidationResult type available for internal use via direct import External consumers should import directly from
-// shared/types/validation
+// ValidationResult type available for internal use via direct import External consumers should import directly from shared/types/validation
 
 /**
  * Describes the configuration for history retention limits.
@@ -92,8 +91,7 @@ export interface HistoryRetentionConfig {
 }
 
 /**
- * Manages business configuration, validation, and policy rules for the
- * app.
+ * Manages business configuration, validation, and policy rules for the app.
  *
  * @remarks
  * Centralizes business logic for configuration decisions, validation, and

@@ -197,7 +197,7 @@ describe("ErrorCatalog Function Coverage Tests", () => {
 
         test("should return false for empty or whitespace strings", () => {
             expect(isKnownErrorMessage("")).toBeFalsy();
-            expect(isKnownErrorMessage(' '.repeat(3))).toBeFalsy();
+            expect(isKnownErrorMessage(" ".repeat(3))).toBeFalsy();
             expect(isKnownErrorMessage("\n\t")).toBeFalsy();
         });
     });

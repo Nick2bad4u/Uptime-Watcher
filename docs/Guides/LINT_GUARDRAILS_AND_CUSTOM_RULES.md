@@ -18,18 +18,18 @@ tags:
 
 ## Table of Contents
 
-1. [Quick examples](#quick-examples)
-2. [Where the rules live](#where-the-rules-live)
-3. [Current custom rule inventory (enforced)](#current-custom-rule-inventory-enforced)
-4. [How to interpret failures](#how-to-interpret-failures)
-5. [IPC + preload/renderer boundary rules](#ipc--preloadrenderer-boundary-rules)
-6. [Anti-duplication helper rules](#anti-duplication-helper-rules)
-7. [Logging correctness rules](#logging-correctness-rules)
-8. [Type + schema enforcement rules](#type--schema-enforcement-rules)
-9. [Candidate additions (recommended)](#candidate-additions-recommended)
-10. [Banned provider reintroductions](#banned-provider-reintroductions)
-11. [When is an ESLint disable acceptable?](#when-is-an-eslint-disable-acceptable)
-12. [Repository-wide AI guardrails (non-tests)](#repository-wide-ai-guardrails-non-tests)
+- [Quick examples](#quick-examples)
+- [Where the rules live](#where-the-rules-live)
+- [Current custom rule inventory (enforced)](#current-custom-rule-inventory-enforced)
+- [How to interpret failures](#how-to-interpret-failures)
+- [IPC + preload/renderer boundary rules](#ipc--preloadrenderer-boundary-rules)
+- [Anti-duplication helper rules](#anti-duplication-helper-rules)
+- [Logging correctness rules](#logging-correctness-rules)
+- [Type + schema enforcement rules](#type--schema-enforcement-rules)
+- [Candidate additions (recommended)](#candidate-additions-recommended)
+- [Banned provider reintroductions](#banned-provider-reintroductions)
+- [When is an ESLint disable acceptable?](#when-is-an-eslint-disable-acceptable)
+- [Repository-wide AI guardrails (non-tests)](#repository-wide-ai-guardrails-non-tests)
 
 ## Quick examples
 

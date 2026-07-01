@@ -16,12 +16,12 @@ import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 type ChangeListener = ((event: MediaQueryListEvent) => void) | undefined;
 
 describe(usePrefersReducedMotion, () => {
-    const originalMatchMedia = window.matchMedia;
+    const originalMatchMedia = matchMedia;
 
     afterEach(() => {
         // Restore any overridden matchMedia implementation between tests.
-        (
-            safeCastTo<{ matchMedia: typeof originalMatchMedia | undefined }>(window)
+        safeCastTo<{ matchMedia: typeof originalMatchMedia | undefined }>(
+            globalThis
         ).matchMedia = originalMatchMedia;
         vi.restoreAllMocks();
     });
@@ -37,37 +37,36 @@ describe(usePrefersReducedMotion, () => {
     it("subscribes to media query changes and updates state", async () => {
         let changeListener: ChangeListener;
 
-        vi.spyOn(window as { matchMedia: typeof window.matchMedia }, "matchMedia")
-            .mockImplementation((query: string): MediaQueryList => {
-                const mediaQueryList: MediaQueryList = {
-                    matches: false,
-                    media: query,
-                    onchange: null,
-                    addEventListener: (
-                        type: string,
-                        listener: EventListenerOrEventListenerObject
-                    ) => {
-                        if (
-                            type === "change" &&
-                            typeof listener === "function"
-                        ) {
-                            changeListener = listener;
-                        }
-                    },
-                    removeEventListener: () => {
-                        // No-op in tests
-                    },
-                    addListener: () => {
-                        // Previous API, unused in hook
-                    },
-                    removeListener: () => {
-                        // Previous API, unused in hook
-                    },
-                    dispatchEvent: () => false,
-                };
+        vi.spyOn(
+            globalThis as { matchMedia: typeof window.matchMedia },
+            "matchMedia"
+        ).mockImplementation((query: string): MediaQueryList => {
+            const mediaQueryList: MediaQueryList = {
+                matches: false,
+                media: query,
+                onchange: null,
+                addEventListener: (
+                    type: string,
+                    listener: EventListenerOrEventListenerObject
+                ) => {
+                    if (type === "change" && typeof listener === "function") {
+                        changeListener = listener;
+                    }
+                },
+                removeEventListener: () => {
+                    // No-op in tests
+                },
+                addListener: () => {
+                    // Previous API, unused in hook
+                },
+                removeListener: () => {
+                    // Previous API, unused in hook
+                },
+                dispatchEvent: () => false,
+            };
 
-                return mediaQueryList;
-            });
+            return mediaQueryList;
+        });
 
         const { result } = renderHook(() => usePrefersReducedMotion());
 
@@ -88,24 +87,26 @@ describe(usePrefersReducedMotion, () => {
     });
 
     it("falls back gracefully when addEventListener is not available", () => {
-        vi.spyOn(window as { matchMedia: typeof window.matchMedia }, "matchMedia")
-            .mockImplementation(
-                (query: string): MediaQueryList =>
-                    ({
-                        matches: false,
-                        media: query,
-                        onchange: null,
-                        // Intentionally omit addEventListener/removeEventListener to
-                        // exercise the fallback branch in subscribeToPreferenceChanges.
-                        addListener: () => {
-                            // Previous no-op
-                        },
-                        removeListener: () => {
-                            // Previous no-op
-                        },
-                        dispatchEvent: () => false,
-                    }) as unknown as MediaQueryList
-            );
+        vi.spyOn(
+            globalThis as { matchMedia: typeof window.matchMedia },
+            "matchMedia"
+        ).mockImplementation(
+            (query: string): MediaQueryList =>
+                ({
+                    matches: false,
+                    media: query,
+                    onchange: null,
+                    // Intentionally omit addEventListener/removeEventListener to
+                    // exercise the fallback branch in subscribeToPreferenceChanges.
+                    addListener: () => {
+                        // Previous no-op
+                    },
+                    removeListener: () => {
+                        // Previous no-op
+                    },
+                    dispatchEvent: () => false,
+                }) as unknown as MediaQueryList
+        );
 
         const { result } = renderHook(() => usePrefersReducedMotion());
 

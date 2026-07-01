@@ -12,7 +12,7 @@ import type {
 } from "@shared/types";
 
 import { MONITOR_STATUS, STATUS_HISTORY_VALUES } from "@shared/types";
-import { arrayFirst, objectValues, safeCastTo   } from "ts-extras";
+import { arrayFirst, objectValues, safeCastTo } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 import type { UpdateStatus } from "../stores/types";
@@ -546,12 +546,14 @@ describe("Types Module", () => {
                     removeMonitor: () => Promise.resolve(true),
                     removeSite: () => Promise.resolve(true),
                     updateSite: () =>
-                        Promise.resolve(safeCastTo<Site>({
-                            identifier: "updated-id",
-                            monitors: [],
-                            monitoring: false,
-                            name: "Updated",
-                        })),
+                        Promise.resolve(
+                            safeCastTo<Site>({
+                                identifier: "updated-id",
+                                monitors: [],
+                                monitoring: false,
+                                name: "Updated",
+                            })
+                        ),
                 },
                 monitorTypes: {
                     formatMonitorDetail: () =>

@@ -16,7 +16,7 @@ import {
     type MonitorType,
 } from "@shared/types";
 import { act, renderHook } from "@testing-library/react";
-import { arrayFirst, objectKeys  } from "ts-extras";
+import { arrayFirst, objectKeys } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useErrorStore } from "../../../stores/error/useErrorStore";
@@ -35,7 +35,7 @@ const mockMonitorTypesApi = vi.hoisted(() => ({
 }));
 
 // Mock dependencies (partial mock to preserve exports like ApplicationError)
-vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
@@ -48,7 +48,7 @@ vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     };
 });
 
-vi.mock(import('../../../stores/utils'), async (importOriginal) => {
+vi.mock("../../../stores/utils", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -68,7 +68,7 @@ vi.stubGlobal("window", {
     electronAPI: mockElectronAPI,
 });
 
-vi.mock(import('../../../services/MonitorTypesService'), () => ({
+vi.mock("../../../services/MonitorTypesService", () => ({
     MonitorTypesService: {
         formatMonitorDetail: mockMonitorTypesApi.formatMonitorDetail,
         formatMonitorTitleSuffix: mockMonitorTypesApi.formatMonitorTitleSuffix,
@@ -118,8 +118,9 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 store.setLoading(true);
                 return await operation();
             } catch (error: unknown) {
-                const errorMessage =
-                    Error.isError(error) ? error.message : String(error);
+                const errorMessage = Error.isError(error)
+                    ? error.message
+                    : String(error);
                 store.setError(errorMessage);
                 throw error;
             } finally {
@@ -693,9 +694,10 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
             expect(result.current.monitorTypes).toHaveLength(1);
             expect(arrayFirst(result.current.monitorTypes)!.type).toBe("http");
-            expect(arrayFirst(arrayFirst(result.current.monitorTypes)!.fields)!.name).toBe(
-                "field-with-unicode-测试"
-            );
+            expect(
+                arrayFirst(arrayFirst(result.current.monitorTypes)!.fields)!
+                    .name
+            ).toBe("field-with-unicode-测试");
         });
     });
 });

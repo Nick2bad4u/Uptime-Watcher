@@ -3,8 +3,8 @@
  *
  * @remarks
  * Coordinates multiple open modals so only the top-most modal traps focus and
- * so the app root is only set to `inert` once (and restored only when
- * the last blocking modal closes).
+ * so the app root is only set to `inert` once (and restored only when the last
+ * blocking modal closes).
  */
 
 import { arrayAt } from "ts-extras";

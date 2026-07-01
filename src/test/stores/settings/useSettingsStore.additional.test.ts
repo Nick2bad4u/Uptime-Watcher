@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
-vi.mock(import('../error/useErrorStore'), () => ({
+vi.mock("../error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             setError: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock(import('../error/useErrorStore'), () => ({
     },
 }));
 
-vi.mock(import('../utils'), () => ({
+vi.mock("../utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, errorHandling) => {
         try {
@@ -49,7 +49,7 @@ vi.mock(import('../utils'), () => ({
     }),
 }));
 
-vi.mock(import('../../constants'), () => ({
+vi.mock("../../constants", () => ({
     DEFAULT_HISTORY_LIMIT: 1000,
 }));
 

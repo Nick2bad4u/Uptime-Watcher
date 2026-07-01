@@ -8,7 +8,7 @@ import type { Site } from "@shared/types";
 import type * as React from "react";
 
 import { act, renderHook } from "@testing-library/react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SelectorHookMock } from "../../utils/createSelectorHookMock";
@@ -22,7 +22,7 @@ const useSitesStoreMockRef = vi.hoisted(() => ({
 }));
 
 // Mock the dependencies
-vi.mock(import('../../../stores/sites/useSitesStore'), async () => {
+vi.mock("../../../stores/sites/useSitesStore", async () => {
     const { createSelectorHookMock } =
         await import("../../utils/createSelectorHookMock");
     const { createSitesStoreMock } =
@@ -224,7 +224,9 @@ describe("useSiteMonitor Hook", () => {
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             expect(result.current.filteredHistory).toHaveLength(2);
-            expect(arrayFirst(result.current.filteredHistory)?.status).toBe("up");
+            expect(arrayFirst(result.current.filteredHistory)?.status).toBe(
+                "up"
+            );
         });
 
         it("should handle monitor with no history", async ({

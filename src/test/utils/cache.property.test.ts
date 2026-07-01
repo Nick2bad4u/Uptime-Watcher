@@ -16,11 +16,9 @@
  * @file
  */
 
-import type { CacheValue } from "@shared/types/configTypes";
-
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { arrayFirst } from "ts-extras";
-import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     AppCaches,
@@ -37,7 +35,7 @@ describe("Cache Utils Property-Based Tests", () => {
         // Mock Date.now for predictable timing in tests
         originalDateNow = Date.now;
         mockTime = 1_000_000; // Start at a predictable time
-        vi.spyOn(Date, 'now').mockImplementation(() => mockTime);
+        vi.spyOn(Date, "now").mockImplementation(() => mockTime);
     });
 
     afterEach(() => {
@@ -240,7 +238,9 @@ describe("Cache Utils Property-Based Tests", () => {
                 // Filter to unique keys only to avoid duplicate key issues
                 const uniqueEntries = entries.filter(
                     (entry, index, arr) =>
-                        arr.findIndex((e) => arrayFirst(e) === arrayFirst(entry)) === index
+                        arr.findIndex(
+                            (e) => arrayFirst(e) === arrayFirst(entry)
+                        ) === index
                 );
 
                 const cache = new TypedCache<string, string>({
@@ -284,7 +284,9 @@ describe("Cache Utils Property-Based Tests", () => {
                 // Filter to ensure unique keys and sufficient entries
                 const uniqueEntries = entries.filter(
                     (entry, index, arr) =>
-                        arr.findIndex((e) => arrayFirst(e) === arrayFirst(entry)) === index
+                        arr.findIndex(
+                            (e) => arrayFirst(e) === arrayFirst(entry)
+                        ) === index
                 );
 
                 if (uniqueEntries.length < maxSize + 3) {

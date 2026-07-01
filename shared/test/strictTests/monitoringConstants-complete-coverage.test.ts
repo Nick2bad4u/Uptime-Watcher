@@ -1,8 +1,8 @@
 /**
  * Provides complete coverage for shared monitoring interval constants.
  *
- * @file Ensures remediation heuristics remain in sync across app layers
- *   by validating the exported thresholds and helper logic.
+ * @file Ensures remediation heuristics remain in sync across app layers by
+ *   validating the exported thresholds and helper logic.
  */
 
 import {
@@ -26,9 +26,7 @@ describe(shouldRemediateMonitorInterval, () => {
     it("flags non-numeric or missing values for remediation", () => {
         expect(shouldRemediateMonitorInterval(undefined)).toBeTruthy();
         expect(shouldRemediateMonitorInterval(NaN)).toBeTruthy();
-        expect(
-            shouldRemediateMonitorInterval("15")
-        ).toBeTruthy();
+        expect(shouldRemediateMonitorInterval("15")).toBeTruthy();
     });
 
     it("flags intervals below the minimum threshold", () => {

@@ -280,12 +280,8 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
 
         test("should return true for all catalog error messages", () => {
             // Test all error messages from all categories
-            for (const category of Object.values(
-                ERROR_CATALOG
-            )) {
-                for (const errorValue of Object.values(
-                    category
-                )) {
+            for (const category of Object.values(ERROR_CATALOG)) {
+                for (const errorValue of Object.values(category)) {
                     if (typeof errorValue === "string") {
                         expect(isKnownErrorMessage(errorValue)).toBeTruthy();
                     }

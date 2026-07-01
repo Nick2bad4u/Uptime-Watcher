@@ -424,7 +424,7 @@ describe("shared/types type guards and validators", () => {
                 activeOperations: [
                     "valid",
                     "",
-                    ' '.repeat(3),
+                    " ".repeat(3),
                 ], // Contains empty/whitespace strings
             };
             expect(validateMonitor(invalidMonitor)).toBeFalsy();

@@ -9,8 +9,6 @@
 
 import type { Except, PartialDeep, SetOptional } from "type-fest";
 
-import { objectAssign } from "ts-extras";
-
 /**
  * Type-safe mock data builder with fluent interface.
  */
@@ -56,7 +54,7 @@ export class MockDataBuilder<T> {
      * @returns Builder instance for chaining
      */
     withFields(fields: Partial<T>): this {
-        objectAssign(this.data, fields);
+        Object.assign(this.data, fields);
         return this;
     }
 }

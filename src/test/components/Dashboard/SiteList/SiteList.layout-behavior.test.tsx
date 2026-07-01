@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import type { UnknownRecord } from "type-fest";
 
 import { render, screen } from "@testing-library/react";
-import { arrayFirst, objectAssign, safeCastTo   } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type {
@@ -46,31 +46,37 @@ const {
     iconInvocations,
 } = vi.hoisted(() => ({
     themeState: { isDark: false },
-    uiStoreState: {
+    uiStoreState: safeCastTo<UiStoreState>({
         siteListLayout: "card-large",
         setSiteListLayout: vi.fn(),
         siteCardPresentation: "grid",
         setSiteCardPresentation: vi.fn(),
         surfaceDensity: "comfortable",
         setSurfaceDensity: vi.fn(),
-    },
-    tableViewInvocations: safeCastTo<Invocation<{
-        density: InterfaceDensity;
-        sites: Site[];
-    }>[]>([]),
+    }),
+    tableViewInvocations: safeCastTo<
+        Invocation<{
+            density: InterfaceDensity;
+            sites: Site[];
+        }>[]
+    >([]),
     compactCardInvocations: safeCastTo<Invocation<{ site: Site }>[]>([]),
-    cardInvocations: safeCastTo<Invocation<{
-        presentation: SiteCardPresentation;
-        site: Site;
-    }>[]>([]),
-    selectorInvocations: safeCastTo<Invocation<{
-        cardPresentation: SiteCardPresentation;
-        layout: SiteListLayoutMode;
-        listDensity: InterfaceDensity;
-        onLayoutChange: (mode: SiteListLayoutMode) => void;
-        onListDensityChange: (density: InterfaceDensity) => void;
-        onPresentationChange: (presentation: SiteCardPresentation) => void;
-    }>[]>([]),
+    cardInvocations: safeCastTo<
+        Invocation<{
+            presentation: SiteCardPresentation;
+            site: Site;
+        }>[]
+    >([]),
+    selectorInvocations: safeCastTo<
+        Invocation<{
+            cardPresentation: SiteCardPresentation;
+            layout: SiteListLayoutMode;
+            listDensity: InterfaceDensity;
+            onLayoutChange: (mode: SiteListLayoutMode) => void;
+            onListDensityChange: (density: InterfaceDensity) => void;
+            onPresentationChange: (presentation: SiteCardPresentation) => void;
+        }>[]
+    >([]),
     iconInvocations: safeCastTo<Invocation<UnknownRecord>[]>([]),
 }));
 
@@ -83,14 +89,14 @@ const useUIStoreMock = vi.hoisted(() => {
             uiStoreState
         )) as unknown as typeof import("../../../../stores/ui/useUiStore").useUIStore;
 
-    objectAssign(mockedHook, {
+    Object.assign(mockedHook, {
         getState: () => uiStoreState,
     });
 
     return mockedHook;
 });
 
-vi.mock(import('../../../../stores/ui/useUiStore'), () => ({
+vi.mock("../../../../stores/ui/useUiStore", () => ({
     useUIStore: useUIStoreMock,
 }));
 
@@ -98,7 +104,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 (globalThis as any).__useSitesStoreMock_siteListLayout__ = useSitesStoreMock;
 
-vi.mock(import('../../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../../stores/sites/useSitesStore", () => ({
     useSitesStore: (selector?: any, equality?: any) =>
         (globalThis as any).__useSitesStoreMock_siteListLayout__?.(
             selector,
@@ -106,17 +112,17 @@ vi.mock(import('../../../../stores/sites/useSitesStore'), () => ({
         ),
 }));
 
-vi.mock(import('../../../../theme/useTheme'), () => ({
+vi.mock("../../../../theme/useTheme", () => ({
     useTheme: () => themeState,
 }));
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({ children }: { readonly children: ReactNode }) => (
         <span>{children}</span>
     ),
 }));
 
-vi.mock(import('../../../../utils/icons'), () => ({
+vi.mock("../../../../utils/icons", () => ({
     AppIcons: {
         metrics: {
             monitor: (props: UnknownRecord) => {
@@ -127,12 +133,12 @@ vi.mock(import('../../../../utils/icons'), () => ({
     },
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteList/EmptyState'), () => ({
+vi.mock("../../../../components/Dashboard/SiteList/EmptyState", () => ({
     EmptyState: () => <div data-testid="site-list-empty-state" />,
 }));
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteList/SiteListLayoutSelector'),
+    "../../../../components/Dashboard/SiteList/SiteListLayoutSelector",
     () => ({
         SiteListLayoutSelector: (props: {
             readonly cardPresentation: SiteCardPresentation;
@@ -150,7 +156,7 @@ vi.mock(
     })
 );
 
-vi.mock(import('../../../../components/Dashboard/SiteList/SiteTableView'), () => ({
+vi.mock("../../../../components/Dashboard/SiteList/SiteTableView", () => ({
     SiteTableView: ({
         density,
         sites,
@@ -163,14 +169,14 @@ vi.mock(import('../../../../components/Dashboard/SiteList/SiteTableView'), () =>
     },
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCompactCard'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCompactCard", () => ({
     SiteCompactCard: ({ site }: { readonly site: Site }) => {
         compactCardInvocations.push({ props: { site } });
         return <div data-testid={`compact-card-${site.identifier}`} />;
     },
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCard'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCard", () => ({
     SiteCard: ({
         site,
         presentation,
@@ -234,7 +240,9 @@ describe("SiteList layout behavior", () => {
         render(<SiteList />);
 
         expect(screen.getByTestId("site-table-view")).toBeInTheDocument();
-        expect(arrayFirst(tableViewInvocations)?.props.sites).toEqual(sampleSites);
+        expect(arrayFirst(tableViewInvocations)?.props.sites).toEqual(
+            sampleSites
+        );
         expect(arrayFirst(tableViewInvocations)?.props.density).toBe(
             uiStoreState.surfaceDensity
         );
@@ -296,7 +304,9 @@ describe("SiteList layout behavior", () => {
         render(<SiteList />);
 
         expect(compactCardInvocations).toHaveLength(1);
-        expect(arrayFirst(compactCardInvocations)?.props.site).toEqual(arrayFirst(sampleSites));
+        expect(arrayFirst(compactCardInvocations)?.props.site).toEqual(
+            arrayFirst(sampleSites)
+        );
         expect(cardInvocations).toHaveLength(0);
     });
 });

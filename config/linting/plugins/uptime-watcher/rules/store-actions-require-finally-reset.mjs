@@ -31,7 +31,11 @@ export const storeActionsRequireFinallyResetRule = {
      *     getFilename: () => string;
      *     sourceCode: any;
      *     getSourceCode: () => any;
-     *     report: (arg0: { data: { flag: any }; messageId: string; node: any }) => void;
+     *     report: (arg0: {
+     *         data: { flag: any };
+     *         messageId: string;
+     *         node: any;
+     *     }) => void;
      * }} context
      */
     create(context) {
@@ -65,7 +69,8 @@ export const storeActionsRequireFinallyResetRule = {
          *
          * @param {unknown} argument
          *
-         * @returns {import("@typescript-eslint/utils").TSESTree.ObjectExpression | null}
+         * @returns {import("@typescript-eslint/utils").TSESTree.ObjectExpression
+         *     | null}
          */
         function getSetObjectExpression(argument) {
             if (

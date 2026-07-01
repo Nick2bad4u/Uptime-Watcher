@@ -161,9 +161,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isNonNegativeNumber(3.14)).toBeTruthy();
             expect(guardsTestModule.isNonNegativeNumber(-1)).toBeFalsy();
             expect(guardsTestModule.isNonNegativeNumber(-0.1)).toBeFalsy();
-            expect(
-                guardsTestModule.isNonNegativeNumber(NaN)
-            ).toBeFalsy();
+            expect(guardsTestModule.isNonNegativeNumber(NaN)).toBeFalsy();
             expect(guardsTestModule.isNonNegativeNumber("0")).toBeFalsy();
 
             // Test isNonNullObject function
@@ -301,9 +299,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             // Test isNumber with special numeric values
             expect(guardsTestModule.isNumber(Number.MAX_VALUE)).toBeTruthy();
             expect(guardsTestModule.isNumber(Number.MIN_VALUE)).toBeTruthy();
-            expect(
-                guardsTestModule.isNumber(Infinity)
-            ).toBeTruthy();
+            expect(guardsTestModule.isNumber(Infinity)).toBeTruthy();
             expect(
                 guardsTestModule.isNumber(Number.NEGATIVE_INFINITY)
             ).toBeTruthy();
@@ -316,9 +312,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(
                 guardsTestModule.isFiniteNumber(Number.MIN_VALUE)
             ).toBeTruthy();
-            expect(
-                guardsTestModule.isFiniteNumber(Infinity)
-            ).toBeFalsy();
+            expect(guardsTestModule.isFiniteNumber(Infinity)).toBeFalsy();
             expect(
                 guardsTestModule.isFiniteNumber(Number.NEGATIVE_INFINITY)
             ).toBeFalsy();

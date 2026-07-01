@@ -413,8 +413,8 @@ export interface Themes {
  *
  * @remarks
  * Provides a centralized registry of all theme configurations available for use
- * throughout the app. Used by the ThemeManager to resolve theme names
- * to actual theme objects.
+ * throughout the app. Used by the ThemeManager to resolve theme names to actual
+ * theme objects.
  *
  * @example
  *

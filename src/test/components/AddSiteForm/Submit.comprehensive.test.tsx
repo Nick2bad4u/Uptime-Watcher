@@ -9,7 +9,7 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
-import { arrayAt, arrayJoin, safeCastTo   } from "ts-extras";
+import { arrayAt, arrayJoin, safeCastTo, objectEntries } from "ts-extras";
 import {
     beforeEach,
     describe,
@@ -18,7 +18,6 @@ import {
     type MockedFunction,
     vi,
 } from "vitest";
-import { objectEntries } from "ts-extras";
 
 import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
 import type { Logger } from "../../../services/logger";
@@ -26,7 +25,7 @@ import type { Logger } from "../../../services/logger";
 import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 
 // Mock the validation functions
-vi.mock(import('../../../utils/monitorValidation'), () => ({
+vi.mock("../../../utils/monitorValidation", () => ({
     createMonitorObject: vi.fn(() => ({
         id: "mock-monitor-id",
         type: "http",
@@ -48,7 +47,7 @@ vi.mock(import('../../../utils/monitorValidation'), () => ({
 }));
 
 // Mock the error handling utility
-vi.mock(import('../../../utils/errorHandling'), () => ({
+vi.mock("../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
         async (fn, operationName, fallbackValue, shouldThrow = false) => {
             try {
@@ -75,7 +74,7 @@ vi.mock(import('../../../utils/errorHandling'), () => ({
 }));
 
 // Mock the fallbacks
-vi.mock(import('../../../utils/fallbacks'), () => ({
+vi.mock("../../../utils/fallbacks", () => ({
     truncateForLogging: vi.fn((str) => str),
 }));
 
@@ -427,7 +426,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 }),
                 fc.constantFrom(...nonWhitespaceTerminalCharacters)
             )
-            .map(([bodyChars, lastChar]) => `${arrayJoin(bodyChars, "")}${lastChar}`);
+            .map(
+                ([bodyChars, lastChar]) =>
+                    `${arrayJoin(bodyChars, "")}${lastChar}`
+            );
 
         const submissionFailureMessageArbitrary = fc
             .tuple(
@@ -437,7 +439,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 }),
                 fc.constantFrom(...nonWhitespaceTerminalCharacters)
             )
-            .map(([bodyChars, lastChar]) => `${arrayJoin(bodyChars, "")}${lastChar}`);
+            .map(
+                ([bodyChars, lastChar]) =>
+                    `${arrayJoin(bodyChars, "")}${lastChar}`
+            );
 
         const concurrencyPropertyParameters = {
             ...basePropertyParameters,
@@ -592,7 +597,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             [
                 fc.oneof(
                     whitespaceOnlyStringArbitrary,
-                    fc.constantFrom("", ' '.repeat(3), "\t", "\n"),
+                    fc.constantFrom("", " ".repeat(3), "\t", "\n"),
                     fc.constant(null),
                     fc.constant(undefined)
                 ),
@@ -671,7 +676,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 expect(mockEvent.preventDefault).toHaveBeenCalledWith();
                 expect(propertiesWithReject.createSite).toHaveBeenCalledWith();
-                expect(propertiesWithReject.setFormError).toHaveBeenCalledWith();
+                expect(
+                    propertiesWithReject.setFormError
+                ).toHaveBeenCalledWith();
 
                 // Verify error characteristics
                 expect([

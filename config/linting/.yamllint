@@ -1,9 +1,9 @@
 ---
 $schema: "https://www.schemastore.org/yamllint.json"
-extends: default
+extends: "default"
 # yaml-language-server: $schema=https://www.schemastore.org/yamllint.json
 
-locale: en_US.UTF-8
+locale: "en_US.UTF-8"
 
 # Define which files to consider as YAML
 yaml-files:
@@ -45,7 +45,7 @@ rules:
 
     # Braces configuration for flow mappings
     braces:
-        level: warning
+        level: "warning"
         max-spaces-inside: 5
         min-spaces-inside: 0
         forbid: false
@@ -54,7 +54,7 @@ rules:
 
     # Brackets configuration for flow sequences
     brackets:
-        level: warning
+        level: "warning"
         max-spaces-inside: 20
         min-spaces-inside: 0
         min-spaces-inside-empty: -1
@@ -63,13 +63,13 @@ rules:
 
     # Colons configuration
     colons:
-        level: warning
+        level: "warning"
         max-spaces-before: 0
         max-spaces-after: 1
 
     # Commas configuration
     commas:
-        level: warning
+        level: "warning"
         max-spaces-before: 0
         max-spaces-after: 1
         min-spaces-after: 1
@@ -79,7 +79,7 @@ rules:
         require-starting-space: true
         ignore-shebangs: true
         min-spaces-from-content: 1
-    comments-indentation: disable
+    comments-indentation: "disable"
 
     # Document start/end configuration
     document-start: false
@@ -87,7 +87,7 @@ rules:
 
     # Empty lines configuration
     empty-lines:
-        level: warning
+        level: "warning"
         max: 2
         max-start: 1
         max-end: 1
@@ -100,14 +100,14 @@ rules:
 
     # Hyphen configuration
     hyphens:
-        level: warning
+        level: "warning"
         max-spaces-after: 1
 
     # Indentation configuration for consistency
     indentation:
-        level: warning
+        level: "warning"
         spaces: 4
-        indent-sequences: consistent
+        indent-sequences: "consistent"
         check-multi-line-strings: false
 
     # Key rules for structure
@@ -117,13 +117,13 @@ rules:
 
     # Line length for readability (relaxed for modern screens)
     line-length:
-        level: warning
+        level: "warning"
         max: 200
         allow-non-breakable-words: true
         allow-non-breakable-inline-mappings: true
 
     # File ending requirements
-    new-line-at-end-of-file: enable
+    new-line-at-end-of-file: "enable"
 
     float-values:
         forbid-inf: false
@@ -131,17 +131,17 @@ rules:
         forbid-scientific-notation: false
         require-numeral-before-decimal: false
 
-    octal-values: enable
+    octal-values: "enable"
 
     quoted-strings:
         allow-quoted-quotes: false
         check-keys: false
-        quote-type: double
+        quote-type: "double"
         required: false
 
     # New lines configuration (force consistent Unix newlines across platforms)
     new-lines:
-        type: unix
+        type: "unix"
 
     # Disable truthy for flexibility with CI/CD configs
     truthy:
@@ -149,4 +149,4 @@ rules:
         allowed-values: ["yes", "no", "true", "false", "on", "off"]
 
     # Enable trailing spaces check
-    trailing-spaces: enable
+    trailing-spaces: "enable"

@@ -111,8 +111,7 @@ function createDataApi(): DataApiInterface {
             /**
              * Imports app data from a JSON string
              *
-             * @param jsonData - JSON string containing app data to
-             *   import
+             * @param jsonData - JSON string containing app data to import
              *
              * @returns Promise resolving to a boolean success flag
              */

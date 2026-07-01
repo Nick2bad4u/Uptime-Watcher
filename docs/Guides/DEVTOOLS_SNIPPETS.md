@@ -18,13 +18,13 @@ tags:
 
 ## Table of Contents
 
-1. [How to Use These Snippets](#how-to-use-these-snippets)
-2. [Snippet 1: Add Test Sites (One of Each Monitor Type)](#snippet-1-add-test-sites-one-of-each-monitor-type)
-3. [Snippet 2: Remove All Sites](#snippet-2-remove-all-sites)
-4. [Snippet 3: Add Minimal Test Sites (Quick Testing)](#snippet-3-add-minimal-test-sites-quick-testing)
-5. [Snippet 4: List All Sites](#snippet-4-list-all-sites)
-6. [Tips](#tips)
-7. [Troubleshooting](#troubleshooting)
+- [How to Use These Snippets](#how-to-use-these-snippets)
+- [Snippet 1: Add Test Sites (One of Each Monitor Type)](#snippet-1-add-test-sites-one-of-each-monitor-type)
+- [Snippet 2: Remove All Sites](#snippet-2-remove-all-sites)
+- [Snippet 3: Add Minimal Test Sites (Quick Testing)](#snippet-3-add-minimal-test-sites-quick-testing)
+- [Snippet 4: List All Sites](#snippet-4-list-all-sites)
+- [Tips](#tips)
+- [Troubleshooting](#troubleshooting)
 
 ## How to Use These Snippets
 

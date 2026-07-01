@@ -11,7 +11,7 @@ import {
     ensureError,
     withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
-import { arrayAt, arrayFirst  } from "ts-extras";
+import { arrayAt, arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import utilities to test
@@ -19,7 +19,7 @@ import { generateUuid } from "../utils/data/generateUuid";
 import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
 // Mock logger
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         error: vi.fn(),
         warn: vi.fn(),
@@ -315,7 +315,9 @@ describe("100% Coverage Edge Cases", () => {
             const wrapper = withAsyncErrorHandling(asyncOp, "test-async");
 
             expect(typeof wrapper).toBe("function");
-            expect(() => { wrapper(); }).not.toThrow();
+            expect(() => {
+                wrapper();
+            }).not.toThrow();
 
             // Wait for async operation to complete
             await new Promise((resolve) => setTimeout(resolve, 10));

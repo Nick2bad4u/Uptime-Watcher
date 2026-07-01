@@ -1,10 +1,12 @@
 # @internal
 
 <!-- prettier-ignore-start -->
-|    |    |
-| -- | -- |
+
+|                  |                                                                       |
+| ---------------- | --------------------------------------------------------------------- |
 | Standardization: | [Discretionary](https://tsdoc.org/pages/spec/standardization_groups/) |
-| Syntax kind: | [Modifier](https://tsdoc.org/pages/spec/tag_kinds/) |
+| Syntax kind:     | [Modifier](https://tsdoc.org/pages/spec/tag_kinds/)                   |
+
 <!-- prettier-ignore-end -->
 
 ## Suggested meaning

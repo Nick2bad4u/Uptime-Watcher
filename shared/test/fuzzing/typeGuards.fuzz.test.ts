@@ -186,8 +186,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                 } else {
                     // If not has property, either not an object or property doesn't exist
                     const isValidFalse =
-                        !isObject(value) ||
-                        !Object.hasOwn(value, property);
+                        !isObject(value) || !Object.hasOwn(value, property);
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -265,12 +264,12 @@ describe("TypeGuards Fuzzing Tests", () => {
 
                 if (isResult) {
                     expect(value instanceof Date).toBeTruthy();
-                    expect(Number.isNaN((value).getTime())).toBeFalsy();
+                    expect(Number.isNaN(value.getTime())).toBeFalsy();
                 } else {
                     // If not a date, ensure it's either not a Date instance or invalid
                     const isValidFalse =
                         !(value instanceof Date) ||
-                        Number.isNaN((value).getTime());
+                        Number.isNaN(value.getTime());
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -377,7 +376,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                     const isValidFalse =
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
-                        (value) < 0;
+                        value < 0;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -424,7 +423,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
                         !Number.isFinite(value) ||
-                        (value) <= 0;
+                        value <= 0;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -481,8 +480,8 @@ describe("TypeGuards Fuzzing Tests", () => {
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
                         !Number.isInteger(value) ||
-                        (value) < 1 ||
-                        (value) > 65_535;
+                        value < 1 ||
+                        value > 65_535;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -530,8 +529,8 @@ describe("TypeGuards Fuzzing Tests", () => {
                     const isValidFalse =
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
-                        (value) <= 0 ||
-                        (value) > maxValidTime;
+                        value <= 0 ||
+                        value > maxValidTime;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -654,7 +653,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                 if (
                     isNonNegativeNumber(value) &&
                     isFiniteNumber(value) &&
-                    (value) > 0
+                    value > 0
                 ) {
                     expect(isPositiveNumber(value)).toBeTruthy();
                 }

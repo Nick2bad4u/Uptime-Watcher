@@ -387,7 +387,8 @@ describe("DatabaseManager - Coverage Tests", () => {
             const mockExecutor = (databaseManager as any).commandExecutor;
             vi.mocked(mockExecutor.execute).mockResolvedValue(true);
 
-            const isResult = await databaseManager.importData('{"test": "data"}');
+            const isResult =
+                await databaseManager.importData('{"test": "data"}');
 
             expect(isResult).toBeTruthy();
             expect(mockExecutor.execute).toHaveBeenCalled();

@@ -21,18 +21,18 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision drivers](#decision-drivers)
-4. [Decision](#decision)
-5. [Detailed design](#detailed-design)
-6. [Security & privacy](#security--privacy)
-7. [Consequences](#consequences)
-8. [Implementation plan](#implementation-plan)
-9. [Testing & Validation](#testing--validation)
-10. [Future enhancements (non-blocking)](#future-enhancements-non-blocking)
-11. [Related ADRs](#related-adrs)
-12. [Review](#review)
+- [Status](#status)
+- [Context](#context)
+- [Decision drivers](#decision-drivers)
+- [Decision](#decision)
+- [Detailed design](#detailed-design)
+- [Security & privacy](#security--privacy)
+- [Consequences](#consequences)
+- [Implementation plan](#implementation-plan)
+- [Testing & Validation](#testing--validation)
+- [Future enhancements (non-blocking)](#future-enhancements-non-blocking)
+- [Related ADRs](#related-adrs)
+- [Review](#review)
 
 ## Status
 

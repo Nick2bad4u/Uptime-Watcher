@@ -44,7 +44,12 @@ import {
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
-import { isFinite as isFiniteNumber, isInteger, safeCastTo, setHas } from "ts-extras";
+import {
+    isFinite as isFiniteNumber,
+    isInteger,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 import {
     buildPayloadPreview,
@@ -512,7 +517,6 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
 
                 const normalizedError = ensureError(error);
 
-                // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
                 throw new IpcError(
                     `Failed verifying handler for channel '${channel}': ${getUserFacingErrorDetail(
                         error
@@ -572,7 +576,6 @@ async function invokeWithValidation<T>(
     } catch (error) {
         const errorMessage = getUserFacingErrorDetail(error);
         const normalizedError = ensureError(error);
-        // eslint-disable-next-line ex/use-error-cause -- Using custom IpcError class with cause handling
         throw new IpcError(
             `IPC call failed for channel '${channel}': ${errorMessage}`,
             channel,

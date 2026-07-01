@@ -678,9 +678,9 @@ describe("Theme Components - Complete Coverage", () => {
                 />
             );
 
-            const input = safeCastTo<HTMLInputElement>(screen.getByPlaceholderText(
-                "controlled input"
-            ));
+            const input = safeCastTo<HTMLInputElement>(
+                screen.getByPlaceholderText("controlled input")
+            );
             expect(input.value).toBe("test value");
 
             fireEvent.change(input, { target: { value: "new value" } });
@@ -959,7 +959,7 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(<ThemedCheckbox checked onChange={mockOnChange} />);
 
-            const checkbox = screen.getByRole("checkbox");
+            const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
             expect(checkbox.checked).toBeTruthy();
         });
 
@@ -1106,7 +1106,7 @@ describe("Theme Components - Complete Coverage", () => {
                 </ThemedSelect>
             );
 
-            const select = screen.getByRole("combobox");
+            const select = screen.getByRole("combobox") as HTMLSelectElement;
             expect(select.value).toBe("option2");
 
             fireEvent.change(select, { target: { value: "option3" } });

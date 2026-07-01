@@ -265,7 +265,9 @@ describe("fallback Utils Property-Based Tests", () => {
                     );
 
                     // Should not throw when executed
-                    expect(() => { wrappedFunction(); }).not.toThrow();
+                    expect(() => {
+                        wrappedFunction();
+                    }).not.toThrow();
                 }),
                 { numRuns: 5 }
             ); // Reduced iterations to minimize async overhead
@@ -300,7 +302,9 @@ describe("fallback Utils Property-Based Tests", () => {
                             );
 
                             // Should not throw even when the async operation fails
-                            expect(() => { wrappedFunction(); }).not.toThrow();
+                            expect(() => {
+                                wrappedFunction();
+                            }).not.toThrow();
                         }
                     ),
                     { numRuns: 3 }
@@ -353,7 +357,9 @@ describe("fallback Utils Property-Based Tests", () => {
                         `operation-${index}`
                     );
 
-                    expect(() => { wrappedFunction(); }).not.toThrow();
+                    expect(() => {
+                        wrappedFunction();
+                    }).not.toThrow();
                 }
 
                 // Allow time for async operations to complete

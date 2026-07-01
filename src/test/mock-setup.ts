@@ -20,7 +20,7 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import fc from "fast-check";
 import { EventEmitter } from "node:events";
-import { objectAssign, safeCastTo  } from "ts-extras";
+import { safeCastTo } from "ts-extras";
 import { type Mock, vi } from "vitest";
 
 import type { ElectronAPI } from "../types";
@@ -51,7 +51,7 @@ type DeepMocked<T> = T extends (...args: infer Args) => infer Return
       ? { [Key in keyof T]: DeepMocked<T[Key]> }
       : T;
 
-vi.mock(import('electron'), () => ({
+vi.mock("electron", () => ({
     app: {
         getPath: vi.fn(() => ""),
         isPackaged: false,
@@ -114,7 +114,7 @@ Object.defineProperty(URL, "revokeObjectURL", {
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
+const baseNumRuns = safeCastTo<{ numRuns?: number }>(current).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
@@ -686,8 +686,8 @@ Object.defineProperty(globalThis, "electronAPI", {
 });
 
 // Mock Chart.js for component testing
-vi.mock(import('chart.js'), () => {
-    const Chart = objectAssign(vi.fn(), {
+vi.mock("chart.js", () => {
+    const Chart = Object.assign(vi.fn(), {
         register: vi.fn(),
     });
 
@@ -709,10 +709,10 @@ vi.mock(import('chart.js'), () => {
     };
 });
 
-vi.mock(import('chartjs-adapter-date-fns'), () => ({}));
+vi.mock("chartjs-adapter-date-fns", () => ({}));
 
 // Mock react-chartjs-2
-vi.mock(import('react-chartjs-2'), () => ({
+vi.mock("react-chartjs-2", () => ({
     Line: vi.fn(),
     Bar: vi.fn(),
     Pie: vi.fn(),
@@ -720,7 +720,7 @@ vi.mock(import('react-chartjs-2'), () => ({
 }));
 
 // Mock axios for HTTP requests
-vi.mock(import('axios'), () => ({
+vi.mock("axios", () => ({
     default: {
         get: vi.fn(),
         post: vi.fn(),
@@ -768,7 +768,7 @@ Object.defineProperties(globalThis, {
 // Mock notifications
 const MockNotification = vi.fn() as any;
 MockNotification.permission = "granted";
-vi.spyOn(MockNotification, 'requestPermission').mockResolvedValue("granted");
+vi.spyOn(MockNotification, "requestPermission").mockResolvedValue("granted");
 
 Object.defineProperty(globalThis, "Notification", {
     value: MockNotification,

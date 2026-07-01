@@ -14,7 +14,7 @@ describe("syncEngineUtils", () => {
             expect(getPersistedDeviceIdValidationError("")).toMatch(
                 /non-empty/iv
             );
-            expect(getPersistedDeviceIdValidationError(' '.repeat(3))).toMatch(
+            expect(getPersistedDeviceIdValidationError(" ".repeat(3))).toMatch(
                 /non-empty/iv
             );
         });
@@ -49,7 +49,7 @@ describe("syncEngineUtils", () => {
             const candidates = [
                 "device-1",
                 "",
-                ' '.repeat(3),
+                " ".repeat(3),
                 " device",
                 "a/b",
                 "a:bad",

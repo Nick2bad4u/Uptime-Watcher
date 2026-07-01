@@ -246,7 +246,7 @@ const ThemedBoxComponent = ({
 
     // Handle keyboard interactions for interactive divs
     const handleKeyDown = (e: KeyboardEvent): void => {
-        if (e.key !== "Enter" && e.key !== " " || !onClick) {
+        if ((e.key !== "Enter" && e.key !== " ") || !onClick) {
             return;
         }
 

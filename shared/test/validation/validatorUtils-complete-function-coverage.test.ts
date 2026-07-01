@@ -29,7 +29,9 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
             );
             expect(validatorUtilsModule.isNonEmptyString("hello")).toBeTruthy();
             expect(validatorUtilsModule.isNonEmptyString("")).toBeFalsy();
-            expect(validatorUtilsModule.isNonEmptyString(' '.repeat(3))).toBeFalsy(); // Whitespace only
+            expect(
+                validatorUtilsModule.isNonEmptyString(" ".repeat(3))
+            ).toBeFalsy(); // Whitespace only
             expect(validatorUtilsModule.isNonEmptyString(null)).toBeFalsy();
             expect(
                 validatorUtilsModule.isNonEmptyString(undefined)
@@ -74,7 +76,9 @@ describe("ValidatorUtils - Complete Function Coverage", () => {
                 validatorUtilsModule.isValidIdentifier("abc@123")
             ).toBeFalsy();
             expect(validatorUtilsModule.isValidIdentifier("")).toBeFalsy();
-            expect(validatorUtilsModule.isValidIdentifier(' '.repeat(3))).toBeFalsy(); // Whitespace only
+            expect(
+                validatorUtilsModule.isValidIdentifier(" ".repeat(3))
+            ).toBeFalsy(); // Whitespace only
             expect(validatorUtilsModule.isValidIdentifier(null)).toBeFalsy();
             expect(validatorUtilsModule.isValidIdentifier(123)).toBeFalsy();
 

@@ -177,7 +177,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             expect(cleanup).toHaveBeenCalledTimes(1);
 
                             // Verify signal was passed
-                            const passedSignal = arrayFirst(operation.mock.calls)?.[0];
+                            const passedSignal = arrayFirst(
+                                operation.mock.calls
+                            )?.[0];
                             expect(passedSignal).toBeInstanceOf(AbortSignal);
                         }
                     )
@@ -216,10 +218,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                                 async (signal: AbortSignal) =>
                                     // Simulate long operation
                                     new Promise((resolve, reject) => {
-                                        const timeout = setTimeout(
-                                            () => { resolve("success"); },
-                                            1000
-                                        );
+                                        const timeout = setTimeout(() => {
+                                            resolve("success");
+                                        }, 1000);
                                         signal.addEventListener("abort", () => {
                                             clearTimeout(timeout);
                                             reject(new Error("Aborted"));
@@ -236,7 +237,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             );
 
                             // Abort after delay
-                            setTimeout(() => { controller.abort(); }, abortDelay);
+                            setTimeout(() => {
+                                controller.abort();
+                            }, abortDelay);
                             vi.advanceTimersByTime(abortDelay);
 
                             await expect(promise).rejects.toThrow("Aborted");
@@ -280,10 +283,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             const promise = sleep(sleepMs, controller.signal);
 
                             // Abort before sleep completes
-                            setTimeout(
-                                () => { controller.abort("Test abort"); },
-                                abortMs
-                            );
+                            setTimeout(() => {
+                                controller.abort("Test abort");
+                            }, abortMs);
                             vi.advanceTimersByTime(abortMs);
 
                             await expect(promise).rejects.toThrow();
@@ -369,10 +371,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                         async (operationDelay, signalDelay, result) => {
                             const controller = new AbortController();
                             const operation = new Promise((resolve) =>
-                                setTimeout(
-                                    () => { resolve(result); },
-                                    operationDelay
-                                )
+                                setTimeout(() => {
+                                    resolve(result);
+                                }, operationDelay)
                             );
 
                             const promise = raceWithAbort(
@@ -381,7 +382,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             );
 
                             // Schedule abort after operation should complete
-                            setTimeout(() => { controller.abort(); }, signalDelay);
+                            setTimeout(() => {
+                                controller.abort();
+                            }, signalDelay);
 
                             // Advance time to complete operation but not abort
                             vi.advanceTimersByTime(operationDelay + 10);
@@ -400,10 +403,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                         async (abortDelay, operationDelay) => {
                             const controller = new AbortController();
                             const operation = new Promise((resolve) =>
-                                setTimeout(
-                                    () => { resolve("success"); },
-                                    operationDelay
-                                )
+                                setTimeout(() => {
+                                    resolve("success");
+                                }, operationDelay)
                             );
 
                             const promise = raceWithAbort(
@@ -412,7 +414,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             );
 
                             // Abort before operation completes
-                            setTimeout(() => { controller.abort(); }, abortDelay);
+                            setTimeout(() => {
+                                controller.abort();
+                            }, abortDelay);
                             vi.advanceTimersByTime(abortDelay + 10);
 
                             await expect(promise).rejects.toThrow(
@@ -432,7 +436,9 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             controller.abort(reason);
 
                             const operation = new Promise((resolve) =>
-                                setTimeout(() => { resolve("success"); }, 1000)
+                                setTimeout(() => {
+                                    resolve("success");
+                                }, 1000)
                             );
 
                             await expect(
@@ -513,9 +519,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                     fc.oneof(fc.constant(undefined), fc.record({})),
                     (options) => {
                         expect(() => {
-                            createCombinedAbortSignal(
-                                options
-                            );
+                            createCombinedAbortSignal(options);
                         }).not.toThrow();
                     }
                 )

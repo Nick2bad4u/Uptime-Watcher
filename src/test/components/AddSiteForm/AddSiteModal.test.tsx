@@ -13,14 +13,10 @@ import {
     within,
 } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteModal } from "../../../components/AddSiteForm/AddSiteModal";
-
-interface ThemeState {
-    isDark: boolean;
-}
 
 interface BoxInvocation {
     readonly children: ReactNode;
@@ -41,11 +37,11 @@ const { themeState, boxInvocations, formInvocations, closeIconSpy } =
         )),
     }));
 
-vi.mock(import('../../../theme/useTheme'), () => ({
+vi.mock("../../../theme/useTheme", () => ({
     useTheme: () => themeState,
 }));
 
-vi.mock(import('../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../theme/components/ThemedBox", () => ({
     ThemedBox: ({
         children,
         ...props
@@ -55,7 +51,7 @@ vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     },
 }));
 
-vi.mock(import('../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../theme/components/ThemedText", () => ({
     ThemedText: ({
         as,
         children,
@@ -69,7 +65,7 @@ vi.mock(import('../../../theme/components/ThemedText'), () => ({
     },
 }));
 
-vi.mock(import('../../../utils/icons'), () => ({
+vi.mock("../../../utils/icons", () => ({
     AppIcons: {
         actions: {
             add: ({ size }: { readonly size?: number }) => (
@@ -85,7 +81,7 @@ vi.mock(import('../../../utils/icons'), () => ({
     },
 }));
 
-vi.mock(import('../../../components/AddSiteForm/AddSiteForm'), () => ({
+vi.mock("../../../components/AddSiteForm/AddSiteForm", () => ({
     AddSiteForm: ({ onSuccess }: { readonly onSuccess: () => void }) => {
         formInvocations.push({ onSuccess });
         return (

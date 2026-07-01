@@ -61,7 +61,7 @@ const setDimensions = (
 };
 
 beforeAll(() => {
-    (safeCastTo<UnknownRecord>(globalThis))["ResizeObserver"] =
+    safeCastTo<UnknownRecord>(globalThis)["ResizeObserver"] =
         MockResizeObserver;
 });
 
@@ -107,7 +107,10 @@ describe(useOverflowMarquee, () => {
                 }
             }
         );
-        const removeEventListenerSpy = vi.spyOn(globalThis, "removeEventListener");
+        const removeEventListenerSpy = vi.spyOn(
+            globalThis,
+            "removeEventListener"
+        );
 
         const { result, unmount } = renderHook(() =>
             useOverflowMarquee({ ref: externalRef })

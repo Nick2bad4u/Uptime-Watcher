@@ -18,8 +18,6 @@
  * top of these primitives.
  */
 
-/* eslint-disable zod/prefer-string-schema-with-trim -- Cloud sync protocol parsing must preserve payload strings/keys exactly and avoid lossy normalization. */
-
 import type { JsonValue as TypeFestJsonValue } from "type-fest";
 
 import * as z from "zod";
@@ -144,8 +142,7 @@ export interface CloudSyncDeleteEntityOperation {
  * Operation emitted to the per-device append-only log.
  */
 export type CloudSyncOperation =
-    | CloudSyncDeleteEntityOperation
-    | CloudSyncSetFieldOperation;
+    CloudSyncDeleteEntityOperation | CloudSyncSetFieldOperation;
 
 const setFieldOperationSchema = z
     .object({
@@ -222,5 +219,3 @@ export function compareCloudSyncWriteKey(
 
     return a.opId - b.opId;
 }
-
-/* eslint-enable zod/prefer-string-schema-with-trim -- End protocol-preserving no-trim exception scope. */

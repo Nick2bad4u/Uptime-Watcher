@@ -3,9 +3,9 @@
  * interface interactions.
  *
  * @remarks
- * This store is responsible for managing the UI state of the app,
- * including modal visibility, selected site, active tabs, and chart time
- * ranges. All state mutations must be performed via store actions.
+ * This store is responsible for managing the UI state of the app, including
+ * modal visibility, selected site, active tabs, and chart time ranges. All
+ * state mutations must be performed via store actions.
  *
  * @packageDocumentation
  */

@@ -9,7 +9,7 @@ import {
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
-import * as crypto from "node:crypto";
+import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { isPresent, stringSplit } from "ts-extras";
@@ -365,8 +365,8 @@ export class FilesystemCloudStorageProvider
                 );
             }
 
-            tempPath = `${targetPath}.tmp-${crypto.randomUUID()}`;
-            const backupPath = `${targetPath}.bak-${crypto.randomUUID()}`;
+            tempPath = `${targetPath}.tmp-${randomUUID()}`;
+            const backupPath = `${targetPath}.bak-${randomUUID()}`;
 
             await fs.writeFile(tempPath, args.buffer);
 

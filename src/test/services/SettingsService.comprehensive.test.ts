@@ -52,18 +52,18 @@ const mockElectronAPI = vi.hoisted(() => ({
 }));
 
 // Mock modules
-vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Backwards-compatible alias for existing assertions
 
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
 
-vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
+vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
     return {
@@ -412,10 +412,7 @@ describe("SettingsService", () => {
                 expect(result).toBe(expectedLimit);
             }
 
-            const rejectingEdgeCases = [
-                Infinity,
-                Number.NEGATIVE_INFINITY,
-            ];
+            const rejectingEdgeCases = [Infinity, Number.NEGATIVE_INFINITY];
 
             for (const limit of rejectingEdgeCases) {
                 mockLogger.warn.mockClear();

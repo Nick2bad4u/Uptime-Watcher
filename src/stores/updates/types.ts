@@ -38,8 +38,8 @@ export interface UpdatesStore {
      * Subscribes to backend update status events.
      *
      * @remarks
-     * This is intentionally store-owned so app bootstrap code can
-     * subscribe via the domain store (rather than wiring
+     * This is intentionally store-owned so app bootstrap code can subscribe via
+     * the domain store (rather than wiring
      * {@link src/services/EventsService#EventsService} directly in the root
      * component).
      *

@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Upload macOS Distributables to Archive Org
-run-name: Upload macOS Distributables To Archive Org
+name: "Upload macOS Distributables to Archive Org"
+run-name: "Upload macOS Distributables To Archive Org"
 
 on:
     workflow_dispatch:
@@ -8,73 +8,73 @@ on:
         workflows: ["Build and Release Electron App"]
         branches: ["main"]
         types:
-            - completed
+            - "completed"
 
 concurrency:
-    group: IAMAC-${{ github.ref }}
+    group: "IAMAC-${{ github.ref }}"
     cancel-in-progress: true
 
 permissions:
-    contents: read
+    contents: "read"
 
 defaults:
     run:
-        shell: bash
+        shell: "bash"
 
 jobs:
     upload-macos:
-        name: Upload macOS distributables to archive.org
-        runs-on: ubuntu-latest
+        name: "Upload macOS distributables to archive.org"
+        runs-on: "ubuntu-latest"
         timeout-minutes: 30
         steps:
-            - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+            - name: "Harden the runner (Audit all outbound calls)"
+              uses: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411" # v2.19.4
               with:
-                  egress-policy: audit
+                  egress-policy: "audit"
 
-            - name: Download macOS release assets (darwin-)
-              id: download_darwin
-              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
+            - name: "Download macOS release assets (darwin-)"
+              id: "download_darwin"
+              uses: "robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f" # v1.13
               with:
                   latest: true
                   fileName: "Uptime-Watcher-darwin-*"
-                  out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  out-file-path: "release-dist"
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: Download macOS release assets (dmg-)
-              id: download_dmg
-              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
+            - name: "Download macOS release assets (dmg-)"
+              id: "download_dmg"
+              uses: "robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f" # v1.13
               with:
                   latest: true
                   fileName: "Uptime-Watcher-dmg-*"
-                  out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  out-file-path: "release-dist"
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: Download macOS release assets (pkg-)
-              id: download_pkg
-              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
+            - name: "Download macOS release assets (pkg-)"
+              id: "download_pkg"
+              uses: "robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f" # v1.13
               with:
                   latest: true
                   fileName: "Uptime-Watcher-pkg-*"
-                  out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  out-file-path: "release-dist"
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: Download macOS release assets (latest-mac.yml)
-              id: download_latest
-              uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
+            - name: "Download macOS release assets (latest-mac.yml)"
+              id: "download_latest"
+              uses: "robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f" # v1.13
               with:
                   latest: true
                   fileName: "latest-mac*.yml"
-                  out-file-path: release-dist
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  out-file-path: "release-dist"
+                  token: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: Upload macOS distributables to archive.org
-              uses: Nick2bad4u/internet-archive-upload@369aaddeede5cca7f0be4cb39dcc89e35afbdf48 # v2.0.0
+            - name: "Upload macOS distributables to archive.org"
+              uses: "Nick2bad4u/internet-archive-upload@369aaddeede5cca7f0be4cb39dcc89e35afbdf48" # v2.0.0
               with:
-                  access-key: ${{ secrets.IA_ACCESS_KEY }}
-                  secret-key: ${{ secrets.IA_SECRET_KEY }}
-                  identifier: Uptime-Watcher-macos-${{ steps.download_darwin.outputs.tag_name }}
-                  files: release-dist/
+                  access-key: "${{ secrets.IA_ACCESS_KEY }}"
+                  secret-key: "${{ secrets.IA_SECRET_KEY }}"
+                  identifier: "Uptime-Watcher-macos-${{ steps.download_darwin.outputs.tag_name }}"
+                  files: "release-dist/"
               continue-on-error: true
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

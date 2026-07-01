@@ -27,7 +27,7 @@ const tooltipMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock(import('../../components/common/Tooltip/Tooltip'), () => ({
+vi.mock("../../components/common/Tooltip/Tooltip", () => ({
     Tooltip: tooltipMock.render,
 }));
 
@@ -39,15 +39,15 @@ const themedBoxMock = vi.hoisted(() => ({
     )),
 }));
 
-vi.mock(import('../../theme/components/ThemedBox'), () => ({
+vi.mock("../../theme/components/ThemedBox", () => ({
     ThemedBox: themedBoxMock.render,
 }));
 
-const themedTextCalls = vi.hoisted(
-    () => safeCastTo<(UnknownRecord & { children?: ReactNode })[]>([])
+const themedTextCalls = vi.hoisted(() =>
+    safeCastTo<(UnknownRecord & { children?: ReactNode })[]>([])
 );
 
-vi.mock(import('../../theme/components/ThemedText'), () => ({
+vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: (props: { children?: ReactNode }) => {
         themedTextCalls.push(props);
         return <span>{props.children}</span>;
@@ -56,7 +56,7 @@ vi.mock(import('../../theme/components/ThemedText'), () => ({
 
 const statusIndicatorCalls = vi.hoisted(() => safeCastTo<UnknownRecord[]>([]));
 
-vi.mock(import('../../theme/components/StatusIndicator'), () => ({
+vi.mock("../../theme/components/StatusIndicator", () => ({
     StatusIndicator: (props: UnknownRecord) => {
         statusIndicatorCalls.push(props);
         return <span data-testid={`status-indicator-${props["status"]}`} />;
@@ -65,7 +65,7 @@ vi.mock(import('../../theme/components/StatusIndicator'), () => ({
 
 const healthIndicatorCalls = vi.hoisted(() => safeCastTo<UnknownRecord[]>([]));
 
-vi.mock(import('../../components/Header/HealthIndicator'), () => ({
+vi.mock("../../components/Header/HealthIndicator", () => ({
     HealthIndicator: (props: UnknownRecord) => {
         healthIndicatorCalls.push(props);
         return <div data-testid="health-indicator" />;

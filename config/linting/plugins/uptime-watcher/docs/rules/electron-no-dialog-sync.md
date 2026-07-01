@@ -23,7 +23,7 @@ No options.
 import { dialog } from "electron";
 
 dialog.showMessageBoxSync({
-  message: "Hello",
+ message: "Hello",
 });
 ```
 
@@ -33,6 +33,6 @@ dialog.showMessageBoxSync({
 import { dialog } from "electron";
 
 await dialog.showMessageBox({
-  message: "Hello",
+ message: "Hello",
 });
 ```

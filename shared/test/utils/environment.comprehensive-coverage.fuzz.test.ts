@@ -42,13 +42,13 @@ describe("environment comprehensive fuzzing tests", () => {
     // Process type surface. The tests only care about a handful of fields
     // (env, version, versions, etc.), not the full EventEmitter interface.
     let originalProcess: any = process;
-    let originalWindow: typeof globalThis.window = globalThis;
+    let originalWindow: typeof globalThis.window = globalThis.window;
     let originalDocument: typeof globalThis.document = document;
 
     beforeEach(() => {
         // Store original globals
         originalProcess = process;
-        originalWindow = globalThis;
+        originalWindow = globalThis.window;
         originalDocument = document;
     });
 

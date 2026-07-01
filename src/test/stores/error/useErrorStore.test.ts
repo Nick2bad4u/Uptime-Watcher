@@ -4,13 +4,13 @@
  */
 
 import { act, renderHook } from "@testing-library/react";
-import { objectKeys, objectValues  } from "ts-extras";
+import { objectKeys, objectValues } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Mock the shared utils
-vi.mock(import('../../../stores/shared/utils'), () => ({
+vi.mock("../../../stores/shared/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
@@ -509,10 +509,10 @@ describe(useErrorStore, () => {
             const { result } = renderHook(() => useErrorStore());
 
             act(() => {
-                result.current.setError(' '.repeat(3));
+                result.current.setError(" ".repeat(3));
             });
 
-            expect(result.current.lastError).toBe(' '.repeat(3));
+            expect(result.current.lastError).toBe(" ".repeat(3));
         });
 
         it("should handle overwriting store errors", async ({

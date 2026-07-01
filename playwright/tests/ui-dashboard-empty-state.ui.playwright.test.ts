@@ -89,9 +89,9 @@ test.describe(
                 await expect.soft(emptyState).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect.soft(
-                    emptyState.getByText("No sites are being monitored")
-                ).toBeVisible();
+                await expect
+                    .soft(emptyState.getByText("No sites are being monitored"))
+                    .toBeVisible();
 
                 await openAddSiteModal(page);
 
@@ -107,17 +107,19 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                await expect.soft(
-                    page.getByTestId("site-count-label")
-                ).toContainText("Tracking 1 site", {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect
+                    .soft(page.getByTestId("site-count-label"))
+                    .toContainText("Tracking 1 site", {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
 
                 await ensureCardLayout(page);
 
-                await expect.soft(getSiteCardLocator(page, siteName)).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect
+                    .soft(getSiteCardLocator(page, siteName))
+                    .toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
             }
         );
     }

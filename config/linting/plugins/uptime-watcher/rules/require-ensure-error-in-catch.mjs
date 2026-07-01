@@ -81,8 +81,10 @@ export const requireEnsureErrorInCatchRule = {
             }
 
             const firstArgument = call.arguments?.[0];
-            return (firstArgument?.type === "Identifier" &&
-                firstArgument.name === caughtName);
+            return (
+                firstArgument?.type === "Identifier" &&
+                firstArgument.name === caughtName
+            );
         }
 
         /**
@@ -120,7 +122,9 @@ export const requireEnsureErrorInCatchRule = {
         /**
          * @typedef {{
          *     ensureErrorCall: boolean;
-         *     firstPropertyAccess: import("@typescript-eslint/utils").TSESTree.MemberExpression | null;
+         *     firstPropertyAccess:
+         *         | import("@typescript-eslint/utils").TSESTree.MemberExpression
+         *         | null;
          *     name: string;
          * }} EnsureErrorState
          */

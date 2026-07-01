@@ -14,7 +14,7 @@ import type { UnknownArray } from "type-fest";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
+import { arrayAt, arrayFirst, safeCastTo } from "ts-extras";
 import { describe, expect, vi } from "vitest";
 
 import type { UseSiteResult } from "../../../../hooks/site/useSite";
@@ -56,7 +56,7 @@ const monitorSelectorCalls: MonitorSelectorStubProps[] = [];
 const statusBadgeCalls: StatusBadgeStubProps[] = [];
 const actionGroupCalls: ActionButtonGroupStubProps[] = [];
 
-vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => {
+vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => {
     const component = vi.fn((props: MarqueeStubProps) => {
         marqueeCalls.push(props);
         return <div data-testid="marquee-text-stub">{props.text}</div>;
@@ -65,7 +65,7 @@ vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => {
 });
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => {
         const component = vi.fn((props: MonitorSelectorStubProps) => {
             monitorSelectorCalls.push(props);
@@ -74,15 +74,15 @@ vi.mock(
                     <button
                         data-prevent-row-activation
                         data-testid="monitor-selector-trigger"
-                        onClick={() =>
-                            { props.onChange({
+                        onClick={() => {
+                            props.onChange({
                                 target: {
                                     value:
                                         arrayFirst(props.monitors)?.id ??
                                         "unknown-monitor",
                                 },
-                            } as ChangeEvent<HTMLSelectElement>); }
-                        }
+                            } as ChangeEvent<HTMLSelectElement>);
+                        }}
                         type="button"
                     >
                         Monitors
@@ -94,7 +94,7 @@ vi.mock(
     }
 );
 
-vi.mock(import('../../../../components/common/StatusBadge'), () => {
+vi.mock("../../../../components/common/StatusBadge", () => {
     const component = vi.fn((props: StatusBadgeStubProps) => {
         statusBadgeCalls.push(props);
         return (
@@ -107,7 +107,7 @@ vi.mock(import('../../../../components/common/StatusBadge'), () => {
 });
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => {
         const component = vi.fn((props: ActionButtonGroupStubProps) => {
             actionGroupCalls.push(props);
@@ -128,7 +128,7 @@ vi.mock(
     }
 );
 
-vi.mock(import('../../../../hooks/site/useSite'), async () => {
+vi.mock("../../../../hooks/site/useSite", async () => {
     const actual = await vi.importActual<
         typeof import("../../../../hooks/site/useSite")
     >("../../../../hooks/site/useSite");
@@ -246,8 +246,11 @@ describe("SiteTableRow fast-check coverage", () => {
             const handleStopMonitoring = vi.fn();
             const handleStopSiteMonitoring = vi.fn();
 
-            const selectedMonitor = includeMonitor ? arrayFirst(monitors) : undefined;
-            const selectedMonitorId = selectedMonitor?.id ?? arrayFirst(monitors)!.id;
+            const selectedMonitor = includeMonitor
+                ? arrayFirst(monitors)
+                : undefined;
+            const selectedMonitorId =
+                selectedMonitor?.id ?? arrayFirst(monitors)!.id;
             const filteredHistory = selectedMonitor?.history ?? [];
 
             const baseSite: Site = {

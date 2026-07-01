@@ -74,8 +74,8 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
         return {
             /**
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression & {
-             *     typeParameters?: unknown;
-             * }} node
+             *         typeParameters?: unknown;
+             *     }} node
              */
             CallExpression(node) {
                 if (node.callee.type !== "Identifier") {

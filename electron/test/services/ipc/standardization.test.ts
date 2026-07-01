@@ -56,7 +56,6 @@ describe("IPC Standardization Concepts", () => {
         // Optional warnings should be string array
         if (response.warnings) {
             expect(Array.isArray(response.warnings)).toBeTruthy();
-            // eslint-disable-next-line unicorn/no-array-for-each
             response.warnings.forEach((warning: any) => {
                 expect(typeof warning).toBe("string");
             });
@@ -104,8 +103,7 @@ describe("IPC Standardization Concepts", () => {
             } catch (error) {
                 return {
                     success: false,
-                    error:
-                        Error.isError(error) ? error.message : String(error),
+                    error: Error.isError(error) ? error.message : String(error),
                     metadata: {
                         handler: "mock-handler",
                         duration: performance.now() - startTime,

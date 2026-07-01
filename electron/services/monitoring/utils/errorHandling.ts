@@ -108,7 +108,9 @@ function buildSafeErrorLogData(args: {
         ...(normalizedCode && { errorCode: normalizedCode }),
         isAxiosError: args.isAxiosError,
         url: args.safeUrlForLogging,
-        ...((typeof args.httpStatus === "number") && { httpStatus: args.httpStatus }),
+        ...(typeof args.httpStatus === "number" && {
+            httpStatus: args.httpStatus,
+        }),
     };
 
     return args.correlationId
@@ -122,7 +124,7 @@ function buildSafeErrorLogData(args: {
 export function isCancellationError(
     error: unknown
 ): error is Error & { code?: string } {
-    if (!(Error.isError(error))) {
+    if (!Error.isError(error)) {
         return false;
     }
 
@@ -223,7 +225,7 @@ export function handleAxiosError(
         const logData = buildSafeErrorLogData({
             ...(correlationId && { correlationId }),
             error,
-            ...((typeof httpStatus === "number") && { httpStatus }),
+            ...(typeof httpStatus === "number" && { httpStatus }),
             isAxiosError: true,
             safeUrlForLogging,
         });

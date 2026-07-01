@@ -11,8 +11,8 @@ import type { UnknownRecord } from "type-fest";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { act, renderHook } from "@testing-library/react";
-import { objectEntries, objectFromEntries, safeCastTo   } from "ts-extras";
-import { describe, expect, it, test } from "vitest";
+import { objectEntries, objectFromEntries, safeCastTo } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 // Types
 import type { AppSettings } from "../../stores/types";
@@ -173,13 +173,13 @@ describe("Stores Comprehensive Fuzzing", () => {
             );
             try {
                 expect(
-                    (safeCastTo<UnknownRecord>(result.current))["setError"]
+                    safeCastTo<UnknownRecord>(result.current)["setError"]
                 ).toBeUndefined();
                 expect(
-                    (safeCastTo<UnknownRecord>(result.current))["clearError"]
+                    safeCastTo<UnknownRecord>(result.current)["clearError"]
                 ).toBeUndefined();
                 expect(
-                    (safeCastTo<UnknownRecord>(result.current))["setLoading"]
+                    safeCastTo<UnknownRecord>(result.current)["setLoading"]
                 ).toBeUndefined();
             } finally {
                 unmount();

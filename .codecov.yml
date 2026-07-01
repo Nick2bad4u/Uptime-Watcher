@@ -9,7 +9,7 @@ codecov:
     archive:
         uploads: true # Keep historical data for analytics
     assume_all_flags: false # Explicit flag management
-    branch: main
+    branch: "main"
     disable_default_path_fixes: false # Keep default path fixes enabled
     max_report_age: "24h" # Modern syntax - reject reports older than 24 hours
     notify:
@@ -17,7 +17,7 @@ codecov:
         notify_error: true # Show upload failures in comments
         wait_for_ci: true
     require_ci_to_pass: true
-    slug: Nick2bad4u/Uptime-Watcher
+    slug: "Nick2bad4u/Uptime-Watcher"
     ui:
         hide_complexity: false # Show complexity metrics
         hide_contextual: false # Show contextual info in UI
@@ -25,7 +25,7 @@ codecov:
         hide_search: false # Enable search functionality
         hide_sunburst: false # Show sunburst for visual coverage
 comment:
-    behavior: default
+    behavior: "default"
     hide_project_coverage: false
 
     layout: "header, flags, diff, tree, files, reach, betaprofiling, components, footer, feedback"
@@ -37,319 +37,319 @@ component_management:
         statuses:
             - branches:
                   - "!main"
-              target: auto
-              threshold: 2%
-              type: project
+              target: "auto"
+              threshold: "2%"
+              type: "project"
     individual_components:
         # === SHARED CORE (Global Coverage for Shared Folder) ===
-        - component_id: shared_core
+        - component_id: "shared_core"
           name: "🧩 Shared Core"
           paths:
-              - shared/**
+              - "shared/**"
           statuses:
-              - target: 90%
-                threshold: 2%
-                type: project
-              - target: 80%
-                threshold: 7%
+              - target: "90%"
+                threshold: "2%"
+                type: "project"
+              - target: "80%"
+                threshold: "7%"
 
-                type: patch
+                type: "patch"
         # === CORE BUSINESS LOGIC (Highest Coverage Requirements) ===
 
-        - component_id: monitoring_core
+        - component_id: "monitoring_core"
           name: "🎯 Monitoring Core Engine"
           paths:
-              - electron/services/monitoring/**
-              - electron/managers/MonitorManager.ts
-              - src/stores/sites/useSiteMonitoring.ts
-              - shared/utils/monitoring/**
+              - "electron/services/monitoring/**"
+              - "electron/managers/MonitorManager.ts"
+              - "src/stores/sites/useSiteMonitoring.ts"
+              - "shared/utils/monitoring/**"
           statuses:
-              - target: 95%
-                threshold: 1%
-                type: project
-              - target: 90%
-                threshold: 3%
+              - target: "95%"
+                threshold: "1%"
+                type: "project"
+              - target: "90%"
+                threshold: "3%"
 
-                type: patch
-        - component_id: database_layer
+                type: "patch"
+        - component_id: "database_layer"
           name: "🗄️ Database Layer"
           paths:
-              - electron/services/database/**
-              - electron/managers/DatabaseManager.ts
-              - shared/types/database.ts
+              - "electron/services/database/**"
+              - "electron/managers/DatabaseManager.ts"
+              - "shared/types/database.ts"
           statuses:
-              - target: 95%
-                threshold: 1%
-                type: project
-              - target: 90%
-                threshold: 3%
+              - target: "95%"
+                threshold: "1%"
+                type: "project"
+              - target: "90%"
+                threshold: "3%"
 
-                type: patch
-        - component_id: orchestrator
+                type: "patch"
+        - component_id: "orchestrator"
           name: "🎼 Uptime Orchestrator"
           paths:
-              - electron/UptimeOrchestrator.ts
+              - "electron/UptimeOrchestrator.ts"
           statuses:
-              - target: 95%
-                threshold: 1%
-                type: project
-              - target: 90%
-                threshold: 3%
+              - target: "95%"
+                threshold: "1%"
+                type: "project"
+              - target: "90%"
+                threshold: "3%"
 
-                type: patch
+                type: "patch"
         # === BUSINESS DOMAIN LOGIC (High Coverage Requirements) ===
 
-        - component_id: site_management
+        - component_id: "site_management"
           name: "🌐 Site Management Domain"
           paths:
-              - electron/managers/SiteManager.ts
-              - src/stores/sites/useSiteOperations.ts
-              - src/stores/sites/useSiteSync.ts
-              - src/stores/sites/useSitesState.ts
-              - shared/types/siteStatus.ts
+              - "electron/managers/SiteManager.ts"
+              - "src/stores/sites/useSiteOperations.ts"
+              - "src/stores/sites/useSiteSync.ts"
+              - "src/stores/sites/useSitesState.ts"
+              - "shared/types/siteStatus.ts"
           statuses:
-              - target: 90%
-                threshold: 2%
-                type: project
-              - target: 85%
-                threshold: 5%
+              - target: "90%"
+                threshold: "2%"
+                type: "project"
+              - target: "85%"
+                threshold: "5%"
 
-                type: patch
-        - component_id: configuration_management
+                type: "patch"
+        - component_id: "configuration_management"
           name: "⚙️ Configuration Management"
           paths:
-              - electron/managers/ConfigurationManager.ts
-              - src/stores/settings/**
-              - shared/types/events.ts
+              - "electron/managers/ConfigurationManager.ts"
+              - "src/stores/settings/**"
+              - "shared/types/events.ts"
           statuses:
-              - target: 90%
-                threshold: 2%
-                type: project
-              - target: 85%
-                threshold: 5%
+              - target: "90%"
+                threshold: "2%"
+                type: "project"
+              - target: "85%"
+                threshold: "5%"
 
-                type: patch
-        - component_id: ipc_communication
+                type: "patch"
+        - component_id: "ipc_communication"
           name: "🔗 IPC Communication Layer"
           paths:
-              - electron/services/ipc/**
-              - electron/preload.ts
+              - "electron/services/ipc/**"
+              - "electron/preload.ts"
           statuses:
-              - target: 85%
-                threshold: 2%
-                type: project
-              - target: 80%
-                threshold: 5%
+              - target: "85%"
+                threshold: "2%"
+                type: "project"
+              - target: "80%"
+                threshold: "5%"
 
-                type: patch
+                type: "patch"
         # === APPLICATION SERVICES (Medium-High Coverage) ===
 
-        - component_id: backend_services
+        - component_id: "backend_services"
           name: "🔧 Backend Services"
           paths:
-              - electron/services/application/**
-              - electron/services/security/**
-              - electron/services/performance/**
-              - electron/services/updater/**
+              - "electron/services/application/**"
+              - "electron/services/security/**"
+              - "electron/services/performance/**"
+              - "electron/services/updater/**"
           statuses:
-              - target: 85%
-                threshold: 3%
-                type: project
-              - target: 80%
-                threshold: 7%
+              - target: "85%"
+                threshold: "3%"
+                type: "project"
+              - target: "80%"
+                threshold: "7%"
 
-                type: patch
-        - component_id: notification_system
+                type: "patch"
+        - component_id: "notification_system"
           name: "📢 Notification System"
           paths:
-              - electron/services/notifications/**
+              - "electron/services/notifications/**"
           statuses:
-              - target: 80%
-                threshold: 3%
-                type: project
-              - target: 75%
-                threshold: 7%
+              - target: "80%"
+                threshold: "3%"
+                type: "project"
+              - target: "75%"
+                threshold: "7%"
 
-                type: patch
-        - component_id: window_management
+                type: "patch"
+        - component_id: "window_management"
           name: "🪟 Window Management"
           paths:
-              - electron/services/window/**
+              - "electron/services/window/**"
           statuses:
-              - target: 80%
-                threshold: 3%
-                type: project
-              - target: 75%
-                threshold: 7%
+              - target: "80%"
+                threshold: "3%"
+                type: "project"
+              - target: "75%"
+                threshold: "7%"
 
-                type: patch
+                type: "patch"
         # === FRONTEND STATE MANAGEMENT (Medium Coverage) ===
 
-        - component_id: frontend_stores
+        - component_id: "frontend_stores"
           name: "📦 Frontend State Stores"
           paths:
-              - src/stores/error/**
-              - src/stores/stats/**
-              - src/stores/ui/**
-              - src/stores/updates/**
-              - shared/utils/errorHandling.ts
+              - "src/stores/error/**"
+              - "src/stores/stats/**"
+              - "src/stores/ui/**"
+              - "src/stores/updates/**"
+              - "shared/utils/errorHandling.ts"
           statuses:
-              - target: 80%
-                threshold: 3%
-                type: project
-              - target: 75%
-                threshold: 8%
+              - target: "80%"
+                threshold: "3%"
+                type: "project"
+              - target: "75%"
+                threshold: "8%"
 
-                type: patch
-        - component_id: business_hooks
+                type: "patch"
+        - component_id: "business_hooks"
           name: "🪝 Business Logic Hooks"
           paths:
-              - src/hooks/site/**
-              - src/hooks/useBackendFocusSync.ts
-              - src/hooks/useSelectedSite.ts
-              - shared/utils/typeGuards.ts
+              - "src/hooks/site/**"
+              - "src/hooks/useBackendFocusSync.ts"
+              - "src/hooks/useSelectedSite.ts"
+              - "shared/utils/typeGuards.ts"
           statuses:
-              - target: 80%
-                threshold: 3%
-                type: project
-              - target: 75%
-                threshold: 8%
+              - target: "80%"
+                threshold: "3%"
+                type: "project"
+              - target: "75%"
+                threshold: "8%"
 
-                type: patch
+                type: "patch"
         # === FRONTEND UI COMPONENTS (Medium Coverage) ===
 
-        - component_id: core_ui_components
+        - component_id: "core_ui_components"
           name: "🧩 Core UI Components"
           paths:
-              - src/components/Dashboard/**
-              - src/components/SiteDetails/**
-              - src/components/AddSiteForm/**
+              - "src/components/Dashboard/**"
+              - "src/components/SiteDetails/**"
+              - "src/components/AddSiteForm/**"
           statuses:
-              - target: 75%
-                threshold: 4%
-                type: project
-              - target: 70%
-                threshold: 10%
+              - target: "75%"
+                threshold: "4%"
+                type: "project"
+              - target: "70%"
+                threshold: "10%"
 
-                type: patch
-        - component_id: common_ui_components
+                type: "patch"
+        - component_id: "common_ui_components"
           name: "🔧 Common UI Components"
           paths:
-              - src/components/common/**
-              - src/components/Header/**
-              - src/components/Settings/**
+              - "src/components/common/**"
+              - "src/components/Header/**"
+              - "src/components/Settings/**"
           statuses:
-              - target: 70%
-                threshold: 5%
-                type: project
-              - target: 65%
-                threshold: 12%
+              - target: "70%"
+                threshold: "5%"
+                type: "project"
+              - target: "65%"
+                threshold: "12%"
 
-                type: patch
+                type: "patch"
         # === FRONTEND INFRASTRUCTURE (Lower Coverage - Harder to Test) ===
 
-        - component_id: theme_system
+        - component_id: "theme_system"
           name: "🎨 Theme System"
           paths:
-              - src/theme/**
-              - shared/utils/stringConversion.ts
+              - "src/theme/**"
+              - "shared/utils/stringConversion.ts"
           statuses:
-              - target: 65%
-                threshold: 5%
-                type: project
-              - target: 60%
-                threshold: 15%
+              - target: "65%"
+                threshold: "5%"
+                type: "project"
+              - target: "60%"
+                threshold: "15%"
 
-                type: patch
-        - component_id: frontend_services
+                type: "patch"
+        - component_id: "frontend_services"
           name: "🔌 Frontend Services"
           paths:
-              - src/services/**
+              - "src/services/**"
           statuses:
-              - target: 75%
-                threshold: 4%
-                type: project
-              - target: 70%
-                threshold: 10%
+              - target: "75%"
+                threshold: "4%"
+                type: "project"
+              - target: "70%"
+                threshold: "10%"
 
-                type: patch
+                type: "patch"
         # === UTILITIES AND HELPERS (High Coverage - Easy to Test) ===
 
-        - component_id: backend_utilities
+        - component_id: "backend_utilities"
           name: "🛠️ Backend Utilities"
           paths:
-              - electron/utils/**
-              - electron/electronUtils.ts
-              - shared/utils/jsonSafety.ts
-              - shared/utils/objectSafety.ts
+              - "electron/utils/**"
+              - "electron/electronUtils.ts"
+              - "shared/utils/jsonSafety.ts"
+              - "shared/utils/objectSafety.ts"
           statuses:
-              - target: 90%
-                threshold: 2%
-                type: project
-              - target: 85%
-                threshold: 5%
+              - target: "90%"
+                threshold: "2%"
+                type: "project"
+              - target: "85%"
+                threshold: "5%"
 
-                type: patch
-        - component_id: frontend_utilities
+                type: "patch"
+        - component_id: "frontend_utilities"
           name: "🧰 Frontend Utilities"
           paths:
-              - src/utils/**
-              - shared/utils/**
+              - "src/utils/**"
+              - "shared/utils/**"
           statuses:
-              - target: 90%
-                threshold: 2%
-                type: project
-              - target: 85%
-                threshold: 5%
+              - target: "90%"
+                threshold: "2%"
+                type: "project"
+              - target: "85%"
+                threshold: "5%"
 
-                type: patch
+                type: "patch"
         # === TYPE DEFINITIONS AND CONSTANTS (Lower Priority) ===
 
-        - component_id: type_system
+        - component_id: "type_system"
           name: "📝 Type Definitions"
           paths:
-              - src/types.ts
-              - electron/types.ts
-              - src/stores/types.ts
-              - src/theme/types.ts
-              - shared/types/**
+              - "src/types.ts"
+              - "electron/types.ts"
+              - "src/stores/types.ts"
+              - "src/theme/types.ts"
+              - "shared/types/**"
           statuses:
-              - target: 60%
-                threshold: 8%
-                type: project
-              - target: 50%
-                threshold: 20%
+              - target: "60%"
+                threshold: "8%"
+                type: "project"
+              - target: "50%"
+                threshold: "20%"
 
-                type: patch
-        - component_id: constants_config
+                type: "patch"
+        - component_id: "constants_config"
           name: "🔧 Constants & Configuration"
           paths:
-              - src/constants.ts
-              - electron/constants.ts
+              - "src/constants.ts"
+              - "electron/constants.ts"
           statuses:
-              - target: 60%
-                threshold: 8%
-                type: project
-              - target: 50%
-                threshold: 20%
+              - target: "60%"
+                threshold: "8%"
+                type: "project"
+              - target: "50%"
+                threshold: "20%"
 
-                type: patch
+                type: "patch"
         # === INTEGRATION POINTS (Special Monitoring) ===
 
-        - component_id: integration_layer
+        - component_id: "integration_layer"
           name: "🔗 Integration Layer"
           paths:
-              - electron/managers/validators/**
-              - src/stores/middleware/**
-              - electron/events/**
-              - shared/validation/**
+              - "electron/managers/validators/**"
+              - "src/stores/middleware/**"
+              - "electron/events/**"
+              - "shared/validation/**"
           statuses:
-              - target: 85%
-                threshold: 3%
-                type: project
-              - target: 80%
-                threshold: 7%
-                type: patch
+              - target: "85%"
+                threshold: "3%"
+                type: "project"
+              - target: "80%"
+                threshold: "7%"
+                type: "patch"
 coverage:
     ignore:
         # Build outputs and compiled files
@@ -405,63 +405,63 @@ coverage:
     precision: 2
     range: "60...100" # More realistic range for complex Electron app
 
-    round: down
+    round: "down"
     status:
         patch:
             default:
                 only_pulls: false
-                target: 65% # Realistic for new code
-                threshold: 10%
+                target: "65%" # Realistic for new code
+                threshold: "10%"
             electron:
                 flags:
-                    - electron
+                    - "electron"
                 paths:
                     - "electron/"
-                target: 70% # Backend should have higher coverage
-                threshold: 10%
+                target: "70%" # Backend should have higher coverage
+                threshold: "10%"
             frontend:
                 flags:
-                    - frontend
+                    - "frontend"
                 paths:
                     - "src/"
-                target: 60% # React components can be harder to test fully
-                threshold: 15%
+                target: "60%" # React components can be harder to test fully
+                threshold: "15%"
             shared:
                 flags:
-                    - shared
+                    - "shared"
                 paths:
                     - "shared/"
 
-                target: 80% # Shared code should be well tested
-                threshold: 10%
+                target: "80%" # Shared code should be well tested
+                threshold: "10%"
         project:
             default:
-                base: auto
-                if_ci_failed: error
+                base: "auto"
+                if_ci_failed: "error"
                 only_pulls: false
-                target: auto
-                threshold: 2% # Slightly more lenient for complex architecture
+                target: "auto"
+                threshold: "2%" # Slightly more lenient for complex architecture
             electron:
                 flags:
-                    - electron
+                    - "electron"
                 paths:
                     - "electron/"
-                target: 85% # Higher target for backend logic
-                threshold: 2%
+                target: "85%" # Higher target for backend logic
+                threshold: "2%"
             frontend:
                 flags:
-                    - frontend
+                    - "frontend"
                 paths:
                     - "src/"
-                target: 75% # Realistic target for React components
-                threshold: 3%
+                target: "75%" # Realistic target for React components
+                threshold: "3%"
             shared:
                 flags:
-                    - shared
+                    - "shared"
                 paths:
                     - "shared/"
-                target: 90% # High target for shared business logic
-                threshold: 2%
+                target: "90%" # High target for shared business logic
+                threshold: "2%"
 flags:
     electron:
         carryforward: false
@@ -471,7 +471,7 @@ flags:
             - "electron/test/**/*"
             - "electron/main.ts" # Entry point
         paths:
-            - electron/
+            - "electron/"
     frontend:
         carryforward: false
         ignore:
@@ -481,7 +481,7 @@ flags:
             - "src/main.tsx" # Entry point
             - "src/index.css" # CSS file
         paths:
-            - src/
+            - "src/"
     shared:
         carryforward: false
         ignore:
@@ -490,7 +490,7 @@ flags:
             - "shared/test/**/*"
 
         paths:
-            - shared/
+            - "shared/"
 # Modern GitHub integration (replaces deprecated github_checks)
 github_checks:
     annotations: true

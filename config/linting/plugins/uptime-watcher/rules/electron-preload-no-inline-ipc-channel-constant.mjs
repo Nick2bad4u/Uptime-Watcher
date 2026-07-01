@@ -39,7 +39,9 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
         }
 
         /**
-         * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} expression
+         * @param {import("@typescript-eslint/utils").TSESTree.Expression
+         *     | null
+         *     | undefined} expression
          *
          * @returns {import("@typescript-eslint/utils").TSESTree.Expression | null}
          */
@@ -60,7 +62,9 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
         }
 
         /**
-         * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} expression
+         * @param {import("@typescript-eslint/utils").TSESTree.Expression
+         *     | null
+         *     | undefined} expression
          */
         function isInlineStringLiteral(expression) {
             const unwrapped = unwrapTsExpression(expression);
@@ -92,7 +96,7 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
 
                 // Heuristic: most channel constants are ALL_CAPS with CHANNEL
                 // In the name.
-                if (!node.id.name.includes('CHANNEL')) {
+                if (!node.id.name.includes("CHANNEL")) {
                     return;
                 }
 

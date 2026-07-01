@@ -397,7 +397,9 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => { windowService.closeMainWindow(); }).not.toThrow();
+            expect(() => {
+                windowService.closeMainWindow();
+            }).not.toThrow();
         });
 
         it("should not close if window is destroyed", async ({
@@ -1596,7 +1598,9 @@ describe(WindowService, () => {
             (windowService as any).mainWindow = null;
 
             // Should not crash when trying to show destroyed window
-            expect(() => { readyCallback(); }).not.toThrow();
+            expect(() => {
+                readyCallback();
+            }).not.toThrow();
         });
     });
 

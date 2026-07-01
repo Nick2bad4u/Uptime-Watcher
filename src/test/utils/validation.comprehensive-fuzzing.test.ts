@@ -25,7 +25,6 @@
 /* eslint-disable no-script-url */
 /* eslint-disable no-template-curly-in-string */
 
-
 import type { MonitorType } from "@shared/types";
 
 import { test as fcTest, fc } from "@fast-check/vitest";
@@ -45,12 +44,13 @@ import {
     isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import { describe, expect, beforeEach, afterEach } from "vitest";
+import { describe, expect, beforeEach, afterEach, it } from "vitest";
+import { isSafeInteger, isInteger } from "ts-extras";
 
 import {
     parseUptimeValue,
     safeGetHostname,
-} from "../../../src/utils/monitoring/dataValidation";
+} from "../../utils/monitoring/dataValidation";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for Domain Objects
@@ -98,7 +98,7 @@ const maliciousStrings = fc.oneof(
     // Path traversal payloads
     fc.constantFrom(
         "../../../etc/passwd",
-        String.raw`......windowssystem32configsam`,
+        "......windowssystem32configsam",
         "....//....//....//etc/passwd",
         "%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd",
         "..%252f..%252f..%252fetc%252fpasswd",
@@ -462,11 +462,15 @@ describe("comprehensive Validation Function Fuzzing", () => {
         );
     });
 
-    describe("uRL Validation Functions", () => {
+    describe("URL Validation Functions", () => {
         fcTest.prop([comprehensiveUrls])(
             "isValidUrl: comprehensive URL validation with security checks",
             (url) => {
-                const isResult = measureValidation(isValidUrl, "isValidUrl", url);
+                const isResult = measureValidation(
+                    isValidUrl,
+                    "isValidUrl",
+                    url
+                );
 
                 // Property: Function should never throw
                 expect(() => isResult).not.toThrow();
@@ -531,8 +535,10 @@ describe("comprehensive Validation Function Fuzzing", () => {
             "isValidUrl: should accept valid HTTP/HTTPS URLs",
             (validUrl) => {
                 // Only test HTTP/HTTPS URLs since that's what the validator accepts
-                if (!(validUrl.startsWith("https://") ||
-                    validUrl.startsWith("https://"))) {
+                if (
+                    !validUrl.startsWith("https://") &&
+                    !validUrl.startsWith("https://")
+                ) {
                     return;
                 }
 
@@ -573,7 +579,11 @@ describe("comprehensive Validation Function Fuzzing", () => {
         fcTest.prop([
             fc.oneof(fc.domain(), fc.ipV4(), malformedHosts, maliciousStrings),
         ])("isValidHost: comprehensive hostname validation", (host) => {
-            const isResult = measureValidation(isValidHost, "isValidHost", host);
+            const isResult = measureValidation(
+                isValidHost,
+                "isValidHost",
+                host
+            );
 
             expect(() => isResult).not.toThrow();
             expect(typeof isResult).toBe("boolean");
@@ -660,7 +670,7 @@ describe("comprehensive Validation Function Fuzzing", () => {
                 // Property: Valid integer strings should pass
                 if (typeof input === "string" && /^-?\d+$/.test(input.trim())) {
                     const num = Number.parseInt(input.trim(), 10);
-                    if (Number.isSafeInteger(num)) {
+                    if (isSafeInteger(num)) {
                         expect(isResult).toBeTruthy();
                     }
                 }
@@ -694,7 +704,7 @@ describe("comprehensive Validation Function Fuzzing", () => {
 
                 expect(() => result).not.toThrow();
                 expect(result).toBeTypeOf("number");
-                expect(Number.isInteger(result)).toBe(true);
+                expect(isInteger(result)).toBe(true);
 
                 // Property: Valid integer strings should convert correctly
                 const stringInput = input;
@@ -770,7 +780,7 @@ describe("comprehensive Validation Function Fuzzing", () => {
                 // Property: Valid port range should pass
                 if (
                     typeof port === "number" &&
-                    Number.isInteger(port) &&
+                    isInteger(port) &&
                     port >= 1 &&
                     port <= 65_535
                 ) {
@@ -1055,7 +1065,10 @@ describe("comprehensive Validation Function Fuzzing", () => {
             "URL validation consistency across different validators",
             (url) => {
                 // Only test valid HTTP/HTTPS URLs
-                if (!(url.startsWith("https://") || url.startsWith("https://"))) {
+                if (
+                    !url.startsWith("https://") &&
+                    !url.startsWith("https://")
+                ) {
                     return;
                 }
 
@@ -1096,10 +1109,18 @@ describe("comprehensive Validation Function Fuzzing", () => {
                     status: "up" as const,
                     timeout: 5000,
                     type: monitorType,
-                    ...((monitorType === "http") && { url: "https://example.com" }),
-                    ...((monitorType === "ping") && { host: "example.com" }),
-                    ...((monitorType === "port") && { host: "example.com", port: 443 }),
-                    ...((monitorType === "dns") && { host: "example.com", recordType: "A" as const }),
+                    ...(monitorType === "http" && {
+                        url: "https://example.com",
+                    }),
+                    ...(monitorType === "ping" && { host: "example.com" }),
+                    ...(monitorType === "port" && {
+                        host: "example.com",
+                        port: 443,
+                    }),
+                    ...(monitorType === "dns" && {
+                        host: "example.com",
+                        recordType: "A" as const,
+                    }),
                 };
 
                 // Test composite validation

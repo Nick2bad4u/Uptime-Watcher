@@ -17,7 +17,7 @@ import { arrayJoin } from "ts-extras";
 export class ValidationError extends Error {
     public readonly errors: readonly string[];
 
-    public constructor(errors: readonly string[], options: ErrorOptions) {
+    public constructor(errors: readonly string[], options?: ErrorOptions) {
         super(`Validation failed: ${arrayJoin(errors, ", ")}`, options);
         this.name = "ValidationError";
         this.errors = errors;

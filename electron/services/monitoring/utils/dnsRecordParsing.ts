@@ -11,7 +11,12 @@
  */
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { arrayFirst, arrayJoin, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
+import {
+    arrayFirst,
+    arrayJoin,
+    isEmpty,
+    isFinite as isFiniteNumber,
+} from "ts-extras";
 
 /** Parsed/normalized DNS record data for display and verification. */
 export interface ParsedDnsRecords {

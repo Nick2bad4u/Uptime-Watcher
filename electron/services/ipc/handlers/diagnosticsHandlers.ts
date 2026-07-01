@@ -208,8 +208,12 @@ export function registerDiagnosticsHandlers({
             const logMetadata: PreloadGuardDiagnosticsLogMetadata = {
                 channel: report.channel,
                 guard: report.guard,
-                ...(isDefined(report.metadata) && { metadata: report.metadata }),
-                ...(isDefined(report.payloadPreview) && { payloadPreview: report.payloadPreview }),
+                ...(isDefined(report.metadata) && {
+                    metadata: report.metadata,
+                }),
+                ...(isDefined(report.payloadPreview) && {
+                    payloadPreview: report.payloadPreview,
+                }),
                 ...(isDefined(report.reason) && { reason: report.reason }),
                 timestamp: report.timestamp,
             };

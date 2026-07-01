@@ -1,33 +1,51 @@
 ﻿# FileAnalyzer.ps1
 param(
-    [switch]$IncludeTests,
+    [switch] $IncludeTests,
     [ValidateSet('Table','Json','Csv','Markdown')]
-    [string]$Format = 'Table'
+    [string] $Format = 'Table'
 )
 
 # Define test file patterns to exclude
-$excludePatterns = @('*test*', '*spec*', '*mock*', '*__tests__*')
+$excludePatterns = @( '*test*', '*spec*', '*mock*', '*__tests__*' )
 
 # Get all files recursively
 $files = Get-ChildItem -Path "Src\electron" -File -Recurse
 
 # Filter files based on test inclusion flag
 $filteredFiles = if (-not $IncludeTests) {
-    $files | Where-Object {
-        $filePath = $_.FullName.ToLower()
-        -not ($excludePatterns | Where-Object { $filePath -like $_ })
-    }
+    $files
+        | Where-Object {
+            $filePath = $_.FullName.ToLower()
+            -not (
+                $excludePatterns | Where-Object {
+                    $filePath -like $_
+                }
+            )
+        }
 } else {
     $files
 }
 
 # Process files and collect data
 $results = foreach ($file in $filteredFiles) {
-    $sizeKB = [math]::Round($file.Length / 1KB, 2)
+    $sizeKB = [math]::Round( $file.Length / 1KB, 2 )
 
     # Get line count (skip for binary files)
     $lineCount = $null
-    if ($file.Extension -notin @('.png','.jpg','.gif','.ico','.svg','.woff','.ttf','.eot','.woff2','.bin')) {
+    if (
+        $file.Extension -notin @(
+            '.png',
+            '.jpg',
+            '.gif',
+            '.ico',
+            '.svg',
+            '.woff',
+            '.ttf',
+            '.eot',
+            '.woff2',
+            '.bin'
+        )
+    ) {
         try {
             $lineCount = [System.IO.File]::ReadLines($file.FullName).Count
         }
@@ -39,9 +57,9 @@ $results = foreach ($file in $filteredFiles) {
         $lineCount = "Binary"
     }
 
-    [PSCustomObject]@{
-        Name      = $file.FullName.Substring($pwd.Path.Length + 1)
-        SizeKB    = $sizeKB
+    [PSCustomObject] @{
+        Name = $file.FullName.Substring($pwd.Path.Length + 1)
+        SizeKB = $sizeKB
         LineCount = $lineCount
         Extension = $file.Extension
         LastModified = $file.LastWriteTime.ToString("yyyy-MM-dd HH:mm")
@@ -87,42 +105,69 @@ switch ($Format) {
         Write-Output "Include tests: $($IncludeTests.IsPresent)" -ForegroundColor DarkGray
         Write-Output "Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm')`n" -ForegroundColor DarkGray
 
-        $sorted | Format-Table -AutoSize @{
-            Label = "File"
-            Expression = {
-                # Color code by file type
-                $color = if ($_.Extension -in '.js','.ts') { 'Cyan' }
-                         elseif ($_.Extension -in '.html','.css') { 'Magenta' }
-                         elseif ($_.Extension -in '.json','.yml') { 'Green' }
-                         else { 'White' }
-                Write-Output $_.Name -ForegroundColor $color -NoNewline
-                ""
-            }
-        },
+        $sorted
+            | Format-Table -AutoSize @{
+                Label = "File"
+                Expression =
+                    {
+                        $color = if ( $_.Extension -in '.js', '.ts' ) {
+                            'Cyan'
+                        }
+                        elseif ( $_.Extension -in '.html', '.css' ) {
+                            'Magenta'
+                        }
+                        elseif ( $_.Extension -in '.json', '.yml' ) {
+                            'Green'
+                        }
+                        else {
+                            'White'
+                        }
+                        Write-Output $_.Name -ForegroundColor $color -NoNewline
+                        ""
+                    } # Color code by file type
+            },
         @{
             Label = "Size (KB)"
-            Expression = {
-                $color = if ($_.SizeKB -gt 100) { 'Red' }
-                         elseif ($_.SizeKB -gt 50) { 'Yellow' }
-                         else { 'White' }
-                Write-Output ("{0:N2}" -f $_.SizeKB) -ForegroundColor $color -NoNewline
-                ""
-            }
+            Expression =
+                {
+                    $color = if ($_.SizeKB -gt 100) {
+                        'Red'
+                    }
+                    elseif ($_.SizeKB -gt 50) {
+                        'Yellow'
+                    }
+                    else {
+                        'White'
+                    }
+                    Write-Output (
+                        "{0:N2}" -f $_.SizeKB
+                    ) -ForegroundColor $color -NoNewline
+                    ""
+                }
             Align = 'Right'
         },
         @{
             Label = "Lines"
-            Expression = {
-                if ($_.LineCount -ne "Binary" -and $_.LineCount -ne "Error") {
-                    $color = if ($_.LineCount -gt 500) { 'Red' }
-                             elseif ($_.LineCount -gt 100) { 'Yellow' }
-                             else { 'White' }
-                    Write-Output $_.LineCount -ForegroundColor $color -NoNewline
-                } else {
-                    Write-Output $_.LineCount -ForegroundColor DarkGray -NoNewline
+            Expression =
+                {
+                    if (
+                        $_.LineCount -ne "Binary" -and $_.LineCount -ne "Error"
+                    ) {
+                        $color = if ($_.LineCount -gt 500) {
+                            'Red'
+                        }
+                        elseif ($_.LineCount -gt 100) {
+                            'Yellow'
+                        }
+                        else {
+                            'White'
+                        }
+                        Write-Output $_.LineCount -ForegroundColor $color -NoNewline
+                    } else {
+                        Write-Output $_.LineCount -ForegroundColor DarkGray -NoNewline
+                    }
+                    ""
                 }
-                ""
-            }
             Align = 'Right'
         }
 

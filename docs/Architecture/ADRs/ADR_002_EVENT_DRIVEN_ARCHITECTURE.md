@@ -19,16 +19,16 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Architecture Flow](#architecture-flow)
-5. [Event Categories](#event-categories)
-6. [Consequences](#consequences)
-7. [Quality Assurance](#quality-assurance)
-8. [Implementation Requirements](#implementation-requirements)
-9. [Compliance](#compliance)
-10. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Architecture Flow](#architecture-flow)
+- [Event Categories](#event-categories)
+- [Consequences](#consequences)
+- [Quality Assurance](#quality-assurance)
+- [Implementation Requirements](#implementation-requirements)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 

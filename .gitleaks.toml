@@ -2,3 +2,23 @@ title = "Nick2bad4u shared Gitleaks configuration"
 
 [extend]
     path = "node_modules/gitleaks-config-nick2bad4u/gitleaks.toml"
+
+[[allowlists]]
+    description = "Ignore generated local build, coverage, docs, and lint reports"
+    paths = [
+        '''^\.cache/''',
+        '''^\.tmp/''',
+        '''^coverage/''',
+        '''^dist/''',
+        '''^docs/docusaurus/\.docusaurus/''',
+        '''^docs/docusaurus/docs/_media/''',
+    ]
+
+[[allowlists]]
+    description = "Allow public OAuth client IDs, token key names, and placeholder secret examples"
+    paths = [
+        '''^docs/Guides/CLOUD_SYNC_GOOGLE_DRIVE_SETUP\.md$''',
+        '''^electron/services/cloud/internal/cloudServiceSettings\.ts$''',
+        '''^electron/services/cloud/providers/dropbox/DropboxTokenManager\.ts$''',
+        '''^shared/test/utils/environment\.comprehensive-coverage\.fuzz\.test\.ts$''',
+    ]

@@ -8,12 +8,7 @@
 
 import { webcrypto } from "node:crypto";
 
-import type {
-    Monitor,
-    MonitorStatus,
-    MonitorType,
-    StatusHistory,
-} from "../types";
+import type { Monitor, StatusHistory } from "../types";
 
 import { castUnchecked } from "../utils/typeHelpers";
 

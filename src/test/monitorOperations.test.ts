@@ -12,7 +12,7 @@ import {
 import { validateMonitor } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import fc from "fast-check";
-import { arrayFirst, safeCastTo  } from "ts-extras";
+import { arrayFirst, safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -448,9 +448,7 @@ describe("monitorOperations", () => {
                         status,
                     };
 
-                    expect(
-                        validateMonitor(monitor)
-                    ).toBeTruthy();
+                    expect(validateMonitor(monitor)).toBeTruthy();
                 })
             );
         });
@@ -988,7 +986,9 @@ describe("monitorOperations", () => {
             const result = addMonitorToSite(mockSite, newMonitor);
 
             expect(result.monitors).toHaveLength(2);
-            expect(arrayFirst(result.monitors)).toEqual(arrayFirst(mockSite.monitors));
+            expect(arrayFirst(result.monitors)).toEqual(
+                arrayFirst(mockSite.monitors)
+            );
             expect(result.monitors[1]).toEqual(newMonitor);
         });
 

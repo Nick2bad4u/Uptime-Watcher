@@ -927,8 +927,9 @@ describe("SyncEngine (ADR-016)", () => {
             } = provider;
 
             const providerWithRecording = {
-                deleteObject: async (key: string) =>
-                    { await recordingProvider.deleteObject(key); },
+                deleteObject: async (key: string) => {
+                    await recordingProvider.deleteObject(key);
+                },
                 downloadBackup: async (
                     ...args: Parameters<
                         FilesystemCloudStorageProvider["downloadBackup"]

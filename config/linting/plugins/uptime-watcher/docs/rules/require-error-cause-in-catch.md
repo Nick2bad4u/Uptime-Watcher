@@ -17,9 +17,9 @@ No options.
 
 ```ts
 try {
-  doThing();
+ doThing();
 } catch (err) {
-  throw new Error("Failed to do thing");
+ throw new Error("Failed to do thing");
 }
 ```
 
@@ -27,8 +27,8 @@ try {
 
 ```ts
 try {
-  doThing();
+ doThing();
 } catch (err) {
-  throw new Error("Failed to do thing", { cause: err });
+ throw new Error("Failed to do thing", { cause: err });
 }
 ```

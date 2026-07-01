@@ -36,7 +36,7 @@ const CustomFallback = ({
 );
 
 // Mock logger to avoid console output during tests
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
     },

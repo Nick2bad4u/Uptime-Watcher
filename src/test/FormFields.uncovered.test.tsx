@@ -17,7 +17,7 @@ type MockThemedInputProps = InputHTMLAttributes<HTMLInputElement>;
 type MockThemedSelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
 // Mock the themed components
-vi.mock(import('../../theme'), () => ({
+vi.mock("../../theme", () => ({
     useTheme: () => ({
         theme: {
             colors: {

@@ -417,10 +417,9 @@ export class NotificationService {
     }
 
     private composeDownBody(context: NotificationContext): string {
-        const metric =
-            isDefined(context.responseTime)
-                ? `Last response ${context.responseTime}ms.`
-                : "Last response unavailable.";
+        const metric = isDefined(context.responseTime)
+            ? `Last response ${context.responseTime}ms.`
+            : "Last response unavailable.";
         const monitorLabel = this.describeMonitor(context.monitor);
         return `${monitorLabel} reported DOWN at ${new Date().toLocaleTimeString()}. ${metric}`;
     }

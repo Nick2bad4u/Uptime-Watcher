@@ -27,7 +27,7 @@ type ThemedBoxMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../theme/components/ThemedBox", () => ({
     ThemedBox: ({ children, className, variant }: ThemedBoxMockProperties) => (
         <div
             className={className}
@@ -46,7 +46,7 @@ type ThemedTextMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../theme/components/ThemedText", () => ({
     ThemedText: ({ children, size, variant }: ThemedTextMockProperties) => (
         <span data-size={size} data-testid="themed-text" data-variant={variant}>
             {children}
@@ -61,7 +61,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock(import('../../../theme/components/ThemedButton'), () => ({
+vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
         className,
@@ -373,7 +373,9 @@ describe(FormErrorAlert, () => {
             const themedBox = screen.getByTestId("themed-box");
             expect(themedBox).toHaveClass("error-alert");
             // Empty className should not add empty class, just the base class
-            expect(stringSplit(themedBox.className, " ")).toEqual(["error-alert"]);
+            expect(stringSplit(themedBox.className, " ")).toEqual([
+                "error-alert",
+            ]);
         });
 
         it("should handle undefined className", ({ task, annotate }) => {

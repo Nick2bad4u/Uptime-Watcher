@@ -23,7 +23,9 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
             vi.spyOn(AbortSignal, "timeout").mockImplementation(
                 (delay: number) => {
                     const controller = new AbortController();
-                    setTimeout(() => { controller.abort(); }, delay);
+                    setTimeout(() => {
+                        controller.abort();
+                    }, delay);
                     return controller.signal;
                 }
             );
@@ -40,7 +42,9 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
                         }
                         signal.addEventListener(
                             "abort",
-                            () => { controller.abort(); },
+                            () => {
+                                controller.abort();
+                            },
                             {
                                 once: true,
                             }
@@ -325,7 +329,9 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
             });
 
             // Abort after the first failure during delay
-            setTimeout(() => { controller.abort(); }, 50);
+            setTimeout(() => {
+                controller.abort();
+            }, 50);
 
             await Promise.all([
                 vi.runAllTimersAsync(),
@@ -479,13 +485,17 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
         it("should throw when signal aborts before operation completes", async () => {
             const operation = new Promise((resolve) => {
-                setTimeout(() => { resolve("late success"); }, 1000);
+                setTimeout(() => {
+                    resolve("late success");
+                }, 1000);
             });
             const controller = new AbortController();
 
             const promise = raceWithAbort(operation, controller.signal);
 
-            setTimeout(() => { controller.abort(); }, 500);
+            setTimeout(() => {
+                controller.abort();
+            }, 500);
             vi.advanceTimersByTime(500);
 
             await expect(promise).rejects.toThrow("Operation was aborted");
@@ -583,7 +593,9 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
         it("should handle race with multiple operations", async () => {
             const slow = new Promise((resolve) =>
-                setTimeout(() => { resolve("slow"); }, 1000)
+                setTimeout(() => {
+                    resolve("slow");
+                }, 1000)
             );
             const fast = Promise.resolve("fast");
             const controller = new AbortController();

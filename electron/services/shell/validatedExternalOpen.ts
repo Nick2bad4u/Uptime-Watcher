@@ -44,7 +44,6 @@ export function validateExternalOpenUrlCandidateWithPolicy(
 ): ExternalOpenUrlValidationResult {
     const validation = validateExternalOpenUrlCandidate(rawUrl);
 
-
     if (!validation.ok) {
         return validation;
     }
@@ -114,7 +113,6 @@ export async function tryOpenExternalValidated(args: {
         args.policy
     );
 
-
     if (!validation.ok) {
         return {
             ok: false,
@@ -147,7 +145,8 @@ export async function tryOpenExternalValidated(args: {
             errorName: resolved.name,
             ok: false,
             outcome: "open-failed",
-            ...(typeof code === "string" && code.length > 0 && { errorCode: code }),
+            ...(typeof code === "string" &&
+                code.length > 0 && { errorCode: code }),
             safeUrlForLogging: validation.safeUrlForLogging,
         };
     }
@@ -183,7 +182,6 @@ export async function openExternalValidatedOrThrow(args: {
         args.url,
         args.policy
     );
-
 
     if (!validation.ok) {
         throw createExternalOpenRejectionError({

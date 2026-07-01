@@ -4,12 +4,12 @@
  */
 
 import { act, renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useUIStore } from "../../../stores/ui/useUiStore";
 
 // Mock the logger
-vi.mock(import('@/stores/utils'), () => ({
+vi.mock("@/stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 

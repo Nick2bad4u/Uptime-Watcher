@@ -472,9 +472,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = parseCacheKey(
-                "config:setting-name"
-            );
+            const result = parseCacheKey("config:setting-name");
             expect(result).toEqual({
                 prefix: "config",
                 identifier: "setting-name",
@@ -490,9 +488,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = parseCacheKey(
-                "monitor:operation:monitor-123"
-            );
+            const result = parseCacheKey("monitor:operation:monitor-123");
             expect(result).toEqual({
                 prefix: "monitor",
                 operation: "operation",
@@ -529,9 +525,9 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() =>
-                parseCacheKey("config:")
-            ).toThrow("Invalid cache key format: config:");
+            expect(() => parseCacheKey("config:")).toThrow(
+                "Invalid cache key format: config:"
+            );
         });
 
         it("should throw error for invalid 3-part format with empty prefix", async ({

@@ -436,7 +436,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             };
 
             // Simulate error when monitor is undefined
-            const monitor;
+            const monitor = undefined;
 
             if (!monitor) {
                 mockLogger.site.error(
@@ -597,7 +597,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 monitoring: true,
             };
 
-            const undefinedMonitor;
+            const undefinedMonitor = undefined;
 
             expect(validMonitor).toHaveProperty("id");
             expect(validMonitor).toHaveProperty("type");

@@ -116,8 +116,7 @@ export class CloudService {
     private dropboxDepsPromise: Promise<DropboxProviderDeps> | undefined;
 
     private googleDriveDepsPromise:
-        | Promise<GoogleDriveProviderDeps>
-        | undefined;
+        Promise<GoogleDriveProviderDeps> | undefined;
 
     private async runCloudOperation<T>(
         operationName: string,

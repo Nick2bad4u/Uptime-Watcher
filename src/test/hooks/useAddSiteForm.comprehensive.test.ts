@@ -11,7 +11,7 @@ import type { MonitorType } from "@shared/types";
 import { fc, test } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
 import { act, renderHook } from "@testing-library/react";
-import { arrayJoin, safeCastTo  } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAddSiteForm } from "../../components/SiteDetails/useAddSiteForm";
@@ -19,14 +19,14 @@ import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 
 // Mock the useMonitorFields hook
 const mockGetFields = vi.fn();
-vi.mock(import('../../hooks/useMonitorFields'), () => ({
+vi.mock("../../hooks/useMonitorFields", () => ({
     useMonitorFields: () => ({
         getFields: mockGetFields,
     }),
 }));
 
 // Mock generateUuid function
-vi.mock(import('../../utils/data/generateUuid'), () => ({
+vi.mock("../../utils/data/generateUuid", () => ({
     generateUuid: () => "mock-uuid-12345",
 }));
 
@@ -528,7 +528,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
                 act(() => {
                     result.current.setAddMode("new");
-                    result.current.setName(' '.repeat(3)); // Whitespace only
+                    result.current.setName(" ".repeat(3)); // Whitespace only
                     result.current.setUrl("https://example.com");
                 });
 
@@ -635,7 +635,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setAddMode("new");
                     result.current.setName("My Site");
                     result.current.setMonitorType("http");
-                    result.current.setUrl(' '.repeat(3)); // Whitespace only
+                    result.current.setUrl(" ".repeat(3)); // Whitespace only
                 });
 
                 expect(result.current.isFormValid()).toBeFalsy();
@@ -1238,12 +1238,9 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
         );
 
         test.prop([
-            safeCastTo<fc.Arbitrary<MonitorType>>(fc.constantFrom(
-                "http",
-                "port",
-                "ping",
-                "dns"
-            )),
+            safeCastTo<fc.Arbitrary<MonitorType>>(
+                fc.constantFrom("http", "port", "ping", "dns")
+            ),
         ])(
             "should handle monitor type changes correctly",
             async (monitorType) => {
@@ -1344,11 +1341,9 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
         );
 
         test.prop([
-            safeCastTo<fc.Arbitrary<MonitorType>>(fc.constantFrom(
-                "http",
-                "port",
-                "ping"
-            )),
+            safeCastTo<fc.Arbitrary<MonitorType>>(
+                fc.constantFrom("http", "port", "ping")
+            ),
         ])(
             "should handle complex form state updates correctly",
             async (monitorType) => {
@@ -1469,7 +1464,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
         test.prop([
             fc.oneof(
                 fc.constant(""),
-                fc.constant(' '.repeat(3)),
+                fc.constant(" ".repeat(3)),
                 fc.constant("\t\n"),
                 fc.string().filter((s) => s.trim().length === 0)
             ),

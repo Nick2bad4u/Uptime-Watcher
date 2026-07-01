@@ -27,8 +27,8 @@ import {
     type IpcInvokeChannelMap,
 } from "@shared/types/ipc";
 import { generateCorrelationId } from "@shared/utils/correlation";
-import { arrayFirst, objectKeys  } from "ts-extras";
-import { beforeEach, describe, expect, it, test, vi } from "vitest";
+import { arrayFirst, objectKeys } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import after mocks
 import { registerStandardizedIpcHandler } from "../../../electron/services/ipc/utils";
@@ -62,7 +62,7 @@ const { mockIpcMain, mockBrowserWindow, mockContextBridge, mockIpcRenderer } =
     }));
 
 // Mock electron immediately
-vi.mock(import('electron'), () => ({
+vi.mock("electron", () => ({
     ipcMain: mockIpcMain,
     BrowserWindow: class {
         static getFocusedWindow() {
@@ -80,7 +80,7 @@ vi.mock(import('electron'), () => ({
 }));
 
 // Mock dependencies
-vi.mock(import('../../../electron/utils/logger'), () => ({
+vi.mock("../../../electron/utils/logger", () => ({
     logger: {
         debug: vi.fn(),
         info: vi.fn(),
@@ -103,9 +103,7 @@ const arbitraryEventChannelName = fc
     .string({ minLength: 5, maxLength: 50 })
     .filter((s) => /^[A-Za-z][\w\-:]*$/v.test(s));
 
-const INVOKE_CHANNELS = objectKeys(
-    IPC_INVOKE_CHANNEL_PARAM_COUNTS
-);
+const INVOKE_CHANNELS = objectKeys(IPC_INVOKE_CHANNEL_PARAM_COUNTS);
 
 const ZERO_PARAM_INVOKE_CHANNELS = INVOKE_CHANNELS.filter(
     (channel) => IPC_INVOKE_CHANNEL_PARAM_COUNTS[channel] === 0
@@ -144,8 +142,8 @@ const registerTestHandler = (
     handler: (...args: unknown[]) => Promise<unknown> | unknown,
     validator: Parameters<typeof registerStandardizedIpcHandler>[2],
     handlers: Parameters<typeof registerStandardizedIpcHandler>[3]
-) =>
-    { registerStandardizedIpcHandler(
+) => {
+    registerStandardizedIpcHandler(
         channel,
         async (...params) => {
             const result = (await handler(...params)) as GenericInvokeResult;
@@ -165,7 +163,8 @@ const registerTestHandler = (
         },
         validator,
         handlers
-    ); };
+    );
+};
 
 const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
     ...MONITOR_STATUS_VALUES

@@ -11,7 +11,7 @@
  */
 import type { UnknownRecord } from "type-fest";
 
-import { objectEntries, objectFromEntries  } from "ts-extras";
+import { objectEntries, objectFromEntries } from "ts-extras";
 
 const SAFE_PROPS = new Set<string>([
     "accept",
@@ -89,7 +89,7 @@ export function sanitizeDomProps<Props extends DomLikeProps>(
         return {};
     }
 
-    const allowed = new Set(Iterator.concat(SAFE_PROPS, additionalAllowed));
+    const allowed = new Set([...SAFE_PROPS, ...additionalAllowed]);
     const safeEntries = objectEntries(props).filter(([key, value]) => {
         if (typeof key !== "string") {
             return false;
@@ -110,5 +110,5 @@ export function sanitizeDomProps<Props extends DomLikeProps>(
         return SAFE_PREFIXES.some((prefix) => key.startsWith(prefix));
     });
 
-    return objectFromEntries(safeEntries) as Partial<Props>;
+    return objectFromEntries(safeEntries) as unknown as Partial<Props>;
 }

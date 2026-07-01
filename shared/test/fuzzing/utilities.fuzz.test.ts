@@ -80,7 +80,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                                 const cleaned = value.replaceAll(
                                     // eslint-disable-next-line no-control-regex
-                                    /[\0-\x1F\u{7F}]/gv,
+                                    /[\0-\u{1F}\u{7F}]/gv,
                                     ""
                                 );
 
@@ -95,7 +95,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                             // Property: should not contain control characters
                             // eslint-disable-next-line no-control-regex
-                            expect(result).not.toMatch(/[\0-\x1f\u{7F}]/v);
+                            expect(result).not.toMatch(/[\0-\x1F\u{7F}]/v);
 
                             // Property: should have reasonable length
                             expect(result.length).toBeLessThanOrEqual(1000);
@@ -354,12 +354,11 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             const sanitizeErrorMessage = (
                                 error: any
                             ): string => {
-                                const message =
-                                    Error.isError(error)
-                                        ? error.message
-                                        : typeof error === "string"
-                                          ? error
-                                          : "Unknown error";
+                                const message = Error.isError(error)
+                                    ? error.message
+                                    : typeof error === "string"
+                                      ? error
+                                      : "Unknown error";
 
                                 // Remove sensitive patterns
                                 const sanitized = message

@@ -116,9 +116,9 @@ describe("Monitoring Types", () => {
             // Mock implementation to test interface
             const mockService: IMonitorService = {
                 check: async (_monitor) => ({
-                        status: "up",
-                        responseTime: 100,
-                    }),
+                    status: "up",
+                    responseTime: 100,
+                }),
                 getType: () => "http",
                 updateConfig: function (
                     _config: Partial<MonitorServiceConfig>
@@ -143,9 +143,9 @@ describe("Monitoring Types", () => {
 
             const mockService: IMonitorService = {
                 check: async (_monitor) => ({
-                        status: "up",
-                        responseTime: 150,
-                    }),
+                    status: "up",
+                    responseTime: 150,
+                }),
                 getType: () => "port",
                 updateConfig: function (
                     _config: Partial<MonitorServiceConfig>

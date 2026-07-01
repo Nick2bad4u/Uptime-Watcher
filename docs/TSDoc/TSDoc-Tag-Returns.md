@@ -1,10 +1,12 @@
 # @returns
 
 <!-- prettier-ignore-start -->
-|    |    |
-| -- | -- |
+
+|                  |                                                              |
+| ---------------- | ------------------------------------------------------------ |
 | Standardization: | [Core](https://tsdoc.org/pages/spec/standardization_groups/) |
-| Syntax kind: | [Block tag](https://tsdoc.org/pages/spec/tag_kinds/) |
+| Syntax kind:     | [Block tag](https://tsdoc.org/pages/spec/tag_kinds/)         |
+
 <!-- prettier-ignore-end -->
 
 ## Usage

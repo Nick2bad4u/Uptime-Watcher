@@ -26,7 +26,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -44,7 +44,7 @@ const mockElectronAPI = {
 let restoreElectronApi: (() => void) | undefined;
 
 // Mock utils (partial) so createPersistConfig remains available.
-vi.mock(import('../stores/utils'), async (importOriginal) => {
+vi.mock("../stores/utils", async (importOriginal) => {
     const actual = await importOriginal<typeof import("../stores/utils")>();
 
     return {
@@ -61,7 +61,7 @@ vi.mock(import('../stores/utils'), async (importOriginal) => {
 });
 
 // Mock useErrorStore
-vi.mock(import('../stores/error/useErrorStore'), () => ({
+vi.mock("../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -72,7 +72,7 @@ vi.mock(import('../stores/error/useErrorStore'), () => ({
 }));
 
 // Mock constants
-vi.mock(import('../constants'), () => ({
+vi.mock("../constants", () => ({
     DEFAULT_HISTORY_LIMIT: 100,
 }));
 
@@ -211,7 +211,9 @@ describe(useSettingsStore, () => {
 
             await useSettingsStore.getState().initializeSettings();
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledWith();
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(250);

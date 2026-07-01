@@ -31,13 +31,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock the logger
-vi.mock(import('../../services/logger'), () => ({
+vi.mock("../../services/logger", () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -302,10 +302,9 @@ describe("SiteService Critical Coverage Tests", () => {
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockReturnValue(
                 new Promise((_, reject) => {
-                    setTimeout(
-                        () => { reject(new Error("Operation timeout")); },
-                        100
-                    );
+                    setTimeout(() => {
+                        reject(new Error("Operation timeout"));
+                    }, 100);
                 })
             );
 

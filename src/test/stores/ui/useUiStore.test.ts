@@ -16,7 +16,7 @@ import type {
 import { useUIStore } from "../../../stores/ui/useUiStore";
 
 // Mock the store utils (partial) so createPersistConfig remains available.
-vi.mock(import('../../../stores/utils'), async (importOriginal) => {
+vi.mock("../../../stores/utils", async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {

@@ -91,9 +91,7 @@ export async function checkSiteManuallyOperation(args: {
         return undefined;
     }
 
-    const firstMonitorId = site.monitors.find((monitor) =>
-        monitor.id
-    )?.id;
+    const firstMonitorId = site.monitors.find((monitor) => monitor.id)?.id;
     if (firstMonitorId) {
         return checkSiteManuallyOperation({
             dependencies,

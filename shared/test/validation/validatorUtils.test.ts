@@ -80,7 +80,7 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isNonEmptyString("")).toBeFalsy();
-            expect(isNonEmptyString(' '.repeat(3))).toBeFalsy();
+            expect(isNonEmptyString(" ".repeat(3))).toBeFalsy();
             expect(isNonEmptyString("\t")).toBeFalsy();
             expect(isNonEmptyString("\n")).toBeFalsy();
             expect(isNonEmptyString("\r\n")).toBeFalsy();
@@ -234,7 +234,7 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidIdentifier("")).toBeFalsy();
-            expect(isValidIdentifier(' '.repeat(3))).toBeFalsy();
+            expect(isValidIdentifier(" ".repeat(3))).toBeFalsy();
             expect(isValidIdentifier("\t")).toBeFalsy();
             expect(isValidIdentifier("\n")).toBeFalsy();
         });

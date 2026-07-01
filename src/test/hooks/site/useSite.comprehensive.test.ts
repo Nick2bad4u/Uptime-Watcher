@@ -16,19 +16,19 @@ import { useSiteStats } from "../../../hooks/site/useSiteStats";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Mock all the sub-hooks
-vi.mock(import('../../../hooks/site/useSiteMonitor'), () => ({
+vi.mock("../../../hooks/site/useSiteMonitor", () => ({
     useSiteMonitor: vi.fn(),
 }));
 
-vi.mock(import('../../../hooks/site/useSiteStats'), () => ({
+vi.mock("../../../hooks/site/useSiteStats", () => ({
     useSiteStats: vi.fn(),
 }));
 
-vi.mock(import('../../../hooks/site/useSiteActions'), () => ({
+vi.mock("../../../hooks/site/useSiteActions", () => ({
     useSiteActions: vi.fn(),
 }));
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(
         (selector?: (state: { isLoading: boolean }) => unknown) => {
             const state = {

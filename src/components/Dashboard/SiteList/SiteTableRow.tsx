@@ -53,7 +53,23 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
         site,
     }: SiteTableRowProperties) {
         const siteState = useSite(site);
-        const {isLoading, isMonitoring, latestSite, monitor, responseTime, selectedMonitorId, status, uptime, handleCardClick, handleCheckNow, handleMonitorIdChange, handleStartMonitoring, handleStartSiteMonitoring, handleStopMonitoring, handleStopSiteMonitoring} = siteState;
+        const {
+            isLoading,
+            isMonitoring,
+            latestSite,
+            monitor,
+            responseTime,
+            selectedMonitorId,
+            status,
+            uptime,
+            handleCardClick,
+            handleCheckNow,
+            handleMonitorIdChange,
+            handleStartMonitoring,
+            handleStartSiteMonitoring,
+            handleStopMonitoring,
+            handleStopSiteMonitoring,
+        } = siteState;
 
         const marqueeTextProps = useMemo<
             NonNullable<MarqueeTextProperties["textProps"]>
@@ -209,10 +225,10 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                 </td>
                 <td className="site-table__cell site-table__cell--response">
                     <ThemedText size="sm">
-                        { typeof responseTime === "number" &&
+                        {typeof responseTime === "number" &&
                         isFiniteNumber(responseTime) &&
                         responseTime > 0
-                            ? `${responseTime } ms`
+                            ? `${responseTime} ms`
                             : "—"}
                     </ThemedText>
                 </td>

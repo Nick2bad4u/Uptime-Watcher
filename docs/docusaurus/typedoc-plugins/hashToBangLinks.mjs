@@ -1,7 +1,5 @@
 // @ts-check
 
-
-
 /**
  * @file TypeDoc plugin which rewrites a repo-specific `path#Export` convention
  *   into TypeDoc's declaration-reference module source syntax: `path!Export`.
@@ -49,14 +47,11 @@ export function load(app) {
                     continue;
                 }
 
-                const reflection =
-                    /** @type {import("typedoc").Reflection} */ (
-                        reflectionMap[reflectionId]
-                    );
+                const reflection = /** @type {import("typedoc").Reflection} */ (
+                    reflectionMap[reflectionId]
+                );
                 if (reflection.comment) {
-                    convertHashLinksToBangLinksInComment(
-                        reflection.comment
-                    );
+                    convertHashLinksToBangLinksInComment(reflection.comment);
                 }
             }
         },

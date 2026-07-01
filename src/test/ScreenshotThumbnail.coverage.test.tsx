@@ -18,7 +18,7 @@ import {
 import { installElectronApiMock } from "./utils/electronApiMock";
 
 // Mock logger
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -36,19 +36,19 @@ vi.mock(import('../services/logger'), () => {
 });
 
 // Mock stores/utils
-vi.mock(import('../stores/utils'), () => ({
+vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
 
 // Mock SystemService
-vi.mock(import('../services/SystemService'), () => ({
+vi.mock("../services/SystemService", () => ({
     SystemService: {
         openExternal: vi.fn().mockResolvedValue(true),
     },
 }));
 
 // Mock useTheme hook
-vi.mock(import('../theme/useTheme'), () => ({
+vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
         themeName: "dark" as const,
     }),
@@ -58,7 +58,7 @@ vi.mock(import('../theme/useTheme'), () => ({
 const mockOpenExternal = vi.fn();
 
 // Mock useUIStore hook
-vi.mock(import('../stores/ui/useUiStore'), () => ({
+vi.mock("../stores/ui/useUiStore", () => ({
     useUIStore: (
         selector?: (state: { openExternal: typeof mockOpenExternal }) => unknown
     ) => {
@@ -71,7 +71,7 @@ vi.mock(import('../stores/ui/useUiStore'), () => ({
 }));
 
 // Mock useMount hook
-vi.mock(import('../hooks/useMount'), () => {
+vi.mock("../hooks/useMount", () => {
     const calledCallbacks = new WeakSet();
     return {
         useMount: vi.fn(
@@ -90,7 +90,7 @@ vi.mock(import('../hooks/useMount'), () => {
 });
 
 // Prevent JSDOM navigation errors by mocking HTMLAnchorElement.prototype.click
-vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation();
+vi.spyOn(HTMLAnchorElement.prototype, "click").mockReturnValue(undefined);
 
 // Mock the anchor element href setter to use hash URLs to prevent JSDOM navigation errors
 const originalSetAttribute = Element.prototype.setAttribute;
@@ -101,7 +101,8 @@ Element.prototype.setAttribute = function (name: string, value: string) {
         value.startsWith("http")
     ) {
         // Use a hash URL instead of the actual URL to prevent JSDOM navigation
-        originalSetAttribute.call(this, name, "#"); return;
+        originalSetAttribute.call(this, name, "#");
+        return;
     }
     originalSetAttribute.call(this, name, value);
 };
@@ -160,8 +161,9 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         });
 
         // Mock getBoundingClientRect for all elements
-        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation()
-            .mockReturnValue(createMockBoundingClientRect());
+        vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue(
+            createMockBoundingClientRect()
+        );
 
         // Set up document.body for portal mounting
         document.body.replaceChildren();

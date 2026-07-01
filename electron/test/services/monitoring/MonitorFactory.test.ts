@@ -184,7 +184,9 @@ describe("MonitorFactory - Fixed", () => {
             getMonitor("ping", mockMonitorConfig);
 
             // Clear cache should not throw
-            expect(() => { clearMonitorFactoryCache(); }).not.toThrow();
+            expect(() => {
+                clearMonitorFactoryCache();
+            }).not.toThrow();
         });
     });
 
@@ -202,7 +204,9 @@ describe("MonitorFactory - Fixed", () => {
                 timeout: 10_000,
                 userAgent: "Updated-Agent/1.0",
             };
-            expect(() => { updateMonitorConfig(newConfig); }).not.toThrow();
+            expect(() => {
+                updateMonitorConfig(newConfig);
+            }).not.toThrow();
         });
     });
 });

@@ -78,7 +78,7 @@ describe(convertError, () => {
     });
 
     it("provides informative messages for whitespace strings", () => {
-        const result = convertError(' '.repeat(3));
+        const result = convertError(" ".repeat(3));
 
         expect(result.error).toBeInstanceOf(Error);
         expect(result.error.message).toBe("[whitespace-only string]");

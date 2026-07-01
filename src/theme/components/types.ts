@@ -10,12 +10,7 @@ export type BadgeSize = "lg" | "md" | "sm" | "xs";
 
 /** Visual style variants for badge components */
 export type BadgeVariant =
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning";
+    "error" | "info" | "primary" | "secondary" | "success" | "warning";
 
 /** HTML element types that can be used as box containers */
 export type BoxElement =
@@ -63,12 +58,7 @@ export type ProgressSize = "lg" | "md" | "sm" | "xl" | "xs";
 
 /** Visual style variants for progress components */
 export type ProgressVariant =
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning";
+    "error" | "info" | "primary" | "secondary" | "success" | "warning";
 
 /** System theme preference options */
 export type SystemThemePreference = "dark" | "light";
@@ -78,15 +68,7 @@ export type TextAlign = "center" | "justify" | "left" | "right";
 
 /** Font size variants for text components */
 export type TextSize =
-    | "2xl"
-    | "3xl"
-    | "4xl"
-    | "base"
-    | "lg"
-    | "md"
-    | "sm"
-    | "xl"
-    | "xs";
+    "2xl" | "3xl" | "4xl" | "base" | "lg" | "md" | "sm" | "xl" | "xs";
 
 /** Color and semantic variants for text components */
 export type TextVariant =

@@ -412,10 +412,9 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         await Promise.race([
                             eventBus.emitTyped("test:complex", largeEventData),
                             new Promise((_, reject) =>
-                                setTimeout(
-                                    () => { reject(new Error("Timeout")); },
-                                    5000
-                                )
+                                setTimeout(() => {
+                                    reject(new Error("Timeout"));
+                                }, 5000)
                             ),
                         ]);
 
@@ -594,15 +593,13 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                         }
                                         case "timeout": {
                                             await new Promise((_, reject) =>
-                                                setTimeout(
-                                                    () =>
-                                                        { reject(
-                                                            new Error(
-                                                                config.errorMessage
-                                                            )
-                                                        ); },
-                                                    50
-                                                )
+                                                setTimeout(() => {
+                                                    reject(
+                                                        new Error(
+                                                            config.errorMessage
+                                                        )
+                                                    );
+                                                }, 50)
                                             );
                                             break;
                                         }

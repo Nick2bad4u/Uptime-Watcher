@@ -14,8 +14,7 @@
 /**
  * Returns the current file name associated with a linted file.
  *
- * @param {
- *     | { filename?: unknown; getFilename?: (() => unknown) | undefined }
+ * @param {{ filename?: unknown; getFilename?: (() => unknown) | undefined }
  *     | undefined
  *     | null} context
  *
@@ -39,8 +38,7 @@ export function getContextFilename(context) {
 /**
  * Returns the {@link SourceCode} instance for the current file.
  *
- * @param {
- *     | { sourceCode?: unknown; getSourceCode?: (() => unknown) | undefined }
+ * @param {{ sourceCode?: unknown; getSourceCode?: (() => unknown) | undefined }
  *     | undefined
  *     | null} context
  *

@@ -1,7 +1,5 @@
 // @ts-check
 
-
-
 /**
  * @typedef {import("typedoc").Comment} Comment
  *
@@ -126,16 +124,16 @@ export function convertHashLinksToBangLinksInInlineTagText(inlineTagText) {
  */
 export function convertHashLinksToBangLinksInParts(parts) {
     for (const part of parts) {
-        if (part.kind !== "inline-tag" ||
-            part.tag !== "@link" &&
+        if (
+            part.kind !== "inline-tag" ||
+            (part.tag !== "@link" &&
                 part.tag !== "@linkcode" &&
-                part.tag !== "@linkplain") {
+                part.tag !== "@linkplain")
+        ) {
             continue;
         }
 
-        const rewritten = convertHashLinksToBangLinksInInlineTagText(
-            part.text
-        );
+        const rewritten = convertHashLinksToBangLinksInInlineTagText(part.text);
         if (rewritten !== part.text) {
             part.text = rewritten;
             // Ensure TypeDoc re-resolves this link based on updated text.

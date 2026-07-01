@@ -1,5 +1,5 @@
 import type { Site } from "@shared/types";
-import type { ArrayElement, Tagged  } from "type-fest";
+import type { ArrayElement, Tagged } from "type-fest";
 
 /**
  * Represents a temporary optimistic lock applied to a monitor's monitoring

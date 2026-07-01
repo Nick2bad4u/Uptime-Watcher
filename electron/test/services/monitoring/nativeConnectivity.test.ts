@@ -219,7 +219,9 @@ describe("Native Connectivity with Degraded State", () => {
             // Arrange
             mockDns.resolve4.mockReturnValue(
                 new Promise((resolve) =>
-                    setTimeout(() => { resolve(["192.168.1.1"]); }, 2000)
+                    setTimeout(() => {
+                        resolve(["192.168.1.1"]);
+                    }, 2000)
                 )
             );
             // Act

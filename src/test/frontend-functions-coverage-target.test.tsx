@@ -14,7 +14,8 @@ import {
     fireEvent,
     render,
     renderHook,
-    screen, waitFor
+    screen,
+    waitFor,
 } from "@testing-library/react";
 import { Component, useEffect, useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -29,7 +30,7 @@ import { useUIStore } from "../stores/ui/useUiStore";
 import { installElectronApiMock } from "./utils/electronApiMock";
 
 // Simple mock for testing
-vi.mock(import('../services/logger'), () => {
+vi.mock("../services/logger", () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -317,11 +318,17 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
 
                 return (
                     <div>
-                        <button onClick={() => { setCount(count + 1); }}>
+                        <button
+                            onClick={() => {
+                                setCount(count + 1);
+                            }}
+                        >
                             Count: {count}
                         </button>
                         <input
-                            onChange={(e) => { setText(e.target.value); }}
+                            onChange={(e) => {
+                                setText(e.target.value);
+                            }}
                             placeholder="Type here"
                             value={text}
                         />
@@ -605,9 +612,15 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const useCounter = (initialValue = 0) => {
                 const [count, setCount] = useState(initialValue);
 
-                const increment = () => { setCount((c) => c + 1); };
-                const decrement = () => { setCount((c) => c - 1); };
-                const reset = () => { setCount(initialValue); };
+                const increment = () => {
+                    setCount((c) => c + 1);
+                };
+                const decrement = () => {
+                    setCount((c) => c - 1);
+                };
+                const reset = () => {
+                    setCount(initialValue);
+                };
 
                 return { count, increment, decrement, reset };
             };

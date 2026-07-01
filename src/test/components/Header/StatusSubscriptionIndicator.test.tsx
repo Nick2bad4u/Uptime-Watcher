@@ -63,13 +63,14 @@ const singleChannelSummary: StatusUpdateSubscriptionSummary = {
 const mockStore = {
     retryStatusSubscription:
         vi.fn<() => Promise<StatusUpdateSubscriptionSummary>>(),
-    statusSubscriptionSummary: safeCastTo<| StatusUpdateSubscriptionSummary
-        | undefined>(healthySummary),
+    statusSubscriptionSummary: safeCastTo<
+        StatusUpdateSubscriptionSummary | undefined
+    >(healthySummary),
 };
 
 type Selector<State, Result> = (state: State) => Result;
 
-vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
+vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: <Result,>(selector?: Selector<typeof mockStore, Result>) =>
         typeof selector === "function" ? selector(mockStore) : mockStore,
 }));

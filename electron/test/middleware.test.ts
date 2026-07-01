@@ -34,6 +34,7 @@ import { logger } from "../utils/logger";
 
 const asEventPayload = (value: unknown): EventPayloadValue =>
     value as EventPayloadValue;
+type TestEventMap = Record<string, EventPayloadValue>;
 
 // Mock logger
 vi.mock("../utils/logger", () => ({
@@ -131,10 +132,7 @@ describe("middleware.ts", () => {
             // Second invocation => count should become 2 (verifies +1 not -1)
             await mw("eventC", {}, next);
 
-            const emitted = metricsCallback.mock.calls.map(
-                (c) =>
-                    c[0]
-            );
+            const emitted = metricsCallback.mock.calls.map((c) => c[0]);
             const counterMetrics = emitted.filter((m) => m.type === "counter");
             const timingMetrics = emitted.filter((m) => m.type === "timing");
 
@@ -351,7 +349,9 @@ describe("middleware.ts", () => {
             await annotate("Type: Event Processing", "type");
 
             const next = vi.fn();
-            const mw = createFilterMiddleware({ allowList: ["eventM"] });
+            const mw = createFilterMiddleware<TestEventMap>({
+                allowList: ["eventM"],
+            });
             await mw("eventN", {}, next);
             expect(logger.debug).toHaveBeenCalledWith(
                 expect.stringContaining("allow list")
@@ -483,7 +483,7 @@ describe("middleware.ts", () => {
                 calls.push("custom");
                 await next();
             };
-            const stack = MIDDLEWARE_STACKS.custom([mw]);
+            const stack = MIDDLEWARE_STACKS.custom<TestEventMap>([mw]);
             const next = vi.fn();
             await stack("eventV", {}, next);
             expect(calls).toEqual(["custom"]);

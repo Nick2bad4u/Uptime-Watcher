@@ -48,8 +48,7 @@ test.describe(
                 const isPackaged = await electronApp.evaluate(
                     async ({ app }) =>
                         // This runs in Electron's main process
-                         app.isPackaged
-
+                        app.isPackaged
                 );
 
                 // Should not be packaged in development/test mode
@@ -120,10 +119,12 @@ test.describe(
                 const electronApp = await launchElectronApp();
 
                 // Get app name and version
-                const appName = await electronApp.evaluate(async ({ app }) => app.getName());
+                const appName = await electronApp.evaluate(async ({ app }) =>
+                    app.getName()
+                );
 
-                const appVersion = await electronApp.evaluate(
-                    async ({ app }) => app.getVersion()
+                const appVersion = await electronApp.evaluate(async ({ app }) =>
+                    app.getVersion()
                 );
 
                 // Verify app metadata

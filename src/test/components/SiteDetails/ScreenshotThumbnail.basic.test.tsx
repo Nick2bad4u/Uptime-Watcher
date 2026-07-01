@@ -28,7 +28,7 @@ let mockThemeState = {
 };
 
 // Mock stores and hooks
-vi.mock(import('../../../stores/ui/useUiStore'), () => ({
+vi.mock("../../../stores/ui/useUiStore", () => ({
     useUIStore: vi.fn((selector?: (state: typeof mockUIState) => unknown) => {
         const state = {
             openExternal: mockUIState.openExternal,
@@ -38,17 +38,14 @@ vi.mock(import('../../../stores/ui/useUiStore'), () => ({
     }),
 }));
 
-vi.mock(import('../../../theme/useTheme'), () => ({
+vi.mock("../../../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({
         themeName: mockThemeState.themeName,
     })),
 }));
 
-vi.mock(import('../../../hooks/useMount'), () => ({
-    useMount: (
-        init: (() => void) | undefined,
-        cleanup?: (() => void)
-    ) => {
+vi.mock("../../../hooks/useMount", () => ({
+    useMount: (init: (() => void) | undefined, cleanup?: () => void) => {
         useEffect(() => {
             if (init) init();
             return () => {
@@ -59,7 +56,7 @@ vi.mock(import('../../../hooks/useMount'), () => ({
 }));
 
 // Mock constants
-vi.mock(import('../../../constants'), () => ({
+vi.mock("../../../constants", () => ({
     UI_DELAYS: {
         STATE_UPDATE_DEFER: 16,
         HOVER_DELAY: 200,
@@ -67,7 +64,7 @@ vi.mock(import('../../../constants'), () => ({
 }));
 
 // Mock React portal to simplify testing
-vi.mock(import('react-dom'), async (importOriginal) => {
+vi.mock("react-dom", async (importOriginal) => {
     const actual = await importOriginal<typeof import("react-dom")>();
     return {
         ...actual,

@@ -395,11 +395,9 @@ function buildStateSyncPayloadDiagnostics(
     return {
         deltaBytes,
         deltaCounts,
-        deltaHistoryEntries:
-            isDefined(delta) ? deltaHistoryEntries : undefined,
+        deltaHistoryEntries: isDefined(delta) ? deltaHistoryEntries : undefined,
         deltaMonitors: isDefined(delta) ? deltaMonitors : undefined,
-        deltaSiteSnapshots:
-            isDefined(delta) ? deltaSiteSnapshots : undefined,
+        deltaSiteSnapshots: isDefined(delta) ? deltaSiteSnapshots : undefined,
         estimatedBytes,
         hasDelta: isDefined(delta),
         maxBytes,

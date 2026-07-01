@@ -48,10 +48,7 @@ interface DeadlockScenario {
         edges: { from: string; to: string; resource: string }[];
     };
     resolutionMethod:
-        | "timeout"
-        | "victim-selection"
-        | "priority-based"
-        | "cost-based";
+        "timeout" | "victim-selection" | "priority-based" | "cost-based";
     preventionMechanism?: string;
     cycleLength: number;
     resourcesInvolved: string[];
@@ -81,11 +78,7 @@ interface TransactionLogMetrics {
     logId: string;
     logSequenceNumber: number;
     operationType:
-        | "begin"
-        | "commit"
-        | "rollback"
-        | "checkpoint"
-        | "data-change";
+        "begin" | "commit" | "rollback" | "checkpoint" | "data-change";
     timestamp: number;
     sizeBytes: number;
     flushTime: number;

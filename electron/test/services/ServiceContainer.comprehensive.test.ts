@@ -17,7 +17,7 @@ import {
 
 // Create hoisted mock factory for TypedEventBus using constructor function pattern
 const MockTypedEventBus = vi.hoisted(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Required for mock
     const { EventEmitter } = require("node:events");
 
     // Use plain constructor function instead of vi.fn().mockImplementation()

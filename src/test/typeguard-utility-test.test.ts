@@ -5,7 +5,7 @@
 import { test } from "@fast-check/vitest";
 import { hasProperties, hasProperty, isArray } from "@shared/utils/typeGuards";
 import * as fc from "fast-check";
-import { arrayFirst, objectKeys  } from "ts-extras";
+import { arrayFirst, objectKeys } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 /** Arbitrary for generating valid property names */

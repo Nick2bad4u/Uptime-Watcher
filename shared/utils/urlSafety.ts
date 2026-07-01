@@ -58,8 +58,7 @@ export type ExternalOpenUrlAcceptedResult = Readonly<{
 
 /** Discriminated union result from {@link validateExternalOpenUrlCandidate}. */
 export type ExternalOpenUrlValidationResult =
-    | ExternalOpenUrlAcceptedResult
-    | ExternalOpenUrlRejectedResult;
+    ExternalOpenUrlAcceptedResult | ExternalOpenUrlRejectedResult;
 
 /**
  * Result of validating an HTTP(S) URL candidate.
@@ -92,8 +91,7 @@ export type HttpUrlAcceptedResult = Readonly<{
 
 /** Discriminated union result from {@link validateHttpUrlCandidate}. */
 export type HttpUrlValidationResult =
-    | HttpUrlAcceptedResult
-    | HttpUrlRejectedResult;
+    HttpUrlAcceptedResult | HttpUrlRejectedResult;
 
 function getRedactedPathname(pathname: string): string {
     return arrayJoin(
@@ -183,7 +181,6 @@ export function validateHttpUrlCandidate(
         toSafeUrlForLogging: getSafeUrlForLogging,
     });
 
-
     if (!primitiveValidation.ok) {
         return primitiveValidation;
     }
@@ -210,8 +207,7 @@ export function validateHttpUrlCandidate(
 }
 
 type HttpUrlNormalizationResult =
-    | ExternalOpenUrlAcceptedResult
-    | ExternalOpenUrlRejectedResult;
+    ExternalOpenUrlAcceptedResult | ExternalOpenUrlRejectedResult;
 
 function getFirstQueryOrHashIndex(url: string): number {
     const queryIndex = url.indexOf("?");
@@ -481,7 +477,6 @@ export function validateExternalOpenUrlCandidate(
         maxBytes: MAX_EXTERNAL_OPEN_URL_BYTES,
         toSafeUrlForLogging: getSafeUrlForLogging,
     });
-
 
     if (!primitiveValidation.ok) {
         return primitiveValidation;

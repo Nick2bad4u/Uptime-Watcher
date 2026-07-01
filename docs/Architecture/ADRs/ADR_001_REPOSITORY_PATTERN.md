@@ -18,13 +18,13 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Consequences](#consequences)
-5. [Implementation Quality Assurance](#implementation-quality-assurance)
-6. [Compliance](#compliance)
-7. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Consequences](#consequences)
+- [Implementation Quality Assurance](#implementation-quality-assurance)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 
@@ -91,7 +91,6 @@ stateDiagram-v2
 ### 3. Consistent Structure
 
 <!-- prettier-ignore -->
-
 ````typescript
 
 import type { Database } from "node-sqlite3-wasm";

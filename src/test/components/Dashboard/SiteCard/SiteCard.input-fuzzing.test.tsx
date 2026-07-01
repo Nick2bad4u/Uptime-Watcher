@@ -23,14 +23,14 @@
  * @author AI Assistant
  */
 
-import type { Monitor, MonitorStatus, MonitorType, Site } from "@shared/types";
+import type { Monitor, MonitorStatus, Site } from "@shared/types";
 import type { ReactNode } from "react";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import "@testing-library/jest-dom";
 import { secureRandomFloat } from "@shared/test/testHelpers";
 import { render, screen } from "@testing-library/react";
-import { arrayFirst, arrayJoin  } from "ts-extras";
+import { arrayFirst, arrayJoin } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
@@ -43,7 +43,7 @@ const normalizeStatusTestIdSegment = (segment: string): string =>
     segment.replaceAll(/[^\da-z]/gi, "_").toLowerCase();
 
 // Mock all SiteCard sub-components with testid patterns
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHeader'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     SiteCardHeader: ({ site }: { site: { site: Site } }) => (
         <div data-testid={`site-card-header-${site.site.identifier}`}>
             Header: {site.site.name}{" "}
@@ -54,7 +54,7 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHeader'), () =
     ),
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardStatus'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
     SiteCardStatus: ({
         monitorLabel,
         status,
@@ -70,7 +70,7 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardStatus'), () =
     ),
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardMetrics'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
     SiteCardMetrics: ({
         metrics,
     }: {
@@ -85,8 +85,10 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardMetrics'), () 
         const statusValue = String(
             statusMetric?.value ?? "unknown"
         ).toLowerCase();
-        const summary = arrayJoin(metrics
-            .map((metric) => `${metric.label}: ${metric.value}`), " | ");
+        const summary = arrayJoin(
+            metrics.map((metric) => `${metric.label}: ${metric.value}`),
+            " | "
+        );
 
         return (
             <div
@@ -100,7 +102,7 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardMetrics'), () 
     },
 }));
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHistory'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
     SiteCardHistory: ({
         filteredHistory,
         monitor,
@@ -115,7 +117,7 @@ vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHistory'), () 
 }));
 
 // Mock the useSite hook with comprehensive return data
-vi.mock(import('../../../../hooks/site/useSite'), () => ({
+vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: vi.fn((site: Site) => ({
         checkCount: 100,
         filteredHistory: [],
@@ -138,7 +140,7 @@ vi.mock(import('../../../../hooks/site/useSite'), () => ({
 }));
 
 // Mock ThemedBox
-vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
+vi.mock("../../../../theme/components/ThemedBox", () => ({
     ThemedBox: ({
         children,
         className,
@@ -178,7 +180,7 @@ vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
  * break CSS selectors: [](){}#$%'",;:*&^!|~`
  */
 const cssSafeIdentifierArbitrary = (
-    options: { maxLength?: number; minLength?: number; } = {}
+    options: { maxLength?: number; minLength?: number } = {}
 ) =>
     fc
         .array(
@@ -263,19 +265,9 @@ const cssSafeIdentifierArbitrary = (
  */
 const validMonitorArbitrary = fc.record({
     id: cssSafeIdentifierArbitrary({ minLength: 5, maxLength: 15 }),
-    type: fc.constantFrom(
-        "http",
-        "ping",
-        "port",
-        "dns"
-    ),
+    type: fc.constantFrom("http", "ping", "port", "dns"),
     monitoring: fc.boolean(),
-    status: fc.constantFrom(
-        "up",
-        "down",
-        "pending",
-        "paused"
-    ),
+    status: fc.constantFrom("up", "down", "pending", "paused"),
     responseTime: fc.integer({ min: 0, max: 10_000 }),
     checkInterval: fc.integer({ min: 1000, max: 300_000 }),
     timeout: fc.integer({ min: 1000, max: 60_000 }),
@@ -471,7 +463,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                 // Normalize whitespace for comparison - HTML normalizes consecutive spaces
                 // Split and join to normalize whitespace instead of using regex replace
                 const normalizeWhitespace = (text: string) =>
-                    text.replaceAll(/\s+/gv, ' ').trim();
+                    text.replaceAll(/\s+/gv, " ").trim();
                 const expectedHeaderText = normalizeWhitespace(
                     `Header: ${site.name} Click to view details`
                 );
@@ -589,14 +581,16 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
             [
                 validSiteArbitrary.map((site) => ({
                     ...site,
-                    monitors: arrayFirst(fc.sample(
-                        fc.uniqueArray(validMonitorArbitrary, {
-                            selector: (monitor) => monitor.id,
-                            minLength: 3,
-                            maxLength: 10,
-                        }),
-                        1
-                    )),
+                    monitors: arrayFirst(
+                        fc.sample(
+                            fc.uniqueArray(validMonitorArbitrary, {
+                                selector: (monitor) => monitor.id,
+                                minLength: 3,
+                                maxLength: 10,
+                            }),
+                            1
+                        )
+                    ),
                 })),
             ],
             {

@@ -153,9 +153,9 @@ export const SITE_ADDED_SOURCE: Readonly<{
  *
  * @public
  */
-export const SITE_ADDED_SOURCES: readonly SiteAddedSource[] = Object.freeze(
-    [...SITE_ADDED_SOURCE_VALUES]
-);
+export const SITE_ADDED_SOURCES: readonly SiteAddedSource[] = Object.freeze([
+    ...SITE_ADDED_SOURCE_VALUES,
+]);
 
 /**
  * Payload for state synchronization events.
@@ -218,8 +218,7 @@ export interface BulkStateSyncEventData extends BaseStateSyncEventData {
 /** Incremental update/delete event containing a delta. */
 export interface DeltaStateSyncEventData extends BaseStateSyncEventData {
     readonly action:
-        | typeof STATE_SYNC_ACTION.DELETE
-        | typeof STATE_SYNC_ACTION.UPDATE;
+        typeof STATE_SYNC_ACTION.DELETE | typeof STATE_SYNC_ACTION.UPDATE;
     /** Structured delta describing how the site collection changed */
     readonly delta: SiteSyncDelta;
     readonly truncated?: false | undefined;
@@ -227,8 +226,7 @@ export interface DeltaStateSyncEventData extends BaseStateSyncEventData {
 
 /** Discriminated union of state sync event payloads. */
 export type StateSyncEventData =
-    | BulkStateSyncEventData
-    | DeltaStateSyncEventData;
+    BulkStateSyncEventData | DeltaStateSyncEventData;
 
 const stateSyncSitesArraySchema = siteSchema.array();
 
@@ -851,8 +849,7 @@ export const UPDATE_STATUS_VALUES: readonly UpdateStatus[] = Object.freeze(
  * Payload for update status change events.
  *
  * @remarks
- * Used to communicate the current status of app updates, including
- * errors.
+ * Used to communicate the current status of app updates, including errors.
  *
  * - `status`: The current update status.
  *
@@ -886,12 +883,7 @@ export interface UpdateStatusEventData {
  * @public
  */
 export type DatabaseOperation =
-    | "connect"
-    | "create"
-    | "delete"
-    | "insert"
-    | "query"
-    | "update";
+    "connect" | "create" | "delete" | "insert" | "query" | "update";
 
 /**
  * Payload for test events (used in development/testing).

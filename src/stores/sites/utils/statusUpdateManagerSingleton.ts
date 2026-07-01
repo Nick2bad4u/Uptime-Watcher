@@ -65,8 +65,7 @@ export function getStatusUpdateCallback(): StatusUpdateCallback | undefined {
  * instance (if initialized).
  */
 export function getStatusUpdateManagerInstance():
-    | StatusUpdateManager
-    | undefined {
+    StatusUpdateManager | undefined {
     return statusUpdateManagerSingleton.instance;
 }
 

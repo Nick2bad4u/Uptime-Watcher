@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-    - name: Questions and support
-      url: https://github.com/Nick2bad4u/Uptime-Watcher/discussions
-      about: Ask usage questions, troubleshooting questions, or general support requests.
-    - name: Security reports
-      url: https://github.com/Nick2bad4u/Uptime-Watcher/security/policy
-      about: Please report vulnerabilities using the project's security policy.
+    - name: "Questions and support"
+      url: "https://github.com/Nick2bad4u/Uptime-Watcher/discussions"
+      about: "Ask usage questions, troubleshooting questions, or general support requests."
+    - name: "Security reports"
+      url: "https://github.com/Nick2bad4u/Uptime-Watcher/security/policy"
+      about: "Please report vulnerabilities using the project's security policy."

@@ -6,8 +6,8 @@
  * This component provides a styled container with configurable theming,
  * optional header section, and interactive features like click and hover
  * states. The card integrates with the theme system for consistent styling
- * across the app. It supports various visual variants, padding, shadow,
- * and border radius configurations.
+ * across the app. It supports various visual variants, padding, shadow, and
+ * border radius configurations.
  *
  * @example Basic card with title and content:
  *

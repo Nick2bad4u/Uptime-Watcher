@@ -56,8 +56,8 @@ interface SystemServiceContract {
  *
  * @remarks
  * Provides a comprehensive interface for system-level operations including
- * external browser navigation and app update management with automatic
- * service initialization and type-safe IPC communication.
+ * external browser navigation and app update management with automatic service
+ * initialization and type-safe IPC communication.
  *
  * @public
  */

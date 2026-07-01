@@ -13,7 +13,7 @@
 
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
-import { describe, expect, it, test } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
     DEFAULT_REQUEST_TIMEOUT_SECONDS,
@@ -149,9 +149,7 @@ describe("timeoutUtils Property-Based Tests", () => {
             const result = clampTimeoutMs(specialValue);
 
             // For NaN, Math.max/min behavior is to return NaN, but we want to verify behavior
-            expect(
-                Number.isFinite(result) || Number.isNaN(result)
-            ).toBe(true);
+            expect(Number.isFinite(result) || Number.isNaN(result)).toBe(true);
         });
     });
 
@@ -386,12 +384,12 @@ describe("timeoutUtils Property-Based Tests", () => {
         });
 
         it("should return false for just outside boundary values", () => {
-            expect(
-                isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)
-            ).toBe(false);
-            expect(
-                isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)
-            ).toBe(false);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)).toBe(
+                false
+            );
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)).toBe(
+                false
+            );
         });
     });
 
@@ -428,12 +426,12 @@ describe("timeoutUtils Property-Based Tests", () => {
         });
 
         it("should return false for just outside boundary values", () => {
-            expect(
-                isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 0.1)
-            ).toBe(false);
-            expect(
-                isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 0.1)
-            ).toBe(false);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 0.1)).toBe(
+                false
+            );
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 0.1)).toBe(
+                false
+            );
         });
     });
 

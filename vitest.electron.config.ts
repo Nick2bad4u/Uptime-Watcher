@@ -168,7 +168,6 @@ const vitestElectronConfig: UserConfig = defineConfig({
         maxWorkers: Math.max(
             1,
             Number(
-
                 process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
             )
         ),

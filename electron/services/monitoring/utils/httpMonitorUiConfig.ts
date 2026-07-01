@@ -54,7 +54,9 @@ export function createHttpMonitorUiConfig(
         ...(formatDetail && { formatDetail }),
         formatTitleSuffix: formatTitleSuffix ?? createUrlSuffixResolver(type),
         ...(helpTexts && { helpTexts }),
-        ...(isDefined(supportsAdvancedAnalytics) && { supportsAdvancedAnalytics }),
+        ...(isDefined(supportsAdvancedAnalytics) && {
+            supportsAdvancedAnalytics,
+        }),
         ...(isDefined(supportsResponseTime) && { supportsResponseTime }),
     };
 }

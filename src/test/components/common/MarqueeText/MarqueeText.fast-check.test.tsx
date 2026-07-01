@@ -14,7 +14,7 @@ import {
     type MarqueeTextProperties,
 } from "../../../../components/common/MarqueeText/MarqueeText";
 
-vi.mock(import('../../../../hooks/ui/useOverflowMarquee'), async () => {
+vi.mock("../../../../hooks/ui/useOverflowMarquee", async () => {
     const actual = await vi.importActual<
         typeof import("../../../../hooks/ui/useOverflowMarquee")
     >("../../../../hooks/ui/useOverflowMarquee");
@@ -75,21 +75,11 @@ describe("MarqueeText fast-check coverage", () => {
     fcTest.prop<
         [
             string,
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
+            string | undefined,
+            string | undefined,
+            string | undefined,
+            string | undefined,
+            string | undefined,
         ]
     >([
         textArbitrary,
@@ -145,9 +135,7 @@ describe("MarqueeText fast-check coverage", () => {
                 expect(wrapper).not.toHaveClass(activeClassName);
             }
 
-            const trackElem = wrapper.querySelector(
-                ".marquee-text__track"
-            );
+            const trackElem = wrapper.querySelector(".marquee-text__track");
             expect(trackElem).not.toBeNull();
             if (trackClassName) {
                 expect(trackElem).toHaveClass(trackClassName);
@@ -177,21 +165,11 @@ describe("MarqueeText fast-check coverage", () => {
     fcTest.prop<
         [
             string,
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
+            string | undefined,
+            string | undefined,
+            string | undefined,
+            string | undefined,
+            string | undefined,
         ]
     >([
         textArbitrary,
@@ -305,15 +283,9 @@ describe("MarqueeText fast-check coverage", () => {
     fcTest.prop<
         [
             string,
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
-            (
-                string | undefined
-            ),
+            string | undefined,
+            string | undefined,
+            string | undefined,
         ]
     >([
         colorArbitrary,

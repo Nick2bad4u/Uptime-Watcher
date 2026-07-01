@@ -31,7 +31,7 @@ describe("Edge Cases", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        const testValue;
+        const testValue = undefined;
         expect(testValue).toBeUndefined();
     });
 });

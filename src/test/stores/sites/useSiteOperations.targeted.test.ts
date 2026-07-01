@@ -6,7 +6,7 @@
 import type { Site } from "@shared/types";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
-import { arrayAt, arrayFirst  } from "ts-extras";
+import { arrayAt, arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
@@ -16,7 +16,7 @@ import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperat
 import { applySavedSiteToStore } from "../../../stores/sites/utils/operationHelpers";
 
 // Mock logger to control development mode checks
-vi.mock(import('../../../services/logger'), () => ({
+vi.mock("../../../services/logger", () => ({
     logger: {
         warn: vi.fn(),
         error: vi.fn(),
@@ -31,13 +31,13 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock(import('../../../stores/error/useErrorStore'), () => ({
+vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
         getState: vi.fn(() => mockErrorStore),
     },
 }));
 
-vi.mock(import('../../../stores/utils'), () => ({
+vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
@@ -53,11 +53,11 @@ vi.mock(import('../../../stores/utils'), () => ({
     }),
 }));
 
-vi.mock(import('../../../stores/sites/utils/fileDownload'), () => ({
+vi.mock("../../../stores/sites/utils/fileDownload", () => ({
     handleSQLiteBackupDownload: vi.fn(async (callback) => await callback()),
 }));
 
-vi.mock(import('../../../utils/safeExtractIpcData'), () => ({
+vi.mock("../../../utils/safeExtractIpcData", () => ({
     safeExtractIpcData: vi.fn((response, _defaultValue) => {
         if (response.success) {
             return response.data;
@@ -362,7 +362,8 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             expect(mockSiteDeps.setSites).toHaveBeenCalledWith();
             const updatedSites =
-                arrayAt(vi.mocked(mockSiteDeps.setSites).mock.calls, -1)?.[0] ?? [];
+                arrayAt(vi.mocked(mockSiteDeps.setSites).mock.calls, -1)?.[0] ??
+                [];
             const reconciledSite = updatedSites.find(
                 (site: Site) =>
                     site.identifier === mockSiteWithMultipleMonitors.identifier
@@ -469,7 +470,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             applySavedSiteToStore(syncSnapshot, statefulDeps);
 
-            expect(arrayFirst(sitesState)?.monitors).toEqual(syncSnapshot.monitors);
+            expect(arrayFirst(sitesState)?.monitors).toEqual(
+                syncSnapshot.monitors
+            );
             expect(statefulDeps.syncSites).not.toHaveBeenCalled();
         });
     });

@@ -104,8 +104,8 @@ const toSerializableErrorContext = (
         errorMessage: normalizedError.message,
         errorName: normalizedError.name,
         ...(normalizedError.stack && {
-                  errorStack: normalizedError.stack,
-              }),
+            errorStack: normalizedError.stack,
+        }),
     };
 };
 
@@ -269,7 +269,7 @@ export class SiteManager {
             siteIdentifier,
             source,
             ...(Array.isArray(sites) && { sites }),
-            ...((typeof timestamp === "number") && { timestamp }),
+            ...(typeof timestamp === "number" && { timestamp }),
         };
 
         return this.sitesStateSynchronizer.emitSitesStateSynchronized(emitArgs);
@@ -458,7 +458,9 @@ export class SiteManager {
             cascade: false,
             identifier,
             operation: "removed",
-            ...(siteBeforeRemoval && { site: structuredClone(siteBeforeRemoval) }),
+            ...(siteBeforeRemoval && {
+                site: structuredClone(siteBeforeRemoval),
+            }),
             timestamp,
         });
 
@@ -548,11 +550,11 @@ export class SiteManager {
         const siteSnapshot =
             await this.getSiteSnapshotForMutation(siteIdentifier);
 
-        const monitorToRemove = siteSnapshot.monitors.find(
+        const hasMonitorToRemove = siteSnapshot.monitors.some(
             (monitor) => monitor.id === monitorId
         );
 
-        if (!monitorToRemove) {
+        if (!hasMonitorToRemove) {
             throw new Error(
                 `Monitor ${monitorId} not found on site ${siteIdentifier}`
             );
@@ -715,7 +717,7 @@ export class SiteManager {
             readonly sites: Site[];
         } = {
             sites,
-            ...((typeof context === "string") && { context }),
+            ...(typeof context === "string" && { context }),
             ...(options && { options }),
         };
 
@@ -736,8 +738,8 @@ export class SiteManager {
      *
      * @remarks
      * Performs silent background loading with error logging and event emission.
-     * This ensures background operations don't disrupt the main app
-     * flow while still providing observability through logging and events.
+     * This ensures background operations don't disrupt the main app flow while
+     * still providing observability through logging and events.
      *
      * @param identifier - The site identifier to load.
      *

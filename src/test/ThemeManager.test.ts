@@ -9,17 +9,14 @@ import { darkTheme, lightTheme } from "../theme/themes";
 // Mock DOM environment
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation(
-        (query) =>
-            ({
-                addEventListener: vi.fn(),
-                dispatchEvent: vi.fn(),
-                matches: false,
-                media: query,
-                onchange: null,
-                removeEventListener: vi.fn(),
-            })
-    ),
+    value: vi.fn().mockImplementation((query) => ({
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        matches: false,
+        media: query,
+        onchange: null,
+        removeEventListener: vi.fn(),
+    })),
 });
 
 describe(ThemeManager, () => {
@@ -89,7 +86,9 @@ describe(ThemeManager, () => {
 
             themeManager.applyTheme(lightTheme);
 
-            expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith();
+            expect(
+                mockDocumentElement.style.setProperty
+            ).toHaveBeenCalledWith();
             expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
                 "theme-light"
             );
@@ -103,7 +102,9 @@ describe(ThemeManager, () => {
 
             themeManager.applyTheme(darkTheme);
 
-            expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith();
+            expect(
+                mockDocumentElement.style.setProperty
+            ).toHaveBeenCalledWith();
             expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
                 "theme-dark"
             );
@@ -219,7 +220,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalWindow = globalThis;
+            const originalWindow = globalThis.window;
             // Intentionally deleting window for testing fallback behavior
             delete (globalThis as any).window;
 
@@ -291,9 +292,7 @@ describe(ThemeManager, () => {
                 removeEventListener: vi.fn(),
             };
 
-            vi.mocked(matchMedia).mockReturnValue(
-                mockMediaQuery as any
-            );
+            vi.mocked(matchMedia).mockReturnValue(mockMediaQuery as any);
 
             const cleanup = themeManager.onSystemThemeChange(callback);
 
@@ -318,7 +317,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalWindow = globalThis;
+            const originalWindow = globalThis.window;
             // Intentionally deleting window for testing fallback behavior
             delete (globalThis as any).window;
 
@@ -326,7 +325,9 @@ describe(ThemeManager, () => {
             const cleanup = themeManager.onSystemThemeChange(callback);
 
             expect(typeof cleanup).toBe("function");
-            expect(() => { cleanup(); }).not.toThrow();
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
 
             globalThis.window = originalWindow;
         });
@@ -563,22 +564,24 @@ describe(ThemeManager, () => {
             ).not.toThrow();
 
             // Also test applyTheme method which calls the apply methods directly
-            expect(() =>
-                { manager.applyTheme(themeWithNullBorderRadius); }
-            ).not.toThrow();
-            expect(() =>
-                { manager.applyTheme(themeWithNullSpacing); }
-            ).not.toThrow();
-            expect(() =>
-                { manager.applyTheme(themeWithNullShadows); }
-            ).not.toThrow();
-            expect(() => { manager.applyTheme(themeWithNullColors); }).not.toThrow();
-            expect(() =>
-                { manager.applyTheme(themeWithNullTypography); }
-            ).not.toThrow();
-            expect(() =>
-                { manager.applyTheme(themeWithNullFontSize); }
-            ).not.toThrow();
+            expect(() => {
+                manager.applyTheme(themeWithNullBorderRadius);
+            }).not.toThrow();
+            expect(() => {
+                manager.applyTheme(themeWithNullSpacing);
+            }).not.toThrow();
+            expect(() => {
+                manager.applyTheme(themeWithNullShadows);
+            }).not.toThrow();
+            expect(() => {
+                manager.applyTheme(themeWithNullColors);
+            }).not.toThrow();
+            expect(() => {
+                manager.applyTheme(themeWithNullTypography);
+            }).not.toThrow();
+            expect(() => {
+                manager.applyTheme(themeWithNullFontSize);
+            }).not.toThrow();
         });
 
         it("should handle undefined document in applyThemeClasses", async ({
@@ -597,7 +600,9 @@ describe(ThemeManager, () => {
             delete (globalThis as any).document;
 
             // This should handle undefined document gracefully
-            expect(() => { manager.applyTheme(lightTheme); }).not.toThrow();
+            expect(() => {
+                manager.applyTheme(lightTheme);
+            }).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;

@@ -20,18 +20,18 @@ This document provides comprehensive patterns for integrating type-fest utilitie
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Pattern 1: UnknownRecord Replacement](#pattern-1-unknownrecord-replacement)
-3. [Pattern 2: LiteralUnion Enhancement](#pattern-2-literalunion-enhancement)
-4. [Pattern 3: Simplify Union Types](#pattern-3-simplify-union-types)
-5. [Pattern 4: SetOptional API Design](#pattern-4-setoptional-api-design)
-6. [Pattern 5: CamelCase String Transformation](#pattern-5-camelcase-string-transformation)
-7. [Pattern 6: ReadonlyDeep Immutability](#pattern-6-readonlydeep-immutability)
-8. [Pattern 7: PartialDeep Testing Utilities](#pattern-7-partialdeep-testing-utilities)
-9. [Multi-Feature Enhancement Strategy](#multi-feature-enhancement-strategy)
-10. [Implementation Guidelines](#implementation-guidelines)
-11. [Validation Checklist](#validation-checklist)
-12. [Search Patterns for Global Application](#search-patterns-for-global-application)
+- [Overview](#overview)
+- [Pattern 1: UnknownRecord Replacement](#pattern-1-unknownrecord-replacement)
+- [Pattern 2: LiteralUnion Enhancement](#pattern-2-literalunion-enhancement)
+- [Pattern 3: Simplify Union Types](#pattern-3-simplify-union-types)
+- [Pattern 4: SetOptional API Design](#pattern-4-setoptional-api-design)
+- [Pattern 5: CamelCase String Transformation](#pattern-5-camelcase-string-transformation)
+- [Pattern 6: ReadonlyDeep Immutability](#pattern-6-readonlydeep-immutability)
+- [Pattern 7: PartialDeep Testing Utilities](#pattern-7-partialdeep-testing-utilities)
+- [Multi-Feature Enhancement Strategy](#multi-feature-enhancement-strategy)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Validation Checklist](#validation-checklist)
+- [Search Patterns for Global Application](#search-patterns-for-global-application)
 
 ## Overview
 

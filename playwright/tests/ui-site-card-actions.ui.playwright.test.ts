@@ -123,7 +123,9 @@ test.describe(
 
                 await expect.soft(metricsSummary).toBeVisible();
                 const summaryText = await metricsSummary.textContent();
-                expect.soft((summaryText ?? "").trim().length).toBeGreaterThan(0);
+                expect
+                    .soft((summaryText ?? "").trim().length)
+                    .toBeGreaterThan(0);
             }
         );
 
@@ -165,12 +167,14 @@ test.describe(
                     selected: true,
                 });
 
-                await expect.soft(selectedOption).toHaveText(
-                    /ssl certificate:\s*secure\.example\.com:443/i,
-                    {
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
-                    }
-                );
+                await expect
+                    .soft(selectedOption)
+                    .toHaveText(
+                        /ssl certificate:\s*secure\.example\.com:443/i,
+                        {
+                            timeout: WAIT_TIMEOUTS.MEDIUM,
+                        }
+                    );
 
                 // Also ensure the selector itself is visible so the identifier
                 // is actually surfaced in the site card UI.
@@ -198,7 +202,9 @@ test.describe(
                     .getByRole("complementary")
                     .filter({ has: page.getByTestId(/status-alert-/v) });
 
-                await expect.soft(toaster).toHaveAttribute("aria-live", "polite");
+                await expect
+                    .soft(toaster)
+                    .toHaveAttribute("aria-live", "polite");
 
                 const alertEntries = page.getByTestId(/status-alert-/v);
                 const pausedToastEntry = alertEntries.filter({
@@ -229,7 +235,9 @@ test.describe(
 
                 const recoveredAlertId = latestToastEntry;
 
-                await expect.soft(recoveredAlertId).toHaveAttribute("data-alert-id");
+                await expect
+                    .soft(recoveredAlertId)
+                    .toHaveAttribute("data-alert-id");
 
                 await latestToastEntry.click();
 
@@ -237,11 +245,11 @@ test.describe(
                 // dismissal. We cannot assert that *all* recovered toasts are
                 // gone, because multiple recovered alerts can be emitted in
                 // quick succession (flaky timing).
-                await expect.soft(
-                    page.getByTestId(`status-alert-${recoveredAlertId}`)
-                ).toHaveCount(0, {
-                    timeout: WAIT_TIMEOUTS.LONG,
-                });
+                await expect
+                    .soft(page.getByTestId(`status-alert-${recoveredAlertId}`))
+                    .toHaveCount(0, {
+                        timeout: WAIT_TIMEOUTS.LONG,
+                    });
             }
         );
     }

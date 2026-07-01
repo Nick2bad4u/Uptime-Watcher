@@ -789,9 +789,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
 
                 // Test each event returns its correct priority
                 for (const eventName of uniqueEvents) {
-                    const priority = getEventPriority(
-                        eventName
-                    );
+                    const priority = getEventPriority(eventName);
                     expect([
                         "CRITICAL",
                         "HIGH",

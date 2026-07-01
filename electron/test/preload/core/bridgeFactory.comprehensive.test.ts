@@ -91,8 +91,6 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         ];
         vi.clearAllMocks();
     });
-
-    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
     describe("createTypedInvoker", () => {
         it("invokes IPC with typed parameters and propagates data", async () => {
             const response: IpcResponse<string> = {
@@ -273,8 +271,6 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             await expect(invoke(payload)).resolves.toBeTruthy();
         });
     });
-
-    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
     describe("createVoidInvoker", () => {
         it("resolves when the response is successful", async () => {
             const response: IpcResponse = { success: true };
@@ -343,8 +339,6 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             }
         });
     });
-
-    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
     describe("createEventManager", () => {
         it("registers and unregisters listeners", () => {
             const handler = vi.fn();
@@ -439,8 +433,6 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             );
         });
     });
-
-    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
     describe("IpcError", () => {
         it("captures channel, original error, and details", () => {
             const inner = new Error("failure");

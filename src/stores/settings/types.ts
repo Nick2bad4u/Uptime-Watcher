@@ -4,8 +4,7 @@
  *
  * @remarks
  * Defines the interface for the settings store which handles user preferences,
- * app configuration, and backend synchronization for persistent
- * settings.
+ * app configuration, and backend synchronization for persistent settings.
  *
  * @packageDocumentation
  */
@@ -41,8 +40,8 @@ export interface SettingsStore {
      * - Merging default values for missing settings
      * - Handling initialization errors gracefully
      *
-     * Should be called during app startup to ensure settings are
-     * properly configured.
+     * Should be called during app startup to ensure settings are properly
+     * configured.
      *
      * @returns Promise resolving to initialization result with status
      *   indicators
@@ -82,8 +81,8 @@ export interface SettingsStore {
      * - Providing user feedback on operation status
      *
      * This operation cannot be undone and affects all user preferences. Backend
-     * synchronization ensures settings are persisted across app
-     * restarts and synchronized with other instances.
+     * synchronization ensures settings are persisted across app restarts and
+     * synchronized with other instances.
      *
      * @returns Promise resolving to reset operation result
      */
@@ -98,9 +97,9 @@ export interface SettingsStore {
      * Current app settings configuration.
      *
      * @remarks
-     * Contains all user preferences and app configuration including
-     * theme settings, notification preferences, monitoring parameters, and
-     * other customizable options.
+     * Contains all user preferences and app configuration including theme
+     * settings, notification preferences, monitoring parameters, and other
+     * customizable options.
      */
     settings: AppSettings;
 

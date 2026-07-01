@@ -18,8 +18,8 @@ import { isRecord } from "../utils/typeHelpers";
  * Base validation result interface.
  *
  * @remarks
- * Provides the core structure for validation results across the app.
- * Other validation interfaces can extend this for domain-specific needs.
+ * Provides the core structure for validation results across the app. Other
+ * validation interfaces can extend this for domain-specific needs.
  *
  * @public
  */
@@ -213,8 +213,10 @@ export function isValidationResult(
         return false;
     }
 
-    return !isDefined(metadata) ||
-        typeof metadata === "object" &&
+    return (
+        !isDefined(metadata) ||
+        (typeof metadata === "object" &&
             metadata !== null &&
-            !Array.isArray(metadata);
+            !Array.isArray(metadata))
+    );
 }

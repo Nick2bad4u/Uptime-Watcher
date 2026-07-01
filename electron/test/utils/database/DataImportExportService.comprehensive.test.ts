@@ -1111,9 +1111,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             // Simulate a repository bug returning a falsy ID so that the
             // history import path skips adding entries.
-            mockRepositories.monitor.createInternal.mockReturnValueOnce(
-                ""
-            );
+            mockRepositories.monitor.createInternal.mockReturnValueOnce("");
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()

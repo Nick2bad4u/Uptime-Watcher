@@ -286,9 +286,11 @@ function collectInjectedChannels(
                 const [configArg] = node.arguments;
                 if (configArg && ts.isObjectLiteralExpression(configArg)) {
                     for (const property of configArg.properties) {
-                        if (!ts.isPropertyAssignment(property) ||
+                        if (
+                            !ts.isPropertyAssignment(property) ||
                             !property.name ||
-                            !ts.isIdentifier(property.name)) {
+                            !ts.isIdentifier(property.name)
+                        ) {
                             continue;
                         }
 
@@ -299,8 +301,7 @@ function collectInjectedChannels(
                                 property.initializer
                             );
                             channels.add(
-                                channelName ??
-                                    "update-notification-preferences"
+                                channelName ?? "update-notification-preferences"
                             );
                         } else if (
                             propertyName === "verifyChannel" ||

@@ -8,7 +8,7 @@ import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
-vi.mock(import('../../../components/AddSiteForm/Submit'), () => ({
+vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
@@ -19,7 +19,7 @@ const monitorFieldErrorState = vi.hoisted(() => ({
 /**
  * Mock monitor field configs so the suite is deterministic (no IPC).
  */
-vi.mock(import('@app/hooks/useMonitorFields'), () => ({
+vi.mock("@app/hooks/useMonitorFields", () => ({
     useMonitorFields: vi.fn(() => ({
         error: monitorFieldErrorState.shouldError
             ? "Failed to load monitor field configurations"
@@ -196,7 +196,9 @@ describe("AddSiteForm (comprehensive)", () => {
         await user.selectOptions(monitorTypeSelect, "port");
 
         expect(screen.getByRole("textbox", { name: /host/i })).toBeVisible();
-        expect(screen.getByRole("spinbutton", { name: /port/iv })).toBeVisible();
+        expect(
+            screen.getByRole("spinbutton", { name: /port/iv })
+        ).toBeVisible();
     });
 
     it("wires submit to handleSubmit", async ({ task, annotate }) => {

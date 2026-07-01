@@ -8,12 +8,12 @@ user-invocable: true
 license: "Unlicense"
 ---
 
-
 # Gh Pr Checks Plan Fix
 
 ## Overview
 
 Use gh to locate failing PR checks, fetch GitHub Actions logs for actionable failures, summarize the failure snippet, then propose a fix plan and implement after explicit approval.
+
 - If a plan-oriented skill (for example `create-plan`) is available, use it; otherwise draft a concise plan inline and request approval before implementing.
 
 Prereq: authenticate with the standard GitHub CLI once (for example, run `gh auth login`), then confirm with `gh auth status` (repo + workflow scopes are typically required).
@@ -64,11 +64,12 @@ Prereq: authenticate with the standard GitHub CLI once (for example, run `gh aut
 
 ## Bundled Resources
 
-### scripts/inspect_pr_checks.py
+### scripts/inspect\_pr\_checks.py
 
 Fetch failing PR checks, pull GitHub Actions logs, and extract a failure snippet. Exits non-zero when failures remain so it can be used in automation.
 
 Usage examples:
+
 - `python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --pr "123"`
 - `python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --pr "https://github.com/org/repo/pull/123" --json`
 - `python "<path-to-skill>/scripts/inspect_pr_checks.py" --repo "." --max-lines 200 --context 40`

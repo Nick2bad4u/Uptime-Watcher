@@ -1,4 +1,3 @@
-/* eslint-disable react-x/static-components -- This component intentionally uses localized render helpers and icon component mapping for readability in a complex history table. */
 /**
  * History tab component for displaying monitor check history.
  *
@@ -45,7 +44,12 @@ import {
     useRef,
     useState,
 } from "react";
-import { arrayIncludes, isEmpty, isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
+import {
+    arrayIncludes,
+    isEmpty,
+    isFinite as isFiniteNumber,
+    safeCastTo,
+} from "ts-extras";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -111,10 +115,12 @@ function extractHttpStatusCode(details: string): null | number {
     return raw ? Number(raw) : null;
 }
 
-function getHttpStatusIcon(code: number): IconType | null { if (!isFiniteNumber(code)) return null;
+function getHttpStatusIcon(code: number): IconType | null {
+    if (!isFiniteNumber(code)) return null;
 
     if (code >= 200 && code <= 299) {
-        return AppIcons.status.up; }
+        return AppIcons.status.up;
+    }
 
     if (code >= 300 && code <= 399) {
         return AppIcons.actions.refreshAlt;
@@ -745,5 +751,3 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         );
     }
 );
-
-/* eslint-enable react-x/static-components -- Re-enable static-components checks for other files. */

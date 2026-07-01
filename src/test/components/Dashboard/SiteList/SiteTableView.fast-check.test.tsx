@@ -32,7 +32,7 @@ const createSite = (identifier: string, name: string): Site => ({
 
 const siteTableRowMock = vi.fn<(props: SiteTableRowProperties) => void>();
 
-vi.mock(import('../../../../components/Dashboard/SiteList/SiteTableRow'), () => ({
+vi.mock("../../../../components/Dashboard/SiteList/SiteTableRow", () => ({
     SiteTableRow: (props: SiteTableRowProperties) => {
         siteTableRowMock(props);
         return null;
@@ -54,7 +54,9 @@ describe(SiteTableView, () => {
         render(<SiteTableView density="comfortable" sites={sites} />);
 
         expect(siteTableRowMock).toHaveBeenCalledTimes(sites.length);
-        expect(arrayFirst(siteTableRowMock.mock.calls)?.[0].rowVariant).toBe("even");
+        expect(arrayFirst(siteTableRowMock.mock.calls)?.[0].rowVariant).toBe(
+            "even"
+        );
         expect(siteTableRowMock.mock.calls[1]?.[0].rowVariant).toBe("odd");
         expect(siteTableRowMock.mock.calls[2]?.[0].rowVariant).toBe("even");
     });

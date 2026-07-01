@@ -4,8 +4,8 @@
  *
  * @remarks
  * This component provides a standardized way to display monitor and site status
- * throughout the app. It combines visual status indicators with text
- * labels to create an accessible and consistent user experience.
+ * throughout the app. It combines visual status indicators with text labels to
+ * create an accessible and consistent user experience.
  *
  * The component is optimized for performance using React.memo and is designed
  * to be reusable across different contexts while maintaining visual

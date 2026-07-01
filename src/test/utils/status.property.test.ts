@@ -13,8 +13,8 @@
 
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
-import { arrayFirst, arrayJoin, stringSplit   } from "ts-extras";
-import { describe, expect, it, test } from "vitest";
+import { arrayFirst, arrayJoin, stringSplit } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 import {
     createStatusIdentifier,
@@ -170,7 +170,7 @@ describe("status Utils Property-Based Tests", () => {
         });
 
         it("should handle whitespace-only strings", () => {
-            expect(getStatusIcon(' '.repeat(3))).toBe("⚪");
+            expect(getStatusIcon(" ".repeat(3))).toBe("⚪");
             expect(getStatusIcon("\t")).toBe("⚪");
             expect(getStatusIcon("\n")).toBe("⚪");
         });
@@ -213,7 +213,10 @@ describe("status Utils Property-Based Tests", () => {
             "should preserve original status length in text part",
             (status) => {
                 const formatted: StatusWithIcon = formatStatusWithIcon(status);
-                const textPart = arrayJoin(stringSplit(formatted, " ").slice(1), " ");
+                const textPart = arrayJoin(
+                    stringSplit(formatted, " ").slice(1),
+                    " "
+                );
 
                 expect(textPart).toHaveLength(status.length);
             }

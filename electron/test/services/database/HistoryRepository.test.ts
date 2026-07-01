@@ -98,7 +98,7 @@ describe(HistoryRepository, () => {
             await annotate("Type: Constructor", "type");
 
             expect(historyRepository).toBeInstanceOf(HistoryRepository);
-            expect(historyRepository.databaseService).toBe(
+            expect(historyRepository["databaseService"]).toBe(
                 mockDatabaseService
             );
         });
@@ -708,7 +708,7 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const db = historyRepository.getDb();
+            const db = historyRepository["getDb"]();
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
             expect(db).toBe(mockDatabase);

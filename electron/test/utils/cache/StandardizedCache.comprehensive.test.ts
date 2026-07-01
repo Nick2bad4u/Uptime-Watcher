@@ -222,8 +222,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             await flushMicrotasks();
 
             const eventPayload = eventSpy.mock.calls.at(-1)?.[0] as
-                | Record<string, unknown>
-                | undefined;
+                Record<string, unknown> | undefined;
 
             expect(eventPayload).toBeDefined();
             expect(eventPayload).toMatchObject({

@@ -19,15 +19,15 @@ topics:
 
 ## Table of Contents
 
-1. [Front matter schema](#front-matter-schema)
-2. [� File Naming Conventions](#-file-naming-conventions)
-3. [�📝 Formatting Standards](#-formatting-standards)
-4. [📋 Content Standards](#-content-standards)
-5. [🎯 Document Types](#-document-types)
-6. [🔧 Tools and Validation](#-tools-and-validation)
-7. [📚 Examples](#-examples)
-8. [🎨 Visual Consistency](#-visual-consistency)
-9. [📊 Maintenance](#-maintenance)
+- [Front matter schema](#front-matter-schema)
+- [� File Naming Conventions](#-file-naming-conventions)
+- [�📝 Formatting Standards](#-formatting-standards)
+- [📋 Content Standards](#-content-standards)
+- [🎯 Document Types](#-document-types)
+- [🔧 Tools and Validation](#-tools-and-validation)
+- [📚 Examples](#-examples)
+- [🎨 Visual Consistency](#-visual-consistency)
+- [📊 Maintenance](#-maintenance)
 
 ## Front matter schema
 

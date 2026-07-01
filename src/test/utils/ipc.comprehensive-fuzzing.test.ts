@@ -19,7 +19,7 @@
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
-import { isEmpty, isInteger, objectKeys   } from "ts-extras";
+import { isEmpty, isInteger, objectKeys } from "ts-extras";
 import { afterEach, beforeEach, describe, expect } from "vitest";
 
 // =============================================================================
@@ -409,10 +409,9 @@ describe("comprehensive IPC Communication Fuzzing", () => {
 
                     return {
                         errors,
-                        monitorId:
-                            isEmpty(errors)
-                                ? Math.floor(secureRandomFloat() * 1000) + 1
-                                : null,
+                        monitorId: isEmpty(errors)
+                            ? Math.floor(secureRandomFloat() * 1000) + 1
+                            : null,
                         success: isEmpty(errors),
                     };
                 };
@@ -732,10 +731,9 @@ describe("comprehensive IPC Communication Fuzzing", () => {
                             error: {
                                 data: scenario.errorData,
                                 handler: scenario.handlerName,
-                                message:
-                                    Error.isError(error)
-                                        ? error.message
-                                        : "Unknown error",
+                                message: Error.isError(error)
+                                    ? error.message
+                                    : "Unknown error",
                                 timestamp: new Date().toISOString(),
                                 type: scenario.errorType,
                             },

@@ -46,12 +46,12 @@ const createValidSite = (
     ],
 });
 
-vi.mock(import('../../services/StateSyncService'), () => ({
+vi.mock("../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
 
 // Mock SiteService that the store operations use
-vi.mock(import('../../services/SiteService'), () => ({
+vi.mock("../../services/SiteService", () => ({
     SiteService: {
         addSite: vi.fn(),
         getSites: vi.fn(),
@@ -62,7 +62,7 @@ vi.mock(import('../../services/SiteService'), () => ({
 }));
 
 // Mock MonitoringService that monitoring operations use
-vi.mock(import('../../services/MonitoringService'), () => ({
+vi.mock("../../services/MonitoringService", () => ({
     MonitoringService: {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
@@ -224,7 +224,9 @@ describe("useSitesStore Function Coverage Tests", () => {
             // Test addSite (local state function)
             store.addSite(testSite);
             expect(useSitesStore.getState().sites).toHaveLength(1);
-            expect(arrayFirst(useSitesStore.getState().sites)).toEqual(testSite);
+            expect(arrayFirst(useSitesStore.getState().sites)).toEqual(
+                testSite
+            );
 
             // Test selectSite
             store.selectSite(testSite);

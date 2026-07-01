@@ -180,7 +180,7 @@ describe(HttpLatencyMonitor, () => {
     });
 
     it("returns error result when latency configuration is invalid", async () => {
-        const invalidMonitor = { ...monitor , maxResponseTime: -5,};
+        const invalidMonitor = { ...monitor, maxResponseTime: -5 };
 
         const result = await monitorService.check(invalidMonitor);
 

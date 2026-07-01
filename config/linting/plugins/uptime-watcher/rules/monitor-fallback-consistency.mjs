@@ -32,7 +32,9 @@ let BASE_MONITOR_TYPES_CACHE = null;
  * Retrieves an ArrayExpression node from an ESTree initializer, unwrapping
  * TypeScript-specific wrappers like `as const`.
  *
- * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} initializer
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression
+ *     | null
+ *     | undefined} initializer
  *   Initializer node from a variable declaration.
  *
  * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression | null}
@@ -256,7 +258,10 @@ export const monitorFallbackConsistencyRule = {
                 }
 
                 /**
-                 * @type {Map<string, import("@typescript-eslint/utils").TSESTree.ObjectExpression>}
+                 * @type {Map<
+                 *     string,
+                 *     import("@typescript-eslint/utils").TSESTree.ObjectExpression
+                 * >}
                  */
                 const optionMap = new Map(),
                     reportedNodes = new Set();

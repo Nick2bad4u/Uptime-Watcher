@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { arrayAt, objectValues  } from "ts-extras";
+import { arrayAt, objectValues } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
@@ -15,14 +15,14 @@ const actionButtonCalls: {
     isMonitoring: boolean;
 }[] = [];
 
-vi.mock(import('../../../../theme/components/ThemedText'), () => ({
+vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (
         <span data-testid="themed-text">{children}</span>
     ),
 }));
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
+    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
         MonitorSelector: ({ selectedMonitorId, onChange }: any) => {
             monitorSelectorCalls.push({ selectedMonitorId });
@@ -41,7 +41,7 @@ vi.mock(
 );
 
 vi.mock(
-    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
+    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
         ActionButtonGroup: ({
             allMonitorsRunning,
@@ -101,7 +101,7 @@ vi.mock(
     })
 );
 
-vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardFooter'), () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
     SiteCardFooter: () => <div data-testid="site-card-footer" />,
 }));
 

@@ -22,7 +22,7 @@
 
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
-import { arrayAt, objectKeys, objectValues   } from "ts-extras";
+import { arrayAt, objectKeys, objectValues } from "ts-extras";
 import { beforeEach, describe, expect, vi } from "vitest";
 
 import { useErrorStore } from "../../../stores/error/useErrorStore";
@@ -61,7 +61,7 @@ const arbitraries = {
         .filter((s) => s.trim().length > 0),
 
     /** Generate empty error message */
-    emptyError: fc.constantFrom("", ' '.repeat(3), "\n", "\t"),
+    emptyError: fc.constantFrom("", " ".repeat(3), "\n", "\t"),
 
     /** Generate store name */
     storeName: fc.constantFrom(
@@ -567,7 +567,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store.clearAllErrors();
 
                 // Act - clear again should not crash
-                expect(() => { store.clearAllErrors(); }).not.toThrow();
+                expect(() => {
+                    store.clearAllErrors();
+                }).not.toThrow();
 
                 // Assert - state should remain clean
                 expect(useErrorStore.getState().lastError).toBeUndefined();

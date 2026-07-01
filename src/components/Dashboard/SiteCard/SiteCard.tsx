@@ -190,8 +190,9 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         const uptimeDisplay = isFiniteNumber(uptime)
             ? `${uptime.toFixed(1)}%`
             : "—";
-        const lastResponseDisplay =
-            isDefined(responseTime) ? `${responseTime} ms` : "—";
+        const lastResponseDisplay = isDefined(responseTime)
+            ? `${responseTime} ms`
+            : "—";
         const avgResponseDisplay =
             checkCount === 0 ? "—" : `${averageResponseTime} ms`;
         const checksDisplay = checkCount.toLocaleString();

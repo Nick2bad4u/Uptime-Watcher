@@ -19,17 +19,17 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Registry Architecture](#registry-architecture)
-5. [Monitor Type Configuration](#monitor-type-configuration)
-6. [Migration System](#migration-system)
-7. [Frontend Integration](#frontend-integration)
-8. [Consequences](#consequences)
-9. [Implementation Guidelines](#implementation-guidelines)
-10. [Compliance](#compliance)
-11. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Registry Architecture](#registry-architecture)
+- [Monitor Type Configuration](#monitor-type-configuration)
+- [Migration System](#migration-system)
+- [Frontend Integration](#frontend-integration)
+- [Consequences](#consequences)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Compliance](#compliance)
+- [Related ADRs](#related-adrs)
 
 ## Status
 
@@ -632,8 +632,7 @@ export const useMonitorTypesStore = create<MonitorTypesStore>()((set, get) => ({
 export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
  const cacheKey = CacheKeys.config.byName("all-monitor-types");
  const cached = AppCaches.monitorTypes.get(cacheKey) as
-  | MonitorTypeConfig[]
-  | undefined;
+  MonitorTypeConfig[] | undefined;
  if (cached) return cached;
 
  const types = await withUtilityErrorHandling(

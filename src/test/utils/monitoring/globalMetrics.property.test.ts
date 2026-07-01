@@ -13,7 +13,7 @@
 import { test } from "@fast-check/vitest";
 import { MONITOR_STATUS_VALUES, type MonitorStatus } from "@shared/types";
 import fc from "fast-check";
-import { describe, expect, it, test } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
     calculateGlobalMonitoringMetrics,

@@ -30,7 +30,7 @@ import { arrayAt } from "ts-extras";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock electron-log/renderer
-vi.mock(import('electron-log/renderer'), () => ({
+vi.mock("electron-log/renderer", () => ({
     default: {
         debug: vi.fn(),
         info: vi.fn(),
@@ -81,7 +81,7 @@ const arbitraries = {
     logMessage: fc.string({ minLength: 1, maxLength: 1000 }),
 
     /** Generate empty or whitespace message */
-    emptyMessage: fc.constantFrom("", ' '.repeat(3), "\n", "\t", "  \n  "),
+    emptyMessage: fc.constantFrom("", " ".repeat(3), "\n", "\t", "  \n  "),
 
     /** Generate context string */
     contextString: fc
@@ -284,10 +284,18 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             "should handle empty or whitespace messages",
             (emptyMessage) => {
                 // Act & Assert - should not crash with empty messages
-                expect(() => { logger.info(emptyMessage); }).not.toThrow();
-                expect(() => { logger.debug(emptyMessage); }).not.toThrow();
-                expect(() => { logger.warn(emptyMessage); }).not.toThrow();
-                expect(() => { logger.error(emptyMessage); }).not.toThrow();
+                expect(() => {
+                    logger.info(emptyMessage);
+                }).not.toThrow();
+                expect(() => {
+                    logger.debug(emptyMessage);
+                }).not.toThrow();
+                expect(() => {
+                    logger.warn(emptyMessage);
+                }).not.toThrow();
+                expect(() => {
+                    logger.error(emptyMessage);
+                }).not.toThrow();
 
                 expect(mockInfo).toHaveBeenCalledWith(
                     `[UPTIME-WATCHER] ${normalizeLogValue(emptyMessage) as string}`
@@ -670,9 +678,15 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             "should handle null/undefined messages gracefully",
             (nullishMessage) => {
                 // Act & Assert - should not crash with null/undefined
-                expect(() => { logger.info(nullishMessage as any); }).not.toThrow();
-                expect(() => { logger.debug(nullishMessage as any); }).not.toThrow();
-                expect(() => { logger.error(nullishMessage as any); }).not.toThrow();
+                expect(() => {
+                    logger.info(nullishMessage as any);
+                }).not.toThrow();
+                expect(() => {
+                    logger.debug(nullishMessage as any);
+                }).not.toThrow();
+                expect(() => {
+                    logger.error(nullishMessage as any);
+                }).not.toThrow();
             }
         );
 
@@ -685,7 +699,9 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 });
 
                 // Act & Assert - should not propagate the error
-                expect(() => { logger.info(message); }).not.toThrow();
+                expect(() => {
+                    logger.info(message);
+                }).not.toThrow();
             }
         );
 
@@ -710,9 +726,9 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 circularError.circular = circularError;
 
                 // Act & Assert - should not crash with circular references
-                expect(() =>
-                    { logger.error("Circular error", circularError); }
-                ).not.toThrow();
+                expect(() => {
+                    logger.error("Circular error", circularError);
+                }).not.toThrow();
                 expect(mockError).toHaveBeenCalledWith();
             }
         );
@@ -804,9 +820,9 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 const negativeDuration = -Math.abs(duration);
 
                 // Act & Assert - should handle negative durations gracefully
-                expect(() =>
-                    { logger.app.performance(operation, negativeDuration); }
-                ).not.toThrow();
+                expect(() => {
+                    logger.app.performance(operation, negativeDuration);
+                }).not.toThrow();
                 expect(mockDebug).toHaveBeenCalledWith();
             }
         );

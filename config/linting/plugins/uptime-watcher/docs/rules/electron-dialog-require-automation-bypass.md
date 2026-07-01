@@ -24,7 +24,7 @@ No options.
 import { dialog } from "electron";
 
 await dialog.showSaveDialog({
-  title: "Save",
+ title: "Save",
 });
 ```
 
@@ -34,11 +34,12 @@ await dialog.showSaveDialog({
 import { dialog } from "electron";
 import { readProcessEnv } from "@shared/utils/environment";
 
-const isPlaywright = readProcessEnv("PLAYWRIGHT_TEST")?.toLowerCase() === "true";
+const isPlaywright =
+ readProcessEnv("PLAYWRIGHT_TEST")?.toLowerCase() === "true";
 
 if (!isPlaywright) {
-  await dialog.showSaveDialog({
-    title: "Save",
-  });
+ await dialog.showSaveDialog({
+  title: "Save",
+ });
 }
 ```

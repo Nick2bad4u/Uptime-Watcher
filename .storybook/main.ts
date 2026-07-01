@@ -1,6 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-vite";
 
-// eslint-disable-next-line import-x/extensions -- storybook wants an extension
 import config from "../storybook/main.ts";
 
 const stories: StorybookConfig["stories"] = Array.isArray(config.stories)
@@ -21,9 +20,9 @@ const stories: StorybookConfig["stories"] = Array.isArray(config.stories)
  * Storybook configuration shim used to bridge the new `storybook/` directory
  * structure with tooling that still expects `.storybook/` entry points.
  */
-const storybookConfig = {
+const storybookConfig: StorybookConfig = {
     ...config,
     stories,
-} satisfies StorybookConfig;
+};
 
 export default storybookConfig;

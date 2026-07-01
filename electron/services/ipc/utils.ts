@@ -18,6 +18,8 @@ import { withLogContext } from "@shared/utils/loggingContext";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 import { arrayJoin, isDefined, safeCastTo, setHas } from "ts-extras";
 
 import type {
@@ -34,6 +36,10 @@ import {
     type HandlerExecutionResult,
 } from "./internal/ipcHandlerExecution";
 import { shouldLogHandler } from "./internal/ipcLogging";
+import {
+    getProductionDistDirectory,
+    isPathWithinDirectory,
+} from "../window/utils/pathGuards";
 
 type ChannelParams<TChannel extends IpcInvokeChannel> = [
     ...IpcInvokeChannelParams<TChannel>,
@@ -42,6 +48,10 @@ type ChannelParams<TChannel extends IpcInvokeChannel> = [
 type StrictIpcInvokeHandler<TChannel extends IpcInvokeChannel> = (
     ...args: ChannelParams<TChannel>
 ) => Promisable<IpcInvokeChannelResult<TChannel>>;
+
+const VITE_DEV_ORIGIN = "http://localhost:5173";
+const CURRENT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
+const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(CURRENT_DIRECTORY);
 
 /**
  * Registers an IPC invoke handler with standardized correlation handling,
@@ -56,6 +66,32 @@ export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
 
 const getExpectedParamCount = (channelName: IpcInvokeChannel): number =>
     IPC_INVOKE_CHANNEL_PARAM_COUNTS[channelName];
+
+function isTrustedIpcSender(event: IpcMainInvokeEvent): boolean {
+    const { senderFrame } = event;
+    if (!senderFrame || senderFrame.isDestroyed()) {
+        return false;
+    }
+
+    try {
+        const senderUrl = new URL(senderFrame.url);
+
+        if (senderUrl.origin === VITE_DEV_ORIGIN) {
+            return true;
+        }
+
+        if (senderUrl.protocol === "file:") {
+            return isPathWithinDirectory(
+                fileURLToPath(senderUrl),
+                PRODUCTION_DIST_DIRECTORY
+            );
+        }
+    } catch {
+        return false;
+    }
+
+    return false;
+}
 
 /**
  * Structured metadata describing IPC handler execution characteristics.
@@ -474,13 +510,35 @@ export function registerStandardizedIpcHandler<
     try {
         ipcMain.handle(
             channelName,
-            async (_event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
+            async (event: IpcMainInvokeEvent, ...rawArgs: unknown[]) => {
+                if (!isTrustedIpcSender(event)) {
+                    logger.warn(
+                        "[IpcHandler] Rejected IPC invocation from untrusted sender",
+                        withLogContext({
+                            channel: channelName,
+                            event: "ipc:handler:untrusted-sender",
+                            severity: "warn",
+                        }),
+                        {
+                            senderUrl: event.senderFrame?.url,
+                        }
+                    );
+
+                    return createErrorResponse(
+                        `Untrusted IPC sender for ${channelLabel}.`,
+                        {
+                            handler: channelName,
+                        }
+                    );
+                }
+
                 const { args, correlationId } =
                     extractIpcCorrelationContext(rawArgs);
                 const argCount = args.length;
 
-                const correlationMetadata =
-                    isDefined(correlationId) ? { correlationId } : {};
+                const correlationMetadata = isDefined(correlationId)
+                    ? { correlationId }
+                    : {};
 
                 // Preserve the dedicated error message for "no-param" channels that
                 // do not use validators.
@@ -557,9 +615,9 @@ export function registerStandardizedIpcHandler<
                 }
 
                 if (validateParams === null) {
-                    const handlerArgs = castUnchecked<ChannelParams<TChannel>>(
-                        [...args]
-                    );
+                    const handlerArgs = castUnchecked<ChannelParams<TChannel>>([
+                        ...args,
+                    ]);
                     return withIpcHandler(
                         channelName,
                         () => handler(...handlerArgs),
@@ -567,9 +625,9 @@ export function registerStandardizedIpcHandler<
                     );
                 }
 
-                const validatedArgs = castUnchecked<ChannelParams<TChannel>>(
-                    [...args]
-                );
+                const validatedArgs = castUnchecked<ChannelParams<TChannel>>([
+                    ...args,
+                ]);
                 return withIpcHandlerValidation(
                     channelName,
                     (...validatedParams: ChannelParams<TChannel>) =>
@@ -583,10 +641,9 @@ export function registerStandardizedIpcHandler<
     } catch (rawError) {
         registeredHandlers.delete(channelName);
 
-        const error =
-            Error.isError(rawError)
-                ? rawError
-                : new Error(getUserFacingErrorDetail(rawError));
+        const error = Error.isError(rawError)
+            ? rawError
+            : new Error(getUserFacingErrorDetail(rawError));
 
         logger.error(
             `[IpcService] Failed to register IPC handler for channel '${channelLabel}'`,

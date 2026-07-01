@@ -52,7 +52,7 @@ const applyDeltaToSites = (
     const { addedSites, updatedSites } = sanitizedDelta;
 
     const updatedByIdentifier = new Map(
-        updatedSites.map((site) => [site, site.identifier] as const)
+        updatedSites.map((site) => [site.identifier, site] as const)
     );
 
     const nextSites: Site[] = [];
@@ -125,7 +125,7 @@ export function createStateSyncEventHandler(
             siteIdentifier,
             source,
             timestamp,
-            ...((typeof sitesCount === "number") && { sitesCount }),
+            ...(typeof sitesCount === "number" && { sitesCount }),
         });
     };
 

@@ -18,13 +18,7 @@ interface IndexDefinition {
     tableName: string;
     columns: string[];
     indexType:
-        | "btree"
-        | "hash"
-        | "gin"
-        | "gist"
-        | "bitmap"
-        | "clustered"
-        | "covering";
+        "btree" | "hash" | "gin" | "gist" | "bitmap" | "clustered" | "covering";
     isUnique: boolean;
     isPrimaryKey: boolean;
     isClustered: boolean;
@@ -88,10 +82,7 @@ interface QueryOptimizationResult {
     costBefore: number;
     costAfter: number;
     scanType:
-        | "table-scan"
-        | "index-scan"
-        | "index-seek"
-        | "clustered-index-scan";
+        "table-scan" | "index-scan" | "index-seek" | "clustered-index-scan";
     cardinalityEstimate: number;
     optimizationTechnique: string[];
 }

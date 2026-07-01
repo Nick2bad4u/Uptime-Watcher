@@ -18,14 +18,14 @@ tags:
 
 ## Table of Contents
 
-1. [Quick Decision Tree](#quick-decision-tree)
-2. [Current Architecture Patterns](#current-architecture-patterns)
-3. [Data Flow Integration](#data-flow-integration)
-4. [Current Store Examples](#current-store-examples)
-5. [Migration Guidelines](#migration-guidelines)
-6. [Best Practices](#best-practices)
-7. [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
-8. [Related Documentation](#related-documentation)
+- [Quick Decision Tree](#quick-decision-tree)
+- [Current Architecture Patterns](#current-architecture-patterns)
+- [Data Flow Integration](#data-flow-integration)
+- [Current Store Examples](#current-store-examples)
+- [Migration Guidelines](#migration-guidelines)
+- [Best Practices](#best-practices)
+- [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+- [Related Documentation](#related-documentation)
 
 ## Quick Decision Tree
 

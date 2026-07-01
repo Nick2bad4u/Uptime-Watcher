@@ -118,8 +118,8 @@ export interface ServiceInfo {
  * orchestration.
  *
  * @remarks
- * Provides singleton access to all core, app, feature, and utility
- * services. Ensures correct initialization order and dependency injection.
+ * Provides singleton access to all core, app, feature, and utility services.
+ * Ensures correct initialization order and dependency injection.
  *
  * @public
  */
@@ -128,9 +128,9 @@ export class ServiceContainer {
      * Singleton instance of the ServiceContainer.
      *
      * @remarks
-     * Maintains the single instance of the ServiceContainer across the
-     * app lifecycle. Initialized via getInstance() method and ensures
-     * all services are managed through a single container.
+     * Maintains the single instance of the ServiceContainer across the app
+     * lifecycle. Initialized via getInstance() method and ensures all services
+     * are managed through a single container.
      *
      * @internal
      */

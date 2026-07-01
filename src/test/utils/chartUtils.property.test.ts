@@ -19,9 +19,10 @@
  */
 
 import type { UnknownRecord } from "type-fest";
+import type { Arbitrary } from "fast-check";
 
 import fc from "fast-check";
-import { arrayJoin, objectFromEntries, safeCastTo   } from "ts-extras";
+import { arrayJoin, objectFromEntries, safeCastTo } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -526,8 +527,9 @@ describe("Chart Utils Property-Based Tests", () => {
                         const result = getScaleProperty(config, axis, property);
 
                         // Always assert something (repo enforces requireAssertions).
-                        const scale = safeCastTo<| undefined
-                            | UnknownRecord>(config.scales?.[axis]);
+                        const scale = safeCastTo<undefined | UnknownRecord>(
+                            config.scales?.[axis]
+                        );
                         const expected = scale?.[property];
                         expect(result).toEqual(expected);
 
@@ -681,7 +683,10 @@ describe("Chart Utils Property-Based Tests", () => {
                                     })
                                 ),
                             ])
-                        )
+                        ) as Record<
+                            string,
+                            Arbitrary<boolean | number | string>
+                        >
                     ),
                 }),
             });

@@ -41,7 +41,7 @@ import {
 import { validateMonitorType } from "@shared/utils/validation";
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import { arrayIncludes, isInteger  } from "ts-extras";
+import { arrayIncludes, isInteger } from "ts-extras";
 import { describe, expect } from "vitest";
 
 describe("type Guards Advanced Fuzzing Tests", () => {
@@ -436,7 +436,10 @@ describe("type Guards Advanced Fuzzing Tests", () => {
                     "dns",
                     "ssl",
                 ];
-                const isExpectedResult = arrayIncludes(validTypes, monitorType as string);
+                const isExpectedResult = arrayIncludes(
+                    validTypes,
+                    monitorType as string
+                );
 
                 expect(isResult).toBe(isExpectedResult);
             }

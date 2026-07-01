@@ -115,8 +115,8 @@ function createLogger(prefix: string): Logger {
  *
  * @remarks
  * Uses "BACKEND" prefix to distinguish from specialized loggers. This is the
- * primary logger for general app events, startup/shutdown,
- * configuration changes, and other non-specific operations.
+ * primary logger for general app events, startup/shutdown, configuration
+ * changes, and other non-specific operations.
  *
  * @example
  *

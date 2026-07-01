@@ -211,9 +211,7 @@ function applyLintCompliantTransforms(codegenOutput) {
     }
 
     // Batch title transformations using a single regex and replacer
-    const titleKeys = Object.keys(titleTransforms).map((k) =>
-        RegExp.escape(k)
-    );
+    const titleKeys = Object.keys(titleTransforms).map((k) => RegExp.escape(k));
     if (titleKeys.length > 0) {
         const titleRegex = new RegExp(titleKeys.join("|"), "g");
         transformed = transformed.replace(
@@ -261,23 +259,21 @@ function applyLintCompliantTransforms(codegenOutput) {
         // Determine describe block name
         const firstTestTitleMatch =
             testCases.length > 0 && testCases[0]
-                ? (/test\("([^"]+)"/v.exec(testCases[0].code))
+                ? /test\("([^"]+)"/v.exec(testCases[0].code)
                 : null;
-        const describeName =
-            firstTestTitleMatch?.[1]
-                ? firstTestTitleMatch[1]
-                      .replace(/^should\s+/v, "")
-                      .replaceAll(/\s+/gv, " ")
-                : "Generated Test";
+        const describeName = firstTestTitleMatch?.[1]
+            ? firstTestTitleMatch[1]
+                  .replace(/^should\s+/v, "")
+                  .replaceAll(/\s+/gv, " ")
+            : "Generated Test";
 
         // Insert describe block after last import
         const insertionIndex = lastImportMatch
             ? lastImportMatch.index + lastImportMatch[0].length
             : 0;
-        const describeBlock =
-            `\n\ntest.describe("${describeName}", () => {\n${
-            testCases.map((tc) => tc.code).join("\n\n")
-            }\n});\n`;
+        const describeBlock = `\n\ntest.describe("${describeName}", () => {\n${testCases
+            .map((tc) => tc.code)
+            .join("\n\n")}\n});\n`;
 
         transformed =
             codeWithoutTests.slice(0, insertionIndex) +

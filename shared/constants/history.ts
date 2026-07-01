@@ -36,9 +36,13 @@ export class HistoryLimitMaximumExceededError extends RangeError {
 
     public readonly candidate: number;
 
-    public constructor(args: { candidate: number; maxLimit: number }, options: ErrorOptions) {
+    public constructor(
+        args: { candidate: number; maxLimit: number },
+        options?: ErrorOptions
+    ) {
         super(
-            `History limit exceeds maximum of ${args.maxLimit}, received: ${args.candidate}`, options
+            `History limit exceeds maximum of ${args.maxLimit}, received: ${args.candidate}`,
+            options
         );
         this.name = "HistoryLimitMaximumExceededError";
         this.candidate = args.candidate;

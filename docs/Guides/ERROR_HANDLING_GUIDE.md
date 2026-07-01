@@ -62,18 +62,18 @@ At a high level, error handling is layered as follows:
 
 ## Table of Contents
 
-1. [Centralized Error Store](#centralized-error-store)
-2. [Shared Error Handling Utilities](#shared-error-handling-utilities)
-3. [Frontend Error Patterns](#frontend-error-patterns)
-4. [Backend Error Patterns](#backend-error-patterns)
-5. [Event System Error Handling](#event-system-error-handling)
-6. [Component Error Boundaries](#component-error-boundaries)
-7. [Validation Error Handling](#validation-error-handling)
-8. [Testing Error Scenarios](#testing-error-scenarios)
-9. [Best Practices](#best-practices)
-10. [Summary](#summary)
-11. [📚 Related Resources](#-related-resources)
-12. [🎯 Quick Reference](#-quick-reference)
+- [Centralized Error Store](#centralized-error-store)
+- [Shared Error Handling Utilities](#shared-error-handling-utilities)
+- [Frontend Error Patterns](#frontend-error-patterns)
+- [Backend Error Patterns](#backend-error-patterns)
+- [Event System Error Handling](#event-system-error-handling)
+- [Component Error Boundaries](#component-error-boundaries)
+- [Validation Error Handling](#validation-error-handling)
+- [Testing Error Scenarios](#testing-error-scenarios)
+- [Best Practices](#best-practices)
+- [Summary](#summary)
+- [📚 Related Resources](#-related-resources)
+- [🎯 Quick Reference](#-quick-reference)
 
 ## Centralized Error Store
 

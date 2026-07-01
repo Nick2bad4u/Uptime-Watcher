@@ -143,9 +143,7 @@ function ensureMonitorDynamicColumns(database: Database): void {
         const column = escapeSqlIdentifier(def.columnName);
         const sqlType = def.sqlType === "INTEGER" ? "INTEGER" : "TEXT";
 
-        database.run(
-            `ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`
-        );
+        database.run(`ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`);
         existingColumns.add(def.columnName);
     }
 }

@@ -19,18 +19,18 @@ tags:
 
 ## Table of Contents
 
-1. [Status](#status)
-2. [Context](#context)
-3. [Decision](#decision)
-4. [Store Categories](#store-categories)
-5. [State Update Patterns](#state-update-patterns)
-6. [Integration with IPC](#integration-with-ipc)
-7. [Testing Patterns](#testing-patterns)
-8. [Consequences](#consequences)
-9. [Implementation Guidelines](#implementation-guidelines)
-10. [Compliance](#compliance)
-11. [Store Pattern Examples](#store-pattern-examples)
-12. [Related ADRs](#related-adrs)
+- [Status](#status)
+- [Context](#context)
+- [Decision](#decision)
+- [Store Categories](#store-categories)
+- [State Update Patterns](#state-update-patterns)
+- [Integration with IPC](#integration-with-ipc)
+- [Testing Patterns](#testing-patterns)
+- [Consequences](#consequences)
+- [Implementation Guidelines](#implementation-guidelines)
+- [Compliance](#compliance)
+- [Store Pattern Examples](#store-pattern-examples)
+- [Related ADRs](#related-adrs)
 
 ## Status
 
@@ -732,9 +732,7 @@ export const useStore = create<Store>()((set, get) => ({
  // Actions
  action: (params) => {
   logStoreAction("StoreName", "action", { params });
-  set((state) => ({
-   /* immutable update */
-  }));
+  set((state) => ({/* immutable update */}));
  },
 }));
 ```

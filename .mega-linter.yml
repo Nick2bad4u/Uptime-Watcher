@@ -3,7 +3,7 @@
 # Config file references
 ACTION_ACTIONLINT_CONFIG_FILE: "config/linting/ActionLintConfig.yaml"
 # Fixes
-APPLY_FIXES: all
+APPLY_FIXES: "all"
 BITBUCKET_COMMENT_REPORTER: false
 # Reporters configuration
 CONFIG_REPORTER: true
@@ -11,45 +11,45 @@ CONSOLE_REPORTER: true
 CONSOLE_REPORTER_SECTIONS: true
 COPYPASTE_JSCPD_CONFIG_FILE: "config/linting/jscpd.json"
 CSS_STYLELINT_CONFIG_FILE: "stylelint.config.mjs"
-DEFAULT_BRANCH: main
+DEFAULT_BRANCH: "main"
 DEFAULT_WORKSPACE: "/tmp/lint"
 # Core configuration
 DISABLE_ERRORS: true
 # Disabled linters (use project-specific tools instead)
 DISABLE_LINTERS:
-    - CSS_STYLELINT # Using project stylelint config
-    - TYPESCRIPT_STANDARD # Using ESLint + Prettier
-    - JAVASCRIPT_PRETTIER
-    - JSON_PRETTIER
-    - YAML_PRETTIER
-    - TYPESCRIPT_ES # Using ESLint + Prettier
-    - JAVASCRIPT_ES # Using ESLint + Prettier
-    - JSX_ESLINT # Using ESLint + Prettier
-    - CREDENTIALS_SECRETLINT # Using secretlint
-    - REPOSITORY_SECRETLINT # Using secretlint
-    - TSX_ESLINT # Using ESLint + Prettier
-    - TYPESCRIPT_PRETTIER
-    - JSON_PRETTIER
-    - JSON_JSONLINT
-    - JSON_ESLINT_PLUGIN_JSONC
+    - "CSS_STYLELINT" # Using project stylelint config
+    - "TYPESCRIPT_STANDARD" # Using ESLint + Prettier
+    - "JAVASCRIPT_PRETTIER"
+    - "JSON_PRETTIER"
+    - "YAML_PRETTIER"
+    - "TYPESCRIPT_ES" # Using ESLint + Prettier
+    - "JAVASCRIPT_ES" # Using ESLint + Prettier
+    - "JSX_ESLINT" # Using ESLint + Prettier
+    - "CREDENTIALS_SECRETLINT" # Using secretlint
+    - "REPOSITORY_SECRETLINT" # Using secretlint
+    - "TSX_ESLINT" # Using ESLint + Prettier
+    - "TYPESCRIPT_PRETTIER"
+    - "JSON_PRETTIER"
+    - "JSON_JSONLINT"
+    - "JSON_ESLINT_PLUGIN_JSONC"
 
 EMAIL_REPORTER: false
 
 ERROR_ON_MISSING_EXEC_BIT: false
 # Excluded directories
 EXCLUDED_DIRECTORIES:
-    - node_modules
-    - dist
-    - coverage
-    - docs
-    - icons
-    - assets
-    - screenshots
-    - libs
-    - tests
-    - .git
-    - .vscode
-    - .idea
+    - "node_modules"
+    - "dist"
+    - "coverage"
+    - "docs"
+    - "icons"
+    - "assets"
+    - "screenshots"
+    - "libs"
+    - "tests"
+    - ".git"
+    - ".vscode"
+    - ".idea"
 
 FAIL_IF_MISSING_LINTER_IN_FLAVOR: true
 
@@ -65,43 +65,43 @@ HTML_HTMLHINT_CONFIG_FILE: "config/linting/.htmlhintrc"
 IGNORE_GENERATED_FILES: true
 IGNORE_GITIGNORED_FILES: true
 # Linters configuration
-JAVASCRIPT_DEFAULT_STYLE: prettier
+JAVASCRIPT_DEFAULT_STYLE: "prettier"
 JAVASCRIPT_PRETTIER_CONFIG_FILE: ".prettierrc"
 JSON_PRETTIER_CONFIG_FILE: ".prettierrc"
 # Error handling for specific linters
 JSON_PRETTIER_DISABLE_ERRORS: true
 JSON_REPORTER: true
-JSON_REPORTER_OUTPUT_DETAIL: detailed
+JSON_REPORTER_OUTPUT_DETAIL: "detailed"
 JSON_V8R_DISABLE_ERRORS_IF_LESS_THAN: 2
 # LLM Advisor configuration
 LLM_ADVISOR_ENABLED: true
-LLM_ADVISOR_LEVEL: WARNING
+LLM_ADVISOR_LEVEL: "WARNING"
 LLM_ADVISOR_POSITION: "after_linter_output"
 LLM_MAX_TOKENS: "1048576"
 LLM_MODEL_NAME: "gemini-2.5-flash"
-LLM_PROVIDER: google
+LLM_PROVIDER: "google"
 LLM_TEMPERATURE: "0.03"
 # Logging configuration
 LOG_FILE: ".mega-linter.log"
-LOG_LEVEL: WARNING
+LOG_LEVEL: "WARNING"
 #  Markdown configuration
-MARKDOWN_DEFAULT_STYLE: markdownlint
+MARKDOWN_DEFAULT_STYLE: "markdownlint"
 MARKDOWN_MARKDOWNLINT_CONFIG_FILE: "config/linting/markdownlint.json"
 MARKDOWN_MARKDOWN_LINK_CHECK_CONFIG_FILE: "config/tools/.markdown-link-check.json"
 MARKDOWN_MARKDOWN_TABLE_FORMATTER_FILTER_REGEX_EXCLUDE: "^.*(CHANGELOG|README|SECURITY)\\.md$"
 MARKDOWN_SUMMARY_REPORTER: true
-OUTPUT_DETAIL: simple
+OUTPUT_DETAIL: "simple"
 # Schema: https://raw.githubusercontent.com/megalinter/megalinter/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json
 # Performance optimizations
 PARALLEL: true
 # Security and analysis plugins
 PLUGINS:
-    - https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-repolinter/refs/heads/main/mega-linter-plugin-repolinter/repolinter.megalinter-descriptor.yml
-    - https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml
-    - https://raw.githubusercontent.com/ssc-services/mega-linter-plugin-salt/main/mega-linter-plugin-salt/salt.megalinter-descriptor.yml
-    - https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml
-    - https://raw.githubusercontent.com/hype8912/check-toml-megalinter-plugin/main/mega-linter-plugin-checktoml/checktoml.megalinter-descriptor.yml
-    - https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-fmlint/refs/heads/main/mega-linter-plugin-fmlint/fmlint.megalinter-descriptor.yml
+    - "https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-repolinter/refs/heads/main/mega-linter-plugin-repolinter/repolinter.megalinter-descriptor.yml"
+    - "https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml"
+    - "https://raw.githubusercontent.com/ssc-services/mega-linter-plugin-salt/main/mega-linter-plugin-salt/salt.megalinter-descriptor.yml"
+    - "https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml"
+    - "https://raw.githubusercontent.com/hype8912/check-toml-megalinter-plugin/main/mega-linter-plugin-checktoml/checktoml.megalinter-descriptor.yml"
+    - "https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-fmlint/refs/heads/main/mega-linter-plugin-fmlint/fmlint.megalinter-descriptor.yml"
 PRINT_ALL_FILES: false
 PRINT_ALPACA: true
 REPOSITORY_CHECKOV_CONFIG_FILE: "config/linting/.checkov.yml"
@@ -117,7 +117,7 @@ SPELL_CSPELL_CONFIG_FILE: ".cspell.json"
 SPELL_LYCHEE_CONFIG_FILE: "config/tools/lychee.toml"
 TAP_REPORTER: true
 TEXT_REPORTER: true
-TYPESCRIPT_DEFAULT_STYLE: prettier
+TYPESCRIPT_DEFAULT_STYLE: "prettier"
 TYPESCRIPT_STANDARD_DISABLE_ERRORS: true
 UPDATED_SOURCES_REPORTER: true
 VALIDATE_ALL_CODEBASE: true
