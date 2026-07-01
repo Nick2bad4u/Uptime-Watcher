@@ -166,7 +166,7 @@ describe(ApplicationService, () => {
 
         // Reset default mock behavior
         mockApp.whenReady.mockResolvedValue(undefined);
-        mockApp.isReady.mockReturnValue(true);
+        mockApp.isReady.mockReturnValue(false);
         mockServiceContainer.initialize.mockResolvedValue(undefined);
         mockUptimeOrchestrator.initialize.mockResolvedValue(undefined);
 

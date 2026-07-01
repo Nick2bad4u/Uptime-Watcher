@@ -89,6 +89,7 @@ vi.mock("electron", () => ({
         getName: vi.fn(() => "Uptime Watcher"),
         getPath: vi.fn((name: string) => `/mock/path/${name}`),
         getVersion: vi.fn(() => "1.0.0"),
+        isReady: vi.fn(() => false),
         isPackaged: false,
         on: vi.fn(),
         quit: vi.fn(),

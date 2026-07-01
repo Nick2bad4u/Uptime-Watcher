@@ -200,7 +200,16 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
     });
 
     describe(safePropertyAccess, () => {
-        test.prop([fc.object(), fc.string()])(
+        const safeDynamicKey = fc
+            .string()
+            .filter(
+                (key) =>
+                    key !== "__proto__" &&
+                    key !== "constructor" &&
+                    key !== "prototype"
+            );
+
+        test.prop([fc.object(), safeDynamicKey])(
             "should return property value when property exists",
             (obj, key) => {
                 // Add the key as an own data property. Object spread cannot

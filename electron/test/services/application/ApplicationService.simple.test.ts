@@ -23,6 +23,7 @@ vi.mock("../../../utils/logger", () => ({
 
 vi.mock("electron", () => ({
     app: {
+        isReady: vi.fn(() => false),
         on: vi.fn(),
         setUserTasks: vi.fn(),
         setAppUserModelId: vi.fn(),

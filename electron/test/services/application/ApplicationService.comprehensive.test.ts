@@ -13,6 +13,7 @@ import { ApplicationService } from "../../../services/application/ApplicationSer
 // Mock Electron app
 vi.mock("electron", () => ({
     app: {
+        isReady: vi.fn(() => false),
         on: vi.fn(),
         off: vi.fn(),
         quit: vi.fn(),
@@ -200,6 +201,7 @@ describe(ApplicationService, () => {
         // Get the mocked app reference
         const electron = await import("electron");
         mockApp = vi.mocked(electron).app;
+        mockApp.isReady.mockReturnValue(false);
 
         // Setup mock returns
         mockServiceContainer.getInstance.mockReturnValue(mockServiceContainer);
